@@ -1,7 +1,7 @@
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
@@ -12,9 +12,45 @@ namespace Cms;
 
 use Fuel\Core\Uri;
 
-class Model_Page extends Model {
+class Model_Page_Page extends \Cms\Model {
     protected static $_table_name = 'cms_page';
     protected static $_primary_key = array('page_id');
+
+	protected static $_has_many = array(
+		'childrens' => array(
+			'key_from'       => 'page_id',
+			'model_to'       => '\Cms\Model_Page_Page',
+			'key_to'         => 'page_pere_id',
+			'cascade_save'   => false,
+			'cascade_delete' => false,
+		),
+	);
+
+	public static $_has_one = array();
+
+	protected static $_belongs_to = array(
+		'parent' => array(
+			'key_from'       => 'page_pere_id',
+			'model_to'       => '\Cms\Model_Page_Page',
+			'key_to'         => 'page_id',
+			'cascade_save'   => false,
+			'cascade_delete' => false,
+		),
+		'racine' => array(
+			'key_from'       => 'page_rac_id',
+			'model_to'       => '\Cms\Model_Page_Root',
+			'key_to'         => 'rac_id',
+			'cascade_save'   => false,
+			'cascade_delete' => false,
+		),
+	);
+
+	const TYPE_CLASSIC       = 0;
+	const TYPE_POPUP         = 1;
+	const TYPE_FOLDER        = 2;
+	const TYPE_EXTERNAL_LINK = 3;
+	const TYPE_INTERNAL_LINK = 4;
+	const TYPE_OTHER_PAGE    = 5;
 
     /**
      * Creates a new query with optional settings up front
@@ -22,12 +58,11 @@ class Model_Page extends Model {
      * @param   array
      * @return  Query
      */
+	/*
     public static function query($options = array())
     {
         return parent::query($options + array('order_by' => array('page_rang')));
-    }
-
-    const TYPE_EXTERNAL_LINK = 3;
+    }*/
 
     public function get_link() {
         return 'href="'.$this->get_href().'"';
@@ -58,6 +93,40 @@ class Model_Page extends Model {
         }
         return $url;
     }
+
+    /*
+
+	public static function set_wysiwyg($names) {
+		foreach ($names as $name) {
+			$relation = 'wysiwyg_'.$name;
+			static::$_has_one[$relation] = array(
+				'key_from' => array('page_id', 'wysiwyg_key'),
+				'model_to' => 'Cms\Page\Model_Wysiwyg',
+				'key_to' => array('wysiwyg_foreign_id', 'wysiwyg_key'),
+				'cascade_save' => false,
+				'cascade_delete' => false,
+				//'conditions' => array(
+				//	'where' => array(
+				//		'wysiwyg_key' => 'cms_page.'.$name,
+				//	),
+				//),
+			);
+		}
+	}
+
+	public function wysiwyg($wysiwyg_name) {
+		$this->wysiwyg_key = 'cms_page.'.$wysiwyg_name;
+		$relation = 'wysiwyg_'.$wysiwyg_name;
+		if (empty($this->$relation)) {
+			$this->$relation = new Model_Wysiwyg(array(
+				'wysiwyg_text' => '',
+				'wysiwyg_key' => $this->wysiwyg_key,
+				'wysiwyg_foreign_id' => $this->page_id,
+			), true);
+		}
+		return $this->$relation;
+	}
+    */
 
 
 
