@@ -10,17 +10,14 @@
 
 namespace Cms;
 
-use Fuel\Core\Uri;
+use Fuel\Core\Config;
 
-class Model_Media_Path extends Model {
-    protected static $_table_name = 'cms_media_path';
-    protected static $_primary_key = array('medip_id');
+class Controller_Admin_Media_List extends Controller_Mp3table_List {
 
-    /**
-     * Properties
-     * medip_id
-     * medip_parent_id
-     * medip_path
-     * medip_title
-     */
+	public function before() {
+		Config::load('cms::admin/media/media', true);
+		$this->config = \Config::getFromUser('cms::admin/media/media', array());
+
+		parent::before();
+	}
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
@@ -12,9 +12,45 @@ namespace Cms;
 
 use Fuel\Core\Uri;
 
-class Model_Page extends Model {
+class Model_Page_Page extends \Cms\Model {
     protected static $_table_name = 'cms_page';
     protected static $_primary_key = array('page_id');
+
+	protected static $_has_many = array(
+		'childrens' => array(
+			'key_from'       => 'page_id',
+			'model_to'       => '\Cms\Model_Page_Page',
+			'key_to'         => 'page_pere_id',
+			'cascade_save'   => false,
+			'cascade_delete' => false,
+		),
+	);
+
+	public static $_has_one = array();
+
+	protected static $_belongs_to = array(
+		'parent' => array(
+			'key_from'       => 'page_pere_id',
+			'model_to'       => '\Cms\Model_Page_Page',
+			'key_to'         => 'page_id',
+			'cascade_save'   => false,
+			'cascade_delete' => false,
+		),
+		'racine' => array(
+			'key_from'       => 'page_rac_id',
+			'model_to'       => '\Cms\Model_Page_Root',
+			'key_to'         => 'rac_id',
+			'cascade_save'   => false,
+			'cascade_delete' => false,
+		),
+	);
+
+	const TYPE_CLASSIC       = 0;
+	const TYPE_POPUP         = 1;
+	const TYPE_FOLDER        = 2;
+	const TYPE_EXTERNAL_LINK = 3;
+	const TYPE_INTERNAL_LINK = 4;
+	const TYPE_OTHER_PAGE    = 5;
 
     /**
      * Creates a new query with optional settings up front
@@ -22,12 +58,11 @@ class Model_Page extends Model {
      * @param   array
      * @return  Query
      */
+	/*
     public static function query($options = array())
     {
         return parent::query($options + array('order_by' => array('page_rang')));
-    }
-
-    const TYPE_EXTERNAL_LINK = 3;
+    }*/
 
     public function get_link() {
         return 'href="'.$this->get_href().'"';
@@ -59,8 +94,42 @@ class Model_Page extends Model {
         return $url;
     }
 
+    /*
+
+	public static function set_wysiwyg($names) {
+		foreach ($names as $name) {
+			$relation = 'wysiwyg_'.$name;
+			static::$_has_one[$relation] = array(
+				'key_from' => array('page_id', 'wysiwyg_key'),
+				'model_to' => 'Cms\Page\Model_Wysiwyg',
+				'key_to' => array('wysiwyg_foreign_id', 'wysiwyg_key'),
+				'cascade_save' => false,
+				'cascade_delete' => false,
+				//'conditions' => array(
+				//	'where' => array(
+				//		'wysiwyg_key' => 'cms_page.'.$name,
+				//	),
+				//),
+			);
+		}
+	}
+
+	public function wysiwyg($wysiwyg_name) {
+		$this->wysiwyg_key = 'cms_page.'.$wysiwyg_name;
+		$relation = 'wysiwyg_'.$wysiwyg_name;
+		if (empty($this->$relation)) {
+			$this->$relation = new Model_Wysiwyg(array(
+				'wysiwyg_text' => '',
+				'wysiwyg_key' => $this->wysiwyg_key,
+				'wysiwyg_foreign_id' => $this->page_id,
+			), true);
+		}
+		return $this->$relation;
+	}
+    */
 
 
+/*
     protected static $_properties = array (
 		'page_id' => array (
 			'type' => 'int',
@@ -122,6 +191,20 @@ class Model_Page extends Model {
 			'key' => 'MUL',
 			'privileges' => 'select,insert,update,references',
 		),
+        'page_gab' => array (
+            'type' => 'string',
+            'name' => 'page_titre',
+            'default' => '',
+            'data_type' => 'page_gab',
+            'null' => false,
+            'ordinal_position' => 5,
+            'character_maximum_length' => '255',
+            'collation_name' => 'latin1_general_ci',
+            'comment' => '',
+            'extra' => '',
+            'key' => '',
+            'privileges' => 'select,insert,update,references',
+        ),
 		'page_niveau' => array (
 			'type' => 'int',
 			'min' => '-128',
@@ -130,7 +213,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 5,
+			'ordinal_position' => 6,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -143,7 +226,7 @@ class Model_Page extends Model {
 			'default' => '',
 			'data_type' => 'varchar',
 			'null' => false,
-			'ordinal_position' => 6,
+			'ordinal_position' => 7,
 			'character_maximum_length' => '255',
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
@@ -157,7 +240,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'varchar',
 			'null' => true,
-			'ordinal_position' => 7,
+			'ordinal_position' => 8,
 			'character_maximum_length' => '255',
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
@@ -171,7 +254,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'varchar',
 			'null' => true,
-			'ordinal_position' => 8,
+			'ordinal_position' => 9,
 			'character_maximum_length' => '255',
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
@@ -186,7 +269,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'text',
 			'null' => true,
-			'ordinal_position' => 9,
+			'ordinal_position' => 10,
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
 			'extra' => '',
@@ -200,7 +283,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'text',
 			'null' => true,
-			'ordinal_position' => 10,
+			'ordinal_position' => 11,
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
 			'extra' => '',
@@ -214,7 +297,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'text',
 			'null' => true,
-			'ordinal_position' => 11,
+			'ordinal_position' => 12,
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
 			'extra' => '',
@@ -229,7 +312,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => true,
-			'ordinal_position' => 12,
+			'ordinal_position' => 13,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -242,7 +325,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'float',
 			'null' => true,
-			'ordinal_position' => 13,
+			'ordinal_position' => 14,
 			'comment' => '',
 			'extra' => '',
 			'key' => '',
@@ -256,7 +339,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 14,
+			'ordinal_position' => 15,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -271,7 +354,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 15,
+			'ordinal_position' => 16,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -286,7 +369,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 16,
+			'ordinal_position' => 17,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -299,7 +382,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'datetime',
 			'null' => true,
-			'ordinal_position' => 17,
+			'ordinal_position' => 18,
 			'comment' => '',
 			'extra' => '',
 			'key' => '',
@@ -313,7 +396,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint unsigned',
 			'null' => false,
-			'ordinal_position' => 18,
+			'ordinal_position' => 19,
 			'display' => '1',
 			'comment' => '',
 			'extra' => '',
@@ -328,7 +411,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'int',
 			'null' => true,
-			'ordinal_position' => 19,
+			'ordinal_position' => 20,
 			'display' => '11',
 			'comment' => '',
 			'extra' => '',
@@ -343,7 +426,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 20,
+			'ordinal_position' => 21,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -358,7 +441,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 21,
+			'ordinal_position' => 22,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -373,7 +456,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'tinyint',
 			'null' => false,
-			'ordinal_position' => 22,
+			'ordinal_position' => 23,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -388,7 +471,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'int',
 			'null' => true,
-			'ordinal_position' => 23,
+			'ordinal_position' => 24,
 			'display' => '11',
 			'comment' => '',
 			'extra' => '',
@@ -401,7 +484,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'varchar',
 			'null' => true,
-			'ordinal_position' => 24,
+			'ordinal_position' => 25,
 			'character_maximum_length' => '50',
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
@@ -415,7 +498,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'varchar',
 			'null' => true,
-			'ordinal_position' => 25,
+			'ordinal_position' => 26,
 			'character_maximum_length' => '255',
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
@@ -429,7 +512,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'varchar',
 			'null' => true,
-			'ordinal_position' => 26,
+			'ordinal_position' => 27,
 			'character_maximum_length' => '255',
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
@@ -445,7 +528,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'tinyint',
 			'null' => true,
-			'ordinal_position' => 27,
+			'ordinal_position' => 28,
 			'display' => '4',
 			'comment' => '',
 			'extra' => '',
@@ -460,7 +543,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'int',
 			'null' => false,
-			'ordinal_position' => 28,
+			'ordinal_position' => 29,
 			'display' => '11',
 			'comment' => '',
 			'extra' => '',
@@ -475,7 +558,7 @@ class Model_Page extends Model {
 			'default' => '0',
 			'data_type' => 'int',
 			'null' => false,
-			'ordinal_position' => 29,
+			'ordinal_position' => 30,
 			'display' => '11',
 			'comment' => '',
 			'extra' => '',
@@ -489,7 +572,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'text',
 			'null' => true,
-			'ordinal_position' => 30,
+			'ordinal_position' => 31,
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
 			'extra' => '',
@@ -503,7 +586,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'text',
 			'null' => true,
-			'ordinal_position' => 31,
+			'ordinal_position' => 32,
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
 			'extra' => '',
@@ -517,7 +600,7 @@ class Model_Page extends Model {
 			'default' => null,
 			'data_type' => 'text',
 			'null' => true,
-			'ordinal_position' => 32,
+			'ordinal_position' => 33,
 			'collation_name' => 'latin1_general_ci',
 			'comment' => '',
 			'extra' => '',
@@ -525,4 +608,5 @@ class Model_Page extends Model {
 			'privileges' => 'select,insert,update,references',
 		),
 	);
+*/
 }
