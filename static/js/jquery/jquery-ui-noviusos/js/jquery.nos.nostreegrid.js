@@ -10,6 +10,7 @@
 define([
 	'jquery-nos'
 ], function( $, undefined ) {
+    "use strict";
 	$.widget( "nos.nostreegrid", $.nos.nosgrid, {
 		options: {
             treeUrl : '',
@@ -107,8 +108,8 @@ define([
                     }
                     tr.data('treeNode', node);
                     return true;
-                };
-            }
+                }
+            };
 
             if (o.movable) {
                 o.columns.unshift({
@@ -123,7 +124,7 @@ define([
                             args.$container.append('<div class="ui-icon ui-icon-grip-dotted-vertical nostreegrid-move-handle"></div>');
 
                             return true;
-                        };
+                        }
                     }
                 });
             }
@@ -234,7 +235,7 @@ define([
                         }
                         event.stopImmediatePropagation();
                         self.mousePressed = new Date().getTime();
-                        cloneNode      = $tr.clone();
+                        var cloneNode = $tr.clone();
 
                         self.dragHelper = $('<div class="nostreegrid-drag-helper ui-state-highlight"></div>')
                             .hide()
@@ -410,13 +411,9 @@ define([
 
         _completeChilds : function(parent, childs) {
             var self = this,
-                o = self.options,
                 nb = 0,
                 oItems = {};
 
-            if (childs.length) {
-                delete childs.length;
-            }
             $.each(childs, function(id, child) {
                 $.extend(child, {
                     treeHash : child._model + '|' + child._id,
@@ -435,7 +432,6 @@ define([
 
         _getTreeNode : function(path) {
             var self = this,
-                o = self.options,
                 node = null;
 
             $.each(path, function(i, id) {
@@ -492,8 +488,9 @@ define([
         _toggle : function($tr, open) {
             var self = this,
                 o = self.options,
-                node = $tr.data('treeNode'),
-                open = open === undefined ? $tr.hasClass('ui-icon-triangle-1-e') : open;
+                node = $tr.data('treeNode');
+
+            open = open === undefined ? $tr.hasClass('ui-icon-triangle-1-e') : open;
 
             $tr.find('.nostreegrid-toggle').addClass(open ? 'ui-icon-clock' : 'ui-icon-triangle-1-e')
                 .removeClass(open ? 'ui-icon-triangle-1-e' : 'ui-icon-triangle-1-se');
@@ -510,7 +507,6 @@ define([
 
         _removeNode : function(node) {
             var self = this,
-                o = self.options,
                 removeIndex = false,
                 removeLength = 0,
                 data = self.data();
@@ -534,8 +530,7 @@ define([
         },
 
         reload : function() {
-            var self = this,
-                o = self.options;
+            var self = this;
 
             self.treeDataSource.proxy.options.data.deep = 2;
             delete self.treeDataSource.proxy.options.data.id;

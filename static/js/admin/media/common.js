@@ -10,6 +10,7 @@
 define([
     'jquery-nos'
 ], function($) {
+    "use strict";
     return function(mp3Grid) {
         return {
             actions : {
@@ -67,10 +68,14 @@ define([
                         .css($(ui || this).offset())
                         .appendTo(document.body)
                         .wijlightbox({
+                            zIndex : 1201,
                             textPosition : 'outside',
                             player : 'img',
                             dialogButtons: 'fullsize',
                             modal : true,
+                            open : function() {
+                                $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
+                            },
                             close : function(e) {
                                 lightbox.wijlightbox('destroy');
                                 lightbox.remove();
@@ -159,6 +164,7 @@ define([
                         inputName : 'folder_id',
                         treeGrid : {
                             treeUrl : 'admin/cms/media/inspector/folder/json',
+                            sortable : false,
                             columns : {
                                 title : {
                                     headerText : mp3Grid.i18n('Folder'),

@@ -1477,6 +1477,7 @@
 			if (c = cm.get('styleselect')) {
                 c.showMenu();
                 c.hideMenu();
+                ed.focus();
 
 				formatNames = [];
 				each(c.items, function(item) {
@@ -1964,13 +1965,14 @@
 
 			var dialog = null;
 
-			$.nos.data('tinymce', this);
-
             dialog = $.nos.dialog({
                 destroyOnClose : true,
-				contentUrl: 'admin/cms/wysiwyg/image',
-				title: editCurrentImage ? 'Edit an image' : 'Insert an image',
-				ajax: true
+				contentUrl: 'admin/cms/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
+				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
+				ajax: true,
+                open : function(e) {
+                    $(e.target).data('tinymce', ed);
+                }
 			});
             dialog.bind('insert.media', function(e, img) {
                 // Cleanup

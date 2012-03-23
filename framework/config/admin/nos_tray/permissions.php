@@ -1,3 +1,4 @@
+<?php
 /**
  * NOVIUS OS - Web OS for digital communication
  *
@@ -7,15 +8,13 @@
  * @link http://www.novius-os.org
  */
 
-define([
-    'jquery-nos'
-], function($) {
-    "use strict";
-    return function(mp3Grid) {
-        return {
-            mp3grid : {
-                inspectorsOrder : 'folders,extensions,preview'
-            }
-        }
-    }
-});
+return array(
+	'general' => array(
+		'driver' => 'select',
+		'label'=> 'Access',
+		'driver_config' => array(
+			'choices' => array(
+			),
+		),
+	),
+);

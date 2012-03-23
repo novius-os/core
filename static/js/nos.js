@@ -12,6 +12,7 @@ define([
 		'static/cms/js/vendor/wijmo/js/jquery.wijmo-open.all.2.0.3.min',
 		'static/cms/js/vendor/wijmo/js/jquery.wijmo-complete.all.2.0.3.min'
 	], function($) {
+        "use strict";
         var undefined = void(0);
 
         $.nos = {
@@ -37,8 +38,8 @@ define([
                 require([
                     'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.mp3grid.js',
                     'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.thumbnails.js',
-                    'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.nosgrid.js',
-                    'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.nostreegrid.js',
+                    'order!static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.nosgrid.js',
+                    'order!static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.nostreegrid.js',
                     'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.inspector-preview.js'
                 ], function( $ ) {
 
@@ -361,9 +362,10 @@ define([
                             iconClass = 'ui-icon ui-icon-' + action.icon;
                         }
                         var uiAction = $('<th></th>')
+                            .css('white-space', 'nowrap')
                             .addClass("ui-state-default")
                             .attr('title', action.label)
-                            .html( iconClass ? '<span class="' + iconClass +'"></span>' : '&nbsp;' + action.label + '&nbsp;');
+                            .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
 
                         // Check whether action name is disabled
                         if (action.name && noParseData && noParseData.actions && noParseData.actions[action.name] == false) {
@@ -388,13 +390,15 @@ define([
                             );
                         }
 
-                        if (iconClass) {
+                        if (iconClass && !action.text) {
                             uiAction.css({
                                 width : 20,
                                 textAlign : 'center'
                             }).children().css({
                                 margin : 'auto'
                             });
+                        } else if (iconClass && action.text) {
+                            uiAction.find('span').css('float', 'left');
                         }
 
                         uiAction.appendTo(container.find('tr'));
@@ -691,10 +695,22 @@ define([
                 },
                 success : function(json) {
                     if (json.error) {
-                        $.nos.notify(json.error, 'error');
+                        if ($.isArray(json.error)) {
+                            $.each(json.error, function() {
+                                $.nos.notify(this, 'error');
+                            });
+                        } else {
+                            $.nos.notify(json.error, 'error');
+                        }
                     }
                     if (json.notify) {
-                        $.nos.notify(json.notify);
+                        if ($.isArray(json.notify)) {
+                            $.each(json.notify, function() {
+                                $.nos.notify(this);
+                            });
+                        } else {
+                            $.nos.notify(json.notify);
+                        }
                     }
                     if (json.fireEvent) {
                         if ($.isArray(json.fireEvent)) {
