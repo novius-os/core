@@ -36,11 +36,11 @@ define([
 
 
                 require([
-                    'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.mp3grid.js',
-                    'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.thumbnails.js',
-                    'order!static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.nosgrid.js',
-                    'order!static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.nostreegrid.js',
-                    'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.inspector-preview.js'
+                    'static/cms/admin/novius-os/js/jquery.nos.mp3grid.js',
+                    'static/cms/admin/novius-os/js/jquery.nos.thumbnails.js',
+                    'order!static/cms/admin/novius-os/js/jquery.nos.nosgrid.js',
+                    'order!static/cms/admin/novius-os/js/jquery.nos.nostreegrid.js',
+                    'static/cms/admin/novius-os/js/jquery.nos.inspector-preview.js'
                 ], function( $ ) {
 
                     require(jsonFile, function () {

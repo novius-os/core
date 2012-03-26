@@ -9,7 +9,7 @@
 
 define([
 	'jquery-nos',
-	'static/cms/js/jquery/jquery-ui-noviusos/js/jquery.nos.loadspinner'
+	'static/cms/admin/novius-os/js/jquery.nos.loadspinner'
 ], function( $ ) {
 	(function(undefined ) {
 

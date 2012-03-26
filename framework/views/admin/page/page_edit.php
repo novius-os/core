@@ -14,7 +14,7 @@ require(['jquery-nos'], function ($) {
 	$(function () {
 		$.nos.tabs.update({
 			label : <?= json_encode($page->page_title) ?>,
-			iconUrl : 'static/cms/img/16/page.png'
+			iconUrl : 'static/cms/admin/novius-os/img/16/page.png'
 		});
 	});
 });
@@ -86,7 +86,7 @@ $uniqids = array();
 <script type="text/javascript">
 require([
     'jquery-nos',
-	'static/cms/js/admin/page/form.js',
+	'static/cms/admin/config/page/form.js'
 ], function($, callback_fn) {
 	$(function() {
         var $tabs = $('#<?= $uniqid_tabs ?>');

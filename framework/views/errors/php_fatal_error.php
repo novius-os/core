@@ -61,7 +61,7 @@
 		$(function() {
 			$.nos.tabs.update({
 				label : 'Error - We\'re working on it'
-				//iconUrl : 'static/cms/img/icons/exclamation--frame.png'
+				//iconUrl : 'static/cms/admin/novius-os/img/icons/exclamation--frame.png'
 			});
 		});
 	});
@@ -73,14 +73,14 @@
 ?>
 	<div id="wrapper">
 		<h1>Oops, I'm hurt</h1>
-		<a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/cms/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
+		<a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/cms/admin/novius-os/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
 		<br /><br /><br />
 		<p class="wip">
-			<img src="static/cms/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
+			<img src="static/cms/admin/novius-os/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
 		</p>
 		<br />
 		<p class="wip">
-			<img src="static/cms/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
+			<img src="static/cms/admin/novius-os/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
 		</p>
 		<br style="clear:left;" />
 

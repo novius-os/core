@@ -15,7 +15,7 @@ require(['jquery-nos'], function ($) {
 	$(function () {
 		$.nos.tabs.update($('#<?= $uniqid ?>'), {
 			label : 'Add a new user',
-			iconUrl : 'static/cms/img/16/user.png'
+			iconUrl : 'static/cms/admin/novius-os/img/16/user.png'
 		});
 	});
 

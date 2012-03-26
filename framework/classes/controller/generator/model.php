@@ -28,7 +28,7 @@ class Controller_Generator_Model extends Controller_Generic_Admin {
 
         $this->template->set('base', Uri::base(false), false);
 
-		\Asset::add_path('static/cms/');
+		\Asset::add_path('static/cms/admin/novius-os/');
 		\Asset::add_path('static/cms/admin/vendor/wijmo/');
 		\Asset::css('aristo/jquery-wijmo.css', array(), 'css');
 		\Asset::css('jquery.wijmo-complete.all.2.0.3.min.css', array(), 'css');

@@ -1,6 +1,6 @@
 /*
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
@@ -292,7 +292,7 @@ body {
   width: 78px !important;
   line-height: 56px !important;
   height: 56px !important;
-  background: url(../images/tabs-logo-off.png) no-repeat;
+  background: url(../img/icons/tabs-logo-off.png) no-repeat;
   top: 0px !important;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.ostabs\.scss}line{font-family:\00003297}}
@@ -304,7 +304,7 @@ body {
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.ostabs\.scss}line{font-family:\00003300}}
 .nos-ostabs > .ui-widget-header li.nos-ostabs-appstab.ui-state-active a span.nos-ostabs-icon, .nos-ostabs > .ui-widget-header li.nos-ostabs-appstab.ui-state-hover a span.nos-ostabs-icon {
-  background: url(../images/tabs-logo-on.png) no-repeat;
+  background: url(../img/icons/tabs-logo-on.png) no-repeat;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.ostabs\.scss}line{font-family:\00003305}}
 .nos-ostabs > .ui-widget-header ul.nos-ostabs-appstab {
@@ -313,7 +313,7 @@ body {
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.ostabs\.scss}line{font-family:\00003311}}
 .nos-ostabs #noviusospanel {
-  background-image: url(../../../../img/wallpapers/circles.jpg);
+  background-image: url(../img/wallpapers/circles.jpg);
   background-size: cover;
   top: 64px;
 }

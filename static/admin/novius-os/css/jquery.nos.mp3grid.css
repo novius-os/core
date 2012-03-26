@@ -84,7 +84,7 @@
   margin: 0 -1px;
   background-color: transparent;
   background-position: 50% 50%;
-  background-image: url(../../../../img/icons/grip-v.png);
+  background-image: url(../img/icons/grip-v.png);
   background-repeat: no-repeat;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\0000376}}
@@ -137,7 +137,7 @@
   border-width: 1px 0;
   background-color: transparent;
   background-position: 50% 50%;
-  background-image: url(../../../../img/icons/grip-h.png);
+  background-image: url(../img/icons/grip-h.png);
   background-repeat: no-repeat;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003122}}
@@ -194,22 +194,22 @@
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003170}}
 .nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel2 .nos-mp3grid-searchbar-container .view-list {
-  background-image: url(../images/view-list.png);
+  background-image: url(../img/16/view-list.png);
   background-position: 0 0;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003174}}
 .nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel2 .nos-mp3grid-searchbar-container .view-tree {
-  background-image: url(../images/view-tree.png);
+  background-image: url(../img/16/view-tree.png);
   background-position: 0 0;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003178}}
 .nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel2 .nos-mp3grid-searchbar-container .view-thumbs-small {
-  background-image: url(../images/view-thumbs-small.png);
+  background-image: url(../img/16/view-thumbs-small.png);
   background-position: 0 0;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003182}}
 .nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel2 .nos-mp3grid-searchbar-container .view-thumbs-big {
-  background-image: url(../images/view-thumbs-big.png);
+  background-image: url(../img/16/view-thumbs-big.png);
   background-position: 0 0;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003187}}
@@ -248,7 +248,7 @@
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003218}}
 .nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel2 .nos-mp3grid-searchbar-container .nos-mp3grid-input-container .nos-mp3grid-reset-search span {
   margin-top: -9px;
-  background-image: url(../images/edit-clear-locationbar-rtl.png);
+  background-image: url(../img/16/edit-clear-locationbar-rtl.png);
   background-position: 0 0;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/novius-cloud\/cms\/static\/js\/jquery\/jquery-ui-noviusos\/css\/jquery\.nos\.mp3grid\.scss}line{font-family:\00003225}}

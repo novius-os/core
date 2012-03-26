@@ -15,7 +15,7 @@ define([
         return {
             tab : {
                 label : mp3Grid.i18n('Users'),
-                iconUrl : 'static/cms/img/32/user.png'
+                iconUrl : 'static/cms/admin/novius-os/img/32/user.png'
             },
             actions : {
                 edit : {

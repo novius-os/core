@@ -30,7 +30,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 
         $error = (\Input::method() == 'POST') ? $this->post_login() : '';
 
-		\Asset::add_path('static/cms/');
+		\Asset::add_path('static/cms/admin/novius-os/');
 		\Asset::css('login.css', array(), 'css');
 
         $this->template->body = \View::forge('misc/login', array(

@@ -1,11 +1,11 @@
 /*
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
- */ 
+ */
 @import "compass/css3/gradient";
 @import "compass/css3/box-shadow";
 @import "compass/css3/box-sizing";
@@ -90,7 +90,7 @@ body {
 				display : inline-block;
 			}
 		}
-		
+
 		li.nos-ostabs-appstab {
 		    margin : 0px 30px 0 30px;
 		}
@@ -226,7 +226,7 @@ body {
 				right : 5px;
 				line-height : 18px;
 				z-index : 2;
-			
+
 				a {
 					position : relative;
 					text-decoration : none;
@@ -234,12 +234,12 @@ body {
 					margin-left : 10px;
 					float : right;
 					display : block;
-	
+
 					.ui-icon {
 						float : left;
 					}
 				}
-	
+
 				a.nos-ostabs-unpin {
 					display : none;
 				}
@@ -280,15 +280,15 @@ body {
 			height : 56px !important;
 			background : none;
 			border : 0;
-			
+
 			a {
 				padding : 0;
-			
+
 				span.nos-ostabs-icon {
 					width : 78px !important;
 					line-height : 56px !important;
 					height : 56px !important;
-					background : url(../images/tabs-logo-off.png) no-repeat;
+					background : url(../img/icons/tabs-logo-off.png) no-repeat;
 					top : 0px !important;
 				}
 		    }
@@ -296,9 +296,9 @@ body {
 
 		li.nos-ostabs-appstab.ui-state-active, li.nos-ostabs-appstab.ui-state-hover {
 		    @include box-shadow(none);
-			
+
 			a span.nos-ostabs-icon {
-				background : url(../images/tabs-logo-on.png) no-repeat;
+				background : url(../img/icons/tabs-logo-on.png) no-repeat;
 		    }
 		}
 
@@ -307,9 +307,9 @@ body {
 			padding: 0;
 		}
    }
-   
+
     #noviusospanel {
-        background-image : url(../../../../img/wallpapers/circles.jpg);
+        background-image : url(../img/wallpapers/circles.jpg);
         background-size : cover;
         top : 64px;
 

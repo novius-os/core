@@ -13,8 +13,8 @@ return array(
     array(
         'name' => 'Page',
         'url' => 'admin/cms/page/list/index',
-        'iconUrl' => 'static/cms/img/32/page.png',
-        'icon64' => 'static/cms/img/64/page.png',
+        'iconUrl' => 'static/cms/admin/novius-os/img/32/page.png',
+        'icon64' => 'static/cms/admin/novius-os/img/64/page.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',
@@ -24,8 +24,8 @@ return array(
     array(
         'name' => 'Media centre',
         'url' => 'admin/cms/media/list/index',
-        'iconUrl' => 'static/cms/img/32/media.png',
-        'icon64' => 'static/cms/img/64/media.png',
+        'iconUrl' => 'static/cms/admin/novius-os/img/32/media.png',
+        'icon64' => 'static/cms/admin/novius-os/img/64/media.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',
@@ -35,8 +35,8 @@ return array(
     array(
         'name' => 'Users',
         'url' => 'admin/cms/user/list/index',
-        'iconUrl' => 'static/cms/img/32/user.png',
-        'icon64' => 'static/cms/img/64/user.png',
+        'iconUrl' => 'static/cms/admin/novius-os/img/32/user.png',
+        'icon64' => 'static/cms/admin/novius-os/img/64/user.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',
@@ -46,8 +46,8 @@ return array(
     array(
         'name' => 'Tray',
         'url' => 'admin/cms/tray/plugins',
-        'iconUrl' => 'static/cms/img/32/user.png',
-        'icon64' => 'static/cms/img/64/user.png',
+        'iconUrl' => 'static/cms/admin/novius-os/img/32/user.png',
+        'icon64' => 'static/cms/admin/novius-os/img/64/user.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',

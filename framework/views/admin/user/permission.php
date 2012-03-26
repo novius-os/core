@@ -11,7 +11,7 @@
 ?>
 
 <script type="text/javascript">
-    require(['link!static/cms/css/permissions.css']);
+    require(['link!static/cms/admin/novius-os/css/permissions.css']);
 </script>
 
 

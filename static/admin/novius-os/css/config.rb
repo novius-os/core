@@ -1,7 +1,7 @@
 # Require any additional compass plugins here.
 
 # Set this to the root of your project when deployed:
-http_path = "/static/cms/css/"
+http_path = "/static/cms/admin/novius-os/css/"
 css_dir = ""
 sass_dir = ""
 images_dir = "images"

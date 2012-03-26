@@ -15,7 +15,7 @@ require(['jquery-nos'], function ($) {
 	$(function () {
 		$.nos.tabs.update($('#<?= $uniqid ?>'), {
 			label : '<?= $user->fullname() ?>',
-			iconUrl : 'static/cms/img/16/user.png'
+			iconUrl : 'static/cms/admin/novius-os/img/16/user.png'
 		});
 	});
 });

@@ -21,12 +21,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <title><?= $title ?></title>
 <meta name="robots" content="noindex,nofollow">
-<link rel="shortcut icon" href="static/cms/img/noviusos.ico">
+<link rel="shortcut icon" href="static/cms/admin/novius-os/img/noviusos.ico">
 <?= $css ?>
 <script type="text/javascript">
 	var require = {
 		paths: {
-			'jquery-nos': 'static/cms/js/nos',
+			'jquery-nos': 'static/cms/admin/novius-os/js/nos',
 			'jquery': 'static/cms/admin/vendor/jquery/jquery-1.7.1.min',
 			'jquery-ui' : 'static/cms/admin/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
 			'link': 'static/cms/admin/vendor/requirejs/link',

@@ -89,7 +89,7 @@ define([
             },
             tab : {
                 label : mp3Grid.i18n('Media center'),
-                iconUrl : 'static/cms/img/32/media.png'
+                iconUrl : 'static/cms/admin/novius-os/img/32/media.png'
             },
             reload : 'cms_media_media',
             mp3grid : {
@@ -249,7 +249,7 @@ define([
                                         if ($.isPlainObject(args.row.data)) {
                                             var text = "";
                                             if (args.row.data.icon) {
-                                                text += "<img style=\"vertical-align:middle\" src=\"static/cms/img/16/" + args.row.data.icon + "\"> ";
+                                                text += "<img style=\"vertical-align:middle\" src=\"static/cms/admin/novius-os/img/16/" + args.row.data.icon + "\"> ";
                                             }
                                             text += args.row.data.title;
 
