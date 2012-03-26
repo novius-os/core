@@ -20,7 +20,7 @@ class Controller_404 extends \Controller {
 	    $view = \View::forge('templates/html5');
 	    $view->set('title', 'Novius OS');
 	    $view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
-	    $view->set('require', 'static/cms/js/vendor/requirejs/require.js', false);
+	    $view->set('require', 'static/cms/admin/vendor/requirejs/require.js', false);
 	    $view->set('css', \View::forge('errors/404_admin', array('css' => true), false), false);
 	    $view->set('js', \View::forge('errors/404_admin', array('js' => true), false), false);
 	    $view->set('body', \View::forge('errors/404_admin', array('body' => true), false), false);

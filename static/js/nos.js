@@ -9,8 +9,8 @@
 
 define([
         'jquery',
-		'static/cms/js/vendor/wijmo/js/jquery.wijmo-open.all.2.0.3.min',
-		'static/cms/js/vendor/wijmo/js/jquery.wijmo-complete.all.2.0.3.min'
+		'static/cms/admin/vendor/wijmo/js/jquery.wijmo-open.all.2.0.3.min',
+		'static/cms/admin/vendor/wijmo/js/jquery.wijmo-complete.all.2.0.3.min'
 	], function($) {
         "use strict";
         var undefined = void(0);
@@ -636,8 +636,8 @@ define([
                 }
                 if ( $.isPlainObject( options ) ) {
                     require([
-                        'link!static/cms/js/vendor/jquery/pnotify/jquery.pnotify.default.css',
-                        'static/cms/js/vendor/jquery/pnotify/jquery.pnotify.min'
+                        'link!static/cms/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
+                        'static/cms/admin/vendor/jquery/pnotify/jquery.pnotify.min'
                     ], function() {
                         var o = {
                             pnotify_history : false,
@@ -865,8 +865,8 @@ define([
                 }, data.inputFileThumb);
 
                 require([
-                    'static/cms/js/vendor/jquery/jquery-ui-input-file-thumb/js/jquery.input-file-thumb',
-                    'link!static/cms/js/vendor/jquery/jquery-ui-input-file-thumb/css/jquery.input-file-thumb.css'
+                    'static/cms/admin/vendor/jquery/jquery-ui-input-file-thumb/js/jquery.input-file-thumb',
+                    'link!static/cms/admin/vendor/jquery/jquery-ui-input-file-thumb/css/jquery.input-file-thumb.css'
                 ], function() {
                     $(function() {
                         input.inputFileThumb(options);

@@ -224,7 +224,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		// Yahoo CSS Reset
 		//\Asset::css('http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css', array(), 'css');
 
-		\Asset::add_path('static/cms/js/vendor/wijmo/');
+		\Asset::add_path('static/cms/admin/vendor/wijmo/');
         \Asset::css('aristo/jquery-wijmo.css', array(), 'css');
         \Asset::css('jquery.wijmo-complete.all.2.0.3.min.css', array(), 'css');
 
@@ -242,7 +242,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
-			         'require'  => 'static/cms/js/vendor/requirejs/require.js',
+			         'require'  => 'static/cms/admin/vendor/requirejs/require.js',
 		         ) as $var => $default) {
 			if (empty($this->template->$var)) {
 				$this->template->$var = $default;

@@ -8,8 +8,8 @@
  */
 
 define([
-	'static/cms/js/vendor/tinymce/jquery.tinymce_src',
-	'static/cms/js/vendor/tinymce/jquery.wysiwyg',
+	'static/cms/admin/vendor/tinymce/jquery.tinymce_src',
+	'static/cms/admin/vendor/tinymce/jquery.wysiwyg',
 	'jquery-nos'
 ], function(a,b,$) {
     "use strict";

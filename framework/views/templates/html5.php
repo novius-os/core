@@ -27,10 +27,10 @@
 	var require = {
 		paths: {
 			'jquery-nos': 'static/cms/js/nos',
-			'jquery': 'static/cms/js/vendor/jquery/jquery-1.7.1.min',
-			'jquery-ui' : 'static/cms/js/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
-			'link': 'static/cms/js/vendor/requirejs/link',
-			'order': 'static/cms/js/vendor/requirejs/order.min'
+			'jquery': 'static/cms/admin/vendor/jquery/jquery-1.7.1.min',
+			'jquery-ui' : 'static/cms/admin/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
+			'link': 'static/cms/admin/vendor/requirejs/link',
+			'order': 'static/cms/admin/vendor/requirejs/order.min'
 		},
 		jQuery: '1.7.1',
 		catchError: true,
@@ -38,7 +38,7 @@
 		deps: [
 			'jquery-ui',
 			'jquery-nos',
-			'static/cms/js/vendor/log'
+			'static/cms/admin/vendor/log'
 		]
 	};
 </script>

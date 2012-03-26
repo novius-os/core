@@ -155,7 +155,7 @@
 		$view = \View::forge('templates/html5');
 		$view->set('title', 'Novius OS error page');
 		$view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
-		$view->set('require', 'static/cms/js/vendor/requirejs/require.js', false);
+		$view->set('require', 'static/cms/admin/vendor/requirejs/require.js', false);
 		$view->set('css', $css, false);
 		$view->set('js', $js, false);
 		$view->set('body', $body, false);

@@ -36,7 +36,7 @@ class Controller_Generic_Admin extends Controller_Template_Extendable {
 		foreach (array(
 			'title' => 'Administration',
 			'base' => \Uri::base(false),
-			'require'  => 'static/cms/js/vendor/requirejs/require.js',
+			'require'  => 'static/cms/admin/vendor/requirejs/require.js',
 		) as $var => $default) {
 			if (empty($this->template->$var)) {
 				$this->template->$var = $default;
