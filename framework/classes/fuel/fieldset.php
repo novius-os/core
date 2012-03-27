@@ -32,6 +32,18 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return $open;
 	}
 
+    public function build($action = null) {
+        $append = array();
+        foreach ($this->append as $a) {
+            if (is_callable($a)) {
+                $append[] = call_user_func($a, $this);
+            } else {
+                $append[] = $a;
+            }
+        }
+        return parent::build($action = null).implode('', $append);
+    }
+
 	public function close() {
 
 		$close = ($this->fieldset_tag == 'form' or empty($this->fieldset_tag))
@@ -299,7 +311,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
             return
 <<<JS
 <script type="text/javascript">
-require(['jquery', 'static/cms/admin/js/validate.js'], function($) {
+require(['jquery', 'static/cms/js/admin/validate.js'], function($) {
 	var json = $validate;
 	//console.log($validate);
 	$('#{$form_attributes['id']}').validate($.extend({}, json, {
