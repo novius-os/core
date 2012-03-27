@@ -30,7 +30,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 
         $error = (\Input::method() == 'POST') ? $this->post_login() : '';
 
-		\Asset::add_path('static/cms/');
+		\Asset::add_path('static/cms/admin/novius-os/');
 		\Asset::css('login.css', array(), 'css');
 
         $this->template->body = \View::forge('misc/login', array(
@@ -47,14 +47,14 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 
 	public function after($response) {
 
-		\Asset::add_path('static/cms/js/vendor/wijmo/');
+		\Asset::add_path('static/cms/admin/vendor/wijmo/');
 		\Asset::css('aristo/jquery-wijmo.css', array(), 'css');
 		\Asset::css('jquery.wijmo-complete.all.2.0.3.min.css', array(), 'css');
 
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
-			         'require'  => 'static/cms/js/vendor/requirejs/require.js',
+			         'require'  => 'static/cms/admin/vendor/requirejs/require.js',
 		         ) as $var => $default) {
 			if (empty($this->template->$var)) {
 				$this->template->$var = $default;

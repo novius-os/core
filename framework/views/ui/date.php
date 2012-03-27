@@ -1,7 +1,7 @@
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
@@ -17,7 +17,7 @@ require([
 		$(function() {
 			$('input[name=<?= $name ?>]').datepicker({
 				showOn : 'both',
-				buttonImage: 'static/cms/img/icons/date-picker.png',
+				buttonImage: 'static/cms/admin/novius-os/img/icons/date-picker.png',
 				buttonImageOnly : true,
 				autoSize: true,
 				dateFormat: 'yy-mm-dd',

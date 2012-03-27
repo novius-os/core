@@ -53,7 +53,7 @@ return array(
     'views' => array(
         'default' => array(
             'name' => __('Default view'),
-            'json' => array('static/cms/js/admin/page/page.js'),
+            'json' => array('static/cms/admin/config/page/page.js'),
         )
     ),
     'i18n' => array(

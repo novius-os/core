@@ -299,7 +299,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
             return
 <<<JS
 <script type="text/javascript">
-require(['jquery', 'static/cms/js/admin/validate.js'], function($) {
+require(['jquery', 'static/cms/admin/js/validate.js'], function($) {
 	var json = $validate;
 	//console.log($validate);
 	$('#{$form_attributes['id']}').validate($.extend({}, json, {
@@ -307,7 +307,7 @@ require(['jquery', 'static/cms/js/admin/validate.js'], function($) {
         success : true,
         ignore: 'input[type=hidden]',
 		submitHandler: function(form) {
-			require(['jquery-nos', 'static/cms/js/vendor/jquery/jquery-form/jquery.form.min'], function($) {
+			require(['jquery-nos', 'static/cms/admin/vendor/jquery/jquery-form/jquery.form.min'], function($) {
 				$(form).ajaxSubmit({
 					dataType: 'json',
 					success: function(json) {
@@ -321,7 +321,7 @@ require(['jquery', 'static/cms/js/admin/validate.js'], function($) {
 			});
 		}
 	}));
-	require(['static/cms/js/vendor/jquery/jquery-form/jquery.form.min', 'jquery-nos']);
+	require(['static/cms/admin/vendor/jquery/jquery-form/jquery.form.min', 'jquery-nos']);
 });
 </script>
 JS;

@@ -14,7 +14,7 @@ class Widget_Date_Picker extends \Fieldset_Field {
 
 	protected $options = array(
 		'showOn'            => 'both',
-		'buttonImage'       => 'static/cms/img/icons/date-picker.png',
+		'buttonImage'       => 'static/cms/admin/novius-os/img/icons/date-picker.png',
 		'buttonImageOnly'   => true,
 		'autoSize'          => true,
 		'dateFormat'        => 'yy-mm-dd',

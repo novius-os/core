@@ -10,11 +10,7 @@
 
 ?>
 <!DOCTYPE html>
-<!--[if lt IE 7 ]> <html class="ie ie6 lte9 lte8 lte7"> <![endif]-->
-<!--[if IE 7 ]>    <html class="ie ie7 lte9 lte8 lte7"> <![endif]-->
-<!--[if IE 8 ]>    <html class="ie ie8 lte9 lte8"> <![endif]-->
-<!--[if IE 9 ]>    <html class="ie ie9 lte9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html class=""> <!--<![endif]-->
+<html>
 <head>
 <?php
 	if (isset($base)) {
@@ -25,17 +21,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <title><?= $title ?></title>
 <meta name="robots" content="noindex,nofollow">
-<link rel="shortcut icon" href="static/cms/img/noviusos.ico">
+<link rel="shortcut icon" href="static/cms/admin/novius-os/img/noviusos.ico">
 <?= $css ?>
 <script type="text/javascript">
 	var require = {
 		paths: {
-			'jquery-nos': 'static/cms/js/nos',
-			'jquery': 'static/cms/js/vendor/jquery/jquery-1.7.1.min',
-			'jquery-ui' : 'static/cms/js/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
-			'link': 'static/cms/js/vendor/requirejs/link',
-			'order': 'static/cms/js/vendor/requirejs/order.min',
-			'domReady': 'static/cms/js/vendor/requirejs/domReady.min'
+			'jquery-nos': 'static/cms/admin/novius-os/js/nos',
+			'jquery': 'static/cms/admin/vendor/jquery/jquery-1.7.1.min',
+			'jquery-ui' : 'static/cms/admin/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
+			'link': 'static/cms/admin/vendor/requirejs/link',
+			'order': 'static/cms/admin/vendor/requirejs/order.min'
 		},
 		jQuery: '1.7.1',
 		catchError: true,
@@ -43,7 +38,7 @@
 		deps: [
 			'jquery-ui',
 			'jquery-nos',
-			'static/cms/js/vendor/log'
+			'static/cms/admin/vendor/log'
 		]
 	};
 </script>

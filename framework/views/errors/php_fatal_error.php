@@ -23,13 +23,9 @@
 	}
 ?>
 -->
-<?php if (!$ajax = Input::is_ajax()) { ?>
-<!DOCTYPE html>
-<html>
-<head>
-	<base href="<?php echo Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST') ?>" />
-	<meta charset="utf-8">
-	<title>Novius OS error page</title>
+<?php
+		ob_start();
+?>
 	<style type="text/css">
 		* { margin: 0; padding: 0; }
 		body { background-color: #EEE; font-family: sans-serif; font-size: 16px; line-height: 20px; margin: 40px; }
@@ -54,53 +50,37 @@
 		.backtrace_block { display: none; }
 		.wip img { vertical-align: middle; }
 	</style>
+<?
+		$css = ob_get_contents();
+		ob_end_clean();
+		ob_start();
+?>
 	<script type="text/javascript">
-		function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']){var disp = elem.style['display'];}else if (elem.currentStyle){var disp = elem.currentStyle['display'];}else if (window.getComputedStyle){var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;}
-	</script>
-	<script type="text/javascript">
-		var require = {
-			paths: {
-				'jquery-nos': 'static/cms/js/nos',
-				'jquery': 'static/cms/js/vendor/jquery/jquery-1.7.1.min',
-				'jquery-ui' : 'static/cms/js/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
-				'link': 'static/cms/js/vendor/requirejs/link',
-				'order': 'static/cms/js/vendor/requirejs/order.min',
-				'domReady': 'static/cms/js/vendor/requirejs/domReady.min'
-			},
-			jQuery: '1.7.1',
-			catchError: true,
-			priority: ['jquery'],
-			deps: [
-				'jquery-ui',
-				'jquery-nos',
-				'static/cms/js/vendor/log'
-			]
-		};
-	</script>
-	<script src="static/cms/js/vendor/requirejs/require.js" type="text/javascript"></script>
-	<script type="text/javascript">
+	function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']){var disp = elem.style['display'];}else if (elem.currentStyle){var disp = elem.currentStyle['display'];}else if (window.getComputedStyle){var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;}
 	require(['jquery-nos'], function($) {
 		$(function() {
 			$.nos.tabs.update({
 				label : 'Error - We\'re working on it'
-				//iconUrl : 'static/cms/img/icons/exclamation--frame.png'
+				//iconUrl : 'static/cms/admin/novius-os/img/icons/exclamation--frame.png'
 			});
 		});
 	});
 	</script>
-</head>
-<body>
-<?php } ?>
+<?
+		$js = ob_get_contents();
+		ob_end_clean();
+		ob_start();
+?>
 	<div id="wrapper">
 		<h1>Oops, I'm hurt</h1>
-		<a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/cms/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
+		<a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/cms/admin/novius-os/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
 		<br /><br /><br />
 		<p class="wip">
-			<img src="static/cms/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
+			<img src="static/cms/admin/novius-os/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
 		</p>
 		<br />
 		<p class="wip">
-			<img src="static/cms/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
+			<img src="static/cms/admin/novius-os/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
 		</p>
 		<br style="clear:left;" />
 
@@ -166,7 +146,21 @@
 		</p>
 	</div>
 	</div>
-<?php if (!$ajax) { ?>
-</body>
-</html>
-<?php } ?>
+<?
+	$body = ob_get_contents();
+	ob_end_clean();
+	ob_start();
+
+	if (!$ajax = Input::is_ajax()) {
+		$view = \View::forge('templates/html5');
+		$view->set('title', 'Novius OS error page');
+		$view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
+		$view->set('require', 'static/cms/admin/vendor/requirejs/require.js', false);
+		$view->set('css', $css, false);
+		$view->set('js', $js, false);
+		$view->set('body', $body, false);
+		echo $view;
+	} else {
+		echo $body;
+	}
+?>

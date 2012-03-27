@@ -27,17 +27,17 @@ return array(
         'default' => array(
             'name' => __('Default view'),
             'json' => array(
-                'static/cms/js/admin/media/common.js',
-                'static/cms/js/admin/media/media.js'
+                'static/cms/admin/config/media/common.js',
+                'static/cms/admin/config/media/media.js'
             ),
         ),
         'image_pick' => array(
             'name' => __('Image'),
             'virtual' => true,
             'json' => array(
-                'static/cms/js/admin/media/common.js',
-                'static/cms/js/admin/media/media.js',
-                'static/cms/js/admin/media/image_pick.js'
+                'static/cms/admin/config/media/common.js',
+                'static/cms/admin/config/media/media.js',
+                'static/cms/admin/config/media/image_pick.js'
             ),
         )
     ),
@@ -131,7 +131,7 @@ return array(
 				'htm' => 'text.png',
 				'html' => 'text.png',
 			);
-			return isset($extensions[$object->media_ext]) ? 'static/cms/img/64/'.$extensions[$object->media_ext] : '';
+			return isset($extensions[$object->media_ext]) ? 'static/cms/admin/novius-os/img/64/'.$extensions[$object->media_ext] : '';
 		},
 	),
 	'inputs' => array(
