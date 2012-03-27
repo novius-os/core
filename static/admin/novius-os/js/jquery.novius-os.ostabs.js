@@ -1158,7 +1158,7 @@ define('jquery-nos-ostabs',
             $.each(self.panels, function(i) {
                 var $panel = $(this);
                 if (i === o.selected) {
-                    $panel.trigger(event.event + (event.type ? '.' + event.type : ''), event.data || null);
+                    self._firePanelEvent($panel, event);
                 } else {
                     var callbacks = $panel.data('callbacks.ostabs');
                     if ($.isPlainObject(callbacks)) {
