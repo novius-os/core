@@ -1,5 +1,7 @@
-
-(function($) {
+define([
+    'jquery',
+    'tinymce'
+], function($) {
     var inc = 1;
     $.fn.wysiwyg = function(options) {
 
@@ -21,4 +23,5 @@
 			}
 		});
     };
-})(jQuery);
+    return $;
+});

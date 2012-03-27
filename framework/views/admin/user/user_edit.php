@@ -10,7 +10,7 @@
 
 ?>
 <script type="text/javascript">
-    require(['jquery-nos'], function ($) {
+    require(['jquery-nos-ostabs'], function ($) {
         $(function () {
             $.nos.tabs.update({
                 label : <?= \Format::forge()->to_json(isset($user) ? $user->fullname() : 'Add a user') ?>,

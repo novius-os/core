@@ -12,7 +12,7 @@
 <div id="<?= $id ?>"><table></table></div>
 <script type="text/javascript">
 	require([
-		'jquery-nos'
+		'jquery-nos-treegrid'
 	], function( $, table, undefined ) {
 		$(function() {
 			var params = <?= \Format::forge()->to_json($params) ?>,

@@ -10,7 +10,7 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos'], function ($) {
+require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
 	$.nos.ui.form('#<?= $uniqid = uniqid('id_') ?>');
 	$(function () {
 		$.nos.tabs.update($('#<?= $uniqid ?>'), {

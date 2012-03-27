@@ -8,7 +8,7 @@
  */
 
 define([
-    'jquery-nos'
+    'jquery-nos-appdesk'
 ], function($) {
     "use strict";
     return function(mp3Grid) {

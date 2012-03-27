@@ -13,7 +13,7 @@
 <div id="<?= $id ?>" style="display:none;"><?= str_replace(array('xxxbeginxxx', 'xxxendxxx'), array($date_begin, $date_end), $label_custom) ?></div>
 <script type="text/javascript">
 require([
-		'jquery-nos'
+		'jquery-nos-listgrid'
 	], function( $, undefined ) {
 		$(function() {
 			var label_custom = $('#<?= $id ?>').removeAttr('id')

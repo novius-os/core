@@ -57,7 +57,7 @@
 ?>
 	<script type="text/javascript">
 	function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']){var disp = elem.style['display'];}else if (elem.currentStyle){var disp = elem.currentStyle['display'];}else if (window.getComputedStyle){var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;}
-	require(['jquery-nos'], function($) {
+	require(['jquery-nos-ostabs'], function($) {
 		$(function() {
 			$.nos.tabs.update({
 				label : 'Error - We\'re working on it'

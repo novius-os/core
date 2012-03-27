@@ -7,10 +7,17 @@
  * @link http://www.novius-os.org
  */
 
-define([
-	'jquery-nos'
-], function( $, undefined ) {
+define('jquery-nos-preview',
+[
+    'jquery',
+    'log',
+    'order!jquery-ui',
+    'order!wijmo-open',
+    'order!wijmo-complete',
+    'order!jquery-nos'
+], function( $ ) {
     "use strict";
+        var undefined = void(0);
 	$.widget( "nos.inspectorPreview", {
 		options: {
             meta : {},

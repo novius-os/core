@@ -123,6 +123,11 @@ return array(
 	),
 
 	/**
+	 * Whether to use minified assets (css & js)
+	 */
+	'assets_minified' => true,
+
+	/**
 	 * Cookie settings
 	 */
 	'cookie' => array(

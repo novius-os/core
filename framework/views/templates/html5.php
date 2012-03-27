@@ -8,6 +8,48 @@
  * @link http://www.novius-os.org
  */
 
+	$paths = array(
+		'jquery-nos' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-listgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-loadspinner' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-preview' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-thumbnailsgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-treegrid' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/novius-os.min',
+		'jquery-nos' => 'static/cms/admin/novius-os/js/jquery.novius-os',
+		'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/jquery.novius-os.appdesk',
+		'jquery-nos-listgrid' => 'static/cms/admin/novius-os/js/jquery.novius-os.listgrid',
+		'jquery-nos-loadspinner' => 'static/cms/admin/novius-os/js/jquery.novius-os.loadspinner',
+		'jquery-nos-preview' => 'static/cms/admin/novius-os/js/jquery.novius-os.preview',
+		'jquery-nos-thumbnailsgrid' => 'static/cms/admin/novius-os/js/jquery.novius-os.thumbnailsgrid',
+		'jquery-nos-treegrid' => 'static/cms/admin/novius-os/js/jquery.novius-os.treegrid',
+		'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/jquery.novius-os.ostabs',
+		'log' => 'static/cms/admin/vendor/log',
+		'jquery' => 'static/cms/admin/vendor/jquery/jquery-1.7.1.min',
+		'jquery-validate' => 'static/cms/admin/vendor/jquery/jquery-validation/jquery.validate.min',
+		'jquery-form' => 'static/cms/admin/vendor/jquery/jquery-form/jquery.form.min',
+		'jquery-ui' => 'static/cms/admin/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
+		'wijmo-open' => 'static/cms/admin/vendor/wijmo/js/jquery.wijmo-open.all.2.0.3.min',
+		'wijmo-complete' => 'static/cms/admin/vendor/wijmo/js/jquery.wijmo-complete.all.2.0.3.min',
+		'tinymce' => 'static/cms/admin/vendor/tinymce/jquery.tinymce_src',
+		'wysiwyg' => 'static/cms/admin/vendor/tinymce/jquery.wysiwyg',
+		'link' => 'static/cms/admin/vendor/requirejs/link',
+		'order' => 'static/cms/admin/vendor/requirejs/order.min',
+	);
+
+	if (\Config::get('assets_minified', true)) {
+		$paths = array_merge($paths, array(
+			'jquery-nos' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-listgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-loadspinner' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-preview' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-thumbnailsgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-treegrid' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/novius-os.min',
+		));
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -25,21 +67,11 @@
 <?= $css ?>
 <script type="text/javascript">
 	var require = {
-		paths: {
-			'jquery-nos': 'static/cms/admin/novius-os/js/nos',
-			'jquery': 'static/cms/admin/vendor/jquery/jquery-1.7.1.min',
-			'jquery-ui' : 'static/cms/admin/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
-			'link': 'static/cms/admin/vendor/requirejs/link',
-			'order': 'static/cms/admin/vendor/requirejs/order.min'
-		},
+		paths: <?= \Format::forge($paths)->to_json() ?>,
 		jQuery: '1.7.1',
 		catchError: true,
 		priority: ['jquery'],
-		deps: [
-			'jquery-ui',
-			'jquery-nos',
-			'static/cms/admin/vendor/log'
-		]
+		deps: ['jquery-nos']
 	};
 </script>
 <script src="<?= $require ?>" type="text/javascript"></script>

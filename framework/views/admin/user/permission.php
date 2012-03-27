@@ -88,7 +88,7 @@ foreach ($apps as $app => $perms) {
 
 
 <script type="text/javascript">
-    require(["jquery"], function($) {
+    require(["jquery-nos"], function($) {
 
     	var $form = $('#<?= $uniqid ?>');
 

@@ -7,8 +7,14 @@
  * @link http://www.novius-os.org
  */
 
-define([
-	'jquery-nos'
+define('jquery-nos-loadspinner',
+[
+    'jquery',
+    'log',
+    'order!jquery-ui',
+    'order!wijmo-open',
+    'order!wijmo-complete',
+    'order!jquery-nos'
 ], function( $ ) {
 	$.widget ('nos.loadspinner', {
 		options : {

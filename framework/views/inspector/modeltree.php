@@ -12,7 +12,7 @@
 <table id="<?= $id ?>"></table>
 <script type="text/javascript">
 require([
-		'jquery-nos'
+		'jquery-nos-treegrid'
 	], function( $, table, undefined ) {
 		$(function() {
 			var inspector = $('#<?= $id ?>').removeAttr('id'),

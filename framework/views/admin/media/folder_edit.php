@@ -50,7 +50,7 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'static/cms/admin/vendor/jquery/jquery-form/jquery.form.min'], function($) {
+require(['jquery-nos', 'order!jquery-form'], function($) {
     $.nos.ui.form('#<?= $uniqid ?>');
     $(function() {
 

@@ -12,5 +12,7 @@
 ?>
 <div id="<?= $id ?>"></div>
 <script type="text/javascript">
+require(['jquery-nos-appdesk'], function( $ ) {
     $.nos.mp3Add("<?= $id ?>", <?= $mp3grid ?>);
+});
 </script>

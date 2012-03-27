@@ -299,13 +299,13 @@ class Fieldset extends \Fuel\Core\Fieldset {
             return
 <<<JS
 <script type="text/javascript">
-require(['jquery', 'static/cms/admin/vendor/jquery/jquery-validation/jquery.validate.min'], function($) {
+require(['jquery', 'jquery-validate'], function($) {
 	var json = $validate;
 	//console.log($validate);
 	$('#{$form_attributes['id']}').validate($.extend({}, json, {
         errorClass : 'ui-state-error',
 		submitHandler: function(form) {
-			require(['jquery-nos', 'static/cms/admin/vendor/jquery/jquery-form/jquery.form.min'], function($) {
+			require(['jquery-nos', 'order!jquery-form'], function($) {
 				$(form).ajaxSubmit({
 					dataType: 'json',
 					success: function(json) {
@@ -319,7 +319,7 @@ require(['jquery', 'static/cms/admin/vendor/jquery/jquery-validation/jquery.vali
 			});
 		}
 	}));
-	require(['static/cms/admin/vendor/jquery/jquery-form/jquery.form.min', 'jquery-nos']);
+	require(['jquery-nos', 'order!jquery-form']);
 });
 </script>
 JS;
