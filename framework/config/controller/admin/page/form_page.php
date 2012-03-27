@@ -19,7 +19,8 @@ return array(
             'type' => 'text',
         ),
         'validation' => array(
-            'min_length' => array(6),
+            'required',
+            'min_length' => array(2),
         ),
     ),
     'page_template' => array(
@@ -36,6 +37,7 @@ return array(
             'size' => 20,
         ),
         'validation' => array(
+            'required',
             'min_length' => array(2),
         ),
     ),

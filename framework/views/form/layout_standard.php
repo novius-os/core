@@ -39,9 +39,10 @@ $large = !empty($large) && $large == true;
             $size  = min(5, floor(6 / count($title)));
 			foreach ((array) $title as $name) {
                 $field = $fieldset->field($name);
+                $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
 				echo ' '.$field
-                        ->set_attribute('placeholder', $field->label)
-                        ->set_attribute('title', $field->label)
+                        ->set_attribute('placeholder',$placeholder)
+                        ->set_attribute('title', $placeholder)
                         ->set_attribute('class', 'title c'.$size)
                         ->set_template('{field}')
                         ->build();
@@ -51,7 +52,7 @@ $large = !empty($large) && $large == true;
 			$id = $fieldset->field($id);
             $value = !empty($id) ? $id->get_value() : null;
             if (!empty($value)) {
-                echo $id->label.$value;
+                echo '<span style="opacity: 0.5">'.$id->label.$value.'</span>';
             }
 			?>
 		</div>
@@ -92,12 +93,15 @@ $large = !empty($large) && $large == true;
         <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;margin-bottom:1em;">
              <div class="accordion">
                 <?php
-                foreach ((array) $menu as $title => $fields) {
+                foreach ((array) $menu as $title => $options) {
+                    if (!isset($options['fields'])) {
+                        $options = array('fields' => $options);
+                    }
                     ?>
-                    <h3><a href="#"><?= $title ?></a></h3>
-                    <div style="overflow:visible;">
+                    <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $title ?></a></h3>
+                    <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
                         <?php
-                        foreach ((array) $fields as $field) {
+                        foreach ((array) $options['fields'] as $field) {
                             try {
                                 if ($field instanceof \View) {
                                     echo $field;

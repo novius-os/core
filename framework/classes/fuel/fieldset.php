@@ -299,11 +299,13 @@ class Fieldset extends \Fuel\Core\Fieldset {
             return
 <<<JS
 <script type="text/javascript">
-require(['jquery', 'static/cms/js/vendor/jquery/jquery-validation/jquery.validate.min'], function($) {
+require(['jquery', 'static/cms/js/admin/validate.js'], function($) {
 	var json = $validate;
 	//console.log($validate);
 	$('#{$form_attributes['id']}').validate($.extend({}, json, {
         errorClass : 'ui-state-error',
+        success : true,
+        ignore: 'input[type=hidden]',
 		submitHandler: function(form) {
 			require(['jquery-nos', 'static/cms/js/vendor/jquery/jquery-form/jquery.form.min'], function($) {
 				$(form).ajaxSubmit({
@@ -346,7 +348,7 @@ JS;
 			'inline_errors'  => true,
 			'auto_id'		 => true,
             'auto_id_prefix' => '', // Temporary fix to fuel bug
-			'required_mark'  => '&nbsp;*',
+			'required_mark'  => '&nbsp;<span style="font-size: 1.5em; line-height: 1em; font-weight: bold">*</span>', // 'Mandatory' is added as title of the label
 			'error_template' => '{error_msg}',
 			'error_class'    => 'error',
 			'form_template' => "\n\t\t{open}\n\t\t<table class=\"fieldset\">\n{fields}\n\t\t</table>\n\t\t{close}\n",

@@ -331,49 +331,54 @@ input.ui-state-disabled {
 }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003160}}
+.faded {
+  opacity: 0.5;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003163}}
 input.ui-widget.primary, button.ui-widget.primary {
   border-width: 2px;
   border-style: outset;
   font-size: 1.1em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003165}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003168}}
 input.ui-widget.primary .ui-button-text, button.ui-widget.primary .ui-button-text {
   line-height: 1.9em;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003169}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003172}}
 input.ui-widget.primary.ui-state-active, button.ui-widget.ui-state-active.primary {
   border-style: inset;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003174}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003177}}
 div.blank_slate {
   font-size: 150%;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003178}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003181}}
 span.optional {
   font-style: italic;
   opacity: 0.7;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003183}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003186}}
 img.publication_status {
   vertical-align: middle;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003188}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003191}}
 .publishable .ui-button-text {
   padding: 0;
   width: 20px;
   height: 20px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003193}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003196}}
 .publishable .ui-button-text img {
   vertical-align: middle;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003198}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/novius-os\/cms\/static\/css\/base\.scss}line{font-family:\00003201}}
 .nos-notification {
   top: 69px;
 }

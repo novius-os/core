@@ -157,6 +157,10 @@ input.ui-state-disabled {
 	margin-top: 3em;
 }
 
+.faded {
+    opacity: 0.5;
+}
+
 input.ui-widget.primary, button.ui-widget.primary {
 	border-width : 2px;
 	border-style : outset;

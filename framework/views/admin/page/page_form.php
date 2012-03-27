@@ -60,10 +60,14 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
     ), false),
 
     'menu' => array(
-        __('Menu') => array('page_menu', 'page_menu_title'),
+        __('Menu')               => array('page_menu', 'page_menu_title'),
         __('URL (page address)') => array('page_virtual_name'),
-        __('SEO') => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
-        __('Admin') => array('page_cache_duration', 'page_lock'),
+        __('SEO')                => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
+        __('Admin')              => array(
+            'header_class'  => 'faded',
+            'content_class' => 'faded',
+            'fields'        => array('page_cache_duration', 'page_lock'),
+        ),
     ),
 ), false) ?>
 <?= $fieldset->close() ?>
