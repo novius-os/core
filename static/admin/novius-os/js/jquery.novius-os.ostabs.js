@@ -838,6 +838,7 @@ define('jquery-nos-ostabs',
             }
 
             var li = $( '<li></li>' ).append( a )
+                .attr('title', tab.label)
                 .addClass( 'ui-corner-top ui-state-default' + (tab.pined ? ' ui-state-pined' : '') ).data( 'ui-ostab', tab )
                 .appendTo( target );
 
@@ -952,6 +953,7 @@ define('jquery-nos-ostabs',
                 $newA = $newLi.find('a');
 
             $li.data( 'ui-ostab', tab )
+                .attr('title', tab.label || '')
                 .addClass($newLi.attr('class'))
                 .css({
                     height: $newLi.css('height'),

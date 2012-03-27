@@ -360,7 +360,7 @@ JS;
 			'inline_errors'  => true,
 			'auto_id'		 => true,
             'auto_id_prefix' => '', // Temporary fix to fuel bug
-			'required_mark'  => '&nbsp;*',
+			'required_mark'  => '&nbsp;<span style="font-size: 1.5em; line-height: 1em; font-weight: bold">*</span>',
 			'error_template' => '{error_msg}',
 			'error_class'    => 'error',
 			'form_template' => "\n\t\t{open}\n\t\t<table class=\"fieldset\">\n{fields}\n\t\t</table>\n\t\t{close}\n",

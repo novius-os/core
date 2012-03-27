@@ -54,8 +54,11 @@ class Controller_Admin_Tray_Account extends \Controller {
             'save' => array(
                 'label' => '',
                 'form' => array(
+                    'class' => 'primary',
+                    'data-icon' => 'check',
                     'type' => 'submit',
-                    'value' => 'Save',
+                    'tag' => 'button',
+                    'value' => __('Save'),
                 ),
             ),
         );
@@ -141,9 +144,10 @@ class Controller_Admin_Tray_Account extends \Controller {
             'save' => array(
                 'label' => '',
                 'form' => array(
+                    'class' => 'primary',
+                    'data-icon' => 'check',
                     'type' => 'submit',
                     'tag' => 'button',
-                    'data-icon' => 'check',
                     'value' => __('Save'),
                 ),
             )
@@ -205,8 +209,11 @@ class Controller_Admin_Tray_Account extends \Controller {
             'save' => array(
                 'label' => '',
                 'form' => array(
+                    'class' => 'primary',
+                    'data-icon' => 'check',
                     'type' => 'submit',
-                    'value' => 'Save',
+                    'tag' => 'button',
+                    'value' => __('Save'),
                 ),
             ),
         );
