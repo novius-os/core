@@ -27,7 +27,7 @@
 		'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/jquery.novius-os.ostabs',
 		'log' => 'static/cms/admin/vendor/log',
 		'jquery' => 'static/cms/admin/vendor/jquery/jquery-1.7.1.min',
-		'jquery-validate' => 'static/cms/admin/vendor/jquery/jquery-validation/jquery.validate.min',
+		'jquery-validate' => 'static/cms/admin/vendor/jquery/jquery-validation/nos.validate',
 		'jquery-form' => 'static/cms/admin/vendor/jquery/jquery-form/jquery.form.min',
 		'jquery-ui' => 'static/cms/admin/vendor/jquery-ui/jquery-ui-1.8.18.custom.min',
 		'wijmo-open' => 'static/cms/admin/vendor/wijmo/js/jquery.wijmo-open.all.2.0.3.min',

@@ -32,6 +32,18 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return $open;
 	}
 
+    public function build($action = null) {
+        $append = array();
+        foreach ($this->append as $a) {
+            if (is_callable($a)) {
+                $append[] = call_user_func($a, $this);
+            } else {
+                $append[] = $a;
+            }
+        }
+        return parent::build($action = null).implode('', $append);
+    }
+
 	public function close() {
 
 		$close = ($this->fieldset_tag == 'form' or empty($this->fieldset_tag))
@@ -304,6 +316,8 @@ require(['jquery', 'jquery-validate'], function($) {
 	//console.log($validate);
 	$('#{$form_attributes['id']}').validate($.extend({}, json, {
         errorClass : 'ui-state-error',
+        success : true,
+        ignore: 'input[type=hidden]',
 		submitHandler: function(form) {
 			require(['jquery-nos', 'order!jquery-form'], function($) {
 				$(form).ajaxSubmit({
