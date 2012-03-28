@@ -1113,10 +1113,10 @@ define('jquery-nos-appdesk',
 			self.gridRendered = false;
             self.uiGridTitle.text(o.texts.item);
 
-			self.uiThumbnail.thumbnails('destroy')
+			self.uiThumbnail.thumbnailsgrid('destroy')
 				.empty()
 				.hide();
-			self.uiGrid.nosgrid('destroy')
+			self.uiGrid.noslistgrid('destroy')
 				.empty()
 				.hide();
             self.uiTreeGrid.nostreegrid('destroy')
@@ -1148,7 +1148,7 @@ define('jquery-nos-appdesk',
                     height : height,
                     width : '100%'
                 })
-				.nosgrid($.extend({
+				.noslistgrid($.extend({
 					columnsAutogenerationMode : 'none',
 					selectionMode: 'singleRow',
 					showFilter: self.showFilter,
@@ -1173,7 +1173,7 @@ define('jquery-nos-appdesk',
 							var r = userData.data.paging;
 							self.pageIndex = r.pageIndex;
 							if (self.gridRendered) {
-								self.uiGrid.nosgrid("currentCell", -1, -1);
+								self.uiGrid.noslistgrid("currentCell", -1, -1);
 							}
                             dataSource.proxy.options.data.lang = o.selectedLang || '';
 							dataSource.proxy.options.data.inspectors = self._jsonInspectors();
@@ -1222,7 +1222,7 @@ define('jquery-nos-appdesk',
 					},
 					currentCellChanged: function (e) {
 						if (e) {
-							var row = $(e.target).nosgrid("currentCell").row(),
+							var row = $(e.target).noslistgrid("currentCell").row(),
 								data = row ? row.data : false;
 
 							if (data) {
@@ -1239,11 +1239,11 @@ define('jquery-nos-appdesk',
 					rendered : function() {
 						self.gridRendered = true;
 						self.uiGrid.css('height', 'auto');
-                        var sel = self.uiGrid.nosgrid("selection");
+                        var sel = self.uiGrid.noslistgrid("selection");
                         sel && sel.clear();
 						if (self.itemSelected !== null) {
                             // Search the selection in the data
-                            $.each(self.uiGrid.nosgrid('data') || [], function(dataRowIndex, data) {
+                            $.each(self.uiGrid.noslistgrid('data') || [], function(dataRowIndex, data) {
                                 if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                     sel.addRows(dataRowIndex);
                                 }
@@ -1355,7 +1355,7 @@ define('jquery-nos-appdesk',
 				height = self.element.height() - position.top + positionContainer.top;
 
 			self.uiThumbnail.css('height', height)
-				.thumbnails($.extend({
+				.thumbnailsgrid($.extend({
 					pageIndex: 0,
 					url: o.grid.proxyUrl,
 					loading: function (dataSource, userData) {
@@ -1387,16 +1387,16 @@ define('jquery-nos-appdesk',
 						if (self.itemSelected !== null) {
                             // Search the selection in the data
                             var found = false;
-                            $.each(self.uiThumbnail.thumbnails('data') || [], function(dataRowIndex, data) {
+                            $.each(self.uiThumbnail.thumbnailsgrid('data') || [], function(dataRowIndex, data) {
                                 if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                     found = true;
-                                    if (!self.uiThumbnail.thumbnails('select', dataRowIndex)) {
+                                    if (!self.uiThumbnail.thumbnailsgrid('select', dataRowIndex)) {
                                         self.itemSelected = null;
                                     }
                                 }
                             });
                             if (!found) {
-                                self.uiThumbnail.thumbnails('unselect');
+                                self.uiThumbnail.thumbnailsgrid('unselect');
                             }
 						}
 					},
@@ -1522,7 +1522,7 @@ define('jquery-nos-appdesk',
                     if (reload) {
                         self._uiList();
                     } else {
-                        self.uiThumbnail.thumbnails('setSize', self.uiSplitterHorizontalBottom.width(), height);
+                        self.uiThumbnail.thumbnailsgrid('setSize', self.uiSplitterHorizontalBottom.width(), height);
                     }
                 } else if (o.defaultView === 'treeGrid') {
                     if (reload) {
@@ -1531,10 +1531,10 @@ define('jquery-nos-appdesk',
                         self.uiTreeGrid.nostreegrid('setSize', null, height);
                     }
                 } else {
-                    self.uiGrid.nosgrid('setSize', null, height);
+                    self.uiGrid.noslistgrid('setSize', null, height);
                     if (reload) {
                         var heights = $.nos.grid.getHeights();
-                        self.uiGrid.nosgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
+                        self.uiGrid.noslistgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
                     }
                 }
             }
@@ -1582,7 +1582,7 @@ define('jquery-nos-appdesk',
                 } else if (o.defaultView === 'treeGrid') {
                     self._uiList();
                 } else {
-                    self.uiGrid.nosgrid("ensureControl", true);
+                    self.uiGrid.noslistgrid("ensureControl", true);
                 }
 			}
 
@@ -1902,11 +1902,11 @@ define('jquery-nos-appdesk',
                                     var inspectorData = $li.data('inspector'),
                                         widget = $('<div></div>')
                                             .appendTo($li)
-                                            .inspectorPreview(inspectorData.options)
+                                            .preview(inspectorData.options)
                                             .parent()
                                             .on({
                                                 widgetResize: function() {
-                                                    widget.inspectorPreview('resize');
+                                                    widget.preview('resize');
                                                 }
                                             })
                                             .end();
@@ -2102,7 +2102,7 @@ define('jquery-nos-appdesk',
                     var table = $('<table></table>')
                         .addClass('nos-appdesk')
                         .appendTo($div)
-                        .nosgrid({
+                        .noslistgrid({
                             scrollMode : 'auto',
                             showFilter: true,
                             allowPaging : true,
@@ -2114,7 +2114,7 @@ define('jquery-nos-appdesk',
                         header : $div.find('.wijmo-wijgrid-headerrow').outerHeight(),
                         filter : $div.find('.wijmo-wijgrid-filterrow').outerHeight()
                     };
-                    table.nosgrid('destroy');
+                    table.noslistgrid('destroy');
                     $div.remove();
                 }
                 return this.heights;
@@ -2133,7 +2133,7 @@ define('jquery-nos-appdesk',
                 var table = $('<table></table>')
                     .addClass('nos-appdesk')
                     .appendTo($div)
-                    .nosgrid({
+                    .noslistgrid({
                         scrollMode : 'none',
                         showFilter: true,
                         allowPaging : true,
@@ -2168,7 +2168,7 @@ define('jquery-nos-appdesk',
                 });
                 //this.cache[text] = $div.find('.buttontd .buttontd:first').outerWidth();
                 var width = $div.find('.buttontd .buttontd:first').outerWidth();
-                table.nosgrid('destroy');
+                table.noslistgrid('destroy');
                 $div.remove();
                 return width;
                 //return this.cache[text];

@@ -18,7 +18,7 @@ define('jquery-nos-preview',
 ], function( $ ) {
     "use strict";
         var undefined = void(0);
-	$.widget( "nos.inspectorPreview", {
+	$.widget( "nos.preview", {
 		options: {
             meta : {},
             actions : [],
@@ -36,7 +36,7 @@ define('jquery-nos-preview',
 			var self = this,
 				o = self.options;
 
-			self.element.addClass('nos-inspector-preview ui-widget ui-widget-content wijmo-wijgrid')
+			self.element.addClass('nos-preview ui-widget ui-widget-content wijmo-wijgrid')
                 .parents('.nos-appdesk')
                 .bind('selectionChanged.appdesk', function(e, data) {
                     if ($.isPlainObject(data)) {
@@ -65,7 +65,7 @@ define('jquery-nos-preview',
 				o = self.options;
 
 			var table = $('<table cellspacing="0" cellpadding="0" border="0"><thead></thead></table>')
-					.addClass('nos-inspector-preview-header wijmo-wijsuperpanel-header wijmo-wijgrid-root wijmo-wijgrid-table')
+					.addClass('nos-preview-header wijmo-wijsuperpanel-header wijmo-wijgrid-root wijmo-wijgrid-table')
 					.css({
 						borderCollapse : 'separate',
 						'-moz-user-select' : '-moz-none'
@@ -93,7 +93,7 @@ define('jquery-nos-preview',
 			if (o.actions.length > 0) {
 
 				self.uiFooter = $('<div></div>')
-					.addClass('nos-inspector-preview-footer')
+					.addClass('nos-preview-footer')
 					.appendTo(self.uiContainer);
 
                 $.each(o.actions, function() {
@@ -176,7 +176,7 @@ define('jquery-nos-preview',
 						height = img.height();
 
 					var div = $('<div></div>')
-						.addClass('nos-inspector-preview-thumb')
+						.addClass('nos-preview-thumb')
 						.css({
 							backgroundImage :'url("' + img.attr('src') +'")',
 							height : (height <= 100 ? height : 100) + 'px'
@@ -222,7 +222,7 @@ define('jquery-nos-preview',
                 i = 0;
 
 			var table = $('<table cellspacing="0" cellpadding="0" border="0"><tbody></tbody></table>')
-					.addClass('nos-inspector-preview-metadata wijmo-wijgrid-root wijmo-wijgrid-table')
+					.addClass('nos-preview-metadata wijmo-wijgrid-root wijmo-wijgrid-table')
 					.css({
 						borderCollapse : 'separate',
 						'-moz-user-select' : '-moz-none'
@@ -262,7 +262,7 @@ define('jquery-nos-preview',
 			self._uiHeader(o.texts.headerDefault);
 
 			self.uiContainer = $('<div></div>')
-				.addClass('nos-inspector-preview-noitem')
+				.addClass('nos-preview-noitem')
 				.text(o.texts.selectItem)
 				.appendTo(self.element);
 
@@ -293,7 +293,7 @@ define('jquery-nos-preview',
 				self._uiHeader(data.title);
 
 				self.uiContainer = $('<div></div>')
-					.addClass('nos-inspector-preview-container')
+					.addClass('nos-preview-container')
 					.appendTo(self.element);
 
 				self._uiThumbnail(data)

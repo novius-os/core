@@ -282,7 +282,7 @@
 	                padding: 4px 5px;
 	            }
 
-				.wijmo-wijgrid, .nos-thumbnails {
+				.wijmo-wijgrid, .nos-thumbnailsgrid {
 					@include box-sizing(border-box);
 				}
 			}
@@ -320,7 +320,7 @@
 	}
 }
 
-.nos-thumbnails-thumb {
+.nos-thumbnailsgrid-thumb {
 	.buttontd {
 		th {
 			border-width: 1px 1px 0 0;

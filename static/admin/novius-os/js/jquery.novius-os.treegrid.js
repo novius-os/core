@@ -19,7 +19,7 @@ define('jquery-nos-treegrid',
 ], function( $ ) {
     "use strict";
     var undefined = void(0);
-	$.widget( "nos.nostreegrid", $.nos.nosgrid, {
+	$.widget( "nos.nostreegrid", $.nos.noslistgrid, {
 		options: {
             treeUrl : '',
             treeOptions : null,
@@ -72,7 +72,7 @@ define('jquery-nos-treegrid',
 
             o.allowPaging = false;
 
-            $.nos.nosgrid.prototype._create.call(self);
+            $.nos.noslistgrid.prototype._create.call(self);
 		},
 
 		_init: function() {
@@ -141,7 +141,7 @@ define('jquery-nos-treegrid',
                 this.sortDirection = 'none';
             });
 
-            $.nos.nosgrid.prototype._init.call(self);
+            $.nos.noslistgrid.prototype._init.call(self);
 
             self._datasource();
             self.treeDataSource.proxy.options.data.deep = 2;
@@ -156,7 +156,7 @@ define('jquery-nos-treegrid',
         _setOption: function(key, value){
             var self = this;
 
-            $.nos.nosgrid.prototype._setOption.apply(self, arguments);
+            $.nos.noslistgrid.prototype._setOption.apply(self, arguments);
 
             if (key === 'treeOptions') {
                 self._datasource()
