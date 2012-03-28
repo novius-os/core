@@ -10,10 +10,10 @@
 
 namespace Cms;
 
-abstract class Orm_Behavior extends \Orm\Observer
+abstract class Orm_Behaviour extends \Orm\Observer
 {
 
-	public static function behavior($instance, $method, $args)
+	public static function behaviour($instance, $method, $args)
 	{
 		$model_class = is_object($instance) ? get_class($instance) : $instance;
 		if (method_exists(static::instance($model_class), $method))
@@ -24,19 +24,17 @@ abstract class Orm_Behavior extends \Orm\Observer
 				return call_user_func_array(array(static::instance($model_class), $method), $args);
 			}
 		}
-        throw new Orm\UnknownMethodBehaviorException();
+        throw new Orm\UnknownMethodBehaviourException();
 	}
 
 	public static function instance($model_class)
 	{
-		$behavior = get_called_class();
-		if (empty(static::$_instances[$behavior][$model_class]))
+		$behaviour = get_called_class();
+		if (empty(static::$_instances[$behaviour][$model_class]))
 		{
-			static::$_instances[$behavior][$model_class] = new static($model_class);
+			static::$_instances[$behaviour][$model_class] = new static($model_class);
 		}
 
-		return static::$_instances[$behavior][$model_class];
+		return static::$_instances[$behaviour][$model_class];
 	}
 }
-
-/* End of file observer.php */

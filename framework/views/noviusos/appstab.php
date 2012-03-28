@@ -16,7 +16,7 @@ require(['jquery-nos'], function($) {
 		//$('#switcher').themeswitcher();
         $('#apps').sortable({
             update: function() {
-                orders = {};
+                var orders = {};
                 $('.app').each(function(i) {
                     orders[$(this).data('key')] = {order: i};
                 });
@@ -54,13 +54,13 @@ require(['jquery-nos'], function($) {
 <script type="text/javascript">
 require(['jquery-nos'], function($) {
 	$('a.app').click(function(e) {
+		e.preventDefault();
         var tab = $(this).data('launcher');
 		$.nos.tabs.add($.extend({
 			app: true,
 			iconSize: 32,
 			labelDisplay: false
 		}, tab), true);
-		e.preventDefault();
 	});
 });
 </script>

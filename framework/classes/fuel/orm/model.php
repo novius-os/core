@@ -10,8 +10,8 @@
 
 namespace Cms\Orm;
 
-class UnknownBehaviorException extends \Exception {};
-class UnknownMethodBehaviorException extends \Exception {};
+class UnknownBehaviourException extends \Exception {};
+class UnknownMethodBehaviourException extends \Exception {};
 
 use Arr;
 use DB;
@@ -24,7 +24,7 @@ class Model extends \Orm\Model {
 	/**
 	 * @var  array  cached observers
 	 */
-	protected static $_behaviors_cached = array();
+	protected static $_behaviours_cached = array();
 
 	public $medias;
 	public $wysiwygs;
@@ -41,6 +41,17 @@ class Model extends \Orm\Model {
 	 * @see \Orm\Model::relations()
 	 */
 	public static function relations($specific = false) {
+
+        /*
+        $relations = \Event::trigger(get_called_class().'.relations', '', array());
+        foreach ($relations as $relation) {
+            foreach ($relation as $type => $rels) {
+                foreach ($rels as $name => $props) {
+                    static::${'_'.$type}[$name] = $props;
+                }
+            }
+        }
+        */
 
         static::$_has_many['linked_wysiwygs'] = array(
 			'key_from' => static::$_primary_key[0],
@@ -82,7 +93,7 @@ class Model extends \Orm\Model {
 
 		if ( !$init)
 		{
-			static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviors());
+			static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviours());
 		}
 
 		if ($specific)
@@ -94,42 +105,42 @@ class Model extends \Orm\Model {
 	}
 
 	/**
-	 * Get the class's behaviors and what they observe
+	 * Get the class's behaviours and what they observe
 	 *
-	 * @param   string  specific behavior to retrieve info of, allows direct param access by using dot notation
+	 * @param   string  specific behaviour to retrieve info of, allows direct param access by using dot notation
 	 * @param   mixed   default return value when specific key wasn't found
 	 * @return  array
 	 */
-	public static function behaviors($specific = null, $default = null)
+	public static function behaviours($specific = null, $default = null)
 	{
 		$class = get_called_class();
 
-		if ( ! array_key_exists($class, static::$_behaviors_cached))
+		if ( ! array_key_exists($class, static::$_behaviours_cached))
 		{
-			$behaviors = array();
-			if (property_exists($class, '_behaviors'))
+			$behaviours = array();
+			if (property_exists($class, '_behaviours'))
 			{
-				foreach (static::$_behaviors as $beha_k => $beha_v)
+				foreach (static::$_behaviours as $beha_k => $beha_v)
 				{
 					if (is_int($beha_k))
 					{
-						$behaviors[$beha_v] = array();
+						$behaviours[$beha_v] = array();
 					}
 					else
 					{
-						$behaviors[$beha_k] = $beha_v;
+						$behaviours[$beha_k] = $beha_v;
 					}
 				}
 			}
-			static::$_behaviors_cached[$class] = $behaviors;
+			static::$_behaviours_cached[$class] = $behaviours;
 		}
 
 		if ($specific)
 		{
-			return \Arr::get(static::$_behaviors_cached[$class], $specific, $default);
+			return \Arr::get(static::$_behaviours_cached[$class], $specific, $default);
 		}
 
-		return static::$_behaviors_cached[$class];
+		return static::$_behaviours_cached[$class];
 	}
 
 
@@ -145,46 +156,46 @@ class Model extends \Orm\Model {
 
 	public function __call($method, $args) {
 		try {
-			return static::_callBehavior($this, $method, $args);
-		} catch (\Cms\Orm\UnknownBehaviorException $e) {}
+			return static::_callBehaviour($this, $method, $args);
+		} catch (\Cms\Orm\UnknownBehaviourException $e) {}
 
 		return parent::__call($method, $args);
 	}
 
 	public static function __callStatic($method, $args) {
 		try {
-			return static::_callBehavior(get_called_class(), $method, $args);
-		} catch (\Cms\Orm\UnknownBehaviorException $e) {}
+			return static::_callBehaviour(get_called_class(), $method, $args);
+		} catch (\Cms\Orm\UnknownBehaviourException $e) {}
 
 		return parent::__callStatic($method, $args);
 	}
 
-	private static function _callBehavior($context, $method, $args) {
-		foreach (static::behaviors() as $behavior => $settings)
+	private static function _callBehaviour($context, $method, $args) {
+		foreach (static::behaviours() as $behaviour => $settings)
 		{
-			if ( ! class_exists($behavior))
+			if ( ! class_exists($behaviour))
 			{
-                throw new \UnexpectedValueException($behavior);
+                throw new \UnexpectedValueException($behaviour);
 			}
 
             try {
-                return call_user_func_array(array($behavior, 'behavior'), array($context, $method, $args));
-            } catch (\Cms\Orm\UnknownMethodBehaviorException $e) {}
+                return call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
+            } catch (\Cms\Orm\UnknownMethodBehaviourException $e) {}
 		}
-		throw new \Cms\Orm\UnknownBehaviorException();
+		throw new \Cms\Orm\UnknownBehaviourException();
 	}
 
-	public static function _callAllBehaviors($context, $method, $args) {
-		foreach (static::behaviors() as $behavior => $settings)
+	public static function _callAllBehaviours($context, $method, $args) {
+		foreach (static::behaviours() as $behaviour => $settings)
 		{
-			if ( ! class_exists($behavior))
+			if ( ! class_exists($behaviour))
 			{
-                throw new \UnexpectedValueException($behavior);
+                throw new \UnexpectedValueException($behaviour);
 			}
 
             try {
-                call_user_func_array(array($behavior, 'behavior'), array($context, $method, $args));
-            } catch (\Cms\Orm\UnknownMethodBehaviorException $e) {}
+                call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
+            } catch (\Cms\Orm\UnknownMethodBehaviourException $e) {}
 		}
 	}
 
@@ -194,19 +205,19 @@ class Model extends \Orm\Model {
 
     public function import_dataset_behaviours(&$dataset) {
 		try {
-            static::_callAllBehaviors(get_called_class(), 'dataset', array(&$dataset, $this));
+            static::_callAllBehaviours(get_called_class(), 'dataset', array(&$dataset, $this));
         } catch (\Exception $e) {}
     }
 
     public function form_processing_behaviours($data, &$json_response) {
 		try {
-            static::_callAllBehaviors($this, 'form_processing', array($data, &$json_response));
+            static::_callAllBehaviours($this, 'form_processing', array($data, &$json_response));
         } catch (\Exception $e) {}
     }
 
     public function form_fieldset_fields(&$fieldset) {
 		try {
-            static::_callAllBehaviors($this, 'form_fieldset_fields', array(&$fieldset));
+            static::_callAllBehaviours($this, 'form_fieldset_fields', array(&$fieldset));
         } catch (\Exception $e) {}
     }
 
@@ -221,9 +232,9 @@ class Model extends \Orm\Model {
 	public static function search($where, $order_by = array(), $options = array()) {
 
 		try {
-			static::_callAllBehaviors(get_called_class(), 'before_search', array(&$where, &$order_by, &$options));
+			static::_callAllBehaviours(get_called_class(), 'before_search', array(&$where, &$order_by, &$options));
 		} catch (\Exception $e) {
-			if ($e->getMessage() !== 'no behavior') {
+			if ($e->getMessage() !== 'no behaviour') {
 				throw $e;
 			}
 		}
