@@ -24,30 +24,30 @@
 	@include box-sizing(border-box);
 }
 
-.nos-mp3grid {
+.nos-appdesk {
     position : relative;
     width : 100%;
     height : 100%;
 
-	.nos-mp3grid-headerbar {
+	.nos-appdesk-headerbar {
 		margin : 0px 10px 0;
 
-		.nos-mp3grid-adds {
+		.nos-appdesk-adds {
 			float : left;
             margin-top: 5px;
 		}
-        .nos-mp3grid-action-secondary {
+        .nos-appdesk-action-secondary {
             display : inline-block;
             margin: 0 1em;
         }
-		.nos-mp3grid-dropdownviews, .nos-mp3grid-dropdownlang {
+		.nos-appdesk-dropdownviews, .nos-appdesk-dropdownlang {
 			float : right;
             margin-top: 10px;
             margin-left: 10px;
 		}
 	}
 
-	.nos-mp3grid-splitter-v {
+	.nos-appdesk-splitter-v {
 		@include box-sizing(border-box);
 		position : absolute;
         top : 45px;
@@ -81,7 +81,7 @@
             }
 
 
-			ul.nos-mp3grid-inspectors-v {
+			ul.nos-appdesk-inspectors-v {
 				position : absolute;
 				top : 0;
 				left : 0;
@@ -123,7 +123,7 @@
                     padding : 0.1em 1em;
                 }
 
-				ul.nos-mp3grid-inspectors-h {
+				ul.nos-appdesk-inspectors-h {
 					position : absolute;
 					top : 0px;
 					left : 0px;
@@ -154,12 +154,12 @@
 			.wijmo-wijsplitter-h-panel2 {
 			    font-size : 1.05em;
 
-				.nos-mp3grid-searchbar-container {
+				.nos-appdesk-searchbar-container {
 				    border-bottom-width: 0;
 		            border-top-width: 0;
 					z-index : 1;
 
-	                .nos-mp3grid-title {
+	                .nos-appdesk-title {
 	                    text-transform: uppercase;
 	                }
 
@@ -180,7 +180,7 @@
 	                    background-position: 0 0;
 	                }
 
-	                .nos-mp3grid-input-container {
+	                .nos-appdesk-input-container {
 	                    position: relative;
 	                    float: right;
 	                    font-size: 0.8em;
@@ -191,16 +191,16 @@
                             vertical-align: middle;
                         }
 
-	                    .nos-mp3grid-search-icon {
+	                    .nos-appdesk-search-icon {
 	                        left: 1px;
 	                    }
 
-                        .nos-mp3grid-search-input {
+                        .nos-appdesk-search-input {
                             -webkit-appearance: initial;
                             width: 10em;
                         }
 
-                        .nos-mp3grid-reset-search {
+                        .nos-appdesk-reset-search {
                             display: inline-block;
                             position: relative;
                             line-height: 1em;
@@ -218,12 +218,12 @@
                             }
                         }
 
-                        .nos-mp3grid-inspectorstags {
+                        .nos-appdesk-inspectorstags {
                             display: inline-block;
                             text-align: right;
                             margin-left: 5px;
 
-                            .nos-mp3grid-inspectorstag {
+                            .nos-appdesk-inspectorstag {
                                 position: relative;
                                 display :inline-block;
                                 margin-left : 10px;
@@ -258,14 +258,14 @@
                         }
 	                }
 
-                    .nos-mp3grid-views-button {
+                    .nos-appdesk-views-button {
 					    float: right;
 						margin-left : 5px;
 	                    font-size: 0.8em;
 	                    margin-top: -3px;
                     }
 
-					.nos-mp3grid-nbresult {
+					.nos-appdesk-nbresult {
 					    float: right;
 						margin-left : 5px;
 	                    font-size: 0.8em;
@@ -273,7 +273,7 @@
 					}
 				}
 
-	            .nos-mp3grid-pagination {
+	            .nos-appdesk-pagination {
 	                float: left;
 	                margin-right: 5px;
 	                font-weight: normal;

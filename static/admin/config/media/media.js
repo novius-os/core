@@ -11,9 +11,9 @@ define([
     'jquery-nos-appdesk'
 ], function($) {
     "use strict";
-    return function(mp3Grid) {
+    return function(appDesk) {
         return {
-            mp3grid : {
+            appdesk : {
                 inspectorsOrder : 'folders,extensions,preview'
             }
         }

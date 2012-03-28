@@ -11,15 +11,15 @@ define([
     'jquery-nos-appdesk'
 ], function($) {
     "use strict";
-    return function(mp3Grid) {
+    return function(appDesk) {
         return {
             tab : {
-                label : mp3Grid.i18n('Users'),
+                label : appDesk.i18n('Users'),
                 iconUrl : 'static/cms/admin/novius-os/img/32/user.png'
             },
             actions : {
                 edit : {
-                    label : mp3Grid.i18n('Edit'),
+                    label : appDesk.i18n('Edit'),
                     icon : 'pencil',
                     primary : true,
                     action : function(item, ui) {
@@ -30,28 +30,28 @@ define([
                     }
                 },
                 'delete' : {
-                    label : mp3Grid.i18n('Delete'),
+                    label : appDesk.i18n('Delete'),
                     icon : 'trash',
                     primary : true,
                     action : function(item, ui) {
                         $.nos.dialog({
                             contentUrl: 'admin/cms/user/user/delete_user/' + item.id,
                             ajax : true,
-                            title: mp3Grid.i18n('Delete a user')._(),
+                            title: appDesk.i18n('Delete a user')._(),
                             width: 400,
                             height: 150
                         });
                     }
                 }
             },
-            mp3grid : {
+            appdesk : {
                 adds : {
                     user : {
-                        label : mp3Grid.i18n('Add a user'),
+                        label : appDesk.i18n('Add a user'),
                         action : function() {
                             $.nos.tabs.add({
                                 url : 'admin/cms/user/form/add',
-                                label : mp3Grid.i18n('Add a user')._()
+                                label : appDesk.i18n('Add a user')._()
                             });
                         }
                     }
@@ -60,12 +60,12 @@ define([
                     proxyUrl : 'admin/cms/user/list/json',
                     columns : {
                         user : {
-                            headerText : mp3Grid.i18n('Name'),
+                            headerText : appDesk.i18n('Name'),
                             dataKey : 'fullname',
                             sortDirection : 'ascending'
                         },
                         email : {
-                            headerText : mp3Grid.i18n('Email'),
+                            headerText : appDesk.i18n('Email'),
                             dataKey : 'email'
                         },
                         actions : {

@@ -283,7 +283,7 @@ define('jquery-nos-thumbnailsgrid',
 
 			self._itemThumbnail(imgContainer, item, index);
 
-			var buttons = $.nos.mp3gridActions(o.actions, noParseData);
+			var buttons = $.nos.appdeskActions(o.actions, noParseData);
 
 			buttons.appendTo(container);
 

@@ -37,8 +37,8 @@ define('jquery-nos-preview',
 				o = self.options;
 
 			self.element.addClass('nos-inspector-preview ui-widget ui-widget-content wijmo-wijgrid')
-                .parents('.nos-mp3grid')
-                .bind('selectionChanged.mp3grid', function(e, data) {
+                .parents('.nos-appdesk')
+                .bind('selectionChanged.appdesk', function(e, data) {
                     if ($.isPlainObject(data)) {
                         self.select(data);
                     } else {

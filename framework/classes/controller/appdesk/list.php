@@ -23,22 +23,22 @@ use Asset, Format, Input, Session, View, Uri;
  * @package  app
  * @extends  Controller
  */
-class Controller_Mp3table_List extends Controller_Generic_Admin {
+class Controller_Appdesk_List extends Controller_Generic_Admin {
 
-	protected $mp3grid = array();
+	protected $appdesk = array();
 
     public function before($response = null) {
         parent::before($response);
-        if (!isset($this->config['mp3grid'])) {
+        if (!isset($this->config['appdesk'])) {
             list($module_name, $file_name) = $this->getLocation();
             $file_name = explode('/', $file_name);
-            array_splice($file_name, count($file_name) - 1, 0, array('mp3grid'));
+            array_splice($file_name, count($file_name) - 1, 0, array('appdesk'));
             $file_name = implode('/', $file_name);
         } else {
-            list($module_name, $file_name) = explode('::', $this->config['mp3grid']);
+            list($module_name, $file_name) = explode('::', $this->config['appdesk']);
         }
 
-		$this->mp3grid = \Config::mergeWithUser($module_name.'::'.$file_name, static::loadConfiguration($module_name, $file_name));
+		$this->appdesk = \Config::mergeWithUser($module_name.'::'.$file_name, static::loadConfiguration($module_name, $file_name));
     }
 
 	public function action_index($view = null) {
@@ -48,21 +48,21 @@ class Controller_Mp3table_List extends Controller_Generic_Admin {
 		}
 
         if (empty($view)) {
-            $view = \Input::get('view', $this->mp3grid['selectedView']);
+            $view = \Input::get('view', $this->appdesk['selectedView']);
         }
-        $this->mp3grid['selectedView'] = $view;
+        $this->appdesk['selectedView'] = $view;
 
-        if (empty($this->mp3grid['custom'])) {
-            $this->mp3grid['custom'] = array(
+        if (empty($this->appdesk['custom'])) {
+            $this->appdesk['custom'] = array(
                 'from' => 'default',
             );
         }
 
-		$view = View::forge('mp3table/list');
+		$view = View::forge('appdesk/list');
 
 		$locales = \Config::get('locales', array());
 
-        $view->set('mp3grid', \Format::forge(array_merge(array('locales' => $locales), $this->mp3grid))->to_json(), false);
+        $view->set('appdesk', \Format::forge(array_merge(array('locales' => $locales), $this->appdesk))->to_json(), false);
 		return $view;
 	}
 
@@ -75,7 +75,7 @@ class Controller_Mp3table_List extends Controller_Generic_Admin {
 			));
 		}
 
-	    $config = $this->mp3grid;
+	    $config = $this->appdesk;
 	    $where = function($query) use ($config) {
 		    foreach ($config['inputs'] as $input => $condition) {
 			    $value = Input::get('inspectors.'.$input);
@@ -103,11 +103,11 @@ class Controller_Mp3table_List extends Controller_Generic_Admin {
 		    return $query;
 	    };
 
-	    $return = $this->items(array_merge($this->mp3grid['query'], array(
+	    $return = $this->items(array_merge($this->appdesk['query'], array(
 		    'callback' => array($where),
-		    'dataset' => $this->mp3grid['dataset'],
+		    'dataset' => $this->appdesk['dataset'],
 		    'lang' => Input::get('lang', null),
-	        'limit' => intval(Input::get('limit', \Arr::get($this->mp3grid['query'], 'limit'))),
+	        'limit' => intval(Input::get('limit', \Arr::get($this->appdesk['query'], 'limit'))),
 	        'offset' => intval(Input::get('offset', 0)),
 	    )));
 
@@ -176,10 +176,10 @@ class Controller_Mp3table_List extends Controller_Generic_Admin {
 			));
 		}
 
-        $tree_config = $this->mp3grid['tree'];
-        $tree_config['id'] =  $this->mp3grid['configuration_id'];
+        $tree_config = $this->appdesk['tree'];
+        $tree_config['id'] =  $this->appdesk['configuration_id'];
 
-		$json = $this->tree(array_merge(array('id' => $this->mp3grid['configuration_id']), $this->mp3grid['tree']));
+		$json = $this->tree(array_merge(array('id' => $this->appdesk['configuration_id']), $this->appdesk['tree']));
 
 		if (\Fuel::$env === \Fuel::DEVELOPMENT) {
 			$json['get'] = Input::get();
