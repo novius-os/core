@@ -17,7 +17,7 @@ define('jquery-nos-listgrid',
     'order!jquery-nos'
 ], function( $ ) {
     "use strict";
-	$.widget( "nos.nosgrid", $.wijmo.wijgrid, {
+	$.widget( "nos.noslistgrid", $.wijmo.wijgrid, {
 		options: {
             texts : {
                 loading : 'Loading...'

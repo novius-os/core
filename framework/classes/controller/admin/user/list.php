@@ -12,6 +12,6 @@ namespace Cms;
 
 use Fuel\Core\Config;
 
-class Controller_Admin_User_List extends Controller_Mp3table_List {
+class Controller_Admin_User_List extends Controller_Appdesk_List {
 
 }

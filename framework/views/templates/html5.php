@@ -10,14 +10,6 @@
 
 	$assets_minified = \Config::get('assets_minified', true);
 	$paths = array(
-		'jquery-nos' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-listgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-loadspinner' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-preview' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-thumbnailsgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-treegrid' => 'static/cms/admin/novius-os/js/novius-os.min',
-		'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/novius-os.min',
 		'jquery-nos' => 'static/cms/admin/novius-os/js/jquery.novius-os',
 		'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/jquery.novius-os.appdesk',
 		'jquery-nos-listgrid' => 'static/cms/admin/novius-os/js/jquery.novius-os.listgrid',
@@ -49,6 +41,7 @@
 			'jquery-nos-thumbnailsgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
 			'jquery-nos-treegrid' => 'static/cms/admin/novius-os/js/novius-os.min',
 			'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'tinymce' => 'static/cms/admin/vendor/tinymce/jquery.tinymce',
 		));
 	}
 ?>

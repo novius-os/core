@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-	$mp3view = (string) Request::forge('cms/admin/media/list/index')->execute(array('image_pick'))->response();
+	$appdeskview = (string) Request::forge('cms/admin/media/list/index')->execute(array('image_pick'))->response();
 	$uniqid = uniqid('tabs_');
 	$id_library = $uniqid.'_library';
 	$id_properties = $uniqid.'_properties';
@@ -234,10 +234,10 @@ require(['jquery-nos'], function($) {
 		if (!newimg) {
 			$container.wijtabs('select', 1)
 				.bind('wijtabsshow', function() {
-					$library.html(<?= \Format::forge()->to_json($mp3view) ?>);
+					$library.html(<?= \Format::forge()->to_json($appdeskview) ?>);
 				});
 		} else {
-			$library.html(<?= \Format::forge()->to_json($mp3view) ?>);
+			$library.html(<?= \Format::forge()->to_json($appdeskview) ?>);
 		}
 	});
 });
