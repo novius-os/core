@@ -1618,7 +1618,7 @@ define('jquery-nos-appdesk',
 	});
 
     $.extend($.nos, {
-        mp3Add: function(id, config) {
+        appdeskAdd: function(id, config) {
             var self = this;
             var onCustom = false;
             var jsonFile = "";
@@ -1699,7 +1699,7 @@ define('jquery-nos-appdesk',
                     var newDiv = $('<div id="' + id + '"></div>');
                     newDiv.insertAfter(div);
                     div.remove();
-                    self.mp3Add(id, config);
+                    self.appdeskAdd(id, config);
                 });
 
             });
