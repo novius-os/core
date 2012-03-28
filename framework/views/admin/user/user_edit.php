@@ -40,47 +40,18 @@ foreach ($fieldset->field() as $field) {
 ?>
 
 <div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+    <div style="margin-left: 4%; margin-right: 4%; height: 28px;">
+        <h1 class="title" style="float:left;"><?= $user->fullname(); ?></h1>
+    </div>
 	<? /*<div class="unit col c1"></div>
 	<div class="unit col c10" id="line_first" style="position:relative;"> */ ?>
-        <div id="tabs" style="width: 92.4%; clear:both; margin:0 auto 1em;">
+        <div class="tabs" style="width: 92.4%; clear:both; margin:0 auto 1em;">
             <ul style="width: 15%;">
                 <li><a href="#details"><?= __('User details') ?></a></li>
                 <li><a href="#permissions"><?= __('Permissions') ?></a></li>
             </ul>
             <div id="details">
-                <?= $fieldset->open('admin/cms/user/form/edit/'.$user->user_id); ?>
-                <?= View::forge('form/layout_standard', array(
-                    'fieldset' => $fieldset,
-                    // Used by the behaviours (publishable, etc.)
-                    'object' => $user,
-                    'medias' => null,
-                    'title' => array('user_firstname', 'user_name'),
-                    'id' => 'user_id',
-
-                    'save' => 'save',
-
-                    'subtitle' => array(),
-
-                    'content' => array(
-                        \View::forge('form/expander', array(
-                            'title'   => 'Details',
-                            'nomargin' => false,
-                            'content' => \View::forge('form/fields', array(
-                                'fieldset' => $fieldset,
-                                'fields' => array('user_email', 'user_last_connection'),
-                            ), false)
-                        ), false),
-                        \View::forge('form/expander', array(
-                            'title'   => 'Set a new password',
-                            'nomargin' => false,
-                            'content' => \View::forge('form/fields', array(
-                                'fieldset' => $fieldset,
-                                'fields' => array('password_reset', 'password_confirmation'),
-                            ), false)
-                        ), false),
-                    ),
-                ), false); ?>
-                <?= $fieldset->close(); ?>
+                <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
             </div>
             <div id="permissions">
                <?= $permissions ?>
@@ -94,7 +65,8 @@ foreach ($fieldset->field() as $field) {
 <script type="text/javascript">
     require(['jquery-nos'], function($) {
         $(function() {
-            var $tabs = $('#tabs');
+            var $container = $('#<?= $uniqid ?>');
+            var $tabs = $container.find('.tabs');
             $tabs.wijtabs({
                 alignment: 'left'
             });
@@ -105,7 +77,7 @@ foreach ($fieldset->field() as $field) {
             $tabs.find('> div').css({
                 width : '84%'
             });
-            var $container = $('#<?= $uniqid ?>');
+
             var $password = $container.find('input[name=user_password]');
 
             <?php $formatter = \Format::forge(); ?>

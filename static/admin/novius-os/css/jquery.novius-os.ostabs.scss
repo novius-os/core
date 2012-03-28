@@ -6,7 +6,6 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-@import "compass/css3/gradient";
 @import "compass/css3/box-shadow";
 @import "compass/css3/box-sizing";
 @import "compass/css3/border-radius";
@@ -15,6 +14,7 @@
 @import "compass/css3/transition";
 @import "compass/css3/transform";
 @import "compass/css3/text-shadow";
+@import "compass/css3/images";
 $support-for-original-webkit-gradients: true;
 
 body {
@@ -272,7 +272,7 @@ body {
 	> .ui-widget-header {
 		position : relative;
 		z-index : 1;
-		@include background-image(linear-gradient(#222222, #111111));
+		@include background(linear-gradient(#222222, #111111));
 
 		li.nos-ostabs-appstab {
 			margin : 0px 60px 0 0px;

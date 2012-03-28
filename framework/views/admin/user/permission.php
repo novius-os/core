@@ -14,6 +14,10 @@
 <form action="admin/cms/user/form/save_permissions" method="POST" id="<?= $uniqid = uniqid('id_') ?>">
   <input type="hidden" name="group_id" value="<?= $group->group_id ?>" />
 
+    <div class="actions_zone">
+        <?= render('form/action_or_cancel') ?>
+    </div>
+
 	<div class="applications">
 	    <div class="application all">
 			<div class="maincheck">
@@ -73,9 +77,7 @@ foreach ($apps as $app => $perms) {
 }
 ?>
 	</div>
-    <div style="margin-top: 30px; margin-bottom: 20px; text-align: center;">
-        <button type="submit" data-icon="check" style="font-size: 2em;"><?= __('Save the permissions') ?></button>
-    </div>
+
 </form>
 </div>
 
@@ -87,6 +89,13 @@ foreach ($apps as $app => $perms) {
     	var $form = $('#<?= $uniqid ?>');
 
     	$.nos.ui.form($form);
+
+        $(".permissions .applications .application.item").click(function() {
+            var $checkbox = $(this).find('.maincheck input[type="checkbox"]');
+            $checkbox.attr('checked', !$checkbox.is(':checked'));
+            $checkbox.change();
+            $checkbox.wijcheckbox('refresh');
+        });
 
     	$(".permissions .applications .application.item :input[type='checkbox']").unbind('change').change(function() {
 			var $access_to_everything = $(this).closest('.applications').find(":input[name='access_to_everything']");
