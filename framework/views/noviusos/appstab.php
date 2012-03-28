@@ -35,9 +35,6 @@ require(['jquery-nos'], function($) {
 	<input type="search" name="search" placeholder="<?= __('Search') ?>" data-button-go="false" />
 </form>
 </div>
-
-<link rel="stylesheet" type="text/css" href="static/cms/admin/novius-os/css/home.css"></link>
-
 <div id="apps">
 	<?php
 	foreach ($apps as $app) {

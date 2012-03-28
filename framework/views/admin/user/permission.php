@@ -9,12 +9,6 @@
  */
 
 ?>
-
-<script type="text/javascript">
-    require(['link!static/cms/admin/novius-os/css/permissions.css']);
-</script>
-
-
 <div class="permissions">
 
 <form action="admin/cms/user/form/save_permissions" method="POST" id="<?= $uniqid = uniqid('id_') ?>">

@@ -220,23 +220,6 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
 
 	public function after($response) {
-
-		// Yahoo CSS Reset
-		//\Asset::css('http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css', array(), 'css');
-
-		\Asset::add_path('static/cms/admin/vendor/wijmo/');
-        \Asset::css('aristo/jquery-wijmo.css', array(), 'css');
-        \Asset::css('jquery.wijmo-complete.all.2.0.3.min.css', array(), 'css');
-
-		\Asset::add_path('static/cms/admin/novius-os/');
-		// laGrid before base
-		\Asset::css('laGrid.css', array(), 'css');
-        // base after wijmo
-		\Asset::css('base.css', array(), 'css');
-		\Asset::css('form.css', array(), 'css');
-        \Asset::css('jquery.nos.ostabs.css', array(), 'css');
-        \Asset::css('jquery.nos.mp3grid.css', array(), 'css');
-
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
