@@ -49,6 +49,7 @@
 			'jquery-nos-thumbnailsgrid' => 'static/cms/admin/novius-os/js/novius-os.min',
 			'jquery-nos-treegrid' => 'static/cms/admin/novius-os/js/novius-os.min',
 			'jquery-nos-ostabs' => 'static/cms/admin/novius-os/js/novius-os.min',
+			'tinymce' => 'static/cms/admin/vendor/tinymce/jquery.tinymce',
 		));
 	}
 ?>

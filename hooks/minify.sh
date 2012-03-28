@@ -18,3 +18,10 @@ then
   ./hooks/minify-nos-js.sh
   git add static/admin/novius-os/js/*
 fi
+
+re="static/admin/vendor/tinymce/themes/nos/editor_template_src.js"
+if [[ $files =~ $re ]]
+then
+  ./hooks/minify-nos-tiny.sh
+  git add static/admin/vendor/tinymce/themes/nos/editor_template.js
+fi

@@ -156,7 +156,7 @@
             ed.addButton('nosmedia', {
                 title : 'nos.media_title',
                 label : 'nos.media_label',
-                class : 'mce_media',
+                'class' : 'mce_media',
                 cmd : 'mceMedia'
             });
 
