@@ -4,7 +4,7 @@
 http_path = "/static/cms/admin/novius-os/css/"
 css_dir = ""
 sass_dir = ""
-images_dir = "images"
+images_dir = "img"
 javascripts_dir = "js"
 
 # You can select your preferred output style here (can be overridden via the command line):

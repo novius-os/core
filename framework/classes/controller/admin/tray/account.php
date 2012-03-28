@@ -16,11 +16,6 @@ use Fuel\Core\View;
 class Controller_Admin_Tray_Account extends \Controller {
 
     public function action_index() {
-
-        \Asset::add_path('static/cms/admin/vendor/wijmo/');
-        \Asset::css('aristo/jquery-wijmo.css', array(), 'css');
-        \Asset::css('jquery.wijmo-complete.all.2.0.3.min.css', array(), 'css');
-
 		$user = \Session::get('logged_user');
 		$fieldset_infos    = static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 		$fieldset_password = static::fieldset_password($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');

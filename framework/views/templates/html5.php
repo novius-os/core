@@ -8,6 +8,7 @@
  * @link http://www.novius-os.org
  */
 
+	$assets_minified = \Config::get('assets_minified', true);
 	$paths = array(
 		'jquery-nos' => 'static/cms/admin/novius-os/js/novius-os.min',
 		'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/novius-os.min',
@@ -38,7 +39,7 @@
 		'order' => 'static/cms/admin/vendor/requirejs/order.min',
 	);
 
-	if (\Config::get('assets_minified', true)) {
+	if ($assets_minified) {
 		$paths = array_merge($paths, array(
 			'jquery-nos' => 'static/cms/admin/novius-os/js/novius-os.min',
 			'jquery-nos-appdesk' => 'static/cms/admin/novius-os/js/novius-os.min',
@@ -64,6 +65,26 @@
 <title><?= $title ?></title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="shortcut icon" href="static/cms/admin/novius-os/img/noviusos.ico">
+<link rel="stylesheet" href="static/cms/admin/vendor/wijmo/css/aristo/jquery-wijmo.css">
+<link rel="stylesheet" href="static/cms/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.0.3.min.css">
+<?php
+	if ($assets_minified) {
+?>
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/novius-os.min.css">
+<?php
+	} else {
+?>
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/laGrid.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/novius-os.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/jquery.novius-os.ostabs.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/jquery.novius-os.appdesk.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/jquery.novius-os.listgrid.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/jquery.novius-os.treegrid.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/jquery.novius-os.thumbnailsgrid.css">
+<link rel="stylesheet" href="static/cms/admin/novius-os/css/jquery.novius-os.preview.css">
+<?php
+	}
+?>
 <?= $css ?>
 <script type="text/javascript">
 	var require = {
