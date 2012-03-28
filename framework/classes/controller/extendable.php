@@ -135,7 +135,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		    }
 	    }
 
-        $translatable  = $model::behaviors('Cms\Orm_Behaviour_Translatable');
+        $translatable  = $model::behaviours('Cms\Orm_Behaviour_Translatable');
         if ($translatable) {
             if (empty($config['lang'])) {
                 // No inspector, we only search items in their primary language
@@ -429,14 +429,14 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		}
 
 		// Change parent for tree relations
-		$behaviour_tree = $model_from::behaviors('Cms\Orm_Behaviour_Tree');
+		$behaviour_tree = $model_from::behaviours('Cms\Orm_Behaviour_Tree');
 		if (!empty($behaviour_tree)) {
 			$parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
 			$from->set_parent($parent);
 		}
 
 		// Change sort order
-		$behaviour_sort = $model_from::behaviors('Cms\Orm_Behaviour_Sortable');
+		$behaviour_sort = $model_from::behaviours('Cms\Orm_Behaviour_Sortable');
 		if (!empty($behaviour_sort)) {
 			switch($params['targetType']) {
 				case 'before':
@@ -504,7 +504,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 			$tree_model = $tree_config['models'][$params['model']];
 			foreach ($tree_model['childs'] as $child) {
 				$model = $child['model'];
-				if (empty($params['lang']) && $model::behaviors('Cms\Orm_Behaviour_Translatable')) {
+				if (empty($params['lang']) && $model::behaviours('Cms\Orm_Behaviour_Translatable')) {
 					$item = $model::find($params['id']);
 					$langs = $item->get_all_lang();
 					$child['where'] = array(array($child['fk'], 'IN', array_keys($langs)));

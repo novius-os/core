@@ -43,7 +43,7 @@ class Model_Media_Folder extends \Cms\Orm\Model {
 		),
 	);
 
-    protected static $_behaviors = array(
+    protected static $_behaviours = array(
 		'Cms\Orm_Behaviour_Tree' => array(
 			'events' => array('before'),
 			'parent_relation' => 'parent',

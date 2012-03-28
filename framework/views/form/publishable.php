@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 if (empty($publishable) && !empty($object)) {
-    $publishable = $object->behaviors('Cms\Orm_Behaviour_Publishable');
+    $publishable = $object->behaviours('Cms\Orm_Behaviour_Publishable');
 }
 
 if (empty($publishable)) {

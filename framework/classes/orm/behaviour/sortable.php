@@ -10,7 +10,7 @@
 
 namespace Cms;
 
-class Orm_Behaviour_Sortable extends Orm_Behavior
+class Orm_Behaviour_Sortable extends Orm_Behaviour
 {
 	protected $_class = null;
 
@@ -69,7 +69,7 @@ class Orm_Behaviour_Sortable extends Orm_Behavior
     }
 
     public function after_sort(\Cms\Orm\Model $obj) {
-        $tree = $obj->behaviors('Cms\Orm_Behaviour_Tree');
+        $tree = $obj->behaviours('Cms\Orm_Behaviour_Tree');
         $sort_property = $this->_properties['sort_property'];
         $conditions = array();
         if (!empty($tree)) {

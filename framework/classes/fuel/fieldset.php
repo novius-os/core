@@ -406,7 +406,7 @@ JS;
         if (empty($instance)) {
             return;
         }
-        $behaviour_translatable = $instance->behaviors('Cms\Orm_Behaviour_Translatable');
+        $behaviour_translatable = $instance->behaviours('Cms\Orm_Behaviour_Translatable');
         if (empty($behaviour_translatable) || $instance->is_main_lang()) {
             return;
         }

@@ -44,7 +44,7 @@ class Model_Page_Page extends \Cms\Orm\Model {
 		),
 	);
 
-	protected static $_behaviors = array(
+	protected static $_behaviours = array(
 		'Cms\Orm_Behaviour_Translatable' => array(
 			'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'before_change_parent', 'after_change_parent'),
 			'lang_property'      => 'page_lang',

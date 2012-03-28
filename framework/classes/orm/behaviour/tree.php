@@ -10,7 +10,7 @@
 
 namespace Cms;
 
-class Orm_Behaviour_Tree extends Orm_Behavior
+class Orm_Behaviour_Tree extends Orm_Behaviour
 {
 	protected $_class = null;
     protected $_parent_relation = null;
@@ -164,7 +164,7 @@ class Orm_Behaviour_Tree extends Orm_Behavior
         // Fetch the relation
         $object->get($this->_properties['parent_relation']);
         foreach ($this->_parent_relation->key_from as $i => $k) {
-            $object->set($k, $parent->get($this->_parent_relation->key_to[$i]));
+            $object->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
         }
 	}
 }

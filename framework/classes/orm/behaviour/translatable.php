@@ -10,7 +10,7 @@
 
 namespace Cms;
 
-class Orm_Behaviour_Translatable extends Orm_Behavior
+class Orm_Behaviour_Translatable extends Orm_Behaviour
 {
     protected $_class = null;
 
