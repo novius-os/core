@@ -387,7 +387,7 @@ define('jquery-nos-ostabs',
                     self.element.find( self._sanitizeSelector( self.anchors[ o.selected ].hash ) ).removeClass( "nos-ostabs-hide" );
                     this.lis.eq( o.selected ).addClass( "nos-ostabs-selected ui-state-active" );
 
-                    // seems to be expected behavior that the show callback is fired
+                    // seems to be expected behaviour that the show callback is fired
                     self.element.queue( "tabs", function() {
                         self._trigger( "show", null, self._ui( self.lis[ o.selected ] ) );
                     });
@@ -1173,14 +1173,25 @@ define('jquery-nos-ostabs',
         },
 
         _firePanelEvent : function($connector, event) {
-            var $connector = $connector.is('.nos-connector') ? $connector : $connector.find('.nos-connector');
+            $connector = $connector.is('.nos-connector') ? $connector : $connector.find('.nos-connector');
+
+            var e = $.Event(event.event, {
+                namespace : event.type || null,
+                data : event.data || null
+            });
 
             if ($connector.is('iframe')) {
                 if ($connector[0].contentDocument.$) {
-                    $connector[0].contentDocument.$('body').trigger(event.event + (event.type ? '.' + event.type : ''), event.data || null);
+                    $connector[0].contentDocument.$('body').trigger(e);
                 }
             } else {
-                $connector.trigger(event.event + (event.type ? '.' + event.type : ''), event.data || null);
+                // @todo Figure out why we need this try catch.
+                // Adding a media throws an TypeError exception : unknown method 'trigger' on DOMWindow
+                try {
+                    $connector.trigger(e);
+                } catch (e) {
+                    log(e);
+                }
             }
         },
 

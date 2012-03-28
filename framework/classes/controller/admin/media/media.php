@@ -163,12 +163,13 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             }
 
 			$body = array(
-				'notify' => 'File successfully edited.',
+				'notify' => 'File successfully added.',
 				'closeDialog' => true,
 				'fireEvent' => array(
 					'event' => 'reload',
 					'target' => 'cms_media_media',
 				),
+                'replaceTab' => 'admin/cms/media/media/edit/'.$media->media_id,
 			);
         } catch (\Exception $e) {
 			$body = array(
@@ -192,7 +193,9 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             }
             $old_media = clone $media;
 
-            if (is_uploaded_file($_FILES['media']['tmp_name'])) {
+            $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
+
+            if ($is_uploaded) {
                 $pathinfo = pathinfo(strtolower($_FILES['media']['name']));
 
                 $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
@@ -235,16 +238,26 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                     throw new \Exception(__('A file with the same name already exists.'));
                 }
 
-                if (is_uploaded_file($_FILES['media']['tmp_name'])) {
+                if ($is_uploaded) {
                     $old_media->delete_from_disk();
                 } else {
+                    // Create the directory if needed
+                    $dest_dir = dirname($dest);
+                    $base_dir = APPPATH.\Cms\Model_Media_Media::$public_path;
+                    $remaining_dir = str_replace($base_dir, '', $dest_dir);
+                    // chmod  is 0777 here because it should be restricted with by the umask
+                    is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
+
+                    if (!is_writeable($dest_dir)) {
+                        throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                    }
                     \File::rename(APPPATH.$old_media->get_public_path(), $dest);
                 }
                 $old_media->delete_public_cache();
             }
 
             // Relace old file if needed
-            if (is_uploaded_file($_FILES['media']['tmp_name'])) {
+            if ($is_uploaded) {
                 // Move the file
                 if (move_uploaded_file($_FILES['media']['tmp_name'], $dest)) {
                     chmod($dest, 0664);
@@ -253,7 +266,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             $media->save();
 
 			$body = array(
-				'notify' => 'File successfully added.',
+				'notify' => 'File successfully saved.',
 				'closeDialog' => true,
 				'fireEvent' => array(
 					'event' => 'reload',

@@ -36,11 +36,11 @@ class Widget_Media_Folder extends \Fieldset_Field {
      */
     public function build() {
 		$folder_id = $this->get_value();
-        return (string) \Request::forge('cms/admin/media/inspector/folder/list')->execute(array('inspector/modeltree_radio', array(
+        return $this->template((string) \Request::forge('cms/admin/media/inspector/folder/list')->execute(array('inspector/modeltree_radio', array(
 	        'params' => array(
 		        'treeUrl' => 'admin/cms/media/inspector/folder/json',
 		        'widget_id' => 'cms_media_folders',
-	            'input_id' => $this->get_attribute('id'),
+	            'input_name' => $this->get_name(),
 	            'selected' => array(
 		            'id' => $folder_id,
 		            'model' => 'Cms\\Model_Media_Folder',
@@ -52,6 +52,6 @@ class Widget_Media_Folder extends \Fieldset_Field {
 		        ),
 		        'height' => '150px',
 		    ),
-        )))->response();
+        )))->response());
     }
 }

@@ -38,7 +38,7 @@
 					if ($.isPlainObject(args.row.data)) {
 
 						$('<input type="radio" />').attr({
-								name : params.input_id,
+								name : params.input_name,
 								value : args.row.data._id
 							})
 							.appendTo(args.$container);
@@ -79,7 +79,7 @@
 
 						if (data && rendered) {
 							params.selected.id = data._id;
-							row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true);
+							row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true).trigger('selectionChanged', data);
 						}
 					},
 					rendering : function() {

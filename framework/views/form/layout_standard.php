@@ -17,6 +17,9 @@ require(['jquery-nos'], function($) {
 
 <?php
 foreach ($fieldset->field() as $field) {
+    if (false != strpos(get_class($field), 'Widget_')) {
+        continue;
+    }
 	if ($field->type == 'hidden') {
 		echo $field->build();
 	}
@@ -30,41 +33,53 @@ $large = !empty($large) && $large == true;
 	<div class="unit col <?= $large ? 'c8' : 'c7' ?>" id="line_first" style="z-index:99;">
 		<div class="line" style="margin-bottom:1em;">
 			<?php
-			foreach ((array) $medias as $name) {
-				echo $fieldset->field($name)->build();
-			}
+            if (!empty($medias)) {
+                foreach ((array) $medias as $name) {
+                    echo $fieldset->field($name)->build();
+                }
+            }
 			?>
 			<?php
-            $title = (array) $title;
-            $size  = min(5, floor(6 / count($title)));
-			foreach ((array) $title as $name) {
-                $field = $fieldset->field($name);
-                $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-				echo ' '.$field
-                        ->set_attribute('placeholder',$placeholder)
-                        ->set_attribute('title', $placeholder)
-                        ->set_attribute('class', 'title c'.$size)
-                        ->set_template('{field}')
-                        ->build();
-			}
-			?>
+            if (!empty($title)) {
+                $title = (array) $title;
+                $size  = min(6, floor(6 / count($title)));
+                foreach ($title as $name) {
+                    $field = $fieldset->field($name);
+                    $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+                    echo ' '.$field
+                            ->set_attribute('placeholder',$placeholder)
+                            ->set_attribute('title', $placeholder)
+                            ->set_attribute('class', 'title '.($field->type == 'file' ? '' : 'c'.$size))
+                            ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
+                            ->build();
+                }
+            }
+            ?>
 			<?php
-			$id = $fieldset->field($id);
-            $value = !empty($id) ? $id->get_value() : null;
-            if (!empty($value)) {
-                echo '<span style="opacity: 0.5">'.$id->label.$value.'</span>';
+            if (!empty($id)) {
+                $id = $fieldset->field($id);
+                $value = !empty($id) ? $id->get_value() : null;
+                if (!empty($value)) {
+                    echo '<span style="opacity: 0.5">'.$id->label.$value.'</span>';
+                }
             }
 			?>
 		</div>
-		<div class="line" style="margin-bottom:1em;overflow:visible;">
+        <?php
+        if (!empty($subtitle)) {
+            ?>
+            <div class="line" style="margin-bottom:1em;overflow:visible;">
 			<?php
             $fieldset->form()->set_config('field_template',  "\t\t{label}{required} {field} {error_msg}</td>\n");
-			foreach ((array) $subtitle as $field) {
-				echo '<div class="unit col">'.$fieldset->field($field)->build().'</div>';
-			}
+            foreach ((array) $subtitle as $field) {
+                echo '<div class="unit col">'.$fieldset->field($field)->build().'</div>';
+            }
             $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 			?>
-		</div>
+            </div>
+        <?php
+        }
+        ?>
 	</div>
 	<div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;text-align:center;">
 		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabs.close();return false;"><?= __('Cancel') ?></a></p>

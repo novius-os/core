@@ -63,7 +63,7 @@ class Controller_Admin_Page_Page extends Controller {
             },
             'success' => function() use ($page) {
                 return array(
-                    'notify' => 'Page sucessfully created.',
+                    'notify' => 'Page sucessfully added.',
                     'fireEvent' => array(
                         'event' => 'reload',
                         'target' => 'cms_page',

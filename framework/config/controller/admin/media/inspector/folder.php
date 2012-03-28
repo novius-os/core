@@ -17,6 +17,9 @@ return array(
 			'dataset' => array(
 				'id' => 'medif_id',
 				'title' => 'medif_title',
+                'path' => function($obj) {
+                    return $obj->medif_path;
+                },
 				'actions' => array(
 					'edit' => function($item) {
 						return $item->medif_parent_id != null;
