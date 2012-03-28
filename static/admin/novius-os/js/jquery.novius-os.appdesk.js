@@ -894,18 +894,6 @@ define('jquery-nos-appdesk',
 					self._loadInspector($(this));
 				});
 
-			self.uiInspectorsVertical.add(self.uiInspectorsHorizontal).sortable({
-					connectWith: ".nos-appdesk-inspectors",
-					start : function() {
-						self.resizing = false;
-					},
-					stop: function() {
-						self.resizing = true;
-						self._resizeInspectorsV(true)
-							._resizeInspectorsH(true);
-					}
-				});
-
 			return self;
 		},
 
