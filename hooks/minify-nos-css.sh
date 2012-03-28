@@ -7,7 +7,10 @@ cd $DIR/../static/admin/novius-os/css
 #kill compass watch
 
 COMPASS_WATCH=`ps -ef | grep compass | grep watch | awk '{ print $2 }'`
-kill -STOP $COMPASS_WATCH
+if [ $COMPASS_WATCH ]
+then
+  kill -STOP $COMPASS_WATCH
+if
 
 JAVA_CMD='java'
 export JAVA_CMD
