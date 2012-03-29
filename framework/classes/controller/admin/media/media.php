@@ -165,7 +165,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 			$body = array(
 				'notify' => 'File successfully added.',
 				'closeDialog' => true,
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
 					'target' => 'cms_media_media',
 				),
@@ -268,7 +268,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 			$body = array(
 				'notify' => 'File successfully saved.',
 				'closeDialog' => true,
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
 					'target' => 'cms_media_media',
 				),

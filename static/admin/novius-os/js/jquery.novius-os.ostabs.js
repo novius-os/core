@@ -458,11 +458,11 @@ define('jquery-nos-ostabs',
 
             function fireCallbacks($panel) {
                 var callbacks = $panel.data('callbacks.ostabs'),
-                    connector = $panel.find('.nos-connector');
+                    dispatcher = $panel.find('.nos-dispatcher');
 
                 if ($.isPlainObject(callbacks)) {
                     $.each(callbacks, function(i, event) {
-                        self._firePanelEvent(connector, event);
+                        self._firePanelEvent(dispatcher, event);
                     });
                     callbacks = {};
                 }
@@ -1091,7 +1091,7 @@ define('jquery-nos-ostabs',
                 this.xhr = $.ajax({
                     url: url,
                     success: function( r ) {
-                        $( '<div></div>' ).addClass( 'nos-ostabs-panel-content nos-connector' )
+                        $( '<div></div>' ).addClass( 'nos-ostabs-panel-content nos-dispatcher' )
                             .data( 'nos-ostabs-index', index )
                             .prependTo( panel.data('callbacks.ostabs', {}) )
                             .html( r );
@@ -1108,7 +1108,7 @@ define('jquery-nos-ostabs',
             } else {
                 $( '<iframe ' + ($.browser.msie ? 'allowTransparency="true" ' : '') + 'src="' + url + '" frameborder="0"></iframe>' )
                     .data( 'nos-ostabs-index', index )
-                    .addClass( 'nos-ostabs-panel-content nos-connector' )
+                    .addClass( 'nos-ostabs-panel-content nos-dispatcher' )
                     .bind( 'load', function() {
                         self._cleanup();
                         self._trigger( "load", null, self._ui( self.lis[index] ) );
@@ -1147,7 +1147,7 @@ define('jquery-nos-ostabs',
             return tabs;
         },
 
-        triggerPanels : function(event) {
+        dispatchEvent : function(event) {
             var self = this,
                 o = this.options;
 
@@ -1172,23 +1172,23 @@ define('jquery-nos-ostabs',
             return self;
         },
 
-        _firePanelEvent : function($connector, event) {
-            $connector = $connector.is('.nos-connector') ? $connector : $connector.find('.nos-connector');
+        _firePanelEvent : function($dispatcher, event) {
+            $dispatcher = $dispatcher.is('.nos-dispatcher') ? $dispatcher : $dispatcher.find('.nos-dispatcher');
 
             var e = $.Event(event.event, {
                 namespace : event.type || null,
                 data : event.data || null
             });
 
-            if ($connector.is('iframe')) {
-                if ($connector[0].contentDocument.$) {
-                    $connector[0].contentDocument.$('body').trigger(e);
+            if ($dispatcher.is('iframe')) {
+                if ($dispatcher[0].contentDocument.$) {
+                    $dispatcher[0].contentDocument.$('body').trigger(e);
                 }
             } else {
                 // @todo Figure out why we need this try catch.
                 // Adding a media throws an TypeError exception : unknown method 'trigger' on DOMWindow
                 try {
-                    $connector.trigger(e);
+                    $dispatcher.trigger(e);
                 } catch (e) {
                     log(e);
                 }

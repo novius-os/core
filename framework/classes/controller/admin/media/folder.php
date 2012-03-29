@@ -151,7 +151,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 			$body = array(
 				'notify' => 'Sub-folder successfully created.',
 				'closeDialog' => true,
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
 					'target' => 'cms_media_folders',
                 ),
@@ -221,7 +221,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 			$body = array(
 				'notify' => 'Folder successfully edited.',
 				'closeDialog' => true,
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
 					'target' => array('cms_media_media', 'cms_media_folders'),
                 ),

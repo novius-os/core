@@ -85,9 +85,9 @@ define('jquery-nos-appdesk',
 
 			self.element.addClass('nos-appdesk');
 
-            self.connector = self.element.closest('.nos-connector');
-            if (!self.connector.size()) {
-                self.connector = self.element;
+            self.dispatcher = self.element.closest('.nos-dispatcher');
+            if (!self.dispatcher.size()) {
+                self.dispatcher = self.element;
             }
 
 			self.uiHeaderBar = $('<div></div>').addClass('nos-appdesk-headerbar')
@@ -305,7 +305,7 @@ define('jquery-nos-appdesk',
                 $.nos.saveUserConfiguration(o.name + '.selectedLang', o.selectedLang);
 
                 self.gridReload();
-                self.connector.data('nosLang', o.selectedLang)
+                self.dispatcher.data('nosLang', o.selectedLang)
                     .trigger('langChange');
             });
 
@@ -1649,7 +1649,7 @@ define('jquery-nos-appdesk',
 
                 var timeout,
                     div = $('div#' + id),
-                    connector = div.closest('.nos-connector'),
+                    dispatcher = div.closest('.nos-dispatcher'),
                     params = appdesk.build();
 
                 if ($.isPlainObject(params.tab) && !$.isEmptyObject(params.tab)) {
@@ -1663,7 +1663,7 @@ define('jquery-nos-appdesk',
                 div.removeAttr('id')
                     .appdesk(params.appdesk);
 
-                connector.on({
+                dispatcher.on({
                     resizePanel : function() {
                         if (timeout) {
                             window.clearTimeout(timeout);
@@ -1678,7 +1678,7 @@ define('jquery-nos-appdesk',
                 });
 
                 if (params.reload) {
-                    connector.on('reload.' + params.reload, function() {
+                    dispatcher.on('reload.' + params.reload, function() {
                         div.appdesk('gridReload');
                     });
                 }

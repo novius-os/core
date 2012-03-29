@@ -17,12 +17,12 @@ define('jquery-nos', [
     var undefined = void(0);
 
     $.nos = {
-        fireEvent : function(event) {
+        dispatchEvent : function(event) {
             if (window.parent != window && window.parent.$nos) {
-                return window.parent.$nos.nos.fireEvent(event);
+                return window.parent.$nos.nos.dispatchEvent(event);
             }
             if ($.nos.$noviusos) {
-                $.nos.$noviusos.ostabs('triggerPanels', event);
+                $.nos.$noviusos.ostabs('dispatchEvent', event);
             }
         },
 
@@ -226,13 +226,13 @@ define('jquery-nos', [
                         $.nos.notify(json.notify);
                     }
                 }
-                if (json.fireEvent) {
-                    if ($.isArray(json.fireEvent)) {
-                        $.each(json.fireEvent, function(i, event) {
-                            $.nos.fireEvent(event);
+                if (json.dispatchEvent) {
+                    if ($.isArray(json.dispatchEvent)) {
+                        $.each(json.dispatchEvent, function(i, event) {
+                            $.nos.dispatchEvent(event);
                         });
                     } else {
-                        $.nos.fireEvent(json.fireEvent);
+                        $.nos.dispatchEvent(json.dispatchEvent);
                     }
                 }
                 // Call user callback

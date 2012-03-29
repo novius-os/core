@@ -64,7 +64,7 @@ class Controller_Admin_Page_Page extends Controller {
             'success' => function() use ($page) {
                 return array(
                     'notify' => 'Page sucessfully added.',
-                    'fireEvent' => array(
+                    'dispatchEvent' => array(
                         'event' => 'reload',
                         'target' => 'cms_page',
                     ),
@@ -172,7 +172,7 @@ class Controller_Admin_Page_Page extends Controller {
             'success' => function() {
                 return array(
                     'notify' => 'Page sucessfully saved.',
-                    'fireEvent' => array(
+                    'dispatchEvent' => array(
                         'event' => 'reload',
                         'target' => 'cms_page',
                     ),
@@ -256,7 +256,7 @@ class Controller_Admin_Page_Page extends Controller {
 
 			$body = array(
 				'notify' => 'Page successfully deleted.',
-                'fireEvent' => array(
+                'dispatchEvent' => array(
 	                'event' => 'reload',
                     'target' => 'cms_page',
                 ),

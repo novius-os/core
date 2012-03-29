@@ -65,7 +65,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'File successfully deleted.',
-                'fireEvent' => array(
+                'dispatchEvent' => array(
 	                'event' => 'reload',
                     'target' => 'cms_media_media',
                 ),
@@ -189,7 +189,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
             \DB::commit_transaction();
             $body = array(
                 'notify' => 'Folder successfully deleted.',
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
 					'target' => array('cms_media_media', 'cms_media_folders'),
                 ),
