@@ -114,8 +114,8 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
             $media = new Model_Media_Media();
 
-            $media->media_path_id = \Input::post('media_path_id', 1);
-            $media->media_module  = \Input::post('media_module', null);
+            $media->media_path_id     = \Input::post('media_path_id', 1);
+            $media->media_application = \Input::post('media_application', null);
 
             $media->media_title = \Input::post('media_title', '');
             $media->media_file  = \Input::post('slug', '');

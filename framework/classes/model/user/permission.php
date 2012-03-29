@@ -14,5 +14,5 @@ use Fuel\Core\Uri;
 
 class Model_User_Permission extends \Cms\Orm\Model {
     protected static $_table_name = 'os_role_permission';
-    protected static $_primary_key = array('perm_role_id', 'perm_module', 'perm_key');
+    protected static $_primary_key = array('perm_role_id', 'perm_application', 'perm_key');
 }
