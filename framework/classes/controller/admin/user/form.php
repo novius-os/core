@@ -27,7 +27,7 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
         } else {
             $user = Model_User_User::find($id);
         }
-        $group = reset($user->groups);
+        $role = reset($user->roles);
 
 
         \Config::load('cms::admin/native_apps', 'natives_apps');
@@ -43,7 +43,7 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
             'fieldset' => static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'),
             'permissions' => \View::forge('cms::admin/user/permission', array(
                 'user' => $user,
-                'group' => $group,
+                'role' => $role,
                 'apps' => $apps,
             ), false),
         ), false);
@@ -51,12 +51,12 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
 
     public function action_save_permissions() {
 
-        $group = Model_User_Group::find(\Input::post('group_id'));
+        $role = Model_User_Role::find(\Input::post('role_id'));
 
 		$modules = \Input::post('module');
         foreach ($modules as $module) {
             $access = Model_User_Permission::find('first', array('where' => array(
-                array('perm_group_id', $group->group_id),
+                array('perm_role_id', $role->role_id),
                 array('perm_module', 'access'),
                 array('perm_key', $module),
             )));
@@ -71,7 +71,7 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
 
             if (!empty($_POST['access'][$module]) && empty($access)) {
                 $access = new Model_User_Permission();
-                $access->perm_group_id   = $group->group_id;
+                $access->perm_role_id   = $role->role_id;
                 $access->perm_module     = 'access';
                 $access->perm_identifier = '';
                 $access->perm_key        = $module;
@@ -85,8 +85,8 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
             $permissions = \Config::get("$module::permissions", array());
 /*
             foreach ($permissions as $identifier => $whatever) {
-                $driver = $group->get_permission_driver($module, $identifier);
-                $driver->save($group, (array) $_POST['permission'][$module][$identifier]);
+                $driver = $role->get_permission_driver($module, $identifier);
+                $driver->save($role, (array) $_POST['permission'][$module][$identifier]);
             }
             */
         }

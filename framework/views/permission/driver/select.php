@@ -12,7 +12,7 @@
 <ul>
 <?php
 foreach ($choices as $key => $choice) {
-    $checked = $driver->check($group, $key);
+    $checked = $driver->check($role, $key);
     ?>
     <li><label><input type="checkbox" name="permission[<?= $module ?>][<?= $identifier ?>][]" value="<?= $key; ?>" <?= $checked ? 'checked' : ''; ?> /> <?= $choice['title']; ?></label></li>
     <?php

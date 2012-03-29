@@ -23,14 +23,14 @@ class Permission_Select extends Permission_Driver {
 		$this->choices = $options['choices'];
 	}
 
-	public function check($group, $key) {
+	public function check($role, $key) {
 		static::_load_permissions();
-		return isset(static::$data[$group->group_id][$this->module]) && in_array($key, (array) static::$data[$group->group_id][$this->module]);
+		return isset(static::$data[$role->role_id][$this->module]) && in_array($key, (array) static::$data[$role->role_id][$this->module]);
 	}
 
-	public function display($group) {
+	public function display($role) {
 		echo \View::forge('cms::permission/driver/select', array(
-			'group'      => $group,
+			'role'      => $role,
 			'module'     => $this->module,
 			'identifier' => $this->identifier,
 			'choices'    => $this->choices,
@@ -38,11 +38,11 @@ class Permission_Select extends Permission_Driver {
 		), false);
 	}
 
-	public function save($group, $data) {
+	public function save($role, $data) {
 
 		$perms = Model_User_Permission::find('all', array(
             'where' => array(
-                array('perm_group_id', $group->group_id),
+                array('perm_role_id', $role->role_id),
 				array('perm_module', $this->module),
                 array('perm_identifier', $this->identifier),
             ),
@@ -56,7 +56,7 @@ class Permission_Select extends Permission_Driver {
 		// Add appropriates one
         foreach ($data as $permitted) {
 			$p = new Model_User_Permission();
-			$p->perm_group_id   = $group->group_id;
+			$p->perm_role_id   = $role->role_id;
 			$p->perm_module     = $this->module;
 			$p->perm_identifier = $this->identifier;
 			$p->perm_key = $permitted;
@@ -69,18 +69,18 @@ class Permission_Select extends Permission_Driver {
 			return;
 		}
 
-        $group_ids = array();
-        foreach (Model_User_Group::find('all') as $g) {
-            $group_ids[] = $g->group_id;
+        $role_ids = array();
+        foreach (Model_User_Role::find('all') as $g) {
+            $role_ids[] = $g->role_id;
         }
         $data = Model_User_Permission::find('all', array(
             'where' => array(
-                array('perm_group_id', 'IN', $group_ids),
+                array('perm_role_id', 'IN', $role_ids),
             ),
         ));
 
         foreach ($data as $d) {
-            static::$data[$d->perm_group_id][$d->perm_module][] = $d->perm_key;
+            static::$data[$d->perm_role_id][$d->perm_module][] = $d->perm_key;
         }
 	}
 

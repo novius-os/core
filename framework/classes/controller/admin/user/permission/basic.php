@@ -14,9 +14,9 @@ use View;
 
 class Controller_Admin_User_Permission_Basic extends Controller {
 
-    public function action_edit($group_id, $app) {
+    public function action_edit($role_id, $app) {
 
-        $group = Model_User_Group::find($group_id);
+        $role = Model_User_Role::find($role_id);
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
         $apps = \Config::get('app_installed', array());
@@ -24,7 +24,7 @@ class Controller_Admin_User_Permission_Basic extends Controller {
         $permissions = \Config::get("$app::permissions", array());
 
         return View::forge('admin/user/permission/basic', array(
-            'group' => $group,
+            'role' => $role,
             'app'   => $app,
             'permissions' => $permissions,
         ));
@@ -33,7 +33,7 @@ class Controller_Admin_User_Permission_Basic extends Controller {
     protected function post_edit() {
         $perms = Model_User_Permission::find('all', array(
             'where' => array(
-                array('perm_group_id', $_POST['group_id']),
+                array('perm_role_id', $_POST['role_id']),
             ),
         ));
         foreach ($perms as $p) {
@@ -49,7 +49,7 @@ class Controller_Admin_User_Permission_Basic extends Controller {
             }
             foreach ($keys as $key) {
                 $p = new Model_User_Permission();
-                $p->perm_group_id = $_POST['group_id'];
+                $p->perm_role_id = $_POST['role_id'];
                 $p->perm_module = $app;
                 $p->perm_key = $key;
                 $p->save();

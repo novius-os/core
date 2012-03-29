@@ -11,9 +11,9 @@
 
 class Config extends \Fuel\Core\Config {
 
-    public static function load($file, $group = null, $reload = false, $overwrite = false) {
+    public static function load($file, $role = null, $reload = false, $overwrite = false) {
         $file = static::convertFileName($file);
-        return parent::load($file, $group, $reload, $overwrite);
+        return parent::load($file, $role, $reload, $overwrite);
     }
 
     public static function get($item, $default = null) {

@@ -30,16 +30,16 @@ class Permission {
 
     public static function check($app, $key) {
         $user = \Session::user();
-        $group = reset($user->groups);
-        return $group->check_permission($app, $key);
+        $role = reset($user->roles);
+        return $role->check_permission($app, $key);
     }
 
 	public static function add($app, $key) {
         $user = \Session::user();
-        $group = reset($user->groups);
+        $role = reset($user->roles);
         try {
 	        $access = new Model_User_Permission();
-	        $access->perm_group_id   = $group->group_id;
+	        $access->perm_role_id   = $role->role_id;
 	        $access->perm_module     = $key;
 	        $access->perm_identifier = '';
 	        $access->perm_key        = $app;

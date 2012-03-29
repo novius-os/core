@@ -14,7 +14,7 @@ I18n::load('user', 'cms_user');
 return array(
 	'query' => array(
 		'model' => 'Cms\Model_User_User',
-		'related' => array('groups'),
+		'related' => array('roles'),
 	),
 	'search_text' => array(
 		'user_firstname',
@@ -65,7 +65,7 @@ return array(
         ),
 		'email' => 'user_email',
 		'id_permission' => function($object) {
-			return $object->groups && reset($object->groups)->group_id ?: $object->user_id;
+			return $object->roles && reset($object->roles)->role_id ?: $object->user_id;
 		}
 	),
 	'inputs' => array(),

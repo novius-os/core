@@ -12,7 +12,7 @@
 <div class="permissions">
 
 <form action="admin/cms/user/form/save_permissions" method="POST" id="<?= $uniqid = uniqid('id_') ?>">
-  <input type="hidden" name="group_id" value="<?= $group->group_id ?>" />
+  <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
 
     <div class="actions_zone">
         <?= render('form/action_or_cancel') ?>
@@ -38,7 +38,7 @@ foreach ($apps as $app => $perms) {
 <input type="hidden" name="module[]" value="<?= $app ?>" />
     <div class="application item">
 		<div class="maincheck">
-			<input type="checkbox" name="access[<?= $app ?>]" value="1" <?= $group->check_permission($app, 'access') ? 'checked' : '' ?> />
+			<input type="checkbox" name="access[<?= $app ?>]" value="1" <?= $role->check_permission($app, 'access') ? 'checked' : '' ?> />
 		</div>
 		<div class="icon">
 			<?php
@@ -61,12 +61,12 @@ foreach ($apps as $app => $perms) {
 	$keys = \Config::get("$app::permissions", array());
 	if (!empty($keys)) {
         foreach ($keys as $key => $value) {
-            $driver = $group->get_permission_driver($app, $key);
+            $driver = $role->get_permission_driver($app, $key);
             ?>
             <h2><?= $value['label']; ?></h2>
             <?php
             //\Debug::dump($driver);
-            echo $driver->display($group);
+            echo $driver->display($role);
         }
     }
     */

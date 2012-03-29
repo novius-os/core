@@ -33,11 +33,11 @@ class Permission_Driver {
 		return false;
 	}
 	
-	public function display($group) {
+	public function display($role) {
 		return '';
 	}
 	
-	public function save($group, $data) {
+	public function save($role, $data) {
 		return;
 	}
 }

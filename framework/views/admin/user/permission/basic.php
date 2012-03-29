@@ -11,7 +11,7 @@
 ?>
 <?php
 foreach ($permissions as $permission) {
-    $checked = $group->check_permission($app, $permission['key']);
+    $checked = $role->check_permission($app, $permission['key']);
     ?>
     <li><label><input type="checkbox" name="app[<?= $app; ?>][]" value="<?= $permission['key']; ?>" <?= $checked ? 'checked' : ''; ?> /> <?= $permission['title']; ?></label></li>
     <?php

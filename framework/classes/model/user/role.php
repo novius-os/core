@@ -12,9 +12,9 @@ namespace Cms;
 
 use Fuel\Core\Uri;
 
-class Model_User_Group extends \Cms\Orm\Model {
-    protected static $_table_name = 'os_group';
-    protected static $_primary_key = array('group_id');
+class Model_User_Role extends \Cms\Orm\Model {
+    protected static $_table_name = 'os_role';
+    protected static $_primary_key = array('role_id');
 
     protected static $permissions;
 	protected $access;
@@ -27,7 +27,7 @@ class Model_User_Group extends \Cms\Orm\Model {
 
 		$args = func_get_args();
 		$args = array_slice($args, 2);
-		array_unshift($args, $this->group_id);
+		array_unshift($args, $this->role_id);
 		$driver = $this->get_permission_driver($module, $key);
 		return call_user_func_array(array($driver, 'check'), $args);
     }
