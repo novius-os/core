@@ -30,7 +30,12 @@ define([
                 e.stopPropagation();
                 return;
             }
-            $(this).closest('p').nextAll()[$(this).is(':checked') ? 'show' : 'hide']();
+            var $siblings = $(this).closest('p').nextAll();
+            if ($(this).is(':checked')) {
+                $siblings.show().find('.nos-treegrid').nostreegrid('doRefresh');
+            } else {
+                $siblings.hide();
+            }
         }).change();
 
         var $page_id = $container.find('input[name=page_id]');

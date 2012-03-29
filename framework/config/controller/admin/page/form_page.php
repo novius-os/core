@@ -23,6 +23,16 @@ return array(
             'min_length' => array(2),
         ),
     ),
+    'page_parent_id' => array(
+        'widget' => 'page_selector',
+        'widget_options' => array(
+            'width' => '250px',
+            'height' => '250px',
+        ),
+        'label' => __('Location: '),
+        'form' => array(
+        ),
+    ),
     'page_template' => array(
         'label' => 'Template: ',
         'form' => array(

@@ -118,6 +118,14 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                 ));
         }
 
+        if (!$object->is_new()) {
+            $children_ids = $this->get_ids_children($object, true);
+            if (in_array($parent->id, $children_ids)) {
+                // Dev details : Cannot move an element inside of its own children
+                throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
+            }
+        }
+
         $this->set_parent_no_observers($object, $parent);
         $object->observe('before_change_parent');
         if (!$object->is_new()) {
@@ -158,6 +166,10 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             static::_populate_id_children($child, $children_relation, $array);
         }
 
+    }
+
+    public function get_parent($object) {
+        return $object->get($this->_properties['parent_relation']);
     }
 
 	public function set_parent_no_observers($object, $parent = null) {

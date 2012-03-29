@@ -69,6 +69,9 @@ $uniqids = array();
                     ), false);
                 } else {
                     $fieldset->populate_with_instance($page_lang);
+                    $fieldset->field('page_parent_id')->set_options(array(
+                        'lang' => $lang,
+                    ));
                     echo View::forge('cms::admin/page/page_form', array(
                         'uniqid' => $uniqids[$lang],
                         'fieldset' => $fieldset,
@@ -94,6 +97,7 @@ require([
             alignment: 'left',
             show: function(e, ui) {
                 $(ui.panel).bind('blank_slate', callback_fn).trigger('blank_slate');
+                $(ui.panel).find('.nos-treegrid').nostreegrid('doRefresh');
             }
         });
         $tabs.find('> ul').css({

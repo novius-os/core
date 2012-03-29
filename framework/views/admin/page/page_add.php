@@ -24,7 +24,7 @@ require(['jquery-nos-ostabs'], function ($) {
     <div id="<?= $uniqid_tabs = uniqid('tabs_') ?>" style="width: 92.4%; clear:both; margin:0 auto 1em;">
         <ul style="width: 5%;">
             <?php
-            $possible = $page->get_possible_lang();
+            $possible = $parent->get_all_lang();
             $locales = Config::get('locales', array());
             foreach ($possible as $lang) {
                 $uniqids[$lang] = uniqid($lang.'_');
@@ -42,7 +42,11 @@ require(['jquery-nos-ostabs'], function ($) {
 
                 // Generates a new id
                 $fieldset->populate_with_instance(null);
+                $fieldset->field('page_parent_id')->set_value($parent->find_lang($lang)->page_id);
                 $fieldset->field('page_lang')->set_value($lang);
+                $fieldset->field('page_parent_id')->set_options(array(
+                    'lang' => $lang,
+                ));
                 echo View::forge('cms::admin/page/page_form', array(
                     'uniqid' => $uniqids[$lang],
                     'fieldset' => $fieldset,

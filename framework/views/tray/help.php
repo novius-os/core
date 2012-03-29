@@ -10,7 +10,7 @@
 
 ?>
 <div id="<?= $uniqid = uniqid('id_'); ?>" style="margin: 3em;" class="blank_slate">
-    <h1 class="title"><?= __('Sorry, there is not much help here for now…') ?></h1>
+    <h1 class="title"><?= __('Sorry, you won\'t get much help here for now…') ?></h1>
 
     <p>&nbsp;</p>
     <ul>
