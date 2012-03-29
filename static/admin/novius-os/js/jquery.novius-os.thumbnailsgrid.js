@@ -18,7 +18,7 @@ define('jquery-nos-thumbnailsgrid',
 ], function( $ ) {
     "use strict";
     var undefined = void(0);
-	$.widget( "nos.thumbnails", {
+	$.widget( "nos.thumbnailsgrid", {
 		options: {
 			thumbnailSize : 128,
 			pageIndex: 0,
@@ -52,7 +52,7 @@ define('jquery-nos-thumbnailsgrid',
 			self.uiPager.wijpager('destroy');
 			self.uiPager.remove();
 
-			self.element.removeClass('nos-thumbnails nos-thumbnails-size-' + o.thumbnailSize)
+			self.element.removeClass('nos-thumbnailsgrid nos-thumbnailsgrid-size-' + o.thumbnailSize)
 				.wijsuperpanel('destroy');
 
 			$.Widget.prototype.destroy.apply(this, arguments);
@@ -79,7 +79,7 @@ define('jquery-nos-thumbnailsgrid',
 				}
 			});
 			self.element
-				.addClass('nos-thumbnails nos-thumbnails-size-' + o.thumbnailSize)
+				.addClass('nos-thumbnailsgrid nos-thumbnailsgrid-size-' + o.thumbnailSize)
 				.wijsuperpanel({
 					showRounder : false,
                     autoRefresh : true
@@ -88,10 +88,10 @@ define('jquery-nos-thumbnailsgrid',
 			self.uiContainer = $(self.element.wijsuperpanel('getContentElement'));
 
             self.uiOverlay = $('<div></div>')
-                .addClass('nos-thumbnails-overlay ui-widget-overlay')
+                .addClass('nos-thumbnailsgrid-overlay ui-widget-overlay')
                 .appendTo(self.element);
             self.uiOverlayText = $('<span><span></span>' + o.texts.loading + '</span>')
-                .addClass('nos-thumbnails-loadingtext ui-widget-content ui-corner-all')
+                .addClass('nos-thumbnailsgrid-loadingtext ui-widget-content ui-corner-all')
                 .find('span')
                 .addClass('ui-icon ui-icon-clock')
                 .end()
@@ -107,7 +107,7 @@ define('jquery-nos-thumbnailsgrid',
 					title : 'Test'
 				});
 
-				var el = self.uiContainer.find('.nos-thumbnails-thumb'),
+				var el = self.uiContainer.find('.nos-thumbnailsgrid-thumb'),
                     container = self.uiContainer.parent();
 				self.itemDimension = {
 					width : el.outerWidth(true),
@@ -238,7 +238,7 @@ define('jquery-nos-thumbnailsgrid',
 			}, item);
 
 			var container = $('<div></div>')
-				.addClass('nos-thumbnails-thumb wijmo-wijgrid ui-widget-content')
+				.addClass('nos-thumbnailsgrid-thumb wijmo-wijgrid ui-widget-content')
 				.data('thumbnail', {
 					data : data,
 					index : index
@@ -246,7 +246,7 @@ define('jquery-nos-thumbnailsgrid',
 				.appendTo(self.uiContainer),
 
 				td = $('<table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td></td></tr></tbody></table>')
-					.addClass('nos-thumbnails-thumb-grid wijmo-wijgrid-root wijmo-wijgrid-table')
+					.addClass('nos-thumbnailsgrid-thumb-grid wijmo-wijgrid-root wijmo-wijgrid-table')
 					.attr('title', item.title)
 					.css({
 						borderCollapse : 'separate',
@@ -272,18 +272,18 @@ define('jquery-nos-thumbnailsgrid',
 					.addClass('wijgridtd'),
 
 				imgContainer = $('<div></div>')
-					.addClass('nos-thumbnails-thumb-container-img wijmo-wijgrid-innercell')
+					.addClass('nos-thumbnailsgrid-thumb-container-img wijmo-wijgrid-innercell')
 					.appendTo(td),
 
 				title = $('<div></div>')
-					.addClass('nos-thumbnails-thumb-title wijmo-wijgrid-innercell')
+					.addClass('nos-thumbnailsgrid-thumb-title wijmo-wijgrid-innercell')
 					.text(item.title)
 					.appendTo(td);
 
 
 			self._itemThumbnail(imgContainer, item, index);
 
-			var buttons = $.nos.mp3gridActions(o.actions, noParseData);
+			var buttons = $.nos.appdeskActions(o.actions, noParseData);
 
 			buttons.appendTo(container);
 
@@ -334,7 +334,7 @@ define('jquery-nos-thumbnailsgrid',
                             marginLeft : '-' + (img.width() / 2) + 'px'
                         });
 				})
-				.addClass('nos-thumbnails-thumb-img')
+				.addClass('nos-thumbnailsgrid-thumb-img')
 				.attr('src', thumbnail);
 
 			return self;
@@ -345,7 +345,7 @@ define('jquery-nos-thumbnailsgrid',
 				o = self.options;
 
 			$('<div></div>')
-				.addClass('nos-thumbnails-thumb-img-default')
+				.addClass('nos-thumbnailsgrid-thumb-img-default')
 				.prependTo(container);
 
 			return self;
@@ -356,7 +356,7 @@ define('jquery-nos-thumbnailsgrid',
 				o = self.options;
 
 			if (index === undefined) {
-				var sel = self.uiContainer.find('.nos-thumbnails-thumb:has(wijmo-wijgrid-current-cell)');
+				var sel = self.uiContainer.find('.nos-thumbnailsgrid-thumb:has(wijmo-wijgrid-current-cell)');
 				if (sel.length) {
 					var data = sel.data('thumbnail');
 					return data.index;
@@ -366,7 +366,7 @@ define('jquery-nos-thumbnailsgrid',
 			} else {
 				self.uiContainer.find('td').removeClass('wijmo-wijgrid-current-cell ui-state-highlight');
 
-				var sel = self.uiContainer.find('.nos-thumbnails-thumb').eq(index);
+				var sel = self.uiContainer.find('.nos-thumbnailsgrid-thumb').eq(index);
 				if (sel.length) {
 					var data = sel.data('thumbnail');
 

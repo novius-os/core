@@ -22,7 +22,7 @@ define('jquery-nos-appdesk',
 ], function( $) {
     "use strict";
     var undefined = void(0);
-	$.widget( "nos.mp3grid", {
+	$.widget( "nos.appdesk", {
 		options: {
 			adds : [],
 			inspectors : [],
@@ -83,72 +83,72 @@ define('jquery-nos-appdesk',
 			var self = this,
 				o = self.options;
 
-			self.element.addClass('nos-mp3grid');
+			self.element.addClass('nos-appdesk');
 
             self.connector = self.element.closest('.nos-connector');
             if (!self.connector.size()) {
                 self.connector = self.element;
             }
 
-			self.uiHeaderBar = $('<div></div>').addClass('nos-mp3grid-headerbar')
+			self.uiHeaderBar = $('<div></div>').addClass('nos-appdesk-headerbar')
 				.appendTo(self.element);
 
-			self.uiAdds = $('<div></div>').addClass('nos-mp3grid-adds')
+			self.uiAdds = $('<div></div>').addClass('nos-appdesk-adds')
 				.appendTo(self.uiHeaderBar);
 			self.uiAddsButton = $('<button type="button"></button>').addClass('primary').appendTo(self.uiAdds);
 
-            self.uiViewsDropDownContainer = $('<div></div>').addClass('nos-mp3grid-dropdownviews')
+            self.uiViewsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownviews')
                 .appendTo(self.uiHeaderBar);
 
-            self.uiLangsDropDownContainer = $('<div></div>').addClass('nos-mp3grid-dropdownlang')
+            self.uiLangsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownlang')
                 .appendTo(self.uiHeaderBar);
 
-			self.uiSplitterVertical = $('<div></div>').addClass('nos-mp3grid-splitter-v')
+			self.uiSplitterVertical = $('<div></div>').addClass('nos-appdesk-splitter-v')
 				.appendTo(self.element);
 			self.uiSplitterVerticalRight = $('<div></div>').appendTo(self.uiSplitterVertical);
-			self.uiInspectorsVertical = $('<ul></ul>').addClass('nos-mp3grid-inspectors nos-mp3grid-inspectors-v')
+			self.uiInspectorsVertical = $('<ul></ul>').addClass('nos-appdesk-inspectors nos-appdesk-inspectors-v')
 				.appendTo(self.uiSplitterVerticalRight);
 			self.uiSplitterVerticalLeft = $('<div></div>').appendTo(self.uiSplitterVertical);
 
 			self.uiSplitterHorizontal = $('<div></div>').appendTo(self.uiSplitterVerticalLeft);
 			self.uiSplitterHorizontalTop = $('<div></div>').appendTo(self.uiSplitterHorizontal);
-			self.uiInspectorsHorizontal = $('<ul></ul>').addClass('nos-mp3grid-inspectors nos-mp3grid-inspectors-h')
+			self.uiInspectorsHorizontal = $('<ul></ul>').addClass('nos-appdesk-inspectors nos-appdesk-inspectors-h')
 				.appendTo(self.uiSplitterHorizontalTop);
 			self.uiSplitterHorizontalBottom = $('<div></div>').appendTo(self.uiSplitterHorizontal);
 
 			self.uiSearchBar = $('<div><form><div></div></form></div>')
-                .addClass('nos-mp3grid-searchbar-container wijmo-wijgrid ui-widget ui-widget-header ui-state-default')
+                .addClass('nos-appdesk-searchbar-container wijmo-wijgrid ui-widget ui-widget-header ui-state-default')
                 .appendTo(self.uiSplitterHorizontalBottom)
                 .find('form')
                 .addClass('wijmo-wijgrid-headerrow wijmo-wijgrid-innercell')
                 .find('div')
-                .addClass('nos-mp3grid-searchbar wijmo-wijgrid-headertext');
+                .addClass('nos-appdesk-searchbar wijmo-wijgrid-headertext');
 
-			self.uiNbResult = $('<div></div>').addClass('nos-mp3grid-nbresult')
+			self.uiNbResult = $('<div></div>').addClass('nos-appdesk-nbresult')
 				.appendTo(self.uiSearchBar);
-            self.uiInputContainer = $('<div></div>').addClass('nos-mp3grid-input-container ui-widget-content ui-corner-all')
+            self.uiInputContainer = $('<div></div>').addClass('nos-appdesk-input-container ui-widget-content ui-corner-all')
                 .appendTo(self.uiSearchBar);
-            self.uiViewsButtons = $('<div></div>').addClass('nos-mp3grid-views-button')
+            self.uiViewsButtons = $('<div></div>').addClass('nos-appdesk-views-button')
                 .appendTo(self.uiSearchBar);
 
-            self.uiSearchIcon = $('<div></div>').addClass('nos-mp3grid-search-icon ui-icon ui-icon-search')
+            self.uiSearchIcon = $('<div></div>').addClass('nos-appdesk-search-icon ui-icon ui-icon-search')
                 .appendTo(self.uiInputContainer);
 			self.uiSearchInput = $('<input type="search" name="search" placeholder="Search" value="" />')
-                .addClass('nos-mp3grid-search-input ui-helper-reset')
+                .addClass('nos-appdesk-search-input ui-helper-reset')
                 .appendTo(self.uiInputContainer);
-			self.uiInspectorsTags = $('<div></div>').addClass('nos-mp3grid-inspectorstags')
+			self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
 				.appendTo(self.uiInputContainer);
 			self.uiResetSearch = $('<a href="#"></a>').text(o.texts.showAll)
-				.addClass('nos-mp3grid-reset-search')
+				.addClass('nos-appdesk-reset-search')
 				.appendTo(self.uiInputContainer);
             self.uiuiResetSearchIcon = $('<span></span>').text(o.texts.showAll)
                 .addClass('ui-icon')
                 .appendTo(self.uiResetSearch);
 
-            self.uiGridTitle = $('<div></div>').addClass('nos-mp3grid-title')
+            self.uiGridTitle = $('<div></div>').addClass('nos-appdesk-title')
                 .appendTo(self.uiSearchBar);
 
-            self.uiPaginationLabel = $('<span></span>').addClass('nos-mp3grid-pagination');
+            self.uiPaginationLabel = $('<span></span>').addClass('nos-appdesk-pagination');
 
 			self.uiGrid = $('<table></table>').appendTo(self.uiSplitterHorizontalBottom);
 
@@ -193,12 +193,12 @@ define('jquery-nos-appdesk',
                         var rules = sheet.rules ? sheet.rules : sheet.cssRules;
                         for (var r=0, numRules = rules.length; r<numRules; r++) {
                             if (rules[r].selectorText === '.ui-widget-content') {
-                                css += '.nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
-                                css += '.nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
+                                css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
+                                css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
                             }
                             if (rules[r].selectorText === '.wijmo-wijgrid tr.wijmo-wijgrid-row.ui-state-hover, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.wijmo-wijgrid-rowheader.ui-state-active') {
-                                css += '.nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
-                                css += '.nos-mp3grid .nos-mp3grid-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
+                                css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
+                                css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
                             }
                         }
                     }
@@ -243,7 +243,7 @@ define('jquery-nos-appdesk',
 
 			$.each(o.adds, function(i, add) {
 				$('<a href="#"></a>')
-                    .addClass('nos-mp3grid-action-secondary')
+                    .addClass('nos-appdesk-action-secondary')
                     .text(this.label)
                     .appendTo(self.uiAdds)
                     .click(function(e) {
@@ -728,7 +728,7 @@ define('jquery-nos-appdesk',
 
 			self.options.grid.columns = newColumns;
 
-            self.element.find('.nos-mp3grid-inspector').remove();
+            self.element.find('.nos-appdesk-inspector').remove();
 
 
             var custom = self._saveUserConfiguration();
@@ -748,10 +748,10 @@ define('jquery-nos-appdesk',
 		        o = self.options,
                 custom = {
                     from:  o.selectedView != 'custom' ? o.selectedView : o.fromView,
-                    mp3grid: self._getInspectorsConfiguration(o)
+                    appdesk: self._getInspectorsConfiguration(o)
                 };
 
-            custom.mp3grid.grid = self._getGridConfiguration(o.grid);
+            custom.appdesk.grid = self._getGridConfiguration(o.grid);
 
             $.nos.saveUserConfiguration(o.name, {selectedView: 'custom', custom: custom});
             return custom;
@@ -879,7 +879,7 @@ define('jquery-nos-appdesk',
 
 			$.each(o.inspectors, function() {
 				if (!this.hide) {
-					$('<li></li>').addClass('nos-mp3grid-inspector ui-widget-content')
+					$('<li></li>').addClass('nos-appdesk-inspector ui-widget-content')
                         .data('inspector', this)
 						.appendTo( this.vertical ? self.uiInspectorsVertical : self.uiInspectorsHorizontal );
 				}
@@ -892,18 +892,6 @@ define('jquery-nos-appdesk',
 				.add(self.uiInspectorsHorizontal.find('> li'))
 				.each(function() {
 					self._loadInspector($(this));
-				});
-
-			self.uiInspectorsVertical.add(self.uiInspectorsHorizontal).sortable({
-					connectWith: ".nos-mp3grid-inspectors",
-					start : function() {
-						self.resizing = false;
-					},
-					stop: function() {
-						self.resizing = true;
-						self._resizeInspectorsV(true)
-							._resizeInspectorsH(true);
-					}
 				});
 
 			return self;
@@ -941,7 +929,7 @@ define('jquery-nos-appdesk',
                     self.pageIndex = 0;
                     self.uiInspectorsTags.wijsuperpanel('destroy');
 
-                    var span = $('<span></span>').addClass('nos-mp3grid-inspectorstag ui-state-default ui-corner-all ' + name)
+                    var span = $('<span></span>').addClass('nos-appdesk-inspectorstag ui-state-default ui-corner-all ' + name)
                         .text(label)
                         .appendTo(self.uiInspectorsTags);
 
@@ -1114,10 +1102,10 @@ define('jquery-nos-appdesk',
 			self.gridRendered = false;
             self.uiGridTitle.text(o.texts.item);
 
-			self.uiThumbnail.thumbnails('destroy')
+			self.uiThumbnail.thumbnailsgrid('destroy')
 				.empty()
 				.hide();
-			self.uiGrid.nosgrid('destroy')
+			self.uiGrid.noslistgrid('destroy')
 				.empty()
 				.hide();
             self.uiTreeGrid.nostreegrid('destroy')
@@ -1149,7 +1137,7 @@ define('jquery-nos-appdesk',
                     height : height,
                     width : '100%'
                 })
-				.nosgrid($.extend({
+				.noslistgrid($.extend({
 					columnsAutogenerationMode : 'none',
 					selectionMode: 'singleRow',
 					showFilter: self.showFilter,
@@ -1174,7 +1162,7 @@ define('jquery-nos-appdesk',
 							var r = userData.data.paging;
 							self.pageIndex = r.pageIndex;
 							if (self.gridRendered) {
-								self.uiGrid.nosgrid("currentCell", -1, -1);
+								self.uiGrid.noslistgrid("currentCell", -1, -1);
 							}
                             dataSource.proxy.options.data.lang = o.selectedLang || '';
 							dataSource.proxy.options.data.inspectors = self._jsonInspectors();
@@ -1194,7 +1182,7 @@ define('jquery-nos-appdesk',
 							}
                             self.uiNbResult.show();
 
-							self.uiResetSearch[self.uiInspectorsTags.find('.nos-mp3grid-inspectorstag').length || self.uiSearchInput.val() ? 'show' : 'hide']();
+							self.uiResetSearch[self.uiInspectorsTags.find('.nos-appdesk-inspectorstag').length || self.uiSearchInput.val() ? 'show' : 'hide']();
 						},
 						reader: {
 							read: function (dataSource) {
@@ -1205,7 +1193,7 @@ define('jquery-nos-appdesk',
 						}
 					}),
 					pageIndexChanging: function() {
-                        self.element.trigger('selectionChanged.mp3grid', false);
+                        self.element.trigger('selectionChanged.appdesk', false);
 					},
 					cellStyleFormatter: function(args) {
 						if (args.$cell.is('th')) {
@@ -1223,13 +1211,13 @@ define('jquery-nos-appdesk',
 					},
 					currentCellChanged: function (e) {
 						if (e) {
-							var row = $(e.target).nosgrid("currentCell").row(),
+							var row = $(e.target).noslistgrid("currentCell").row(),
 								data = row ? row.data : false;
 
 							if (data) {
 
                                 self.itemSelected = $.extend({}, data);
-                                self.element.trigger('selectionChanged.mp3grid', data);
+                                self.element.trigger('selectionChanged.appdesk', data);
 							}
 						}
 						return true;
@@ -1240,11 +1228,11 @@ define('jquery-nos-appdesk',
 					rendered : function() {
 						self.gridRendered = true;
 						self.uiGrid.css('height', 'auto');
-                        var sel = self.uiGrid.nosgrid("selection");
+                        var sel = self.uiGrid.noslistgrid("selection");
                         sel && sel.clear();
 						if (self.itemSelected !== null) {
                             // Search the selection in the data
-                            $.each(self.uiGrid.nosgrid('data') || [], function(dataRowIndex, data) {
+                            $.each(self.uiGrid.noslistgrid('data') || [], function(dataRowIndex, data) {
                                 if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                     sel.addRows(dataRowIndex);
                                 }
@@ -1316,7 +1304,7 @@ define('jquery-nos-appdesk',
 
                             if (data) {
                                 self.itemSelected = $.extend({}, data);
-                                self.element.trigger('selectionChanged.mp3grid', data);
+                                self.element.trigger('selectionChanged.appdesk', data);
                             }
                         }
                         return true;
@@ -1356,7 +1344,7 @@ define('jquery-nos-appdesk',
 				height = self.element.height() - position.top + positionContainer.top;
 
 			self.uiThumbnail.css('height', height)
-				.thumbnails($.extend({
+				.thumbnailsgrid($.extend({
 					pageIndex: 0,
 					url: o.grid.proxyUrl,
 					loading: function (dataSource, userData) {
@@ -1380,7 +1368,7 @@ define('jquery-nos-appdesk',
                         }
                         self.uiNbResult.show();
 
-						self.uiResetSearch[self.uiInspectorsTags.find('.nos-mp3grid-inspectorstag').length || self.uiSearchInput.val() ? 'show' : 'hide']();
+						self.uiResetSearch[self.uiInspectorsTags.find('.nos-appdesk-inspectorstag').length || self.uiSearchInput.val() ? 'show' : 'hide']();
 					},
 					rendered : function() {
                         self.uiSplitterHorizontalBottom.find('.wijmo-wijpager').prepend(self.uiPaginationLabel);
@@ -1388,16 +1376,16 @@ define('jquery-nos-appdesk',
 						if (self.itemSelected !== null) {
                             // Search the selection in the data
                             var found = false;
-                            $.each(self.uiThumbnail.thumbnails('data') || [], function(dataRowIndex, data) {
+                            $.each(self.uiThumbnail.thumbnailsgrid('data') || [], function(dataRowIndex, data) {
                                 if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                     found = true;
-                                    if (!self.uiThumbnail.thumbnails('select', dataRowIndex)) {
+                                    if (!self.uiThumbnail.thumbnailsgrid('select', dataRowIndex)) {
                                         self.itemSelected = null;
                                     }
                                 }
                             });
                             if (!found) {
-                                self.uiThumbnail.thumbnails('unselect');
+                                self.uiThumbnail.thumbnailsgrid('unselect');
                             }
 						}
 					},
@@ -1410,15 +1398,15 @@ define('jquery-nos-appdesk',
 					},
 					pageIndexChanging: function() {
 						self.itemSelected = null;
-                        self.element.trigger('selectionChanged.mp3grid', false);
+                        self.element.trigger('selectionChanged.appdesk', false);
 					},
 					selectionChanged : function(e, data) {
 						if (!data || $.isEmptyObject(data)) {
 							self.itemSelected = null;
-                            self.element.trigger('selectionChanged.mp3grid', false);
+                            self.element.trigger('selectionChanged.appdesk', false);
 						} else {
 							self.itemSelected = $.extend({}, data.item.data.noParseData);
-                            self.element.trigger('selectionChanged.mp3grid', data.item.data.noParseData);
+                            self.element.trigger('selectionChanged.appdesk', data.item.data.noParseData);
 						}
 					}
 				}, o.thumbnails));
@@ -1523,7 +1511,7 @@ define('jquery-nos-appdesk',
                     if (reload) {
                         self._uiList();
                     } else {
-                        self.uiThumbnail.thumbnails('setSize', self.uiSplitterHorizontalBottom.width(), height);
+                        self.uiThumbnail.thumbnailsgrid('setSize', self.uiSplitterHorizontalBottom.width(), height);
                     }
                 } else if (o.defaultView === 'treeGrid') {
                     if (reload) {
@@ -1532,10 +1520,10 @@ define('jquery-nos-appdesk',
                         self.uiTreeGrid.nostreegrid('setSize', null, height);
                     }
                 } else {
-                    self.uiGrid.nosgrid('setSize', null, height);
+                    self.uiGrid.noslistgrid('setSize', null, height);
                     if (reload) {
                         var heights = $.nos.grid.getHeights();
-                        self.uiGrid.nosgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
+                        self.uiGrid.noslistgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
                     }
                 }
             }
@@ -1583,7 +1571,7 @@ define('jquery-nos-appdesk',
                 } else if (o.defaultView === 'treeGrid') {
                     self._uiList();
                 } else {
-                    self.uiGrid.nosgrid("ensureControl", true);
+                    self.uiGrid.noslistgrid("ensureControl", true);
                 }
 			}
 
@@ -1619,7 +1607,7 @@ define('jquery-nos-appdesk',
 	});
 
     $.extend($.nos, {
-        mp3Add: function(id, config) {
+        appdeskAdd: function(id, config) {
             var self = this;
             var onCustom = false;
             var jsonFile = "";
@@ -1638,15 +1626,15 @@ define('jquery-nos-appdesk',
             }
 
             require(jsonFile, function () {
-                var mp3Grid = $.nos.mp3GridSetup();
-                $.extend(true, mp3Grid.i18nMessages, config.i18n);
+                var appdesk = $.nos.appdeskSetup();
+                $.extend(true, appdesk.i18nMessages, config.i18n);
 
-                // Extending mp3Grid with each of the different json files
+                // Extending appdesk with each of the different json files
                 for (var i = 0; i < arguments.length; i++) {
-                    $.extend(true, mp3Grid, arguments[i](mp3Grid));
+                    $.extend(true, appdesk, arguments[i](appdesk));
                 }
 
-                $.extend(true, mp3Grid.mp3grid, {
+                $.extend(true, appdesk.appdesk, {
                     locales : config.locales,
                     views : config.views,
                     name  : config.configuration_id,
@@ -1654,15 +1642,15 @@ define('jquery-nos-appdesk',
                     selectedLang : config.selectedLang
                 });
                 if (onCustom) {
-                    $.extend(true, mp3Grid.mp3grid, {
+                    $.extend(true, appdesk.appdesk, {
                         fromView : config.custom.from
-                    }, config.custom.mp3grid);
+                    }, config.custom.appdesk);
                 }
 
                 var timeout,
                     div = $('div#' + id),
                     connector = div.closest('.nos-connector'),
-                    params = mp3Grid.build();
+                    params = appdesk.build();
 
                 if ($.isPlainObject(params.tab) && !$.isEmptyObject(params.tab)) {
                     try {
@@ -1673,7 +1661,7 @@ define('jquery-nos-appdesk',
                 }
 
                 div.removeAttr('id')
-                    .mp3grid(params.mp3grid);
+                    .appdesk(params.appdesk);
 
                 connector.on({
                     resizePanel : function() {
@@ -1681,17 +1669,17 @@ define('jquery-nos-appdesk',
                             window.clearTimeout(timeout);
                         }
                         timeout = window.setTimeout(function() {
-                            div.mp3grid('resize');
+                            div.appdesk('resize');
                         }, 200);
                     },
                     showPanel :  function() {
-                        div.mp3grid('resize');
+                        div.appdesk('resize');
                     }
                 });
 
                 if (params.reload) {
                     connector.on('reload.' + params.reload, function() {
-                        div.mp3grid('gridReload');
+                        div.appdesk('gridReload');
                     });
                 }
 
@@ -1700,13 +1688,13 @@ define('jquery-nos-appdesk',
                     var newDiv = $('<div id="' + id + '"></div>');
                     newDiv.insertAfter(div);
                     div.remove();
-                    self.mp3Add(id, config);
+                    self.appdeskAdd(id, config);
                 });
 
             });
         },
 
-        mp3GridSetup : function() {
+        appdeskSetup : function() {
             var self = {};
 
             var objectToArray = function(val, i) {
@@ -1787,7 +1775,7 @@ define('jquery-nos-appdesk',
                                         cellFormatter : function(args) {
                                             if ($.isPlainObject(args.row.data)) {
 
-                                                var buttons = $.nos.mp3gridActions(actions, args.row.data, {
+                                                var buttons = $.nos.appdeskActions(actions, args.row.data, {
                                                     showOnlyArrow : showOnlyArrow
                                                 });
 
@@ -1812,7 +1800,7 @@ define('jquery-nos-appdesk',
 
                 self = {
                     tab : null,
-                    mp3grid : {
+                    appdesk : {
                         adds : {},
                         grid : {
                             proxyUrl : '',
@@ -1844,7 +1832,7 @@ define('jquery-nos-appdesk',
                     build : function() {
                         // Clone object
                         var params = $.extend(true, {
-                            mp3grid : {
+                            appdesk : {
                                 texts : this.i18nMessages,
                                 splitters : {},
                                 slidersChange : function(e, rapport) {
@@ -1853,36 +1841,36 @@ define('jquery-nos-appdesk',
                             }
                         }, this);
 
-                        if (params.mp3grid.splittersVertical) {
-                            params.mp3grid.splitters.vertical = {splitterDistance : params.mp3grid.splittersVertical};
+                        if (params.appdesk.splittersVertical) {
+                            params.appdesk.splitters.vertical = {splitterDistance : params.appdesk.splittersVertical};
                         }
-                        if (params.mp3grid.splittersHorizontal) {
-                            params.mp3grid.splitters.horizontal = {splitterDistance : params.mp3grid.splittersHorizontal};
+                        if (params.appdesk.splittersHorizontal) {
+                            params.appdesk.splitters.horizontal = {splitterDistance : params.appdesk.splittersHorizontal};
                         }
-                        params.mp3grid.adds = $.map(params.mp3grid.adds, objectToArray);
+                        params.appdesk.adds = $.map(params.appdesk.adds, objectToArray);
 
 
-                        params.mp3grid.inspectors = keyToOrderedArray(params.mp3grid, 'inspectors');
+                        params.appdesk.inspectors = keyToOrderedArray(params.appdesk, 'inspectors');
 
                         // 'actions' is an object containing all the possible actions
-                        // 'mp3grid.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
+                        // 'appdesk.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
                         if (params.actions) {
                             var gridActions = params.actions;
-                            if (params.mp3grid.grid.columns.actions && params.mp3grid.grid.columns.actions.actions) {
-                                $.each(params.mp3grid.grid.columns.actions.actions, function(i, val) {
+                            if (params.appdesk.grid.columns.actions && params.appdesk.grid.columns.actions.actions) {
+                                $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
                                     if ($.type(val) == 'string') {
-                                        params.mp3grid.grid.columns.actions.actions[i] = gridActions[val];
+                                        params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
                                     }
                                 });
                             }
-                            if (params.mp3grid.thumbnails && params.mp3grid.thumbnails.actions) {
-                                $.each(params.mp3grid.thumbnails.actions, function(i, val) {
+                            if (params.appdesk.thumbnails && params.appdesk.thumbnails.actions) {
+                                $.each(params.appdesk.thumbnails.actions, function(i, val) {
                                     if ($.type(val) == 'string') {
-                                        params.mp3grid.thumbnails.actions[i] = gridActions[val];
+                                        params.appdesk.thumbnails.actions[i] = gridActions[val];
                                     }
                                 });
                             }
-                            $.each(params.mp3grid.inspectors, function(i, inspector) {
+                            $.each(params.appdesk.inspectors, function(i, inspector) {
                                 if (inspector.preview && inspector.options.actions) {
                                     $.each(inspector.options.actions, function(i, val) {
                                         if ($.type(val) == 'string') {
@@ -1897,17 +1885,17 @@ define('jquery-nos-appdesk',
                         recursive(params);
 
                         // Build properties for preview inspector
-                        for (var i = 0; i < params.mp3grid.inspectors.length; i++) {
-                            if (params.mp3grid.inspectors[i].preview) {
-                                params.mp3grid.inspectors[i].url = function($li) {
+                        for (var i = 0; i < params.appdesk.inspectors.length; i++) {
+                            if (params.appdesk.inspectors[i].preview) {
+                                params.appdesk.inspectors[i].url = function($li) {
                                     var inspectorData = $li.data('inspector'),
                                         widget = $('<div></div>')
                                             .appendTo($li)
-                                            .inspectorPreview(inspectorData.options)
+                                            .preview(inspectorData.options)
                                             .parent()
                                             .on({
                                                 widgetResize: function() {
-                                                    widget.inspectorPreview('resize');
+                                                    widget.preview('resize');
                                                 }
                                             })
                                             .end();
@@ -1922,8 +1910,8 @@ define('jquery-nos-appdesk',
         },
 
         // Keep track of all created menus so we can hide them when
-        mp3GridActionsList : [],
-        mp3gridActions : function(actions, noParseData, options) {
+        appdeskActionsList : [],
+        appdeskActions : function(actions, noParseData, options) {
             options = options || {};
             var container = $('<table><tr></tr></table>').addClass('buttontd wijgridtd');
 
@@ -2020,7 +2008,7 @@ define('jquery-nos-appdesk',
                 // Don't select the line when clicking the "more actions" arrow dropdown
                 dropDown.appendTo(container.find('tr')).click(function(e) {
 
-                    $.each($.nos.mp3GridActionsList, function() {
+                    $.each($.nos.appdeskActionsList, function() {
                         $(this).wijmenu('hideAllMenus');
                     });
 
@@ -2080,7 +2068,7 @@ define('jquery-nos-appdesk',
                             }
                         });
 
-                        $.nos.mp3GridActionsList.push(ul);
+                        $.nos.appdeskActionsList.push(ul);
 
                         this.created = true;
 
@@ -2101,9 +2089,9 @@ define('jquery-nos-appdesk',
                         .appendTo('body');
 
                     var table = $('<table></table>')
-                        .addClass('nos-mp3grid')
+                        .addClass('nos-appdesk')
                         .appendTo($div)
-                        .nosgrid({
+                        .noslistgrid({
                             scrollMode : 'auto',
                             showFilter: true,
                             allowPaging : true,
@@ -2115,7 +2103,7 @@ define('jquery-nos-appdesk',
                         header : $div.find('.wijmo-wijgrid-headerrow').outerHeight(),
                         filter : $div.find('.wijmo-wijgrid-filterrow').outerHeight()
                     };
-                    table.nosgrid('destroy');
+                    table.noslistgrid('destroy');
                     $div.remove();
                 }
                 return this.heights;
@@ -2132,9 +2120,9 @@ define('jquery-nos-appdesk',
                     .appendTo('body');
 
                 var table = $('<table></table>')
-                    .addClass('nos-mp3grid')
+                    .addClass('nos-appdesk')
                     .appendTo($div)
-                    .nosgrid({
+                    .noslistgrid({
                         scrollMode : 'none',
                         showFilter: true,
                         allowPaging : true,
@@ -2144,7 +2132,7 @@ define('jquery-nos-appdesk',
                                 cellFormatter : function(args) {
                                     if ($.isPlainObject(args.row.data)) {
 
-                                        var buttons = $.nos.mp3gridActions(actions, []);
+                                        var buttons = $.nos.appdeskActions(actions, []);
 
                                         buttons.appendTo(args.$container);
                                         args.$container.parent().addClass('buttontd');
@@ -2169,7 +2157,7 @@ define('jquery-nos-appdesk',
                 });
                 //this.cache[text] = $div.find('.buttontd .buttontd:first').outerWidth();
                 var width = $div.find('.buttontd .buttontd:first').outerWidth();
-                table.nosgrid('destroy');
+                table.noslistgrid('destroy');
                 $div.remove();
                 return width;
                 //return this.cache[text];

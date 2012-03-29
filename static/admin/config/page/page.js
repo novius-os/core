@@ -11,15 +11,15 @@ define([
     'jquery-nos-appdesk'
 ], function($) {
     "use strict";
-    return function(mp3Grid) {
+    return function(appDesk) {
         return {
             tab : {
-                label : mp3Grid.i18n('Pages'),
+                label : appDesk.i18n('Pages'),
                 iconUrl : 'static/cms/admin/novius-os/img/32/page.png'
             },
             actions : {
                 edit : {
-                    label : mp3Grid.i18n('Edit'),
+                    label : appDesk.i18n('Edit'),
                     name : 'edit',
                     primary : true,
                     icon : 'pencil',
@@ -31,7 +31,7 @@ define([
                     }
                 },
                 'delete' : {
-                    label : mp3Grid.i18n('Delete'),
+                    label : appDesk.i18n('Delete'),
                     name : 'delete',
                     primary : true,
                     icon : 'trash',
@@ -39,14 +39,14 @@ define([
                         $.nos.dialog({
                             contentUrl: 'admin/cms/page/page/delete_page/' + item.id,
                             ajax : true,
-                            title: mp3Grid.i18n('Delete a page')._(),
+                            title: appDesk.i18n('Delete a page')._(),
                             width: 500,
                             height: 250
                         });
                     }
                 },
                 'visualise' : {
-                    label : mp3Grid.i18n('Visualise'),
+                    label : appDesk.i18n('Visualise'),
                     name : 'visualise',
                     primary : true,
                     iconClasses : 'nos-icon16 nos-icon16-eye',
@@ -56,19 +56,19 @@ define([
                 }
             },
             reload : 'cms_page',
-            mp3grid : {
+            appdesk : {
                 adds: {
                     page : {
-                        label : mp3Grid.i18n('Add a page'),
+                        label : appDesk.i18n('Add a page'),
                         action : function() {
                             $.nos.tabs.add({
                                 url: 'admin/cms/page/page/add',
-                                title: mp3Grid.i18n('Add a page')._()
+                                title: appDesk.i18n('Add a page')._()
                             });
                         }
                     }/*,
                     root : {
-                        label : mp3Grid.i18n('Add a root'),
+                        label : appDesk.i18n('Add a root'),
                         url : 'admin/cms/page/root/add'
                     }*/
                 },
@@ -76,7 +76,7 @@ define([
                     proxyUrl : 'admin/cms/page/list/json',
                     columns : {
                         title : {
-                            headerText : mp3Grid.i18n('Title'),
+                            headerText : appDesk.i18n('Title'),
                             dataKey : 'title',
                             sortDirection : 'ascending'
                         },
@@ -84,12 +84,12 @@ define([
                             lang : true
                         },
                         url : {
-                            headerText : mp3Grid.i18n('Virtual url'),
+                            headerText : appDesk.i18n('Virtual url'),
                             visible : false,
                             dataKey : 'url'
                         },
                         published : {
-                            headerText : mp3Grid.i18n('Status'),
+                            headerText : appDesk.i18n('Status'),
                             dataKey : 'publication_status'
                         },
                         actions : {
@@ -106,14 +106,14 @@ define([
                         widget_id : 'cms_page_roots',
                         vertical : true,
                         hide : true,
-                        label : mp3Grid.i18n('Roots'),
+                        label : appDesk.i18n('Roots'),
                         url : 'admin/cms/page/inspector/root/list',
                         inputName : 'rac_id',
                         grid : {
                             urlJson : 'admin/cms/page/inspector/root/json',
                             columns : {
                                 title : {
-                                    headerText : mp3Grid.i18n('Root'),
+                                    headerText : appDesk.i18n('Root'),
                                     dataKey : 'title'
                                 }
                             }

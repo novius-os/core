@@ -21,7 +21,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
         if (empty($media)) {
             throw new \Exception('Media not found.');
         }
-        if (!static::check_permission_action('delete', 'controller/admin/media/mp3grid/list', $media)) {
+        if (!static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $media)) {
             throw new \Exception('Permission denied');
         }
         return $media;

@@ -8,20 +8,20 @@
  */
 @import "compass/css3/box-sizing";
 
-.nos-thumbnails {
+.nos-thumbnailsgrid {
     position: relative;
 
-    .nos-thumbnails-loading {
+    .nos-thumbnailsgrid-loading {
         background: inherit;
     }
-    .nos-thumbnails-overlay {
+    .nos-thumbnailsgrid-overlay {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
         z-index: 99;
     }
-    .nos-thumbnails-loadingtext {
+    .nos-thumbnailsgrid-loadingtext {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -43,30 +43,30 @@
 		@include box-sizing(border-box);
 	    padding : 0 10px 10px 0;
 
-		.nos-thumbnails-thumb {
+		.nos-thumbnailsgrid-thumb {
 		    position: relative;
 			float : left;
 			margin : 10px 0 0 10px;
 
-			.nos-thumbnails-thumb-grid {
+			.nos-thumbnailsgrid-thumb-grid {
 			    width : 100%;
 
 				td {
 					border-width: 0 ;
 					vertical-align: top;
 
-					.nos-thumbnails-thumb-container-img {
+					.nos-thumbnailsgrid-thumb-container-img {
 						@include box-sizing(border-box);
 						position: relative;
 						margin: 3px auto 0;
 						padding: 0px;
 						overflow : hidden;
 
-						.nos-thumbnails-thumb-img-default {
+						.nos-thumbnailsgrid-thumb-img-default {
 							background-repeat: no-repeat;
 						}
 
-						.nos-thumbnails-thumb-img {
+						.nos-thumbnailsgrid-thumb-img {
 							position: relative;
 							top: 50%;
 							left: 50%;
@@ -74,7 +74,7 @@
 
 					}
 
-					.nos-thumbnails-thumb-title {
+					.nos-thumbnailsgrid-thumb-title {
 						@include box-sizing(content-box);
 					    display : block;
 						white-space: normal;
@@ -111,36 +111,36 @@
 		}
 	}
 }
-.nos-thumbnails-size-64 {
+.nos-thumbnailsgrid-size-64 {
 
 	.wijmo-wijsuperpanel-contentwrapper {
 
-		.nos-thumbnails-thumb {
+		.nos-thumbnailsgrid-thumb {
 			width : 100px;
 
-			.nos-thumbnails-thumb-grid {
+			.nos-thumbnailsgrid-thumb-grid {
 
 				td {
 					height: 126px; /* 105 + 21 (action bar) */
 
-					.nos-thumbnails-thumb-container-img {
+					.nos-thumbnailsgrid-thumb-container-img {
 						width: 64px;
 						height: 64px;
 
-						.nos-thumbnails-thumb-img-default {
+						.nos-thumbnailsgrid-thumb-img-default {
 							width: 64px;
 							height: 64px;
 							background: url(../img/64/thumbnail-64-default.png) no-repeat;
 						}
 
-						.nos-thumbnails-thumb-img {
+						.nos-thumbnailsgrid-thumb-img {
 							margin-top: -32px;
 	                        margin-left: -32px;
 						}
 
 					}
 
-                    .nos-thumbnails-thumb-title {
+                    .nos-thumbnailsgrid-thumb-title {
                         width: 92px;
                     }
 				}
@@ -149,36 +149,36 @@
 	}
 
 }
-.nos-thumbnails-size-128 {
+.nos-thumbnailsgrid-size-128 {
 
 	.wijmo-wijsuperpanel-contentwrapper {
 
-		.nos-thumbnails-thumb {
+		.nos-thumbnailsgrid-thumb {
 			width : 185px; /* 164 + 21 (action bar) */
 
-			.nos-thumbnails-thumb-grid {
+			.nos-thumbnailsgrid-thumb-grid {
 
 				td {
 					height: 169px;
 
-					.nos-thumbnails-thumb-container-img {
+					.nos-thumbnailsgrid-thumb-container-img {
 						width: 128px;
 						height: 128px;
 
-						.nos-thumbnails-thumb-img-default {
+						.nos-thumbnailsgrid-thumb-img-default {
 							width: 128px;
 							height: 128px;
 							background: url(../img/128/thumbnail-128-default.png) no-repeat;
 						}
 
-						.nos-thumbnails-thumb-img {
+						.nos-thumbnailsgrid-thumb-img {
 							margin-top: -64px;
 	                        margin-left: -64px;
 						}
 
 					}
 
-                    .nos-thumbnails-thumb-title {
+                    .nos-thumbnailsgrid-thumb-title {
                         width: 156px;
                     }
 				}

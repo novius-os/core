@@ -96,7 +96,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 	public function action_upload() {
 
-        if (!static::check_permission_action('add', 'controller/admin/media/mp3grid/list')) {
+        if (!static::check_permission_action('add', 'controller/admin/media/appdesk/list')) {
             throw new \Exception(__('Permission denied'));
         }
 
@@ -182,7 +182,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 	public function action_update() {
 
-        if (!static::check_permission_action('add', 'controller/admin/media/mp3grid/list')) {
+        if (!static::check_permission_action('add', 'controller/admin/media/appdesk/list')) {
             throw new \Exception(__('Permission denied'));
         }
         try {

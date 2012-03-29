@@ -11,22 +11,22 @@ define([
     'jquery-nos-appdesk'
 ], function($) {
     "use strict";
-    return function(mp3Grid) {
+    return function(appDesk) {
 
         // Remove all primary actions
-        $.each(mp3Grid.actions, function() {
+        $.each(appDesk.actions, function() {
             this.primary = false;
         });
 
         // Add "pick" as unique primary action
-        mp3Grid.mp3grid.grid.columns.actions.actions.unshift('pick');
-        mp3Grid.mp3grid.thumbnails.actions.unshift('pick');
-        mp3Grid.mp3grid.inspectors.preview.options.actions.unshift('pick');
+        appDesk.appdesk.grid.columns.actions.actions.unshift('pick');
+        appDesk.appdesk.thumbnails.actions.unshift('pick');
+        appDesk.appdesk.inspectors.preview.options.actions.unshift('pick');
 
         return {
             actions : {
                 pick : {
-                    label : mp3Grid.i18n('Pick'),
+                    label : appDesk.i18n('Pick'),
                     icon : 'check',
                     text : true,
                     primary : true,
@@ -35,7 +35,7 @@ define([
                     }
                 }
             },
-            mp3grid : {
+            appdesk : {
                 grid : {
                     id : 'cms_media_grid_image'
                 },

@@ -196,7 +196,7 @@ class Controller_Admin_Page_Page extends Controller {
         if (empty($page)) {
             throw new \Exception('Page not found.');
         }
-        if (!static::check_permission_action('delete', 'controller/admin/page/mp3grid/list', $page)) {
+        if (!static::check_permission_action('delete', 'controller/admin/page/appdesk/list', $page)) {
             throw new \Exception('Permission denied');
         }
         return $page;

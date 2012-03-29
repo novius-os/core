@@ -332,6 +332,12 @@ img.publication_status {
 
 	}
 
+    .actions_zone {
+        margin-top: 20px;
+        text-align: right;
+        padding-right: 40px;
+    }
+
 	.applications {
 		overflow: hidden;
 		.application {
@@ -341,16 +347,26 @@ img.publication_status {
 			height: 80px;
 			position: relative;
 			margin-top: 10px;
+            margin-bottom: 20px;
 
 
 			&.all {
 				height: 40px;
+	            border: none;
+
+	            &:hover, &.selected {
+	                background: none !important;
+	            }
 
 				.infos {
 					line-height: 40px;
+	                background: none;
+	                left: 60px;
 				}
 
 				.maincheck {
+				    background: none;
+
 					.wijmo-checkbox {
 						margin-top: 11px;
 					}
@@ -399,8 +415,8 @@ img.publication_status {
 			.infos {
 				position: absolute;
 				top: 0px;
+	            left: 155px;
 				bottom: 0px;
-				left: 155px;
 				right: 0px;
 				line-height: 80px;
 				font-size: 24px;
@@ -409,4 +425,9 @@ img.publication_status {
 		}
 
 	}
+}
+
+
+.ui-tabs-left .wijmo-wijtabs-content {
+    width: 84%;
 }

@@ -11,18 +11,18 @@ define([
     'jquery-nos-appdesk'
 ], function($) {
     "use strict";
-    return function(mp3Grid) {
+    return function(appDesk) {
         return {
             actions : {
                 edit : {
                     name : 'edit',
                     primary : true,
                     icon : 'pencil',
-                    label : mp3Grid.i18n('Edit'),
+                    label : appDesk.i18n('Edit'),
                     action : function(item) {
                         $.nos.tabs.add({
                             url: 'admin/cms/media/media/edit/' + item.id,
-                            label: mp3Grid.i18n('Edit a media')._()
+                            label: appDesk.i18n('Edit a media')._()
                         });
                     }
                 },
@@ -30,12 +30,12 @@ define([
                     name : 'delete',
                     primary : true,
                     icon : 'trash',
-                    label : mp3Grid.i18n('Delete'),
+                    label : appDesk.i18n('Delete'),
                     action : function(item) {
                         $.nos.dialog({
                             contentUrl: 'admin/cms/media/actions/delete_media/' + item.id,
                             ajax : true,
-                            title: mp3Grid.i18n('Delete a media')._(),
+                            title: appDesk.i18n('Delete a media')._(),
                             width: 400,
                             height: 150
                         });
@@ -46,7 +46,7 @@ define([
                     //primary : true,
                     //icon : 'search',
                     iconClasses : 'nos-icon16 nos-icon16-eye',
-                    label : mp3Grid.i18n('Visualise'),
+                    label : appDesk.i18n('Visualise'),
                     action : function(item, ui) {
 
                         if (!item.image) {
@@ -92,24 +92,24 @@ define([
                 }
             },
             tab : {
-                label : mp3Grid.i18n('Media center'),
+                label : appDesk.i18n('Media center'),
                 iconUrl : 'static/cms/admin/novius-os/img/32/media.png'
             },
             reload : 'cms_media_media',
-            mp3grid : {
+            appdesk : {
                 splittersVertical : 300,
                 adds : {
                     media : {
-                        label : mp3Grid.i18n('Add a media'),
+                        label : appDesk.i18n('Add a media'),
                         action : function() {
                             $.nos.tabs.add({
                                 url: 'admin/cms/media/media/add',
-                                label: mp3Grid.i18n('Add a media')._()
+                                label: appDesk.i18n('Add a media')._()
                             });
                         }
                     },
                     folder : {
-                        label : mp3Grid.i18n('Add a folder'),
+                        label : appDesk.i18n('Add a folder'),
                         action : function() {
                             $.nos.dialog({
                                 contentUrl: 'admin/cms/media/folder/add',
@@ -126,14 +126,14 @@ define([
                     proxyUrl : 'admin/cms/media/list/json',
                     columns : {
                         extension : {
-                            headerText : mp3Grid.i18n('Ext.'),
+                            headerText : appDesk.i18n('Ext.'),
                             dataKey : 'extension',
                             width : 60,
                             ensurePxWidth : true,
                             allowSizing : false
                         },
                         title : {
-                            headerText : mp3Grid.i18n('Title'),
+                            headerText : appDesk.i18n('Title'),
                             dataKey : 'title',
                             sortDirection : 'ascending'
                         },
@@ -160,7 +160,7 @@ define([
                     folders : {
                         vertical : true,
                         widget_id : 'cms_media_folders',
-                        label : mp3Grid.i18n('Folders'),
+                        label : appDesk.i18n('Folders'),
                         url : 'admin/cms/media/inspector/folder/list',
                         inputName : 'folder_id',
                         treeGrid : {
@@ -168,7 +168,7 @@ define([
                             sortable : false,
                             columns : {
                                 title : {
-                                    headerText : mp3Grid.i18n('Folder'),
+                                    headerText : appDesk.i18n('Folder'),
                                     dataKey : 'title'
                                 },
                                 actions : {
@@ -176,7 +176,7 @@ define([
                                     actions : [
                                         {
                                             name : 'add_media',
-                                            label : mp3Grid.i18n('Add a media in this folder'),
+                                            label : appDesk.i18n('Add a media in this folder'),
                                             icon : 'plus',
                                             action : function(item) {
                                                 $.nos.tabs.add({
@@ -187,7 +187,7 @@ define([
                                         },
                                         {
                                             name : 'add_folder',
-                                            label : mp3Grid.i18n('Add a sub-folder to this folder'),
+                                            label : appDesk.i18n('Add a sub-folder to this folder'),
                                             icon : 'folder-open',
                                             action : function(item) {
                                                 $.nos.dialog({
@@ -201,7 +201,7 @@ define([
                                         },
                                         {
                                             name : 'edit',
-                                            label : mp3Grid.i18n('Edit this folder'),
+                                            label : appDesk.i18n('Edit this folder'),
                                             icon : 'pencil',
                                             action : function(item) {
                                                 $.nos.dialog({
@@ -215,7 +215,7 @@ define([
                                         },
                                         {
                                             name : 'delete',
-                                            label : mp3Grid.i18n('Delete this folder'),
+                                            label : appDesk.i18n('Delete this folder'),
                                             icon : 'trash',
                                             action : function(item) {
                                                 $.nos.dialog({
@@ -235,13 +235,13 @@ define([
                     extensions : {
                         vertical : true,
                         widget_id : 'cms_media_extensions',
-                        label : mp3Grid.i18n('Type of file'),
+                        label : appDesk.i18n('Type of file'),
                         url : 'admin/cms/media/inspector/extension/list',
                         inputName : 'media_extension[]',
                         grid : {
                             columns : {
                                 title : {
-                                    headerText : mp3Grid.i18n('Type of file'),
+                                    headerText : appDesk.i18n('Type of file'),
                                     dataKey : 'title',
                                     cellFormatter : function(args) {
                                         if ($.isPlainObject(args.row.data)) {
@@ -269,15 +269,15 @@ define([
                     preview : {
                         vertical : true,
                         widget_id : 'cms_media_preview',
-                        label : mp3Grid.i18n('Preview'),
+                        label : appDesk.i18n('Preview'),
                         preview : true,
                         options : {
                             meta : {
                                 fileName : {
-                                    label : mp3Grid.i18n('File name:')
+                                    label : appDesk.i18n('File name:')
                                 },
                                 pathFolder : {
-                                    label : mp3Grid.i18n('Path:')
+                                    label : appDesk.i18n('Path:')
                                 }
                             },
                             actions : ['edit', 'delete', 'visualise'],
