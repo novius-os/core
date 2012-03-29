@@ -7,13 +7,13 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-use Cms\I18n;
+use Nos\I18n;
 
-I18n::load('media', 'cms_media');
+I18n::load('media', 'nos_media');
 
 return array(
 	'query' => array(
-		'model' => 'Cms\Model_Media_Media',
+		'model' => 'Nos\Model_Media_Media',
 		'related' => array(),
 		'limit' => 10,
 	),
@@ -27,17 +27,17 @@ return array(
         'default' => array(
             'name' => __('Default view'),
             'json' => array(
-                'static/cms/admin/config/media/common.js',
-                'static/cms/admin/config/media/media.js'
+                'static/novius-os/admin/config/media/common.js',
+                'static/novius-os/admin/config/media/media.js'
             ),
         ),
         'image_pick' => array(
             'name' => __('Image'),
             'virtual' => true,
             'json' => array(
-                'static/cms/admin/config/media/common.js',
-                'static/cms/admin/config/media/media.js',
-                'static/cms/admin/config/media/image_pick.js'
+                'static/novius-os/admin/config/media/common.js',
+                'static/novius-os/admin/config/media/media.js',
+                'static/novius-os/admin/config/media/image_pick.js'
             ),
         )
     ),
@@ -131,7 +131,7 @@ return array(
 				'htm' => 'text.png',
 				'html' => 'text.png',
 			);
-			return isset($extensions[$object->media_ext]) ? 'static/cms/admin/novius-os/img/64/'.$extensions[$object->media_ext] : '';
+			return isset($extensions[$object->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$object->media_ext] : '';
 		},
 	),
 	'inputs' => array(

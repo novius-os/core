@@ -9,12 +9,12 @@
  */
 
 return array(
-	'_root_' => 'cms/admin/noviusos/index',
-	'admin' => 'cms/admin/noviusos/index',
+	'_root_' => 'nos/admin/noviusos/index',
+	'admin' => 'nos/admin/noviusos/index',
 
-	//'admin/cms/(:any)' => 'cms/$1',
+	//'admin/nos/(:any)' => 'nos/$1',
 	'admin/(:segment)/(:any)' => '$1/admin/$2',
-	//'(:any)' => 'cms/admin/dispatch/$1',
+	//'(:any)' => 'nos/admin/dispatch/$1',
 
 	'_404_' => null,
 );

@@ -17,7 +17,7 @@ require([
 		$(function() {
 			$('input[name=<?= $name ?>]').datepicker({
 				showOn : 'both',
-				buttonImage: 'static/cms/admin/novius-os/img/icons/date-picker.png',
+				buttonImage: 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
 				buttonImageOnly : true,
 				autoSize: true,
 				dateFormat: 'yy-mm-dd',

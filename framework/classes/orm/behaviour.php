@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 abstract class Orm_Behaviour extends \Orm\Observer
 {

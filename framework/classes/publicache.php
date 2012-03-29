@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class CacheNotFoundException extends \Exception {}
 class CacheExpiredException extends \Exception {}
@@ -124,7 +124,7 @@ class PubliCache {
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
-		\Cms::main_controller()->expires = \Date::forge($expires)->format("%H:%M:%S");;
+		\Nos::main_controller()->expires = \Date::forge($expires)->format("%H:%M:%S");;
     }
 
     public function save($duration = -1, $controller = null) {

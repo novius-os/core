@@ -107,9 +107,9 @@ return array(
         'form' => array(
             'type' => 'select',
             'options' => array(
-                Cms\Model_Page_Page::EXTERNAL_TARGET_NEW   => 'New window',
-                Cms\Model_Page_Page::EXTERNAL_TARGET_POPUP => 'Popup',
-                Cms\Model_Page_Page::EXTERNAL_TARGET_SAME  => 'Same window',
+                Nos\Model_Page_Page::EXTERNAL_TARGET_NEW   => 'New window',
+                Nos\Model_Page_Page::EXTERNAL_TARGET_POPUP => 'Popup',
+                Nos\Model_Page_Page::EXTERNAL_TARGET_SAME  => 'Same window',
             ),
         ),
     ),
@@ -118,10 +118,10 @@ return array(
         'form' => array(
             'type' => 'select',
             'options' => array(
-                Cms\Model_Page_Page::TYPE_CLASSIC => 'Page',
-                Cms\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
-                Cms\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',
-                Cms\Model_Page_Page::TYPE_EXTERNAL_LINK => 'External link',
+                Nos\Model_Page_Page::TYPE_CLASSIC => 'Page',
+                Nos\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
+                Nos\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',
+                Nos\Model_Page_Page::TYPE_EXTERNAL_LINK => 'External link',
             ),
         ),
     ),
@@ -130,9 +130,9 @@ return array(
         'form' => array(
             'type' => 'select',
             'options' => array(
-                Cms\Model_Page_Page::LOCK_UNLOCKED => 'Unlocked',
-                Cms\Model_Page_Page::LOCK_DELETION => 'Deletion',
-                Cms\Model_Page_Page::LOCK_EDITION  => 'Modification',
+                Nos\Model_Page_Page::LOCK_UNLOCKED => 'Unlocked',
+                Nos\Model_Page_Page::LOCK_DELETION => 'Deletion',
+                Nos\Model_Page_Page::LOCK_EDITION  => 'Modification',
             ),
         ),
     ),

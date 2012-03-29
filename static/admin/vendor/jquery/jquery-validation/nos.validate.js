@@ -1,4 +1,4 @@
-define(['jquery', 'static/cms/admin/vendor/jquery/jquery-validation/jquery.validate.min'], function($) {
+define(['jquery', 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate.min'], function($) {
     // This replaces the showLabel function
     var showLabel = function (element, message) {
         var self = this;

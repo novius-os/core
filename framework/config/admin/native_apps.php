@@ -12,9 +12,9 @@ return array(
     'nos_page' =>
     array(
         'name' => __('Pages'),
-        'url' => 'admin/cms/page/list/index',
-        'iconUrl' => 'static/cms/admin/novius-os/img/32/page.png',
-        'icon64' => 'static/cms/admin/novius-os/img/64/page.png',
+        'url' => 'admin/nos/page/list/index',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',
@@ -23,9 +23,9 @@ return array(
     'nos_media' =>
     array(
         'name' => __('Media centre'),
-        'url' => 'admin/cms/media/list/index',
-        'iconUrl' => 'static/cms/admin/novius-os/img/32/media.png',
-        'icon64' => 'static/cms/admin/novius-os/img/64/media.png',
+        'url' => 'admin/nos/media/list/index',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/media.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',
@@ -34,9 +34,9 @@ return array(
     'nos_user' =>
     array(
         'name' => __('Users'),
-        'url' => 'admin/cms/user/list/index',
-        'iconUrl' => 'static/cms/admin/novius-os/img/32/user.png',
-        'icon64' => 'static/cms/admin/novius-os/img/64/user.png',
+        'url' => 'admin/nos/user/list/index',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',
@@ -45,9 +45,9 @@ return array(
     'nos_tray' =>
     array(
         'name' => __('Applications manager'),
-        'url' => 'admin/cms/tray/plugins',
-        'iconUrl' => 'static/cms/admin/novius-os/img/24/tabs-store.png',
-        'icon64' => 'static/cms/admin/novius-os/img/64/app-manager.png',
+        'url' => 'admin/nos/tray/plugins',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/24/tabs-store.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/app-manager.png',
         'provider' =>
             array(
                 'name' => 'Novius OS',

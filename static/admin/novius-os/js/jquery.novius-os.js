@@ -150,8 +150,8 @@ define('jquery-nos', [
             }
             if ( $.isPlainObject( options ) ) {
                 require([
-                    'link!static/cms/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
-                    'static/cms/admin/vendor/jquery/pnotify/jquery.pnotify.min'
+                    'link!static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
+                    'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.min'
                 ], function() {
                     var o = {
                         pnotify_history : false,
@@ -266,8 +266,8 @@ define('jquery-nos', [
         media : function(input, data) {
 
             var contentUrls = {
-                'all'   : '/admin/cms/media/list',
-                'image' : '/admin/cms/media/list?view=image_pick'
+                'all'   : '/admin/nos/media/list',
+                'image' : '/admin/nos/media/list?view=image_pick'
             };
 
             var dialog = null;
@@ -297,8 +297,8 @@ define('jquery-nos', [
             }, data.inputFileThumb);
 
             require([
-                'static/cms/admin/vendor/jquery/jquery-ui-input-file-thumb/js/jquery.input-file-thumb',
-                'link!static/cms/admin/vendor/jquery/jquery-ui-input-file-thumb/css/jquery.input-file-thumb.css'
+                'static/novius-os/admin/vendor/jquery/jquery-ui-input-file-thumb/js/jquery.input-file-thumb',
+                'link!static/novius-os/admin/vendor/jquery/jquery-ui-input-file-thumb/css/jquery.input-file-thumb.css'
             ], function() {
                 $(function() {
                     input.inputFileThumb(options);
@@ -337,7 +337,7 @@ define('jquery-nos', [
 
         saveUserConfiguration: function(key, configuration) {
             this.ajax.request({
-                url: '/admin/cms/noviusos/save_user_configuration',
+                url: '/admin/nos/noviusos/save_user_configuration',
                 data: {
                     key: key,
                     configuration: configuration

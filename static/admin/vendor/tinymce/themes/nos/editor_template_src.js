@@ -1967,7 +1967,7 @@
 
             dialog = $.nos.dialog({
                 destroyOnClose : true,
-				contentUrl: 'admin/cms/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
+				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
 				ajax: true,
                 open : function(e) {

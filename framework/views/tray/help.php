@@ -24,7 +24,7 @@
         <li><p>&nbsp;</p></li>
         <li>
             <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span>
-            <img src="static/cms/admin/novius-os/img/flags/fr.png" />
+            <img src="static/novius-os/admin/novius-os/img/flags/fr.png" />
             <p style="display:inline-block;"><?= strtr(__('{Forums} are also available on our website.'), array(
                 '{' => '<a href="http://www.novius-os.org/support-forums.html" target="_blank">',
                 '}' => '</a>',

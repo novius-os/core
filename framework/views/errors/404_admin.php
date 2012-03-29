@@ -38,14 +38,14 @@ if ($body) {
 ?>
 <div id="wrapper">
 	<h1>404 Not Found</h1>
-	<img src="static/cms/admin/novius-os/img/logo.png" style="float:left; margin-right: 30px;"/>
+	<img src="static/novius-os/admin/novius-os/img/logo.png" style="float:left; margin-right: 30px;"/>
 	<br /><br /><br />
 	<p class="wip">
-		<img src="static/cms/admin/novius-os/img/flags/fr.png" />&nbsp; Cette fonction n'est pas encore implémentée. Revenez bientôt !
+		<img src="static/novius-os/admin/novius-os/img/flags/fr.png" />&nbsp; Cette fonction n'est pas encore implémentée. Revenez bientôt !
 	</p>
 	<br />
 	<p class="wip">
-		<img src="static/cms/admin/novius-os/img/flags/gb.png" />&nbsp; This feature is not implemented yet. Check again soon!
+		<img src="static/novius-os/admin/novius-os/img/flags/gb.png" />&nbsp; This feature is not implemented yet. Check again soon!
 	</p>
 	<br style="clear:left;" />
 

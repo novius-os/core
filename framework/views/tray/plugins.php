@@ -20,13 +20,13 @@
 	<div class="unit col c1"></div>
 	<div class="unit col c10" id="line_first" style="position:relative;;">
 		<div class="line" style="overflow:visible;">
-			<h1 class="title"><?= Cms\I18n::get('Applications'); ?></h1>
+			<h1 class="title"><?= Nos\I18n::get('Applications'); ?></h1>
 
 			<div class="app_list">
 				<table>
 					<thead>
 						<tr>
-							<td><?= Cms\I18n::get('Installed and ready to use') ?></td>
+							<td><?= Nos\I18n::get('Installed and ready to use') ?></td>
 							<td><?= __('Actions') ?></td>
 						</tr>
 					</thead>
@@ -35,8 +35,8 @@
 						<tr>
 							<td><?= isset($metadata['name']) ? $metadata['name'] : $app ?></td>
 							<td>
-								<a href="admin/cms/tray/plugins/remove/<?= $app ?>">remove</a>
-								<?= !empty($metadata['dirty']) ? '- [<a href="admin/cms/tray/plugins/add/'.$app.'">repair install</a>]' : '' ?>
+								<a href="admin/nos/tray/plugins/remove/<?= $app ?>">remove</a>
+								<?= !empty($metadata['dirty']) ? '- [<a href="admin/nos/tray/plugins/add/'.$app.'">repair install</a>]' : '' ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -44,7 +44,7 @@
 				</table>
 
 				<?php if (empty($installed)) { ?>
-				<em><?php echo Cms\I18n::get('No applications found') ?>.</em>
+				<em><?php echo Nos\I18n::get('No applications found') ?>.</em>
 				<?php } ?>
 			</div>
 
@@ -54,7 +54,7 @@
 				<table>
 					<thead>
 						<tr>
-							<td><?= Cms\I18n::get('Available for installation') ?></td>
+							<td><?= Nos\I18n::get('Available for installation') ?></td>
 							<td><?= __('Actions') ?></td>
 						</tr>
 					</thead>
@@ -62,14 +62,14 @@
 				<?php foreach ($others as $app => $metadata) { ?>
 						<tr>
 							<td><?= isset($metadata['name']) ? $metadata['name'] : $app ?> </td>
-							<td><a href="admin/cms/tray/plugins/add/<?= $app ?>">add</a></td>
+							<td><a href="admin/nos/tray/plugins/add/<?= $app ?>">add</a></td>
 						</tr>
 						<?php } ?>
 					</tbody>
 				</table>
 
 				<?php if (empty($others)) { ?>
-				<em><?= Cms\I18n::get('No applications found') ?></em>
+				<em><?= Nos\I18n::get('No applications found') ?></em>
 				<?php } ?>
 
 			</div>
@@ -77,9 +77,9 @@
 			<?php if ($allow_upload) { ?>
 
 			<p>&nbsp;</p>
-			<h1 class="title"><?= Cms\I18n::get('Install from a .zip file') ?></h1>
+			<h1 class="title"><?= Nos\I18n::get('Install from a .zip file') ?></h1>
 
-			<form method="post" action="/admin/cms/tray/plugins/upload" enctype="multipart/form-data">
+			<form method="post" action="/admin/nos/tray/plugins/upload" enctype="multipart/form-data">
 				<input type="file" name="zip" />
 				<input type="submit" value="Upload the application" />
 			</form>

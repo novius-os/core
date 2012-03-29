@@ -11,9 +11,9 @@
 return array(
 	'models' => array(
 		array(
-			'model' => 'Cms\Model_Media_Folder',
+			'model' => 'Nos\Model_Media_Folder',
 			'order_by' => 'medif_title',
-			'childs' => array('Cms\Model_Media_Folder'),
+			'childs' => array('Nos\Model_Media_Folder'),
 			'dataset' => array(
 				'id' => 'medif_id',
 				'title' => 'medif_title',
@@ -33,7 +33,7 @@ return array(
 	),
 	'roots' => array(
 		array(
-			'model' => 'Cms\Model_Media_Folder',
+			'model' => 'Nos\Model_Media_Folder',
 			'where' => array(array('medif_parent_id', 'IS', \DB::expr('NULL'))),
 			'order_by' => 'medif_title',
 		),

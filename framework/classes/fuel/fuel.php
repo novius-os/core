@@ -18,7 +18,7 @@ class Fuel extends Fuel\Core\Fuel {
 	protected static function generate_base_url()
 	{
 		$base_url = parent::generate_base_url();
-		return str_replace('htdocs/cms/', '', $base_url);
+		return str_replace('htdocs/novius-os/', '', $base_url);
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Fuel extends Fuel\Core\Fuel {
 	 */
 	public static function module_exists($name) {
 
-		if ($name == 'cms' || $name == 'app') {
+		if ($name == 'nos' || $name == 'app') {
 			return true;
 		}
 
@@ -43,7 +43,7 @@ class Fuel extends Fuel\Core\Fuel {
 
     public static function add_module($name) {
 
-		if ($name == 'cms' || $name == 'app') {
+		if ($name == 'nos' || $name == 'app') {
 			return;
 		}
 

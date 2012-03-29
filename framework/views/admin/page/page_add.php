@@ -14,7 +14,7 @@ require(['jquery-nos-ostabs'], function ($) {
 	$(function () {
 		$.nos.tabs.update({
 			label : <?= json_encode(__('Add a page')) ?>,
-			iconUrl : 'static/cms/admin/novius-os/img/16/page.png'
+			iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
 		});
 	});
 });
@@ -28,7 +28,7 @@ require(['jquery-nos-ostabs'], function ($) {
             $locales = Config::get('locales', array());
             foreach ($possible as $lang) {
                 $uniqids[$lang] = uniqid($lang.'_');
-                echo '<li style="text-align: center;"><a href="#'.$uniqids[$lang].'">'.Cms\Helper::flag($lang)/*.' '.\Arr::get($locales, $lang, $lang)*/.'</a></li>';
+                echo '<li style="text-align: center;"><a href="#'.$uniqids[$lang].'">'.Nos\Helper::flag($lang)/*.' '.\Arr::get($locales, $lang, $lang)*/.'</a></li>';
             }
             ?>
         </ul>
@@ -47,7 +47,7 @@ require(['jquery-nos-ostabs'], function ($) {
                 $fieldset->field('page_parent_id')->set_options(array(
                     'lang' => $lang,
                 ));
-                echo View::forge('cms::admin/page/page_form', array(
+                echo View::forge('nos::admin/page/page_form', array(
                     'uniqid' => $uniqids[$lang],
                     'fieldset' => $fieldset,
                     'page' => $page,
@@ -65,7 +65,7 @@ require(['jquery-nos-ostabs'], function ($) {
 <script type="text/javascript">
 require([
     'jquery-nos',
-	'static/cms/admin/config/page/form.js'
+	'static/novius-os/admin/config/page/form.js'
 ], function($, callback_fn) {
 	$(function() {
         var $tabs = $('#<?= $uniqid_tabs ?>');

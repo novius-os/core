@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Extendable extends \Fuel\Core\Controller {
     protected $config = array();
@@ -58,7 +58,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         $module_name = strtolower($controller[0]);
         $file_name   = strtolower(str_replace('_', DS, $controller[1]));
         $location = array($module_name, $file_name);
-        if ($module_name == 'cms') {
+        if ($module_name == 'nos') {
             $submodule = explode('_', $controller[1]);
             if ($submodule[0] == 'Controller' && $submodule[1] == 'Admin' && count($submodule) > 2) {
                 $location[] = strtolower($submodule[2]);
@@ -110,7 +110,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         $model = $config['model'];
         $pk = \Arr::get($model::primary_key(), 0);
 
-        $query = \Cms\Orm\Query::forge($model, $model::connection());
+        $query = \Nos\Orm\Query::forge($model, $model::connection());
         foreach ($config['related'] as $related) {
             $query->related($related);
         }
@@ -135,7 +135,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		    }
 	    }
 
-        $translatable  = $model::behaviours('Cms\Orm_Behaviour_Translatable');
+        $translatable  = $model::behaviours('Nos\Orm_Behaviour_Translatable');
         if ($translatable) {
             if (empty($config['lang'])) {
                 // No inspector, we only search items in their primary language
@@ -238,9 +238,9 @@ class Controller_Extendable extends \Fuel\Core\Controller {
                     $langs = $item['lang'];
                     foreach ($all_langs as $lang) {
                         if (in_array($lang, $langs)) {
-                            $flags .= \Cms\Helper::flag($lang);
+                            $flags .= \Nos\Helper::flag($lang);
                         } else {
-                            $flags .= \Cms\Helper::flag_empty();
+                            $flags .= \Nos\Helper::flag_empty();
                         }
                     }
                     $item['lang'] = $flags;
@@ -429,14 +429,14 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		}
 
 		// Change parent for tree relations
-		$behaviour_tree = $model_from::behaviours('Cms\Orm_Behaviour_Tree');
+		$behaviour_tree = $model_from::behaviours('Nos\Orm_Behaviour_Tree');
 		if (!empty($behaviour_tree)) {
 			$parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
 			$from->set_parent($parent);
 		}
 
 		// Change sort order
-		$behaviour_sort = $model_from::behaviours('Cms\Orm_Behaviour_Sortable');
+		$behaviour_sort = $model_from::behaviours('Nos\Orm_Behaviour_Sortable');
 		if (!empty($behaviour_sort)) {
 			switch($params['targetType']) {
 				case 'before':
@@ -504,7 +504,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 			$tree_model = $tree_config['models'][$params['model']];
 			foreach ($tree_model['childs'] as $child) {
 				$model = $child['model'];
-				if (empty($params['lang']) && $model::behaviours('Cms\Orm_Behaviour_Translatable')) {
+				if (empty($params['lang']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
 					$item = $model::find($params['id']);
 					$langs = $item->get_all_lang();
 					$child['where'] = array(array($child['fk'], 'IN', array_keys($langs)));

@@ -8,33 +8,33 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Widget_Date_Select extends \Fieldset_Field {
 
     /**
-     * @var \Cms\Fieldset_Field
+     * @var \Nos\Fieldset_Field
      */
     protected $year;
 
     /**
-     * @var \Cms\Fieldset_Field
+     * @var \Nos\Fieldset_Field
      */
     protected $month;
 
     /**
-     * @var \Cms\Fieldset_Field
+     * @var \Nos\Fieldset_Field
      */
     protected $day;
 
 
     /**
-     * @var \Cms\Fieldset_Field
+     * @var \Nos\Fieldset_Field
      */
     protected $time;
 
     /**
-     * @var \Cms\Fieldset_Field
+     * @var \Nos\Fieldset_Field
      */
     protected $parts;
 
@@ -45,7 +45,7 @@ class Widget_Date_Select extends \Fieldset_Field {
      * @param  array   $attributes
      * @param  array   $rules
      * @param  \Fuel\Core\Fieldset  $fieldset
-     * @return  Cms\Widget_Date
+     * @return  Nos\Widget_Date
      */
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
         parent::__construct($name, $label, $attributes, $rules, $fieldset);

@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Event;
 
@@ -44,7 +44,7 @@ class Controller extends Controller_Extendable {
     public function set_rewrite_prefix($prefix = null) {
 
         if (empty($prefix)) {
-            $c =\Cms::main_controller();
+            $c =\Nos::main_controller();
             if (!empty($c->rewrite_prefix)) {
                 $prefix    = $c->rewrite_prefix;
                 $rewriting = \Arr::get($c->rewriting, $c->rewrite_prefix, array());
@@ -101,7 +101,7 @@ class Controller extends Controller_Extendable {
     public static function rewrite_url() {
         $args = func_get_args();
         $url = array_shift($args);
-        return \Cms::rewrite_url($url, $args);
+        return \Nos::rewrite_url($url, $args);
     }
 
 

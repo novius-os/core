@@ -13,7 +13,7 @@ require(['jquery-nos-ostabs'], function ($) {
 	$(function () {
 		$.nos.tabs.update({
 			label : <?= json_encode($media->media_title) ?>,
-			iconUrl : 'static/cms/admin/novius-os/img/16/media.png'
+			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
 		});
 	});
 });
@@ -28,7 +28,7 @@ require(['jquery-nos-ostabs'], function ($) {
     $form_attributes['enctype'] = 'multipart/form-data';
     $fieldset->set_config('form_attributes', $form_attributes);
     ?>
-    <?= $fieldset->open('admin/cms/media/media/update'); ?>
+    <?= $fieldset->open('admin/nos/media/media/update'); ?>
     <?= $fieldset->field('media_id')->build(); ?>
     <?php
     ob_start();

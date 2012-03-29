@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Orm_Behaviour_Sortable extends Orm_Behaviour
 {
@@ -50,12 +50,12 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         $this->_move($object, 10000);
 	}
 
-    public function get_sort(\Cms\Orm\Model $obj) {
+    public function get_sort(\Nos\Orm\Model $obj) {
         $sort_property = $this->_properties['sort_property'];
         return $obj->get($sort_property);
     }
 
-    public function set_sort(\Cms\Orm\Model $obj, $sort) {
+    public function set_sort(\Nos\Orm\Model $obj, $sort) {
         $sort_property = $this->_properties['sort_property'];
         $obj->set($sort_property, $sort);
     }
@@ -68,8 +68,8 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         $object->observe('after_sort');
     }
 
-    public function after_sort(\Cms\Orm\Model $obj) {
-        $tree = $obj->behaviours('Cms\Orm_Behaviour_Tree');
+    public function after_sort(\Nos\Orm\Model $obj) {
+        $tree = $obj->behaviours('Nos\Orm_Behaviour_Tree');
         $sort_property = $this->_properties['sort_property'];
         $conditions = array();
         if (!empty($tree)) {

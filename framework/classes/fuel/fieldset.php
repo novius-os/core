@@ -206,7 +206,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			$label       = isset($settings['label']) ? $settings['label'] : $p;
 			$attributes  = isset($settings['form']) ? $settings['form'] : array();
 			if (!empty($settings['widget'])) {
-				 $class = Inflector::words_to_upper('Cms\Widget_'.$settings['widget']);
+				 $class = Inflector::words_to_upper('Nos\Widget_'.$settings['widget']);
 				 $attributes['widget_options'] = isset($settings['widget_options']) ? $settings['widget_options'] : array();
 				 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
@@ -406,7 +406,7 @@ JS;
         if (empty($instance)) {
             return;
         }
-        $behaviour_translatable = $instance->behaviours('Cms\Orm_Behaviour_Translatable');
+        $behaviour_translatable = $instance->behaviours('Nos\Orm_Behaviour_Translatable');
         if (empty($behaviour_translatable) || $instance->is_main_lang()) {
             return;
         }

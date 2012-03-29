@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Request;
 
@@ -42,8 +42,8 @@ class Controller_Appdesk_List extends Controller_Generic_Admin {
     }
 
 	public function action_index($view = null) {
-		if (!\Cms\Auth::check()) {
-			\Response::redirect('/admin/cms/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
+		if (!\Nos\Auth::check()) {
+			\Response::redirect('/admin/nos/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
 			exit();
 		}
 
@@ -69,9 +69,9 @@ class Controller_Appdesk_List extends Controller_Generic_Admin {
     public function action_json()
     {
 
-		if (!\Cms\Auth::check()) {
+		if (!\Nos\Auth::check()) {
 			\Response::json(403, array(
-				'login_page' => \Uri::base(false).'admin/cms/login',
+				'login_page' => \Uri::base(false).'admin/nos/login',
 			));
 		}
 
@@ -170,9 +170,9 @@ class Controller_Appdesk_List extends Controller_Generic_Admin {
 
 	public function action_tree_json()
 	{
-		if (!\Cms\Auth::check()) {
+		if (!\Nos\Auth::check()) {
 			\Response::json(403, array(
-				'login_page' => \Uri::base(false).'admin/cms/login',
+				'login_page' => \Uri::base(false).'admin/nos/login',
 			));
 		}
 

@@ -14,7 +14,7 @@
         $(function () {
             $.nos.tabs.update({
                 label : <?= \Format::forge()->to_json(isset($user) ? $user->fullname() : 'Add a user') ?>,
-                iconUrl : 'static/cms/admin/novius-os/img/16/user.png'
+                iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
             });
         });
     });
@@ -83,8 +83,8 @@ foreach ($fieldset->field() as $field) {
             <?php $formatter = \Format::forge(); ?>
             // Password strength
             require([
-                'static/cms/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
-                'link!static/cms/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
+                'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
+                'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
             ], function() {
                 var strength_id = '<?= $uniqid ?>_strength';
                 var $strength = $('<span id="' + strength_id + '"></span>');

@@ -10,7 +10,7 @@
 
 return array(
 	'query' => array(
-		'model' => 'Cms\Model_Page_Root',
+		'model' => 'Nos\Model_Page_Root',
 	),
 	'dataset' => array(
 		'id' => 'root_id',

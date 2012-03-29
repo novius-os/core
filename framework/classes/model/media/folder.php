@@ -8,25 +8,25 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Uri;
 
-class Model_Media_Folder extends \Cms\Orm\Model {
+class Model_Media_Folder extends \Nos\Orm\Model {
     protected static $_table_name = 'os_media_folder';
     protected static $_primary_key = array('medif_id');
 
 	protected static $_has_many = array(
 		'children' => array(
 			'key_from'       => 'medif_id',
-			'model_to'       => '\Cms\Model_Media_Folder',
+			'model_to'       => '\Nos\Model_Media_Folder',
 			'key_to'         => 'medif_parent_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
 		),
         'media' => array(
 			'key_from'       => 'medif_id',
-			'model_to'       => '\Cms\Model_Media_Media',
+			'model_to'       => '\Nos\Model_Media_Media',
 			'key_to'         => 'media_path_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
@@ -36,7 +36,7 @@ class Model_Media_Folder extends \Cms\Orm\Model {
 	protected static $_belongs_to = array(
 		'parent' => array(
 			'key_from'       => 'medif_parent_id',
-			'model_to'       => '\Cms\Model_Media_Folder',
+			'model_to'       => '\Nos\Model_Media_Folder',
 			'key_to'         => 'medif_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
@@ -44,7 +44,7 @@ class Model_Media_Folder extends \Cms\Orm\Model {
 	);
 
     protected static $_behaviours = array(
-		'Cms\Orm_Behaviour_Tree' => array(
+		'Nos\Orm_Behaviour_Tree' => array(
 			'events' => array('before'),
 			'parent_relation' => 'parent',
 			'children_relation' => 'children',

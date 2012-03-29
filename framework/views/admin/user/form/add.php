@@ -15,7 +15,7 @@ require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
 	$(function () {
 		$.nos.tabs.update($('#<?= $uniqid ?>'), {
 			label : 'Add a new user',
-			iconUrl : 'static/cms/admin/novius-os/img/16/user.png'
+			iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
 		});
 	});
 
@@ -26,7 +26,7 @@ require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
 	<div class="line myBody">
 		<div class="unit col c1"></div>
 		<div class="unit col c7 ui-widget">
-			<?= $fieldset_add->open('admin/cms/user/form/add/'); ?>
+			<?= $fieldset_add->open('admin/nos/user/form/add/'); ?>
 			<div class="expander">
 				<h3>Add a new user</h3>
 				<div>

@@ -11,7 +11,7 @@
 ?>
 <div class="permissions">
 
-<form action="admin/cms/user/form/save_permissions" method="POST" id="<?= $uniqid = uniqid('id_') ?>">
+<form action="admin/nos/user/form/save_permissions" method="POST" id="<?= $uniqid = uniqid('id_') ?>">
   <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
 
     <div class="actions_zone">

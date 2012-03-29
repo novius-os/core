@@ -111,7 +111,7 @@ require(['jquery-nos'], function($) {
             }
 
             $.nos.ajax.request({
-                url : 'admin/cms/page/page/delete_page_confirm',
+                url : 'admin/nos/page/page/delete_page_confirm',
                 method : 'POST',
                 data : $container.find('form').serialize(),
                 success : function(json) {

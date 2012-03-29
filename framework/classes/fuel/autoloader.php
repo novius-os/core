@@ -13,17 +13,17 @@ class Autoloader extends Fuel\Core\Autoloader {
     static $alreadyLoadedClasses = array();
     public static function load($class)
 	{
-        if (!(substr($class, 0, 3) == 'Cms' && static::$alreadyLoadedClasses[$class])) {
+        if (!(substr($class, 0, 3) == 'Nos' && static::$alreadyLoadedClasses[$class])) {
             $loaded = parent::load($class);
         }
 
-        if (substr($class, 0, 3) == 'Cms' && static::$alreadyLoadedClasses[$class]) {
+        if (substr($class, 0, 3) == 'Nos' && static::$alreadyLoadedClasses[$class]) {
             $loaded = 1;
         }
 
         print_r(static::$alreadyLoadedClasses[$class]);
 
-        if (substr($class, 0, 3) == 'Cms') {
+        if (substr($class, 0, 3) == 'Nos') {
             static::$alreadyLoadedClasses[$class] = true;
         }
 

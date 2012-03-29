@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Media_Actions extends Controller_Extendable {
 
@@ -30,7 +30,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
 	public function action_delete_media($media_id = null) {
         try {
             $media = static::_get_media_with_permission($media_id, 'delete');
-            return \View::forge('cms::admin/media/media_delete', array(
+            return \View::forge('nos::admin/media/media_delete', array(
                 'media'       => $media,
                 'usage_count' => count($media->link),
             ));
@@ -67,7 +67,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
 				'notify' => 'File successfully deleted.',
                 'dispatchEvent' => array(
 	                'event' => 'reload',
-                    'target' => 'cms_media_media',
+                    'target' => 'nos_media_media',
                 ),
 
 			);
@@ -88,7 +88,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
      *
      * @param   int     $folder_id ID of the folder
      * @param   string  $permission Which permission to check
-     * @return  Cms\Model_Media_Folder
+     * @return  Nos\Model_Media_Folder
      */
     protected static function _get_folder_with_permission($folder_id, $permission) {
         if (empty($folder_id)) {
@@ -107,7 +107,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
 	public function action_delete_folder($folder_id = null) {
         try {
             $folder = static::_get_folder_with_permission($folder_id, 'delete');
-            return \View::forge('cms::admin/media/folder_delete', array(
+            return \View::forge('nos::admin/media/folder_delete', array(
                 'folder'      => $folder,
                 'media_count' => $folder->count_media(),
             ));
@@ -191,7 +191,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
                 'notify' => 'Folder successfully deleted.',
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => array('cms_media_media', 'cms_media_folders'),
+					'target' => array('nos_media_media', 'nos_media_folders'),
                 ),
             );
         } catch (\Exception $e) {

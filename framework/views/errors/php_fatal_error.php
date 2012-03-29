@@ -61,7 +61,7 @@
 		$(function() {
 			$.nos.tabs.update({
 				label : 'Error - We\'re working on it'
-				//iconUrl : 'static/cms/admin/novius-os/img/icons/exclamation--frame.png'
+				//iconUrl : 'static/novius-os/admin/novius-os/img/icons/exclamation--frame.png'
 			});
 		});
 	});
@@ -73,14 +73,14 @@
 ?>
 	<div id="wrapper">
 		<h1>Oops, I'm hurt</h1>
-		<a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/cms/admin/novius-os/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
+		<a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/novius-os/admin/novius-os/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
 		<br /><br /><br />
 		<p class="wip">
-			<img src="static/cms/admin/novius-os/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
+			<img src="static/novius-os/admin/novius-os/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
 		</p>
 		<br />
 		<p class="wip">
-			<img src="static/cms/admin/novius-os/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
+			<img src="static/novius-os/admin/novius-os/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
 		</p>
 		<br style="clear:left;" />
 
@@ -152,10 +152,10 @@
 	ob_start();
 
 	if (!$ajax = Input::is_ajax()) {
-		$view = \View::forge('cms::templates/html5');
+		$view = \View::forge('nos::templates/html5');
 		$view->set('title', 'Novius OS error page');
 		$view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
-		$view->set('require', 'static/cms/admin/vendor/requirejs/require.js', false);
+		$view->set('require', 'static/novius-os/admin/vendor/requirejs/require.js', false);
 		$view->set('css', $css, false);
 		$view->set('js', $js, false);
 		$view->set('body', $body, false);

@@ -10,7 +10,7 @@
 
 // Load in the Autoloader
 require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
-require CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'autoloader.php';
+require NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'autoloader.php';
 //class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
 
 // Bootstrap the framework DO NOT edit this
@@ -19,24 +19,24 @@ require_once COREPATH.'bootstrap.php';
 Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
-	'Date'           => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'date.php',
-    'Config'         => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'config.php',
-    'Session'        => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'session.php',
-	'Fuel'           => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fuel.php',
-	'Finder'         => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'finder.php',
-	'Fieldset'       => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset.php',
-	'Fieldset_Field' => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset_field.php',
-	'Format'         => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'format.php',
-	'Response'       => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'response.php',
-    'Controller'     => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'controller.php',
-    'Arr'            => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'arr.php',
-	'Cms\Orm\Query'  => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'query.php',
-	'Cms\Orm\Model'  => CMSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'model.php',
+	'Date'           => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'date.php',
+    'Config'         => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'config.php',
+    'Session'        => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'session.php',
+	'Fuel'           => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fuel.php',
+	'Finder'         => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'finder.php',
+	'Fieldset'       => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset.php',
+	'Fieldset_Field' => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset_field.php',
+	'Format'         => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'format.php',
+	'Response'       => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'response.php',
+    'Controller'     => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'controller.php',
+    'Arr'            => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'arr.php',
+	'Nos\Orm\Query'  => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'query.php',
+	'Nos\Orm\Model'  => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'model.php',
 ));
 
 function __($_message, $default = null)
 {
-    return \Cms\I18n::get($_message, $default);
+    return \Nos\I18n::get($_message, $default);
 }
 
 // Register the autoloader
@@ -79,13 +79,13 @@ spl_autoload_register(function($class) {
 //*/
 
 // Initialize the framework with the config file.
-$config_novius = include(CMSPATH.'config/config.php');
-$routes_novius = include(CMSPATH.'config/routes.php');
+$config_novius = include(NOSPATH.'config/config.php');
+$routes_novius = include(NOSPATH.'config/routes.php');
 $config_app    = include(APPPATH.'config/config.php');
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
 
-Autoloader::add_namespace('Cms', CMSPATH.'classes'.DS);
+Autoloader::add_namespace('Nos', NOSPATH.'classes'.DS);
 Autoloader::add_namespace('App', APPPATH.'classes'.DS);
 
 Config::load('namespaces', true);
@@ -100,7 +100,7 @@ define('URL_ADMIN', Uri::base(false).'admin/');
 define('PHP_BEGIN', '<?php ');
 define('PHP_END', ' ?>');
 
-require_once CMSPATH.'classes'.DS.'cms.php';
+require_once NOSPATH.'classes'.DS.'nos.php';
 
 // Site bootstrap
 if (is_file(APPPATH.'bootstrap.php')) {

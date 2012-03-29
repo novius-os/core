@@ -14,7 +14,7 @@ require(['jquery-nos-ostabs'], function ($) {
 	$(function () {
 		$.nos.tabs.update({
 			label : <?= json_encode($page->page_title) ?>,
-			iconUrl : 'static/cms/admin/novius-os/img/16/page.png'
+			iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
 		});
 	});
 });
@@ -42,7 +42,7 @@ $uniqids = array();
             $locales = Config::get('locales', array());
             foreach ($possible as $lang) {
                 $uniqids[$lang] = uniqid($lang.'_');
-                echo '<li style="text-align: center;"><a href="#'.$uniqids[$lang].'">'.Cms\Helper::flag($lang)/*.' '.\Arr::get($locales, $lang, $lang)*/.'</a></li>';
+                echo '<li style="text-align: center;"><a href="#'.$uniqids[$lang].'">'.Nos\Helper::flag($lang)/*.' '.\Arr::get($locales, $lang, $lang)*/.'</a></li>';
             }
             ?>
         </ul>
@@ -62,7 +62,7 @@ $uniqids = array();
             <div id="<?= $uniqids[$lang] ?>" class="page_lang">
                 <?php
                 if (empty($page_lang)) {
-                    echo View::forge('cms::admin/page/page_form_blank_slate', array(
+                    echo View::forge('nos::admin/page/page_form_blank_slate', array(
                         'lang'      => $lang,
                         'common_id' => $common_id,
                         'possible'  => $labels,
@@ -72,7 +72,7 @@ $uniqids = array();
                     $fieldset->field('page_parent_id')->set_options(array(
                         'lang' => $lang,
                     ));
-                    echo View::forge('cms::admin/page/page_form', array(
+                    echo View::forge('nos::admin/page/page_form', array(
                         'uniqid' => $uniqids[$lang],
                         'fieldset' => $fieldset,
                         'page' => $page_lang,
@@ -89,7 +89,7 @@ $uniqids = array();
 <script type="text/javascript">
 require([
     'jquery-nos',
-	'static/cms/admin/config/page/form.js'
+	'static/novius-os/admin/config/page/form.js'
 ], function($, callback_fn) {
 	$(function() {
         var $tabs = $('#<?= $uniqid_tabs ?>');

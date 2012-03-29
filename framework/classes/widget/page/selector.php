@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Widget_Page_Selector extends \Fieldset_Field {
 
@@ -40,14 +40,14 @@ class Widget_Page_Selector extends \Fieldset_Field {
      */
     public function build() {
 		$page_id = $this->get_value();
-        return $this->template((string) \Request::forge('cms/admin/page/inspector/page/list')->execute(array('inspector/modeltree_radio', array(
+        return $this->template((string) \Request::forge('nos/admin/page/inspector/page/list')->execute(array('inspector/modeltree_radio', array(
 	        'params' => array(
-		        'treeUrl' => 'admin/cms/page/inspector/page/json',
-		        'widget_id' => 'cms_page',
+		        'treeUrl' => 'admin/nos/page/inspector/page/json',
+		        'widget_id' => 'nos_page',
 	            'input_name' => $this->get_name(),
 	            'selected' => array(
 		            'id' => $page_id,
-		            'model' => 'Cms\\Model_Page_Page',
+		            'model' => 'Nos\\Model_Page_Page',
 	            ),
 		        'columns' => array(
 			        array(

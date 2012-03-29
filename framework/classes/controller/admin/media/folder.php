@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Media_Folder extends Controller_Extendable {
 
@@ -63,7 +63,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
                 ),
             ),
         ));
-		return \View::forge('cms::admin/media/folder_add', array(
+		return \View::forge('nos::admin/media/folder_add', array(
             'fieldset' => $fieldset,
             'folder' => $folder,
             'hide_widget_media_path' => $hide_widget_media_path,
@@ -105,7 +105,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
                 ),
             ),
         ));
-		return \View::forge('cms::admin/media/folder_edit', array(
+		return \View::forge('nos::admin/media/folder_edit', array(
             'fieldset' => $fieldset,
             'folder' => $folder,
             'checked' => $basename == $folder::friendly_slug($folder->medif_title),
@@ -153,7 +153,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => 'cms_media_folders',
+					'target' => 'nos_media_folders',
                 ),
 			);
 		} catch (\Exception $e) {
@@ -223,7 +223,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => array('cms_media_media', 'cms_media_folders'),
+					'target' => array('nos_media_media', 'nos_media_folders'),
                 ),
 			);
 
