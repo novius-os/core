@@ -106,9 +106,9 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 
         $apps = array();
         foreach ($launchers as $key => $app) {
-            if (!empty($app['url']) && !empty($app['icon64'])) { // do we have to display the modules ?
-                //\Debug::dump($app['module'], Permission::check($app['module'], 'access'));
-                if (!isset($app['module']) || Permission::check($app['module'], 'access')) { // do we have the rights to access the modules ?
+            if (!empty($app['url']) && !empty($app['icon64'])) { // do we have to display the application?
+                //\Debug::dump($app['application'], Permission::check($app['application'], 'access'));
+                if (!isset($app['application']) || Permission::check($app['application'], 'access')) { // do we have the rights to access the application?
                     $app['key'] = $key;
                     $apps[] = $app;
                 }

@@ -35,7 +35,7 @@ foreach ($apps as $app => $perms) {
 	\Config::load("$app::permissions", true);
     ?>
 
-<input type="hidden" name="module[]" value="<?= $app ?>" />
+<input type="hidden" name="applications[]" value="<?= $app ?>" />
     <div class="application item">
 		<div class="maincheck">
 			<input type="checkbox" name="access[<?= $app ?>]" value="1" <?= $group->check_permission($app, 'access') ? 'checked' : '' ?> />

@@ -18,7 +18,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
     public function action_index() {
 
-        $LOCAL      = APPPATH.'modules'.DS;
+        $LOCAL = APPPATH.'modules'.DS;
 
         $plugins = array();
         $plugins['local'] = File::read_dir($LOCAL, 1);
@@ -47,12 +47,12 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
 		// Get the differences between the metadata files
 		static::array_diff_key_assoc($app_installed, $plugins['local'], $diff);
-		foreach ($app_installed as $app => &$metadata) {
-			$instance = new \Cms\Module($app);
+		foreach ($app_installed as $app_name => &$metadata) {
+			$instance = new \Cms\Application($app_name);
 			if (!$instance->check_install()) {
 				$metadata['dirty'] = true;
 			}
-			if (isset($diff[$app])) {
+			if (isset($diff[$app_name])) {
 				$metadata['dirty'] = true;
 			}
 		}
@@ -65,27 +65,27 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
         $this->template->body->set('allow_upload', \Config::get('allow_plugin_upload', false));
     }
 
-	public function action_add($app) {
-		$instance = new \Cms\Module($app);
+	public function action_add($app_name) {
+		$instance = new \Cms\Application($app_name);
 		if ($instance->install()) {
 
 			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
 			$app_installed = \Config::get('app_installed', array());
-            $metadata = @include APPPATH.'modules'.DS.$app.DS.'config'.DS.'metadata.php';
-			$app_installed[$app] = $metadata;
+            $metadata = @include APPPATH.'modules'.DS.$app_name.DS.'config'.DS.'metadata.php';
+			$app_installed[$app_name] = $metadata;
 			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
 		}
 
 		\Response::redirect('admin/cms/tray/plugins');
 	}
 
-	public function action_remove($app) {
-		$instance = new \Cms\Module($app);
+	public function action_remove($app_name) {
+		$instance = new \Cms\Application($app_name);
 
 		if ($instance->uninstall()) {
 			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
 			$app_installed = \Config::get('app_installed', array());
-			unset($app_installed[$app]);
+			unset($app_installed[$app_name]);
 			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
 		}
 
@@ -148,7 +148,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
 		if (empty($metadata['install_folder'])) {
 			\Session::forge()->set_flash('notification.plugins', array(
-				'title' => 'This is not a valid module archive.',
+				'title' => 'This is not a valid application archive.',
 				'type' => 'error',
 			));
 			\Response::redirect('admin/cms/tray/plugins');

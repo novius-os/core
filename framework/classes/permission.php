@@ -12,7 +12,7 @@ namespace Cms;
 
 class Permission {
 
-	public static function forge($module, $key, $driver_config) {
+	public static function forge($app_name, $key, $driver_config) {
 
 		$driver = $driver_config['driver'];
 		// @todo Inflector::words_to_upper ?
@@ -23,9 +23,9 @@ class Permission {
 		}
 
 		if (class_exists($class)) {
-			return new $class($module, $key, $driver_config['label'], $driver_config['driver_config']);
+			return new $class($app_name, $key, $driver_config['label'], $driver_config['driver_config']);
 		}
-		throw new \Exception('The permission driver '.$driver.' has not be found for module '.$module.' ('.$key.').');
+		throw new \Exception('The permission driver '.$driver.' has not be found for application '.$app_name.' ('.$key.').');
 	}
 
     public static function check($app, $key) {
@@ -39,10 +39,10 @@ class Permission {
         $group = reset($user->groups);
         try {
 	        $access = new Model_User_Permission();
-	        $access->perm_group_id   = $group->group_id;
-	        $access->perm_module     = $key;
-	        $access->perm_identifier = '';
-	        $access->perm_key        = $app;
+	        $access->perm_group_id    = $group->group_id;
+	        $access->perm_application = $key;
+	        $access->perm_identifier  = '';
+	        $access->perm_key         = $app;
 	        $access->save();
         } catch(\Exception $e) {
 

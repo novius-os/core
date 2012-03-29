@@ -49,7 +49,7 @@ class Model_Media_Media extends \Cms\Orm\Model {
      * media_file
      * media_ext
      * media_title
-     * media_module
+     * media_application
      * media_protected
      * media_width
      * media_height

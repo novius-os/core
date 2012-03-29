@@ -25,16 +25,16 @@ class Permission_Select extends Permission_Driver {
 
 	public function check($group, $key) {
 		static::_load_permissions();
-		return isset(static::$data[$group->group_id][$this->module]) && in_array($key, (array) static::$data[$group->group_id][$this->module]);
+		return isset(static::$data[$group->group_id][$this->application]) && in_array($key, (array) static::$data[$group->group_id][$this->application]);
 	}
 
 	public function display($group) {
 		echo \View::forge('cms::permission/driver/select', array(
-			'group'      => $group,
-			'module'     => $this->module,
-			'identifier' => $this->identifier,
-			'choices'    => $this->choices,
-			'driver'     => $this,
+			'group'       => $group,
+			'application' => $this->application,
+			'identifier'  => $this->identifier,
+			'choices'     => $this->choices,
+			'driver'      => $this,
 		), false);
 	}
 
@@ -42,9 +42,9 @@ class Permission_Select extends Permission_Driver {
 
 		$perms = Model_User_Permission::find('all', array(
             'where' => array(
-                array('perm_group_id', $group->group_id),
-				array('perm_module', $this->module),
-                array('perm_identifier', $this->identifier),
+                array('perm_group_id',    $group->group_id),
+				array('perm_application', $this->application),
+                array('perm_identifier',  $this->identifier),
             ),
         ));
 
@@ -56,9 +56,9 @@ class Permission_Select extends Permission_Driver {
 		// Add appropriates one
         foreach ($data as $permitted) {
 			$p = new Model_User_Permission();
-			$p->perm_group_id   = $group->group_id;
-			$p->perm_module     = $this->module;
-			$p->perm_identifier = $this->identifier;
+			$p->perm_group_id    = $group->group_id;
+			$p->perm_application = $this->application;
+			$p->perm_identifier  = $this->identifier;
 			$p->perm_key = $permitted;
 			$p->save();
         }
@@ -80,7 +80,7 @@ class Permission_Select extends Permission_Driver {
         ));
 
         foreach ($data as $d) {
-            static::$data[$d->perm_group_id][$d->perm_module][] = $d->perm_key;
+            static::$data[$d->perm_group_id][$d->perm_application][] = $d->perm_key;
         }
 	}
 

@@ -53,40 +53,37 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
 
         $group = Model_User_Group::find(\Input::post('group_id'));
 
-		$modules = \Input::post('module');
-        foreach ($modules as $module) {
+		$applications = \Input::post('applications');
+        foreach ($applications as $application) {
             $access = Model_User_Permission::find('first', array('where' => array(
-                array('perm_group_id', $group->group_id),
-                array('perm_module', 'access'),
-                array('perm_key', $module),
+                array('perm_group_id',    $group->group_id),
+                array('perm_application', 'access'),
+                array('perm_key',         $application),
             )));
 
-            // Grant of remove access to the module
-            if (empty($_POST['access'][$module]) && !empty($access)) {
+            // Grant of remove access to the application
+            if (empty($_POST['access'][$application]) && !empty($access)) {
                 $access->delete();
-                \Response::json(array(
-                    'notify' => 'Access successfully denied.',
-                ));
             }
 
-            if (!empty($_POST['access'][$module]) && empty($access)) {
+            if (!empty($_POST['access'][$application]) && empty($access)) {
                 $access = new Model_User_Permission();
-                $access->perm_group_id   = $group->group_id;
-                $access->perm_module     = 'access';
-                $access->perm_identifier = '';
-                $access->perm_key        = $module;
+                $access->perm_group_id    = $group->group_id;
+                $access->perm_application = 'access';
+                $access->perm_identifier  = '';
+                $access->perm_key         = $application;
                 $access->save();
             }
 
             \Config::load('applications', true);
             $apps = \Config::get('applications', array());
 
-            \Config::load("$module::permissions", true);
-            $permissions = \Config::get("$module::permissions", array());
+            \Config::load("$application::permissions", true);
+            $permissions = \Config::get("$application::permissions", array());
 /*
             foreach ($permissions as $identifier => $whatever) {
-                $driver = $group->get_permission_driver($module, $identifier);
-                $driver->save($group, (array) $_POST['permission'][$module][$identifier]);
+                $driver = $group->get_permission_driver($application, $identifier);
+                $driver->save($group, (array) $_POST['permission'][$application][$identifier]);
             }
             */
         }
