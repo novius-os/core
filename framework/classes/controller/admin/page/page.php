@@ -63,7 +63,7 @@ class Controller_Admin_Page_Page extends Controller {
             },
             'success' => function() use ($page) {
                 return array(
-                    'notify' => 'Page sucessfully created.',
+                    'notify' => 'Page sucessfully added.',
                     'fireEvent' => array(
                         'event' => 'reload',
                         'target' => 'cms_page',
@@ -77,6 +77,7 @@ class Controller_Admin_Page_Page extends Controller {
         return \View::forge('cms::admin/page/page_add', array(
 			'parent'   => $parent,
 			'page'     => $page,
+            'parent'   => $parent,
 			'fieldset' => $fieldset,
 		), false);
     }
@@ -85,15 +86,18 @@ class Controller_Admin_Page_Page extends Controller {
 
         $create_from_id = \Input::get('create_from_id', 0);
         if (empty($create_from_id)) {
-            $page      = Model_Page_Page::forge();
-            $common_id = \Input::get('common_id');
-            $parent_id = 1;
+            $page                 = Model_Page_Page::forge();
+            $page->page_lang_common_id = \Input::get('common_id');
         } else {
              $page_from = Model_Page_Page::find($create_from_id);
              $page      = clone $page_from;
-             $common_id = $page->find_main_lang()->page_id;
-             $parent_id = $page_from->page_parent_id;
         }
+        $page->page_lang = \Input::get('lang');
+        $parent_page = Model_Page_Page::find($page->page_lang_common_id)->find_parent();
+        if (!empty($page->page_lang)) {
+            $parent_page = $parent_page->find_lang($page->page_lang);
+        }
+        $page->page_parent_id = $parent_page->page_id;
 
         $fields = \Config::load('cms::controller/admin/page/form_page', true);
         $fields = \Arr::merge($fields, array(
@@ -112,13 +116,12 @@ class Controller_Admin_Page_Page extends Controller {
             'page_lang_common_id' => array(
                 'form' => array(
                     'type' => 'hidden',
-                    'value' => $common_id,
+                    'value' => $page->page_lang_common_id,
                 ),
             ),
             'page_parent_id' => array(
-                'form' => array(
-                    'type' => 'hidden',
-                    'value' => $parent_id,
+                'widget_options' => array(
+                    'lang' => $page->page_lang,
                 ),
             ),
 			'save' => array(
@@ -155,6 +158,13 @@ class Controller_Admin_Page_Page extends Controller {
 
 		$fieldset = \Fieldset::build_from_config($fields, $page, array(
             'before_save' => function($page, $data) {
+                $parent = $page->find_parent();
+                // Event 'after_change_parent' will set the appropriate lang
+                //\Debug::dump($parent->id, $parent->get_lang(), $page->get_lang());
+                //\Debug::dump($parent->find_lang('en_GB')->id);
+                $page->set_parent($parent);
+                $page->page_level = $parent->page_level + 1;
+
                 foreach (\Input::post('wysiwyg', array()) as $key => $text) {
                     $page->wysiwygs->$key = $text;
                 }

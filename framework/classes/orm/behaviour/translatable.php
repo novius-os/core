@@ -91,7 +91,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         $obj_main = $this->find_main_lang($object);
 
         // No main language found => we just created a new main item :)
-        if (empty($ob_main)) {
+        if (empty($obj_main)) {
             $single_property = $this->_properties['single_id_property'];
             $object->set($single_property, $object->id);
         } else {
@@ -148,8 +148,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
                 )));
             }
         } else {
-            $langs_self   = $this->get_other_lang($object);
-            $langs_self[] = $this->get_lang($object);
+            $langs_self= $this->get_all_lang($object);
 
             $missing_langs = array_diff($langs_self, $langs_parent);
             if (!empty($missing_langs)) {
@@ -173,7 +172,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
             $parent = $new_parent->find_lang($item->get_lang());
             $item->set_parent_no_observers($parent);
 
-            //$item->save();
+            $item->save();
         }
     }
 
@@ -268,7 +267,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         $current_lang = $object->get_lang();
         $all = $this->get_all_lang($object);
         foreach ($all as $k => $lang) {
-            if ($object->get($this->_properties['lang_property']) == $current_lang) {
+            if ($lang == $current_lang) {
                 unset($all[$k]);
             }
         }

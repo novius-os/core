@@ -208,7 +208,10 @@ define('jquery-nos-treegrid',
                             Array.prototype.splice.apply(nosGridData, [index, 0, data.node].concat(toArray(data.node.treeChilds)));
                         }
                     }
-                    self.ensureControl(true);
+                    // @todo ensureControl is failing when the element is hidden. Need to call 'doRefresh' when it gets visible again
+                    try {
+                        self.ensureControl(true);
+                    } catch (e) {}
                 },
                 reader: {
                     read: function (dataSource) {

@@ -20,12 +20,9 @@ define([
                     icon : 'pencil',
                     label : appDesk.i18n('Edit'),
                     action : function(item) {
-                        $.nos.dialog({
-                            contentUrl: 'admin/cms/media/media/edit/' + item.id,
-                            ajax : true,
-                            title: appDesk.i18n('Edit a media')._(),
-                            width: 850,
-                            height: 400
+                        $.nos.tabs.add({
+                            url: 'admin/cms/media/media/edit/' + item.id,
+                            label: appDesk.i18n('Edit a media')._()
                         });
                     }
                 },
@@ -57,33 +54,40 @@ define([
                             return;
                         }
 
-                        // Create the lightbox
-                        var lightbox = $('<div><a href="/' + item.path + '" rel="wijlightbox"><img src="/' + item.path + '" title="' + item.title + '" style="width:0;height:0;" /></a></div>')
-                        .css({
-                            position : 'absolute',
-                            dislplay : 'none',
-                            width : 1,
-                            height: 1
-                        })
-                        .css($(ui || this).offset())
-                        .appendTo(document.body)
-                        .wijlightbox({
-                            zIndex : 1201,
-                            textPosition : 'outside',
-                            player : 'img',
-                            dialogButtons: 'fullsize',
-                            modal : true,
-                            open : function() {
-                                $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
-                            },
-                            close : function(e) {
-                                lightbox.wijlightbox('destroy');
-                                lightbox.remove();
-                            }
-                        });
+                        var image = new Image();
+                        image.onerror = function() {
+                            $.nos.notify('Image not found', 'error');
+                        }
+                        image.onload = function() {
+                            // Create the lightbox
+                            var lightbox = $('<div><a href="/' + item.path + '" rel="wijlightbox"><img src="/' + item.path + '" title="' + item.title + '" style="width:0;height:0;" /></a></div>')
+                            .css({
+                                position : 'absolute',
+                                dislplay : 'none',
+                                width : 1,
+                                height: 1
+                            })
+                            .css($(ui || this).offset())
+                            .appendTo(document.body)
+                            .wijlightbox({
+                                zIndex : 1201,
+                                textPosition : 'outside',
+                                player : 'img',
+                                dialogButtons: 'fullsize',
+                                modal : true,
+                                open : function() {
+                                    $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
+                                },
+                                close : function(e) {
+                                    lightbox.wijlightbox('destroy');
+                                    lightbox.remove();
+                                }
+                            });
 
-                        // Open it
-                        lightbox.find('a').triggerHandler('click');
+                            // Open it
+                            lightbox.find('a').triggerHandler('click');
+                        }
+                        image.src = item.path;
                     }
                 }
             },
@@ -98,12 +102,9 @@ define([
                     media : {
                         label : appDesk.i18n('Add a media'),
                         action : function() {
-                            $.nos.dialog({
-                                contentUrl: 'admin/cms/media/media/add',
-                                ajax : true,
-                                title: appDesk.i18n('Add a media')._(),
-                                width: 850,
-                                height: 400
+                            $.nos.tabs.add({
+                                url: 'admin/cms/media/media/add',
+                                label: appDesk.i18n('Add a media')._()
                             });
                         }
                     },
@@ -114,7 +115,7 @@ define([
                                 contentUrl: 'admin/cms/media/folder/add',
                                 ajax : true,
                                 title: 'Add a folder',
-                                width: 600,
+                                width: 650,
                                 height: 400
                             });
                         }
@@ -178,12 +179,9 @@ define([
                                             label : appDesk.i18n('Add a media in this folder'),
                                             icon : 'plus',
                                             action : function(item) {
-                                                $.nos.dialog({
-                                                    contentUrl: 'admin/cms/media/media/add/' + item.id,
-                                                    ajax : true,
-                                                    title: 'Add a media in the "' + item.title + '" folder',
-                                                    width: 650,
-                                                    height: 240
+                                                $.nos.tabs.add({
+                                                    url: 'admin/cms/media/media/add/' + item.id,
+                                                    label: 'Add a media in the "' + item.title + '" folder'
                                                 });
                                             }
                                         },
@@ -196,7 +194,7 @@ define([
                                                     contentUrl: 'admin/cms/media/folder/add/' + item.id,
                                                     ajax : true,
                                                     title: 'Add a sub-folder in "' + item.title + '"',
-                                                    width: 600,
+                                                    width: 650,
                                                     height: 250
                                                 });
                                             }

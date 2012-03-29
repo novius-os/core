@@ -152,7 +152,7 @@
 	ob_start();
 
 	if (!$ajax = Input::is_ajax()) {
-		$view = \View::forge('templates/html5');
+		$view = \View::forge('cms::templates/html5');
 		$view->set('title', 'Novius OS error page');
 		$view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
 		$view->set('require', 'static/cms/admin/vendor/requirejs/require.js', false);

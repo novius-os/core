@@ -10,24 +10,28 @@
 
 namespace Cms;
 
-class Widget_Media_Folder extends \Fieldset_Field {
+class Widget_Page_Selector extends \Fieldset_Field {
 
 	protected $options = array();
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
 
 		//$attributes['type']   = 'hidden';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' media';
+		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' nos-page';
 
 		if (empty($attributes['id'])) {
-			$attributes['id'] = uniqid('media_');
+			$attributes['id'] = uniqid('page_');
 		}
 		if (!empty($attributes['widget_options'])) {
-			$this->options = \Arr::merge($this->options, $attributes['widget_options']);
+			$this->set_options($attributes['widget_options']);
 		}
 		unset($attributes['widget_options']);
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
+    }
+
+    public function set_options(array $options) {
+        $this->options = \Arr::merge($this->options, $options);
     }
 
     /**
@@ -35,22 +39,26 @@ class Widget_Media_Folder extends \Fieldset_Field {
      * @return type
      */
     public function build() {
-		$folder_id = $this->get_value();
-        return $this->template((string) \Request::forge('cms/admin/media/inspector/folder/list')->execute(array('inspector/modeltree_radio', array(
+		$page_id = $this->get_value();
+        return $this->template((string) \Request::forge('cms/admin/page/inspector/page/list')->execute(array('inspector/modeltree_radio', array(
 	        'params' => array(
-		        'treeUrl' => 'admin/cms/media/inspector/folder/json',
-		        'widget_id' => 'cms_media_folders',
+		        'treeUrl' => 'admin/cms/page/inspector/page/json',
+		        'widget_id' => 'cms_page',
 	            'input_name' => $this->get_name(),
 	            'selected' => array(
-		            'id' => $folder_id,
-		            'model' => 'Cms\\Model_Media_Folder',
+		            'id' => $page_id,
+		            'model' => 'Cms\\Model_Page_Page',
 	            ),
 		        'columns' => array(
 			        array(
 				        'dataKey' => 'title',
 			        )
 		        ),
-		        'height' => '150px',
+                'treeOptions' => array(
+                    'lang' => \Arr::get($this->options, 'lang', null)
+                ),
+		        'height' => \Arr::get($this->options, 'height', '150px'),
+		        'width' => \Arr::get($this->options, 'width', null),
 		    ),
         )))->response());
     }

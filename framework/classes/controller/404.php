@@ -17,7 +17,7 @@ class Controller_404 extends \Controller {
     }
 
     public function action_admin() {
-	    $view = \View::forge('templates/html5');
+	    $view = \View::forge('cms::templates/html5');
 	    $view->set('title', 'Novius OS');
 	    $view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
 	    $view->set('require', 'static/cms/admin/vendor/requirejs/require.js', false);

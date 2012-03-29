@@ -899,7 +899,8 @@ define('jquery-nos-appdesk',
 
 		_loadInspector : function($li) {
 			var self = this,
-				inspector = $li.data('inspector');
+				inspector = $li.data('inspector'),
+                o = self.options;
 
             inspector.selectionChanged = function(value, label) {
                     var multiple = false,

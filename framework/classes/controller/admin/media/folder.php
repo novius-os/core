@@ -39,7 +39,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
                     'type'  => 'hidden',
                     'value' => $folder->medif_id,
                 ),
-                'label' => __('Choose a folder where to put your media:'),
+                'label' => __('Choose a folder where to put your sub-folder:'),
             ),
             'medif_title' => array(
                 'form' => array(
