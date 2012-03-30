@@ -48,7 +48,7 @@ class Application {
 	}
 
 	public function check_install() {
-		return is_dir(APPPATH.'modules'.DS.$this->name)
+		return is_dir(APPPATH.'applications'.DS.$this->name)
 		&& $this->is_link('static')
 		&& $this->is_link('htdocs');
 		//&& $this->is_link('data')
@@ -57,9 +57,9 @@ class Application {
 
 	protected function symlink($folder) {
 		if (!$this->is_link($folder)) {
-			$private = APPPATH.'modules'.DS.$this->name.DS.$folder;
+			$private = APPPATH.'applications'.DS.$this->name.DS.$folder;
 			if (is_dir($private)) {
-				$public = DOCROOT.$folder.DS.'modules'.DS.$this->name;
+				$public = DOCROOT.$folder.DS.'apps'.DS.$this->name;
                 if (is_link($public)) {
                     unlink($public);
                 }
@@ -71,7 +71,7 @@ class Application {
 	}
 
 	protected function unsymlink($folder) {
-		$public = DOCROOT.$folder.DS.'modules'.DS.$this->name;
+		$public = DOCROOT.$folder.DS.'apps'.DS.$this->name;
 		if (file_exists($public)) {
 			return unlink($public);
 		}
@@ -79,9 +79,9 @@ class Application {
 	}
 
 	protected function is_link($folder) {
-		$private = APPPATH.'modules'.DS.$this->name.DS.$folder;
+		$private = APPPATH.'applications'.DS.$this->name.DS.$folder;
 		if (file_exists($private)) {
-			$public = DOCROOT.$folder.DS.'modules'.DS.$this->name;
+			$public = DOCROOT.$folder.DS.'apps'.DS.$this->name;
 			return is_link($public) && readlink($public) == $private;
 		}
 		return true;

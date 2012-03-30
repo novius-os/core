@@ -18,7 +18,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
     public function action_index() {
 
-        $LOCAL = APPPATH.'modules'.DS;
+        $LOCAL = APPPATH.'applications'.DS;
 
         $plugins = array();
         $plugins['local'] = File::read_dir($LOCAL, 1);
@@ -71,7 +71,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
 			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
 			$app_installed = \Config::get('app_installed', array());
-            $metadata = @include APPPATH.'modules'.DS.$app_name.DS.'config'.DS.'metadata.php';
+            $metadata = @include APPPATH.'applications'.DS.$app_name.DS.'config'.DS.'metadata.php';
 			$app_installed[$app_name] = $metadata;
 			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
 		}
@@ -154,7 +154,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 			\Response::redirect('admin/nos/tray/plugins');
 		}
 
-		$path = APPPATH.'modules'.DS.$metadata['install_folder'];
+		$path = APPPATH.'applications'.DS.$metadata['install_folder'];
 		if (is_dir($path.$name)) {
 			\Session::forge()->set_flash('notification.plugins', array(
 				'title' => $metadata['install_folder'].' already exists in you module directory.',
