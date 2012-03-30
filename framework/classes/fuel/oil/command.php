@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-class Command
+class Command extends \Oil\Command
 {
     public static function init($args)
     {
@@ -184,7 +184,6 @@ class Command
 
         return $actions;
     }
-
 }
 
 /* End of file oil/classes/command.php */

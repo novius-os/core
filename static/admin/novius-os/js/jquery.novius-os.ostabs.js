@@ -22,7 +22,7 @@ define('jquery-nos-ostabs',
 
     $.widget( "nos.ostabs", {
         options: {
-            initTabs: [], // e.g. [{"url":"http://www.google.com","iconUrl":"img/google-32.png","label":"Google","iconSize":32,"labelDisplay":false,"pined":true},{"url":"http://www.twitter.com","iconClasses":"ui-icon ui-icon-signal-diag","label":"Twitter","pined":true}]
+            initTabs: [], // e.g. [{"url":"http://www.google.com","iconUrl":"img/google-32.png","label":"Google","iconSize":32,"labelDisplay":false},{"url":"http://www.twitter.com","iconClasses":"ui-icon ui-icon-signal-diag","label":"Twitter"}]
             newTab: 'appsTab', // e.g. {"url":"applications.htm","label":"Open a new tab","iframe":true} or "appsTab" or false
             trayTabs: [], // e.g. [{"url":"account.php","iconClasses":"ui-icon ui-icon-contact","label":"Account"},{"url":"customize.htm","iconClasses":"ui-icon ui-icon-gear","label":"Customization"}]
             appsTab: {}, // e.g. {"panelId":"ospanel","url":"applications.htm","iconUrl":"os.png","label":"My OS","iframe":true} or false
@@ -37,16 +37,12 @@ define('jquery-nos-ostabs',
                 newTab: 'New tab',
                 removeTab: 'Remove tab',
                 closeTab: 'Close tab',
-                pinTab: 'Pin tab',
-                unpinTab: 'Unpin tab',
                 reloadTab: 'Reload tab',
                 spinner: 'Loading...'
             },
 
             // callbacks
             add: null,
-            pin: null,
-            unpin: null,
             remove: null,
             select: null,
             show: null,
@@ -54,7 +50,6 @@ define('jquery-nos-ostabs',
         },
 
         tabId : 0,
-        pined: [],
         stackOpening: [],
 
         _create: function() {
@@ -72,20 +67,26 @@ define('jquery-nos-ostabs',
 
         // TODO : revoir ?
         _setOption: function( key, value ) {
+            var self = this;
+
             if ( key == "selected" ) {
-                this.select( value );
+                self.select( value );
             } else {
-                this.options[ key ] = value;
-                this._tabify();
+                self.options[ key ] = value;
+                self._tabify();
             }
         },
 
         _getNextTabId: function() {
-            return ++this.tabId;
+            var self = this;
+
+            return ++self.tabId;
         },
 
         _tabId: function( a ) {
-            return $( a ).data( "panelid.tabs" ) || "nos-ostabs-" + this._getNextTabId();
+            var self = this;
+
+            return $( a ).data( "panelid.tabs" ) || "nos-ostabs-" + self._getNextTabId();
         },
 
         _sanitizeSelector: function( hash ) {
@@ -95,7 +96,7 @@ define('jquery-nos-ostabs',
 
         _ui: function( li, panel ) {
             var self = this,
-                index = this.lis.index( li );
+                index = self.lis.index( li );
             if ( panel === undefined ) {
                 panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) )[ 0 ];
             }
@@ -108,8 +109,10 @@ define('jquery-nos-ostabs',
         },
 
         _cleanup: function() {
+            var self = this;
+
             // restore all former loading tabs labels
-            this.lis.filter( ".ui-state-processing" )
+            self.lis.filter( ".ui-state-processing" )
                 .removeClass( "ui-state-processing" )
                 .find( "span.nos-ostabs-icon" )
                 .removeClass( 'nos-ostabs-loader' )
@@ -129,102 +132,117 @@ define('jquery-nos-ostabs',
                         el.html( html ).removeData( "label.tabs" );
                     }
                 });
+
+            return self;
         },
 
         _tabify: function( init ) {
             var self = this,
-                o = this.options,
+                o = self.options,
                 fragmentId = /^#.+/; // Safari 2 reports '#' for an empty hash
 
             // initialization from scratch
             if ( init ) {
-                this.element.addClass( "nos-ostabs ui-widget ui-widget-content" );
+                self.element.addClass( "nos-ostabs ui-widget ui-widget-content" );
 
-                this.uiOstabsHeader = $( '<div></div>' )
+                self.uiOstabsHeader = $( '<div></div>' )
                     .addClass( 'ui-widget-header' )
-                    .appendTo( this.element );
+                    .appendTo( self.element );
 
-                this.uiOstabsTabsContainer = $( '<div></div>' )
+                self.uiOstabsSuperPanel = $( '<div></div>' )
                     .addClass('nos-ostabs-tabs')
-                    .appendTo( this.uiOstabsHeader );
+                    .appendTo( self.uiOstabsHeader );
 
-                this.uiOstabsScrollLeft = $( '<a href="#"></a>' )
-                    .addClass( 'nos-ostabs-scroll-left' );
-                $('<span></span>').addClass( 'ui-icon ui-icon-triangle-1-w' )
-                    .text(this.options.texts.scrollLeft)
-                    .appendTo(this.uiOstabsScrollLeft);
+                self.uiOstabsTray = $( '<ul></ul>' )
+                    .addClass( 'nos-ostabs-tray nos-ostabs-nav' );
+                if ( $.isArray( o.trayTabs ) ) {
+                    $.each( o.trayTabs, function(i, el) {
+                        if ( $.isPlainObject(el) ) {
+                            self._add( el, self.uiOstabsTray )
+                                .addClass( 'nos-ostabs-tray' );
+                        }
+                    } );
+                }
+                self.uiOstabsTray.prependTo(self.uiOstabsHeader);
 
-                this.uiOstabsScrollRight = $('<a href="#"></a>')
-                    .addClass( 'nos-ostabs-scroll-right' );
-                $('<span></span>').addClass( 'ui-icon ui-icon-triangle-1-e' )
-                    .text(this.options.texts.scrollRight)
-                    .appendTo(this.uiOstabsScrollRight);
+                if ( $.isPlainObject(o.appsTab) ) {
+                    self.uiOstabsAppsTab = $( '<ul></ul>' )
+                        .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
+                        .prependTo( self.uiOstabsHeader );
+                    self._add( o.appsTab, self.uiOstabsAppsTab )
+                    .addClass( 'nos-ostabs-appstab' )
+                    .removeClass( 'ui-state-default' );
+                } else {
+                    self.uiOstabsAppsTab = $( '<ul></ul>' );
+                }
 
-                this.uiOstabsScrollRight.add( this.uiOstabsScrollLeft )
-                    .addClass( 'ui-state-default ui-corner-all' )
-                    .attr( 'role', 'button' )
-                    .mouseenter(function() {
-                        var scroll = this;
-                        $( scroll ).data( 'nos-ostabs-hover', true );
-                        var inter = setInterval(function() {
-                            if ( self.sorting && $( scroll ).data( 'nos-ostabs-hover' ) ) {
-                                self._scroll( scroll !== self.uiOstabsScrollRight.get(0) );
-                            } else {
-                                clearInterval( inter );
+                self.uiOstabsSuperPanel.css( 'left', self.uiOstabsAppsTab.outerWidth( true ) + 25 )
+                    .css( 'right', self.uiOstabsTray.outerWidth( true ) + 35 )
+                    .wijsuperpanel({
+                        allowResize : false,
+                        autoRefresh : true,
+                        hScroller : {
+                            scrollBarVisibility : 'hidden',
+                            scrollMode : 'buttons',
+                            increaseButtonPosition : {
+                                my: "left bottom",
+                                at: "right bottom"
+                            },
+                            decreaseButtonPosition : {
+                                my: "right bottom",
+                                at: "left bottom"
                             }
-                        }, 200);
-                        self.uiOstabsScrollRight.addClass( 'ui-state-hover' );
-                    }).mouseleave(function() {
-                        $( this ).data( 'nos-ostabs-hover', false );
-                        self.uiOstabsScrollRight.removeClass( 'ui-state-hover' );
-                    }).focus(function() {
-                        self.uiOstabsScrollRight.addClass( 'ui-state-focus' );
-                    }).blur(function() {
-                        self.uiOstabsScrollRight.removeClass( 'ui-state-focus' );
-                    }).click(function() {
-                        self._scroll(this !== self.uiOstabsScrollRight.get(0));
-                        return false;
-                    }).appendTo( this.uiOstabsTabsContainer );
+                        },
+                        vScroller : {
+                            scrollBarVisibility : 'hidden'
+                        },
+                        showRounder : false
+                    })
+                    .removeClass('ui-widget ui-widget-content')
+                    .css('overflow', 'visible');
 
-                this.uiOstabsTabsWrap = $( '<div></div>' ).appendTo( this.uiOstabsTabsContainer );
-                this.uiOstabsTabs = $( '<ul></ul>' ).appendTo( this.uiOstabsTabsWrap );
+                self.uiOstabsSuperPanelContent = self.uiOstabsSuperPanel.wijsuperpanel( 'getContentElement');
+                self.uiOstabsTabs = $( '<ul></ul>' ).appendTo( self.uiOstabsSuperPanelContent );
 
-                if ( $.isArray( this.options.initTabs ) ) {
-                    $.each( this.options.initTabs, function(i, el) {
+                if ( $.isArray( o.initTabs ) ) {
+                    $.each( o.initTabs, function(i, el) {
                         self._add( el );
                     } );
                 }
 
-                var newTab = this.options.newTab;
+                var newTab = o.newTab;
                 if ( $.isPlainObject(newTab) ) {
                     newTab = $.extend({
-                        label: this.options.texts.newTab,
+                        label: o.texts.newTab,
                         iconClasses: 'ui-icon ui-icon-circle-plus'
-                    }, newTab, {
-                        pined: true
-                    } );
-                } else if ( newTab && $.isPlainObject(this.options.appsTab) ) {
-                    newTab = $.extend( {}, this.options.appsTab, {
-                        label: this.options.texts.newTab,
+                    }, newTab);
+                } else if ( newTab && $.isPlainObject(o.appsTab) ) {
+                    newTab = $.extend( {}, o.appsTab, {
+                        label: o.texts.newTab,
                         iconClasses: 'ui-icon ui-icon-circle-plus',
                         iconUrl: '',
-                        iconSize: 16,
-                        pined: true
+                        iconSize: 16
                     });
                 } else {
                     newTab = false;
                 }
 
                 if ( newTab ) {
-                    this.uiOstabsNewTab = self._add( newTab ).addClass( 'nos-ostabs-newtab' );
+                    self.uiOstabsNewTab = self._add( newTab ).addClass( 'nos-ostabs-newtab' );
                 } else {
-                    this.uiOstabsNewTab = $ ( '<li>/<li>' );
+                    self.uiOstabsNewTab = $ ( '<li>/<li>' );
                 }
+                self.uiOstabsNewTab.hover(function() {
+                    $(this).find('.nos-ostabs-label').css('display', 'inline-block');
+                    self._tabsWidth();
+                }, function() {
+                    $(this).find('.nos-ostabs-label').css('display', 'none');
+                    self._tabsWidth();
+                });
 
-                this.uiOstabsTabs.sortable({
+                self.uiOstabsTabs.sortable({
                     items: 'li:not(.nos-ostabs-newtab)',
-                    appendTo: this.uiOstabsTabsContainer,
-                    containment: this.uiOstabsTabsContainer,
+                    appendTo: self.uiOstabsSuperPanelContent,
                     cursor: 'move',
                     delay: 250,
                     scroll: false,
@@ -258,47 +276,19 @@ define('jquery-nos-ostabs',
                     }
                 });
 
-                this.uiOstabsTray = $( '<ul></ul>' )
-                    .addClass( 'nos-ostabs-tray nos-ostabs-nav' );
-                if ( $.isArray( this.options.trayTabs ) ) {
-                    $.each( this.options.trayTabs, function(i, el) {
-                        if ( $.isPlainObject(el) ) {
-                            $.extend( el, {pined : true} );
-                            self._add( el, self.uiOstabsTray )
-                                .addClass( 'nos-ostabs-tray' );
-                        }
-                    } );
-                }
-                this.uiOstabsTray.prependTo(this.uiOstabsHeader);
 
-                if ( $.isPlainObject(this.options.appsTab) ) {
-                    this.uiOstabsAppsTab = $( '<ul></ul>' )
-                        .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
-                        .prependTo( this.uiOstabsHeader );
-                    self._add( this.options.appsTab, this.uiOstabsAppsTab )
-                    .addClass( 'nos-ostabs-appstab' )
-                    .removeClass( 'ui-state-default' );
-                } else {
-                    this.uiOstabsAppsTab = $( '<ul></ul>' );
-                }
-
-                this.uiOstabsTabsContainer.css( 'left', this.uiOstabsAppsTab.outerWidth( true ) );
-                this.uiOstabsTabsContainer.css( 'right', this.uiOstabsTray.outerWidth( true ) );
-
-                this.tabsWidth = this.uiOstabsTabsContainer.width();
-                this.labelWidth = this.options.labelMaxWidth;
-                this.uiOstabsTabs.width( this.tabsWidth );
-
-                $('<style type="text/css" class="statepined">.nos-ostabs .ui-widget-header li.ui-state-pined {color : ' + this.uiOstabsHeader.css('color') + ';background:transparent;}</style>').appendTo('head');
+                self.tabsWidth = self.uiOstabsSuperPanelContent.width();
+                self.labelWidth = o.labelMaxWidth;
+                self.uiOstabsTabs.width( self.tabsWidth );
             }
 
-            this.lis = this.uiOstabsAppsTab.add(this.uiOstabsTray).add(this.uiOstabsTabs).find("li:has(a[href])");
-            this.anchors = this.lis.map(function() {
+            self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTray).add(self.uiOstabsTabs).find("li:has(a[href])");
+            self.anchors = self.lis.map(function() {
                 return $( "a", this )[ 0 ];
             });
-            this.panels = $( [] );
+            self.panels = $( [] );
 
-            this.anchors.each(function( i, a ) {
+            self.anchors.each(function( i, a ) {
                 var href = $( a ).attr( "href" );
                 // For dynamically created HTML that contains a hash as href IE < 8 expands
                 // such href to the full page url with hash and then misinterprets tab as ajax.
@@ -330,10 +320,10 @@ define('jquery-nos-ostabs',
                     a.href = "#" + id;
                     var $panel = self.element.find( "#" + id );
                     if ( !$panel.length ) {
-                        var $li = self.lis.eq(i);
+                        self.lis.eq(i);
                         $panel = $( '<div></div>' )
                             .attr( "id", id )
-                            .addClass( "nos-ostabs-panel ui-widget-content ui-corner-bottom nos-ostabs-hide" + ($li.hasClass('ui-state-pined') ? ' ui-state-pined' : ''))
+                            .addClass( "nos-ostabs-panel ui-widget-content ui-corner-bottom nos-ostabs-hide")
                             .appendTo( self.element );
 
                         self._actions($panel, i);
@@ -345,11 +335,10 @@ define('jquery-nos-ostabs',
             // initialization from scratch
             if ( init ) {
                 // attach necessary classes for styling
-                this.uiOstabsTabs.add( this.uiOstabsTray )
-                    .add( this.uiOstabsAppsTab )
+                self.uiOstabsTray.add( self.uiOstabsAppsTab )
                     .addClass( "nos-ostabs-nav ui-helper-reset ui-helper-clearfix" );
-                this.lis.addClass( "ui-corner-top" );
-                this.panels.addClass( "nos-ostabs-panel ui-widget-content" );
+                self.lis.addClass( "ui-corner-top" );
+                self.panels.addClass( "nos-ostabs-panel ui-widget-content" );
 
                 // Selected tab
                 // use "selected" option or try to retrieve:
@@ -357,44 +346,40 @@ define('jquery-nos-ostabs',
                 // 2. from selected class attribute on <li>
                 if ( o.selected === undefined ) {
                     if ( location.hash ) {
-                        this.anchors.each(function( i, a ) {
+                        self.anchors.each(function( i, a ) {
                             if ( a.hash == location.hash ) {
                                 o.selected = i;
                                 return false;
                             }
                         });
                     }
-                    if ( typeof o.selected !== "number" && this.lis.filter( ".nos-ostabs-selected" ).length ) {
-                        o.selected = this.lis.index( this.lis.filter( ".nos-ostabs-selected" ) );
+                    if ( typeof o.selected !== "number" && self.lis.filter( ".nos-ostabs-selected" ).length ) {
+                        o.selected = self.lis.index( self.lis.filter( ".nos-ostabs-selected" ) );
                     }
-                    o.selected = o.selected || ( this.lis.length ? 0 : -1 );
+                    o.selected = o.selected || ( self.lis.length ? 0 : -1 );
                 }
 
                 // sanity check - default to first tab...
-                o.selected = ( ( o.selected >= 0 && this.anchors[ o.selected ] ) || o.selected < 0 )
+                o.selected = ( ( o.selected >= 0 && self.anchors[ o.selected ] ) || o.selected < 0 )
                     ? o.selected
                     : 0;
 
-                self.pined = $.map( this.lis.filter( ".ui-state-pined" ), function( n, i ) {
-                        return self.lis.index( n );
-                    }).sort();
-
                 // highlight selected tab
-                this.panels.addClass( "nos-ostabs-hide" );
-                this.lis.removeClass( "nos-ostabs-selected ui-state-active" );
+                self.panels.addClass( "nos-ostabs-hide" );
+                self.lis.removeClass( "nos-ostabs-selected ui-state-active" );
                 // check for length avoids error when initializing empty list
-                if ( o.selected >= 0 && this.anchors.length ) {
+                if ( o.selected >= 0 && self.anchors.length ) {
                     self.element.find( self._sanitizeSelector( self.anchors[ o.selected ].hash ) ).removeClass( "nos-ostabs-hide" );
-                    this.lis.eq( o.selected ).addClass( "nos-ostabs-selected ui-state-active" );
+                    self.lis.eq( o.selected ).addClass( "nos-ostabs-selected ui-state-active" );
 
                     // seems to be expected behaviour that the show callback is fired
                     self.element.queue( "tabs", function() {
                         self._trigger( "show", null, self._ui( self.lis[ o.selected ] ) );
                     });
 
-                    this.title(o.selected, this.title(o.selected));
+                    self.title(o.selected, self.title(o.selected));
 
-                    this._load( o.selected );
+                    self._load( o.selected );
                 }
 
                 // clean up to avoid memory leaks in certain versions of IE 6
@@ -405,34 +390,31 @@ define('jquery-nos-ostabs',
                 });
             // update selected after add/remove
             } else {
-                o.selected = this.lis.index( this.lis.filter( ".nos-ostabs-selected" ) );
+                o.selected = self.lis.index( self.lis.filter( ".nos-ostabs-selected" ) );
             }
 
             // reset cache if switching from cached to not cached
-            this.anchors.removeData( "cache.tabs" );
+            self.anchors.removeData( "cache.tabs" );
 
             // remove all handlers before, tabify may run on existing tabs after add or option change
-            this.lis.add( this.anchors ).unbind( ".tabs" );
+            self.lis.add( self.anchors ).unbind( ".tabs" );
 
             var addState = function( state, el ) {
-                el.removeClass( "ui-state-pined").addClass( "ui-state-" + state );
+                el.addClass( "ui-state-" + state );
             };
             var removeState = function( state, el ) {
                 el.removeClass( "ui-state-" + state );
-                if ($.inArray( self.lis.index(el), self.pined ) !== -1 && !el.is('.ui-state-active') ) {
-                    el.addClass( "ui-state-pined");
-                }
             };
-            this.lis.bind( "mouseover.tabs" , function() {
+            self.lis.bind( "mouseover.tabs" , function() {
                 addState( "hover", $( this ) );
             });
-            this.lis.bind( "mouseout.tabs", function() {
+            self.lis.bind( "mouseout.tabs", function() {
                 removeState( "hover", $( this ) );
             });
-            this.anchors.bind( "focus.tabs", function() {
+            self.anchors.bind( "focus.tabs", function() {
                 addState( "focus", $( this ).closest( "li" ) );
             });
-            this.anchors.bind( "blur.tabs", function() {
+            self.anchors.bind( "blur.tabs", function() {
                 removeState( "focus", $( this ).closest( "li" ) );
             });
 
@@ -471,13 +453,13 @@ define('jquery-nos-ostabs',
             // Show a tab...
             var showTab = showFx
                 ? function( clicked, $show ) {
-                    var $li = $( clicked ).closest( "li" ).addClass( "nos-ostabs-selected ui-state-active" ).removeClass( 'ui-state-pined' );
+                    var $li = $( clicked ).closest( "li" ).addClass( "nos-ostabs-selected ui-state-active" );
                     $show.hide().removeClass( "nos-ostabs-hide" ) // avoid flicker that way
                         .animate( showFx, showFx.duration || "normal", function() {
                             if ( $li.hasClass( 'nos-ostabs-newtab' ) ) {
                                 self._tabsWidth();
                             }
-                            self._scrollTo( $li );
+                            self.uiOstabsSuperPanel.wijsuperpanel('scrollChildIntoView', $li.find('a'));
                             // TODO ?
                             // Gilles : Bug avec effet la class hide réapparait, sans doute à cause de la double création de panel au add
                             //$( this ).removeClass( "nos-ostabs-hide" );
@@ -491,8 +473,8 @@ define('jquery-nos-ostabs',
                     if ( $li.hasClass( 'nos-ostabs-newtab' ) ) {
                         self._tabsWidth();
                     }
-                    self._scrollTo( $li );
-                    $li.addClass( "nos-ostabs-selected ui-state-active" ).removeClass( 'ui-state-pined' );
+                    self.uiOstabsSuperPanel.wijsuperpanel('scrollChildIntoView', $li.find('a'));
+                    $li.addClass( "nos-ostabs-selected ui-state-active" );
                     $show.removeClass( "nos-ostabs-hide" );
                     fireCallbacks($show);
                     self._firePanelEvent($show, {event : 'showPanel'});
@@ -523,21 +505,20 @@ define('jquery-nos-ostabs',
                 };
 
             // attach tab event handler, unbind to avoid duplicates from former tabifying...
-            this.anchors.bind( "click.tabs", function() {
+            self.anchors.bind( "click.tabs", function() {
                 var el = this,
                     $li = $(el).closest( "li" ),
                     $hide = self.panels.filter( ":not(.nos-ostabs-hide)" ),
                     $show = self.element.find( self._sanitizeSelector( el.hash ) );
 
-                $li.addClass( "ui-state-open" ).removeClass('ui-state-pined');
+                $li.addClass( "ui-state-open" );
                 self.uiOstabsNewTab.removeClass('ui-state-open ui-state-default');
 
                 o.selected = self.anchors.index( this );
 
                 // If tab selected or
                 // or is already loading or click callback returns false stop here.
-                // Check if click handler returns false last so that it is not executed
-                // for a pined or loading tab!
+                // Check if click handler returns false last so that it is not executed for loading tab!
                 if ($li.hasClass( "nos-ostabs-selected" ) ||
                     $li.hasClass( "ui-state-processing" ) ||
                     self.panels.filter( ":animated" ).length ||
@@ -571,18 +552,20 @@ define('jquery-nos-ostabs',
             });
 
             // disable click in any case
-            this.anchors.bind( "click.tabs", function(){
+            self.anchors.bind( "click.tabs", function(){
                 return false;
             });
 
-            this._tabsWidth();
+            self._tabsWidth();
         },
 
         _getIndex: function( index ) {
+            var self = this;
+
             // meta-function to give users option to provide a href string instead of a numerical index.
             // also sanitizes numerical indexes to valid values.
             if ( typeof index == "string" ) {
-                index = this.anchors.index( this.anchors.filter( "[href$=" + index + "]" ) );
+                index = self.anchors.index( self.anchors.filter( "[href$=" + index + "]" ) );
             }
 
             return index;
@@ -590,7 +573,7 @@ define('jquery-nos-ostabs',
 
         _actions: function( $panel, index ) {
             var self = this,
-                o = this.options;
+                o = self.options;
 
             var li = self.lis.eq(index),
                 a =  self.anchors.eq(index);
@@ -616,36 +599,10 @@ define('jquery-nos-ostabs',
                     })
                     .appendTo( links );
                 $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
-                    .text( removable && !$.inArray( index, self.pined ) ? o.texts.removeTab : o.texts.closeTab )
+                    .text( removable ? o.texts.removeTab : o.texts.closeTab )
                     .appendTo( close );
-                $( '<span></span>' ).text( removable && !$.inArray( index, self.pined ) ? o.texts.removeTab : o.texts.closeTab )
+                $( '<span></span>' ).text( removable ? o.texts.removeTab : o.texts.closeTab )
                     .appendTo( close );
-            }
-
-            if ( removable ) {
-                var pin = $( '<a href="#"></a>' )
-                    .addClass( 'nos-ostabs-pin' )
-                    .click(function() {
-                        self._pin( self.lis.index(li) );
-                        return false;
-                    })
-                    .text( o.texts.pinTab )
-                    .appendTo( links );
-                $( '<span></span>' ).addClass( 'ui-icon ui-icon-pin-s' )
-                    .text( o.texts.pinTab )
-                    .appendTo( pin );
-
-                var unpin = $( '<a href="#"></a>' )
-                    .addClass( 'nos-ostabs-unpin' )
-                    .click(function() {
-                        self._unpin( self.lis.index(li) );
-                        return false;
-                    })
-                    .text( o.texts.unpinTab )
-                    .appendTo( links );
-                $( '<span></span>' ).addClass( 'ui-icon ui-icon-pin-w' )
-                    .text( o.texts.unpinTab )
-                    .appendTo( unpin );
             }
 
             if ( reloadable ) {
@@ -661,151 +618,94 @@ define('jquery-nos-ostabs',
                     .text( o.texts.reloadTab )
                     .appendTo( links );
                 $( '<span></span>' ).addClass( 'ui-icon ui-icon-refresh' )
-                    .text( o.texts.pinTab )
+                    .text( o.texts.reloadTab )
                     .appendTo( reload );
             }
 
         },
 
         _tabsWidth: function() {
-            var width = 0;
-            this.uiOstabsTabs.width( 10000000 );
-            this.uiOstabsTabs.find( 'li' )
+            var self = this,
+                o = self.options,
+                width = 0;
+            self.uiOstabsTabs.width( 10000000 );
+            self.uiOstabsTabs.find( 'li' )
                 .each(function() {
                     width += $( this ).outerWidth( true );
                 });
-            this.uiOstabsTabs.width( width );
+            self.uiOstabsTabs.width( width );
 
-            var nbLabel = this.uiOstabsTabs.find( '.nos-ostabs-label:visible' ).length,
+            var nbLabel = self.uiOstabsTabs.find( '.nos-ostabs-label:visible' ).length,
                 add;
-            if ( this.tabsWidth < this.uiOstabsTabs.width() ) {
-                while ( this.tabsWidth < this.uiOstabsTabs.width() && this.labelWidth > this.options.labelMinWidth ) {
-                    add = this.labelWidth - this.options.labelMinWidth;
+            if ( self.tabsWidth < self.uiOstabsTabs.width() ) {
+                while ( self.tabsWidth < self.uiOstabsTabs.width() && self.labelWidth > o.labelMinWidth ) {
+                    add = self.labelWidth - o.labelMinWidth;
                     add = add > 10 ? 10 : add;
                     width = width - nbLabel * add;
-                    this.uiOstabsTabs.width( width );
-                    this.labelWidth = this.labelWidth - add;
+                    self.uiOstabsTabs.width( width );
+                    self.labelWidth = self.labelWidth - add;
                     $( 'head .tabswidth' ).remove();
-                    $( '<style type="text/css" class="tabswidth">.nos-ostabs .ui-widget-header .nos-ostabs-label {width : ' + this.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
+                    $( '<style type="text/css" class="tabswidth">.nos-ostabs .ui-widget-header .nos-ostabs-label {width : ' + self.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
                 }
             } else {
                 do {
-                    add = this.options.labelMaxWidth - this.labelWidth;
+                    add = o.labelMaxWidth - self.labelWidth;
                     add = add > 10 ? 10 : add;
-                    if ( this.tabsWidth > (width + nbLabel * 10) ) {
+                    if ( self.tabsWidth > (width + nbLabel * 10) ) {
                         width = width + nbLabel * add;
-                        this.uiOstabsTabs.width( width );
-                        this.labelWidth = this.labelWidth + add;
+                        self.uiOstabsTabs.width( width );
+                        self.labelWidth = self.labelWidth + add;
                         $( 'head .tabswidth' ).remove();
-                        $( '<style type="text/css" class="tabswidth">.nos-ostabs .ui-widget-header .nos-ostabs-label {width : ' + this.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
+                        $( '<style type="text/css" class="tabswidth">.nos-ostabs .ui-widget-header .nos-ostabs-label {width : ' + self.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
                     }
-                } while ( this.tabsWidth > (width + nbLabel * 10) && this.labelWidth < this.options.labelMaxWidth );
-            }
-            this._scrollState();
-        },
-
-        _scroll: function( back ) {
-            var self = this,
-                left = parseInt( self.uiOstabsTabs.css( 'left' ).replace( 'px', '' ) );
-
-            if ( (back && left >= 0) || (!back && (left + self.uiOstabsTabs.width()) <= self.uiOstabsTabsWrap.width()) ) {
-                return false;
+                } while ( self.tabsWidth > (width + nbLabel * 10) && self.labelWidth < o.labelMaxWidth );
             }
 
-            var lis = this.uiOstabsTabs.find( 'li' );
-            lis.each(function( i, el ) {
-                var p = $( this ).position();
-                if ( (left + p.left) >= 0 ) {
-                    if ( (!back && i < (lis.length - 1)) || (back && i > 0) ) {
-                        p = lis.eq( back ? i -1 : i + 1 ).position();
-                        left = p.left * -1;
-                        self.uiOstabsTabs.animate( {left : left + 'px'}, 200, function() {
-                            self._scrollState();
-                        });
-                    }
-                    return false;
-                }
-            });
-        },
-
-        _scrollTo: function( li ) {
-            var self = this;
-            var pos = li.position();
-            var left = parseInt( self.uiOstabsTabs.css( 'left' ).replace( 'px', '' ) );
-            if ( (pos.left + li.outerWidth(true) - left) < self.uiOstabsTabsWrap.width() ) {
-                return true;
-            }
-            var lis = this.uiOstabsTabs.find( 'li' );
-            lis.each(function() {
-                var p = $( this ).position();
-                if ( (pos.left + li.outerWidth( true ) - p.left) < self.uiOstabsTabsWrap.width() ) {
-                    left = p.left * -1;
-                    self.uiOstabsTabs.animate( {left : left + 'px'}, 200, function() {
-                        self._scrollState();
-                    });
-                    return false;
-                }
-            });
-        },
-
-        _scrollState: function() {
-            if ( this.tabsWidth < this.uiOstabsTabs.width() ) {
-                this.uiOstabsScrollRight.add( this.uiOstabsScrollLeft )
-                    .removeClass( 'ui-state-disabled' )
-                    .show();
-                var left = parseInt( this.uiOstabsTabs.css('left').replace('px', '') );
-                if ( left >= 0 ) {
-                    this.uiOstabsScrollLeft.addClass( 'ui-state-disabled' );
-                }
-                if ( left + this.uiOstabsTabs.width() < this.tabsWidth ) {
-                    this.uiOstabsScrollRight.addClass( 'ui-state-disabled' );
-                }
+            if ( self.tabsWidth < self.uiOstabsTabs.width() ) {
+                self.uiOstabsSuperPanel.find('.wijmo-wijsuperpanel-buttonleft, .wijmo-wijsuperpanel-buttonright').show();
             } else {
-                this.uiOstabsScrollRight.add( this.uiOstabsScrollLeft )
-                    .removeClass( 'ui-state-disabled' )
-                    .hide();
+                self.uiOstabsSuperPanel.find('.wijmo-wijsuperpanel-buttonleft, .wijmo-wijsuperpanel-buttonright').hide();
             }
         },
 
         add: function( tab, index ) {
+            var self = this;
+
             if ( !$.isPlainObject(tab) || tab.url === undefined ) {
                 return false;
             }
 
             if ( index === undefined ) {
-                index = this.anchors.length - 1;
+                index = self.anchors.length - 1;
             }
 
-            var self = this,
-                $li = self._add(tab);
+            var $li = self._add(tab);
 
-            if ( index < this.lis.length ) {
-                $li.insertBefore( this.lis[ index ] );
+            if ( index < self.lis.length ) {
+                $li.insertBefore( self.lis[ index ] );
             } else {
-                index = this.lis.eq($li);
+                index = self.lis.eq($li);
             }
-            this.uiOstabsTabs.sortable( 'refresh' );
+            self.uiOstabsTabs.sortable( 'refresh' );
 
-            self.pined = $.map( self.pined, function( n, i ) {
-                return n >= index ? ++n : n;
-            });
+            self._tabify();
 
-            this._tabify();
-
-            if ( this.anchors.length == 1 ) {
+            if ( self.anchors.length == 1 ) {
                 self.select(0);
             }
 
-            this._trigger( "add", tab, this._ui( $li[ 0 ] ) );
+            self._trigger( "add", tab, self._ui( $li[ 0 ] ) );
             return index;
         },
 
         _add: function(tab, target) {
+            var self = this;
+
             if ( !$.isPlainObject(tab) || tab.url === undefined ) {
                 return false;
             }
 
-            target = target || this.uiOstabsTabs;
+            target = target || self.uiOstabsTabs;
 
             tab = $.extend({
                 url: '',
@@ -815,7 +715,6 @@ define('jquery-nos-ostabs',
                 iconClasses: 'ui-icon ui-icon-document',
                 iconUrl: '',
                 iconSize: 16,
-                pined: false,
                 panelId: false
             }, tab);
 
@@ -828,7 +727,7 @@ define('jquery-nos-ostabs',
                 a.data( "panelid.tabs", tab.panelId );
             }
 
-            var icon = this._icon( tab ).appendTo( a );
+            var icon = self._icon( tab ).appendTo( a );
 
             var label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
                 .text( tab.label )
@@ -839,10 +738,10 @@ define('jquery-nos-ostabs',
 
             var li = $( '<li></li>' ).append( a )
                 .attr('title', tab.label)
-                .addClass( 'ui-corner-top ui-state-default' + (tab.pined ? ' ui-state-pined' : '') ).data( 'ui-ostab', tab )
+                .addClass( 'ui-corner-top ui-state-default').data( 'ui-ostab', tab )
                 .appendTo( target );
 
-            if ( !isNaN( tab.iconSize ) && tab.iconSize !== 16 && target !== this.uiOstabsTabs) {
+            if ( !isNaN( tab.iconSize ) && tab.iconSize !== 16 && target !== self.uiOstabsTabs) {
                 li.css({
                     height: ( tab.iconSize + 4 ) + 'px',
                     bottom: ( tab.iconSize - 35 ) + 'px'
@@ -854,21 +753,20 @@ define('jquery-nos-ostabs',
         },
 
         remove: function( index ) {
-            index = this._getIndex( index );
-            var self = this,
-                o = this.options,
-                $li = this.lis.eq( index ),
-                $a = this.anchors.eq( index ),
+            var self = this;
+            index = self._getIndex( index );
+            var $li = self.lis.eq( index ),
+                $a = self.anchors.eq( index ),
                 $panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) );
 
             if ( index == 0 && !$li.hasClass( "nos-ostabs-selected" ) ) {
-                var linewtab = this.lis.filter( '.nos-ostabs-newtab' );
+                var linewtab = self.lis.filter( '.nos-ostabs-newtab' );
                 if ( linewtab.hasClass( "nos-ostabs-selected" ) ) {
                     $li = linewtab;
                 }
             }
 
-            if ( $.inArray( index, this.pined ) === -1 && $li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
+            if ( $li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
                 $li.remove();
                 $panel.remove();
             }
@@ -884,9 +782,9 @@ define('jquery-nos-ostabs',
 
             // Open the last tab in stack opening or the 0 index
             if (self.stackOpening.length) {
-                this.select( this.anchors.index( self.stackOpening[self.stackOpening.length - 1] ) );
+                self.select( self.anchors.index( self.stackOpening[self.stackOpening.length - 1] ) );
             } else {
-                this.select( 0 );
+                self.select( 0 );
             }
 
             if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
@@ -896,37 +794,29 @@ define('jquery-nos-ostabs',
                 .removeData('callbacks.ostabs');
 
             $li.removeClass( "nos-ostabs-selected" );
-            if ( $.inArray( index, this.pined ) ) {
-                $li.addClass( "ui-state-pined" );
-            }
 
-            if ( $.inArray( index, this.pined ) === -1 && $li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
-                self.pined = $.map( self.pined, function( n, i ) {
-                    return n >= index ? --n : n;
-                });
-            }
+            self._tabify();
 
-            this._tabify();
-
-            this._trigger( "remove", null, this._ui( $li[ 0 ], $panel[ 0 ] ) );
-            return this;
+            self._trigger( "remove", null, self._ui( $li[ 0 ], $panel[ 0 ] ) );
+            return self;
         },
 
         title: function( index, title ) {
-            index = this._getIndex( index );
-            var self = this, o = this.options;
+            var self = this,
+                o = self.options;
+            index = self._getIndex( index );
 
-            var $li = this.lis.eq( index );
+            var $li = self.lis.eq( index );
             if ( title === undefined ) {
                 return $li.find( '.nos-ostabs-label' ).text();
             } else {
                 $li.find( '.nos-ostabs-label' ).text( title );
 
-                if ( this.options.selected == index ) {
+                if ( o.selected == index ) {
                     $( 'title' ).text( title );
                 }
 
-                this._trigger( "title", null, this._ui( $li[ 0 ] ) );
+                self._trigger( "title", null, self._ui( $li[ 0 ] ) );
 
                 return self;
             }
@@ -986,78 +876,29 @@ define('jquery-nos-ostabs',
             return icon;
         },
 
-        _unpin: function( index ) {
-            var self = this,
-                o = this.options;
-            index = self._getIndex( index );
-            if ( $.inArray( index, self.pined ) == -1 ) {
-                return;
-            }
-
-            self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) )
-                .find( '.nos-ostabs-actions .nos-ostabs-close span' )
-                .text( o.texts.removeTab );
-
-            self.lis.eq( index )
-                .add( self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) ) )
-                .removeClass( "ui-state-pined" );
-            self.pined = $.grep( self.pined, function( n, i ) {
-                return n != index;
-            });
-
-            self._trigger( "unpin", null, self._ui( self.lis[ index ] ) );
-            return this;
-        },
-
-        _pin: function( index ) {
-            var self = this,
-                o = this.options;
-
-            index = this._getIndex( index );
-            // cannot pin already pin tab
-            if ( $.inArray( index, self.pined ) == -1 ) {
-                var $panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) );
-                $panel.find( '.nos-ostabs-actions .nos-ostabs-close span' )
-                    .text( o.texts.closeTab );
-
-                var $li = this.lis.eq( index );
-                $li.add($panel)
-                    .addClass( "ui-state-pined" );
-                if ( $li.hasClass( 'nos-ostabs-selected' ) ) {
-                    $li.removeClass( "ui-state-pined" );
-                }
-
-                self.pined.push( index );
-                self.pined.sort();
-
-                this._trigger( "pin", null, this._ui( this.lis[ index ] ) );
-            }
-
-            return this;
-        },
-
         select: function( index ) {
-            index = this._getIndex( index );
+            var self = this;
+            index = self._getIndex( index );
             if ( index == -1 ) {
-                return this;
+                return self;
             }
-            this.anchors.eq( index ).trigger( "click.tabs" );
-            return this;
+            self.anchors.eq( index ).trigger( "click.tabs" );
+            return self;
         },
 
         _load: function( index ) {
-            index = this._getIndex( index );
-            var self = this,
-                o = this.options,
-                a = this.anchors.eq( index )[ 0 ],
+            var self = this;
+            index = self._getIndex( index );
+            var o = self.options,
+                a = self.anchors.eq( index )[ 0 ],
                 url = $.data( a, "load.tabs" ),
                 iframe = $.data( a, "iframe.tabs" );
 
-            this._abort();
+            self._abort();
 
             // not remote or from cache
-            if ( (!url && iframe) || this.element.queue( "tabs" ).length !== 0 && $.data( a, "cache.tabs" ) ) {
-                this.element.dequeue( "tabs" );
+            if ( (!url && iframe) || self.element.queue( "tabs" ).length !== 0 && $.data( a, "cache.tabs" ) ) {
+                self.element.dequeue( "tabs" );
                 return;
             }
 
@@ -1065,30 +906,32 @@ define('jquery-nos-ostabs',
                 content = $( '> *', panel ).not( '.nos-ostabs-actions' ).length;
 
             if (content !== 0) {
-                this.element.dequeue( "tabs" );
+                self.element.dequeue( "tabs" );
                 return;
             }
 
             // load remote from here on
-            this.lis.eq( index ).addClass( "ui-state-processing" );
+            self.lis.eq( index ).addClass( "ui-state-processing" );
 
             $( "span.nos-ostabs-label", a ).each(function() {
-                $( this ).data( "label.tabs", $( this ).html() )
-                    .html( $(this).data("label.tabs") ? o.texts.spinner : '' );
+                var $a = $( this );
+                $a.data( "label.tabs", $a.html() )
+                    .html( $a.data("label.tabs") ? o.texts.spinner : '' );
             });
 
             if ( $.isFunction($.fn.loadspinner) ) {
                 $( "span.nos-ostabs-icon", a ).each(function() {
-                    $( this ).addClass( 'ui-state-processing' )
+                    var $a = $( this );
+                    $a.addClass( 'ui-state-processing' )
                         .loadspinner({
-                            diameter : $( this ).width(),
+                            diameter : $a.width(),
                             scaling : true
                         });
                 });
             }
 
             if (!iframe) {
-                this.xhr = $.ajax({
+                self.xhr = $.ajax({
                     url: url,
                     success: function( r ) {
                         $( '<div></div>' ).addClass( 'nos-ostabs-panel-content nos-dispatcher' )
@@ -1121,26 +964,28 @@ define('jquery-nos-ostabs',
             // last, so that load event is fired before show...
             self.element.dequeue( "tabs" );
 
-            return this;
+            return self;
         },
 
         _abort: function() {
+            var self = this;
             // stop possibly running animations
-            this.element.queue( [] );
-            this.panels.stop( false, true );
+            self.element.queue( [] );
+            self.panels.stop( false, true );
 
             // "tabs" queue must not contain more than two elements,
             // which are the callbacks for the latest clicked tab...
-            this.element.queue( "tabs", this.element.queue( "tabs" ).splice( -2, 2 ) );
+            self.element.queue( "tabs", self.element.queue( "tabs" ).splice( -2, 2 ) );
 
             // take care of tab labels
-            this._cleanup();
-            return this;
+            self._cleanup();
+            return self;
         },
 
         tabs: function() {
-            var tabs = [];
-            this.uiOstabsTabs.find( 'li:not(.nos-ostabs-newtab)' )
+            var self = this,
+                tabs = [];
+            self.uiOstabsTabs.find( 'li:not(.nos-ostabs-newtab)' )
                 .each(function() {
                     tabs.push( $(this).data('ui-ostab') );
                 });
@@ -1149,7 +994,7 @@ define('jquery-nos-ostabs',
 
         dispatchEvent : function(event) {
             var self = this,
-                o = this.options;
+                o = self.options;
 
             if (!$.isPlainObject(event)) {
                 event = {
@@ -1197,7 +1042,7 @@ define('jquery-nos-ostabs',
 
         current: function() {
             var self = this,
-                o = this.options;
+                o = self.options;
 
             return {
                 tab: $(self.lis.get(o.selected)),
@@ -1220,8 +1065,6 @@ define('jquery-nos-ostabs',
                 };
                 $.extend(configuration, {
                     add: fct,
-                    pin: fct,
-                    unpin: fct,
                     remove: fct,
                     select: fct,
                     show: fct,
@@ -1236,6 +1079,7 @@ define('jquery-nos-ostabs',
                     configuration['selected'] = configuration['user_configuration']['tabs']['selected'];
                 }
                 noviusos.ostabs(configuration);
+
                 /*
                  if (configuration['user_configuration']['tabs']) {
                  noviusos.ostabs('setConfiguration', configuration['user_configuration']['tabs']);
