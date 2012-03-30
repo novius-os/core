@@ -82,7 +82,7 @@ class Finder extends Fuel\Core\Finder {
 
 		$local_config_path = APPPATH.$directory.DS;
 		if ($is_namespaced) {
-			$local_config_path .= ($active_module != 'nos' ? 'modules'.DS.$active_module : 'novius-os').DS;
+			$local_config_path .= ($active_module != 'nos' ? 'applications'.DS.$active_module : 'novius-os').DS;
 		}
 		if ($context == 'config.save') {
 			$search = array($local_config_path);

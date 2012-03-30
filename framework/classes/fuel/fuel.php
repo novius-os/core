@@ -77,16 +77,16 @@ class Fuel extends Fuel\Core\Fuel {
 				// Allow autoloading from bootstrap to alias classes from this namespace
 				self::$namespace_aliases[$namespace] = $config['namespace'];
 			}
-			Config::load("modules/$name", "$name::config");
+			Config::load("applications/$name", "$name::config");
 
 			// Load the bootstrap if it exists
 			if (is_file($path.'bootstrap.php')) {
 				static::load($path.'bootstrap.php');
 			}
 
-			// Load dependent moduless
-			Config::load(APPPATH.'data'.DS.'config'.DS.'modules_dependencies.php', true);
-			$dependencies = Config::get('modules_dependencies', array());
+			// Load dependent applications
+			Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', true);
+			$dependencies = Config::get('app_dependencies', array());
 			if (!empty($dependencies[$name])) {
 				foreach ($dependencies[$name] as $module) {
 					static::add_module($module);

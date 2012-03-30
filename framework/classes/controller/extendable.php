@@ -71,8 +71,8 @@ class Controller_Extendable extends \Fuel\Core\Controller {
     protected static function loadConfiguration($module_name, $file_name) {
         \Config::load($module_name.'::'.$file_name, true);
         $config = \Config::get($module_name.'::'.$file_name);
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'modules_dependencies.php', true);
-        $dependencies = \Config::get(APPPATH.'data'.DS.'config'.DS.'modules_dependencies.php', array());
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', true);
+        $dependencies = \Config::get(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', array());
         if (!empty($dependencies[$module_name])) {
             foreach ($dependencies[$module_name] as $dependency) {
                 \Config::load($dependency.'::'.$file_name, true);
