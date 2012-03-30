@@ -1,7 +1,7 @@
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
@@ -39,7 +39,7 @@ call_user_func(function() {
     define('APPPATH',  realpath($app_path).DIRECTORY_SEPARATOR);
     define('PKGPATH',  realpath($package_path).DIRECTORY_SEPARATOR);
     define('COREPATH', realpath($core_path).DIRECTORY_SEPARATOR);
-    define('CMSPATH',  realpath($novius_path).DIRECTORY_SEPARATOR);
+    define('NOSPATH',  realpath($novius_path).DIRECTORY_SEPARATOR);
 
 });
 
@@ -48,5 +48,5 @@ defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
 defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Boot the app
-require_once CMSPATH.'bootstrap.php';
-\Cms\PubliCache::delete('blog/category/3');
+require_once NOSPATH.'bootstrap.php';
+\Nos\PubliCache::delete('blog/category/3');

@@ -23,7 +23,7 @@
         }
     }
     ?>
-    <?= $fieldset->open('admin/cms/media/folder/do_edit'); ?>
+    <?= $fieldset->open('admin/nos/media/folder/do_edit'); ?>
     <?= $fieldset->field('medif_id')->build(); ?>
     <table class="fieldset">
         <tr>
@@ -50,7 +50,7 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'static/cms/js/vendor/jquery/jquery-form/jquery.form.min'], function($) {
+require(['jquery-nos', 'order!jquery-form'], function($) {
     $.nos.ui.form('#<?= $uniqid ?>');
     $(function() {
 

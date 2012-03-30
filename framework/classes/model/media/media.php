@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
-class Model_Media_Media extends \Cms\Orm\Model {
+class Model_Media_Media extends \Nos\Orm\Model {
     protected static $_table_name = 'os_media';
     protected static $_primary_key = array('media_id');
 
@@ -19,7 +19,7 @@ class Model_Media_Media extends \Cms\Orm\Model {
     protected static $_belongs_to = array(
         'path' => array(
             'key_from'       => 'media_path_id',
-            'model_to'       => 'Cms\Model_Media_Folder',
+            'model_to'       => 'Nos\Model_Media_Folder',
             'key_to'         => 'medif_id',
             'cascade_save'   => false,
             'cascade_delete' => false,
@@ -29,7 +29,7 @@ class Model_Media_Media extends \Cms\Orm\Model {
     protected static $_has_many = array(
 		'link' => array(
 			'key_from' => 'media_id',
-			'model_to' => 'Cms\Model_Media_Link',
+			'model_to' => 'Nos\Model_Media_Link',
 			'key_to' => 'medil_media_id',
 			'cascade_save' => false,
 			'cascade_delete' => false,
@@ -49,7 +49,7 @@ class Model_Media_Media extends \Cms\Orm\Model {
      * media_file
      * media_ext
      * media_title
-     * media_module
+     * media_application
      * media_protected
      * media_width
      * media_height
@@ -91,7 +91,7 @@ class Model_Media_Media extends \Cms\Orm\Model {
             return false;
         }
         if (!empty($params['max_width']) || !empty($params['max_height'])) {
-            list($width, $height, $ratio) = \Cms\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $params['max_width'], $params['max_height']);
+            list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $params['max_width'], $params['max_height']);
             $src = $this->get_public_path_resized($params['max_width'], $params['max_height']);
         } else {
             list($width, $height) = array($this->media_width, $this->media_height);

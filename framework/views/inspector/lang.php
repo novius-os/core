@@ -13,13 +13,13 @@
 <table id="<?= $id ?>"></table>
 <script type="text/javascript">
 require([
-		'jquery-nos',
+		'jquery-nos-listgrid'
 	], function( $, table, undefined ) {
 		$(function() {
 			var inspector = $('#<?= $id ?>').removeAttr('id'),
 				parent = inspector.parent().bind({
 						widgetResize: function() {
-                            inspector.nosgrid('setSize', parent.width(), parent.height());
+                            inspector.noslistgrid('setSize', parent.width(), parent.height());
 						}
 					}),
                 inspectorData = parent.data('inspector'),
@@ -29,7 +29,7 @@ require([
                     height : '100%',
                     width : '100%'
                 })
-                .nosgrid({
+                .noslistgrid({
                     showFilter: false,
                     allowSorting: false,
                     scrollMode : 'auto',
@@ -39,13 +39,13 @@ require([
                     columns : inspectorData.grid.columns,
                     data: <?= $content ?>,
                     currentCellChanged: function (e) {
-                        var row = $(e.target).nosgrid("currentCell").row(),
+                        var row = $(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {
                             inspectorData.selectionChanged(data.id, data.title);
                         }
-                        inspector.nosgrid("currentCell", -1, -1);
+                        inspector.noslistgrid("currentCell", -1, -1);
                     },
                     rendering : function() {
                         rendered = false;

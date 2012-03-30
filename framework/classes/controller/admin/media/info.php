@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Media_Info extends Controller_Admin_Noviusos {
 
@@ -17,8 +17,8 @@ class Controller_Admin_Media_Info extends Controller_Admin_Noviusos {
 		$media = Model_Media_Media::find($id);
 
 		if (!empty($media)) {
-			\Config::load('cms::controller/admin/media/mp3grid/list', true);
-			$dataset = \Config::get('cms::controller/admin/media/mp3grid/list.dataset', array());
+			\Config::load('nos::controller/admin/media/appdesk/list', true);
+			$dataset = \Config::get('nos::controller/admin/media/appdesk/list.dataset', array());
 			$item = array();
 			foreach ($dataset as $key => $data)
 			{

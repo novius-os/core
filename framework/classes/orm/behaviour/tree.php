@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
-class Orm_Behaviour_Tree extends Orm_Behavior
+class Orm_Behaviour_Tree extends Orm_Behaviour
 {
 	protected $_class = null;
     protected $_parent_relation = null;
@@ -61,7 +61,7 @@ class Orm_Behaviour_Tree extends Orm_Behavior
     /**
      * Deletes the children recursively
      */
-    public function before_delete(\Cms\Orm\Model $object) {
+    public function before_delete(\Nos\Orm\Model $object) {
         $this->delete_children($object);
     }
 
@@ -80,12 +80,12 @@ class Orm_Behaviour_Tree extends Orm_Behavior
     /**
      * Returns all the direct children of the object
      *
-     * @param  \Cms\Orm\Model  $object
+     * @param  \Nos\Orm\Model  $object
      * @param  array  $where
      * @param  array  $order_by
      * @param  array  $options
-     * @see \Cms\Model_Page_Page::search
-     * @return array of \Cms\Model_Page_Page
+     * @see \Nos\Model_Page_Page::search
+     * @return array of \Nos\Model_Page_Page
      */
     public function find_children($object, $where = array(), $order_by = array(), $options = array()) {
         // Search items whose parent is self
@@ -116,6 +116,14 @@ class Orm_Behaviour_Tree extends Orm_Behavior
                     $this->_parent_relation->model_to,
                     $this->_class
                 ));
+        }
+
+        if (!$object->is_new()) {
+            $children_ids = $this->get_ids_children($object, true);
+            if (in_array($parent->id, $children_ids)) {
+                // Dev details : Cannot move an element inside of its own children
+                throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
+            }
         }
 
         $this->set_parent_no_observers($object, $parent);
@@ -160,11 +168,15 @@ class Orm_Behaviour_Tree extends Orm_Behavior
 
     }
 
+    public function get_parent($object) {
+        return $object->get($this->_properties['parent_relation']);
+    }
+
 	public function set_parent_no_observers($object, $parent = null) {
         // Fetch the relation
         $object->get($this->_properties['parent_relation']);
         foreach ($this->_parent_relation->key_from as $i => $k) {
-            $object->set($k, $parent->get($this->_parent_relation->key_to[$i]));
+            $object->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
         }
 	}
 }

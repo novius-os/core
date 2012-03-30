@@ -23,7 +23,7 @@
         }
     }
     ?>
-    <?= $fieldset->open('admin/cms/media/folder/do'); ?>
+    <?= $fieldset->open('admin/nos/media/folder/do'); ?>
     <table class="fieldset">
         <tr>
             <th><?= $fieldset->field('medif_title')->label; ?></th>
@@ -41,20 +41,23 @@
         </tr>
         <tr>
             <th><?= $hide_widget_media_path ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
-            <td></td>
+            <td id="<?= $uniqid_radio = uniqid('radio_') ?>"><?= $fieldset->field('medif_parent_id')->build(); ?></td>
+        </tr>
+        <tr>
+            <th></th>
+            <td>
+                <?= $fieldset->field('save')->build(); ?>
+                &nbsp; <?= __('or') ?> &nbsp;
+                <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
+            </td>
         </tr>
     </table>
-    <?= $fieldset->field('medif_parent_id')->build(); ?>
-    <p>
-        <?= $fieldset->field('save')->build(); ?>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
-    </p>
+
     <?= $fieldset->close(); ?>
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'static/cms/js/vendor/jquery/jquery-form/jquery.form.min'], function($) {
+require(['jquery-nos', 'order!jquery-form'], function($) {
     $.nos.ui.form('#<?= $uniqid ?>');
     $(function() {
 
@@ -88,7 +91,7 @@ require(['jquery-nos', 'static/cms/js/vendor/jquery/jquery-form/jquery.form.min'
 		}).triggerHandler('change');
 
         var $path_prefix = $container.find('span[data-id=path_prefix]');
-        $container.find('input[name=medif_parent_id]').change(function(e, row_data) {
+        $container.find('#<?= $uniqid_radio ?>').delegate('input[name=medif_parent_id]', 'selectionChanged', function(e, row_data) {
             $path_prefix.text(row_data && row_data.path && row_data.path != '/' ? row_data.path : '');
         });
 

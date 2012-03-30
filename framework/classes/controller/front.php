@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Cache;
 use Fuel\Core\Config;
@@ -160,8 +160,8 @@ class Controller_Front extends Controller {
                     'rewrites'    => array(),
                 );
             }
-            $module         = array_shift($fragments);
-            $rewriting[$module]      = array(
+            $application             = array_shift($fragments);
+            $rewriting[$application] = array(
                 'url'         => $url.(empty($url) ? '' : '.html'),
                 'rewrite_url' => $rewrite_url.(empty($rewrite_url) ? '' : '.html'),
                 'rewrites'    => $fragments,
@@ -184,7 +184,7 @@ class Controller_Front extends Controller {
 
         // Scan all wysiwyg
         foreach ($this->template['layout'] as $wysiwyg_name => $layout) {
-            $content = \Cms::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
+            $content = \Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
 
             $this->page_title = $this->page->page_title;
 

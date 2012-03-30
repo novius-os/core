@@ -123,6 +123,11 @@ return array(
 	),
 
 	/**
+	 * Whether to use minified assets (css & js)
+	 */
+	'assets_minified' => true,
+
+	/**
 	 * Cookie settings
 	 */
 	'cookie' => array(
@@ -147,8 +152,8 @@ return array(
 	*/
 	'module_paths' => array(
 		realpath(APPPATH.'modules').DS,
-		// Strip trailing "cms/framework/"
-		realpath(substr(CMSPATH, 0, -14).'lib').DS,
+		// Strip trailing "novius-os/framework/"
+		realpath(substr(NOSPATH, 0, -20).'lib').DS,
 	),
 
 

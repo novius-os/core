@@ -11,9 +11,9 @@
 
 class Config extends \Fuel\Core\Config {
 
-    public static function load($file, $group = null, $reload = false, $overwrite = false) {
+    public static function load($file, $role = null, $reload = false, $overwrite = false) {
         $file = static::convertFileName($file);
-        return parent::load($file, $group, $reload, $overwrite);
+        return parent::load($file, $role, $reload, $overwrite);
     }
 
     public static function get($item, $default = null) {
@@ -42,8 +42,8 @@ class Config extends \Fuel\Core\Config {
     public static function convertFileName($file) {
         //\Debug::dump($file);
         if (is_string($file) && strpos($file, '::') !== false && substr($file, 0, 4) == 'nos_') {
-            list($module_name, $configuration_path) = explode('::', $file);
-            $file = 'cms::admin/'.$module_name.'/'.$configuration_path;
+            list($application, $configuration_path) = explode('::', $file);
+            $file = 'nos::admin/'.$application.'/'.$configuration_path;
             //echo ($file.' ');
             /*exit();*/
         }

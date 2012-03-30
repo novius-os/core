@@ -8,16 +8,16 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
-class Model_Media_Link extends \Cms\Orm\Model {
+class Model_Media_Link extends \Nos\Orm\Model {
     protected static $_table_name = 'os_media_link';
     protected static $_primary_key = array('medil_id');
 
 	public static $_belongs_to = array(
 		'media' => array(
 			'key_from' => 'medil_media_id',
-			'model_to' => 'Cms\Model_Media_Media',
+			'model_to' => 'Nos\Model_Media_Media',
 			'key_to' => 'media_id',
 			'cascade_save' => false,
 			'cascade_delete' => false,

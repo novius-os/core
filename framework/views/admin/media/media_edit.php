@@ -8,7 +8,18 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div class="fieldset standalone" id="<?= $uniqid = uniqid('id_') ?>">
+<script type="text/javascript">
+require(['jquery-nos-ostabs'], function ($) {
+	$(function () {
+		$.nos.tabs.update({
+			label : <?= json_encode($media->media_title) ?>,
+			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
+		});
+	});
+});
+</script>
+
+<div class="page fieldset standalone" id="<?= $uniqid = uniqid('id_') ?>">
     <?php
     $fieldset->set_config('field_template', '{field}');
 
@@ -17,33 +28,36 @@
     $form_attributes['enctype'] = 'multipart/form-data';
     $fieldset->set_config('form_attributes', $form_attributes);
     ?>
-    <?= $fieldset->open('admin/cms/media/media/update'); ?>
+    <?= $fieldset->open('admin/nos/media/media/update'); ?>
     <?= $fieldset->field('media_id')->build(); ?>
+    <?php
+    ob_start();
+    ?>
     <table>
         <tr>
-            <th><?= $fieldset->field('media')->label ?></th>
-            <td><?= $fieldset->field('media')->build(); ?></td>
-        </tr>
-        <tr>
+            <?= $media->is_image() ? '<td rowspan="3" style="width:128px;">'.$media->get_img_tag_resized(128, null).'</td>' : '' ?>
             <th><?= $fieldset->field('media_title')->label ?></th>
             <td><?= $fieldset->field('media_title')->build() ?></td>
         </tr>
         </tr>
         <tr>
             <th><?= $fieldset->field('slug')->label ?></th>
-            <td><?= $fieldset->field('slug')->build() ?> <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Generate from title') ?></label></td>
+            <td><?= $fieldset->field('slug')->build() ?> <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?> /> <?= __('Generate from title') ?></label></td>
         </tr>
         <tr>
-            <th><?= $hide_widget_media_path ? '' :  $fieldset->field('media_path_id')->label; ?></th>
-            <td></td>
+            <th><?= $fieldset->field('media_path_id')->label; ?></th>
+            <td><?= $fieldset->field('media_path_id')->build(); ?></td>
         </tr>
     </table>
-    <?= $fieldset->field('media_path_id')->build(); ?>
-    <p>
-        <?= $fieldset->field('save')->build(); ?>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
-    </p>
+    <?php
+    $content = ob_get_clean();
+    ?>
+    <?= View::forge('form/layout_standard', array(
+        'fieldset' => $fieldset,
+        'title' => 'media',
+        'save' => 'save',
+        'content' => $content,
+    ), false) ?>
     <?= $fieldset->close(); ?>
 </div>
 
@@ -51,10 +65,10 @@
 <script type="text/javascript">
 require([
     'jquery-nos',
-    'static/cms/js/vendor/jquery/jquery-form/jquery.form.min'
+    'order!jquery-form'
 ],
 function($) {
-    $.nos.ui.form('#<?= $uniqid ?>');
+    // Form UI enhancements are already taken care of by the form/layout_standard view
 
     $(function() {
         var $container = $('#<?= $uniqid ?>');

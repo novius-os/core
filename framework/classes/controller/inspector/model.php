@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use \Input;
 use \Format;
@@ -25,8 +25,8 @@ class Controller_Inspector_Model extends Controller_Extendable {
 
     public function action_list()
     {
-		if (!\Cms\Auth::check()) {
-			\Response::redirect('/admin/cms/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
+		if (!\Nos\Auth::check()) {
+			\Response::redirect('/admin/nos/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
 			exit();
 		}
 
@@ -37,9 +37,9 @@ class Controller_Inspector_Model extends Controller_Extendable {
 
     public function action_json()
     {
-		if (!\Cms\Auth::check()) {
+		if (!\Nos\Auth::check()) {
 			\Response::json(403, array(
-				'login_page' => \Uri::base(false).'admin/cms/login',
+				'login_page' => \Uri::base(false).'admin/nos/login',
 			));
 		}
 

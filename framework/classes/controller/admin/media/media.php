@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Media_Media extends Controller_Extendable {
 
@@ -26,7 +26,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         }
 
 		$folder = Model_Media_Folder::find($folder_id);
-        $fields = \Config::load('cms::controller/admin/media/form_media', true);
+        $fields = \Config::load('nos::controller/admin/media/form_media', true);
 
         $fields = \Arr::merge($fields, array(
             'media_path_id' => array(
@@ -44,7 +44,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
         $fieldset = \Fieldset::build_from_config($fields);
 
-		return \View::forge('cms::admin/media/media_add', array(
+		return \View::forge('nos::admin/media/media_add', array(
             'fieldset' => $fieldset,
             'folder' => $folder,
             'hide_widget_media_path' => $hide_widget_media_path,
@@ -58,7 +58,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         $ext = $pathinfo['extension'];
         $filename = $pathinfo['filename'];
 
-        $fields = \Config::load('cms::controller/admin/media/form_media', true);
+        $fields = \Config::load('nos::controller/admin/media/form_media', true);
 
         $fields = \Arr::merge($fields, array(
             'media_id' => array(
@@ -87,7 +87,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
         $fieldset = \Fieldset::build_from_config($fields);
 
-		return \View::forge('cms::admin/media/media_edit', array(
+		return \View::forge('nos::admin/media/media_edit', array(
             'fieldset' => $fieldset,
             'media' => $media,
             'checked' => $filename == Model_Media_Folder::friendly_slug($media->media_title),
@@ -96,7 +96,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 	public function action_upload() {
 
-        if (!static::check_permission_action('add', 'controller/admin/media/mp3grid/list')) {
+        if (!static::check_permission_action('add', 'controller/admin/media/appdesk/list')) {
             throw new \Exception(__('Permission denied'));
         }
 
@@ -114,8 +114,8 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
             $media = new Model_Media_Media();
 
-            $media->media_path_id = \Input::post('media_path_id', 1);
-            $media->media_module  = \Input::post('media_module', null);
+            $media->media_path_id     = \Input::post('media_path_id', 1);
+            $media->media_application = \Input::post('media_application', null);
 
             $media->media_title = \Input::post('media_title', '');
             $media->media_file  = \Input::post('slug', '');
@@ -147,7 +147,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
             // Create the directory if needed
 			$dest_dir = dirname($dest);
-            $base_dir = APPPATH.\Cms\Model_Media_Media::$public_path;
+            $base_dir = APPPATH.\Nos\Model_Media_Media::$public_path;
             $remaining_dir = str_replace($base_dir, '', $dest_dir);
             // chmod  is 0777 here because it should be restricted with by the umask
 			is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
@@ -163,12 +163,13 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             }
 
 			$body = array(
-				'notify' => 'File successfully edited.',
+				'notify' => 'File successfully added.',
 				'closeDialog' => true,
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => 'cms_media_media',
+					'target' => 'nos_media_media',
 				),
+                'replaceTab' => 'admin/nos/media/media/edit/'.$media->media_id,
 			);
         } catch (\Exception $e) {
 			$body = array(
@@ -181,7 +182,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 	public function action_update() {
 
-        if (!static::check_permission_action('add', 'controller/admin/media/mp3grid/list')) {
+        if (!static::check_permission_action('add', 'controller/admin/media/appdesk/list')) {
             throw new \Exception(__('Permission denied'));
         }
         try {
@@ -192,7 +193,9 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             }
             $old_media = clone $media;
 
-            if (is_uploaded_file($_FILES['media']['tmp_name'])) {
+            $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
+
+            if ($is_uploaded) {
                 $pathinfo = pathinfo(strtolower($_FILES['media']['name']));
 
                 $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
@@ -235,16 +238,26 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                     throw new \Exception(__('A file with the same name already exists.'));
                 }
 
-                if (is_uploaded_file($_FILES['media']['tmp_name'])) {
+                if ($is_uploaded) {
                     $old_media->delete_from_disk();
                 } else {
+                    // Create the directory if needed
+                    $dest_dir = dirname($dest);
+                    $base_dir = APPPATH.\Nos\Model_Media_Media::$public_path;
+                    $remaining_dir = str_replace($base_dir, '', $dest_dir);
+                    // chmod  is 0777 here because it should be restricted with by the umask
+                    is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
+
+                    if (!is_writeable($dest_dir)) {
+                        throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                    }
                     \File::rename(APPPATH.$old_media->get_public_path(), $dest);
                 }
                 $old_media->delete_public_cache();
             }
 
             // Relace old file if needed
-            if (is_uploaded_file($_FILES['media']['tmp_name'])) {
+            if ($is_uploaded) {
                 // Move the file
                 if (move_uploaded_file($_FILES['media']['tmp_name'], $dest)) {
                     chmod($dest, 0664);
@@ -253,11 +266,11 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             $media->save();
 
 			$body = array(
-				'notify' => 'File successfully added.',
+				'notify' => 'File successfully saved.',
 				'closeDialog' => true,
-				'fireEvent' => array(
+				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => 'cms_media_media',
+					'target' => 'nos_media_media',
 				),
 			);
         } catch (\Exception $e) {

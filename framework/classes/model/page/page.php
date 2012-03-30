@@ -8,11 +8,11 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Uri;
 
-class Model_Page_Page extends \Cms\Orm\Model {
+class Model_Page_Page extends \Nos\Orm\Model {
 
     protected static $_table_name = 'os_page';
     protected static $_primary_key = array('page_id');
@@ -20,7 +20,7 @@ class Model_Page_Page extends \Cms\Orm\Model {
 	protected static $_has_many = array(
 		'children' => array(
 			'key_from'       => 'page_id',
-			'model_to'       => '\Cms\Model_Page_Page',
+			'model_to'       => '\Nos\Model_Page_Page',
 			'key_to'         => 'page_parent_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
@@ -30,22 +30,22 @@ class Model_Page_Page extends \Cms\Orm\Model {
 	protected static $_belongs_to = array(
 		'parent' => array(
 			'key_from'       => 'page_parent_id',
-			'model_to'       => '\Cms\Model_Page_Page',
+			'model_to'       => '\Nos\Model_Page_Page',
 			'key_to'         => 'page_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
 		),
 		'racine' => array(
 			'key_from'       => 'page_root_id',
-			'model_to'       => '\Cms\Model_Page_Root',
+			'model_to'       => '\Nos\Model_Page_Root',
 			'key_to'         => 'root_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
 		),
 	);
 
-	protected static $_behaviors = array(
-		'Cms\Orm_Behaviour_Translatable' => array(
+	protected static $_behaviours = array(
+		'Nos\Orm_Behaviour_Translatable' => array(
 			'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'before_change_parent', 'after_change_parent'),
 			'lang_property'      => 'page_lang',
 			'common_id_property' => 'page_lang_common_id',
@@ -64,16 +64,16 @@ class Model_Page_Page extends \Cms\Orm\Model {
                 'page_cache_duration',
             ),
 		),
-		'Cms\Orm_Behaviour_Tree' => array(
+		'Nos\Orm_Behaviour_Tree' => array(
 			'events' => array('before_search', 'after_delete'),
 			'parent_relation' => 'parent',
 			'children_relation' => 'children',
 		),
-		'Cms\Orm_Behaviour_Sortable' => array(
+		'Nos\Orm_Behaviour_Sortable' => array(
 			'events' => array('after_sort'),
 			'sort_property' => 'page_sort',
 		),
-		'Cms\Orm_Behaviour_Publishable' => array(
+		'Nos\Orm_Behaviour_Publishable' => array(
 			'publication_bool_property' => 'page_published',
 		),
 	);
@@ -99,7 +99,7 @@ class Model_Page_Page extends \Cms\Orm\Model {
      * @param array  $where
      * @param array  $order_by
      * @param array  $options   Additional options to pass on to the ::find() method
-     * @return array of \Cms\Model_Page_Page
+     * @return array of \Nos\Model_Page_Page
      */
     public static function search($where, $order_by = array(), $options = array()) {
         isset($order_by['page_sort']) or $order_by['page_sort'] = 'ASC';
@@ -161,5 +161,13 @@ class Model_Page_Page extends \Cms\Orm\Model {
             $url .= $this->page_virtual_url;
         }
         return $url;
+    }
+
+    public function get_possible_lang() {
+        $parent = $this->find_parent();
+        if (!empty($parent)) {
+            return $parent->get_all_lang();
+        }
+        return array_keys(\Config::get('locales'));
     }
 }

@@ -60,6 +60,17 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
             $auto_id = str_replace(array('[', ']', '->'), array('-', '', '_'), $form->get_config('auto_id_prefix', '').$this->name);
             $this->set_attribute('id', $auto_id);
         }
+        $required = $this->get_attribute('required', null);
+        if ($required) {
+            $label = $this->label;
+            if (!is_array($label)) {
+                $label = array('label' => $label);
+            }
+            if (empty($label['title'])) {
+                $label['title'] = __('Mandatory');
+            }
+            $this->label = $label;
+        }
         return parent::build();
     }
 }

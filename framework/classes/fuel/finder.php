@@ -14,7 +14,7 @@ class Finder extends Fuel\Core\Finder {
 	{
 		if ( ! static::$instance)
 		{
-			static::$instance = static::forge(array(APPPATH, CMSPATH, COREPATH));
+			static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
 		}
 
 		return static::$instance;
@@ -82,14 +82,14 @@ class Finder extends Fuel\Core\Finder {
 
 		$local_config_path = APPPATH.$directory.DS;
 		if ($is_namespaced) {
-			$local_config_path .= ($active_module != 'cms' ? 'modules'.DS.$active_module : 'cms').DS;
+			$local_config_path .= ($active_module != 'nos' ? 'modules'.DS.$active_module : 'novius-os').DS;
 		}
 		if ($context == 'config.save') {
 			$search = array($local_config_path);
 		} else {
 
-			if ($active_module == 'cms' && $directory == 'views') {
-				$search[] = APPPATH.$directory.DS.'cms'.DS;
+			if ($active_module == 'nos' && $directory == 'views') {
+				$search[] = APPPATH.$directory.DS.'novius-os'.DS;
 			}
 
 			// -8 = strip the classes directory
@@ -97,8 +97,8 @@ class Finder extends Fuel\Core\Finder {
 				$search[] = substr($namespace_path, 0, -8).$directory.DS;
 			}
 
-			if ($active_module && $active_module != 'cms') {
-				$search[] = CMSPATH.$directory.DS;
+			if ($active_module && $active_module != 'nos') {
+				$search[] = NOSPATH.$directory.DS;
 			}
 			if ($context == 'config.load') {
 				$search[] = $local_config_path;

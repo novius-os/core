@@ -8,15 +8,15 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
-class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
+class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 
     public function action_add() {
 
         $user = Model_User_User::forge();
 
-        return \View::forge('cms::admin/user/user_add', array(
+        return \View::forge('nos::admin/user/user_add', array(
             'fieldset' => static::fieldset_add($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'),
         ), false);
     }
@@ -27,10 +27,10 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
         } else {
             $user = Model_User_User::find($id);
         }
-        $group = reset($user->groups);
+        $role = reset($user->roles);
 
 
-        \Config::load('cms::admin/native_apps', 'natives_apps');
+        \Config::load('nos::admin/native_apps', 'natives_apps');
         $natives_apps = \Config::get('natives_apps', array());
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
@@ -38,12 +38,12 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
 
         $apps = array_merge($natives_apps, $apps);
 
-        return \View::forge('cms::admin/user/user_edit', array(
+        return \View::forge('nos::admin/user/user_edit', array(
             'user'   => $user,
             'fieldset' => static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'),
-            'permissions' => \View::forge('cms::admin/user/permission', array(
+            'permissions' => \View::forge('nos::admin/user/permission', array(
                 'user' => $user,
-                'group' => $group,
+                'role' => $role,
                 'apps' => $apps,
             ), false),
         ), false);
@@ -51,47 +51,46 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
 
     public function action_save_permissions() {
 
-        $group = Model_User_Group::find(\Input::post('group_id'));
+        $role = Model_User_Role::find(\Input::post('role_id'));
 
-		$modules = \Input::post('module');
-        foreach ($modules as $module) {
+		$applications = \Input::post('applications');
+        foreach ($applications as $application) {
             $access = Model_User_Permission::find('first', array('where' => array(
-                array('perm_group_id', $group->group_id),
+                array('perm_role_id', $role->role_id),
                 array('perm_module', 'access'),
-                array('perm_key', $module),
+                array('perm_key',         $application),
             )));
 
-            // Grant of remove access to the module
-            if (empty($_POST['access'][$module]) && !empty($access)) {
+            // Grant of remove access to the application
+            if (empty($_POST['access'][$application]) && !empty($access)) {
                 $access->delete();
-                \Response::json(array(
-                    'notify' => 'Access successfully denied.',
-                ));
             }
 
-            if (!empty($_POST['access'][$module]) && empty($access)) {
+            if (!empty($_POST['access'][$application]) && empty($access)) {
                 $access = new Model_User_Permission();
-                $access->perm_group_id   = $group->group_id;
+                $access->perm_role_id   = $role->role_id;
                 $access->perm_module     = 'access';
                 $access->perm_identifier = '';
-                $access->perm_key        = $module;
+                $access->perm_key         = $application;
                 $access->save();
             }
 
             \Config::load('applications', true);
             $apps = \Config::get('applications', array());
 
-            \Config::load("$module::permissions", true);
-            $permissions = \Config::get("$module::permissions", array());
-
+            \Config::load("$application::permissions", true);
+            $permissions = \Config::get("$application::permissions", array());
+/*
             foreach ($permissions as $identifier => $whatever) {
-                $driver = $group->get_permission_driver($module, $identifier);
-                $driver->save($group, (array) $_POST['permission'][$module][$identifier]);
+                $driver = $role->get_permission_driver($application, $identifier);
+                $driver->save($role, (array) $_POST['permission'][$application][$identifier]);
             }
+            */
         }
 		\Response::json(array(
             'notify' => 'Permissions successfully saved.',
         ));
+
     }
 
     public static function fieldset_add($user) {
@@ -168,7 +167,7 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
             'success' => function() use ($user) {
                 return array(
                     'notify' => 'User successfully created.',
-                    'replaceTab' => 'admin/cms/user/form/edit/'.$user->user_id,
+                    'replaceTab' => 'admin/nos/user/form/edit/'.$user->user_id,
                 );
             }
         ));

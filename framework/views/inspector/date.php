@@ -13,7 +13,7 @@
 <div id="<?= $id ?>" style="display:none;"><?= str_replace(array('xxxbeginxxx', 'xxxendxxx'), array($date_begin, $date_end), $label_custom) ?></div>
 <script type="text/javascript">
 require([
-		'jquery-nos'
+		'jquery-nos-listgrid'
 	], function( $, undefined ) {
 		$(function() {
 			var label_custom = $('#<?= $id ?>').removeAttr('id')
@@ -24,7 +24,7 @@ require([
                 parent = inspector.parent().bind({
                         widgetResize: function() {
                             label_custom.appendTo(parent);
-                            inspector.nosgrid('setSize', parent.width(), parent.height());
+                            inspector.noslistgrid('setSize', parent.width(), parent.height());
                         }
                     }),
                 inspectorData = parent.data('inspector'),
@@ -60,7 +60,7 @@ require([
                     height : '100%',
                     width : '100%'
                 })
-                .nosgrid({
+                .noslistgrid({
                     columnsAutogenerationMode : 'none',
                     scrollMode : 'auto',
                     showGroupArea : false,
@@ -103,7 +103,7 @@ require([
                     ],
                     data: <?= $content ?>,
                     currentCellChanged: function (e) {
-                        var row = $(e.target).nosgrid("currentCell").row(),
+                        var row = $(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {
@@ -116,7 +116,7 @@ require([
                                 inspectorData.selectionChanged(data.value, data.title);
                             }
                         }
-                        inspector.nosgrid("currentCell", -1, -1);
+                        inspector.noslistgrid("currentCell", -1, -1);
                     },
                     rendering : function() {
                         rendered = false;

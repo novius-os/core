@@ -8,17 +8,17 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 
-	public $template = 'cms::templates/html5';
+	public $template = 'nos::templates/html5';
 
 	public function before($response = null) {
 		parent::before($response);
 
-		if (!\Cms\Auth::check()) {
-			\Response::redirect('/admin/cms/login' . ($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
+		if (!\Nos\Auth::check()) {
+			\Response::redirect('/admin/nos/login' . ($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
 			exit();
 		}
 
@@ -26,29 +26,10 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 	}
 
 	public function after($response) {
-
-		// Yahoo CSS Reset
-		//\Asset::css('http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css', array(), 'css');
-
-		\Asset::add_path('static/cms/js/vendor/wijmo/');
-        \Asset::css('aristo/jquery-wijmo.css', array(), 'css');
-        \Asset::css('jquery.wijmo-complete.all.2.0.3.min.css', array(), 'css');
-
-		\Asset::add_path('static/cms/');
-		// laGrid before base
-		\Asset::css('laGrid.css', array(), 'css');
-        // base after wijmo
-		\Asset::css('base.css', array(), 'css');
-		\Asset::css('form.css', array(), 'css');
-
-		\Asset::add_path('static/cms/js/jquery/jquery-ui-noviusos/');
-        \Asset::css('jquery.nos.ostabs.css', array(), 'css');
-        \Asset::css('jquery.nos.mp3grid.css', array(), 'css');
-
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
-			         'require'  => 'static/cms/js/vendor/requirejs/require.js',
+			         'require'  => 'static/novius-os/admin/vendor/requirejs/require.js',
 		         ) as $var => $default) {
 			if (empty($this->template->$var)) {
 				$this->template->$var = $default;
@@ -74,42 +55,34 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 			'trayTabs' => array(
 				array(
                     'iframe' => true,
-					'url' => 'admin/cms/tray/plugins',
+					'url' => 'admin/nos/tray/plugins',
 					'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
-					'label' => 'Novius store',
+					'label' => __('Applications manager'),
 					'iconSize' => 24,
 				),
 				array(
-                    'iframe' => true,
-					'url' => 'generator/model',
+					'url' => 'admin/nos/tray/help',
 					'iconClasses' => 'nos-icon24 nos-icon24-help',
-					'label' => 'Help',
+					'label' => __('Help'),
 					'iconSize' => 24,
 				),
 				array(
-                    'iframe' => true,
-					'url' => 'generator/model',
-					'iconClasses' => 'nos-icon24 nos-icon24-settings',
-					'label' => 'Settings',
-					'iconSize' => 24,
-				),
-				array(
-					'url' => 'admin/cms/tray/account',
+					'url' => 'admin/nos/tray/account',
 					'iconClasses' => 'nos-icon24 nos-icon24-account',
-					'label' => 'Account',
+					'label' => __('Account'),
 					'iconSize' => 24,
 				),
 			),
 			'appsTab' => array(
 				'panelId' => 'noviusospanel',
-				'url' => 'admin/cms/noviusos/appstab',
+				'url' => 'admin/nos/noviusos/appstab',
 				'iconClasses' => 'nos-icon32',
 				'iconSize' => 32,
 				'label' => 'Novius OS',
 			),
 			'newTab' => array(
 				'panelId' => 'noviusospanel',
-				'url' => 'admin/cms/noviusos/appstab',
+				'url' => 'admin/nos/noviusos/appstab',
 				'iconClasses' => 'nos-icon16 nos-icon16-add',
 				'iconSize' => 16,
 			),
@@ -126,16 +99,16 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'launchers.php', 'launchers');
 		$launchers = \Config::get('launchers', array());
 
-        \Config::load('cms::admin/launchers_default', true);
-        $launchers_default = \Config::get('cms::admin/launchers_default', array());
+        \Config::load('nos::admin/launchers_default', true);
+        $launchers_default = \Config::get('nos::admin/launchers_default', array());
         $launchers = array_merge($launchers, $launchers_default);
         //$app_installed = \Config::mergeWithUser('misc.apps', $app_installed);
 
         $apps = array();
         foreach ($launchers as $key => $app) {
-            if (!empty($app['url']) && !empty($app['icon64'])) { // do we have to display the modules ?
-                //\Debug::dump($app['module'], Permission::check($app['module'], 'access'));
-                if (!isset($app['module']) || Permission::check($app['module'], 'access')) { // do we have the rights to access the modules ?
+            if (!empty($app['url']) && !empty($app['icon64'])) { // do we have to display the application?
+                //\Debug::dump($app['application'], Permission::check($app['application'], 'access'));
+                if (!isset($app['application']) || Permission::check($app['application'], 'access')) { // do we have the rights to access the application?
                     $app['key'] = $key;
                     $apps[] = $app;
                 }

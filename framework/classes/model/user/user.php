@@ -8,26 +8,26 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Uri;
 
-\Autoloader::add_class('PasswordHash', CMSPATH.'vendor'.DS.'phpass'.DS.'PasswordHash.php');
+\Autoloader::add_class('PasswordHash', NOSPATH.'vendor'.DS.'phpass'.DS.'PasswordHash.php');
 
-class Model_User_User extends \Cms\Orm\Model {
+class Model_User_User extends \Nos\Orm\Model {
     protected static $_table_name = 'os_user';
     protected static $_primary_key = array('user_id');
 
 	protected static $_delete;
 
     protected static $_many_many = array(
-        'groups' => array(
+        'roles' => array(
             'key_from' => 'user_id',
             'key_through_from' => 'user_id', // column 1 from the table in between, should match a posts.id
-            'table_through' => 'os_user_group', // both models plural without prefix in alphabetical order
-            'key_through_to' => 'group_id', // column 2 from the table in between, should match a users.id
-            'model_to' => 'Cms\Model_User_Group',
-            'key_to' => 'group_id',
+            'table_through' => 'os_user_role', // both models plural without prefix in alphabetical order
+            'key_through_to' => 'role_id', // column 2 from the table in between, should match a users.id
+            'model_to' => 'Nos\Model_User_Role',
+            'key_to' => 'role_id',
             'cascade_save' => false,
             'cascade_delete' => false,
         ),
@@ -58,24 +58,24 @@ class Model_User_User extends \Cms\Orm\Model {
 		}
 		$already_saved[$this->user_id] = true;
 
-		if (empty($this->groups)) {
-			$group = new Model_User_Group();
-			$group->group_user_id = $this->user_id;
+		if (empty($this->roles)) {
+            $role = new Model_User_Role();
+            $role->role_user_id = $this->user_id;
 		} else {
-			$group = reset($this->groups);
+            $role = reset($this->roles);
 		}
-		$group->group_name = $this->fullname();
-		$this->groups[] = $group;
-		$this->save(array('groups'));
+        $role->role_name = $this->fullname();
+		$this->roles[] = $role;
+		$this->save(array('roles'));
     }
 
 	public function _event_before_delete() {
-		// Load the groups to delete
-		static::$_delete['groups'] = $this->groups;
+		// Load the roles to delete
+		static::$_delete['roles'] = $this->roles;
 	}
 	public function _event_after_delete() {
-		foreach (static::$_delete['groups'] as $group) {
-			$group->delete();
+		foreach (static::$_delete['roles'] as $role) {
+            $role->delete();
 		}
 	}
 
@@ -85,7 +85,7 @@ class Model_User_User extends \Cms\Orm\Model {
 
     public function check_permission($app, $key) {
 		$args = func_get_args();
-        foreach ($this->groups as $g) {
+        foreach ($this->roles as $g) {
             if (call_user_func_array(array($g, 'check_permission'), $args)) {
                 return true;
             }

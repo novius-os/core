@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Widget_Wysiwyg extends \Fieldset_Field {
 
@@ -47,8 +47,7 @@ class Widget_Wysiwyg extends \Fieldset_Field {
 		return <<<JS
 <script type="text/javascript">
     require([
-    'static/cms/js/vendor/tinymce/jquery.tinymce_src',
-    'static/cms/js/vendor/tinymce/jquery.wysiwyg'
+    'wysiwyg'
     ], function() {
         $('textarea#$id').wysiwyg($('textarea#$id').data('wysiwyg-options'));
     });

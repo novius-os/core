@@ -8,11 +8,11 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Uri;
 
-class Model_Comment extends \Cms\Orm\Model {
+class Model_Comment extends \Nos\Orm\Model {
     protected static $_table_name = 'os_comment';
     protected static $_primary_key = array('comm_id');
 

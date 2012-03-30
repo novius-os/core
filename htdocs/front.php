@@ -1,7 +1,7 @@
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
- * 
+ *
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
@@ -17,16 +17,16 @@ ini_set('display_errors', 1);
 define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
-define('PKGPATH',  realpath(DOCROOT.'../cms/packages/').DIRECTORY_SEPARATOR);
-define('COREPATH', realpath(DOCROOT.'../cms/fuel-core/').DIRECTORY_SEPARATOR);
-define('CMSPATH',  realpath(DOCROOT.'../cms/framework/').DIRECTORY_SEPARATOR);
+define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
+define('COREPATH', realpath(DOCROOT.'../novius-os/fuel-core/').DIRECTORY_SEPARATOR);
+define('NOSPATH',  realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
 
 // Get the start time and memory for use later
 defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
 defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Boot the app
-require_once CMSPATH.'bootstrap.php';
+require_once NOSPATH.'bootstrap.php';
 
 if (empty($_SERVER['REDIRECT_URL']) && !empty($_GET['URL'])) {
 	$_SERVER['REDIRECT_URL'] = $_GET['URL'].'.html';
@@ -36,7 +36,7 @@ if (empty($_SERVER['REDIRECT_URL']) && !empty($_GET['URL'])) {
 	}
 }
 // Generate the request, execute it and send the output.
-$response = Request::forge('cms/front/index', false)->execute()->response();
+$response = Request::forge('nos/front/index', false)->execute()->response();
 
 // This will add the execution time and memory usage to the output.
 // Comment this out if you don't use it.

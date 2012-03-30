@@ -8,10 +8,10 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Config;
 
-class Controller_Admin_Media_List extends Controller_Mp3table_List {
+class Controller_Admin_Media_List extends Controller_Appdesk_List {
 
 }

@@ -8,24 +8,37 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Page_Page extends Controller {
 
     public function action_add() {
 
-        $parent = Model_Page_Page::find(1);
+        $parent = Model_Page_Page::find(\Input::post('page_parent_id', 1));
         $page   = Model_Page_Page::forge();
 
-        $fields = \Config::load('cms::controller/admin/page/form_page', true);
+        $fields = \Config::load('nos::controller/admin/page/form_page', true);
         $fields = \Arr::merge($fields, array(
             'page_title' => array(
-                'validation' => array('required'),
+                'validation' => array(
+                    'required',
+                    'min_length' => array(6),
+                ),
             ),
             'page_parent_id' => array(
                 'form' => array(
                     'type' => 'hidden',
                     'value' => $parent->page_id,
+                ),
+            ),
+            'page_lang' => array(
+                'form' => array(
+                    'type' => 'hidden',
+                ),
+            ),
+            'page_lang_common_id' => array(
+                'form' => array(
+                    'type' => 'hidden',
                 ),
             ),
 			'save' => array(
@@ -37,29 +50,100 @@ class Controller_Admin_Page_Page extends Controller {
 
 		$fieldset = \Fieldset::build_from_config($fields, $page, array(
             'before_save' => function($page, $data) {
-                $parent = $page->get_parent();
+                $parent = $page->find_parent();
                 // Event 'after_change_parent' will set the appropriate lang
                 //\Debug::dump($parent->id, $parent->get_lang(), $page->get_lang());
                 //\Debug::dump($parent->find_lang('en_GB')->id);
                 $page->set_parent($parent);
                 $page->page_level = $parent->page_level + 1;
+
+                foreach (\Input::post('wysiwyg', array()) as $key => $text) {
+                    $page->wysiwygs->$key = $text;
+                }
             },
             'success' => function() use ($page) {
                 return array(
-                    'notify' => 'Page sucessfully created.',
-                    'fireEvent' => array(
+                    'notify' => 'Page sucessfully added.',
+                    'dispatchEvent' => array(
                         'event' => 'reload',
-                        'target' => 'cms_page',
+                        'target' => 'nos_page',
                     ),
-                    'replaceTab' => 'admin/admin/page/page/edit/'.$page->page_id,
+                    'replaceTab' => 'admin/nos/page/page/edit/'.$page->page_id,
                 );
             }
         ));
 		$fieldset->js_validation();
-        $fieldset->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
-        return \View::forge('cms::admin/page/page_add', array(
+        return \View::forge('nos::admin/page/page_add', array(
 			'parent'   => $parent,
+			'page'     => $page,
+            'parent'   => $parent,
+			'fieldset' => $fieldset,
+		), false);
+    }
+
+    public function action_form() {
+
+        $create_from_id = \Input::get('create_from_id', 0);
+        if (empty($create_from_id)) {
+            $page                 = Model_Page_Page::forge();
+            $page->page_lang_common_id = \Input::get('common_id');
+        } else {
+             $page_from = Model_Page_Page::find($create_from_id);
+             $page      = clone $page_from;
+        }
+        $page->page_lang = \Input::get('lang');
+        $parent_page = Model_Page_Page::find($page->page_lang_common_id)->find_parent();
+        if (!empty($page->page_lang)) {
+            $parent_page = $parent_page->find_lang($page->page_lang);
+        }
+        $page->page_parent_id = $parent_page->page_id;
+
+        $fields = \Config::load('nos::controller/admin/page/form_page', true);
+        $fields = \Arr::merge($fields, array(
+            'page_title' => array(
+                'validation' => array(
+                    'required',
+                    'min_length' => array(6),
+                ),
+            ),
+            'page_lang' => array(
+                'form' => array(
+                    'type' => 'hidden',
+                    'value' => \Input::get('lang'),
+                ),
+            ),
+            'page_lang_common_id' => array(
+                'form' => array(
+                    'type' => 'hidden',
+                    'value' => $page->page_lang_common_id,
+                ),
+            ),
+            'page_parent_id' => array(
+                'widget_options' => array(
+                    'lang' => $page->page_lang,
+                ),
+            ),
+			'save' => array(
+				'form' => array(
+					'value' => __('Add'),
+				),
+			),
+        ));
+
+        if (!empty($create_from_id)) {
+            $fields['create_from_id'] = array(
+                'form' => array(
+                    'type' => 'hidden',
+                    'value' => $create_from_id,
+                ),
+            );
+        }
+
+		$fieldset = \Fieldset::build_from_config($fields, $page);
+		$fieldset->js_validation();
+
+        return \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
 		), false);
@@ -69,21 +153,28 @@ class Controller_Admin_Page_Page extends Controller {
 
         $page = Model_Page_Page::find($id);
 
-        $fields = \Config::load('cms::controller/admin/page/form_page', true);
-        $fields = \Arr::merge($fields, array(
-            'page_id' => array (
-                'label' => 'ID: ',
-                'widget' => 'text',
-            ),
-        ));
+        $fields = \Config::load('nos::controller/admin/page/form_page', true);
+        \Arr::set($fields, 'id.form.value', $page->page_id);
 
 		$fieldset = \Fieldset::build_from_config($fields, $page, array(
+            'before_save' => function($page, $data) {
+                $parent = $page->find_parent();
+                // Event 'after_change_parent' will set the appropriate lang
+                //\Debug::dump($parent->id, $parent->get_lang(), $page->get_lang());
+                //\Debug::dump($parent->find_lang('en_GB')->id);
+                $page->set_parent($parent);
+                $page->page_level = $parent->page_level + 1;
+
+                foreach (\Input::post('wysiwyg', array()) as $key => $text) {
+                    $page->wysiwygs->$key = $text;
+                }
+            },
             'success' => function() {
                 return array(
                     'notify' => 'Page sucessfully saved.',
-                    'fireEvent' => array(
+                    'dispatchEvent' => array(
                         'event' => 'reload',
-                        'target' => 'cms_page',
+                        'target' => 'nos_page',
                     ),
                 );
             }
@@ -91,7 +182,7 @@ class Controller_Admin_Page_Page extends Controller {
 		$fieldset->js_validation();
         $fieldset->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
-        return \View::forge('cms::admin/page/page_edit', array(
+        return \View::forge('nos::admin/page/page_edit', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
 		), false);
@@ -105,7 +196,7 @@ class Controller_Admin_Page_Page extends Controller {
         if (empty($page)) {
             throw new \Exception('Page not found.');
         }
-        if (!static::check_permission_action('delete', 'controller/admin/page/mp3grid/list', $page)) {
+        if (!static::check_permission_action('delete', 'controller/admin/page/appdesk/list', $page)) {
             throw new \Exception('Permission denied');
         }
         return $page;
@@ -114,7 +205,7 @@ class Controller_Admin_Page_Page extends Controller {
 	public function action_delete_page($page_id = null) {
         try {
             $page = static::_get_page_with_permission($page_id, 'delete');
-            return \View::forge('cms::admin/page/page_delete', array(
+            return \View::forge('nos::admin/page/page_delete', array(
                 'page' => $page,
             ));
         } catch (\Exception $e) {
@@ -165,9 +256,9 @@ class Controller_Admin_Page_Page extends Controller {
 
 			$body = array(
 				'notify' => 'Page successfully deleted.',
-                'fireEvent' => array(
+                'dispatchEvent' => array(
 	                'event' => 'reload',
-                    'target' => 'cms_page',
+                    'target' => 'nos_page',
                 ),
 			);
 

@@ -32,7 +32,7 @@ require(['jquery-nos'], function($) {
 }
 </style>
 <div id="login">
-    <img src="static/cms/img/logo.png" />
+    <img src="static/novius-os/admin/novius-os/img/logo.png" />
     <form method="POST" action="">
         <p><input type="email" name="email" id="email" value="<?= \Input::post('email', ''); ?>" placeholder="Email" /></p>
         <p><input type="password" name="password" placeholder="Password" /></p>

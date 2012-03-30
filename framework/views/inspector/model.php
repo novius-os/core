@@ -13,23 +13,23 @@
 <table id="<?= $id ?>"></table>
 <script type="text/javascript">
 require([
-		'jquery-nos'
+		'jquery-nos-listgrid'
 	], function( $, undefined ) {
 		$(function() {
 			var inspector = $('#<?= $id ?>').removeAttr('id'),
 				connector = inspector.closest('.nos-inspector, body')
 					.on('langChange', function() {
 						if (inspectorData.langChange) {
-							inspector.nosgrid('ensureControl', true);
+							inspector.noslistgrid('ensureControl', true);
 						}
 					}),
 				parent = inspector.parent()
 					.on({
 						widgetResize : function() {
-	                        inspector.nosgrid('setSize', parent.width(), parent.height());
+	                        inspector.noslistgrid('setSize', parent.width(), parent.height());
 						},
 						widgetReload : function() {
-							inspector.nosgrid('option', 'pageSize', Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row));
+							inspector.noslistgrid('option', 'pageSize', Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row));
 						}
 					}),
                 inspectorData = parent.data('inspector'),
@@ -41,7 +41,7 @@ require([
                     height : '100%',
                     width : '100%'
                 })
-                .nosgrid({
+                .noslistgrid({
                     columnsAutogenerationMode : 'none',
                     showFilter: showFilter,
                     allowSorting: true,
@@ -77,13 +77,13 @@ require([
                         }
                     }),
                     currentCellChanged: function (e) {
-                        var row = $(e.target).nosgrid("currentCell").row(),
+                        var row = $(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {
                             inspectorData.selectionChanged(data.id, data.title);
                         }
-                        inspector.nosgrid("currentCell", -1, -1);
+                        inspector.noslistgrid("currentCell", -1, -1);
                     },
                     rendering : function() {
                         rendered = false;

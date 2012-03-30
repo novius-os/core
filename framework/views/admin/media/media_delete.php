@@ -60,7 +60,7 @@ require(['jquery-nos'], function($) {
                 return;
             }
             $.nos.ajax.request({
-                url : 'admin/cms/media/actions/delete_media_confirm',
+                url : 'admin/nos/media/actions/delete_media_confirm',
                 method : 'POST',
                 data : {
                     id : <?= $media->media_id ?>

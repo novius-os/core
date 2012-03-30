@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Request;
 
@@ -161,8 +161,8 @@ class Controller_Inspector_Date extends Controller_Extendable {
 		$view->set('content', \Format::forge($content)->to_json(), false);
 		$view->set('label_custom', $this->config['label_custom_inputs']);
 
-		$view->set('date_begin', Request::forge('cms/ui/date/index/'.$this->config['input_begin'])->execute(), false);
-		$view->set('date_end', Request::forge('cms/ui/date/index/'.$this->config['input_end'])->execute(), false);
+		$view->set('date_begin', Request::forge('nos/ui/date/index/'.$this->config['input_begin'])->execute(), false);
+		$view->set('date_end', Request::forge('nos/ui/date/index/'.$this->config['input_end'])->execute(), false);
 
 		return $view;
 	}

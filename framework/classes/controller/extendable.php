@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Extendable extends \Fuel\Core\Controller {
     protected $config = array();
@@ -25,8 +25,10 @@ class Controller_Extendable extends \Fuel\Core\Controller {
                     \Asset::add_path($path);
                 }
             }
+
             if (isset($this->config['assets']['css'])) {
                 foreach ($this->config['assets']['css'] as $css) {
+
                     \Asset::css($css, array(), 'css');
                 }
             }
@@ -40,14 +42,14 @@ class Controller_Extendable extends \Fuel\Core\Controller {
     }
 
     protected function trigger($event, $data = '', $return_type = 'string') {
-        list($module_name, $file_name) = $this->getLocation();
+        list($application, $file_name) = $this->getLocation();
         $file_name = str_replace('/', '_', $file_name);
-        return \Event::trigger($module_name.'.'.$file_name.'.'.$event, $data, $return_type);
+        return \Event::trigger($application.'.'.$file_name.'.'.$event, $data, $return_type);
     }
 
     protected static function getConfiguration() {
-        list($module_name, $file_name) = self::getLocation();
-        return static::loadConfiguration($module_name, $file_name);
+        list($application, $file_name) = self::getLocation();
+        return static::loadConfiguration($application, $file_name);
     }
 
     protected static function getLocation() {
@@ -56,7 +58,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         $module_name = strtolower($controller[0]);
         $file_name   = strtolower(str_replace('_', DS, $controller[1]));
         $location = array($module_name, $file_name);
-        if ($module_name == 'cms') {
+        if ($module_name == 'nos') {
             $submodule = explode('_', $controller[1]);
             if ($submodule[0] == 'Controller' && $submodule[1] == 'Admin' && count($submodule) > 2) {
                 $location[] = strtolower($submodule[2]);
@@ -108,7 +110,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         $model = $config['model'];
         $pk = \Arr::get($model::primary_key(), 0);
 
-        $query = \Cms\Orm\Query::forge($model, $model::connection());
+        $query = \Nos\Orm\Query::forge($model, $model::connection());
         foreach ($config['related'] as $related) {
             $query->related($related);
         }
@@ -133,7 +135,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		    }
 	    }
 
-        $translatable  = $model::behaviors('Cms\Orm_Behaviour_Translatable');
+        $translatable  = $model::behaviours('Nos\Orm_Behaviour_Translatable');
         if ($translatable) {
             if (empty($config['lang'])) {
                 // No inspector, we only search items in their primary language
@@ -222,24 +224,24 @@ class Controller_Extendable extends \Fuel\Core\Controller {
             }
             if ($translatable) {
 	            $langs = $model::languages($common_ids);
+                foreach ($langs as $common_id => $list) {
+                    $langs[$common_id] = explode(',', $list);
+                }
                 foreach ($keys as $key => $common_id) {
                     $items[$key]['lang'] = $langs[$common_id];
                 }
+                $all_langs = array_unique(\Arr::flatten($langs));
+
 
                 foreach ($items as &$item) {
                     $flags = '';
-                    foreach (explode(',', $item['lang']) as $lang) {
-                        // Convert lang_LOCALE to locale
-                        list($lang, $locale) = explode('_', $lang.'_');
-                        if (!empty($locale)) {
-                            $lang = strtolower($locale);
+                    $langs = $item['lang'];
+                    foreach ($all_langs as $lang) {
+                        if (in_array($lang, $langs)) {
+                            $flags .= \Nos\Helper::flag($lang);
+                        } else {
+                            $flags .= \Nos\Helper::flag_empty();
                         }
-                        switch($lang) {
-                            case 'en':
-                                $lang = 'gb';
-                                break;
-                        }
-                        $flags .= '<img src="static/cms/img/flags/'.$lang.'.png" /> ';
                     }
                     $item['lang'] = $flags;
                 }
@@ -427,14 +429,14 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		}
 
 		// Change parent for tree relations
-		$behaviour_tree = $model_from::behaviors('Cms\Orm_Behaviour_Tree');
+		$behaviour_tree = $model_from::behaviours('Nos\Orm_Behaviour_Tree');
 		if (!empty($behaviour_tree)) {
 			$parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
 			$from->set_parent($parent);
 		}
 
 		// Change sort order
-		$behaviour_sort = $model_from::behaviors('Cms\Orm_Behaviour_Sortable');
+		$behaviour_sort = $model_from::behaviours('Nos\Orm_Behaviour_Sortable');
 		if (!empty($behaviour_sort)) {
 			switch($params['targetType']) {
 				case 'before':
@@ -502,14 +504,14 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 			$tree_model = $tree_config['models'][$params['model']];
 			foreach ($tree_model['childs'] as $child) {
 				$model = $child['model'];
-				if (empty($params['lang']) && $model::behaviors('Cms\Orm_Behaviour_Translatable')) {
+				if (empty($params['lang']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
 					$item = $model::find($params['id']);
 					$langs = $item->get_all_lang();
 					$child['where'] = array(array($child['fk'], 'IN', array_keys($langs)));
 				} else {
 					$child['where'] = array(array($child['fk'] => $params['id']));
 				}
-				$childs[]       = $child;
+				$childs[] = $child;
 			}
 		}
 
@@ -518,7 +520,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		foreach ($childs as $child) {
 			$tree_model = $tree_config['models'][$child['model']];
 			$pk = $tree_model['pk'];
-			$controler = $this;
+			$controller = $this;
 
 			$config = array_merge($tree_model, array(
 				'lang' => $params['lang'],
@@ -532,10 +534,10 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 					return $query;
 				}),
 				'dataset' => array_merge($tree_model['dataset'], array(
-					'treeChilds' => function($object) use ($controler, $tree_config, $params, $child, $pk) {
+					'treeChilds' => function($object) use ($controller, $tree_config, $params, $child, $pk) {
 						$open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$object->{$pk}, null);
 						if ($open === true || ($params['deep'] > 1 && $open !== false)) {
-							$items = $controler->tree_items($tree_config, array(
+							$items = $controller->tree_items($tree_config, array(
 								'model' => $child['model'],
 								'id' => $object->{$pk},
 								'deep' => $params['deep'] - 1,
@@ -543,7 +545,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 							));
 							return count($items) ? $items : 0;
 						} else {
-							return $controler->tree_items($tree_config, array(
+							return $controller->tree_items($tree_config, array(
 								'countProcess' => true,
 								'model' => $child['model'],
 								'id' => $object->{$pk},

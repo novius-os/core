@@ -10,11 +10,11 @@
 
 ?>
 <script type="text/javascript">
-    require(['jquery-nos'], function ($) {
+    require(['jquery-nos-ostabs'], function ($) {
         $(function () {
             $.nos.tabs.update({
                 label : <?= \Format::forge()->to_json('Add a user') ?>,
-                iconUrl : 'static/cms/img/16/user.png'
+                iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
             });
         });
     });
@@ -40,7 +40,7 @@ foreach ($fieldset->field() as $field) {
 ?>
 
 <div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
-    <?= $fieldset->open('admin/cms/user/form/add'); ?>
+    <?= $fieldset->open('admin/nos/user/form/add'); ?>
     <?= View::forge('form/layout_standard', array(
         'fieldset' => $fieldset,
         'medias' => null,
@@ -76,8 +76,8 @@ foreach ($fieldset->field() as $field) {
             <?php $formatter = \Format::forge(); ?>
             // Password strength
             require([
-                'static/cms/js/vendor/jquery/jquery-password_strength/jquery.password_strength',
-                'link!static/cms/js/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
+                'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
+                'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
             ], function() {
                 var strength_id = '<?= $uniqid ?>_strength';
                 var $strength = $('<span id="' + strength_id + '"></span>');

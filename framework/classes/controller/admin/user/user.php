@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_User_User extends Controller_Extendable {
 
@@ -20,7 +20,7 @@ class Controller_Admin_User_User extends Controller_Extendable {
         if (empty($media)) {
             throw new \Exception('User not found.');
         }
-        if (!static::check_permission_action('delete', 'controller/admin/media/mp3grid/list', $media)) {
+        if (!static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $media)) {
             throw new \Exception('Permission denied');
         }
         return $media;
@@ -29,7 +29,7 @@ class Controller_Admin_User_User extends Controller_Extendable {
 	public function action_delete_user($user_id = null) {
         try {
             $user = static::_get_user_with_permission($user_id, 'delete');
-            return \View::forge('cms::admin/user/user_delete', array(
+            return \View::forge('nos::admin/user/user_delete', array(
                 'user'       => $user,
             ));
         } catch (\Exception $e) {
@@ -59,9 +59,9 @@ class Controller_Admin_User_User extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'User permanently deleted.',
-                'fireEvent' => array(
+                'dispatchEvent' => array(
                     'event' => 'reload',
-	                'target' => 'cms_user_user',
+	                'target' => 'nos_user_user',
                 ),
 
 			);

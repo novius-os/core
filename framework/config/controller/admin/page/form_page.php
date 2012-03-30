@@ -7,14 +7,30 @@ foreach (Config::get('templates', array()) as $tpl_key => $template) {
 }
 
 return array(
-    'id' => array (
+    'page_id' => array (
         'label' => 'ID: ',
-        'widget' => 'text',
+        'form' => array(
+            'type' => 'hidden',
+        ),
     ),
     'page_title' => array(
         'label' => 'Title',
         'form' => array(
             'type' => 'text',
+        ),
+        'validation' => array(
+            'required',
+            'min_length' => array(2),
+        ),
+    ),
+    'page_parent_id' => array(
+        'widget' => 'page_selector',
+        'widget_options' => array(
+            'width' => '250px',
+            'height' => '250px',
+        ),
+        'label' => __('Location: '),
+        'form' => array(
         ),
     ),
     'page_template' => array(
@@ -24,18 +40,15 @@ return array(
             'options' => $templates,
         ),
     ),
-    'page_lang' => array(
-        'label' => 'Create in: ',
-        'form' => array(
-            'type' => 'select',
-            'options' => Config::get('locales'),
-        ),
-    ),
     'page_virtual_name' => array(
         'label' => 'URL: ',
         'form' => array(
             'type' => 'text',
             'size' => 20,
+        ),
+        'validation' => array(
+            'required',
+            'min_length' => array(2),
         ),
     ),
     'page_meta_title' => array(
@@ -94,9 +107,9 @@ return array(
         'form' => array(
             'type' => 'select',
             'options' => array(
-                Cms\Model_Page_Page::EXTERNAL_TARGET_NEW   => 'New window',
-                Cms\Model_Page_Page::EXTERNAL_TARGET_POPUP => 'Popup',
-                Cms\Model_Page_Page::EXTERNAL_TARGET_SAME  => 'Same window',
+                Nos\Model_Page_Page::EXTERNAL_TARGET_NEW   => 'New window',
+                Nos\Model_Page_Page::EXTERNAL_TARGET_POPUP => 'Popup',
+                Nos\Model_Page_Page::EXTERNAL_TARGET_SAME  => 'Same window',
             ),
         ),
     ),
@@ -105,10 +118,10 @@ return array(
         'form' => array(
             'type' => 'select',
             'options' => array(
-                Cms\Model_Page_Page::TYPE_CLASSIC => 'Page',
-                Cms\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
-                Cms\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',
-                Cms\Model_Page_Page::TYPE_EXTERNAL_LINK => 'External link',
+                Nos\Model_Page_Page::TYPE_CLASSIC => 'Page',
+                Nos\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
+                Nos\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',
+                Nos\Model_Page_Page::TYPE_EXTERNAL_LINK => 'External link',
             ),
         ),
     ),
@@ -117,9 +130,9 @@ return array(
         'form' => array(
             'type' => 'select',
             'options' => array(
-                Cms\Model_Page_Page::LOCK_UNLOCKED => 'Unlocked',
-                Cms\Model_Page_Page::LOCK_DELETION => 'Deletion',
-                Cms\Model_Page_Page::LOCK_EDITION  => 'Modification',
+                Nos\Model_Page_Page::LOCK_UNLOCKED => 'Unlocked',
+                Nos\Model_Page_Page::LOCK_DELETION => 'Deletion',
+                Nos\Model_Page_Page::LOCK_EDITION  => 'Modification',
             ),
         ),
     ),

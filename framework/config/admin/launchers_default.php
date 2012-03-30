@@ -12,25 +12,25 @@ return array(
     'nos_page' =>
     array(
         'name' => 'Page',
-        'url' => 'admin/cms/page/list/index',
-        'iconUrl' => 'static/cms/img/32/page.png',
-        'icon64' => 'static/cms/img/64/page.png',
-        'module' => 'nos_page',
+        'url' => 'admin/nos/page/list/index',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
+        'application' => 'nos_page',
     ),
     'nos_media' =>
     array(
         'name' => 'Media centre',
-        'url' => 'admin/cms/media/list/index',
-        'iconUrl' => 'static/cms/img/32/media.png',
-        'icon64' => 'static/cms/img/64/media.png',
-        'module' => 'nos_media',
+        'url' => 'admin/nos/media/list/index',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/media.png',
+        'application' => 'nos_media',
     ),
     'nos_user' =>
     array(
         'name' => 'Users',
-        'url' => 'admin/cms/user/list/index',
-        'iconUrl' => 'static/cms/img/32/user.png',
-        'icon64' => 'static/cms/img/64/user.png',
-        'module' => 'nos_user',
+        'url' => 'admin/nos/user/list/index',
+        'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+        'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
+        'application' => 'nos_user',
     ),
 );
