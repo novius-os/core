@@ -20,7 +20,7 @@ class Controller_Generic_Admin extends Controller_Template_Extendable {
         $location = $this->getLocation();
         list($application, $file_name) = $location;
         if ($application == 'nos' && isset($location[2])) {
-	        $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native modules...
+	        $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native applications...
         }
 
         if ($application != 'nos' && !Permission::check($application, 'access')) {
