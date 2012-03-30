@@ -310,7 +310,6 @@ HELP;
         if ($module) {
             foreach (\Config::get('module_paths') as $m)
             {
-                print_r($m .$module."\n");
                 if (is_dir($m .$module)) {
                     return $m .$module .DS;
                 }
