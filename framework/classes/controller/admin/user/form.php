@@ -56,9 +56,9 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 		$applications = \Input::post('applications');
         foreach ($applications as $application) {
             $access = Model_User_Permission::find('first', array('where' => array(
-                array('perm_role_id', $role->role_id),
-                array('perm_module', 'access'),
-                array('perm_key',         $application),
+                array('perm_role_id',     $role->role_id),
+                array('perm_application', 'access'),
+                array('perm_key',          $application),
             )));
 
             // Grant of remove access to the application
@@ -68,9 +68,9 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 
             if (!empty($_POST['access'][$application]) && empty($access)) {
                 $access = new Model_User_Permission();
-                $access->perm_role_id   = $role->role_id;
-                $access->perm_module     = 'access';
-                $access->perm_identifier = '';
+                $access->perm_role_id     = $role->role_id;
+                $access->perm_application = 'access';
+                $access->perm_identifier  = '';
                 $access->perm_key         = $application;
                 $access->save();
             }
