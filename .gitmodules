@@ -7,3 +7,6 @@
 [submodule "packages/parser"]
 	path = packages/parser
 	url = git://github.com/fuel/parser.git
+[submodule "packages/oil"]
+	path = packages/oil
+	url = git://github.com/fuel/oil.git

@@ -11,18 +11,24 @@
 
 class Config extends \Fuel\Core\Config {
 
-    public static function load($file, $role = null, $reload = false, $overwrite = false) {
-        $file = static::convertFileName($file);
-        return parent::load($file, $role, $reload, $overwrite);
+    public static function load($file, $group = null, $reload = false, $overwrite = false) {
+        $originFileName = $file;
+        $file = static::convertFileName($file, 'load');
+        if ($originFileName == 'db')  {
+            $group = 'db';
+        }
+        return parent::load($file, $group, $reload, $overwrite);
     }
 
     public static function get($item, $default = null) {
-        $item = static::convertFileName($item);
+        $item = static::convertFileName($item, 'get');
+        //print_r($item."\n");
+        //print_r(parent::get($item, $default));
         return parent::get($item, $default);
 	}
 
     public static function save($file, $config) {
-		$file = static::convertFileName($file);
+		$file = static::convertFileName($file, 'save');
         return parent::save($file, $config);
 	}
 
@@ -39,14 +45,16 @@ class Config extends \Fuel\Core\Config {
 		return \Arr::delete(static::$items, $item);
 	}
 */
-    public static function convertFileName($file) {
+    public static function convertFileName($file, $from = 'load') {
         //\Debug::dump($file);
         if (is_string($file) && strpos($file, '::') !== false && substr($file, 0, 4) == 'nos_') {
             list($application, $configuration_path) = explode('::', $file);
             $file = 'cms::admin/'.$application.'/'.$configuration_path;
-            //echo ($file.' ');
-            /*exit();*/
         }
+        /*
+        if (is_string($file) && substr($file, 0, 2) == 'db' && $from == 'load' && defined('FROM_OIL') && FROM_OIL == 1) {
+            $file = DOCROOT.'local/config'.DS.'db.php';
+        }*/
         return $file;
     }
 
