@@ -23,16 +23,16 @@ Paths constants
 ---------------
 
 * `APPPATH` still links to `~/local/`
-* `PKGPATH` still links to `~/cms/packages/`
-* `COREPATH` still links to `~/cms/fue-core/`
-* Novius OS introduces a new constant`CMSPATH`, which links to `~/cms/`
+* `PKGPATH` still links to `~/novius-os/packages/`
+* `COREPATH` still links to `~/novius-os/fue-core/`
+* Novius OS introduces a new constant`NOSPATH`, which links to `~/novius-os/`
 
 Autoloader
 ----------
 
 Two additionnal namespaces are registered by Novius OS:
 
-* `cms` links to `CMSPATH`
+* `novius-os` links to `NOSPATH`
 * `app` links to `APPPATH`
 
 Bootstrap & entry points
@@ -48,8 +48,8 @@ If you use it, you can't route an URL from the front-office to a controller. Eve
 
 So instead of a unique `index.php` entry point from FuelPHP, we have two entry points:
 
-* `~/cms/htdocs/admin.php`: back-office entry point. Matches every URL starting with `/admin/`
-* `~/cms/htdocs/front.php`: front-office entry point. Matches every URL ending with `.html`
+* `~/novius-os/htdocs/admin.php`: back-office entry point. Matches every URL starting with `/admin/`
+* `~/novius-os/htdocs/front.php`: front-office entry point. Matches every URL ending with `.html`
 
 
 ### Admin entry point

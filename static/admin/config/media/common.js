@@ -21,7 +21,7 @@ define([
                     label : appDesk.i18n('Edit'),
                     action : function(item) {
                         $.nos.tabs.add({
-                            url: 'admin/cms/media/media/edit/' + item.id,
+                            url: 'admin/nos/media/media/edit/' + item.id,
                             label: appDesk.i18n('Edit a media')._()
                         });
                     }
@@ -33,7 +33,7 @@ define([
                     label : appDesk.i18n('Delete'),
                     action : function(item) {
                         $.nos.dialog({
-                            contentUrl: 'admin/cms/media/actions/delete_media/' + item.id,
+                            contentUrl: 'admin/nos/media/actions/delete_media/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a media')._(),
                             width: 400,
@@ -93,9 +93,9 @@ define([
             },
             tab : {
                 label : appDesk.i18n('Media center'),
-                iconUrl : 'static/cms/admin/novius-os/img/32/media.png'
+                iconUrl : 'static/novius-os/admin/novius-os/img/32/media.png'
             },
-            reload : 'cms_media_media',
+            reload : 'nos_media_media',
             appdesk : {
                 splittersVertical : 300,
                 adds : {
@@ -103,7 +103,7 @@ define([
                         label : appDesk.i18n('Add a media'),
                         action : function() {
                             $.nos.tabs.add({
-                                url: 'admin/cms/media/media/add',
+                                url: 'admin/nos/media/media/add',
                                 label: appDesk.i18n('Add a media')._()
                             });
                         }
@@ -112,7 +112,7 @@ define([
                         label : appDesk.i18n('Add a folder'),
                         action : function() {
                             $.nos.dialog({
-                                contentUrl: 'admin/cms/media/folder/add',
+                                contentUrl: 'admin/nos/media/folder/add',
                                 ajax : true,
                                 title: 'Add a folder',
                                 width: 650,
@@ -122,8 +122,8 @@ define([
                     }
                 },
                 grid : {
-                    id : 'cms_media_grid',
-                    proxyUrl : 'admin/cms/media/list/json',
+                    id : 'nos_media_grid',
+                    proxyUrl : 'admin/nos/media/list/json',
                     columns : {
                         extension : {
                             headerText : appDesk.i18n('Ext.'),
@@ -159,12 +159,12 @@ define([
                 inspectors : {
                     folders : {
                         vertical : true,
-                        widget_id : 'cms_media_folders',
+                        widget_id : 'nos_media_folders',
                         label : appDesk.i18n('Folders'),
-                        url : 'admin/cms/media/inspector/folder/list',
+                        url : 'admin/nos/media/inspector/folder/list',
                         inputName : 'folder_id',
                         treeGrid : {
-                            treeUrl : 'admin/cms/media/inspector/folder/json',
+                            treeUrl : 'admin/nos/media/inspector/folder/json',
                             sortable : false,
                             columns : {
                                 title : {
@@ -180,7 +180,7 @@ define([
                                             icon : 'plus',
                                             action : function(item) {
                                                 $.nos.tabs.add({
-                                                    url: 'admin/cms/media/media/add/' + item.id,
+                                                    url: 'admin/nos/media/media/add/' + item.id,
                                                     label: 'Add a media in the "' + item.title + '" folder'
                                                 });
                                             }
@@ -191,7 +191,7 @@ define([
                                             icon : 'folder-open',
                                             action : function(item) {
                                                 $.nos.dialog({
-                                                    contentUrl: 'admin/cms/media/folder/add/' + item.id,
+                                                    contentUrl: 'admin/nos/media/folder/add/' + item.id,
                                                     ajax : true,
                                                     title: 'Add a sub-folder in "' + item.title + '"',
                                                     width: 650,
@@ -205,7 +205,7 @@ define([
                                             icon : 'pencil',
                                             action : function(item) {
                                                 $.nos.dialog({
-                                                    contentUrl: 'admin/cms/media/folder/edit/' + item.id,
+                                                    contentUrl: 'admin/nos/media/folder/edit/' + item.id,
                                                     ajax : true,
                                                     title: 'Edit the "' + item.title + '" folder',
                                                     width: 600,
@@ -219,7 +219,7 @@ define([
                                             icon : 'trash',
                                             action : function(item) {
                                                 $.nos.dialog({
-                                                    contentUrl: 'admin/cms/media/actions/delete_folder/' + item.id,
+                                                    contentUrl: 'admin/nos/media/actions/delete_folder/' + item.id,
                                                     ajax : true,
                                                     title: 'Delete the "' + item.title + '" folder',
                                                     width: 400,
@@ -234,9 +234,9 @@ define([
                     },
                     extensions : {
                         vertical : true,
-                        widget_id : 'cms_media_extensions',
+                        widget_id : 'nos_media_extensions',
                         label : appDesk.i18n('Type of file'),
-                        url : 'admin/cms/media/inspector/extension/list',
+                        url : 'admin/nos/media/inspector/extension/list',
                         inputName : 'media_extension[]',
                         grid : {
                             columns : {
@@ -247,7 +247,7 @@ define([
                                         if ($.isPlainObject(args.row.data)) {
                                             var text = "";
                                             if (args.row.data.icon) {
-                                                text += "<img style=\"vertical-align:middle\" src=\"static/cms/admin/novius-os/img/16/" + args.row.data.icon + "\"> ";
+                                                text += "<img style=\"vertical-align:middle\" src=\"static/novius-os/admin/novius-os/img/16/" + args.row.data.icon + "\"> ";
                                             }
                                             text += args.row.data.title;
 
@@ -268,7 +268,7 @@ define([
                     },
                     preview : {
                         vertical : true,
-                        widget_id : 'cms_media_preview',
+                        widget_id : 'nos_media_preview',
                         label : appDesk.i18n('Preview'),
                         preview : true,
                         options : {

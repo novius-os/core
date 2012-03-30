@@ -22,17 +22,17 @@ Folder organization
 Root folders
 ------------
 
-* `~/cms/` : internal files of the framework
+* `~/novius-os/` : internal files of the framework
 * `~/local/` : your website
 * `~/public/` : document root
 
 
-Cms folder organization
+Novius-os folder organization
 -----------------------
 
-* `~/cms/framework/` : the Novius OS framework
-* `~/cms/fuel-core/` : FuelPHP, the low-level framework used by Novius OS
-* `~/cms/packages/` : FuelPHP packages
+* `~/novius-os/framework/` : the Novius OS framework
+* `~/novius-os/fuel-core/` : FuelPHP, the low-level framework used by Novius OS
+* `~/novius-os/packages/` : FuelPHP packages
 
 
 Application folder organization
@@ -67,7 +67,7 @@ Where the application can write the developer cannot, and vice-versa.
 
 Each of these 4 folders has the same sub-directories structure :
 
-* `~/cms/` : Novius OS files
+* `~/novius-os/` : Novius OS files
 * `~/modules/<module_name>/` : module files
 
 There is also an additional `~/public/media/` directory which is used by the [media library](/admin/doc/media_library).

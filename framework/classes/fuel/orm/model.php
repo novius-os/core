@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms\Orm;
+namespace Nos\Orm;
 
 class UnknownBehaviourException extends \Exception {};
 class UnknownMethodBehaviourException extends \Exception {};
@@ -55,7 +55,7 @@ class Model extends \Orm\Model {
 
         static::$_has_many['linked_wysiwygs'] = array(
 			'key_from' => static::$_primary_key[0],
-			'model_to' => 'Cms\Model_Wysiwyg',
+			'model_to' => 'Nos\Model_Wysiwyg',
 			'key_to' => 'wysiwyg_foreign_id',
 			'cascade_save' => true,
 			'cascade_delete' => false,
@@ -68,7 +68,7 @@ class Model extends \Orm\Model {
 
         static::$_has_many['linked_medias'] = array(
 			'key_from' => static::$_primary_key[0],
-			'model_to' => 'Cms\Model_Media_Link',
+			'model_to' => 'Nos\Model_Media_Link',
 			'key_to' => 'medil_foreign_id',
 			'cascade_save' => true,
 			'cascade_delete' => false,
@@ -157,7 +157,7 @@ class Model extends \Orm\Model {
 	public function __call($method, $args) {
 		try {
 			return static::_callBehaviour($this, $method, $args);
-		} catch (\Cms\Orm\UnknownBehaviourException $e) {}
+		} catch (\Nos\Orm\UnknownBehaviourException $e) {}
 
 		return parent::__call($method, $args);
 	}
@@ -165,7 +165,7 @@ class Model extends \Orm\Model {
 	public static function __callStatic($method, $args) {
 		try {
 			return static::_callBehaviour(get_called_class(), $method, $args);
-		} catch (\Cms\Orm\UnknownBehaviourException $e) {}
+		} catch (\Nos\Orm\UnknownBehaviourException $e) {}
 
 		return parent::__callStatic($method, $args);
 	}
@@ -180,9 +180,9 @@ class Model extends \Orm\Model {
 
             try {
                 return call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Cms\Orm\UnknownMethodBehaviourException $e) {}
+            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {}
 		}
-		throw new \Cms\Orm\UnknownBehaviourException();
+		throw new \Nos\Orm\UnknownBehaviourException();
 	}
 
 	public static function _callAllBehaviours($context, $method, $args) {
@@ -195,7 +195,7 @@ class Model extends \Orm\Model {
 
             try {
                 call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Cms\Orm\UnknownMethodBehaviourException $e) {}
+            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {}
 		}
 	}
 
@@ -293,7 +293,7 @@ class Model extends \Orm\Model {
 					}
 				}
 				// Create a new relation if it doesn't exist yet
-				$wysiwyg                        = new \Cms\Model_Wysiwyg();
+				$wysiwyg                        = new \Nos\Model_Wysiwyg();
 				$wysiwyg->wysiwyg_text          = $value;
 				$wysiwyg->wysiwyg_join_table    = static::$_table_name;
 				$wysiwyg->wysiwyg_key           = $key;
@@ -324,7 +324,7 @@ class Model extends \Orm\Model {
 				}
 
 				// Create a new relation if it doesn't exist yet
-				$medil                   = new \Cms\Model_Media_Link();
+				$medil                   = new \Nos\Model_Media_Link();
 				$medil->medil_from_table = static::$_table_name;
 				$medil->medil_key        = $key;
 				$medil->medil_foreign_id = $this->id;
@@ -452,8 +452,8 @@ class Model_Media_Provider
 	public function __set($property, $value)
 	{
 		// Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
-		$media_id = (string) ($value instanceof \Cms\Model_Media_Media ? $value->media_id : $value);
-		$media = \Cms\Model_Media_Media::find($media_id);
+		$media_id = (string) ($value instanceof \Nos\Model_Media_Media ? $value->media_id : $value);
+		$media = \Nos\Model_Media_Media::find($media_id);
 		if (is_null($media))
 		{
 			$pk = $this->parent->primary_key();
@@ -504,7 +504,7 @@ class Model_Wysiwyg_Provider
 
 	public function __set($property, $value)
 	{
-		$value = (string) ($value instanceof \Cms\Model_Wysiwyg ? $value->wysiwyg_text : $value);
+		$value = (string) ($value instanceof \Nos\Model_Wysiwyg ? $value->wysiwyg_text : $value);
 
 		// Reuse the getter
         $wysiwyg = $this->parent->{'wysiwygs->'.$property};

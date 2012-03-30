@@ -20,7 +20,7 @@
     <ul style="margin-left:1em;">
         <li>
             <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span>
-            <form action="admin/cms/page/page/form" style="display:inline-block;">
+            <form action="admin/nos/page/page/form" style="display:inline-block;">
                 <?= Form::hidden('lang',      $lang) ?>
                 <?= Form::hidden('common_id', $common_id) ?>
                 <?= __('Start from scratch ') ?>
@@ -30,7 +30,7 @@
 
         <li>
             <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span>
-            <form action="admin/cms/page/page/form" style="display:inline-block;">
+            <form action="admin/nos/page/page/form" style="display:inline-block;">
                 <?= Form::hidden('lang',      $lang) ?>
                 <?= Form::hidden('common_id', $common_id) ?>
                 <?php

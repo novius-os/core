@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Permission {
 
@@ -16,7 +16,7 @@ class Permission {
 
 		$driver = $driver_config['driver'];
 		// @todo Inflector::words_to_upper ?
-		$class = '\Cms\Permission_'.ucfirst($driver);
+		$class = '\Nos\Permission_'.ucfirst($driver);
 
 		if (empty($driver_config['label'])) {
 			\Debug::dump($driver_config);

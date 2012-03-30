@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Request;
 use Fuel\Core\View;
@@ -19,7 +19,7 @@ class Controller_Inspector_Lang extends Controller_Extendable {
 
 	protected $config = array(
 		'label' => 'Language',
-		'iconClasses' => 'cms_blog-icon16 cms_blog-icon16-date',
+		'iconClasses' => 'noviusos_blog-icon16 noviusos_blog-icon16-date',
 		'input'	     => 'lang',
 		'input_name' => 'lang',
 		'widget_id'  => 'filterlang',

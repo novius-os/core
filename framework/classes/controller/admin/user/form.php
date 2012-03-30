@@ -8,15 +8,15 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
-class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
+class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 
     public function action_add() {
 
         $user = Model_User_User::forge();
 
-        return \View::forge('cms::admin/user/user_add', array(
+        return \View::forge('nos::admin/user/user_add', array(
             'fieldset' => static::fieldset_add($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'),
         ), false);
     }
@@ -30,7 +30,7 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
         $role = reset($user->roles);
 
 
-        \Config::load('cms::admin/native_apps', 'natives_apps');
+        \Config::load('nos::admin/native_apps', 'natives_apps');
         $natives_apps = \Config::get('natives_apps', array());
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
@@ -38,10 +38,10 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
 
         $apps = array_merge($natives_apps, $apps);
 
-        return \View::forge('cms::admin/user/user_edit', array(
+        return \View::forge('nos::admin/user/user_edit', array(
             'user'   => $user,
             'fieldset' => static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'),
-            'permissions' => \View::forge('cms::admin/user/permission', array(
+            'permissions' => \View::forge('nos::admin/user/permission', array(
                 'user' => $user,
                 'role' => $role,
                 'apps' => $apps,
@@ -167,7 +167,7 @@ class Controller_Admin_User_Form extends \Cms\Controller_Generic_Admin {
             'success' => function() use ($user) {
                 return array(
                     'notify' => 'User successfully created.',
-                    'replaceTab' => 'admin/cms/user/form/edit/'.$user->user_id,
+                    'replaceTab' => 'admin/nos/user/form/edit/'.$user->user_id,
                 );
             }
         ));

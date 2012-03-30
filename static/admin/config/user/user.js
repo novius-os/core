@@ -15,7 +15,7 @@ define([
         return {
             tab : {
                 label : appDesk.i18n('Users'),
-                iconUrl : 'static/cms/admin/novius-os/img/32/user.png'
+                iconUrl : 'static/novius-os/admin/novius-os/img/32/user.png'
             },
             actions : {
                 edit : {
@@ -24,7 +24,7 @@ define([
                     primary : true,
                     action : function(item, ui) {
                         $.nos.tabs.add({
-                            url : 'admin/cms/user/form/edit/' + item.id,
+                            url : 'admin/nos/user/form/edit/' + item.id,
                             label : item.title
                         });
                     }
@@ -35,7 +35,7 @@ define([
                     primary : true,
                     action : function(item, ui) {
                         $.nos.dialog({
-                            contentUrl: 'admin/cms/user/user/delete_user/' + item.id,
+                            contentUrl: 'admin/nos/user/user/delete_user/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a user')._(),
                             width: 400,
@@ -50,14 +50,14 @@ define([
                         label : appDesk.i18n('Add a user'),
                         action : function() {
                             $.nos.tabs.add({
-                                url : 'admin/cms/user/form/add',
+                                url : 'admin/nos/user/form/add',
                                 label : appDesk.i18n('Add a user')._()
                             });
                         }
                     }
                 },
                 grid : {
-                    proxyUrl : 'admin/cms/user/list/json',
+                    proxyUrl : 'admin/nos/user/list/json',
                     columns : {
                         user : {
                             headerText : appDesk.i18n('Name'),

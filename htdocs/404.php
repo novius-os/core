@@ -18,16 +18,16 @@ ini_set('display_errors', 1);
 define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
-define('PKGPATH',  realpath(DOCROOT.'../cms/packages/').DIRECTORY_SEPARATOR);
-define('COREPATH', realpath(DOCROOT.'../cms/fuel-core/').DIRECTORY_SEPARATOR);
-define('CMSPATH',  realpath(DOCROOT.'../cms/framework/').DIRECTORY_SEPARATOR);
+define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
+define('COREPATH', realpath(DOCROOT.'../novius-os/fuel-core/').DIRECTORY_SEPARATOR);
+define('NOSPATH',  realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
 
 // Get the start time and memory for use later
 defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
 defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Boot the app
-require_once CMSPATH.'bootstrap.php';
+require_once NOSPATH.'bootstrap.php';
 
 $resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`', $_SERVER['REDIRECT_URL'], $m);
 
@@ -42,16 +42,16 @@ if ($resized) {
 }
 
 $media = false;
-$res = \DB::select()->from(\Cms\Model_Media_Media::table())->where(array(
+$res = \DB::select()->from(\Nos\Model_Media_Media::table())->where(array(
     array(DB::expr('CONCAT(media_path, media_file)'), '=', $media_url),
 ))->execute()->as_array();
 
 if ($res) {
-    $media = \Cms\Model_Media_Media::forge(reset($res));
+    $media = \Nos\Model_Media_Media::forge(reset($res));
     $media->freeze();
 }
 
-//$media = Cms\Model_Media::find('all', array(
+//$media = Nos\Model_Media::find('all', array(
 //    'where' => array(
 //        array(DB::expr('CONCAT(media_path, media_file)'), '=', $media_url),
 //    ),
@@ -70,7 +70,7 @@ if (false === $media) {
             mkdir($dir, 0755, true);
         }
         try {
-            \Cms\Tools_Image::resize($source, $max_width, $max_height, $dest);
+            \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
             $send_file = $dest;
         } catch(\Exception $e) {
             $send_file = false;
@@ -88,8 +88,8 @@ if (false === $media) {
 }
 
 if (false !== $send_file && is_file($send_file)) {
-	//Cms\Tools_File::$use_xsendfile = false;
-    Cms\Tools_File::send($send_file);
+	//Nos\Tools_File::$use_xsendfile = false;
+    Nos\Tools_File::send($send_file);
 }
 
 // TODO header 404

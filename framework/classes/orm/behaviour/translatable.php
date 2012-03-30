@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Orm_Behaviour_Translatable extends Orm_Behaviour
 {
@@ -35,7 +35,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * @param   Model  The object
      * @return  void
      */
-    public function before_insert(\Cms\Orm\Model $object)
+    public function before_insert(\Nos\Orm\Model $object)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $lang_property      = $this->_properties['lang_property'];
@@ -53,7 +53,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * @param Model $object
      * @return  void
      */
-    public function after_insert(\Cms\Orm\Model $object)
+    public function after_insert(\Nos\Orm\Model $object)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $single_id_property = $this->_properties['single_id_property'];
@@ -84,7 +84,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @param Model $object
      */
-    public function before_save(\Cms\Orm\Model $object) {
+    public function before_save(\Nos\Orm\Model $object) {
         if ($this->is_main_lang($object) || $object->is_new()) {
             return;
         }
@@ -102,7 +102,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         }
     }
 
-    public function after_delete(\Cms\Orm\Model $object) {
+    public function after_delete(\Nos\Orm\Model $object) {
 
         if (!$this->is_main_lang($object)) {
             return;
@@ -131,9 +131,9 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
 
     /**
      * Check if the parent exists in all the langages of the child
-     * @param \Cms\Orm\Model $object
+     * @param \Nos\Orm\Model $object
      */
-    public function before_change_parent(\Cms\Orm\Model $object) {
+    public function before_change_parent(\Nos\Orm\Model $object) {
 
         // This event has been sent from the tree behaviour, so we don't need to check it exists
         $new_parent = $object->find_parent();
@@ -161,9 +161,9 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
 
     /**
      * Check if the parent exists in all the langages of the child
-     * @param \Cms\Orm\Model $object
+     * @param \Nos\Orm\Model $object
      */
-    public function after_change_parent(\Cms\Orm\Model $object) {
+    public function after_change_parent(\Nos\Orm\Model $object) {
 
         // This event has been sent from the tree behaviour, so we don't need to check it exists
         $new_parent = $object->find_parent();
@@ -179,7 +179,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * Optimised operation for deleting all languages
      *
-     * @param  \Cms\Orm\Model  $object
+     * @param  \Nos\Orm\Model  $object
      */
     public function delete_all_lang($object) {
         $single_id_property = $this->_properties['common_id_property'];
@@ -203,7 +203,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * Find the object in the main language
      *
-     * @return  \Cms\Model
+     * @return  \Nos\Model
      */
     public function find_main_lang($object) {
         return $object->find_lang('main');

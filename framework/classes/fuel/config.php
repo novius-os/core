@@ -46,15 +46,10 @@ class Config extends \Fuel\Core\Config {
 	}
 */
     public static function convertFileName($file, $from = 'load') {
-        //\Debug::dump($file);
         if (is_string($file) && strpos($file, '::') !== false && substr($file, 0, 4) == 'nos_') {
             list($application, $configuration_path) = explode('::', $file);
-            $file = 'cms::admin/'.$application.'/'.$configuration_path;
+            $file = 'nos::admin/'.$application.'/'.$configuration_path;
         }
-        /*
-        if (is_string($file) && substr($file, 0, 2) == 'db' && $from == 'load' && defined('FROM_OIL') && FROM_OIL == 1) {
-            $file = DOCROOT.'local/config'.DS.'db.php';
-        }*/
         return $file;
     }
 

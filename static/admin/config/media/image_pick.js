@@ -37,7 +37,7 @@ define([
             },
             appdesk : {
                 grid : {
-                    id : 'cms_media_grid_image'
+                    id : 'nos_media_grid_image'
                 },
                 values: {
                     media_extension: ['image']

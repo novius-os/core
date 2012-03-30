@@ -25,7 +25,7 @@ Installation
 Médiathèque : X-Sendfile
 ------------------------
 
-* Test réel avec image htdocs/xsendfile (http://cloud.julian.lyon.novius.fr/htdocs/cms/xsendfile.php)
+* Test réel avec image htdocs/xsendfile (http://cloud.julian.lyon.novius.fr/htdocs/novius-os/xsendfile.php)
 * Apache : détection de l'installation de mod_xsendfile
 * Apache : explication de l'activation avec `XSendFile On` et `XSendFileAllowAbove on`
 

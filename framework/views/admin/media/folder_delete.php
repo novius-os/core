@@ -60,7 +60,7 @@ require(['jquery-nos'], function($) {
                 return;
             }
             $.nos.ajax.request({
-                url : 'admin/cms/media/actions/delete_folder_confirm',
+                url : 'admin/nos/media/actions/delete_folder_confirm',
                 method : 'POST',
                 data : {
                     id : <?= $folder->medif_id ?>

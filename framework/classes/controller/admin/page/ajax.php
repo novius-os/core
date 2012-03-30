@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\Config;
 
@@ -37,10 +37,10 @@ class Controller_Admin_Page_Ajax extends \Controller {
 			{
 				$ids[] = $id;
 			}
-			$medias = \Cms\Model_Media_Media::find($ids);
+			$medias = \Nos\Model_Media_Media::find($ids);
 			foreach ($matches[1] as $k => $id)
 			{
-				$media = \Cms\Model_Media_Media::find($id);
+				$media = \Nos\Model_Media_Media::find($id);
 				list($width, $height) = array($matches[2][$k], $matches[3][$k]);
 				if ($width && $height && ($width != $media->media_width || $height != $media->media_height))
 				{

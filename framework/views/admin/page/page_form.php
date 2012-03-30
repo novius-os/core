@@ -24,7 +24,7 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
 
 ?>
 
-<?= $fieldset->open('admin/cms/page/page/'.($page->is_new() ? 'add' : 'edit/'.$page->page_id)) ?>
+<?= $fieldset->open('admin/nos/page/page/'.($page->is_new() ? 'add' : 'edit/'.$page->page_id)) ?>
 <?= View::forge('form/layout_standard', array(
     'fieldset' => $fieldset,
     // Used by the behaviours (publishable, etc.)

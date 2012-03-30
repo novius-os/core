@@ -15,6 +15,6 @@ require(['jquery-nos'], function($) {
 	while (top.parent != top) {
 		top = top.parent;
 	}
-	top.location = 'admin/cms/login';
+	top.location = 'admin/nos/login';
 });
 </script>

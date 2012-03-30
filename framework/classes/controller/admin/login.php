@@ -8,19 +8,19 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Str;
 
 class Controller_Admin_Login extends Controller_Template_Extendable {
 
-	public $template = 'cms::templates/html5';
+	public $template = 'nos::templates/html5';
 
     public function before($response = null) {
         parent::before($response);
 
         // If user is already logged in, proceed
-		if (\Cms\Auth::check()) {
+		if (\Nos\Auth::check()) {
 			\Response::redirect(urldecode(\Input::get('redirect', '/admin/')));
 			exit();
 		}
@@ -30,7 +30,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 
         $error = (\Input::method() == 'POST') ? $this->post_login() : '';
 
-		\Asset::add_path('static/cms/admin/novius-os/');
+		\Asset::add_path('static/novius-os/admin/novius-os/');
 		\Asset::css('login.css', array(), 'css');
 
         $this->template->body = \View::forge('misc/login', array(
@@ -50,7 +50,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
-			         'require'  => 'static/cms/admin/vendor/requirejs/require.js',
+			         'require'  => 'static/novius-os/admin/vendor/requirejs/require.js',
 		         ) as $var => $default) {
 			if (empty($this->template->$var)) {
 				$this->template->$var = $default;
@@ -66,7 +66,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 
 	protected function post_login() {
 
-		if (\Cms\Auth::login($_POST['email'], $_POST['password'])) {
+		if (\Nos\Auth::login($_POST['email'], $_POST['password'])) {
 			\Event::trigger('user_login');
 			\Response::redirect(urldecode(\Input::get('redirect', '/admin/')));
 			exit();

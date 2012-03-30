@@ -15,7 +15,7 @@ require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
 	$(function () {
 		$.nos.tabs.update($('#<?= $uniqid ?>'), {
 			label : '<?= $user->fullname() ?>',
-			iconUrl : 'static/cms/admin/novius-os/img/16/user.png'
+			iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
 		});
 	});
 });
@@ -25,7 +25,7 @@ require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
 	<div class="line myBody">
 		<div class="unit col c1"></div>
 		<div class="unit col c7 ui-widget">
-			<?= $fieldset_edit->open('admin/cms/user/form/edit/'.$user->user_id); ?>
+			<?= $fieldset_edit->open('admin/nos/user/form/edit/'.$user->user_id); ?>
 			<?= $fieldset_edit->field('user_name')
 				->set_template('{field}')
 				->set_attribute('class', 'title c3');
@@ -54,7 +54,7 @@ require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
 			<div class="expander">
 				<h3>Change password</h3>
 				<div>
-				<?= $fieldset_password->open('admin/cms/user/form/edit/'.$user->user_id); ?>
+				<?= $fieldset_password->open('admin/nos/user/form/edit/'.$user->user_id); ?>
 					<table>
 						<?php
 						foreach ($fieldset_password->field() as $f) {

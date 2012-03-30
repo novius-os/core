@@ -8,13 +8,13 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Widget_Date_Picker extends \Fieldset_Field {
 
 	protected $options = array(
 		'showOn'            => 'both',
-		'buttonImage'       => 'static/cms/admin/novius-os/img/icons/date-picker.png',
+		'buttonImage'       => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
 		'buttonImageOnly'   => true,
 		'autoSize'          => true,
 		'dateFormat'        => 'yy-mm-dd',

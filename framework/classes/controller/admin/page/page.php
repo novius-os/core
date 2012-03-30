@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Page_Page extends Controller {
 
@@ -17,7 +17,7 @@ class Controller_Admin_Page_Page extends Controller {
         $parent = Model_Page_Page::find(\Input::post('page_parent_id', 1));
         $page   = Model_Page_Page::forge();
 
-        $fields = \Config::load('cms::controller/admin/page/form_page', true);
+        $fields = \Config::load('nos::controller/admin/page/form_page', true);
         $fields = \Arr::merge($fields, array(
             'page_title' => array(
                 'validation' => array(
@@ -66,15 +66,15 @@ class Controller_Admin_Page_Page extends Controller {
                     'notify' => 'Page sucessfully added.',
                     'dispatchEvent' => array(
                         'event' => 'reload',
-                        'target' => 'cms_page',
+                        'target' => 'nos_page',
                     ),
-                    'replaceTab' => 'admin/cms/page/page/edit/'.$page->page_id,
+                    'replaceTab' => 'admin/nos/page/page/edit/'.$page->page_id,
                 );
             }
         ));
 		$fieldset->js_validation();
 
-        return \View::forge('cms::admin/page/page_add', array(
+        return \View::forge('nos::admin/page/page_add', array(
 			'parent'   => $parent,
 			'page'     => $page,
             'parent'   => $parent,
@@ -99,7 +99,7 @@ class Controller_Admin_Page_Page extends Controller {
         }
         $page->page_parent_id = $parent_page->page_id;
 
-        $fields = \Config::load('cms::controller/admin/page/form_page', true);
+        $fields = \Config::load('nos::controller/admin/page/form_page', true);
         $fields = \Arr::merge($fields, array(
             'page_title' => array(
                 'validation' => array(
@@ -143,7 +143,7 @@ class Controller_Admin_Page_Page extends Controller {
 		$fieldset = \Fieldset::build_from_config($fields, $page);
 		$fieldset->js_validation();
 
-        return \View::forge('cms::admin/page/page_form', array(
+        return \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
 		), false);
@@ -153,7 +153,7 @@ class Controller_Admin_Page_Page extends Controller {
 
         $page = Model_Page_Page::find($id);
 
-        $fields = \Config::load('cms::controller/admin/page/form_page', true);
+        $fields = \Config::load('nos::controller/admin/page/form_page', true);
         \Arr::set($fields, 'id.form.value', $page->page_id);
 
 		$fieldset = \Fieldset::build_from_config($fields, $page, array(
@@ -174,7 +174,7 @@ class Controller_Admin_Page_Page extends Controller {
                     'notify' => 'Page sucessfully saved.',
                     'dispatchEvent' => array(
                         'event' => 'reload',
-                        'target' => 'cms_page',
+                        'target' => 'nos_page',
                     ),
                 );
             }
@@ -182,7 +182,7 @@ class Controller_Admin_Page_Page extends Controller {
 		$fieldset->js_validation();
         $fieldset->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
-        return \View::forge('cms::admin/page/page_edit', array(
+        return \View::forge('nos::admin/page/page_edit', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
 		), false);
@@ -205,7 +205,7 @@ class Controller_Admin_Page_Page extends Controller {
 	public function action_delete_page($page_id = null) {
         try {
             $page = static::_get_page_with_permission($page_id, 'delete');
-            return \View::forge('cms::admin/page/page_delete', array(
+            return \View::forge('nos::admin/page/page_delete', array(
                 'page' => $page,
             ));
         } catch (\Exception $e) {
@@ -258,7 +258,7 @@ class Controller_Admin_Page_Page extends Controller {
 				'notify' => 'Page successfully deleted.',
                 'dispatchEvent' => array(
 	                'event' => 'reload',
-                    'target' => 'cms_page',
+                    'target' => 'nos_page',
                 ),
 			);
 

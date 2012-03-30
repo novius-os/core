@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\File;
 use Fuel\Core\View;
@@ -29,7 +29,7 @@ class Controller_Admin_Tray_Account extends \Controller {
 
 	public function action_disconnect() {
 		\Session::destroy();
-		\Response::redirect('/admin/cms/login/reset');
+		\Response::redirect('/admin/nos/login/reset');
 		exit();
 	}
 

@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-class Cms {
+class Nos {
 
     /**
      * Rewrites an URL according to conventions
@@ -44,7 +44,7 @@ class Cms {
     /**
      * Returns the controller instance from the main request
      *
-     * @return \Cms\Controller
+     * @return \Nos\Controller
      */
     public static function main_controller() {
         return Request::main()->controller_instance;
@@ -53,7 +53,7 @@ class Cms {
     /**
      * Returns the pagefrom the main request
      *
-     * @return \Cms\Model_Page_Page
+     * @return \Nos\Model_Page_Page
      */
     public static function main_page() {
         return static::main_controller()->page;
@@ -80,14 +80,14 @@ class Cms {
         try {
             $request  = Request::forge($where);
 
-            \Cms::main_controller()->rewrite_prefix = $application;
+            \Nos::main_controller()->rewrite_prefix = $application;
             $response = call_user_func_array(array($request, "execute"), array($args['args']));
-            \Cms::main_controller()->rewrite_prefix = null;
+            \Nos::main_controller()->rewrite_prefix = null;
             $cache_cleanup = $request->controller_instance->cache_cleanup;
 
             if (!empty($cache_cleanup)) {
                 \Fuel::$profiling && \Profiler::console($cache_cleanup);
-                Cms::main_controller()->cache_cleanup[] = $cache_cleanup;
+                Nos::main_controller()->cache_cleanup[] = $cache_cleanup;
             }
             echo $response;
             //echo $response->response();
@@ -105,18 +105,18 @@ class Cms {
      * Parse a wyiswyg
      *
      * @param  string           $content     Wysiwyg content to parse
-     * @param  \Cms\Controller  $controller  Context for the execution
+     * @param  \Nos\Controller  $controller  Context for the execution
      * @param  boolean          $no_cache    Should cache be skipped?
      * @return string
      */
     public static function parse_wysiwyg($content, $controller, $inline = null) {
 
-		Cms::_parse_enhancers($content);
-		Cms::_parse_medias($content);
-		Cms::_parse_internals($content);
+		Nos::_parse_enhancers($content);
+		Nos::_parse_medias($content);
+		Nos::_parse_internals($content);
 
 		$content = strtr($content, array(
-			'nos://anchor/' => \Cms::main_controller()->url,
+			'nos://anchor/' => \Nos::main_controller()->url,
 		));
 
 		foreach(Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
@@ -189,7 +189,7 @@ class Cms {
 			{
 				$media_ids[] = $media_id;
 			}
-			$medias = Cms\Model_Media_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+			$medias = Nos\Model_Media_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
 			foreach ($matches[1] as $match_id => $media_id)
 			{
 				if (!empty($matches[3][$match_id])) {
@@ -212,7 +212,7 @@ class Cms {
 			{
 				$page_ids[] = $page_id;
 			}
-			$pages = Cms\Model_Page_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+			$pages = Nos\Model_Page_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
 			foreach ($matches[1] as $match_id => $page_id)
 			{
 				$content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);

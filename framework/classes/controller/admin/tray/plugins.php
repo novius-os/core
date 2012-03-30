@@ -8,13 +8,13 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 use Fuel\Core\File;
 use Fuel\Core\View;
 
 class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
-	public $template = 'cms::templates/html5';
+	public $template = 'nos::templates/html5';
 
     public function action_index() {
 
@@ -47,8 +47,8 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
 		// Get the differences between the metadata files
 		static::array_diff_key_assoc($app_installed, $plugins['local'], $diff);
-		foreach ($app_installed as $app_name => &$metadata) {
-			$instance = new \Cms\Application($app_name);
+	    foreach ($app_installed as $app_name => &$metadata) {
+			$instance = new \Nos\Application($app_name);
 			if (!$instance->check_install()) {
 				$metadata['dirty'] = true;
 			}
@@ -66,7 +66,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
     }
 
 	public function action_add($app_name) {
-		$instance = new \Cms\Application($app_name);
+		$instance = new \Nos\Application($app_name);
 		if ($instance->install()) {
 
 			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
@@ -76,11 +76,11 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
 		}
 
-		\Response::redirect('admin/cms/tray/plugins');
+		\Response::redirect('admin/nos/tray/plugins');
 	}
 
 	public function action_remove($app_name) {
-		$instance = new \Cms\Application($app_name);
+		$instance = new \Nos\Application($app_name);
 
 		if ($instance->uninstall()) {
 			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
@@ -89,17 +89,17 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
 		}
 
-		\Response::redirect('admin/cms/tray/plugins');
+		\Response::redirect('admin/nos/tray/plugins');
 	}
 
 	public function action_upload() {
 
 		if (\Config::get('allow_plugin_upload', false) == false) {
-			Response::redirect('admin/cms/tray/plugins');
+			Response::redirect('admin/nos/tray/plugins');
 		}
 
 		if (empty($_FILES['zip'])) {
-			\Response::redirect('admin/cms/tray/plugins');
+			\Response::redirect('admin/nos/tray/plugins');
 		}
 
 		if (!is_uploaded_file($_FILES['zip']['tmp_name'])) {
@@ -107,7 +107,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 				'title' => 'Upload error.',
 				'type' => 'error',
 			));
-			\Response::redirect('admin/cms/tray/plugins');
+			\Response::redirect('admin/nos/tray/plugins');
 		}
 
 		if ($_FILES['zip']['error'] != UPLOAD_ERR_OK) {
@@ -115,7 +115,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 				'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
 				'type' => 'error',
 			));
-			\Response::redirect('admin/cms/tray/plugins');
+			\Response::redirect('admin/nos/tray/plugins');
 		}
 
 		$files = array();
@@ -139,7 +139,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 				'title' => $name.' already exists in you module directory.',
 				'type' => 'error',
 			));
-			\Response::redirect('admin/cms/tray/plugins');
+			\Response::redirect('admin/nos/tray/plugins');
 		}
 		$root = ($count == 1 ? $root_files[0] : '');
 
@@ -151,7 +151,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 				'title' => 'This is not a valid application archive.',
 				'type' => 'error',
 			));
-			\Response::redirect('admin/cms/tray/plugins');
+			\Response::redirect('admin/nos/tray/plugins');
 		}
 
 		$path = APPPATH.'modules'.DS.$metadata['install_folder'];
@@ -160,7 +160,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 				'title' => $metadata['install_folder'].' already exists in you module directory.',
 				'type' => 'error',
 			));
-			\Response::redirect('admin/cms/tray/plugins');
+			\Response::redirect('admin/nos/tray/plugins');
 		}
 
 		usort($files, function($a, $b) {
@@ -188,7 +188,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		} catch (\Exception $e) {
 			\Fuel\Core\File::delete_dir($path, true, true);
 		}
-		\Response::redirect('admin/cms/tray/plugins');
+		\Response::redirect('admin/nos/tray/plugins');
 	}
 
 	/**
@@ -223,7 +223,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
-			         'require'  => 'static/cms/admin/vendor/requirejs/require.js',
+			         'require'  => 'static/novius-os/admin/vendor/requirejs/require.js',
 		         ) as $var => $default) {
 			if (empty($this->template->$var)) {
 				$this->template->$var = $default;

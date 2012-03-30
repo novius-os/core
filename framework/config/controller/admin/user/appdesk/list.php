@@ -7,13 +7,13 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-use Cms\I18n;
+use Nos\I18n;
 
-I18n::load('user', 'cms_user');
+I18n::load('user', 'nos_user');
 
 return array(
 	'query' => array(
-		'model' => 'Cms\Model_User_User',
+		'model' => 'Nos\Model_User_User',
 		'related' => array('roles'),
 	),
 	'search_text' => array(
@@ -25,7 +25,7 @@ return array(
     'views' => array(
         'default' => array(
             'name' => __('Default view'),
-            'json' => array('static/cms/admin/config/user/user.js'),
+            'json' => array('static/novius-os/admin/config/user/user.js'),
         )
     ),
     'i18n' => array(

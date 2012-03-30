@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Widget_Media extends \Fieldset_Field {
 
@@ -46,7 +46,7 @@ class Widget_Media extends \Fieldset_Field {
 		$this->fieldset()->append($this->js_init());
 		$media_id = $this->get_value();
 		if (!empty($media_id)) {
-			$media = \Cms\Model_Media_Media::find($media_id);
+			$media = \Nos\Model_Media_Media::find($media_id);
 			if (!empty($media)) {
 				$this->options['inputFileThumb']['file'] = $media->get_public_path_resized(64, 64);
 			}

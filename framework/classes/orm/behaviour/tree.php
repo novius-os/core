@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Orm_Behaviour_Tree extends Orm_Behaviour
 {
@@ -61,7 +61,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Deletes the children recursively
      */
-    public function before_delete(\Cms\Orm\Model $object) {
+    public function before_delete(\Nos\Orm\Model $object) {
         $this->delete_children($object);
     }
 
@@ -80,12 +80,12 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Returns all the direct children of the object
      *
-     * @param  \Cms\Orm\Model  $object
+     * @param  \Nos\Orm\Model  $object
      * @param  array  $where
      * @param  array  $order_by
      * @param  array  $options
-     * @see \Cms\Model_Page_Page::search
-     * @return array of \Cms\Model_Page_Page
+     * @see \Nos\Model_Page_Page::search
+     * @return array of \Nos\Model_Page_Page
      */
     public function find_children($object, $where = array(), $order_by = array(), $options = array()) {
         // Search items whose parent is self

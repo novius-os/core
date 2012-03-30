@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Helper {
 
@@ -31,7 +31,7 @@ class Helper {
                 $lang = 'gb';
                 break;
         }
-        return '<img src="static/cms/admin/novius-os/img/flags/'.$lang.'.png" title="'.\Arr::get(static::$locales, $locale, $locale).'" /> ';
+        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$lang.'.png" title="'.\Arr::get(static::$locales, $locale, $locale).'" /> ';
 	}
 
     public static function flag_empty() {

@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Controller_Admin_Media_Media extends Controller_Extendable {
 
@@ -26,7 +26,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         }
 
 		$folder = Model_Media_Folder::find($folder_id);
-        $fields = \Config::load('cms::controller/admin/media/form_media', true);
+        $fields = \Config::load('nos::controller/admin/media/form_media', true);
 
         $fields = \Arr::merge($fields, array(
             'media_path_id' => array(
@@ -44,7 +44,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
         $fieldset = \Fieldset::build_from_config($fields);
 
-		return \View::forge('cms::admin/media/media_add', array(
+		return \View::forge('nos::admin/media/media_add', array(
             'fieldset' => $fieldset,
             'folder' => $folder,
             'hide_widget_media_path' => $hide_widget_media_path,
@@ -58,7 +58,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         $ext = $pathinfo['extension'];
         $filename = $pathinfo['filename'];
 
-        $fields = \Config::load('cms::controller/admin/media/form_media', true);
+        $fields = \Config::load('nos::controller/admin/media/form_media', true);
 
         $fields = \Arr::merge($fields, array(
             'media_id' => array(
@@ -87,7 +87,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
         $fieldset = \Fieldset::build_from_config($fields);
 
-		return \View::forge('cms::admin/media/media_edit', array(
+		return \View::forge('nos::admin/media/media_edit', array(
             'fieldset' => $fieldset,
             'media' => $media,
             'checked' => $filename == Model_Media_Folder::friendly_slug($media->media_title),
@@ -147,7 +147,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
             // Create the directory if needed
 			$dest_dir = dirname($dest);
-            $base_dir = APPPATH.\Cms\Model_Media_Media::$public_path;
+            $base_dir = APPPATH.\Nos\Model_Media_Media::$public_path;
             $remaining_dir = str_replace($base_dir, '', $dest_dir);
             // chmod  is 0777 here because it should be restricted with by the umask
 			is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
@@ -167,9 +167,9 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => 'cms_media_media',
+					'target' => 'nos_media_media',
 				),
-                'replaceTab' => 'admin/cms/media/media/edit/'.$media->media_id,
+                'replaceTab' => 'admin/nos/media/media/edit/'.$media->media_id,
 			);
         } catch (\Exception $e) {
 			$body = array(
@@ -243,7 +243,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 } else {
                     // Create the directory if needed
                     $dest_dir = dirname($dest);
-                    $base_dir = APPPATH.\Cms\Model_Media_Media::$public_path;
+                    $base_dir = APPPATH.\Nos\Model_Media_Media::$public_path;
                     $remaining_dir = str_replace($base_dir, '', $dest_dir);
                     // chmod  is 0777 here because it should be restricted with by the umask
                     is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
@@ -270,7 +270,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => 'cms_media_media',
+					'target' => 'nos_media_media',
 				),
 			);
         } catch (\Exception $e) {

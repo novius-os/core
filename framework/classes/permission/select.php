@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Permission_Select extends Permission_Driver {
 
@@ -29,7 +29,7 @@ class Permission_Select extends Permission_Driver {
 	}
 
 	public function display($role) {
-		echo \View::forge('cms::permission/driver/select', array(
+		echo \View::forge('nos::permission/driver/select', array(
 			'role'        => $role,
 			'application' => $this->application,
 			'identifier'  => $this->identifier,

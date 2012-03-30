@@ -152,8 +152,8 @@ return array(
 	*/
 	'module_paths' => array(
 		realpath(APPPATH.'modules').DS,
-		// Strip trailing "cms/framework/"
-		realpath(substr(CMSPATH, 0, -14).'lib').DS,
+		// Strip trailing "novius-os/framework/"
+		realpath(substr(NOSPATH, 0, -20).'lib').DS,
 	),
 
 

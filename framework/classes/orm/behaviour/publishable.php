@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Cms;
+namespace Nos;
 
 class Orm_Behaviour_Publishable extends Orm_Behaviour
 {
@@ -34,12 +34,12 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     public static function publication_status($item) {
         $published = $item->published();
         if ($published === true) {
-            return '<img class="publication_status" src="static/cms/admin/novius-os/img/icons/status-green.png"> '.__('Published');
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published');
         }
         if ($published === false) {
-            return '<img class="publication_status" src="static/cms/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
         }
-        return '<img class="publication_status" src="static/cms/admin/novius-os/img/icons/status-schedule.png"> '.strtr(__('From {date}'), array(
+        return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-schedule.png"> '.strtr(__('From {date}'), array(
             '{date}' => \Date::create_from_string($published)->format('local'),
         ));
     }
