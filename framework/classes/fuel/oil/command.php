@@ -77,7 +77,7 @@ class Command
 
                 case 'c':
                 case 'console':
-                    new Console;
+                    new Oil\Console;
 
                 case 'r':
                 case 'refine':

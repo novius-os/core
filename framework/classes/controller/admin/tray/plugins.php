@@ -18,7 +18,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
     public function action_index() {
 
-        $LOCAL = APPPATH.'modules'.DS;
+        $LOCAL = APPPATH.'applications'.DS;
 
         $plugins = array();
         $plugins['local'] = File::read_dir($LOCAL, 1);
