@@ -13,14 +13,14 @@ namespace Nos;
 class Permission_Driver {
 
 	protected $identifier;
-	protected $module;
+	protected $application;
 	protected $label;
 
-	public function __construct($module, $identifier, $label, $options = array()) {
+	public function __construct($application, $identifier, $label, $options = array()) {
 
-		$this->module     = $module;
-		$this->identifier = $identifier;
-		$this->label      = $label;
+		$this->application = $application;
+		$this->identifier  = $identifier;
+		$this->label       = $label;
 
 		$this->set_options($options);
 	}

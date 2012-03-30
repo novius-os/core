@@ -42,8 +42,8 @@ class Config extends \Fuel\Core\Config {
     public static function convertFileName($file) {
         //\Debug::dump($file);
         if (is_string($file) && strpos($file, '::') !== false && substr($file, 0, 4) == 'nos_') {
-            list($module_name, $configuration_path) = explode('::', $file);
-            $file = 'nos::admin/'.$module_name.'/'.$configuration_path;
+            list($application, $configuration_path) = explode('::', $file);
+            $file = 'nos::admin/'.$application.'/'.$configuration_path;
             //echo ($file.' ');
             /*exit();*/
         }

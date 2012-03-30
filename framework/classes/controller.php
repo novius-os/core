@@ -17,7 +17,7 @@ class Controller extends Controller_Extendable {
     public $url;
     public $rewrite_url;
     public $rewrites;
-    public $module;
+    public $application;
 
     public $rewrite_prefix;
 

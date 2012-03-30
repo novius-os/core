@@ -138,7 +138,6 @@ return array(
 		'folder_id' => function($value, $query) {
 			if ($value) {
 				$query->where(array('media_path_id', '=', $value));
-				$query->order_by('media_title');
 			}
 			return $query;
 		},
@@ -175,7 +174,6 @@ return array(
 			}
 			$opened and $query->and_where_close();
 
-			$query->order_by('media_title');
 			return $query;
 		},
 	),

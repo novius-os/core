@@ -160,8 +160,8 @@ class Controller_Front extends Controller {
                     'rewrites'    => array(),
                 );
             }
-            $module         = array_shift($fragments);
-            $rewriting[$module]      = array(
+            $application             = array_shift($fragments);
+            $rewriting[$application] = array(
                 'url'         => $url.(empty($url) ? '' : '.html'),
                 'rewrite_url' => $rewrite_url.(empty($rewrite_url) ? '' : '.html'),
                 'rewrites'    => $fragments,

@@ -74,13 +74,13 @@ class Nos {
         if (empty($args['args'])) {
             $args['args'] = array();
         }
-        $module = !empty($args['module']) ? $args['module'] : '';
+        $application = !empty($args['application']) ? $args['application'] : '';
 
         ob_start();
         try {
             $request  = Request::forge($where);
 
-            \Nos::main_controller()->rewrite_prefix = $module;
+            \Nos::main_controller()->rewrite_prefix = $application;
             $response = call_user_func_array(array($request, "execute"), array($args['args']));
             \Nos::main_controller()->rewrite_prefix = null;
             $cache_cleanup = $request->controller_instance->cache_cleanup;
@@ -133,14 +133,14 @@ class Nos {
 
         \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
 
-		preg_match_all('`<(\w+)\s[^>]+data-module="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-application="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
         foreach ($matches[2] as $match_id => $fct_id) {
 
             $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id]);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
 		}
 
-		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-module="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-application="([^"]+)">.*?</\\1>`', $content, $matches);
         foreach ($matches[3] as $match_id => $fct_id) {
             $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id]);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
@@ -165,9 +165,9 @@ class Nos {
 
         if ($found) {
             $function_content = self::hmvc($config['target'].'/main', array(
-                'args'     => array($args),
-                'module'   => $config['rewrite_prefix'] ?: $name,
-                'inline'   => true,
+                'args'        => array($args),
+                'application' => $config['rewrite_prefix'] ?: $name,
+                'inline'      => true,
             ));
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
                 $function_content = 'Enhancer '.$name.' ('.$config['target'].') returned empty content.';

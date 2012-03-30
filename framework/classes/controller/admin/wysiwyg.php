@@ -10,7 +10,7 @@ class Controller_Admin_Wysiwyg extends \Controller {
 		return $view;
 	}
 
-	public function action_modules() {
+	public function action_enhancers() {
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'wysiwyg_enhancers.php', 'wysiwyg_enhancers');
         $functions = \Config::get('wysiwyg_enhancers', array());

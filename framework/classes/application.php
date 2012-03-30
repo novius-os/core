@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Module {
+class Application {
 
     public $name;
 
@@ -20,12 +20,12 @@ class Module {
         return $config;
     }
 
-	public static function forge($module_name) {
-		return new static($module_name);
+	public static function forge($app_name) {
+		return new static($app_name);
 	}
 
-	public function __construct($module_name) {
-		$this->name = $module_name;
+	public function __construct($app_name) {
+		$this->name = $app_name;
 	}
 
 	public function install() {
@@ -102,8 +102,8 @@ class Module {
     /**
      * @static
      * @param array $params
-     * params['add'] : module to add
-     * params['remove'] : module to remove
+     * params['add'] : application to add
+     * params['remove'] : application to remove
      * @return bool
      */
     protected static function _refresh_property($property, array $params = array()) {
@@ -115,7 +115,7 @@ class Module {
         \Config::load(APPPATH.'data'.DS.'config'.DS.$property.'.php', $property);
         $existing_properties = \Config::get($property, array());
 
-        // We add the module templates we want to add
+        // We add the application templates we want to add
         $new_properties = array();
 		if ($property == 'templates') {
 			\Config::load('templates', 'local_templates');
@@ -127,14 +127,14 @@ class Module {
             $config = \Config::get($add.'::metadata', array());
             if (isset($config[$property])) {
                 foreach ($config[$property] as $key => $val) {
-                    $config[$property][$key]['module'] = $add;
+                    $config[$property][$key]['application'] = $add;
                 }
                 $new_properties = array_merge($new_properties, $config[$property]);
             }
 
         }
 
-        // then we get the list of installed modules
+        // then we get the list of installed applications
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
         $app_installed = \Config::get('app_installed', array());
         // and add their templates to the new templates
@@ -144,7 +144,7 @@ class Module {
                 $config = \Config::get($app_name.'::metadata', array());
                 if (isset($config[$property])) {
                     foreach ($config[$property] as $key => $val) {
-                        $config[$property][$key]['module'] = $app_name;
+                        $config[$property][$key]['application'] = $app_name;
                     }
                     $new_properties = array_merge($new_properties, $config[$property]);
                 }
@@ -156,7 +156,7 @@ class Module {
             $deleted_properties = array();
             foreach ($existing_properties as $key => $val) {
                 if (!empty($new_properties[$key])) {
-                    if (!($remove && isset($val['module']) && $remove === $val['module'])) {
+                    if (!($remove && isset($val['application']) && $remove === $val['application'])) {
                         $new_properties[$key] = $existing_properties[$key];
                     }
                 } else {
@@ -174,7 +174,7 @@ class Module {
             }
         }
 
-		// Local templates get replaced, everytime and have priority over modules
+		// Local templates get replaced, everytime and have priority over applications
 		if ($property == 'templates') {
 			$new_properties = \Arr::merge($new_properties, \Config::get('local_templates'));
 		}
@@ -220,8 +220,8 @@ class Module {
             }
         }
 
-        \Config::set('modules_dependencies', $dependencies);
-        \Config::save(APPPATH.'data'.DS.'config'.DS.'modules_dependencies.php', $dependencies);
+        \Config::set('app_dependencies', $dependencies);
+        \Config::save(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', $dependencies);
     }
 
     public function addPermission() {

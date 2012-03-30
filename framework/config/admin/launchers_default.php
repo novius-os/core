@@ -15,7 +15,7 @@ return array(
         'url' => 'admin/nos/page/list/index',
         'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
         'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
-        'module' => 'nos_page',
+        'application' => 'nos_page',
     ),
     'nos_media' =>
     array(
@@ -23,7 +23,7 @@ return array(
         'url' => 'admin/nos/media/list/index',
         'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
         'icon64' => 'static/novius-os/admin/novius-os/img/64/media.png',
-        'module' => 'nos_media',
+        'application' => 'nos_media',
     ),
     'nos_user' =>
     array(
@@ -31,6 +31,6 @@ return array(
         'url' => 'admin/nos/user/list/index',
         'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
         'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
-        'module' => 'nos_user',
+        'application' => 'nos_user',
     ),
 );

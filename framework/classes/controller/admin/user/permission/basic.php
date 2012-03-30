@@ -50,7 +50,7 @@ class Controller_Admin_User_Permission_Basic extends Controller {
             foreach ($keys as $key) {
                 $p = new Model_User_Permission();
                 $p->perm_role_id = $_POST['role_id'];
-                $p->perm_module = $app;
+                $p->perm_application = $app;
                 $p->perm_key = $key;
                 $p->save();
             }

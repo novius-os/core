@@ -8,7 +8,7 @@ define([
 		var self = $(this);
 		$.ajax({
 			dataType: 'json',
-			url: 'admin/nos/wysiwyg/modules',
+			url: 'admin/nos/wysiwyg/enhancers',
 			success: function(enhancers) {
 				options = $.extend({
 					// Location of TinyMCE script

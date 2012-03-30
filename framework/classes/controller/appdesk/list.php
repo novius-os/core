@@ -30,15 +30,15 @@ class Controller_Appdesk_List extends Controller_Generic_Admin {
     public function before($response = null) {
         parent::before($response);
         if (!isset($this->config['appdesk'])) {
-            list($module_name, $file_name) = $this->getLocation();
+            list($application, $file_name) = $this->getLocation();
             $file_name = explode('/', $file_name);
             array_splice($file_name, count($file_name) - 1, 0, array('appdesk'));
             $file_name = implode('/', $file_name);
         } else {
-            list($module_name, $file_name) = explode('::', $this->config['appdesk']);
+            list($application, $file_name) = explode('::', $this->config['appdesk']);
         }
 
-		$this->appdesk = \Config::mergeWithUser($module_name.'::'.$file_name, static::loadConfiguration($module_name, $file_name));
+		$this->appdesk = \Config::mergeWithUser($application.'::'.$file_name, static::loadConfiguration($application, $file_name));
     }
 
 	public function action_index($view = null) {

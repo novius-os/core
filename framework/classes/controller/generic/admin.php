@@ -18,16 +18,16 @@ class Controller_Generic_Admin extends Controller_Template_Extendable {
     public function before($response = null) {
         $ret = parent::before($response);
         $location = $this->getLocation();
-        list($module_name, $file_name) = $location;
-        if ($module_name == 'nos' && isset($location[2])) {
-            $module_name = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native modules...
+        list($application, $file_name) = $location;
+        if ($application == 'nos' && isset($location[2])) {
+	        $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native modules...
         }
 
-        if ($module_name != 'nos' && !Permission::check($module_name, 'access')) {
-            throw new \Exception('You don\'t have access to module '.$module_name.'!');
+        if ($application != 'nos' && !Permission::check($application, 'access')) {
+            throw new \Exception('You don\'t have access to module '.$application.'!');
         }
 
-        //\Debug::dump($module_name, Permission::check($module_name, 'access'));
+        //\Debug::dump($application, Permission::check($application, 'access'));
         return $ret;
     }
 

@@ -55,20 +55,20 @@ if (\Input::server('SERVER_NAME') == 'os1.novius.fr') {
 }
 Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOPMENT);
 
-//* Register module autoloader
+//* Register application autoloader
 spl_autoload_register(function($class) {
 	$class = ltrim($class, '\\');
-	list($module, $whatever) = explode('\\', $class.'\\');
-	$module = explode('_', $module);
-	foreach ($module as &$part) {
+	list($application, $whatever) = explode('\\', $class.'\\');
+	$application = explode('_', $application);
+	foreach ($application as &$part) {
 		$part = ucfirst($part);
 	}
-	$module = implode('_', $module);
+	$application = implode('_', $application);
 
-	// A module can be put inside any namespace when properly configured
-	if (!empty(Fuel::$namespace_aliases[$module])) {
-		if (class_exists(Fuel::$namespace_aliases[$module].'\\'.$whatever)) {
-			class_alias(Fuel::$namespace_aliases[$module].'\\'.$whatever, $class);
+	// An application can be put inside any namespace when properly configured
+	if (!empty(Fuel::$namespace_aliases[$application])) {
+		if (class_exists(Fuel::$namespace_aliases[$application].'\\'.$whatever)) {
+			class_alias(Fuel::$namespace_aliases[$application].'\\'.$whatever, $class);
 		}
 		if (class_exists($class, false)) {
 			return true;

@@ -42,14 +42,14 @@ class Controller_Extendable extends \Fuel\Core\Controller {
     }
 
     protected function trigger($event, $data = '', $return_type = 'string') {
-        list($module_name, $file_name) = $this->getLocation();
+        list($application, $file_name) = $this->getLocation();
         $file_name = str_replace('/', '_', $file_name);
-        return \Event::trigger($module_name.'.'.$file_name.'.'.$event, $data, $return_type);
+        return \Event::trigger($application.'.'.$file_name.'.'.$event, $data, $return_type);
     }
 
     protected static function getConfiguration() {
-        list($module_name, $file_name) = self::getLocation();
-        return static::loadConfiguration($module_name, $file_name);
+        list($application, $file_name) = self::getLocation();
+        return static::loadConfiguration($application, $file_name);
     }
 
     protected static function getLocation() {
