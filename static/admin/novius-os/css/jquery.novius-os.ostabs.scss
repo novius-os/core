@@ -85,12 +85,6 @@ body {
 			}
 		}
 
-		li.nos-ostabs-newtab.ui-state-active {
-			.nos-ostabs-label {
-				display : inline-block;
-			}
-		}
-
 		li.nos-ostabs-appstab {
 		    margin : 0px 30px 0 30px;
 		}
@@ -153,18 +147,22 @@ body {
 			top : 0px;
 			height : 46px;
 
-			div {
+			.wijmo-wijsuperpanel-statecontainer {
+				overflow: visible;
+			}
+			/*div {
 				overflow : hidden;
 				position : relative;
 				height : 46px;
 				left : 0px;
-				top : 0px;
+				top : 0px;*/
 
 				ul {
-					left : 0px;
-					top : 0px;
+					@include box-sizing(border-box);
+					margin: 0;
+					padding: 6px 0 0;
 				}
-			}
+			/*}
 
 			a.nos-ostabs-scroll-left, a.nos-ostabs-scroll-right {
 				margin: 20px 0 0;
@@ -178,7 +176,7 @@ body {
 
 			a.nos-ostabs-scroll-right {
 				float : right;
-			}
+			}*/
 		}
 	}
 
@@ -275,7 +273,7 @@ body {
 		@include background(linear-gradient(#222222, #111111));
 
 		li.nos-ostabs-appstab {
-			margin : 0px 60px 0 0px;
+			margin : 0px 35px 0 0px;
 			bottom : 0 !important;
 			height : 56px !important;
 			background : none;
@@ -305,6 +303,16 @@ body {
 		ul.nos-ostabs-appstab {
 			height : 55px;
 			padding: 0;
+		}
+
+		ul.nos-ostabs-tray {
+			li:not(.ui-state-active) {
+			    background:transparent;
+		    }
+		}
+
+		li.nos-ostabs-newtab:not(.ui-state-active) {
+			background:transparent;
 		}
    }
 
