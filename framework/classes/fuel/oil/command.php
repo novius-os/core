@@ -93,7 +93,7 @@ class Command extends \Oil\Command
 
                     $task = isset($args[2]) ? $args[2] : null;
 
-                    call_user_func('Oil\Refine::run', $task, array_slice($args, 3));
+                    call_user_func('Refine::run', $task, array_slice($args, 3));
                     break;
 
                 case 'cell':
