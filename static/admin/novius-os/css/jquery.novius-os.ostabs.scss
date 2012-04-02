@@ -306,7 +306,7 @@ body {
 		}
 
 		ul.nos-ostabs-tray {
-			li:not(.ui-state-active) {
+			li:not(.ui-state-open) {
 			    background:transparent;
 		    }
 		}
