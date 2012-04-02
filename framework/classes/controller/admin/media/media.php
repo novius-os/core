@@ -100,8 +100,10 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             throw new \Exception(__('Permission denied'));
         }
 
+        $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
+
         try {
-            if (!is_uploaded_file($_FILES['media']['tmp_name'])) {
+            if (!$is_uploaded) {
                 throw new \Exception(__('Please pick a file from your hard drive.'));
             }
 
@@ -140,14 +142,14 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 throw new \Exception(__("The parent folder doesn't exists."));
             }
 
-            $dest = APPPATH.$media->get_public_path();
+            $dest = APPPATH.$media->get_private_path();
             if (is_file($dest)) {
                 throw new \Exception(__('A file with the same name already exists.'));
             }
 
             // Create the directory if needed
-			$dest_dir = dirname($dest);
-            $base_dir = APPPATH.\Nos\Model_Media_Media::$public_path;
+			$dest_dir = dirname($dest).'/';
+            $base_dir = APPPATH.\Nos\Model_Media_Media::$private_path;
             $remaining_dir = str_replace($base_dir, '', $dest_dir);
             // chmod  is 0777 here because it should be restricted with by the umask
 			is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
@@ -203,7 +205,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                     throw new \Exception(__('This extension is not allowed due to security reasons.'));
                 }
             } else {
-                $pathinfo = pathinfo(APPPATH.$media->get_public_path());
+                $pathinfo = pathinfo(APPPATH.$media->get_private_path());
             }
             $media->media_title     = \Input::post('media_title', '');
             $media->media_file      = \Input::post('slug', '');
@@ -232,8 +234,8 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 throw new \Exception(__("The parent folder doesn't exists."));
             }
 
-            $dest = APPPATH.$media->get_public_path();
-            if ($old_media->get_public_path() != $media->get_public_path()) {
+            $dest = APPPATH.$media->get_private_path();
+            if ($old_media->get_private_path() != $media->get_private_path()) {
                 if (is_file($dest)) {
                     throw new \Exception(__('A file with the same name already exists.'));
                 }
@@ -251,7 +253,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                     if (!is_writeable($dest_dir)) {
                         throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
                     }
-                    \File::rename(APPPATH.$old_media->get_public_path(), $dest);
+                    \File::rename(APPPATH.$old_media->get_private_path(), $dest);
                 }
                 $old_media->delete_public_cache();
             }
