@@ -308,35 +308,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		$validate = \Format::forge()->to_json($json);
 		$this->append(function($fieldset) use ($validate) {
             $form_attributes = $fieldset->get_config('form_attributes', array());
-            return
-<<<JS
-<script type="text/javascript">
-require(['jquery', 'jquery-validate'], function($) {
-	var json = $validate;
-	//console.log($validate);
-	$('#{$form_attributes['id']}').validate($.extend({}, json, {
-        errorClass : 'ui-state-error',
-        success : true,
-        ignore: 'input[type=hidden]',
-		submitHandler: function(form) {
-			require(['jquery-nos', 'order!jquery-form'], function($) {
-				$(form).ajaxSubmit({
-					dataType: 'json',
-					success: function(json) {
-						$.nos.ajax.success(json);
-                        $(form).triggerHandler('ajax_success', [json]);
-					},
-					error: function() {
-						$.nos.notify('An error occured', 'error');
-					},
-				});
-			});
-		}
-	}));
-	require(['jquery-nos', 'order!jquery-form']);
-});
-</script>
-JS;
+            return '<script type="text/javascript">require(["jquery-nos"], function($) {$.nos.ui.validate("#'.$form_attributes['id'].'", '.$validate.')});</script>';
         });
 	}
 
