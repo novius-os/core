@@ -9,9 +9,9 @@
  */
 
 ?>
-<div class="permissions">
+<div class="permissions" id="<?= $uniqid = uniqid('id_') ?>">
 
-<form action="admin/nos/user/form/save_permissions" method="POST" id="<?= $uniqid = uniqid('id_') ?>">
+<form action="admin/nos/user/form/save_permissions" method="POST">
   <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
 
     <div class="actions_zone">
@@ -21,7 +21,7 @@
 	<div class="applications">
 	    <div class="application all">
 			<div class="maincheck">
-				<input type="checkbox" name="access_to_everything" value="1"/>
+				<input type="checkbox" name="access_to_everything" value="1" class="access_to_everything" />
 			</div>
 			<div class="infos">
 				<?= __('Full access for everything') ?>
@@ -85,71 +85,63 @@ foreach ($apps as $app => $perms) {
 
 <script type="text/javascript">
     require(["jquery-nos"], function($) {
+	    $(function() {
+		    var $form = $('#<?= $uniqid ?>'),
+			    $applications = $form.find('.applications'),
+			    $items = $applications.find("div.item"),
+			    $checkboxes = $items.find(":checkbox"),
+			    $access_to_everything = $applications.find(":checkbox.access_to_everything");
 
-    	var $form = $('#<?= $uniqid ?>');
+		    $.nos.ui.form($form);
 
-    	$.nos.ui.form($form);
+		    $items.click(function() {
+	            var $checkbox = $(this).find('div.maincheck :checkbox');
+	            $checkbox.attr('checked', !$checkbox.is(':checked'));
+	            $checkbox.change();
+	            $checkbox.wijcheckbox('refresh');
+	        });
 
-        $(".permissions .applications .application.item").click(function() {
-            var $checkbox = $(this).find('.maincheck input[type="checkbox"]');
-            $checkbox.attr('checked', !$checkbox.is(':checked'));
-            $checkbox.change();
-            $checkbox.wijcheckbox('refresh');
-        });
+		    $checkboxes.change(function() {
+				var all_checked = true;
+			    $checkboxes.each(function() {
+					if (!$(this).is(':checked')) {
+						all_checked = false;
+					}
+				});
+				$access_to_everything.attr('checked', all_checked);
+			    $access_to_everything.wijcheckbox('refresh');
+	        });
+		    $checkboxes.eq(0).change();
 
-    	$(".permissions .applications .application.item :input[type='checkbox']").unbind('change').change(function() {
-			var $access_to_everything = $(this).closest('.applications').find(":input[name='access_to_everything']");
-			var $all_checkboxes = $(this).closest('.applications').find(".application.item :input[type='checkbox']");
-			var all_checked = true;
-			$all_checkboxes.each(function() {
-				if (!$(this).is(':checked')) {
-					all_checked = false;
+		    $access_to_everything.change(function() {
+				var all_checked = true;
+			    $checkboxes.each(function() {
+					if (!$(this).is(':checked')) {
+						all_checked = false;
+					}
+				});
+
+				if (all_checked) {
+					$checkboxes.attr('checked', false);
+				} else {
+					$checkboxes.attr('checked', true);
 				}
-			});
+			    $checkboxes.wijcheckbox('refresh');
+	        });
 
-			$access_to_everything.attr('checked', all_checked);
-			$access_to_everything.wijcheckbox('refresh');
-    	}).change();
-
-    	$(".permissions .applications :input[name='access_to_everything']").unbind('change').change(function() {
-    		var $all_checkboxes = $(this).closest('.applications').find(".application.item :input[type='checkbox']");
-			var all_checked = true;
-			$all_checkboxes.each(function() {
-				if (!$(this).is(':checked')) {
-					all_checked = false;
-				}
-			});
-
-			if (all_checked) {
-				$all_checkboxes.attr('checked', false);
-			} else {
-				$all_checkboxes.attr('checked', true);
-			}
-			$all_checkboxes.wijcheckbox('refresh');
-    	});
-
-        $form.submit(function(e) {
-            e.preventDefault();
-            $(this).ajaxSubmit({
-                dataType: 'json',
-                success: function(json) {
-                    $.nos.ajax.success(json);
-                },
-                error: function() {
-                    $.nos.notify('An error occured', 'error');
-                }
-            });
-        });
-
-        $('h1 input:not(:checked)').closest('h1').next().hide();
-        $('h1 input').change(function() {
-            $(this).closest('h1').next()[$(this).is(':checked') ? 'show' : 'hide']();
-            if (!$(this).is(':checked')) {
-                $(this).closest('form').submit();
-            }
-        });
-
-
+	        $form.find('form').submit(function(e) {
+	            e.preventDefault();
+	            $(this).ajaxSubmit({
+	                dataType: 'json',
+	                success: function(json) {
+	                    $.nos.ajax.success(json);
+	                },
+	                error: function() {
+	                    $.nos.notify('An error occured', 'error');
+	                }
+	            });
+	        });
+	    });
     });
 </script>
 
