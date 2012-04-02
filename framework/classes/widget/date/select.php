@@ -82,7 +82,10 @@ class Widget_Date_Select extends \Fieldset_Field {
 
         $this->add_rule(array('valid_date' => function($value) {
             list($date, $time) = explode(' ', $value.' ');
-            list($year, $month ,$day) = explode('-', $date);
+	        $date = explode('-', $date);
+	        if (count($date) >= 3) {
+                list($year, $month ,$day) = explode('-', $date);
+	        }
             return empty($value) or !empty($year) and !empty($month) and !empty($day) and checkdate((int) $month, (int) $day, (int) $year);
         }));
     }
