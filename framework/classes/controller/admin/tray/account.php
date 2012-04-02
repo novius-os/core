@@ -68,16 +68,18 @@ class Controller_Admin_Tray_Account extends \Controller {
 						$media = Model_Media_Media::find($data['background']);
 						if (!empty($media)) {
 							\Arr::set($configuration, 'misc.display.background', $data['background']);
-							$notify = 'Your wallpaper is now "'.$media->media_title.'"';
+							$notify = strtr(__('Your wallpaper is now "{title}"'), array(
+                                '{title}' => $media->media_title,
+                            ));
 							$body['wallpaper_url'] = \Uri::create($media->get_public_path());
 						} else {
 							$data['background'] = null;
-							$error = 'The selected image does not exists.';
+							$error = __('The selected image does not exists.');
 						}
                     }
 					if (empty($data['background'])) {
 						\Arr::delete($configuration, 'misc.display.background');
-						$notify = 'Your wallpaper has been removed.';
+						$notify = __('Your wallpaper has been removed.');
 					}
 
                     $user->user_configuration = serialize($configuration);

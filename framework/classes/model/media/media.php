@@ -14,11 +14,12 @@ class Model_Media_Media extends \Nos\Orm\Model {
     protected static $_table_name = 'os_media';
     protected static $_primary_key = array('media_id');
 
-    public static $public_path = 'media/';
+    public static $private_path = 'data/media/';
+    public static $public_path  = 'media/';
 
     protected static $_belongs_to = array(
-        'path' => array(
-            'key_from'       => 'media_path_id',
+        'folder' => array(
+            'key_from'       => 'media_folder_id',
             'model_to'       => 'Nos\Model_Media_Folder',
             'key_to'         => 'medif_id',
             'cascade_save'   => false,
@@ -45,7 +46,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
     /**
      * Properties
      * media_id
-     * media_path_id
+     * media_folder_id
      * media_file
      * media_ext
      * media_title
@@ -57,7 +58,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
 
     public function delete_from_disk() {
 
-        $file = APPPATH.$this->get_public_path();
+        $file = APPPATH.$this->get_private_path();
         if (is_file($file)) {
             \File::delete($file);
         }
@@ -81,9 +82,16 @@ class Model_Media_Media extends \Nos\Orm\Model {
         }
     }
 
+    public function get_path() {
+        return $this->media_path.$this->media_file;
+    }
+
     public function get_public_path() {
-        //$this->_relate('path');
-        return static::$public_path.$this->media_path.$this->media_file;
+        return static::$public_path.$this->get_path();
+    }
+
+    public function get_private_path() {
+        return static::$private_path.$this->get_path();
     }
 
     public function get_img_tag($params = array()) {
@@ -119,7 +127,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
     }
 
 	public function refresh_path() {
-		$folder = Model_Media_Folder::find($this->media_path_id);
+		$folder = Model_Media_Folder::find($this->media_folder_id);
         if (empty($folder)) {
             return false;
         }
@@ -147,7 +155,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
 
 	public function _event_before_save() {
 		$this->media_ext = pathinfo($this->media_file, PATHINFO_EXTENSION);
-		$is_image = @getimagesize(APPPATH.$this->get_public_path());
+		$is_image = @getimagesize(APPPATH.$this->get_private_path());
 		if ($is_image !== false) {
 			list($this->media_width, $this->media_height) = $is_image;
 		}

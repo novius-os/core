@@ -254,6 +254,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         );
 
         $fieldset = \Fieldset::build_from_config($fields, $user, array(
+	        'form_name' => 'form_user_edit',
             'success' => function($user, $data) {
                 return array(
                      'notify' => $user->is_changed('user_password') ? 'New password successfully set.' : 'User successfully saved.',

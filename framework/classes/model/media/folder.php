@@ -27,7 +27,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         'media' => array(
 			'key_from'       => 'medif_id',
 			'model_to'       => '\Nos\Model_Media_Media',
-			'key_to'         => 'media_path_id',
+			'key_to'         => 'media_folder_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
 		),
@@ -93,7 +93,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         $folder_ids = $this->get_ids_children(true);
         return Model_Media_Media::count(array(
             'where' => array(
-                array('media_path_id', 'IN', $folder_ids),
+                array('media_folder_id', 'IN', $folder_ids),
             ),
         ));
     }
@@ -103,7 +103,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         return Model_Media_Link::count(array(
             'related' => array('media'),
             'where' => array(
-                array('media.media_path_id', 'IN', $folder_ids),
+                array('media.media_folder_id', 'IN', $folder_ids),
             ),
         ));
     }
@@ -166,7 +166,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
             // 1 request for each updated folder
             \DB::update(Model_Media_Media::table())
                 ->value('media_path', $this->medif_path)
-                ->where('media_path_id', $this->medif_id)
+                ->where('media_folder_id', $this->medif_id)
                 ->execute();
         }
     }

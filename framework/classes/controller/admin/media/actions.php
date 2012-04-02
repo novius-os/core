@@ -149,13 +149,13 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
             $all_folders = $folder->find_children_recursive(true);
             $folder_ids = array_keys($all_folders);
 
-            $escaped_path_ids = array();
+            $escaped_folder_ids = array();
             foreach($folder_ids as $id) {
-                $escaped_path_ids[] = (int) $id;
+                $escaped_folder_ids[] = (int) $id;
             }
             // Cleanup empty values
-            $escaped_path_ids = array_filter($escaped_path_ids);
-            $escaped_path_ids = implode(',', $escaped_path_ids);
+            $escaped_folder_ids = array_filter($escaped_folder_ids);
+            $escaped_folder_ids = implode(',', $escaped_folder_ids);
 
             $pk = Model_Media_Media::primary_key();
             $pk = $pk[0];
@@ -168,13 +168,13 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
                 DELETE $table_link.* FROM $table_link
                 LEFT JOIN $table_media ON media_id = medil_media_id
                 WHERE
-                    media_path_id IN ($escaped_path_ids)")->execute();
+                    media_folder_id IN ($escaped_folder_ids)")->execute();
 
             // Delete media entries
             \DB::query("
                 DELETE $table_media.* FROM $table_media
                 WHERE
-                    media_path_id IN ($escaped_path_ids)")->execute();
+                    media_folder_id IN ($escaped_folder_ids)")->execute();
 
             // Can throw an exception
             $folder->delete_from_disk();
@@ -184,7 +184,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
             \DB::query("
                 DELETE $table_folder.* FROM $table_folder
                 WHERE
-                    medif_id IN ($escaped_path_ids)")->execute();
+                    medif_id IN ($escaped_folder_ids)")->execute();
 
             \DB::commit_transaction();
             $body = array(
