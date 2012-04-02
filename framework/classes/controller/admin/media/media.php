@@ -29,7 +29,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         $fields = \Config::load('nos::controller/admin/media/form_media', true);
 
         $fields = \Arr::merge($fields, array(
-            'media_path_id' => array(
+            'media_folder_id' => array(
                 'widget' => $hide_widget_media_path ? null : 'media_folder',
 		        'form' => array(
 			        'value' => $folder->medif_id,
@@ -67,10 +67,10 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                     'value' => $media->media_id,
                 ),
             ),
-            'media_path_id' => array(
+            'media_folder_id' => array(
                 'widget' =>  'media_folder',
                 'form' => array(
-                    'value' => $media->media_path_id,
+                    'value' => $media->media_folder_id,
                 ),
             ),
             'media_title' => array(
@@ -114,7 +114,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
             $media = new Model_Media_Media();
 
-            $media->media_path_id     = \Input::post('media_path_id', 1);
+            $media->media_folder_id     = \Input::post('media_folder_id', 1);
             $media->media_application = \Input::post('media_application', null);
 
             $media->media_title = \Input::post('media_title', '');
@@ -205,9 +205,9 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             } else {
                 $pathinfo = pathinfo(APPPATH.$media->get_public_path());
             }
-            $media->media_title   = \Input::post('media_title', '');
-            $media->media_file    = \Input::post('slug', '');
-            $media->media_path_id = \Input::post('media_path_id', 1);
+            $media->media_title     = \Input::post('media_title', '');
+            $media->media_file      = \Input::post('slug', '');
+            $media->media_folder_id = \Input::post('media_folder_id', 1);
 
             // Empty title = auto-generated from file name
             if (empty($media->media_title)) {

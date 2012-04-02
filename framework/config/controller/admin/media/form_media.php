@@ -5,7 +5,7 @@ return array(
         'label' => 'ID: ',
         'widget' => 'text',
     ),
-    'media_path_id' => array(
+    'media_folder_id' => array(
         'form' => array(
             'type'  => 'hidden',
         ),

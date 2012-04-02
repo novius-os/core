@@ -45,8 +45,8 @@ require(['jquery-nos-ostabs'], function ($) {
             <td><?= $fieldset->field('slug')->build() ?> <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?> /> <?= __('Generate from title') ?></label></td>
         </tr>
         <tr>
-            <th><?= $fieldset->field('media_path_id')->label; ?></th>
-            <td><?= $fieldset->field('media_path_id')->build(); ?></td>
+            <th><?= $fieldset->field('media_folder_id')->label; ?></th>
+            <td><?= $fieldset->field('media_folder_id')->build(); ?></td>
         </tr>
     </table>
     <?php

@@ -17,8 +17,8 @@ class Model_Media_Media extends \Nos\Orm\Model {
     public static $public_path = 'media/';
 
     protected static $_belongs_to = array(
-        'path' => array(
-            'key_from'       => 'media_path_id',
+        'folder' => array(
+            'key_from'       => 'media_folder_id',
             'model_to'       => 'Nos\Model_Media_Folder',
             'key_to'         => 'medif_id',
             'cascade_save'   => false,
@@ -45,7 +45,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
     /**
      * Properties
      * media_id
-     * media_path_id
+     * media_folder_id
      * media_file
      * media_ext
      * media_title
@@ -119,7 +119,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
     }
 
 	public function refresh_path() {
-		$folder = Model_Media_Folder::find($this->media_path_id);
+		$folder = Model_Media_Folder::find($this->media_folder_id);
         if (empty($folder)) {
             return false;
         }
