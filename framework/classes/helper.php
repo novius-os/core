@@ -14,7 +14,7 @@ class Helper {
 
     static $locales = array();
 
-    public function _init() {
+    public static function _init() {
 
         \Config::load('locales', true);
         static::$locales = \Config::get('locales', array());

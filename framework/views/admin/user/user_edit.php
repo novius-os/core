@@ -47,13 +47,13 @@ foreach ($fieldset->field() as $field) {
 	<div class="unit col c10" id="line_first" style="position:relative;"> */ ?>
         <div class="tabs" style="width: 92.4%; clear:both; margin:0 auto 1em;">
             <ul style="width: 15%;">
-                <li><a href="#details"><?= __('User details') ?></a></li>
-                <li><a href="#permissions"><?= __('Permissions') ?></a></li>
+                <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
+                <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
             </ul>
-            <div id="details">
+            <div id="<?= $uniqid ?>_details">
                 <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
             </div>
-            <div id="permissions">
+            <div id="<?= $uniqid ?>_permissions">
                <?= $permissions ?>
             </div>
         </div>
@@ -63,7 +63,11 @@ foreach ($fieldset->field() as $field) {
 </div>
 
 <script type="text/javascript">
-    require(['jquery-nos'], function($) {
+    require([
+	    'order!jquery-nos',
+	    'order!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
+	    'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
+    ], function($) {
         $(function() {
             var $container = $('#<?= $uniqid ?>');
             var $tabs = $container.find('.tabs');
@@ -78,27 +82,22 @@ foreach ($fieldset->field() as $field) {
                 width : '84%'
             });
 
-            var $password = $container.find('input[name=user_password]');
+            var $password = $container.find('input[name=password_reset]');
 
-            <?php $formatter = \Format::forge(); ?>
             // Password strength
-            require([
-                'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
-                'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
-            ], function() {
-                var strength_id = '<?= $uniqid ?>_strength';
-                var $strength = $('<span id="' + strength_id + '"></span>');
-                $password.after($strength);
-                $password.password_strength({
-                    container : '#' + strength_id,
-                    texts : {
-                        1 : ' <span class="color"></span><span class="box"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Insufficient')) ?> + '</span>',
-                        2 : ' <span class="color"></span><span class="color"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Weak')) ?> + '</span>',
-                        3 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Average')) ?> + '</span>',
-                        4 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Strong')) ?> + '</span>',
-                        5 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Outstanding')) ?> + '</span>'
-                    }
-                });
+            var strength_id = '<?= $uniqid ?>_strength';
+            var $strength = $('<span id="' + strength_id + '"></span>');
+            $password.after($strength);
+            <?php $formatter = \Format::forge(); ?>
+            $password.password_strength({
+                container : '#' + strength_id,
+                texts : {
+                    1 : ' <span class="color"></span><span class="box"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Insufficient')) ?> + '</span>',
+                    2 : ' <span class="color"></span><span class="color"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Weak')) ?> + '</span>',
+                    3 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Average')) ?> + '</span>',
+                    4 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Strong')) ?> + '</span>',
+                    5 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Outstanding')) ?> + '</span>'
+                }
             });
         });
     });

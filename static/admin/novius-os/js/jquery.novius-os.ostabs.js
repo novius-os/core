@@ -370,7 +370,7 @@ define('jquery-nos-ostabs',
                 // check for length avoids error when initializing empty list
                 if ( o.selected >= 0 && self.anchors.length ) {
                     self.element.find( self._sanitizeSelector( self.anchors[ o.selected ].hash ) ).removeClass( "nos-ostabs-hide" );
-                    self.lis.eq( o.selected ).addClass( "nos-ostabs-selected ui-state-active" );
+                    self.lis.eq( o.selected ).addClass( "nos-ostabs-selected ui-state-active ui-state-open" );
 
                     // seems to be expected behaviour that the show callback is fired
                     self.element.queue( "tabs", function() {
