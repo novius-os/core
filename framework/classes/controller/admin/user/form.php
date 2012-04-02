@@ -245,6 +245,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         );
 
         $fieldset = \Fieldset::build_from_config($fields, $user, array(
+            'form_name' => 'form_user_edit',
             'before_save' => function($user, $data) {
                 if (!empty($data['password_reset'])) {
                     $user->user_password = $data['password_reset'];

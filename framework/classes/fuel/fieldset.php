@@ -33,6 +33,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	}
 
     public function build($action = null) {
+        $build = parent::build($action);
         $append = array();
         foreach ($this->append as $a) {
             if (is_callable($a)) {
@@ -41,7 +42,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $append[] = $a;
             }
         }
-        return parent::build($action = null).implode('', $append);
+        return $build.implode('', $append);
     }
 
 	public function close() {
