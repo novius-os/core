@@ -147,6 +147,8 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                 'form' => array(
                     'type' => 'password',
                 ),
+	            'before_save' => function($object, $data) {
+	            },
                 'validation' => array(
                     'required', // To show the little star
                     'match_field' => array('user_password'),
@@ -220,6 +222,11 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                     'type' => 'password',
                     'value' => '',
                 ),
+	            'before_save' => function($object, $data) {
+		            if (!empty($data['password_reset'])) {
+			            $object->user_password = $data['password_reset'];
+		            }
+	            },
                 'validation' => array(
                     'min_length' => array(6),
                 ),
@@ -229,6 +236,8 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                 'form' => array(
                     'type' => 'password',
                 ),
+	            'before_save' => function($object, $data) {
+	            },
                 'validation' => array(
                     'match_field' => array('password_reset'),
                 ),
@@ -245,12 +254,6 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         );
 
         $fieldset = \Fieldset::build_from_config($fields, $user, array(
-            'before_save' => function($user, $data) {
-                if (!empty($data['password_reset'])) {
-                    $user->user_password = $data['password_reset'];
-                    $notify = 'Password successfully changed.';
-                }
-            },
             'success' => function($user, $data) {
                 return array(
                      'notify' => $user->is_changed('user_password') ? 'New password successfully set.' : 'User successfully saved.',

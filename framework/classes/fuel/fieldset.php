@@ -438,30 +438,31 @@ class Fieldset extends \Fuel\Core\Fieldset {
         $json_response = array();
 
         $pk = $object->primary_key();
-		foreach ($fields as $name => $config)
-		{
-			if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
-				continue;
-			}
-			$type = \Arr::get($config, 'form.type', null);
 
-			if ($type == 'submit') {
-				continue;
-			}
+	    // Will trigger cascade_save for media and wysiwyg
+	    try {
+			foreach ($fields as $name => $config)
+			{
+				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
+					continue;
+				}
+				$type = \Arr::get($config, 'form.type', null);
 
-			if ($type == 'checkox' && empty($data[$name])) {
-				$object->$name = null;
-			} else if (isset($data[$name]) && !in_array($name, $pk)) {
-				try {
-					$object->$name = $data[$name];
-				} catch (\Exception $e) {
-					$json_response['error'] = $e->getMessage();
+				if ($type == 'submit') {
+					continue;
+				}
+
+				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
+					call_user_func($config['before_save'], $object, $data);
+				} else {
+					if ($type == 'checkox' && empty($data[$name])) {
+						$object->$name = null;
+					} else if (isset($data[$name]) && !in_array($name, $pk)) {
+						$object->$name = $data[$name];
+					}
 				}
 			}
-		}
 
-		// Will trigger cascade_save for media and wysiwyg
-		try {
             // Let behaviours do their job (publication for example)
             $object->form_processing_behaviours($data, $json_response);
 
@@ -488,6 +489,24 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $object->save();
 				$json_response['notify'] = __('Operation completed successfully.');
 			}
+
+		    foreach ($fields as $name => $config)
+			{
+				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
+					continue;
+				}
+				$type = \Arr::get($config, 'form.type', null);
+
+				if ($type == 'submit') {
+					continue;
+				}
+
+				if (!empty($config['success']) && is_callable($config['success'])) {
+					$json_field = call_user_func($config['success'], $object, $data);
+					$json_response = \Arr::merge($json_response, $json_field);
+				}
+			}
+
 		} catch (Exception $e) {
 			if (empty($options['error']) && is_callable($options['error'])) {
 				$json_response = call_user_func($options['error'], $e, $object, $data);
