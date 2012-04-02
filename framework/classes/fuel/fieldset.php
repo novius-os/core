@@ -33,6 +33,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	}
 
     public function build($action = null) {
+        $build = parent::build($action);
         $append = array();
         foreach ($this->append as $a) {
             if (is_callable($a)) {
@@ -41,7 +42,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $append[] = $a;
             }
         }
-        return parent::build($action = null).implode('', $append);
+        return $build.implode('', $append);
     }
 
 	public function close() {
@@ -308,35 +309,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		$validate = \Format::forge()->to_json($json);
 		$this->append(function($fieldset) use ($validate) {
             $form_attributes = $fieldset->get_config('form_attributes', array());
-            return
-<<<JS
-<script type="text/javascript">
-require(['jquery', 'jquery-validate'], function($) {
-	var json = $validate;
-	//console.log($validate);
-	$('#{$form_attributes['id']}').validate($.extend({}, json, {
-        errorClass : 'ui-state-error',
-        success : true,
-        ignore: 'input[type=hidden]',
-		submitHandler: function(form) {
-			require(['jquery-nos', 'order!jquery-form'], function($) {
-				$(form).ajaxSubmit({
-					dataType: 'json',
-					success: function(json) {
-						$.nos.ajax.success(json);
-                        $(form).triggerHandler('ajax_success', [json]);
-					},
-					error: function() {
-						$.nos.notify('An error occured', 'error');
-					},
-				});
-			});
-		}
-	}));
-	require(['jquery-nos', 'order!jquery-form']);
-});
-</script>
-JS;
+            return '<script type="text/javascript">require(["jquery-nos"], function($) {$.nos.ui.validate("#'.$form_attributes['id'].'", '.$validate.')});</script>';
         });
 	}
 
@@ -466,30 +439,31 @@ JS;
         $json_response = array();
 
         $pk = $object->primary_key();
-		foreach ($fields as $name => $config)
-		{
-			if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
-				continue;
-			}
-			$type = \Arr::get($config, 'form.type', null);
 
-			if ($type == 'submit') {
-				continue;
-			}
+	    // Will trigger cascade_save for media and wysiwyg
+	    try {
+			foreach ($fields as $name => $config)
+			{
+				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
+					continue;
+				}
+				$type = \Arr::get($config, 'form.type', null);
 
-			if ($type == 'checkox' && empty($data[$name])) {
-				$object->$name = null;
-			} else if (isset($data[$name]) && !in_array($name, $pk)) {
-				try {
-					$object->$name = $data[$name];
-				} catch (\Exception $e) {
-					$json_response['error'] = $e->getMessage();
+				if ($type == 'submit') {
+					continue;
+				}
+
+				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
+					call_user_func($config['before_save'], $object, $data);
+				} else {
+					if ($type == 'checkox' && empty($data[$name])) {
+						$object->$name = null;
+					} else if (isset($data[$name]) && !in_array($name, $pk)) {
+						$object->$name = $data[$name];
+					}
 				}
 			}
-		}
 
-		// Will trigger cascade_save for media and wysiwyg
-		try {
             // Let behaviours do their job (publication for example)
             $object->form_processing_behaviours($data, $json_response);
 
@@ -516,6 +490,24 @@ JS;
                 $object->save();
 				$json_response['notify'] = __('Operation completed successfully.');
 			}
+
+		    foreach ($fields as $name => $config)
+			{
+				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
+					continue;
+				}
+				$type = \Arr::get($config, 'form.type', null);
+
+				if ($type == 'submit') {
+					continue;
+				}
+
+				if (!empty($config['success']) && is_callable($config['success'])) {
+					$json_field = call_user_func($config['success'], $object, $data);
+					$json_response = \Arr::merge($json_response, $json_field);
+				}
+			}
+
 		} catch (Exception $e) {
 			if (empty($options['error']) && is_callable($options['error'])) {
 				$json_response = call_user_func($options['error'], $e, $object, $data);

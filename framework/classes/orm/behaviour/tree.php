@@ -109,20 +109,22 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @return  void
      */
 	public function set_parent($object, $parent = null) {
-        // Check if the object is appropriate
-        if (get_class($parent) != $this->_parent_relation->model_to) {
-            throw new \Exception(sprintf('Cannot set "parent" to object of type %s in tree behaviour (expected %s): %s',
-                    (string) get_class($parent),
-                    $this->_parent_relation->model_to,
-                    $this->_class
-                ));
-        }
+        if ($parent !== null) {
+            // Check if the object is appropriate
+            if (get_class($parent) != $this->_parent_relation->model_to) {
+                throw new \Exception(sprintf('Cannot set "parent" to object of type %s in tree behaviour (expected %s): %s',
+                        (string) get_class($parent),
+                        $this->_parent_relation->model_to,
+                        $this->_class
+                    ));
+            }
 
-        if (!$object->is_new()) {
-            $children_ids = $this->get_ids_children($object, true);
-            if (in_array($parent->id, $children_ids)) {
-                // Dev details : Cannot move an element inside of its own children
-                throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
+            if (!$object->is_new()) {
+                $children_ids = $this->get_ids_children($object, true);
+                if (in_array($parent->id, $children_ids)) {
+                    // Dev details : Cannot move an element inside of its own children
+                    throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
+                }
             }
         }
 

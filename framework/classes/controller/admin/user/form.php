@@ -65,9 +65,9 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 		$applications = \Input::post('applications');
         foreach ($applications as $application) {
             $access = Model_User_Permission::find('first', array('where' => array(
-                array('perm_role_id', $role->role_id),
+                array('perm_role_id',     $role->role_id),
                 array('perm_application', 'access'),
-                array('perm_key',         $application),
+                array('perm_key',          $application),
             )));
 
             // Grant of remove access to the application
@@ -77,9 +77,9 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 
             if (!empty($_POST['access'][$application]) && empty($access)) {
                 $access = new Model_User_Permission();
-                $access->perm_role_id   = $role->role_id;
-                $access->perm_module     = 'access';
-                $access->perm_identifier = '';
+                $access->perm_role_id     = $role->role_id;
+                $access->perm_application = 'access';
+                $access->perm_identifier  = '';
                 $access->perm_key         = $application;
                 $access->save();
             }
@@ -156,6 +156,8 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                 'form' => array(
                     'type' => 'password',
                 ),
+	            'before_save' => function($object, $data) {
+	            },
                 'validation' => array(
                     'required', // To show the little star
                     'match_field' => array('user_password'),
@@ -229,6 +231,11 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                     'type' => 'password',
                     'value' => '',
                 ),
+	            'before_save' => function($object, $data) {
+		            if (!empty($data['password_reset'])) {
+			            $object->user_password = $data['password_reset'];
+		            }
+	            },
                 'validation' => array(
                     'min_length' => array(6),
                 ),
@@ -238,6 +245,8 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                 'form' => array(
                     'type' => 'password',
                 ),
+	            'before_save' => function($object, $data) {
+	            },
                 'validation' => array(
                     'match_field' => array('password_reset'),
                 ),
@@ -254,12 +263,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         );
 
         $fieldset = \Fieldset::build_from_config($fields, $user, array(
-            'before_save' => function($user, $data) {
-                if (!empty($data['password_reset'])) {
-                    $user->user_password = $data['password_reset'];
-                    $notify = 'Password successfully changed.';
-                }
-            },
+	        'form_name' => 'form_user_edit',
             'success' => function($user, $data) {
                 return array(
                      'notify' => $user->is_changed('user_password') ? 'New password successfully set.' : 'User successfully saved.',

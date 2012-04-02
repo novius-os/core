@@ -332,6 +332,30 @@ define('jquery-nos', [
                         header: "h3"
                     });
                 });
+            },
+
+            validate : function(context, params) {
+                $(function() {
+                    require(['jquery-validate', 'jquery-form'], function() {
+                        $(context).validate($.extend({}, params, {
+                            errorClass : 'ui-state-error',
+                            success : true,
+                            ignore: 'input[type=hidden]',
+                            submitHandler: function(form) {
+                                $(form).ajaxSubmit({
+                                    dataType: 'json',
+                                    success: function(json) {
+                                        $.nos.ajax.success(json);
+                                        $(form).triggerHandler('ajax_success', [json]);
+                                    },
+                                    error: function() {
+                                        $.nos.notify('An error occured', 'error');
+                                    }
+                                });
+                            }
+                        }));
+                    });
+                });
             }
         },
 

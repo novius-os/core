@@ -26,6 +26,9 @@ body {
   top: 50%;
   width: 440px;
 }
+#login p {
+    margin: 1em 0;
+}
 #login label {
 	display: inline-block;
 	text-align: right;

@@ -137,7 +137,7 @@ return array(
 	'inputs' => array(
 		'folder_id' => function($value, $query) {
 			if ($value) {
-				$query->where(array('media_path_id', '=', $value));
+				$query->where(array('media_folder_id', '=', $value));
 			}
 			return $query;
 		},

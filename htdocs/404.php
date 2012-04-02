@@ -63,7 +63,7 @@ if (false === $media) {
     $send_file = false;
 } else {
     if ($resized) {
-        $source = APPPATH.$media->get_public_path();
+        $source = APPPATH.$media->get_private_path();
         $dest   = DOCROOT.$m[0];
         $dir    = dirname($dest);
         if (!is_dir($dir)) {
@@ -76,7 +76,7 @@ if (false === $media) {
             $send_file = false;
         }
     } else {
-        $source = APPPATH.$media->get_public_path();
+        $source = APPPATH.$media->get_private_path();
         $target = DOCROOT.$media->get_public_path();
         $dir    = dirname($target);
         if (!is_dir($dir)) {

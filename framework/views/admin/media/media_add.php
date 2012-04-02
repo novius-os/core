@@ -45,8 +45,8 @@ require(['jquery-nos-ostabs'], function ($) {
 	if (!$hide_widget_media_path) {
 ?>
         <tr>
-            <th><?= $fieldset->field('media_path_id')->label ?></th>
-            <td><?= $fieldset->field('media_path_id')->build() ?></td>
+            <th><?= $fieldset->field('media_folder_id')->label ?></th>
+            <td><?= $fieldset->field('media_folder_id')->build() ?></td>
         </tr>
 <?php
 	}
