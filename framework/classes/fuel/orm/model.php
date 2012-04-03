@@ -259,9 +259,9 @@ class Model extends \Orm\Model {
 			$prefix_length = strlen($prefix);
 		}
 		foreach (func_get_args() as $property) {
-			if (substr($property, 0, $prefix_length) != $prefix) {
+			//if (substr($property, 0, $prefix_length) != $prefix) {
 				$property = $prefix.$property;
-			}
+			//}
 			if (!empty($this->{$property})) {
 				return $this->{$property};
 			}

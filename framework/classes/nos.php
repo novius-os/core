@@ -133,14 +133,14 @@ class Nos {
 
         \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
 
-		preg_match_all('`<(\w+)\s[^>]+data-application="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
         foreach ($matches[2] as $match_id => $fct_id) {
 
             $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id]);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
 		}
 
-		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-application="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`', $content, $matches);
         foreach ($matches[3] as $match_id => $fct_id) {
             $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id]);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
