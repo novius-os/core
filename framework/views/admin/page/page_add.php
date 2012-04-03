@@ -44,7 +44,7 @@ require(['jquery-nos-ostabs'], function ($) {
                 $fieldset->populate_with_instance(null);
                 $fieldset->field('page_parent_id')->set_value($parent->find_lang($lang)->page_id);
                 $fieldset->field('page_lang')->set_value($lang);
-                $fieldset->field('page_parent_id')->set_options(array(
+                $fieldset->field('page_parent_id')->set_widget_options(array(
                     'lang' => $lang,
                 ));
                 echo View::forge('nos::admin/page/page_form', array(
