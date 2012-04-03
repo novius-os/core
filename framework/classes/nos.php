@@ -164,13 +164,13 @@ class Nos {
         ));
 
         if ($found) {
-            $function_content = self::hmvc($config['target'].'/main', array(
+            $function_content = self::hmvc($config['enhancer'].'/main', array(
                 'args'        => array($args),
                 'application' => $config['rewrite_prefix'] ?: $name,
                 'inline'      => true,
             ));
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
-                $function_content = 'Enhancer '.$name.' ('.$config['target'].') returned empty content.';
+                $function_content = 'Enhancer '.$name.' ('.$config['enhancer'].') returned empty content.';
             }
         } else {
             $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Function '.$name.' not found in '.get_class($controller).'.' : '';
