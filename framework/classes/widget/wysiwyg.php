@@ -44,15 +44,7 @@ class Widget_Wysiwyg extends \Fieldset_Field {
 
 	public function js_init() {
 		$id = $this->get_attribute('id');
-		return <<<JS
-<script type="text/javascript">
-    require([
-    'wysiwyg'
-    ], function() {
-        $('textarea#$id').wysiwyg($('textarea#$id').data('wysiwyg-options'));
-    });
-</script>
-JS;
+		return '<script type="text/javascript">require(["wysiwyg"], function() {var $t = $("textarea#'.$id.'");$t.wysiwyg($t.data("wysiwyg-options"));});</script>';
 	}
 
 }
