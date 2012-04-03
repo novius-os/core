@@ -12,8 +12,8 @@ class Controller_Admin_Wysiwyg extends \Controller {
 
 	public function action_enhancers() {
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'wysiwyg_enhancers.php', 'wysiwyg_enhancers');
-        $functions = \Config::get('wysiwyg_enhancers', array());
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
+        $functions = \Config::get('enhancers', array());
 
 		\Response::json($functions);
 	}

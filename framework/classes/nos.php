@@ -129,7 +129,7 @@ class Nos {
 	protected static function _parse_enhancers(&$content) {
 
         // Fetch the available functions
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'wysiwyg_enhancers.php', 'wysiwyg_enhancers');
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
         \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
 
@@ -154,7 +154,7 @@ class Nos {
 
         // Check if the function exists
         $name   = $fct_id;
-        $config = Config::get("wysiwyg_enhancers.$name", false);
+        $config = Config::get("enhancers.$name", false);
         $found  = $config !== false;
 
         false && \Fuel::$profiling && Profiler::console(array(
