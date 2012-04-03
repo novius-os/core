@@ -85,7 +85,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
     }
 
     public function path($file = '') {
-        return APPPATH.'media/'.$this->medif_path.$file;
+        return APPPATH.'data/media/'.$this->medif_path.$file;
     }
 
     public function count_media() {

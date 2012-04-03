@@ -446,7 +446,7 @@ class Model_Media_Provider
         if ($media === null) {
             return $media;
         }
-        return $media->media;
+        return $media->get('media');
 	}
 
 	public function __set($property, $value)
