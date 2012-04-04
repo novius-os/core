@@ -67,7 +67,9 @@ if (false === $media) {
         $dest   = DOCROOT.$m[0];
         $dir    = dirname($dest);
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            if (!@mkdir($dir, 0755, true)) {
+                exit("Can't create dir ".$dir);
+            }
         }
         try {
             \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
