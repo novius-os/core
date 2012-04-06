@@ -60,7 +60,7 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
     ), false),
 
     'menu' => array(
-        __('Menu')               => array('page_menu', 'page_menu_title', 'page_parent_id'),
+        __('Menu')               => array('page_parent_id', 'page_menu', 'page_menu_title'),
         __('URL (page address)') => array('page_virtual_name'),
         __('SEO')                => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
         __('Admin')              => array(
