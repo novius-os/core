@@ -3,7 +3,7 @@
 	url = git://github.com/novius-os/fuelphp-core.git
 [submodule "packages/orm"]
 	path = packages/orm
-	url = git://github.com/fuel/orm.git
+	url = git://github.com/novius-os/fuelphp-orm.git
 [submodule "packages/parser"]
 	path = packages/parser
 	url = git://github.com/fuel/parser.git

@@ -15,11 +15,10 @@ use Event;
 class Controller extends Controller_Extendable {
 
     public $url;
-    public $rewrite_url;
-    public $rewrites;
-    public $application;
+	public $enhancerUrl;
+	public $enhancerUrlPath;
 
-    public $rewrite_prefix;
+	public $enhancerUrl_segments;
 
     public $cache;
     public $cache_cleanup;
@@ -27,39 +26,6 @@ class Controller extends Controller_Extendable {
     public $nesting_level;
 
     public $default_config = array();
-
-
-    public function before() {
-        $parent_request = $this->request->parent();
-        if ($parent_request && $parent_request->controller_instance) {
-            $this->nesting_level = $parent_request->controller_instance->nesting_level + 1;
-        }
-        $this->set_rewrite_prefix();
-        if ($this->nesting_level > 3) {
-            \Fuel::$profiling && \Console::logError(new Exception(), '3 levels of nesting reached. You need to stop now.');
-        }
-        return parent::before();
-    }
-
-    public function set_rewrite_prefix($prefix = null) {
-
-        if (empty($prefix)) {
-            $c =\Nos::main_controller();
-            if (!empty($c->rewrite_prefix)) {
-                $prefix    = $c->rewrite_prefix;
-                $rewriting = \Arr::get($c->rewriting, $c->rewrite_prefix, array());
-            }
-        } else if ($prefix == -1) {
-            $rewriting = $this->rewriting[-1];
-        }
-
-        if (!empty($rewriting)) {
-            $this->rewrite_prefix = $prefix;
-            $this->url            = $rewriting['url'];
-            $this->rewrite_url    = $rewriting['rewrite_url'];
-            $this->rewrites       = $rewriting['rewrites'];
-        }
-    }
 
     public function trigger($event, $data = '', $return_type = 'string') {
         Event::trigger(get_called_class().'.'.$event, $this, 'array');
@@ -71,11 +37,6 @@ class Controller extends Controller_Extendable {
 
     public function rebuild_cache($cache) {
         $this->cache = $cache;
-    }
-
-    public function get_rewrite($name) {
-        // @todo big tweak!!
-        return implode(',', $this->rewrites);
     }
 
     protected function merge_config($mixed) {
@@ -97,12 +58,4 @@ class Controller extends Controller_Extendable {
         }
         return $views;
     }
-
-    public static function rewrite_url() {
-        $args = func_get_args();
-        $url = array_shift($args);
-        return \Nos::rewrite_url($url, $args);
-    }
-
-
 }

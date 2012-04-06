@@ -12,7 +12,7 @@ namespace Nos;
 
 class Widget_Page_Selector extends \Fieldset_Field {
 
-	protected $options = array();
+	protected $widget_options = array();
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
 
@@ -23,15 +23,15 @@ class Widget_Page_Selector extends \Fieldset_Field {
 			$attributes['id'] = uniqid('page_');
 		}
 		if (!empty($attributes['widget_options'])) {
-			$this->set_options($attributes['widget_options']);
+			$this->set_widget_options($attributes['widget_options']);
 		}
 		unset($attributes['widget_options']);
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
-    public function set_options(array $options) {
-        $this->options = \Arr::merge($this->options, $options);
+    public function set_widget_options(array $options) {
+        $this->widget_options = \Arr::merge($this->widget_options, $options);
     }
 
     /**
@@ -55,10 +55,10 @@ class Widget_Page_Selector extends \Fieldset_Field {
 			        )
 		        ),
                 'treeOptions' => array(
-                    'lang' => \Arr::get($this->options, 'lang', null)
+                    'lang' => \Arr::get($this->widget_options, 'lang', null)
                 ),
-		        'height' => \Arr::get($this->options, 'height', '150px'),
-		        'width' => \Arr::get($this->options, 'width', null),
+		        'height' => \Arr::get($this->widget_options, 'height', '150px'),
+		        'width' => \Arr::get($this->widget_options, 'width', null),
 		    ),
         )))->response());
     }

@@ -74,15 +74,12 @@ class Nos {
         if (empty($args['args'])) {
             $args['args'] = array();
         }
-        $application = !empty($args['application']) ? $args['application'] : '';
 
         ob_start();
         try {
             $request  = Request::forge($where);
 
-            \Nos::main_controller()->rewrite_prefix = $application;
-            $response = call_user_func_array(array($request, "execute"), array($args['args']));
-            \Nos::main_controller()->rewrite_prefix = null;
+	        $response = $request->execute($args['args']);
             $cache_cleanup = $request->controller_instance->cache_cleanup;
 
             if (!empty($cache_cleanup)) {
@@ -106,12 +103,11 @@ class Nos {
      *
      * @param  string           $content     Wysiwyg content to parse
      * @param  \Nos\Controller  $controller  Context for the execution
-     * @param  boolean          $no_cache    Should cache be skipped?
      * @return string
      */
-    public static function parse_wysiwyg($content, $controller, $inline = null) {
+    public static function parse_wysiwyg($content, $controller) {
 
-		Nos::_parse_enhancers($content);
+		Nos::_parse_enhancers($content, $controller);
 		Nos::_parse_medias($content);
 		Nos::_parse_internals($content);
 
@@ -126,36 +122,43 @@ class Nos {
 		return $content;
     }
 
-	protected static function _parse_enhancers(&$content) {
+	protected static function _parse_enhancers(&$content, $controller) {
 
         // Fetch the available functions
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'wysiwyg_enhancers.php', 'wysiwyg_enhancers');
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
         \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
 
 		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
         foreach ($matches[2] as $match_id => $fct_id) {
 
-            $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id]);
+            $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id], $controller);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
 		}
 
 		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`', $content, $matches);
         foreach ($matches[3] as $match_id => $fct_id) {
-            $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id]);
+            $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id], $controller);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
 		}
 	}
 
-    protected static function __parse_enhancers($fct_id, $args) {
+    protected static function __parse_enhancers($fct_id, $args, $controller) {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
         )));
 
         // Check if the function exists
         $name   = $fct_id;
-        $config = Config::get("wysiwyg_enhancers.$name", false);
+        $config = Config::get("enhancers.$name", false);
         $found  = $config !== false;
+
+	    if (!empty($config['urlEnhancer'])) {
+		    $args = array(
+			    'url' => $controller->enhancerUrl,
+			    'config' => $args,
+		    );
+	    }
 
         false && \Fuel::$profiling && Profiler::console(array(
             'function_id'   => $fct_id,
@@ -164,13 +167,11 @@ class Nos {
         ));
 
         if ($found) {
-            $function_content = self::hmvc($config['target'].'/main', array(
+            $function_content = self::hmvc((!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']).'/main', array(
                 'args'        => array($args),
-                'application' => $config['rewrite_prefix'] ?: $name,
-                'inline'      => true,
             ));
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
-                $function_content = 'Enhancer '.$name.' ('.$config['target'].') returned empty content.';
+                $function_content = 'Enhancer '.$name.' ('.$config['enhancer'].') returned empty content.';
             }
         } else {
             $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Function '.$name.' not found in '.get_class($controller).'.' : '';

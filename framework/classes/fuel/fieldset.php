@@ -332,7 +332,6 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		$fieldset = \Fieldset::forge(uniqid(), array(
 			'inline_errors'  => true,
 			'auto_id'		 => true,
-            'auto_id_prefix' => '', // Temporary fix to fuel bug
 			'required_mark'  => '&nbsp;<span style="font-size: 1.5em; line-height: 1em; font-weight: bold">*</span>',
 			'error_template' => '{error_msg}',
 			'error_class'    => 'error',
@@ -401,6 +400,9 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $form_attributes['id'] = 'form_id_'.$uniqid;
             $this->set_config('auto_id_prefix', 'form'.$uniqid.'_');
             $this->set_config('form_attributes', $form_attributes);
+            foreach ($this->fields as $field) {
+                $field->set_attribute('id', '');
+            }
         }
 
         if (empty($instance)) {

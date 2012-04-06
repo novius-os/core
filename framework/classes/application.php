@@ -87,7 +87,7 @@ class Application {
 		return true;
 	}
 
-    static protected $properties = array('templates', 'launchers', 'wysiwyg_enhancers');
+    static protected $properties = array('templates', 'launchers', 'enhancers');
 
     protected function _refresh_properties($add = true) {
         foreach (static::$properties as $property) {
