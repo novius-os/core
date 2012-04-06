@@ -73,6 +73,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         $config = \Config::get($module_name.'::'.$file_name);
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', true);
         $dependencies = \Config::get(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', array());
+
         if (!empty($dependencies[$module_name])) {
             foreach ($dependencies[$module_name] as $dependency) {
                 \Config::load($dependency.'::'.$file_name, true);

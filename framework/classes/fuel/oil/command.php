@@ -77,7 +77,7 @@ class Command extends \Oil\Command
 
                 case 'c':
                 case 'console':
-                    new Console;
+                    new \Nos\Oil\Console;
 
                 case 'r':
                 case 'refine':

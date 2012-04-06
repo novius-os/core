@@ -80,9 +80,6 @@ class Refine extends Oil\Refine
 
         require_once $file;
 
-        echo "$file\n";
-        exit();
-
         $task = ucfirst($task);
 
         $new_task = new $task;

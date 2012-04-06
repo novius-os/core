@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+namespace Nos\Oil;
+
 class Console extends \Oil\Console
 {
 

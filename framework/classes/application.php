@@ -196,6 +196,7 @@ class Application {
         if ($add) {
             \Config::load($add.'::metadata', true);
             $config = \Config::get($add.'::metadata', array());
+
             if (isset($config['extends'])) {
                 if (!isset($dependencies[$config['extends']])) {
                     $dependencies[$config['extends']] = array();
