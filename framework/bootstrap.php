@@ -33,7 +33,10 @@ Autoloader::add_classes(array(
     'Generate'       => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'generate.php',
     'Command'        => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'command.php',
     'Console'        => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'console.php',
-	'Nos\Orm\Query'  => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'query.php',
+    'Refine'         => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'refine.php',
+    'Nos\Tasks\Migrate' => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'tasks'.DIRECTORY_SEPARATOR.'migrate.php',
+    'Migrate'        => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'migrate.php',
+    'Nos\Orm\Query'  => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'query.php',
 	'Nos\Orm\Model'  => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'model.php',
 
 ));

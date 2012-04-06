@@ -12,7 +12,8 @@ namespace Nos;
 
 class Controller_Generic_Admin extends Controller_Template_Extendable {
 
-    public $template = 'nos::templates/html5';
+    public $template    = 'nos::templates/html5';
+    public $bypass      = false;
 
 
     public function before($response = null) {
@@ -23,7 +24,7 @@ class Controller_Generic_Admin extends Controller_Template_Extendable {
 	        $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native applications...
         }
 
-        if ($application != 'nos' && !Permission::check($application, 'access')) {
+        if (!$this->bypass && $application != 'nos' && !Permission::check($application, 'access')) {
             throw new \Exception('You don\'t have access to module '.$application.'!');
         }
 

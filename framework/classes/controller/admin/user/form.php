@@ -12,6 +12,15 @@ namespace Nos;
 
 class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 
+    public function before($response = null) {
+        if (\Request::active()->action == 'edit' &&\Request::active()->method_params[0] == \Session::user()->user_id) {
+            $this->bypass = true;
+        }
+        $ret = parent::before($response);
+
+        return $ret;
+    }
+
     public function action_add() {
 
         $user = Model_User_User::forge();

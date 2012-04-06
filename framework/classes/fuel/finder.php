@@ -20,7 +20,7 @@ class Finder extends Fuel\Core\Finder {
 		return static::$instance;
 	}
 
-	protected static function normalize_namespace($name) {
+	public static function normalize_namespace($name) {
 		return implode('\\', array_map(function($a) {
 			return Inflector::words_to_upper($a);
 		}, explode('\\', $name)));
@@ -128,17 +128,6 @@ class Finder extends Fuel\Core\Finder {
 		if (is_array($found) && !$multiple) {
 			$found = isset($found[0]) ? $found[0] : false;
 		}
-/*
-			echo '<pre>';
-			print_r(array(
-				func_get_args(),
-				(int) $is_namespaced,
-				array($directory, $file, $ext, $multiple, $cache),
-				static::$_paths,
-				$search,
-				$found,
-			));
-			echo '</pre>';//*/
 
 		return $found;
 	}

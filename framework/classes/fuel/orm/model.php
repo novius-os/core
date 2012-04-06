@@ -259,9 +259,9 @@ class Model extends \Orm\Model {
 			$prefix_length = strlen($prefix);
 		}
 		foreach (func_get_args() as $property) {
-			if (substr($property, 0, $prefix_length) != $prefix) {
+			//if (substr($property, 0, $prefix_length) != $prefix) {
 				$property = $prefix.$property;
-			}
+			//}
 			if (!empty($this->{$property})) {
 				return $this->{$property};
 			}
@@ -505,7 +505,7 @@ class Model_Media_Provider
         if ($media === null) {
             return $media;
         }
-        return $media->media;
+        return $media->get('media');
 	}
 
 	public function __set($property, $value)
