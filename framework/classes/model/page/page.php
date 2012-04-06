@@ -44,6 +44,8 @@ class Model_Page_Page extends \Nos\Orm\Model {
 		),
 	);
 
+	protected static $_observers = array('Orm\\Observer_Self');
+
 	protected static $_behaviours = array(
 		'Nos\Orm_Behaviour_Translatable' => array(
 			'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'before_change_parent', 'after_change_parent'),
@@ -170,4 +172,58 @@ class Model_Page_Page extends \Nos\Orm\Model {
         }
         return array_keys(\Config::get('locales'));
     }
+
+	public function _event_after_save() {
+		$diff = $this->get_diff();
+		if (!empty($diff[0]['page_virtual_url'])) {
+			static::_remove_url_enhanced($diff[0]['page_virtual_url']);
+		}
+
+		\Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
+
+		$content = '';
+		foreach (\Input::post('wysiwyg', array()) as $text) {
+			$content .= $text;
+		}
+
+		$urlEnhancer = false;
+		$regexps = array(
+			'`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`' => 2,
+			'`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`' => 3,
+		);
+		foreach ($regexps as $regexp => $name_index) {
+			preg_match_all($regexp, $content, $matches);
+			foreach ($matches[$name_index] as $name) {
+				$config = \Config::get("enhancers.$name", false);
+				if ($config && !empty($config['urlEnhancer'])) {
+					$urlEnhancer = true;
+					break 2;
+				}
+			}
+		}
+
+		if ($urlEnhancer) {
+			\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
+
+			$url_enhanced = \Config::get("url_enhanced", array());
+			$url = str_replace('.html', '/', $this->page_virtual_url);
+			$url_enhanced[$url] = $url;
+
+			\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
+		}
+	}
+
+	public function _event_after_delete() {
+		static::_remove_url_enhanced($this->page_virtual_url);
+	}
+
+	static protected function _remove_url_enhanced($url) {
+		\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
+
+		$url_enhanced = \Config::get("url_enhanced", array());
+		$url = str_replace('.html', '/', $url);
+		unset($url_enhanced[$url]);
+
+		\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
+	}
 }

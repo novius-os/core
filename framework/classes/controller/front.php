@@ -24,9 +24,6 @@ class Controller_Front extends Controller {
 
     protected $_view;
 
-    public $full_url;
-    public $rewriting;
-
     public $assets_css = array();
     public $assets_js  = array();
     public $raw_css    = array();
@@ -38,22 +35,16 @@ class Controller_Front extends Controller {
     public $meta_robots      = 'index,follow';
     public $metas            = array();
 
-
-    //public function before() {
-    //    return parent::before();
-    //}
-
-    // front entry point = action_index()
-
     public function router($action, $params) {
 
-        $this->_prepare();
+	    // Strip out leading / and trailing .html
+	    $url = substr($_SERVER['REDIRECT_URL'], 1, -5);
 
-        $cache_path = str_replace(str_replace('.html', '', $this->rewrite_url), '', $this->full_url);
-        $cache_path = (empty($this->url) ? 'index/' : $this->url).$cache_path;
+        $cache_path = $url;
+        $cache_path = (empty($url) ? 'index/' : $url).$cache_path;
         $cache_path = rtrim($cache_path, '/');
 
-		$nocache = true;
+		$nocache = \Fuel::$env === \Fuel::DEVELOPMENT;
 
 		\Event::trigger('front.start');
 
@@ -62,18 +53,37 @@ class Controller_Front extends Controller {
             $content = $publi_cache->execute($this);
         } catch (CacheNotFoundException $e) {
             $publi_cache->start();
-            try {
-                $this->_generate_cache();
-            } catch (Exception $e) {
-                // Cannot generate cache: fatal error...
-                exit($e->getMessage());
-            }
-			//ob_start();
-            echo $this->_view->render();
-			//$content = ob_get_clean();
-            $publi_cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
-            //\Event::trigger('page_save_cache', $publi_cache->get_path());
-            $content = $publi_cache->execute();
+
+	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
+	        $url_enhanced = \Config::get("url_enhanced", array());
+	        $url_enhanced[$url.'/'] = $url.'/';
+	        $_404 = true;
+	        foreach ($url_enhanced as $tempurl) {
+		        if (substr($url.'/', 0, strlen($tempurl)) === $tempurl) {
+			        $_404 = false;
+			        $this->url = $tempurl != '/' ? substr($tempurl, 0, -1).'.html' : '';
+			        $this->enhancerUrlPath = $tempurl != '/' ? $tempurl : '';
+			        $this->enhancerUrl = ltrim(str_replace(substr($tempurl, 0, -1), '', $url), '/');
+			        try {
+				        $this->_generate_cache();
+			        } catch (NotFoundException $e) {
+				        $_404 = true;
+				        continue;
+			        } catch (\Exception $e) {
+				        // Cannot generate cache: fatal error...
+				        //@todo : cas de la page d'erreur
+				        exit($e->getMessage());
+			        }
+
+		            echo $this->_view->render();
+			        $publi_cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
+			        $content = $publi_cache->execute();
+			        break;
+		        }
+	        }
+	        if ($_404) {
+		        //@todo : cas du 404
+	        }
         }
 		$this->_handle_head($content);
 
@@ -121,58 +131,6 @@ class Controller_Front extends Controller {
     }
 
     /**
-     * Determine the URL of the page.
-     * Computes all rewrites from all sub-pages.
-     */
-    protected function _prepare() {
-        // Strip out leading / and trailing .html
-        $url = substr($_SERVER['REDIRECT_URL'], 1, -5);
-        $this->full_url = $url;
-        $exploded_url = explode('/', $url);
-        $rebuildt_url = array();
-        $rewriting     = array();
-        while(null !== ($fragment = array_shift($exploded_url))) {
-            $fragments = explode(',', $fragment);
-            if (count($fragments) == 1) {
-                if ($fragment == $fragments[0]) {
-                    $rebuildt_url[] = $fragment;
-                    $url = implode('/', $rebuildt_url);
-                    $url = $url.(empty($url) ? '' : '.html');
-                    $rewriting[-1] = array(
-                        'url'         => $url,
-                        'rewrite_url' => $url,
-                        'rewrites'    => array(),
-                    );
-                    continue;
-                } else {
-                    $fragments = array();
-                }
-            }
-
-            $url = implode('/', $rebuildt_url);
-            $rebuildt_url[] = $fragment;
-            //$rewrite_url    = implode('/', $rebuildt_url);
-            $rewrite_url    = $url;
-            if (empty($rewriting[-1])) {
-                $rewriting[-1] = array(
-                    'url'         => $url,
-                    'rewrite_url' => $url,
-                    'rewrites'    => array(),
-                );
-            }
-            $application             = array_shift($fragments);
-            $rewriting[$application] = array(
-                'url'         => $url.(empty($url) ? '' : '.html'),
-                'rewrite_url' => $rewrite_url.(empty($rewrite_url) ? '' : '.html'),
-                'rewrites'    => $fragments,
-            );
-        }
-        $this->rewriting     = $rewriting;
-        $this->nesting_level = 0;
-        $this->set_rewrite_prefix(-1);
-    }
-
-    /**
      * Generate the cache. Renders all wysiwyg and assign them to the view.
      */
     protected function _generate_cache() {
@@ -210,10 +168,8 @@ class Controller_Front extends Controller {
 
         if (empty($pages)) {
             var_dump($this->url);
-            var_dump($this->rewrite_url);
             throw new \Exception('The requested page was not found.');
         }
-
 
         // Get the first page
         reset($pages);

@@ -426,6 +426,65 @@ class Model extends \Orm\Model {
 			return false;
 		}
 	}
+
+
+	/**
+	 * Generates an array with keys new & old that contain ONLY the values that differ between the original and
+	 * the current unsaved model.
+	 * Note: relations are given as single or array of imploded pks
+	 *
+	 * @return  array
+	 */
+	public function get_diff()
+	{
+		$diff = array(0 => array(), 1 => array());
+		foreach ($this->_data as $key => $val)
+		{
+			if ($this->is_changed($key))
+			{
+				$diff[0][$key] = $this->_original[$key];
+				$diff[1][$key] = $val;
+			}
+		}
+		foreach ($this->_data_relations as $key => $val)
+		{
+			$rel = static::relations($key);
+			if ($rel->singular)
+			{
+				if ((($new_pk = $val->implode_pk($val)) and ! isset($this->_original_relations[$key]))
+					or $new_pk != $this->_original_relations[$key])
+				{
+					$diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
+					$diff[1][$key] = $new_pk;
+				}
+			}
+			else
+			{
+				// $this->_original_relations[$key] can be not set (case of children width page)
+				$original_pks = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : array();
+				foreach ($val as $v)
+				{
+					if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks))
+					{
+						$diff[0][$key] = null;
+						$diff[1][$key] = is_set($diff[1][$key]) ? $diff[1][$key] + array($new_pk) : array($new_pk);
+					}
+					else
+					{
+						$original_pks = array_diff($original_pks, array($new_pk));
+					}
+				}
+				if (count($original_pks)) {
+					$diff[0][$key] = $original_pks;
+					if (!isset($diff[1][$key])) {
+						$diff[1][$key] = null;
+					}
+				}
+			}
+		}
+
+		return $diff;
+	}
 }
 
 

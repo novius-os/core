@@ -4,11 +4,12 @@ define([
 ], function($) {
     var inc = 1;
     $.fn.wysiwyg = function(options) {
-
 		var self = $(this);
+        options = options || {};
 		$.ajax({
 			dataType: 'json',
 			url: 'admin/nos/wysiwyg/enhancers',
+            data : options.urlEnhancers ? {urlEnhancers : true} : null,
 			success: function(enhancers) {
 				options = $.extend({
 					// Location of TinyMCE script

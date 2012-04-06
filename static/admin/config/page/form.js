@@ -80,6 +80,7 @@ define([
                         $wysiwyg.append(bloc);
                         // The bottom row from TinyMCE is roughly 21px
                         $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg({
+                            urlEnhancers : true,
                             height: (coords[3] / data.rows * ratio) - 21
                         });
                     });
