@@ -80,6 +80,8 @@ class Model_Page_Page extends \Nos\Orm\Model {
 		),
 	);
 
+	protected $_data_events = array();
+
 	const TYPE_CLASSIC       = 0;
 	const TYPE_POPUP         = 1;
 	const TYPE_FOLDER        = 2;
@@ -173,9 +175,31 @@ class Model_Page_Page extends \Nos\Orm\Model {
         return array_keys(\Config::get('locales'));
     }
 
-	public function _event_after_save() {
+	public function _event_before_save() {
 		$diff = $this->get_diff();
-		if (!empty($diff[0]['page_virtual_url'])) {
+
+		if (!empty($diff[0]['page_virtual_name'])) {
+			$diff[0]['page_virtual_url'] = $this->page_virtual_url;
+			$this->page_virtual_url = str_replace($diff[0]['page_virtual_name'].'.html', $diff[1]['page_virtual_name'].'.html', $this->page_virtual_url);
+			$diff[1]['page_virtual_url'] = $this->page_virtual_url;
+			$this->_data_events = $diff;
+		}
+	}
+
+	public function _event_after_save() {
+		$diff = $this->_data_events;
+
+		if (!empty($diff[0]['page_virtual_name'])) {
+
+			$old_virtual_url = str_replace('.html', '/', $diff[0]['page_virtual_url']);
+			$new_virtual_url = str_replace($diff[0]['page_virtual_name'].'/', $this->page_virtual_name.'/', $old_virtual_url);
+			\DB::update($this->table())
+				->set(array(
+					'page_virtual_url' => \DB::expr('REPLACE(page_virtual_url, '.\DB::escape($old_virtual_url).', '.\DB::escape($new_virtual_url).')'),
+				))
+				->where('page_virtual_url', 'LIKE', $old_virtual_url.'%')
+				->execute();
+
 			static::_remove_url_enhanced($diff[0]['page_virtual_url']);
 		}
 

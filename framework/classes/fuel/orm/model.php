@@ -467,7 +467,7 @@ class Model extends \Orm\Model {
 					if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks))
 					{
 						$diff[0][$key] = null;
-						$diff[1][$key] = is_set($diff[1][$key]) ? $diff[1][$key] + array($new_pk) : array($new_pk);
+						$diff[1][$key] = isset($diff[1][$key]) ? $diff[1][$key] + array($new_pk) : array($new_pk);
 					}
 					else
 					{
