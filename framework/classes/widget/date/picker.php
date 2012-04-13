@@ -49,6 +49,7 @@ class Widget_Date_Picker extends \Fieldset_Field {
      * @return string
      */
     public function build() {
+        parent::build();
 
 	    $this->fieldset()->append($this->js_init());
 

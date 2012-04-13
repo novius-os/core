@@ -123,7 +123,6 @@ class Nos {
     }
 
 	protected static function _parse_enhancers(&$content, $controller) {
-
         // Fetch the available functions
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
@@ -147,9 +146,11 @@ class Nos {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
         )));
+        $args->page = $controller->page;
 
         // Check if the function exists
         $name   = $fct_id;
+
         $config = Config::get("enhancers.$name", false);
         $found  = $config !== false;
 

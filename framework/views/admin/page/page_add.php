@@ -8,6 +8,7 @@
  * @link http://www.novius-os.org
  */
 
+
 ?>
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function ($) {
@@ -50,7 +51,8 @@ require(['jquery-nos-ostabs'], function ($) {
                 echo View::forge('nos::admin/page/page_form', array(
                     'uniqid' => $uniqids[$lang],
                     'fieldset' => $fieldset,
-                    'page' => $page,
+                    'item' => $page,
+                    'lang' => $lang,
                 ), false);
                 ?>
             </div>

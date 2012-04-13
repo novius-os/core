@@ -118,6 +118,7 @@ $large = !empty($large) && $large == true;
                         <?php
                         foreach ((array) $options['fields'] as $field) {
                             try {
+                                //echo $field;
                                 if ($field instanceof \View) {
                                     echo $field;
                                 } else {

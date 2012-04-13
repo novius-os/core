@@ -28,7 +28,7 @@
 ?>
 	<style type="text/css">
 		* { margin: 0; padding: 0; }
-		body { background-color: #EEE; font-family: sans-serif; font-size: 16px; line-height: 20px; margin: 40px; }
+		body { overflow: auto; background-color: #EEE; font-family: sans-serif; font-size: 16px; line-height: 20px; margin: 40px; }
 		#wrapper { padding: 30px; background: #fff; color: #333; margin: 0 auto; width: 800px; }
 		a { color: #36428D; }
 		h1 { color: #000; font-size: 45px; padding: 0 0 25px; line-height: 1em; }

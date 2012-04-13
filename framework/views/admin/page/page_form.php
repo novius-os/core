@@ -8,6 +8,13 @@
  * @link http://www.novius-os.org
  */
 
+$page = $item;
+
+$fieldset->populate_with_instance($page);
+$fieldset->field('page_parent_id')->set_widget_options(array(
+    'lang' => $lang,
+));
+
 $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 
 foreach ($fieldset->field() as $field) {

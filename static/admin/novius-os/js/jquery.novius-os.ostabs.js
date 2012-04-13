@@ -730,7 +730,7 @@ define('jquery-nos-ostabs',
             var icon = self._icon( tab ).appendTo( a );
 
             var label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
-                .text( tab.label )
+                .text( tab.label ? tab.label : 'New tab' )
                 .appendTo( a );
             if ( !tab.labelDisplay ) {
                 label.hide();

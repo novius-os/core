@@ -4,7 +4,7 @@
     // Used by the behaviours (publishable, etc.)
     'object' => $user,
     'medias' => null,
-    'title' => array('user_firstname', 'user_name'),
+    'title' => array('user_firstname', 'user_name', 'user_email'),
     'id' => 'user_id',
 
     'save' => 'save',

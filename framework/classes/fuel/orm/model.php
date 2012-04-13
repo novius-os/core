@@ -177,7 +177,6 @@ class Model extends \Orm\Model {
 			{
                 throw new \UnexpectedValueException($behaviour);
 			}
-
             try {
                 return call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
             } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {}

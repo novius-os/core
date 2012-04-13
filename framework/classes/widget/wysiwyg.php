@@ -17,11 +17,12 @@ class Widget_Wysiwyg extends \Fieldset_Field {
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
 
         $attributes['type']  = 'textarea';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce';
+		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce not_initialized';
 
 		if (empty($attributes['id'])) {
 			$attributes['id'] = uniqid('wysiwyg_');
 		}
+
 		if (!empty($attributes['widget_options'])) {
 			$this->options = \Arr::merge($this->options, $attributes['widget_options']);
 		}
@@ -35,7 +36,7 @@ class Widget_Wysiwyg extends \Fieldset_Field {
      * @return string
      */
     public function build() {
-
+        parent::build();
 	    $this->fieldset()->append($this->js_init());
 
 		$this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
@@ -43,8 +44,9 @@ class Widget_Wysiwyg extends \Fieldset_Field {
     }
 
 	public function js_init() {
-		$id = $this->get_attribute('id');
-		return '<script type="text/javascript">require(["wysiwyg"], function() {var $t = $("textarea#'.$id.'");$t.wysiwyg($t.data("wysiwyg-options"));});</script>';
+	    // we have to find why it's called two times...
+        $id = $this->get_attribute('id');
+        return '<script type="text/javascript">require(["wysiwyg"], function() {var $t = $("textarea#'.$id.'.not_initialized"); $t.removeClass("not_initialized"); $t.wysiwyg($t.data("wysiwyg-options"));});</script>';
 	}
 
 }

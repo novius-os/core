@@ -49,6 +49,7 @@ class Controller_Front extends Controller {
 		\Event::trigger('front.start');
 
         $publi_cache = PubliCache::forge('pages'.DS.$cache_path);
+
         try {
             $content = $publi_cache->execute($this);
         } catch (CacheNotFoundException $e) {
@@ -57,6 +58,7 @@ class Controller_Front extends Controller {
 	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
 	        $url_enhanced = \Config::get("url_enhanced", array());
 	        $url_enhanced[$url.'/'] = $url.'/';
+
 	        $_404 = true;
 	        foreach ($url_enhanced as $tempurl) {
 		        if (substr($url.'/', 0, strlen($tempurl)) === $tempurl) {

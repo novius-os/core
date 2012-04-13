@@ -144,8 +144,9 @@ class Controller_Admin_Page_Page extends Controller {
 		$fieldset->js_validation();
 
         return \View::forge('nos::admin/page/page_form', array(
-			'page'     => $page,
+			'item'     => $page,
 			'fieldset' => $fieldset,
+            'lang'     => $page->page_lang
 		), false);
     }
 

@@ -307,6 +307,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 		//\Debug::dump($json);
 		$validate = \Format::forge()->to_json($json);
+        //\Debug::dump($fieldset->get_config('form_attributes', array()));
 		$this->append(function($fieldset) use ($validate) {
             $form_attributes = $fieldset->get_config('form_attributes', array());
             return '<script type="text/javascript">require(["jquery-nos"], function($) {$.nos.ui.validate("#'.$form_attributes['id'].'", '.$validate.')});</script>';
@@ -410,7 +411,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
         }
 
         $populate = array();
-        foreach ($instance as $k => $field) {
+
+        foreach ($this->fields as $k => $f) {
             // Don't populate password fields
             if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
                 continue;
@@ -419,8 +421,16 @@ class Fieldset extends \Fuel\Core\Fieldset {
             if (\Arr::get($this->config_used, "$k.dont_populate", false) == true) {
                 continue;
             }
-            $populate[$k] = $field;
+            if (!isset($instance->{$k})) {
+                continue;
+            }
+
+            //if (isset($instance->{$k})) {
+                $field = $instance->{$k};
+                $populate[$k] = $field;
+            //}
         }
+
         $this->populate($populate);
     }
 
@@ -444,6 +454,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 	    // Will trigger cascade_save for media and wysiwyg
 	    try {
+
+
 			foreach ($fields as $name => $config)
 			{
 				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
@@ -492,6 +504,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $object->save();
 				$json_response['notify'] = __('Operation completed successfully.');
 			}
+
 
 		    foreach ($fields as $name => $config)
 			{
