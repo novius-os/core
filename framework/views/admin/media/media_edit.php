@@ -23,6 +23,8 @@ require(['jquery-nos-ostabs'], function ($) {
     <?php
     $fieldset->set_config('field_template', '{field}');
 
+    $fieldset->field('slug')->set_template('{label} {field} .'.$media->media_ext.' ');
+
     // Enctype multipart/form-data
     $form_attributes = $fieldset->get_config('form_attributes', array());
     $form_attributes['enctype'] = 'multipart/form-data';

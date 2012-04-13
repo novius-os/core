@@ -413,6 +413,13 @@ class Fieldset extends \Fuel\Core\Fieldset {
         $populate = array();
 
         foreach ($this->fields as $k => $f) {
+            $populateCallback = \Arr::get($this->config_used, "$k.populate");
+            if ($populateCallback && is_callable($populateCallback)) {
+                $field = call_user_func($populateCallback, $instance);
+                $populate[$k] = $field;
+                continue;
+            }
+
             // Don't populate password fields
             if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
                 continue;
