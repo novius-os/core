@@ -25,7 +25,7 @@ foreach ($fieldset->field() as $field) {
 
 $fieldset->field('page_cache_duration')->set_template('{label} {field} seconds');
 $fieldset->field('page_lock')->set_template('{label} {field}');
-$fieldset->field('page_virtual_name')->set_template('{label} {field} .html');
+$fieldset->field('page_virtual_name')->set_template('{label} <br /> <div class="table-field">{field} <span>&nbsp;.html</span></div>');
 
 
 $checkbox = '<br /><label><input type="checkbox" data-id="same_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
@@ -49,7 +49,7 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
     'subtitle' => array('page_type', 'page_template'),
 
     'content' => \View::forge('form/expander', array(
-        'title'    => 'Content',
+        'title'    => __('Content'),
         // Wysiwyg are edge-to-edge with the border
         'nomargin' => true,
         'options' => array(

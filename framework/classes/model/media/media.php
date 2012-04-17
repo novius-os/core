@@ -83,7 +83,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
     }
 
     public function get_path() {
-        return $this->media_path.$this->media_file;
+        return ltrim($this->media_path, '/').$this->media_file;
     }
 
     public function get_public_path() {

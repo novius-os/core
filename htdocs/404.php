@@ -43,7 +43,7 @@ if ($resized) {
 
 $media = false;
 $res = \DB::select()->from(\Nos\Model_Media_Media::table())->where(array(
-    array(DB::expr('CONCAT(media_path, media_file)'), '=', $media_url),
+    array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
 ))->execute()->as_array();
 
 if ($res) {
