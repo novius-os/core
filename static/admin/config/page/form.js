@@ -32,7 +32,7 @@ define([
             }
             var $siblings = $(this).closest('p').nextAll();
             if ($(this).is(':checked')) {
-                $siblings.show().find('.nos-treegrid').nostreegrid('doRefresh');
+                $siblings.show();
             } else {
                 $siblings.hide();
             }
