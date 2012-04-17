@@ -107,7 +107,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         $fields = array(
             'user_id' => array (
                 'label' => __('ID: '),
-                'widget' => 'text',
+                'widget' => 'Nos\Widget_Text',
             ),
             'user_name' => array (
                 'label' => __('Family name'),
@@ -134,7 +134,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
             'user_last_connection' => array (
                 'label' => __('Last login: '),
                 'add' => false,
-                'widget' => 'date_select',
+                'widget' => 'Nos\Widget_Date_Select',
                 'form' => array(
                     'readonly' => true,
                     'date_format' => 'eu_full',
@@ -192,7 +192,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         $fields = array(
             'user_id' => array (
                 'label' => __('ID: '),
-                'widget' => 'text',
+                'widget' => 'Nos\Widget_Text',
             ),
             'user_name' => array (
                 'label' => __('Family name'),
@@ -219,7 +219,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
             'user_last_connection' => array (
                 'label' => __('Last login: '),
                 'add' => false,
-                'widget' => 'date_select',
+                'widget' => 'Nos\Widget_Date_Select',
                 'form' => array(
                     'readonly' => true,
                     'date_format' => 'eu_full',

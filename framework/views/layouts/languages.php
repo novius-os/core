@@ -27,8 +27,7 @@
 <?php
     $uniqids = array();
 ?>
-
-<div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+<div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>" style="display:none;">
     <div id="<?= $uniqid_tabs = uniqid('tabs_') ?>" style="width: 92.4%; clear:both; margin:0 auto 1em;">
         <ul style="width: 5%;">
             <?php
@@ -40,7 +39,7 @@
             }
             ?>
         </ul>
-        <?php
+<?php
         $labels     = array();
         $items_lang = array();
 
@@ -83,28 +82,30 @@
         ?>
     </div>
 </div>
-
 <script type="text/javascript">
-    require([
-        'jquery-nos',
-        'static/novius-os/admin/config/page/form.js'
-    ], function($, callback_fn) {
-        $(function() {
-            var $tabs = $('#<?= $uniqid_tabs ?>');
-            $tabs.wijtabs({
-                alignment: 'left',
-                show: function(e, ui) {
-                    $(ui.panel).bind('blank_slate', callback_fn).trigger('blank_slate');
-                    //$(ui.panel).find('.nos-treegrid').nostreegrid('doRefresh');
-                }
-            });
-            $tabs.find('> ul').css({
-                width : '5%'
-            });
-            $tabs.find('> div').css({
-                width : '94%'
-            });
-            $tabs.wijtabs('select', '#<?= $uniqids[$item->get_lang()] ?>');
-        });
-    });
+	require([
+		'jquery-nos',
+		'static/novius-os/admin/config/page/form.js'
+	], function($, callback_fn) {
+		$(function() {
+			var $tabs = $('#<?= $uniqid_tabs ?>');
+			$('#<?= $uniqid ?>').show(function() {
+				$.nos.ui.initOnShow.show($(this));
+			});
+			$tabs.wijtabs({
+				alignment: 'left',
+				show: function(e, ui) {
+					$.nos.ui.initOnShow.show($(ui.panel));
+					$(ui.panel).bind('blank_slate', callback_fn).trigger('blank_slate');
+				}
+			});
+			$tabs.find('> ul').css({
+				width : '5%'
+			});
+			$tabs.find('> div').css({
+				width : '94%'
+			});
+			$tabs.wijtabs('select', '#<?= $uniqids[$item->get_lang()] ?>');
+		});
+	});
 </script>

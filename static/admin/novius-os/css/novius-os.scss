@@ -316,6 +316,19 @@ img.publication_status {
 	text-align: right;
     vertical-align: top;
 }
+div.table-field {
+    display: table;
+    width:100%;
+}
+div.table-field > input {
+    display : table-cell;
+    -moz-box-sizing : border-box;
+    box-sizing : border-box;
+    width   : 100%;
+}
+div.table-field > span {
+    display : table-cell;
+}
 
 
 

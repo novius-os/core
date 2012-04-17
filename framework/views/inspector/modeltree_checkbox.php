@@ -32,6 +32,7 @@
 					}),
 				rendered = false,
 				init = function() {
+					container.find('input[name="' + params.input_name + '[]"]').remove();
 					table.nostreegrid({
 							sortable : false,
 							movable : false,
@@ -58,8 +59,17 @@
 									data = row ? row.data : false;
 
 								if (data && rendered) {
-									params.selected.id = data._id;
-									row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true).trigger('selectionChanged', data);
+									var checkbox = row.$rows.find(':checkbox[value=' + row.data._id + ']'),
+										checked = checkbox.is(':checked');
+									if (checked) {
+										delete params.selected[row.data._model + '|' + row.data._id];
+									} else {
+										params.selected[row.data._model + '|' + row.data._id] = {
+											id : row.data._id,
+											model : row.data._model
+										};
+									}
+									checkbox.prop('checked', !checked).trigger('selectionChanged', data);
 								}
 							},
 							rendering : function() {
@@ -68,12 +78,13 @@
 							rendered : function() {
 								rendered = true;
 								table.css("height", "auto");
-								if ($.isPlainObject(params.selected) && params.selected.id) {
-									var radio = container.find(':radio[value=' + params.selected.id + ']')
-										.prop('checked', true),
-										nostreegrid = table.data('nostreegrid');
-
-									nostreegrid._view()._getSuperPanel().scrollChildIntoView(radio);
+								if ($.isPlainObject(params.selected)) {
+									$.each(params.selected, function(i, selected) {
+										if ($.isPlainObject(selected) && selected.id) {
+											container.find(':checkbox[value=' + selected.id + ']').prop('checked', true);
+											table.data('nostreegrid');
+										}
+									});
 								}
 							},
 							columns: params.columns
@@ -92,8 +103,8 @@
 				cellFormatter : function(args) {
 					if ($.isPlainObject(args.row.data)) {
 
-						$('<input type="radio" />').attr({
-								name : params.input_name,
+						$('<input type="checkbox" />').attr({
+								name : params.input_name + '[]',
 								value : args.row.data._id
 							})
 							.appendTo(args.$container);
@@ -103,10 +114,22 @@
 				}
 			});
 
-            table.css({
-                    height : '100%',
-                    width : '100%'
-                });
+			if ($.isPlainObject(params.selected)) {
+				$.each(params.selected, function(i, selected) {
+					if ($.isPlainObject(selected) && selected.id) {
+						$('<input type="hidden" />').attr({
+								name : params.input_name + '[]',
+								value : selected.id
+							})
+							.appendTo(container);
+					}
+				});
+			}
+
+			table.css({
+				height : '100%',
+				width : '100%'
+			});
 			$.nos.ui.initOnShow.init(table, init);
 		});
 	});

@@ -3,7 +3,7 @@
 return array(
     'id' => array (
         'label' => 'ID: ',
-        'widget' => 'text',
+        'widget' => 'Nos\Widget_Text',
     ),
     'media_folder_id' => array(
         'form' => array(

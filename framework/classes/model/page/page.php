@@ -161,7 +161,7 @@ class Model_Page_Page extends \Nos\Orm\Model {
         }
         $url = !empty($params['absolute']) ? Uri::base(false) : '';
 
-        if (!$this->page_home) {
+        if (!$this->page_home || !$this->is_main_lang()) {
             $url .= $this->page_virtual_url;
         }
         return $url;
