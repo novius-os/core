@@ -77,7 +77,7 @@ class Nos {
 
         ob_start();
         try {
-            $request  = Request::forge($where);
+            $request = Request::forge($where);
 
 	        $response = $request->execute($args['args']);
             $cache_cleanup = $request->controller_instance->cache_cleanup;
@@ -175,8 +175,8 @@ class Nos {
                 $function_content = 'Enhancer '.$name.' ('.$config['enhancer'].') returned empty content.';
             }
         } else {
-            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Function '.$name.' not found in '.get_class($controller).'.' : '';
-            \Fuel::$profiling && Console::logError(new Exception(), 'Function '.$name.' not found in '.get_class($controller).'.');
+            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$name.' not found in '.get_class($controller).'.' : '';
+            \Fuel::$profiling && Console::logError(new Exception(), 'Enhancer'.$name.' not found in '.get_class($controller).'.');
         }
         return $function_content;
     }
