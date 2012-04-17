@@ -24,7 +24,7 @@ return array(
         ),
     ),
     'page_parent_id' => array(
-        'widget' => 'page_selector',
+        'widget' => 'Nos\Widget_Page_Selector',
         'widget_options' => array(
             'width' => '250px',
             'height' => '250px',

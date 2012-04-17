@@ -207,7 +207,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			$label       = isset($settings['label']) ? $settings['label'] : $p;
 			$attributes  = isset($settings['form']) ? $settings['form'] : array();
 			if (!empty($settings['widget'])) {
-				 $class = Inflector::words_to_upper('Nos\Widget_'.$settings['widget']);
+				 $class = $settings['widget'];
 				 $attributes['widget_options'] = isset($settings['widget_options']) ? $settings['widget_options'] : array();
 				 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
@@ -465,7 +465,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 			foreach ($fields as $name => $config)
 			{
-				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
+				if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
 					continue;
 				}
 				$type = \Arr::get($config, 'form.type', null);
@@ -515,7 +515,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 		    foreach ($fields as $name => $config)
 			{
-				if (!empty($config['widget']) && in_array($config['widget'], array('widget_text', 'widget_empty'))) {
+				if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
 					continue;
 				}
 				$type = \Arr::get($config, 'form.type', null);

@@ -329,9 +329,36 @@ define('jquery-nos', [
                         $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
                     });
                     $container.find('.accordion').wijaccordion({
-                        header: "h3"
+                        header: "h3",
+                        selectedIndexChanged : function(e, args) {
+                            $.nos.ui.initOnShow.show($(e.target).find('.ui-accordion-content').eq(args.newIndex));
+                        }
                     });
                 });
+            },
+
+            initOnShow : {
+                init : function($el, init) {
+                    if (!$.isFunction(init)) {
+                        return;
+                    }
+                    if ($el.is(':visible')) {
+                        init();
+                    } else {
+                        $el.addClass('nos-init-on-show')
+                            .data('nos-init-on-show', init);
+                    }
+                },
+
+                show : function($container) {
+                    $container.find('.nos-init-on-show:visible').each(function() {
+                        var $el = $(this),
+                            init = $el.data('nos-init-on-show');
+
+                        $el.removeClass('nos-init-on-show');
+                        init();
+                    });
+                }
             },
 
             validate : function(context, params) {

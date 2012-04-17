@@ -26,7 +26,7 @@ array (
     'user_id' => array (
         'label' => 'ID',
         'add' => false,
-        'widget' => 'text',
+        'widget' => 'Nos\Widget_Text',
     ),
     'user_fullname' => array (
         'label' => 'Full name',
@@ -44,7 +44,7 @@ array (
     ),
     'user_password' => array (
         'label' => 'Password',
-        'widget' => 'password',
+        'widget' => 'Nos\Widget_Password',
         'validation' => array(
             'required',
             'min_length' => array(6),
@@ -53,7 +53,7 @@ array (
     'user_last_connection' => array (
         'label' => 'Last login',
         'add' => false,
-        'widget' => 'date_select',
+        'widget' => 'Nos\Widget_Date_Select',
         'attributes' => array(
             'readonly' => true,
             'date_format' => 'eu_full',
@@ -101,8 +101,8 @@ Inherited from Fuel:
 
 * Creates 3 inputs in the same label:
 
- * Day: a text field 
- * Month: a select field 
+ * Day: a text field
+ * Month: a select field
  * Year: a text field
 
 *Attributes*

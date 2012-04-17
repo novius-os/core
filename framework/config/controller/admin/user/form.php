@@ -62,7 +62,7 @@ return array (
         'user_last_connection' => array (
             'label' => 'Last login',
             'add' => false,
-            'widget' => 'date_select',
+            'widget' => 'Nos\Widget_Date_Select',
 			'form' => array(
 				'readonly' => true,
 				'date_format' => 'eu_full',

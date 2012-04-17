@@ -34,7 +34,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 
         $fieldset = \Fieldset::build_from_config(array(
             'medif_parent_id' => array(
-                'widget' => $hide_widget_media_path ? null : 'media_folder',
+                'widget' => $hide_widget_media_path ? null : 'Nos\Widget_Media_Folder',
                 'form' => array(
                     'type'  => 'hidden',
                     'value' => $folder->medif_id,

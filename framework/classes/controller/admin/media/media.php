@@ -30,7 +30,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
         $fields = \Arr::merge($fields, array(
             'media_folder_id' => array(
-                'widget' => $hide_widget_media_path ? null : 'media_folder',
+                'widget' => $hide_widget_media_path ? null : 'Nos\Widget_Media_Folder',
 		        'form' => array(
 			        'value' => $folder->medif_id,
 		        ),
@@ -68,7 +68,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 ),
             ),
             'media_folder_id' => array(
-                'widget' =>  'media_folder',
+                'widget' =>  'Nos\Widget_Media_Folder',
                 'form' => array(
                     'value' => $media->media_folder_id,
                 ),
