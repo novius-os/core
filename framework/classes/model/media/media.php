@@ -123,7 +123,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
         if (!$this->is_image()) {
             return false;
         }
-        return str_replace('media/', 'cache/media/', static::$public_path).$this->media_path.str_replace('.'.$this->media_ext, '', $this->media_file).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
+        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->media_path, '/').str_replace('.'.$this->media_ext, '', $this->media_file).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 
 	public function refresh_path() {
