@@ -450,9 +450,15 @@ class Model extends \Orm\Model {
 			$rel = static::relations($key);
 			if ($rel->singular)
 			{
-				if ((($new_pk = $val->implode_pk($val)) and ! isset($this->_original_relations[$key]))
+                if (isset($val)) {
+                    $new_pk = $val->implode_pk($val);
+                } else {
+                    $new_pk = null;
+                }
+				if ((! isset($this->_original_relations[$key]))
 					or $new_pk != $this->_original_relations[$key])
 				{
+
 					$diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
 					$diff[1][$key] = $new_pk;
 				}

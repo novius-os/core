@@ -369,10 +369,17 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 			}
 
 			if (is_array($selected) && !empty($selected['id']) && !empty($selected['model'])) {
-				$this->tree_selected($tree_config, array(
-					'model' => $selected['model'],
-					'id' => $selected['id'],
-				));
+				if (!empty($selected['id']) && !empty($selected['model'])) {
+					$selected = array($selected);
+				}
+				foreach ($selected as $sel) {
+					if (!empty($sel['id']) && !empty($sel['model'])) {
+						$this->tree_selected($tree_config, array(
+							'model' => $sel['model'],
+							'id' => $sel['id'],
+						));
+					}
+				}
 			}
 			if ($id && $model) {
 				\Session::set('tree.'.$tree_config['id'].'.'.$model.'|'.$id, true);

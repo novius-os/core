@@ -69,7 +69,7 @@ require(['jquery-nos'], function($) {
 			$container = $('#' + id)
 				.find('> form')
 				.submit(function(e) {
-					$container.find('input[data-id=save]').triggerHandler('click');
+					$container.find('button[data-id=save]').triggerHandler('click');
 					e.stopPropagation();
 					e.preventDefault();
 				})
@@ -80,7 +80,7 @@ require(['jquery-nos'], function($) {
 					e.preventDefault();
 				})
 				.end()
-				.find('input[data-id=save]')
+				.find('button[data-id=save]')
 				.click(function(e) {
 					var img = $('<img />');
 

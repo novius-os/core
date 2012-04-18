@@ -39,7 +39,7 @@ class Controller_Admin_Tray_Account extends \Controller {
         $fields = array (
             'background' => array (
                 'label' => 'Wallpaper',
-                'widget' => 'media',
+                'widget' => 'Nos\Widget_Media',
 				'form' => array(
 					'value' => \Arr::get($configuration, 'misc.display.background', ''),
 				),

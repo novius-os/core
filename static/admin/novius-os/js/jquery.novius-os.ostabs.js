@@ -1119,12 +1119,40 @@ define('jquery-nos-ostabs',
                     }
                     return false;
                 },
+                open : function(tab, end) {
+                    if (window.parent != window && window.parent.$nos) {
+                        return window.parent.$nos.nos.tabs.add(tab, end);
+                    }
+                    if (noviusos.length) {
+                        var tabs = noviusos.ostabs('tabs'),
+                            sel = false;
+                        $.each(tabs, function(i, t) {
+                            if (t.url === tab.url) {
+                                sel = i;
+                                return false;
+                            }
+                        });
+                        if (sel !== false) {
+                            return noviusos.ostabs('select', sel + 4); // Add 4 because appstab and tray are before and not return by tabs
+                        } else {
+                            return this.add(tab, end);
+                        }
+                    } else if (tab.url) {
+                        window.open(tab.url);
+                    }
+                    return false;
+                },
                 update : function(index, tab) {
                     if (window.parent != window && window.parent.$nos) {
                         return window.parent.$nos.nos.tabs.update(this.current(), index, tab);
                     }
                     if (tab == null) {
                         tab = index;
+                        index = null;
+                    }
+                    if ($.type(index) === 'object' && $.isFunction(index.parents) && index.closest('.ui-dialog-content').size()) {
+                        //In a dialog, don't update tab
+                        return true;
                     }
                     index = this.current(index);
                     if (noviusos.length) {

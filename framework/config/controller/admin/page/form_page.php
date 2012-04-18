@@ -24,7 +24,7 @@ return array(
         ),
     ),
     'page_parent_id' => array(
-        'widget' => 'page_selector',
+        'widget' => 'Nos\Widget_Page_Selector',
         'widget_options' => array(
             'width' => '250px',
             'height' => '250px',
@@ -119,8 +119,8 @@ return array(
             'type' => 'select',
             'options' => array(
                 Nos\Model_Page_Page::TYPE_CLASSIC => 'Page',
-                Nos\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
-                Nos\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',
+                /*Nos\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
+                Nos\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',*/
                 Nos\Model_Page_Page::TYPE_EXTERNAL_LINK => 'External link',
             ),
         ),

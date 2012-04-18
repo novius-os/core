@@ -231,7 +231,7 @@ define('jquery-nos-appdesk',
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     if ($.isFunction(first.action)) {
-                        first.action();
+                        first.action($(this));
                     } else {
                         $.nos.tabs.add({
                             iframe : true,
@@ -250,7 +250,7 @@ define('jquery-nos-appdesk',
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         if ($.isFunction(add.action)) {
-                            add.action.apply(this);
+                            add.action($(this));
                         } else {
                             $.nos.tabs.add({
                                 iframe : true,
@@ -2048,9 +2048,10 @@ define('jquery-nos-appdesk',
                         // Search the higher ancestor possible
                         // @todo Review this, because when it's called from inspectors, the result is a <table>
                         //       which is not convenient to add <ul>s or <div>s
-                        var containerActions = $.nos.$noviusos.ostabs
-                            ? $.nos.$noviusos.ostabs('current').panel
-                            : dropDown.parentsUntil('.ui-widget, body').last();
+                        var containerActions = dropDown.closest('.ui-dialog-content').size() ? dropDown.closest('.ui-dialog-content') : ($.nos.$noviusos.ostabs
+                                ? $.nos.$noviusos.ostabs('current').panel
+                                : dropDown.parentsUntil('.ui-widget, body').last()
+                            );
 
                         ul.appendTo(containerActions);
 

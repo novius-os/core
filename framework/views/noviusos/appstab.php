@@ -56,7 +56,7 @@ require(['jquery-nos'], function($) {
 	$('a.app').click(function(e) {
 		e.preventDefault();
         var tab = $(this).data('launcher');
-		$.nos.tabs.add($.extend({
+		$.nos.tabs.open($.extend({
 			app: true,
 			iconSize: 32,
 			labelDisplay: false
