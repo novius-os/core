@@ -1148,6 +1148,11 @@ define('jquery-nos-ostabs',
                     }
                     if (tab == null) {
                         tab = index;
+                        index = null;
+                    }
+                    if ($.type(index) === 'object' && $.isFunction(index.parents) && index.closest('.ui-dialog-content').size()) {
+                        //In a dialog, don't update tab
+                        return true;
                     }
                     index = this.current(index);
                     if (noviusos.length) {

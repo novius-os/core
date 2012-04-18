@@ -306,6 +306,20 @@ define('jquery-nos', [
             });
         },
 
+        openTabOrDialog : function(context, tab, dialogOptions) {
+            var dialog = $(context).closest('.ui-dialog-content').size();
+            if (dialog) {
+                dialogOptions = dialogOptions || {};
+                $.nos.dialog($.extend({
+                    contentUrl: tab.url,
+                    ajax : !tab.iframe,
+                    title: tab.label
+                }, dialogOptions));
+            } else {
+                $.nos.tabs.add(tab);
+            }
+        },
+
         ui : {
             form : function(context) {
                 context = context || 'body';

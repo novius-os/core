@@ -11,7 +11,7 @@
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function ($) {
 	$(function () {
-		$.nos.tabs.update({
+		$.nos.tabs.update($('#<?= $uniqid = uniqid('id_') ?>'), {
 			label : <?= json_encode($media->media_title) ?>,
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
 		});
@@ -19,7 +19,7 @@ require(['jquery-nos-ostabs'], function ($) {
 });
 </script>
 
-<div class="page fieldset standalone" id="<?= $uniqid = uniqid('id_') ?>">
+<div class="page fieldset standalone" id="<?= $uniqid ?>">
     <?php
     $fieldset->set_config('field_template', '{field}');
 
