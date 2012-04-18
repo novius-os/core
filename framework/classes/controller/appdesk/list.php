@@ -179,7 +179,7 @@ class Controller_Appdesk_List extends Controller_Generic_Admin {
         $tree_config = $this->appdesk['tree'];
         $tree_config['id'] =  $this->appdesk['configuration_id'];
 
-		$json = $this->tree(array_merge(array('id' => $this->appdesk['configuration_id']), $this->appdesk['tree']));
+		$json = $this->tree($tree_config);
 
 		if (\Fuel::$env === \Fuel::DEVELOPMENT) {
 			$json['get'] = Input::get();

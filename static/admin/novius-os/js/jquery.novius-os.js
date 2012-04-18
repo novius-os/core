@@ -322,7 +322,7 @@ define('jquery-nos', [
                         }
                         $(this).button(options);
                     });
-                    $container.find("select").wijdropdown();
+                    $container.find("select").filter(':not(.notransform)').wijdropdown();
                     $container.find(":input[type=checkbox]").wijcheckbox();
                     $container.find('.expander').each(function() {
                         var $this = $(this);
