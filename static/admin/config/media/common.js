@@ -101,7 +101,7 @@ define([
                 adds : {
                     media : {
                         label : appDesk.i18n('Add a media'),
-                        action : function() {
+                        action : function(ui) {
                             $.nos.tabs.add({
                                 url: 'admin/nos/media/media/add',
                                 label: appDesk.i18n('Add a media')._()
@@ -178,7 +178,7 @@ define([
                                             name : 'add_media',
                                             label : appDesk.i18n('Add a media in this folder'),
                                             icon : 'plus',
-                                            action : function(item) {
+                                            action : function(item, ui) {
                                                 $.nos.tabs.add({
                                                     url: 'admin/nos/media/media/add/' + item.id,
                                                     label: 'Add a media in the "' + item.title + '" folder'

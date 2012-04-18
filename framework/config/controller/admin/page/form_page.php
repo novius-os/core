@@ -119,8 +119,8 @@ return array(
             'type' => 'select',
             'options' => array(
                 Nos\Model_Page_Page::TYPE_CLASSIC => 'Page',
-                Nos\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
-                Nos\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',
+                /*Nos\Model_Page_Page::TYPE_FOLDER => 'Folder / Chapter',
+                Nos\Model_Page_Page::TYPE_INTERNAL_LINK => 'Internal link',*/
                 Nos\Model_Page_Page::TYPE_EXTERNAL_LINK => 'External link',
             ),
         ),

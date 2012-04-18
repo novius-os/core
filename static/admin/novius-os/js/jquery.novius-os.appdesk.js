@@ -231,7 +231,7 @@ define('jquery-nos-appdesk',
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     if ($.isFunction(first.action)) {
-                        first.action();
+                        first.action($(this));
                     } else {
                         $.nos.tabs.add({
                             iframe : true,
