@@ -306,6 +306,20 @@ define('jquery-nos', [
             });
         },
 
+        openTabOrDialog : function(context, tab, dialogOptions) {
+            var dialog = $(context).closest('.ui-dialog-content').size();
+            if (dialog) {
+                dialogOptions = dialogOptions || {};
+                $.nos.dialog($.extend({
+                    contentUrl: tab.url,
+                    ajax : !tab.iframe,
+                    title: tab.label
+                }, dialogOptions));
+            } else {
+                $.nos.tabs.add(tab);
+            }
+        },
+
         ui : {
             form : function(context) {
                 context = context || 'body';
@@ -322,7 +336,7 @@ define('jquery-nos', [
                         }
                         $(this).button(options);
                     });
-                    $container.find("select").wijdropdown();
+                    $container.find("select").filter(':not(.notransform)').wijdropdown();
                     $container.find(":input[type=checkbox]").wijcheckbox();
                     $container.find('.expander').each(function() {
                         var $this = $(this);

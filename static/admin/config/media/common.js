@@ -19,8 +19,8 @@ define([
                     primary : true,
                     icon : 'pencil',
                     label : appDesk.i18n('Edit'),
-                    action : function(item) {
-                        $.nos.tabs.add({
+                    action : function(item, ui) {
+                        $.nos.openTabOrDialog(ui, {
                             url: 'admin/nos/media/media/edit/' + item.id,
                             label: appDesk.i18n('Edit a media')._()
                         });
@@ -102,7 +102,7 @@ define([
                     media : {
                         label : appDesk.i18n('Add a media'),
                         action : function(ui) {
-                            $.nos.tabs.add({
+                            $.nos.openTabOrDialog(ui, {
                                 url: 'admin/nos/media/media/add',
                                 label: appDesk.i18n('Add a media')._()
                             });
@@ -110,13 +110,13 @@ define([
                     },
                     folder : {
                         label : appDesk.i18n('Add a folder'),
-                        action : function() {
-                            $.nos.dialog({
-                                contentUrl: 'admin/nos/media/folder/add',
-                                ajax : true,
-                                title: 'Add a folder',
-                                width: 650,
-                                height: 400
+                        action : function(ui) {
+                            $.nos.openTabOrDialog(ui, {
+                                url: 'admin/nos/media/folder/add',
+                                label: 'Add a folder'
+                            }, {
+                                width: 600,
+                                height: 250
                             });
                         }
                     }
@@ -179,7 +179,7 @@ define([
                                             label : appDesk.i18n('Add a media in this folder'),
                                             icon : 'plus',
                                             action : function(item, ui) {
-                                                $.nos.tabs.add({
+                                                $.nos.openTabOrDialog(ui, {
                                                     url: 'admin/nos/media/media/add/' + item.id,
                                                     label: 'Add a media in the "' + item.title + '" folder'
                                                 });
@@ -189,12 +189,12 @@ define([
                                             name : 'add_folder',
                                             label : appDesk.i18n('Add a sub-folder to this folder'),
                                             icon : 'folder-open',
-                                            action : function(item) {
-                                                $.nos.dialog({
-                                                    contentUrl: 'admin/nos/media/folder/add/' + item.id,
-                                                    ajax : true,
-                                                    title: 'Add a sub-folder in "' + item.title + '"',
-                                                    width: 650,
+                                            action : function(item, ui) {
+                                                $.nos.openTabOrDialog(ui, {
+                                                    url: 'admin/nos/media/folder/add/' + item.id,
+                                                    label: 'Add a sub-folder in "' + item.title + '"'
+                                                }, {
+                                                    width: 600,
                                                     height: 250
                                                 });
                                             }
@@ -203,11 +203,11 @@ define([
                                             name : 'edit',
                                             label : appDesk.i18n('Edit this folder'),
                                             icon : 'pencil',
-                                            action : function(item) {
-                                                $.nos.dialog({
-                                                    contentUrl: 'admin/nos/media/folder/edit/' + item.id,
-                                                    ajax : true,
-                                                    title: 'Edit the "' + item.title + '" folder',
+                                            action : function(item, ui) {
+                                                $.nos.openTabOrDialog(ui, {
+                                                    url: 'admin/nos/media/folder/edit/' + item.id,
+                                                    label: 'Edit the "' + item.title + '" folder'
+                                                }, {
                                                     width: 600,
                                                     height: 250
                                                 });
