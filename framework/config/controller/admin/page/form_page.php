@@ -44,7 +44,6 @@ return array(
         'label' => 'URL: ',
         'form' => array(
             'type' => 'text',
-            'size' => 20,
         ),
         'validation' => array(
             'required',
@@ -55,14 +54,12 @@ return array(
         'label' => 'SEO title: ',
         'form' => array(
             'type' => 'text',
-            'size' => 26,
         ),
     ),
     'page_meta_description' => array(
         'label' => 'Description: ',
         'form' => array(
             'type' => 'textarea',
-            'cols' => 26,
             'rows' => 6,
         ),
     ),
@@ -70,7 +67,6 @@ return array(
         'label' => 'Keywords: ',
         'form' => array(
             'type' => 'textarea',
-            'cols' => 26,
             'rows' => 3,
         ),
     ),
@@ -92,14 +88,12 @@ return array(
         'label' => 'What\'s the page called in the menu: ',
         'form' => array(
             'type' => 'text',
-            'size' => 26,
         ),
     ),
     'page_external_link' => array(
         'label' => 'URL: ',
         'form' => array(
             'type' => 'text',
-            'size' => 60
         ),
     ),
     'page_external_link_type' => array(

@@ -11,8 +11,8 @@
 class Fieldset extends \Fuel\Core\Fieldset {
 
 	protected $append = array();
-
     protected $config_used = array();
+    protected $js_validation = false;
 
 	public function append($content) {
 		$this->append[] = $content;
@@ -20,6 +20,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 	public function open($action = null) {
 		$attributes = $this->get_config('form_attributes');
+        if (empty($attributes['id'])) {
+            $attributes['id'] = uniqid('form_');
+            $this->set_config('form_attributes', $attributes);
+        }
 		if ($action and ($this->fieldset_tag == 'form' or empty($this->fieldset_tag)))
 		{
 			$attributes['action'] = $action;
@@ -34,15 +38,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
     public function build($action = null) {
         $build = parent::build($action);
-        $append = array();
-        foreach ($this->append as $a) {
-            if (is_callable($a)) {
-                $append[] = call_user_func($a, $this);
-            } else {
-                $append[] = $a;
-            }
-        }
-        return $build.implode('', $append);
+        return $build.$this->build_append();
     }
 
 	public function close() {
@@ -51,6 +47,61 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			? $this->form()->close().PHP_EOL
 			: $this->form()->{$this->fieldset_tag.'_close'}();
 
+		return $close.$this->build_append();
+	}
+
+    public function build_hidden_fields() {
+        $output = '';
+        foreach ($this->field() as $field) {
+            if (false != strpos(get_class($field), 'Widget_')) {
+                continue;
+            }
+            if ($field->type == 'hidden') {
+                $output .= $field->build();
+            }
+        }
+        return $output;
+    }
+
+    protected function build_append() {
+
+		$json = array();
+        if ($this->js_validation) {
+            foreach ($this->fields as $f) {
+
+                $rules = $f->js_validation();
+
+                if (empty($rules)) {
+                    continue;
+                }
+
+                foreach ($rules as $rule) {
+                    if (empty($rule)) {
+                        continue;
+                    }
+
+                    list($name, $args) = $rule;
+                    is_array($name) and $name = reset($name);
+
+                    list($js_name, $js_args) = $this->format_js_validation($name, $args);
+                    if (empty($js_name)) {
+                        continue;
+                    }
+                    $json['rules'][$f->name][$js_name] = $js_args;
+
+                    // Computes the error message, replacing :args placeholders with {n}
+                    $error = new \Validation_Error($f, '', array($name => ''), array());
+                    $error = $error->get_message();
+                    preg_match_all('`:param:(\d+)`', $error, $m);
+                    foreach ($m[1] as $int) {
+                        $error = str_replace(':param:'.$int, '{' . ($int - 1).'}', $error);
+                    }
+                    $json['messages'][$f->name][$js_name] = $error;
+                }
+            }
+        }
+		$js_rules = \Format::forge()->to_json($json);
+
         $append = array();
         foreach ($this->append as $a) {
             if (is_callable($a)) {
@@ -59,8 +110,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $append[] = $a;
             }
         }
-		return $close.implode('', $append);
-	}
+        $form_attributes = $this->get_config('form_attributes', array());
+        $append[] = '<script type="text/javascript">require(["jquery-nos"], function($) {$.nos.ui.validate("#'.$form_attributes['id'].'", '.$js_rules.')});</script>';
+        return implode('', $append);
+    }
 
 	public function form_name($value) {
 		if ($field = $this->field('form_name')) {
@@ -270,48 +323,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return array($name, $args);
 	}
 
-	public function js_validation() {
-		$json = array();
-		foreach ($this->fields as $f) {
-
-			$rules = $f->js_validation();
-
-			if (empty($rules)) {
-				continue;
-			}
-
-			foreach ($rules as $rule) {
-				if (empty($rule)) {
-					continue;
-				}
-
-				list($name, $args) = $rule;
-				is_array($name) and $name = reset($name);
-
-				list($js_name, $js_args) = $this->format_js_validation($name, $args);
-				if (empty($js_name)) {
-					continue;
-				}
-				$json['rules'][$f->name][$js_name] = $js_args;
-
-				// Computes the error message, replacing :args placeholders with {n}
-				$error = new \Validation_Error($f, '', array($name => ''), array());
-				$error = $error->get_message();
-				preg_match_all('`:param:(\d+)`', $error, $m);
-				foreach ($m[1] as $int) {
-					$error = str_replace(':param:'.$int, '{' . ($int - 1).'}', $error);
-				}
-				$json['messages'][$f->name][$js_name] = $error;
-			}
-		}
-
-		//\Debug::dump($json);
-		$validate = \Format::forge()->to_json($json);
-        //\Debug::dump($fieldset->get_config('form_attributes', array()));
-		$this->append(function($fieldset) use ($validate) {
-            $form_attributes = $fieldset->get_config('form_attributes', array());
-            return '<script type="text/javascript">require(["jquery-nos"], function($) {$.nos.ui.validate("#'.$form_attributes['id'].'", '.$validate.')});</script>';
-        });
+	public function js_validation($validation = true) {
+        $this->js_validation = $validation;
 	}
 
 	public static function build_from_config($config, $model = null, $options = array()) {
