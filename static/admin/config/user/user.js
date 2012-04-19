@@ -23,7 +23,7 @@ define([
                     icon : 'pencil',
                     primary : true,
                     action : function(item, ui) {
-                        $.nos.tabs.add({
+                        $.nos.tabs.open({
                             url : 'admin/nos/user/form/edit/' + item.id,
                             label : item.title
                         });
