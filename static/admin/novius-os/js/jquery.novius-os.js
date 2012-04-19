@@ -306,6 +306,19 @@ define('jquery-nos', [
             });
         },
 
+        form : {
+            ajax : function(context) {
+                if (!context) {
+                    return;
+                }
+                var $container = $(context);
+                if (!$container.is('form')) {
+                    $container = $container.find('form');
+                }
+                $.nos.ui.validate($container, {});
+            }
+        },
+
         ui : {
             form : function(context) {
                 context = context || 'body';
@@ -362,26 +375,36 @@ define('jquery-nos', [
             },
 
             validate : function(context, params) {
-                $(function() {
-                    require(['jquery-validate', 'jquery-form'], function() {
-                        $(context).validate($.extend({}, params, {
-                            errorClass : 'ui-state-error',
-                            success : true,
-                            ignore: 'input[type=hidden]',
-                            submitHandler: function(form) {
-                                $(form).ajaxSubmit({
-                                    dataType: 'json',
-                                    success: function(json) {
-                                        $.nos.ajax.success(json);
-                                        $(form).triggerHandler('ajax_success', [json]);
-                                    },
-                                    error: function() {
-                                        $.nos.notify('An error occured', 'error');
-                                    }
-                                });
+                var submitForm = function(form) {
+                    require(['jquery-form'], function() {
+                        $(form).ajaxSubmit({
+                            dataType: 'json',
+                            success: function(json) {
+                                $.nos.ajax.success(json);
+                                $(form).triggerHandler('ajax_success', [json]);
+                            },
+                            error: function() {
+                                $.nos.notify('An error occured', 'error');
                             }
-                        }));
+                        });
                     });
+                }
+                $(function() {
+                    if (!params || $.isEmptyObject(params)) {
+                        $(context).submit(function(e) {
+                            submitForm(context);
+                            e.preventDefault();
+                        });
+                    } else {
+                        require(['jquery-validate'], function() {
+                            $(context).validate($.extend({}, params, {
+                                errorClass : 'ui-state-error',
+                                success : true,
+                                ignore: 'input[type=hidden]',
+                                submitHandler: submitForm
+                            }));
+                        });
+                    }
                 });
             }
         },

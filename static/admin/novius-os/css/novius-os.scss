@@ -132,10 +132,10 @@ input.ui-state-disabled {
 }
 
 // Right menu on form pages
-.wijmo-wijaccordion, .fieldset.standalone {
-	p {
-		margin: 0.5em 0;
-	}
+.wijmo-wijaccordion .ui-accordion-content, .fieldset.standalone {
+    > p, > div {
+        margin: 0.5em 0;
+    }
 }
 
 .mceExternalToolbar {
@@ -298,38 +298,55 @@ img.publication_status {
   /*margin-top: 2em;*/
 }
 .fieldset .ui-widget-content {
-  padding: 0;
+    padding: inherit 0;
 }
 .fieldset table, table.fieldset {
 	width: 100%;
 }
-.fieldset td , .fieldset th {
-	padding-top: 0.5em;
-	padding-bottom: 0.5em;
-}
-.fieldset th {
-	/* @include .c7 .c2 */
-	width: 30.4% !important; /* = .c7 .c2 + .c7 .col */
-	padding-right: 6.7%; /* = .c7 .col */
-}
-.fieldset th {
-	text-align: right;
-    vertical-align: top;
-}
-div.table-field {
-    display: table;
-    width:100%;
-}
-div.table-field > input {
-    display : table-cell;
-    -moz-box-sizing : border-box;
-    box-sizing : border-box;
-    width   : 100%;
-}
-div.table-field > span {
-    display : table-cell;
+.fieldset {
+    th, td {
+        padding-right: 6.7%; /* = .c7 .col */
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+    th {
+        text-align: right;
+        vertical-align: top;
+        width: 30.4% !important; /* = .c7 .c2 + .c7 .col */
+    }
+    input, textarea {
+        width: 100%;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    input[size], textarea[cols] {
+        width: auto;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+    }
 }
 
+.table-field {
+    display: table;
+    width:100%;
+
+    > input {
+        display : table-cell;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        width   : 100%;
+    }
+
+    > input[size] {
+        width: auto;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+    }
+
+    > span, > div, > label {
+        display : table-cell;
+    }
+}
 
 
 /*+-++-++-++-++-++-++-++-++-++-++-+

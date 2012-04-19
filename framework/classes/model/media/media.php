@@ -98,13 +98,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
         if (!$this->is_image()) {
             return false;
         }
-        if (!empty($params['max_width']) || !empty($params['max_height'])) {
-            list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $params['max_width'], $params['max_height']);
-            $src = $this->get_public_path_resized($params['max_width'], $params['max_height']);
-        } else {
-            list($width, $height) = array($this->media_width, $this->media_height);
-            $src = $this->get_public_path();
-        }
+        list($src, $width, $height, $ratio) = $this->get_img_infos($params['max_width'], $params['max_height']);
         return '<img src="'.$src.'" width="'.$width.'" height="'.$height.'" />';
     }
 
@@ -113,6 +107,21 @@ class Model_Media_Media extends \Nos\Orm\Model {
             'max_width'  => $max_width,
             'max_height' => $max_height,
         ));
+    }
+
+    public function get_img_infos($max_width = null, $max_height = null) {
+        if (!$this->is_image()) {
+            return false;
+        }
+        if (!empty($max_width) || !empty($params['max_height'])) {
+            list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $max_width, $max_height);
+            $src = $this->get_public_path_resized($max_width, $max_height);
+        } else {
+            list($width, $height) = array($this->media_width, $this->media_height);
+            $src = $this->get_public_path();
+            $ration = 1;
+        }
+        return array($src, $width, $height, $ratio);
     }
 
     public function is_image() {

@@ -73,6 +73,9 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                     'value' => $media->media_folder_id,
                 ),
             ),
+            'media' => array(
+                'label' => __('Change the file:'),
+            ),
             'media_title' => array(
                 'form' => array(
                     'value' => $media->media_title,
@@ -189,7 +192,8 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         }
         try {
 
-            $media = Model_Media_Media::find(\Input::post('media_id'));
+            $media = Model_Media_Media::find(\Input::post('media_id', -1));
+
             if (empty($media)) {
                 throw new \Exception('Media not found.');
             }
@@ -269,7 +273,6 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'File successfully saved.',
-				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
 					'target' => 'nos_media_media',
