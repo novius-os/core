@@ -96,7 +96,6 @@ if (false !== $send_file && is_file($send_file)) {
 
 // TODO header 404
 // real 404
-//exit('test');
 
 
 
