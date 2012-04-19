@@ -89,6 +89,8 @@ class Nos {
             echo $response;
             //echo $response->response();
             //$content = $response->response();
+        } catch (\Nos\NotFoundException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $content = null;
             \Fuel::$profiling && Console::logError($e, "HMVC request '$where' failed.");
@@ -146,7 +148,6 @@ class Nos {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
         )));
-        $args->page = $controller->page;
 
         // Check if the function exists
         $name   = $fct_id;

@@ -15,6 +15,7 @@ use Fuel\Core\Config;
 use Fuel\Core\Request;
 use Fuel\Core\View;
 
+class NotFoundException extends \Exception {}
 
 class Controller_Front extends Controller {
 
@@ -38,13 +39,13 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
-	    $url = substr($_SERVER['REDIRECT_URL'], 1, -5);
+	    $url = substr(str_replace('.html', '', $_SERVER['REDIRECT_URL']), 1);
 
         $cache_path = $url;
         $cache_path = (empty($url) ? 'index/' : $url).$cache_path;
         $cache_path = rtrim($cache_path, '/');
 
-		$nocache = \Fuel::$env === \Fuel::DEVELOPMENT;
+		$nocache = \Input::method() == 'POST' || \Fuel::$env === \Fuel::DEVELOPMENT;
 
 		\Event::trigger('front.start');
 
@@ -63,7 +64,7 @@ class Controller_Front extends Controller {
 	        foreach ($url_enhanced as $tempurl) {
 		        if (substr($url.'/', 0, strlen($tempurl)) === $tempurl) {
 			        $_404 = false;
-			        $this->url = $tempurl != '/' ? substr($tempurl, 0, -1).'.html' : '';
+			        $this->url = $tempurl != '/' ? substr($tempurl, 0, -1) : '';
 			        $this->enhancerUrlPath = $tempurl != '/' ? $tempurl : '';
 			        $this->enhancerUrl = ltrim(str_replace(substr($tempurl, 0, -1), '', $url), '/');
 			        try {
@@ -74,6 +75,7 @@ class Controller_Front extends Controller {
 			        } catch (\Exception $e) {
 				        // Cannot generate cache: fatal error...
 				        //@todo : cas de la page d'erreur
+                        $_404 = true;
 				        exit($e->getMessage());
 			        }
 
@@ -84,7 +86,12 @@ class Controller_Front extends Controller {
 		        }
 	        }
 	        if ($_404) {
-		        //@todo : cas du 404
+                \Event::trigger('front.404NotFound', array('url' => $this->url));
+                if (!\Event::has_events('front.404NotFound')) {
+                    echo 404;
+                    $this->response->status = 404;
+                    //@todo : cas du 404 natif
+                }
 	        }
         }
 		$this->_handle_head($content);
@@ -160,7 +167,8 @@ class Controller_Front extends Controller {
         if (empty($this->url)) {
             $where[] = array('page_entrance', 1);
         } else {
-            $where[] = array('page_virtual_url', $this->url);
+            $where[] = array('page_virtual_url', $this->url.'.html');
+            //$where[] = array('page_parent_id', 'IS NOT', null);
         }
 
         // Liste toutes les pages ayant le bon nom
@@ -169,8 +177,8 @@ class Controller_Front extends Controller {
         ));
 
         if (empty($pages)) {
-            var_dump($this->url);
-            throw new \Exception('The requested page was not found.');
+            //var_dump($this->url);
+            throw new NotFoundException('The requested page was not found.');
         }
 
         // Get the first page
