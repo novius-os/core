@@ -11,7 +11,6 @@
 namespace Nos;
 
 class CacheNotFoundException extends \Exception {}
-class NotFoundException extends \Exception {}
 class CacheExpiredException extends \Exception {}
 
 class PubliCache {

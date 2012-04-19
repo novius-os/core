@@ -86,14 +86,6 @@ function($) {
 		var $slug       = $container.find('input[name=slug]');
 		var $same_title = $container.find('input[data-id=same_title]');
 
-        var $dialog = $container.closest(':wijmo-wijdialog');
-        var closeDialog = function() {
-            $dialog && $dialog
-                .wijdialog('close')
-                .wijdialog('destroy')
-                .remove();
-        }
-
         $file.change(function() {
             var path = $file.val();
 
@@ -133,16 +125,14 @@ function($) {
 		}).triggerHandler('change');
 
         $container.find('form').submit(function(e) {
-            $(this).ajaxSubmit({
+	        var $from = $(this);
+	        $from.ajaxSubmit({
                 dataType: 'json',
                 success: function(json) {
                     //Success before close, success use the window reference
                     $.nos.ajax.success(json);
                     if (json.closeDialog) {
-                        window.parent.jQuery(':wijmo-wijdialog:last')
-                            .wijdialog('close')
-                            .wijdialog('destroy')
-                            .remove();
+	                    $.nos.tabOrDialog.close($from);
                     }
                 },
                 error: function() {
@@ -154,7 +144,7 @@ function($) {
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            closeDialog();
+	        $.nos.tabOrDialog.close(this);
         });
     });
 });

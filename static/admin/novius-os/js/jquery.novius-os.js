@@ -306,17 +306,30 @@ define('jquery-nos', [
             });
         },
 
-        openTabOrDialog : function(context, tab, dialogOptions) {
-            var dialog = $(context).closest('.ui-dialog-content').size();
-            if (dialog) {
-                dialogOptions = dialogOptions || {};
-                $.nos.dialog($.extend({
-                    contentUrl: tab.url,
-                    ajax : !tab.iframe,
-                    title: tab.label
-                }, dialogOptions));
-            } else {
-                $.nos.tabs.add(tab);
+        tabOrDialog : {
+            open : function(context, tab, dialogOptions) {
+                var dialog = $(context).closest('.ui-dialog-content').size();
+                if (dialog) {
+                    dialogOptions = dialogOptions || {};
+                    $.nos.dialog($.extend({
+                        contentUrl: tab.url,
+                        ajax : !tab.iframe,
+                        title: tab.label
+                    }, dialogOptions));
+                } else {
+                    $.nos.tabs.add(tab);
+                }
+            },
+
+            close : function(context) {
+                var $dialog = $(context).closest(':wijmo-wijdialog');
+                if ($dialog.size()) {
+                    $dialog.wijdialog('close')
+                        .wijdialog('destroy')
+                        .remove();
+                } else {
+                    $.nos.tabs.close();
+                }
             }
         },
 
