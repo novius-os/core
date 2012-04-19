@@ -19,49 +19,54 @@ require(['jquery-nos-ostabs'], function ($) {
 });
 </script>
 
-<div class="page fieldset standalone" id="<?= $uniqid ?>">
-    <?php
-    $fieldset->set_config('field_template', '{field}');
+<?php
+$fieldset->set_config('field_template', '{field}');
 
-    $fieldset->field('slug')->set_template('{label} {field} .'.$media->media_ext.' ');
+// Enctype multipart/form-data
+$form_attributes = $fieldset->get_config('form_attributes', array());
+$form_attributes['enctype'] = 'multipart/form-data';
+$fieldset->set_config('form_attributes', $form_attributes);
+?>
 
-    // Enctype multipart/form-data
-    $form_attributes = $fieldset->get_config('form_attributes', array());
-    $form_attributes['enctype'] = 'multipart/form-data';
-    $fieldset->set_config('form_attributes', $form_attributes);
-    ?>
-    <?= $fieldset->open('admin/nos/media/media/update'); ?>
-    <?= $fieldset->field('media_id')->build(); ?>
-    <?php
-    ob_start();
-    ?>
-    <table>
-        <tr>
-            <?= $media->is_image() ? '<td rowspan="3" style="width:128px;">'.$media->get_img_tag_resized(128, null).'</td>' : '' ?>
-            <th><?= $fieldset->field('media_title')->label ?></th>
-            <td><?= $fieldset->field('media_title')->build() ?></td>
-        </tr>
-        </tr>
-        <tr>
-            <th><?= $fieldset->field('slug')->label ?></th>
-            <td><?= $fieldset->field('slug')->build() ?> <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?> /> <?= __('Generate from title') ?></label></td>
-        </tr>
-        <tr>
-            <th><?= $fieldset->field('media_folder_id')->label; ?></th>
-            <td><?= $fieldset->field('media_folder_id')->build(); ?></td>
-        </tr>
-    </table>
-    <?php
-    $content = ob_get_clean();
-    ?>
-    <?= View::forge('form/layout_standard', array(
-        'fieldset' => $fieldset,
-        'title' => 'media',
-        'save' => 'save',
-        'content' => $content,
-    ), false) ?>
-    <?= $fieldset->close(); ?>
+<?= $fieldset->open('admin/nos/media/media/update'); ?>
+<?= $fieldset->build_hidden_fields(); ?>
+<div class="page line ui-widget" id="<?= $uniqid ?>">
+	<div class="unit col c1" ></div>
+	<div class="unit col c2" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
+        <?php
+        if ($media->is_image()) {
+            list($src, $width, $height, $ratio) = $media->get_img_infos(128, null);
+            printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
+        }
+        ?>
+    </div>
+	<div class="unit col c6" style="z-index:99;">
+        <div class="line" style="margin-bottom:1em;">
+            <table class="fieldset standalone">
+                <tr class="title">
+                    <th></th>
+                    <td><?= $fieldset->field('media_title')->build() ?></td>
+                </tr>
+                <tr>
+                    <th><?= $fieldset->field('media')->label ?></th>
+                    <td><?= $fieldset->field('media')->build() ?></td>
+                </tr>
+                <tr>
+                    <th><?= $fieldset->field('slug')->label ?></th>
+                    <td class="table-field"><?= $fieldset->field('slug')->build() ?><span>.<?= $media->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
+                </tr>
+                <tr>
+                    <th><?= $fieldset->field('media_folder_id')->label; ?></th>
+                    <td><?= $fieldset->field('media_folder_id')->build(); ?></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="unit col c3 lastUnit">
+        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabs.close();return false;"><?= __('Cancel') ?></a></p>
+    </div>
 </div>
+<?= $fieldset->close(); ?>
 
 
 <script type="text/javascript">
@@ -70,7 +75,8 @@ require([
     'order!jquery-form'
 ],
 function($) {
-    // Form UI enhancements are already taken care of by the form/layout_standard view
+    $.nos.ui.form('#<?= $uniqid ?>');
+    $.nos.form.ajax('#<?= $uniqid ?>');
 
     $(function() {
         var $container = $('#<?= $uniqid ?>');
@@ -79,14 +85,6 @@ function($) {
 		var $title      = $container.find('input[name=media_title]');
 		var $slug       = $container.find('input[name=slug]');
 		var $same_title = $container.find('input[data-id=same_title]');
-
-        var $dialog = $container.closest(':wijmo-wijdialog');
-        var closeDialog = function() {
-            $dialog && $dialog
-                .wijdialog('close')
-                .wijdialog('destroy')
-                .remove();
-        }
 
         $file.change(function() {
             var path = $file.val();
@@ -127,16 +125,14 @@ function($) {
 		}).triggerHandler('change');
 
         $container.find('form').submit(function(e) {
-            $(this).ajaxSubmit({
+	        var $from = $(this);
+	        $from.ajaxSubmit({
                 dataType: 'json',
                 success: function(json) {
                     //Success before close, success use the window reference
                     $.nos.ajax.success(json);
                     if (json.closeDialog) {
-                        window.parent.jQuery(':wijmo-wijdialog:last')
-                            .wijdialog('close')
-                            .wijdialog('destroy')
-                            .remove();
+	                    $.nos.tabOrDialog.close($from);
                     }
                 },
                 error: function() {
@@ -148,7 +144,7 @@ function($) {
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            closeDialog();
+	        $.nos.tabOrDialog.close(this);
         });
     });
 });

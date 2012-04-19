@@ -16,21 +16,15 @@ require(['jquery-nos'], function($) {
 </script>
 
 <?php
-foreach ($fieldset->field() as $field) {
-    if (false != strpos(get_class($field), 'Widget_')) {
-        continue;
-    }
-	if ($field->type == 'hidden') {
-		echo $field->build();
-	}
-}
+echo $fieldset->build_hidden_fields();
+
 $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 $large = !empty($large) && $large == true;
 ?>
 
 <div class="line ui-widget" id="<?= $uniqid1 ?>">
 	<?= $large ? '' : '<div class="unit col c1"></div>'; ?>
-	<div class="unit col <?= $large ? 'c8' : 'c7' ?>" id="line_first" style="z-index:99;">
+	<div class="unit col <?= $large ? 'c8' : 'c7' ?>" style="z-index:99;">
 		<div class="line" style="margin-bottom:1em;">
 			<?php
             if (!empty($medias)) {
@@ -82,7 +76,7 @@ $large = !empty($large) && $large == true;
         ?>
 	</div>
 	<div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;text-align:center;">
-		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabs.close();return false;"><?= __('Cancel') ?></a></p>
+		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabOrDialog.close(this);return false;"><?= __('Cancel') ?></a></p>
         <?php
             echo \View::forge('form/publishable', array(
                 'object' => !empty($object) ? $object : null,
@@ -106,7 +100,7 @@ $large = !empty($large) && $large == true;
         $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
         ?>
         <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;margin-bottom:1em;">
-             <div class="accordion">
+             <div class="accordion fieldset">
                 <?php
                 foreach ((array) $menu as $title => $options) {
                     if (!isset($options['fields'])) {

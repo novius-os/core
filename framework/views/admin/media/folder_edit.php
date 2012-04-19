@@ -60,14 +60,6 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 		var $seo_title  = $container.find('input[name=medif_path]');
 		var $same_title = $container.find('input[data-id=same_title]');
 
-        var $dialog = $container.closest(':wijmo-wijdialog');
-        var closeDialog = function() {
-            $dialog && $dialog
-                .wijdialog('close')
-                .wijdialog('destroy')
-                .remove();
-        }
-
 		// Same title and description (alt)
 		$title.bind('change keyup', function() {
 			if ($same_title.is(':checked')) {
@@ -84,14 +76,12 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 		}).triggerHandler('change');
 
         $container.find('form').submit(function(e) {
-            $(this).ajaxSubmit({
+	        var $form = $(this);
+	        $form.ajaxSubmit({
                 dataType: 'json',
                 success: function(json) {
                     if (json.closeDialog) {
-                        window.parent.jQuery(':wijmo-wijdialog')
-                            .wijdialog('close')
-                            .wijdialog('destroy')
-                            .remove();
+	                    $.nos.tabOrDialog.close($form);
                     }
                     $.nos.ajax.success(json);
                 },
@@ -104,7 +94,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            closeDialog();
+            $.nos.tabOrDialog.close(this);
         });
     });
 });

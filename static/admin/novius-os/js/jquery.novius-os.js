@@ -306,17 +306,43 @@ define('jquery-nos', [
             });
         },
 
-        openTabOrDialog : function(context, tab, dialogOptions) {
-            var dialog = $(context).closest('.ui-dialog-content').size();
-            if (dialog) {
-                dialogOptions = dialogOptions || {};
-                $.nos.dialog($.extend({
-                    contentUrl: tab.url,
-                    ajax : !tab.iframe,
-                    title: tab.label
-                }, dialogOptions));
-            } else {
-                $.nos.tabs.add(tab);
+        tabOrDialog : {
+            open : function(context, tab, dialogOptions) {
+                var dialog = $(context).closest('.ui-dialog-content').size();
+                if (dialog) {
+                    dialogOptions = dialogOptions || {};
+                    $.nos.dialog($.extend({
+                        contentUrl: tab.url,
+                        ajax : !tab.iframe,
+                        title: tab.label
+                    }, dialogOptions));
+                } else {
+                    $.nos.tabs.add(tab);
+                }
+            },
+
+            close : function(context) {
+                var $dialog = $(context).closest(':wijmo-wijdialog');
+                if ($dialog.size()) {
+                    $dialog.wijdialog('close')
+                        .wijdialog('destroy')
+                        .remove();
+                } else {
+                    $.nos.tabs.close();
+                }
+            }
+        },
+
+        form : {
+            ajax : function(context) {
+                if (!context) {
+                    return;
+                }
+                var $container = $(context);
+                if (!$container.is('form')) {
+                    $container = $container.find('form');
+                }
+                $.nos.ui.validate($container, {});
             }
         },
 
@@ -376,26 +402,36 @@ define('jquery-nos', [
             },
 
             validate : function(context, params) {
-                $(function() {
-                    require(['jquery-validate', 'jquery-form'], function() {
-                        $(context).validate($.extend({}, params, {
-                            errorClass : 'ui-state-error',
-                            success : true,
-                            ignore: 'input[type=hidden]',
-                            submitHandler: function(form) {
-                                $(form).ajaxSubmit({
-                                    dataType: 'json',
-                                    success: function(json) {
-                                        $.nos.ajax.success(json);
-                                        $(form).triggerHandler('ajax_success', [json]);
-                                    },
-                                    error: function() {
-                                        $.nos.notify('An error occured', 'error');
-                                    }
-                                });
+                var submitForm = function(form) {
+                    require(['jquery-form'], function() {
+                        $(form).ajaxSubmit({
+                            dataType: 'json',
+                            success: function(json) {
+                                $.nos.ajax.success(json);
+                                $(form).triggerHandler('ajax_success', [json]);
+                            },
+                            error: function() {
+                                $.nos.notify('An error occured', 'error');
                             }
-                        }));
+                        });
                     });
+                }
+                $(function() {
+                    if (!params || $.isEmptyObject(params)) {
+                        $(context).submit(function(e) {
+                            submitForm(context);
+                            e.preventDefault();
+                        });
+                    } else {
+                        require(['jquery-validate'], function() {
+                            $(context).validate($.extend({}, params, {
+                                errorClass : 'ui-state-error',
+                                success : true,
+                                ignore: 'input[type=hidden]',
+                                submitHandler: submitForm
+                            }));
+                        });
+                    }
                 });
             }
         },

@@ -24,7 +24,7 @@ define([
                     primary : true,
                     icon : 'pencil',
                     action : function(item) {
-                        $.nos.tabs.add({
+                        $.nos.tabs.open({
                             url : 'admin/nos/page/page/edit/' + item.id,
                             label : item.title
                         });
