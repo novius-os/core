@@ -13,7 +13,7 @@ define([
 			success: function(enhancers) {
 				options = $.extend({
 					// Location of TinyMCE script
-					script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce.js',
+					script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce' + (assets_minified ? '' : '_src') + '.js',
 					theme      : 'nos',
 					plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
 					theme_nos_enhancers : enhancers
