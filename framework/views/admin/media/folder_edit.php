@@ -81,7 +81,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
                 dataType: 'json',
                 success: function(json) {
                     if (json.closeDialog) {
-	                    $.nos.tabOrDialog.close($form);
+	                    $form.noviusos().tabClose();
                     }
                     $.nos.ajax.success(json);
                 },
@@ -94,7 +94,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            $.nos.tabOrDialog.close(this);
+            $(this).noviusos().tabClose();
         });
     });
 });

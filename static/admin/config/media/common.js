@@ -20,7 +20,7 @@ define([
                     icon : 'pencil',
                     label : appDesk.i18n('Edit'),
                     action : function(item, ui) {
-                        $.nos.tabOrDialog.open(ui, {
+                        $(ui).noviusos().tabOpen({
                             url: 'admin/nos/media/media/edit/' + item.id,
                             label: appDesk.i18n('Edit a media')._()
                         });
@@ -31,8 +31,8 @@ define([
                     primary : true,
                     icon : 'trash',
                     label : appDesk.i18n('Delete'),
-                    action : function(item) {
-                        $.nos.dialog({
+                    action : function(item, ui) {
+                        $(ui).noviusos().dialogOpen({
                             contentUrl: 'admin/nos/media/actions/delete_media/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a media')._(),
@@ -102,7 +102,7 @@ define([
                     media : {
                         label : appDesk.i18n('Add a media'),
                         action : function(ui) {
-                            $.nos.tabOrDialog.open(ui, {
+                            $(ui).noviusos().tabOpen({
                                 url: 'admin/nos/media/media/add',
                                 label: appDesk.i18n('Add a media')._()
                             });
@@ -111,7 +111,7 @@ define([
                     folder : {
                         label : appDesk.i18n('Add a folder'),
                         action : function(ui) {
-                            $.nos.tabOrDialog.open(ui, {
+                            $(ui).noviusos().tabOpen({
                                 url: 'admin/nos/media/folder/add',
                                 label: 'Add a folder'
                             }, {
@@ -179,7 +179,7 @@ define([
                                             label : appDesk.i18n('Add a media in this folder'),
                                             icon : 'plus',
                                             action : function(item, ui) {
-                                                $.nos.tabOrDialog.open(ui, {
+                                                $(ui).noviusos().tabOpen({
                                                     url: 'admin/nos/media/media/add/' + item.id,
                                                     label: 'Add a media in the "' + item.title + '" folder'
                                                 });
@@ -190,7 +190,7 @@ define([
                                             label : appDesk.i18n('Add a sub-folder to this folder'),
                                             icon : 'folder-open',
                                             action : function(item, ui) {
-                                                $.nos.tabOrDialog.open(ui, {
+                                                $(ui).noviusos().tabOpen({
                                                     url: 'admin/nos/media/folder/add/' + item.id,
                                                     label: 'Add a sub-folder in "' + item.title + '"'
                                                 }, {
@@ -204,7 +204,7 @@ define([
                                             label : appDesk.i18n('Edit this folder'),
                                             icon : 'pencil',
                                             action : function(item, ui) {
-                                                $.nos.tabOrDialog.open(ui, {
+                                                $(ui).noviusos().tabOpen({
                                                     url: 'admin/nos/media/folder/edit/' + item.id,
                                                     label: 'Edit the "' + item.title + '" folder'
                                                 }, {
@@ -217,8 +217,8 @@ define([
                                             name : 'delete',
                                             label : appDesk.i18n('Delete this folder'),
                                             icon : 'trash',
-                                            action : function(item) {
-                                                $.nos.dialog({
+                                            action : function(item, ui) {
+                                                $(ui).noviusos().dialogOpen({
                                                     contentUrl: 'admin/nos/media/actions/delete_folder/' + item.id,
                                                     ajax : true,
                                                     title: 'Delete the "' + item.title + '" folder',

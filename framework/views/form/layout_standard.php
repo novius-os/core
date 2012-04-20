@@ -76,7 +76,7 @@ $large = !empty($large) && $large == true;
         ?>
 	</div>
 	<div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;text-align:center;">
-		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabOrDialog.close(this);return false;"><?= __('Cancel') ?></a></p>
+		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).noviusos().tabClose();return false;"><?= __('Cancel') ?></a></p>
         <?php
             echo \View::forge('form/publishable', array(
                 'object' => !empty($object) ? $object : null,
