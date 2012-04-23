@@ -42,6 +42,7 @@ return array (
             'edit' => false,
 			'form' => array(
 				'type' => 'password',
+                'size' => 20,
 			),
             'validation' => array(
                 'required',
@@ -53,6 +54,7 @@ return array (
             'edit' => false,
 			'form' => array(
 				'type' => 'password',
+                'size' => 20,
 			),
             'validation' => array(
                 'required', // To show the little star

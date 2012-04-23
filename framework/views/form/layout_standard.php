@@ -22,47 +22,50 @@ $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_cla
 $large = !empty($large) && $large == true;
 ?>
 
-<div class="line ui-widget" id="<?= $uniqid1 ?>">
+<div class="line ui-widget" id="<?= $uniqid1 ?>" style="margin-bottom:1em;">
 	<?= $large ? '' : '<div class="unit col c1"></div>'; ?>
-	<div class="unit col <?= $large ? 'c8' : 'c7' ?>" style="z-index:99;">
-		<div class="line" style="margin-bottom:1em;">
+	<div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="z-index:99;">
+        <table class="title-fields" style="margin-bottom:1em;">
+            <tr>
 			<?php
             if (!empty($medias)) {
+                echo '<td>';
                 foreach ((array) $medias as $name) {
                     echo $fieldset->field($name)->build();
                 }
+                echo '</td>';
             }
 			?>
+                <td>
 			<?php
             if (!empty($title)) {
                 $title = (array) $title;
                 $size  = min(6, floor(6 / count($title)));
+                $first = true;
                 foreach ($title as $name) {
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        echo '</td><td>';
+                    }
                     $field = $fieldset->field($name);
                     $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
                     echo ' '.$field
                             ->set_attribute('placeholder',$placeholder)
                             ->set_attribute('title', $placeholder)
-                            ->set_attribute('class', 'title '.($field->type == 'file' ? '' : 'c'.$size))
+                            ->set_attribute('class', 'title '.($field->type == 'file' ? '' : ''/*'c'.$size*/))
                             ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
                             ->build();
                 }
             }
             ?>
-			<?php
-            if (!empty($id)) {
-                $id = $fieldset->field($id);
-                $value = !empty($id) ? $id->get_value() : null;
-                if (!empty($value)) {
-                    echo '<span style="opacity: 0.5">'.$id->label.$value.'</span>';
-                }
-            }
-			?>
-		</div>
+                </td>
+            </tr>
+        </table>
         <?php
         if (!empty($subtitle)) {
             ?>
-            <div class="line" style="margin-bottom:1em;overflow:visible;">
+            <div class="line" style="overflow:visible;">
 			<?php
             $fieldset->form()->set_config('field_template',  "\t\t{label}{required} {field} {error_msg}</td>\n");
             foreach ((array) $subtitle as $field) {
@@ -75,7 +78,8 @@ $large = !empty($large) && $large == true;
         }
         ?>
 	</div>
-	<div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;text-align:center;">
+    <div class="unit col c1"></div>
+	<div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>" style="position:relative;z-index:98;">
 		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabOrDialog.close(this);return false;"><?= __('Cancel') ?></a></p>
         <?php
             echo \View::forge('form/publishable', array(
@@ -96,6 +100,23 @@ $large = !empty($large) && $large == true;
 	</div>
 
 	<?php
+    if (!empty($id)) {
+        $_id = $fieldset->field($id);
+        $_id = !empty($_id) ? $_id->get_value() : null;
+        $admin = __('Admin');
+        if (empty($_id)) {
+            // Nothing
+        } else {
+            if (empty($menu[$admin])) {
+                // Display below current content, in a new line
+            } else if (isset($menu[$admin]['fields'])) {
+                array_unshift($menu[$admin]['fields'], '_id');
+            } else {
+                array_unshift($menu[$admin], '_id');
+            }
+        }
+    }
+
     if (!empty($menu)) {
         $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
         ?>
@@ -112,9 +133,10 @@ $large = !empty($large) && $large == true;
                         <?php
                         foreach ((array) $options['fields'] as $field) {
                             try {
-                                //echo $field;
                                 if ($field instanceof \View) {
                                     echo $field;
+                                } else if ($field == '_id') {
+                                    echo '<p>ID : '.$_id.'</p>';
                                 } else {
                                     echo '<p>'.$fieldset->field($field)->build().'</p>';
                                 }
@@ -134,3 +156,8 @@ $large = !empty($large) && $large == true;
         ?>
 	<?= $large ? '' : '<div class="unit lastUnit"></div>' ?>
 </div>
+
+<?php
+if (empty($menu) && !empty($_id)) {
+    echo '<div class="line"><div class="unit col c1"></div><div class="unit">ID : '.$_id.'</div></div>';
+}
