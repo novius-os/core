@@ -91,20 +91,22 @@
 
 <script type="text/javascript">
 	require(['jquery-nos'], function ($) {
-		$.nos.ui.form('#<?= $uniqid ?>');
-		$(".app_list table").wijgrid({
-			columns: [
-				{  },
-				{ width: 100, ensurePxWidth: true }
-			] });
+		$(function() {
+			$('#<?= $uniqid ?>').nos().form();
+			$(".app_list table").wijgrid({
+				columns: [
+					{  },
+					{ width: 100, ensurePxWidth: true }
+				] });
 
-		<?php
-		$flash = \Session::get_flash('notification.plugins');
-		if (!empty($flash)) {
-			?>
-				$.nos.notify(<?= \Format::forge()->to_json($flash); ?>);
-			<?php
-		}
-		?>
+<?php
+	$flash = \Session::get_flash('notification.plugins');
+	if (!empty($flash)) {
+?>
+			$.nos.notify(<?= \Format::forge()->to_json($flash); ?>);
+<?php
+	}
+?>
+		});
 	});
 </script>

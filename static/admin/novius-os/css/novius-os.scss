@@ -319,6 +319,9 @@ img.publication_status {
         -moz-box-sizing: border-box;
         box-sizing: border-box;
     }
+    textarea {
+        resize: vertical;
+    }
     input[size], textarea[cols] {
         width: auto;
         -moz-box-sizing: content-box;
@@ -326,9 +329,30 @@ img.publication_status {
     }
 }
 
+table.title-fields {
+    width : 100%;
+
+    td {
+        padding-right : 1em;
+    }
+
+    td:last-child {
+        padding-right : 0;
+    }
+
+    input {
+        width : 100%;
+        box-sizing : border-box;
+        -moz-box-sizing : border-box;
+    }
+}
+
 .table-field {
     display: table;
     width:100%;
+}
+
+.table-field, .row-field {
 
     > input {
         display : table-cell;
@@ -343,11 +367,10 @@ img.publication_status {
         box-sizing: content-box;
     }
 
-    > span, > div, > label {
+    > span, > div:not(.row-field), > label {
         display : table-cell;
     }
 }
-
 
 /*+-++-++-++-++-++-++-++-++-++-++-+
 * |P||E||R||M||I||S||S||I||O||N||S|

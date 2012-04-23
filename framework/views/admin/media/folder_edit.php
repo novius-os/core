@@ -51,10 +51,8 @@
 
 <script type="text/javascript">
 require(['jquery-nos', 'order!jquery-form'], function($) {
-    $.nos.ui.form('#<?= $uniqid ?>');
     $(function() {
-
-        var $container = $('#<?= $uniqid ?>');
+        var $container = $('#<?= $uniqid ?>').nos().form();
 
 		var $title      = $container.find('input[name=medif_title]');
 		var $seo_title  = $container.find('input[name=medif_path]');
@@ -81,7 +79,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
                 dataType: 'json',
                 success: function(json) {
                     if (json.closeDialog) {
-	                    $.nos.tabOrDialog.close($form);
+	                    $form.nos().tab('close');
                     }
                     $.nos.ajax.success(json);
                 },
@@ -94,7 +92,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            $.nos.tabOrDialog.close(this);
+            $(this).nos().tab('close');
         });
     });
 });

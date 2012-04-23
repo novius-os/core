@@ -111,7 +111,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
             }
         }
         $form_attributes = $this->get_config('form_attributes', array());
-        $append[] = '<script type="text/javascript">require(["jquery-nos"], function($) {$.nos.ui.validate("#'.$form_attributes['id'].'", '.$js_rules.')});</script>';
+        $append[] = '<script type="text/javascript">require(["jquery-nos"], function($) {$("#'.$form_attributes['id'].'").nos().form("validate", '.$js_rules.').form("ajax");});</script>';
         return implode('', $append);
     }
 

@@ -61,7 +61,7 @@ $fieldset->set_config('form_attributes', $form_attributes);
         </div>
     </div>
     <div class="unit col c3 lastUnit">
-        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabs.close();return false;"><?= __('Cancel') ?></a></p>
+        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
     </div>
 </div>
 <?= $fieldset->close(); ?>
@@ -74,35 +74,14 @@ require([
     'order!jquery-form'
 ],
 function($) {
-    $.nos.ui.form('#<?= $uniqid ?>');
-    $.nos.form.ajax('#<?= $uniqid ?>');
-
     $(function() {
         var $container = $('#<?= $uniqid ?>')
+	            .nos().form()
 		        .find('form')
-	            .submit(function(e) {
-		            var $form = $(this);
-		        $form.ajaxSubmit({
-				        dataType: 'json',
-				        success: function(json) {
-					        //Success before close, success use the window reference
-					        $.nos.ajax.success(json);
-					        if (json.closeDialog) {
-						        $.nos.tabOrDialog.close($form);
-					        }
-				        },
-				        error: function() {
-					        $.nos.notify('An error occured', 'error');
-				        }
-			        });
-			        e.preventDefault();
+		        .bind('ajax_success', function() {
+			        $(this).nos().dialog('close');
 		        })
-	            .end()
-	            .find('a[data-id=cancel]')
-	            .click(function(e) {
-			        e.preventDefault();
-		            $.nos.tabOrDialog.close(this);
-		        })
+	            .nos().form('ajax')
 	            .end(),
             $file = $container.find(':file[name=media]')
 	            .change(function() {

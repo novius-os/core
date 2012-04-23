@@ -26,117 +26,6 @@ define('jquery-nos', [
             }
         },
 
-        dataStore : {},
-        data : function (id, json) {
-            if (window.parent != window && window.parent.$nos) {
-                return window.parent.$nos.nos.data(id, json);
-            }
-
-            if (id) {
-                if (json) {
-                    this.dataStore[id] = json;
-                }
-                return this.dataStore[id];
-            }
-        },
-
-        dialog : function(options) {
-
-            if (options.destroyOnClose) {
-                var oldClose = options.close;
-                options.close = function() {
-                    if ($.isFunction(oldClose)) {
-                        oldClose.apply(this, arguments);
-                    }
-                    $(this).wijdialog('destroy')
-                        .remove();
-                };
-            }
-
-            // Default options
-            options = $.extend(true, {}, {
-                width: window.innerWidth - 200,
-                height: window.innerHeight - 100,
-                modal: true,
-                captionButtons: {
-                    pin: {visible: false},
-                    refresh: {visible: options.contentUrl != null && !options.ajax},
-                    toggle: {visible: false},
-                    minimize: {visible: false},
-                    maximize: {visible: false}
-                }
-            }, options);
-
-            var where   = $.nos.$noviusos.ostabs ? $.nos.$noviusos.ostabs('current').panel : $('body');
-            var $dialog = $(document.createElement('div')).appendTo(where);
-
-            $.nos.data('dialog', $dialog);
-
-            if (typeof options['content'] != 'undefined') {
-                $dialog.append(options.content);
-            }
-
-            var proceed = true;
-            if (options.ajax) {
-                var contentUrl = options.contentUrl;
-                delete options.contentUrl;
-                options.autoOpen = false;
-                $dialog.wijdialog(options);
-
-                // Request the remote document
-                $.ajax({
-                    url: contentUrl,
-                    type: 'GET',
-                    dataType: "html",
-                    // Complete callback (responseText is used internally)
-                    complete: function( jqXHR, status, responseText ) {
-                        // Store the response as specified by the jqXHR object
-                        responseText = jqXHR.responseText;
-                        // If successful, inject the HTML into all the matched elements
-                        if ( jqXHR.isResolved() ) {
-                            // #4825: Get the actual response in case
-                            // a dataFilter is present in ajaxSettings
-                            jqXHR.done(function( r ) {
-                                responseText = r;
-                            });
-
-
-
-                            try {
-                                var json = $.parseJSON(responseText);
-                                // If the dialog ajax URL returns a valid JSON string, don't show the dialog
-                                proceed = false;
-                            } catch (e) {}
-
-                            if (proceed) {
-                                $dialog.wijdialog('open');
-                            } else {
-                                $dialog.empty();
-                                $dialog.wijdialog('destroy');
-                                $dialog.remove();
-                                $.nos.ajax.success(json);
-                            }
-
-                            // inject the full result
-                            $dialog.html( responseText );
-                        }
-                    }
-                });
-            } else {
-                $dialog.wijdialog(options);
-            }
-            if (proceed) {
-                if ($.isFunction(options['onLoad'])) {
-                    options['onLoad']();
-                }
-                $dialog.bind('wijdialogclose', function(event, ui) {
-                    $dialog.closest('.ui-dialog').hide().appendTo(where);
-                });
-            }
-
-            return $dialog;
-        },
-
         notify : function( options, type ) {
 
             if (window.parent != window && window.parent.$nos) {
@@ -263,179 +152,6 @@ define('jquery-nos', [
             }
         },
 
-        media : function(input, data) {
-
-            var contentUrls = {
-                'all'   : '/admin/nos/media/list',
-                'image' : '/admin/nos/media/list?view=image_pick'
-            };
-
-            var dialog = null;
-
-            var options = $.extend({
-                title: input.attr('title') || 'File',
-                allowDelete : true,
-                choose: function(e) {
-                    // Open the dialog to choose the file
-                    if (dialog == null) {
-                        dialog = $.nos.dialog({
-                            contentUrl: contentUrls[data.mode],
-                            ajax: true,
-                            title: 'Choose a media file'
-                        });
-                        dialog.bind('select.media', function(e, item) {
-                            input.inputFileThumb({
-                                file: item.thumbnail
-                            });
-                            input.val(item.id);
-                            dialog.wijdialog('close');
-                        });
-                    } else {
-                        dialog.wijdialog('open');
-                    }
-                }
-            }, data.inputFileThumb);
-
-            require([
-                'static/novius-os/admin/vendor/jquery/jquery-ui-input-file-thumb/js/jquery.input-file-thumb',
-                'link!static/novius-os/admin/vendor/jquery/jquery-ui-input-file-thumb/css/jquery.input-file-thumb.css'
-            ], function() {
-                $(function() {
-                    input.inputFileThumb(options);
-                });
-            });
-        },
-
-        tabOrDialog : {
-            open : function(context, tab, dialogOptions) {
-                var dialog = $(context).closest('.ui-dialog-content').size();
-                if (dialog) {
-                    dialogOptions = dialogOptions || {};
-                    $.nos.dialog($.extend({
-                        contentUrl: tab.url,
-                        ajax : !tab.iframe,
-                        title: tab.label
-                    }, dialogOptions));
-                } else {
-                    $.nos.tabs.add(tab);
-                }
-            },
-
-            close : function(context) {
-                var $dialog = $(context).closest(':wijmo-wijdialog');
-                if ($dialog.size()) {
-                    $dialog.wijdialog('close')
-                        .wijdialog('destroy')
-                        .remove();
-                } else {
-                    $.nos.tabs.close();
-                }
-            }
-        },
-
-        form : {
-            ajax : function(context) {
-                if (!context) {
-                    return;
-                }
-                var $container = $(context);
-                if (!$container.is('form')) {
-                    $container = $container.find('form');
-                }
-                $.nos.ui.validate($container, {});
-            }
-        },
-
-        ui : {
-            form : function(context) {
-                context = context || 'body';
-                $(function() {
-                    var $container = $(context);
-                    $container.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
-                    $container.find(":input[type='submit'],button").each(function() {
-                        var options = {};
-                        var icon = $(this).data('icon');
-                        if (icon) {
-                             options.icons = {
-                                 primary: 'ui-icon-' + icon
-                             }
-                        }
-                        $(this).button(options);
-                    });
-                    $container.find("select").filter(':not(.notransform)').wijdropdown();
-                    $container.find(":input[type=checkbox]").wijcheckbox();
-                    $container.find('.expander').each(function() {
-                        var $this = $(this);
-                        $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
-                    });
-                    $container.find('.accordion').wijaccordion({
-                        header: "h3",
-                        selectedIndexChanged : function(e, args) {
-                            $.nos.ui.initOnShow.show($(e.target).find('.ui-accordion-content').eq(args.newIndex));
-                        }
-                    });
-                });
-            },
-
-            initOnShow : {
-                init : function($el, init) {
-                    if (!$.isFunction(init)) {
-                        return;
-                    }
-                    if ($el.is(':visible')) {
-                        init();
-                    } else {
-                        $el.addClass('nos-init-on-show')
-                            .data('nos-init-on-show', init);
-                    }
-                },
-
-                show : function($container) {
-                    $container.find('.nos-init-on-show:visible').each(function() {
-                        var $el = $(this),
-                            init = $el.data('nos-init-on-show');
-
-                        $el.removeClass('nos-init-on-show');
-                        init();
-                    });
-                }
-            },
-
-            validate : function(context, params) {
-                var submitForm = function(form) {
-                    require(['jquery-form'], function() {
-                        $(form).ajaxSubmit({
-                            dataType: 'json',
-                            success: function(json) {
-                                $.nos.ajax.success(json);
-                                $(form).triggerHandler('ajax_success', [json]);
-                            },
-                            error: function() {
-                                $.nos.notify('An error occured', 'error');
-                            }
-                        });
-                    });
-                }
-                $(function() {
-                    if (!params || $.isEmptyObject(params)) {
-                        $(context).submit(function(e) {
-                            submitForm(context);
-                            e.preventDefault();
-                        });
-                    } else {
-                        require(['jquery-validate'], function() {
-                            $(context).validate($.extend({}, params, {
-                                errorClass : 'ui-state-error',
-                                success : true,
-                                ignore: 'input[type=hidden]',
-                                submitHandler: submitForm
-                            }));
-                        });
-                    }
-                });
-            }
-        },
-
         saveUserConfiguration: function(key, configuration) {
             this.ajax.request({
                 url: '/admin/nos/noviusos/save_user_configuration',
@@ -446,7 +162,316 @@ define('jquery-nos', [
             });
         }
     };
-    window.$nos = $;
 
-    return $;
+    var $nos = window.$nos = $.sub();
+
+    $nos.fn.extend({
+        media : function(data) {
+
+            data = data || {};
+            var contentUrls = {
+                    'all'   : '/admin/nos/media/list',
+                    'image' : '/admin/nos/media/list?view=image_pick'
+                },
+                $input = this;
+
+            var dialog = null;
+
+            var options = $.extend({
+                title: $input.attr('title') || 'File',
+                allowDelete : true,
+                choose: function(e) {
+                    // Open the dialog to choose the file
+                    if (dialog == null) {
+                        dialog = $input.nos().dialog({
+                            contentUrl: contentUrls[data.mode],
+                            ajax: true,
+                            title: 'Choose a media file'
+                        });
+                        dialog.bind('select.media', function(e, item) {
+                            $input.inputFileThumb({
+                                file: item.thumbnail
+                            });
+                            $input.val(item.id);
+                            dialog.wijdialog('close');
+                        });
+                    } else {
+                        dialog.wijdialog('open');
+                    }
+                }
+            }, data.inputFileThumb || {});
+
+            require([
+                'static/novius-os/admin/vendor/jquery/jquery-ui-input-file-thumb/js/jquery.input-file-thumb',
+                'link!static/novius-os/admin/vendor/jquery/jquery-ui-input-file-thumb/css/jquery.input-file-thumb.css'
+            ], function() {
+                $(function() {
+                    $input.inputFileThumb(options);
+                });
+            });
+        },
+
+        form : function() {
+            var args = Array.prototype.slice.call(arguments),
+                method = 'ui';
+            if (args.length > 0 && $.inArray(args[0], ['ui', 'validate', 'ajax']) !== -1) {
+                method = args.shift();
+            }
+            switch (method) {
+                case 'ui' :
+                    var $form = this;
+                    $form.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
+                    $form.find(":input[type='submit'],button").each(function() {
+                            var options = {};
+                            var icon = $(this).data('icon');
+                            if (icon) {
+                                options.icons = {
+                                    primary: 'ui-icon-' + icon
+                                }
+                            }
+                            $(this).button(options);
+                        });
+                    $form.find("select").filter(':not(.notransform)').nos().initOnShow('init', function() {
+                            $(this).wijdropdown();
+                        });
+                    $form.find(":input[type=checkbox]").nos().initOnShow('init', function() {
+                        $(this).wijcheckbox();
+                    });
+                    $form.find('.expander').each(function() {
+                            var $this = $(this);
+                            $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
+                        });
+                    $form.find('.accordion').wijaccordion({
+                            header: "h3",
+                            selectedIndexChanged : function(e, args) {
+                                $(e.target).find('.ui-accordion-content').eq(args.newIndex).nos().initOnShow();
+                            }
+                        });
+                    break;
+
+                case 'validate' :
+                    var $context = this,
+                        params = args[0] || {};
+                    if (!$context.is('form')) {
+                        $context = $context.find('form');
+                    }
+                    require(['jquery-validate'], function() {
+                        $context.validate($.extend({}, params, {
+                            errorClass : 'ui-state-error',
+                            success : true,
+                            ignore: 'input[type=hidden]'
+                        }));
+                    });
+                    break;
+
+                case 'ajax' :
+                    var $context = this;
+                    if (!$context.is('form')) {
+                        $context = $context.find('form');
+                    }
+                    require(['jquery-form'], function() {
+                        $context.ajaxForm({
+                            dataType: 'json',
+                            success: function(json) {
+                                $.nos.ajax.success(json);
+                                $context.triggerHandler('ajax_success', [json]);
+                            },
+                            error: function() {
+                                $.nos.notify('An error occured', 'error');
+                            }
+                        });
+                    });
+                    break;
+            }
+            return this;
+        },
+
+        initOnShow : function() {
+            var args = Array.prototype.slice.call(arguments),
+                method = 'show';
+            if (args.length > 0 && $.inArray(args[0], ['init', 'show']) !== -1) {
+                method = args.shift();
+            }
+            switch (method) {
+                case 'init' :
+                    var callback = args[0];
+                    if (!$.isFunction(callback)) {
+                        return;
+                    }
+                    this.each(function() {
+                        var $el = $(this);
+                        if ($el.is(':visible')) {
+                            callback.call($el);
+                        } else {
+                            $el.addClass('nos-init-on-show')
+                                .data('nos-init-on-show', callback);
+                        }
+                    });
+                    break;
+
+                case 'show' :
+                    this.find('.nos-init-on-show:visible').each(function() {
+                        var $el = $(this),
+                            callback = $el.data('nos-init-on-show');
+
+                        $el.removeClass('nos-init-on-show');
+                        callback.call(this);
+                    });
+                    break;
+            }
+            return this;
+        },
+
+        dialog : function() {
+            var args = Array.prototype.slice.call(arguments),
+                method = 'open';
+            if (args.length > 0 && $.inArray(args[0], ['open', 'close']) !== -1) {
+                method = args.shift();
+            }
+            switch (method) {
+                case 'open' :
+                    var options = args[0] || {};
+                    if (options.destroyOnClose) {
+                        var oldClose = options.close;
+                        options.close = function() {
+                            if ($.isFunction(oldClose)) {
+                                oldClose.apply(this, arguments);
+                            }
+                            $(this).wijdialog('destroy')
+                                .remove();
+                        };
+                    }
+
+                    // Default options
+                    options = $.extend(true, {}, {
+                        width: window.innerWidth - 200,
+                        height: window.innerHeight - 100,
+                        modal: true,
+                        captionButtons: {
+                            pin: {visible: false},
+                            refresh: {visible: options.contentUrl != null && !options.ajax},
+                            toggle: {visible: false},
+                            minimize: {visible: false},
+                            maximize: {visible: false}
+                        }
+                    }, options);
+
+                    var where   = $.nos.$noviusos.ostabs ? $.nos.$noviusos.ostabs('current').panel : $('body');
+                    var $dialog = $(document.createElement('div')).appendTo(where);
+
+                    if (options['content'] !== undefined) {
+                        $dialog.append(options.content);
+                    }
+
+                    var proceed = true;
+                    if (options.ajax) {
+                        var contentUrl = options.contentUrl;
+                        delete options.contentUrl;
+                        options.autoOpen = false;
+                        $dialog.wijdialog(options);
+
+                        // Request the remote document
+                        $.ajax({
+                            url: contentUrl,
+                            type: 'GET',
+                            dataType: "html",
+                            // Complete callback (responseText is used internally)
+                            complete: function( jqXHR, status, responseText ) {
+                                // Store the response as specified by the jqXHR object
+                                responseText = jqXHR.responseText;
+                                // If successful, inject the HTML into all the matched elements
+                                if ( jqXHR.isResolved() ) {
+                                    // #4825: Get the actual response in case
+                                    // a dataFilter is present in ajaxSettings
+                                    jqXHR.done(function( r ) {
+                                        responseText = r;
+                                    });
+
+
+
+                                    try {
+                                        var json = $.parseJSON(responseText);
+                                        // If the dialog ajax URL returns a valid JSON string, don't show the dialog
+                                        proceed = false;
+                                    } catch (e) {}
+
+                                    if (proceed) {
+                                        $dialog.wijdialog('open');
+                                    } else {
+                                        $dialog.empty();
+                                        $dialog.wijdialog('destroy');
+                                        $dialog.remove();
+                                        $.nos.ajax.success(json);
+                                    }
+
+                                    // inject the full result
+                                    $dialog.html( responseText );
+                                }
+                            }
+                        });
+                    } else {
+                        $dialog.wijdialog(options);
+                    }
+                    if (proceed) {
+                        if ($.isFunction(options['onLoad'])) {
+                            options['onLoad']();
+                        }
+                        $dialog.bind('wijdialogclose', function(event, ui) {
+                            $dialog.closest('.ui-dialog').hide().appendTo(where);
+                        });
+                    }
+
+                    return $dialog;
+                    break;
+
+                case 'close' :
+                    this.closest(':wijmo-wijdialog')
+                        .wijdialog('close')
+                        .wijdialog('destroy')
+                        .remove();
+                    break;
+            }
+            return this;
+        },
+
+        tab : function() {
+            var args = Array.prototype.slice.call(arguments),
+                method = 'open';
+            if (args.length > 0 && $.inArray(args[0], ['open', 'close']) !== -1) {
+                method = args.shift();
+            }
+            switch (method) {
+                case 'open' :
+                    var tab = args[0] || {},
+                        dialogOptions = args[1] || {},
+                        dialog = this.closest('.ui-dialog-content').size();
+                    if (dialog) {
+                        this.dialog($.extend({
+                            contentUrl: tab.url,
+                            ajax : !tab.iframe,
+                            title: tab.label
+                        }, dialogOptions));
+                    } else {
+                        $.nos.tabs.add(tab);
+                    }
+                    break;
+
+                case 'close' :
+                    var $dialog = this.closest(':wijmo-wijdialog');
+                    if ($dialog.size()) {
+                        this.dialog('close');
+                    } else {
+                        $.nos.tabs.close();
+                    }
+                    break;
+            }
+            return this;
+        }
+    });
+
+    $.fn.nos = function() {
+        return $nos(this);
+    };
+
+    return $nos;
 });

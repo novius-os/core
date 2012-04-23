@@ -55,7 +55,7 @@
         foreach ($possible as $lang) {
             $item_lang = $items_lang[$lang];
             ?>
-            <div id="<?= $uniqids[$lang] ?>" class="page_lang">
+            <div id="<?= $uniqids[$lang] ?>" class="page_lang" style="display:none;">
                 <?php
                 if (empty($item_lang)) {
                     echo View::forge($views['blank']['location'],
@@ -89,14 +89,13 @@
 	], function($, callback_fn) {
 		$(function() {
 			var $tabs = $('#<?= $uniqid_tabs ?>');
-			$('#<?= $uniqid ?>').show(function() {
-				$.nos.ui.initOnShow.show($(this));
-			});
+			$('#<?= $uniqid ?>').css('display', 'block')
+				.nos().initOnShow();
 			$tabs.wijtabs({
 				alignment: 'left',
 				show: function(e, ui) {
-					$.nos.ui.initOnShow.show($(ui.panel));
-					$(ui.panel).bind('blank_slate', callback_fn).trigger('blank_slate');
+					$(ui.panel).nos().initOnShow()
+						.bind('blank_slate', callback_fn).trigger('blank_slate');
 				}
 			});
 			$tabs.find('> ul').css({
@@ -105,7 +104,11 @@
 			$tabs.find('> div').css({
 				width : '94%'
 			});
+			$('#<?= $uniqids[$item->get_lang()] ?>').css('display', 'block')
+				.nos().initOnShow();
 			$tabs.wijtabs('select', '#<?= $uniqids[$item->get_lang()] ?>');
+			$tabs.find('div.page_lang').css('display', 'block')
+				.nos().initOnShow();
 		});
 	});
 </script>

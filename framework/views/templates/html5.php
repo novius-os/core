@@ -80,13 +80,14 @@
 ?>
 <?= $css ?>
 <script type="text/javascript">
-	var require = {
-		paths: <?= \Format::forge($paths)->to_json() ?>,
-		jQuery: '1.7.1',
-		catchError: true,
-		priority: ['jquery'],
-		deps: ['jquery-nos']
-	};
+	var assets_minified = <?= \Format::forge($assets_minified)->to_json() ?>,
+		require = {
+			paths: <?= \Format::forge($paths)->to_json() ?>,
+			jQuery: '1.7.1',
+			catchError: true,
+			priority: ['jquery'],
+			deps: ['jquery-nos']
+		};
 </script>
 <script src="<?= $require ?>" type="text/javascript"></script>
 <?= $js ?>

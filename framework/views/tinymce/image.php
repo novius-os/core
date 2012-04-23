@@ -227,8 +227,9 @@ require(['jquery-nos'], function($) {
 			})
 			.find('.wijmo-wijtabs-content')
 			.css('width', '81%')
-			.addClass('box-sizing-border');
-		$.nos.ui.form($container);
+			.addClass('box-sizing-border')
+			.end()
+			.nos().form();
 
 
 		if (!newimg) {

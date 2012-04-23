@@ -1912,12 +1912,12 @@
 
 			// Open the dialog popup (it returns the node inserted in the body)
             if (metadata.dialog.ajax || !edit) {
-                dialog = $.nos.dialog($.extend({
+                dialog = $(ui).nos().dialog($.extend({
                     destroyOnClose : true,
                     title: metadata.title
                 }, edit ? $.extend({}, metadata.dialog, {ajax : edit.data('config')}) : metadata.dialog));
             } else {
-                dialog = $.nos.dialog($.extend({
+                dialog = $(ui).nos().dialog($.extend({
                     destroyOnClose : true,
                     title: metadata.title
                 }, $.extend({}, metadata.dialog, {contentUrl : null})));
@@ -1972,7 +1972,7 @@
 
 			var dialog = null;
 
-            dialog = $.nos.dialog({
+            dialog = $(ui).nos().dialog({
                 destroyOnClose : true,
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),

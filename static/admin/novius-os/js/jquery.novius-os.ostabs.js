@@ -16,7 +16,7 @@ define('jquery-nos-ostabs',
     'order!wijmo-complete',
     'order!jquery-nos',
     'order!jquery-nos-loadspinner'
-], function( $ ) {
+], function( $, a, b, c, d, $nos ) {
     "use strict";
     var undefined = void(0);
 
@@ -512,7 +512,7 @@ define('jquery-nos-ostabs',
                     $show = self.element.find( self._sanitizeSelector( el.hash ) );
 
                 $li.addClass( "ui-state-open" );
-                self.uiOstabsNewTab.removeClass('ui-state-open ui-state-default');
+                self.uiOstabsNewTab.removeClass('ui-state-open');
 
                 o.selected = self.anchors.index( this );
 
@@ -1055,7 +1055,7 @@ define('jquery-nos-ostabs',
     $(function() {
         var noviusos = $('#noviusos');
 
-        $.extend($.nos, {
+        $.extend($nos.nos, {
             $noviusos : noviusos,
 
             initialize: function(configuration) {
@@ -1193,5 +1193,5 @@ define('jquery-nos-ostabs',
         });
     });
 
-	return $;
+	return $nos;
 });

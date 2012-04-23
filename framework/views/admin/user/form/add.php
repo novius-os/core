@@ -11,9 +11,9 @@
 ?>
 <script type="text/javascript">
 require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
-	$.nos.ui.form('#<?= $uniqid = uniqid('id_') ?>');
 	$(function () {
-		$.nos.tabs.update($('#<?= $uniqid ?>'), {
+		var $div = $('#<?= $uniqid = uniqid('id_') ?>').nos().form();
+		$.nos.tabs.update($div, {
 			label : 'Add a new user',
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
 		});

@@ -35,8 +35,8 @@ define([
                     name : 'delete',
                     primary : true,
                     icon : 'trash',
-                    action : function(item) {
-                        $.nos.dialog({
+                    action : function(item, ui) {
+                        $(ui).nos().dialog({
                             contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a page')._(),

@@ -43,6 +43,8 @@ class Widget_Media extends \Fieldset_Field {
      * @return type
      */
     public function build() {
+        parent::build();
+        
 		$this->fieldset()->append($this->js_init());
 		$media_id = $this->get_value();
 		if (!empty($media_id)) {
@@ -62,7 +64,7 @@ class Widget_Media extends \Fieldset_Field {
 require(['jquery-nos'], function ($) {
 	$(function() {
 		$(':input#$id').each(function() {
-			$.nos.media($(this), $(this).data('media-options'));
+			$(this).nos().media($(this).data('media-options'));
 		});
 	});
 });

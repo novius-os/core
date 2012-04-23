@@ -107,7 +107,7 @@
                     height : '100%',
                     width : '100%'
                 });
-			$.nos.ui.initOnShow.init(table, init);
+			table.nos().initOnShow('init', init);
 		});
 	});
 </script>

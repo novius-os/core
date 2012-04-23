@@ -21,9 +21,8 @@
 
 <script type="text/javascript">
 require(['jquery-nos'], function($) {
-    $.nos.ui.form('#<?= $uniqid ?>');
     $(function() {
-        var $container    = $('#<?= $uniqid ?>');
+        var $container    = $('#<?= $uniqid ?>').nos().form();
         var $confirmation = $container.find('button[data-id=confirmation]');
 
         var $dialog       = $.nos.data('dialog');
@@ -44,14 +43,14 @@ require(['jquery-nos'], function($) {
                     id : <?= $user->user_id ?>
                 },
                 success : function(json) {
-                    closeDialog();
+	                $confirmation.nos().dialog('close');
                 }
             });
         });
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            closeDialog();
+            $(this).nos().dialog('close');
         });
 
     });

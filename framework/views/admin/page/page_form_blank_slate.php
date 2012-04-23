@@ -54,8 +54,7 @@
 <script type="text/javascript">
 require(['jquery-nos'], function ($) {
 	$(function () {
-		$.nos.ui.form('#<?= $uniqid ?>');
-        var $container = $('#<?= $uniqid ?>');
+        var $container = $('#<?= $uniqid ?>').nos().form();
 
         $container.find('form').submit(function(e) {
             e.preventDefault();
