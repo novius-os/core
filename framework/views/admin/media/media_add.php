@@ -61,7 +61,7 @@ $fieldset->set_config('form_attributes', $form_attributes);
         </div>
     </div>
     <div class="unit col c3 lastUnit">
-        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$.nos.tabs.close();return false;"><?= __('Cancel') ?></a></p>
+        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).noviusos().tabClose();return false;"><?= __('Cancel') ?></a></p>
     </div>
 </div>
 <?= $fieldset->close(); ?>
@@ -80,28 +80,8 @@ function($) {
     $(function() {
         var $container = $('#<?= $uniqid ?>')
 		        .find('form')
-	            .submit(function(e) {
-		            var $form = $(this);
-		        $form.ajaxSubmit({
-				        dataType: 'json',
-				        success: function(json) {
-					        //Success before close, success use the window reference
-					        $.nos.ajax.success(json);
-					        if (json.closeDialog) {
-						        $.nos.tabOrDialog.close($form);
-					        }
-				        },
-				        error: function() {
-					        $.nos.notify('An error occured', 'error');
-				        }
-			        });
-			        e.preventDefault();
-		        })
-	            .end()
-	            .find('a[data-id=cancel]')
-	            .click(function(e) {
-			        e.preventDefault();
-		            $.nos.tabOrDialog.close(this);
+		        .bind('ajax_success', function() {
+			        $(this).noviusos().dialogClose();
 		        })
 	            .end(),
             $file = $container.find(':file[name=media]')

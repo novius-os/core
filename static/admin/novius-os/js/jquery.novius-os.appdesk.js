@@ -359,7 +359,7 @@ define('jquery-nos-appdesk',
 
                 if ($(this).val() == 'edit_custom') {
                     var $el = self._uiCustomViewDialog();
-                    self.uiCustomViewDialog = $.nos.dialog({
+                    self.uiCustomViewDialog = $(self.uiViewsDropDown).noviusos().dialogOpen({
                         title: o.texts.settings,
                         contentUrl: null,
                         content: $el,

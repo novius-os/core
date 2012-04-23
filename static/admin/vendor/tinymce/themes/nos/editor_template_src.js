@@ -597,6 +597,8 @@
 
         _createEnhancer : function() {
             var c, t = this, s = t.settings, o = {}, v;
+
+
             if (!s.theme_nos_enhancers) {
                 return false;
             }
@@ -608,16 +610,21 @@
             });
 
             c.onRenderMenu.add(function(c, m) {
+
+
                 m.settings.max_height = 300;
                 m.add({
                     title : 'nos.enhancer_desc',
                     'class' : 'mceMenuItemTitle'
                 }).setDisabled(1);
 
+
+
                 each(s.theme_nos_enhancers, function(f) {
                     m.add({
                         title : f.title,
-                        icon : f.id,
+                        //icon_src: f.iconUrl,
+                        style : 'background: url(' + f.iconUrl + ') no-repeat 5px center;',
                         id : 'enhancer_' + f.id,
                         onclick : function() {
                             t.editor.execCommand('nosEnhancer', false, f);
@@ -1905,12 +1912,12 @@
 
 			// Open the dialog popup (it returns the node inserted in the body)
             if (metadata.dialog.ajax || !edit) {
-                dialog = $.nos.dialog($.extend({
+                dialog = $(ui).noviusos().dialogOpen($.extend({
                     destroyOnClose : true,
                     title: metadata.title
                 }, edit ? $.extend({}, metadata.dialog, {ajax : edit.data('config')}) : metadata.dialog));
             } else {
-                dialog = $.nos.dialog($.extend({
+                dialog = $(ui).noviusos().dialogOpen($.extend({
                     destroyOnClose : true,
                     title: metadata.title
                 }, $.extend({}, metadata.dialog, {contentUrl : null})));
@@ -1965,7 +1972,7 @@
 
 			var dialog = null;
 
-            dialog = $.nos.dialog({
+            dialog = $(ui).noviusos().dialogOpen({
                 destroyOnClose : true,
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),

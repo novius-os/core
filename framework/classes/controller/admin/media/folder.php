@@ -206,13 +206,15 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
                     throw new \Exception(__('A folder with the same name already exists.'));
                 }
 
-                if (\File::rename_dir($old_folder->path(), $folder->path())) {
-                    // refresh_path($cascade_children = true, $cascade_media = true
-                    $folder->refresh_path(true, true);
-                } else {
-                    // Restore old path if rename failed
-                    $folder->medif_path = $old_folder->medif_path;
-                }
+	            if (is_dir($old_folder->path())) {
+	                if (\File::rename_dir($old_folder->path(), $folder->path())) {
+	                    // refresh_path($cascade_children = true, $cascade_media = true
+	                    $folder->refresh_path(true, true);
+	                } else {
+	                    // Restore old path if rename failed
+	                    $folder->medif_path = $old_folder->medif_path;
+	                }
+	            }
 
                 $old_folder->delete_public_cache();
             }

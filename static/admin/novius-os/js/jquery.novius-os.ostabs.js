@@ -512,7 +512,7 @@ define('jquery-nos-ostabs',
                     $show = self.element.find( self._sanitizeSelector( el.hash ) );
 
                 $li.addClass( "ui-state-open" );
-                self.uiOstabsNewTab.removeClass('ui-state-open ui-state-default');
+                self.uiOstabsNewTab.removeClass('ui-state-open');
 
                 o.selected = self.anchors.index( this );
 

@@ -40,103 +40,6 @@ define('jquery-nos', [
             }
         },
 
-        dialog : function(options) {
-
-            if (options.destroyOnClose) {
-                var oldClose = options.close;
-                options.close = function() {
-                    if ($.isFunction(oldClose)) {
-                        oldClose.apply(this, arguments);
-                    }
-                    $(this).wijdialog('destroy')
-                        .remove();
-                };
-            }
-
-            // Default options
-            options = $.extend(true, {}, {
-                width: window.innerWidth - 200,
-                height: window.innerHeight - 100,
-                modal: true,
-                captionButtons: {
-                    pin: {visible: false},
-                    refresh: {visible: options.contentUrl != null && !options.ajax},
-                    toggle: {visible: false},
-                    minimize: {visible: false},
-                    maximize: {visible: false}
-                }
-            }, options);
-
-            var where   = $.nos.$noviusos.ostabs ? $.nos.$noviusos.ostabs('current').panel : $('body');
-            var $dialog = $(document.createElement('div')).appendTo(where);
-
-            $.nos.data('dialog', $dialog);
-
-            if (typeof options['content'] != 'undefined') {
-                $dialog.append(options.content);
-            }
-
-            var proceed = true;
-            if (options.ajax) {
-                var contentUrl = options.contentUrl;
-                delete options.contentUrl;
-                options.autoOpen = false;
-                $dialog.wijdialog(options);
-
-                // Request the remote document
-                $.ajax({
-                    url: contentUrl,
-                    type: 'GET',
-                    dataType: "html",
-                    // Complete callback (responseText is used internally)
-                    complete: function( jqXHR, status, responseText ) {
-                        // Store the response as specified by the jqXHR object
-                        responseText = jqXHR.responseText;
-                        // If successful, inject the HTML into all the matched elements
-                        if ( jqXHR.isResolved() ) {
-                            // #4825: Get the actual response in case
-                            // a dataFilter is present in ajaxSettings
-                            jqXHR.done(function( r ) {
-                                responseText = r;
-                            });
-
-
-
-                            try {
-                                var json = $.parseJSON(responseText);
-                                // If the dialog ajax URL returns a valid JSON string, don't show the dialog
-                                proceed = false;
-                            } catch (e) {}
-
-                            if (proceed) {
-                                $dialog.wijdialog('open');
-                            } else {
-                                $dialog.empty();
-                                $dialog.wijdialog('destroy');
-                                $dialog.remove();
-                                $.nos.ajax.success(json);
-                            }
-
-                            // inject the full result
-                            $dialog.html( responseText );
-                        }
-                    }
-                });
-            } else {
-                $dialog.wijdialog(options);
-            }
-            if (proceed) {
-                if ($.isFunction(options['onLoad'])) {
-                    options['onLoad']();
-                }
-                $dialog.bind('wijdialogclose', function(event, ui) {
-                    $dialog.closest('.ui-dialog').hide().appendTo(where);
-                });
-            }
-
-            return $dialog;
-        },
-
         notify : function( options, type ) {
 
             if (window.parent != window && window.parent.$nos) {
@@ -278,7 +181,7 @@ define('jquery-nos', [
                 choose: function(e) {
                     // Open the dialog to choose the file
                     if (dialog == null) {
-                        dialog = $.nos.dialog({
+                        dialog = $(input).noviusos().dialogOpen({
                             contentUrl: contentUrls[data.mode],
                             ajax: true,
                             title: 'Choose a media file'
@@ -304,33 +207,6 @@ define('jquery-nos', [
                     input.inputFileThumb(options);
                 });
             });
-        },
-
-        tabOrDialog : {
-            open : function(context, tab, dialogOptions) {
-                var dialog = $(context).closest('.ui-dialog-content').size();
-                if (dialog) {
-                    dialogOptions = dialogOptions || {};
-                    $.nos.dialog($.extend({
-                        contentUrl: tab.url,
-                        ajax : !tab.iframe,
-                        title: tab.label
-                    }, dialogOptions));
-                } else {
-                    $.nos.tabs.add(tab);
-                }
-            },
-
-            close : function(context) {
-                var $dialog = $(context).closest(':wijmo-wijdialog');
-                if ($dialog.size()) {
-                    $dialog.wijdialog('close')
-                        .wijdialog('destroy')
-                        .remove();
-                } else {
-                    $.nos.tabs.close();
-                }
-            }
         },
 
         form : {
@@ -446,7 +322,144 @@ define('jquery-nos', [
             });
         }
     };
-    window.$nos = $;
 
-    return $;
+    var $nos = window.$nos = $.sub();
+    $nos.fn.extend({
+        dialogOpen : function(options) {
+
+            if (options.destroyOnClose) {
+                var oldClose = options.close;
+                options.close = function() {
+                    if ($.isFunction(oldClose)) {
+                        oldClose.apply(this, arguments);
+                    }
+                    $(this).wijdialog('destroy')
+                        .remove();
+                };
+            }
+
+            // Default options
+            options = $.extend(true, {}, {
+                width: window.innerWidth - 200,
+                height: window.innerHeight - 100,
+                modal: true,
+                captionButtons: {
+                    pin: {visible: false},
+                    refresh: {visible: options.contentUrl != null && !options.ajax},
+                    toggle: {visible: false},
+                    minimize: {visible: false},
+                    maximize: {visible: false}
+                }
+            }, options);
+
+            var where   = $.nos.$noviusos.ostabs ? $.nos.$noviusos.ostabs('current').panel : $('body');
+            var $dialog = $(document.createElement('div')).appendTo(where);
+
+            $.nos.data('dialog', $dialog);
+
+            if (typeof options['content'] != 'undefined') {
+                $dialog.append(options.content);
+            }
+
+            var proceed = true;
+            if (options.ajax) {
+                var contentUrl = options.contentUrl;
+                delete options.contentUrl;
+                options.autoOpen = false;
+                $dialog.wijdialog(options);
+
+                // Request the remote document
+                $.ajax({
+                    url: contentUrl,
+                    type: 'GET',
+                    dataType: "html",
+                    // Complete callback (responseText is used internally)
+                    complete: function( jqXHR, status, responseText ) {
+                        // Store the response as specified by the jqXHR object
+                        responseText = jqXHR.responseText;
+                        // If successful, inject the HTML into all the matched elements
+                        if ( jqXHR.isResolved() ) {
+                            // #4825: Get the actual response in case
+                            // a dataFilter is present in ajaxSettings
+                            jqXHR.done(function( r ) {
+                                responseText = r;
+                            });
+
+
+
+                            try {
+                                var json = $.parseJSON(responseText);
+                                // If the dialog ajax URL returns a valid JSON string, don't show the dialog
+                                proceed = false;
+                            } catch (e) {}
+
+                            if (proceed) {
+                                $dialog.wijdialog('open');
+                            } else {
+                                $dialog.empty();
+                                $dialog.wijdialog('destroy');
+                                $dialog.remove();
+                                $.nos.ajax.success(json);
+                            }
+
+                            // inject the full result
+                            $dialog.html( responseText );
+                        }
+                    }
+                });
+            } else {
+                $dialog.wijdialog(options);
+            }
+            if (proceed) {
+                if ($.isFunction(options['onLoad'])) {
+                    options['onLoad']();
+                }
+                $dialog.bind('wijdialogclose', function(event, ui) {
+                    $dialog.closest('.ui-dialog').hide().appendTo(where);
+                });
+            }
+
+            return $dialog;
+        },
+
+        dialogClose : function() {
+            this.closest(':wijmo-wijdialog')
+                .wijdialog('close')
+                .wijdialog('destroy')
+                .remove();
+        },
+
+        tabOpen : function(tab, dialogOptions) {
+            var dialog = this.closest('.ui-dialog-content').size();
+            if (dialog) {
+                dialogOptions = dialogOptions || {};
+                this.dialogOpen($.extend({
+                    contentUrl: tab.url,
+                    ajax : !tab.iframe,
+                    title: tab.label
+                }, dialogOptions));
+            } else {
+                $.nos.tabs.add(tab);
+            }
+
+            return this;
+        },
+
+        tabClose : function() {
+            var $dialog = this.closest(':wijmo-wijdialog');
+            if ($dialog.size()) {
+                this.dialogClose();
+            } else {
+                $.nos.tabs.close();
+            }
+
+            return this;
+        }
+    });
+
+    $.fn.noviusos = function() {
+        return $nos(this);
+    };
+
+    return $nos;
 });

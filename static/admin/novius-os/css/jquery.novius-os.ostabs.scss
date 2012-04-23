@@ -97,6 +97,14 @@ body {
 			}
 		}
 
+		li.nos-ostabs-newtab.ui-state-active {
+			a {
+				.nos-ostabs-label {
+					display : inline-block;
+				}
+			}
+		}
+
 		li.nos-ostabs-selected a, li.ui-state-disabled a, li.ui-state-processing a {
 			cursor: text;
 		}
