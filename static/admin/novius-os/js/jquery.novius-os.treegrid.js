@@ -16,7 +16,7 @@ define('jquery-nos-treegrid',
     'order!wijmo-complete',
     'order!jquery-nos',
     'order!jquery-nos-listgrid'
-], function( $ ) {
+], function( $, a, b, c, d, $nos ) {
     "use strict";
     var undefined = void(0);
 	$.widget( "nos.nostreegrid", $.nos.noslistgrid, {
@@ -551,5 +551,5 @@ define('jquery-nos-treegrid',
             return self;
         }
     });
-	return $;
+	return $nos;
 });

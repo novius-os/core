@@ -15,7 +15,7 @@ define('jquery-nos-loadspinner',
     'order!wijmo-open',
     'order!wijmo-complete',
     'order!jquery-nos'
-], function( $ ) {
+], function( $, a, b, c, d, $nos ) {
 	$.widget ('nos.loadspinner', {
 		options : {
 			diameter : 40, // The diameter of the loader.
@@ -388,5 +388,5 @@ define('jquery-nos-loadspinner',
 			return this;
 		}
 	});
-	return $;
+	return $nos;
 });

@@ -15,7 +15,7 @@ define('jquery-nos-preview',
     'order!wijmo-open',
     'order!wijmo-complete',
     'order!jquery-nos'
-], function( $ ) {
+], function( $, a, b, c, d, $nos ) {
     "use strict";
         var undefined = void(0);
 	$.widget( "nos.preview", {
@@ -317,5 +317,5 @@ define('jquery-nos-preview',
 			return self;
 		}
 	});
-	return $;
+	return $nos;
 });

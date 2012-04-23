@@ -19,7 +19,7 @@ define('jquery-nos-appdesk',
     'order!jquery-nos-listgrid',
     'order!jquery-nos-treegrid',
     'order!jquery-nos-preview'
-], function( $) {
+], function( $, a, b ,c ,d, $nos) {
     "use strict";
     var undefined = void(0);
 	$.widget( "nos.appdesk", {
@@ -233,7 +233,7 @@ define('jquery-nos-appdesk',
                     if ($.isFunction(first.action)) {
                         first.action($(this));
                     } else {
-                        $.nos.tabs.add({
+                        $nos.nos.tabs.add({
                             iframe : true,
                             url : first.url,
                             label : first.label
@@ -252,7 +252,7 @@ define('jquery-nos-appdesk',
                         if ($.isFunction(add.action)) {
                             add.action($(this));
                         } else {
-                            $.nos.tabs.add({
+                            $nos.nos.tabs.add({
                                 iframe : true,
                                 url : add.url,
                                 label : add.label
@@ -302,7 +302,7 @@ define('jquery-nos-appdesk',
 
                 o.selectedLang = select.val();
 
-                $.nos.saveUserConfiguration(o.name + '.selectedLang', o.selectedLang);
+                $nos.nos.saveUserConfiguration(o.name + '.selectedLang', o.selectedLang);
 
                 self.gridReload();
                 self.dispatcher.data('nosLang', o.selectedLang)
@@ -422,9 +422,9 @@ define('jquery-nos-appdesk',
                     $(this).find('option').attr('selected', '');
                     $(this).find('option[value=custom]').attr('selected', 'selected');
                     $(this).wijdropdown("refresh");
-                    $.nos.saveUserConfiguration(o.name + '.selectedView', $(this).val());
+                    $nos.nos.saveUserConfiguration(o.name + '.selectedView', $(this).val());
                 } else {
-                    $.nos.saveUserConfiguration(o.name + '.selectedView', $(this).val());
+                    $nos.nos.saveUserConfiguration(o.name + '.selectedView', $(this).val());
                     self.element.trigger('reloadView', {selectedView: $(this).val()});
                 }
 			});
@@ -753,7 +753,7 @@ define('jquery-nos-appdesk',
 
             custom.appdesk.grid = self._getGridConfiguration(o.grid);
 
-            $.nos.saveUserConfiguration(o.name, {selectedView: 'custom', custom: custom});
+            $nos.nos.saveUserConfiguration(o.name, {selectedView: 'custom', custom: custom});
             return custom;
         },
 
@@ -1131,7 +1131,7 @@ define('jquery-nos-appdesk',
 				position = self.uiGrid.offset(),
                 positionContainer = self.element.offset(),
 				height = self.element.height() - position.top + positionContainer.top,
-				heights = $.nos.grid.getHeights();
+				heights = $nos.nos.grid.getHeights();
 
 			self.uiGrid.css({
                     height : height,
@@ -1522,7 +1522,7 @@ define('jquery-nos-appdesk',
                 } else {
                     self.uiGrid.noslistgrid('setSize', null, height);
                     if (reload) {
-                        var heights = $.nos.grid.getHeights();
+                        var heights = $nos.nos.grid.getHeights();
                         self.uiGrid.noslistgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
                     }
                 }
@@ -1606,7 +1606,7 @@ define('jquery-nos-appdesk',
 
 	});
 
-    $.extend($.nos, {
+    $.extend($nos.nos, {
         appdeskAdd: function(id, config) {
             var self = this;
             var onCustom = false;
@@ -1626,7 +1626,7 @@ define('jquery-nos-appdesk',
             }
 
             require(jsonFile, function () {
-                var appdesk = $.nos.appdeskSetup();
+                var appdesk = $nos.nos.appdeskSetup();
                 $.extend(true, appdesk.i18nMessages, config.i18n);
 
                 // Extending appdesk with each of the different json files
@@ -1654,7 +1654,7 @@ define('jquery-nos-appdesk',
 
                 if ($.isPlainObject(params.tab) && !$.isEmptyObject(params.tab)) {
                     try {
-                        $.nos.tabs.update(div, params.tab);
+                        $nos.nos.tabs.update(div, params.tab);
                     } catch (e) {
                         log('Could not update current tab. Maybe your config file should not try to update it.');
                     }
@@ -1759,7 +1759,7 @@ define('jquery-nos-appdesk',
                                     if (showOnlyArrow) {
                                         width = 20;
                                     } else {
-                                        width = $.nos.grid.getActionWidth(actions);
+                                        width = $nos.nos.grid.getActionWidth(actions);
 
                                         if (actions.length > 1) {
                                             // Reserve space for the dropdown actions menu
@@ -1775,7 +1775,7 @@ define('jquery-nos-appdesk',
                                         cellFormatter : function(args) {
                                             if ($.isPlainObject(args.row.data)) {
 
-                                                var buttons = $.nos.appdeskActions(actions, args.row.data, {
+                                                var buttons = $nos.nos.appdeskActions(actions, args.row.data, {
                                                     showOnlyArrow : showOnlyArrow
                                                 });
 
@@ -2008,7 +2008,7 @@ define('jquery-nos-appdesk',
                 // Don't select the line when clicking the "more actions" arrow dropdown
                 dropDown.appendTo(container.find('tr')).click(function(e) {
 
-                    $.each($.nos.appdeskActionsList, function() {
+                    $.each($nos.nos.appdeskActionsList, function() {
                         $(this).wijmenu('hideAllMenus');
                     });
 
@@ -2048,8 +2048,8 @@ define('jquery-nos-appdesk',
                         // Search the higher ancestor possible
                         // @todo Review this, because when it's called from inspectors, the result is a <table>
                         //       which is not convenient to add <ul>s or <div>s
-                        var containerActions = dropDown.closest('.ui-dialog-content').size() ? dropDown.closest('.ui-dialog-content') : ($.nos.$noviusos.ostabs
-                                ? $.nos.$noviusos.ostabs('current').panel
+                        var containerActions = dropDown.closest('.ui-dialog-content').size() ? dropDown.closest('.ui-dialog-content') : ($nos.nos.$noviusos.ostabs
+                                ? $nos.nos.$noviusos.ostabs('current').panel
                                 : dropDown.parentsUntil('.ui-widget, body').last()
                             );
 
@@ -2069,7 +2069,7 @@ define('jquery-nos-appdesk',
                             }
                         });
 
-                        $.nos.appdeskActionsList.push(ul);
+                        $nos.nos.appdeskActionsList.push(ul);
 
                         this.created = true;
 
@@ -2133,7 +2133,7 @@ define('jquery-nos-appdesk',
                                 cellFormatter : function(args) {
                                     if ($.isPlainObject(args.row.data)) {
 
-                                        var buttons = $.nos.appdeskActions(actions, []);
+                                        var buttons = $nos.nos.appdeskActions(actions, []);
 
                                         buttons.appendTo(args.$container);
                                         args.$container.parent().addClass('buttontd');
@@ -2166,5 +2166,5 @@ define('jquery-nos-appdesk',
         }
     });
 
-	return $;
+	return $nos;
 });

@@ -15,7 +15,7 @@ define('jquery-nos-listgrid',
     'order!wijmo-open',
     'order!wijmo-complete',
     'order!jquery-nos'
-], function( $ ) {
+], function( $, a, b, c, d, $nos ) {
     "use strict";
 	$.widget( "nos.noslistgrid", $.wijmo.wijgrid, {
 		options: {
@@ -86,7 +86,7 @@ define('jquery-nos-listgrid',
 							notify.text = notify.text.replace('log-in again', "<a href=\"" + json.login_page + "\">log-in again</a>");
 						}
 					} catch (e) {}
-					$.nos.notify(notify);
+					$nos.nos.notify(notify);
 				}
 				self._overlayHide();
                 if ($.isFunction(old_ajaxError)) {
@@ -128,5 +128,5 @@ define('jquery-nos-listgrid',
             return self;
         }
     });
-	return $;
+	return $nos;
 });
