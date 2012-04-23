@@ -52,8 +52,8 @@ return array(
 		'notices'      => true,
 	),
 
-	'language'  => 'fr',
-	'locale'    => 'fr_FR',
+	'language'  => 'en',
+	'locale'    => 'en_GB',
 	'encoding'  => 'UTF-8',
 
 	/**

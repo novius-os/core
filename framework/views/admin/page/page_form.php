@@ -23,9 +23,9 @@ foreach ($fieldset->field() as $field) {
 	}
 }
 
-$fieldset->field('page_cache_duration')->set_template('{label} {field} seconds');
-$fieldset->field('page_lock')->set_template('{label} {field}');
-$fieldset->field('page_virtual_name')->set_template('{label} <br /> <div class="table-field">{field} <span>&nbsp;.html</span></div>');
+$fieldset->field('page_cache_duration')->set_template('{label} {field} {required} seconds');
+$fieldset->field('page_lock')->set_template('{label} {field} {required}');
+$fieldset->field('page_virtual_name')->set_template('{label}{required} <br /> <div class="table-field">{field} <span>&nbsp;.html</span></div>');
 
 
 $checkbox = '<br /><label><input type="checkbox" data-id="same_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
