@@ -94,11 +94,12 @@ class Controller_Admin_Page_Page extends Controller {
         }
         $page->page_lang = \Input::get('lang');
         $parent_page = Model_Page_Page::find($page->page_lang_common_id)->find_parent();
-        if (!empty($page->page_lang)) {
-            $parent_page = $parent_page->find_lang($page->page_lang);
+        if ($parent_page) {
+            if (!empty($page->page_lang)) {
+                $parent_page = $parent_page->find_lang($page->page_lang);
+            }
+            $page->page_parent_id = $parent_page->page_id;
         }
-        $page->page_parent_id = $parent_page->page_id;
-
         $fields = \Config::load('nos::controller/admin/page/form_page', true);
         $fields = \Arr::merge($fields, array(
             'page_title' => array(

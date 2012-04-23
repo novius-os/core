@@ -26,13 +26,13 @@
 
 <?php
     $uniqids = array();
+    $locales = Config::get('locales', array());
+    $possible = $item->get_possible_lang();
 ?>
 <div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>" style="display:none;">
     <div id="<?= $uniqid_tabs = uniqid('tabs_') ?>" style="width: 92.4%; clear:both; margin:0 auto 1em;">
         <ul style="width: 5%;">
             <?php
-            $possible = $item->get_possible_lang();
-            $locales = Config::get('locales', array());
             foreach ($possible as $lang) {
                 $uniqids[$lang] = uniqid($lang.'_');
                 echo '<li style="text-align: center;"><a href="#'.$uniqids[$lang].'">'.Nos\Helper::flag($lang).'</a></li>';
