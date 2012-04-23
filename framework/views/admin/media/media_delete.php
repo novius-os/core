@@ -39,9 +39,8 @@
 
 <script type="text/javascript">
 require(['jquery-nos'], function($) {
-    $.nos.ui.form('#<?= $uniqid ?>');
     $(function() {
-        var $container    = $('#<?= $uniqid ?>');
+        var $container    = $('#<?= $uniqid ?>').nos().form();
         var $verification = $container.find('input[data-id=verification]');
         var $confirmation = $container.find('button[data-id=confirmation]');
 

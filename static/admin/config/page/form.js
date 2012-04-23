@@ -52,36 +52,38 @@ define([
                 dataType: 'json',
                 success: function(data) {
 
-                    var ratio = $wysiwyg.width() * 3 / 5;
-                    $wysiwyg.empty().css({
-                        height: ratio,
-                        overflow: 'visible'
-                    });
-                    $.each(data.layout, function(i) {
-                        var coords = this.split(',');
-                        var bloc = $('<div></div>').css({
-                            position: 'absolute',
-                            left:   Math.round(coords[0] / data.cols * 100) + '%',
-                            top:    Math.round(coords[1] / data.rows * ratio),
-                            width:  Math.round(coords[2] / data.cols * 100) + '%',
-                            height: Math.round(coords[3] / data.rows * ratio)
-                        }).append(
-                            $('<textarea></textarea>')
-                            .val(data.content[i])
-                            .attr({name: 'wysiwyg[' + i + ']'})
-                            .addClass('wysiwyg')
-                            .css({
-                                display: 'block',
-                                width: '100%',
-                                height: Math.round(coords[3] / data.rows * ratio),
-                                border: 0,
-                                boxShadow: 'inset 0px 0px 2px 2px  #888'
-                            }));
-                        $wysiwyg.append(bloc);
-                        // The bottom row from TinyMCE is roughly 21px
-                        $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg({
-                            urlEnhancers : true,
-                            height: (coords[3] / data.rows * ratio) - 21
+                    $wysiwyg.nos().initOnShow('init', function() {
+                        var ratio = $wysiwyg.width() * 3 / 5;
+                        $wysiwyg.empty().css({
+                            height: ratio,
+                            overflow: 'visible'
+                        });
+                        $.each(data.layout, function(i) {
+                            var coords = this.split(',');
+                            var bloc = $('<div></div>').css({
+                                position: 'absolute',
+                                left:   Math.round(coords[0] / data.cols * 100) + '%',
+                                top:    Math.round(coords[1] / data.rows * ratio),
+                                width:  Math.round(coords[2] / data.cols * 100) + '%',
+                                height: Math.round(coords[3] / data.rows * ratio)
+                            }).append(
+                                $('<textarea></textarea>')
+                                .val(data.content[i])
+                                .attr({name: 'wysiwyg[' + i + ']'})
+                                .addClass('wysiwyg')
+                                .css({
+                                    display: 'block',
+                                    width: '100%',
+                                    height: Math.round(coords[3] / data.rows * ratio),
+                                    border: 0,
+                                    boxShadow: 'inset 0px 0px 2px 2px  #888'
+                                }));
+                            $wysiwyg.append(bloc);
+                            // The bottom row from TinyMCE is roughly 21px
+                            $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg({
+                                urlEnhancers : true,
+                                height: (coords[3] / data.rows * ratio) - 21
+                            });
                         });
                     });
                 }

@@ -36,7 +36,7 @@ define([
                     primary : true,
                     icon : 'trash',
                     action : function(item, ui) {
-                        $(ui).noviusos().dialogOpen({
+                        $(ui).nos().dialog({
                             contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a page')._(),

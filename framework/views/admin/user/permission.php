@@ -86,13 +86,11 @@ foreach ($apps as $app => $perms) {
 <script type="text/javascript">
     require(["jquery-nos"], function($) {
 	    $(function() {
-		    var $form = $('#<?= $uniqid ?>'),
+		    var $form = $('#<?= $uniqid ?>').nos().form(),
 			    $applications = $form.find('.applications'),
 			    $items = $applications.find("div.item"),
 			    $checkboxes = $items.find(":checkbox"),
 			    $access_to_everything = $applications.find(":checkbox.access_to_everything");
-
-		    $.nos.ui.form($form);
 
 		    $items.click(function() {
 	            var $checkbox = $(this).find('div.maincheck :checkbox');

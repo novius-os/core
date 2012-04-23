@@ -61,7 +61,7 @@ $fieldset->set_config('form_attributes', $form_attributes);
         </div>
     </div>
     <div class="unit col c3 lastUnit">
-        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).noviusos().tabClose();return false;"><?= __('Cancel') ?></a></p>
+        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
     </div>
 </div>
 <?= $fieldset->close(); ?>
@@ -74,15 +74,14 @@ require([
     'order!jquery-form'
 ],
 function($) {
-    $.nos.ui.form('#<?= $uniqid ?>');
-    $.nos.form.ajax('#<?= $uniqid ?>');
-
     $(function() {
         var $container = $('#<?= $uniqid ?>')
+	            .nos().form()
 		        .find('form')
 		        .bind('ajax_success', function() {
-			        $(this).noviusos().dialogClose();
+			        $(this).nos().dialog('close');
 		        })
+	            .nos().form('ajax')
 	            .end(),
             $file = $container.find(':file[name=media]')
 	            .change(function() {

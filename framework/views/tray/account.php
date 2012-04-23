@@ -39,8 +39,8 @@
 
 <script type="text/javascript">
     require(['jquery-nos'], function($) {
-		$.nos.ui.form('#<?= $uniqid ?>');
 		$(function() {
+			$('#<?= $uniqid ?>').nos().form();
 			$('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
 				if (json.wallpaper_url) {
 					$('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
@@ -48,10 +48,9 @@
 					$('#noviusospanel').css('background-image', '');
 				}
 			});
+			$('#<?= $uniqid ?> .tabs').wijtabs({
+				alignment: 'left'
+			});
 		});
-
-        $('#<?= $uniqid ?> .tabs').wijtabs({
-            alignment: 'left'
-        });
     });
 </script>

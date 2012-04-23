@@ -2,6 +2,6 @@
     <?= __('Save') ?>
 </button>
 &nbsp; <?= __('or') ?> &nbsp;
-<a href="#" onclick="$(this).noviusos().tabClose();return false;">
+<a href="#" onclick="$(this).nos().tab('close');return false;">
     <?= __('Cancel') ?>
 </a>

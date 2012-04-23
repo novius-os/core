@@ -11,8 +11,8 @@
 ?>
 <script type="text/javascript">
 require(['jquery-nos'], function($) {
-    $.nos.ui.form('#login');
     $(function() {
+	    $('#login').nos().form();
         <?php if (!empty($error)) { ?>
         $.nos.notify(<?= json_encode(array(
             'title' => $error,
