@@ -78,7 +78,6 @@ $large = !empty($large) && $large == true;
         }
         ?>
 	</div>
-<<<<<<< HEAD
     <div class="unit col c1"></div>
 	<div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>" style="position:relative;z-index:98;">
 		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).noviusos().tabClose();return false;"><?= __('Cancel') ?></a></p>
