@@ -17,9 +17,9 @@ if (empty($publishable)) {
 ?>
 <p style="margin: 0 0 1em;">
     <?php $published = !empty($object) ? $object->published() : false; ?>
-    <table style="margin:0 2em;">
+    <table style="margin:0 2em 0 1em;">
         <tr>
-            <td id="<?= $buttonset = uniqid('buttonset_') ?>" class="publishable" style="width:63px; text-align:right;">
+            <td id="<?= $buttonset = uniqid('buttonset_') ?>" class="publishable" style="width:50px;">
                 <input type="radio" name="<?= $publishable['publication_bool_property'] ?>" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $published === false ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
                 <input type="radio" name="<?= $publishable['publication_bool_property'] ?>" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $published === true ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
             </td>

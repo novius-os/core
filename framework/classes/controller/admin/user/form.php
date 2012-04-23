@@ -229,6 +229,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                 'label' => __('Password: '),
                 'form' => array(
                     'type' => 'password',
+                    'size' => 20,
                     'value' => '',
                 ),
 	            'before_save' => function($object, $data) {
@@ -244,6 +245,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
                 'label' => __('Password (confirmation): '),
                 'form' => array(
                     'type' => 'password',
+                    'size' => 20,
                 ),
 	            'before_save' => function($object, $data) {
 	            },
