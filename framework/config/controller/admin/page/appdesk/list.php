@@ -25,8 +25,8 @@ return array(
 					'url' => function($page) {
                         return $page->get_href();
                     },
-                    'visualise' => function($page) {
-                        return $page->get_href(array('absolute' => true));
+                    'previewUrl' => function($page) {
+                        return $page->get_href(array('absolute' => true)).'?_preview=1';
                     },
                     'actions' => array(
                         'delete' => function($page) {
@@ -89,8 +89,8 @@ return array(
         'url' => function($page) {
             return $page->get_href();
         },
-        'visualise' => function($page) {
-            return $page->get_href(array('absolute' => true));
+        'previewUrl' => function($page) {
+            return $page->get_href(array('absolute' => true)).'?_preview=1';
         },
         'actions' => array(
             'delete' => function($page) {
