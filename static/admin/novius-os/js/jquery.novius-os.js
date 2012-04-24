@@ -146,7 +146,7 @@ define('jquery-nos', [
                             document.location.href = json.redirect;
                         }
                         if (json.replaceTab) {
-                            this.tab('add', {url : url}, false)
+                            this.tab('add', {url : json.replaceTab}, false)
                                 .tab('close');
                         }
                     }
