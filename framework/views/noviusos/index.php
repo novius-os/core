@@ -14,7 +14,7 @@
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function( $nos ) {
 		$nos(function() {
-			$nos.nos.initialize(<?= $ostabs ?>);
+			$nos('#noviusos').tab('init', <?= $ostabs ?>);
 		});
 	});
 </script>

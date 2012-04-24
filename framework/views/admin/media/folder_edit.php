@@ -50,7 +50,7 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'order!jquery-form'], function($nos) {
+require(['jquery-nos', 'order!jquery-form', 'order!static/novius-os/admin/config/media/seo_compliant'], function($nos) {
     $nos(function() {
         var $container = $nos('#<?= $uniqid ?>').form();
 
@@ -61,7 +61,7 @@ require(['jquery-nos', 'order!jquery-form'], function($nos) {
 		// Same title and description (alt)
 		$title.bind('change keyup', function() {
 			if ($same_title.is(':checked')) {
-				$seo_title.val(seo_compliant($title.val()));
+				$seo_title.val($nos.seoCompliant($title.val()));
 			}
 		});
 		$same_title.change(function() {
@@ -73,22 +73,9 @@ require(['jquery-nos', 'order!jquery-form'], function($nos) {
 			}
 		}).triggerHandler('change');
 
-        $container.find('form').submit(function(e) {
-	        var $form = $nos(this);
-	        $form.ajaxSubmit({
-                dataType: 'json',
-                success: function(json) {
-                    if (json.closeDialog) {
-	                    $form.tab('close');
-                    }
-                    $nos.nos.ajax.success(json);
-                },
-                error: function() {
-                    $nos.notify('An error occured', 'error');
-                }
-            });
-            e.preventDefault();
-        });
+	    $container.find('form').bind('ajax_success', function() {
+		    $nos(this).dialog('close');
+	    })
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
@@ -96,8 +83,4 @@ require(['jquery-nos', 'order!jquery-form'], function($nos) {
         });
     });
 });
-
-<?php
-include __DIR__.'/seo_compliant.js';
-?>
 </script>

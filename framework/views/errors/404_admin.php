@@ -26,7 +26,7 @@ if ($js) {
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function($nos) {
 	$nos(function() {
-		$nos.nos.tabs.update({
+		$nos('#wrapper').tab('update', {
 			label : 'Not implemented yet'
 		});
 	});

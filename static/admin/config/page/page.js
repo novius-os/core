@@ -23,8 +23,8 @@ define([
                     name : 'edit',
                     primary : true,
                     icon : 'pencil',
-                    action : function(item) {
-                        $nos.nos.tabs.open({
+                    action : function(item, ui) {
+                        $nos(ui).tab({
                             url : 'admin/nos/page/page/edit/' + item.id,
                             label : item.title
                         });
@@ -60,8 +60,8 @@ define([
                 adds: {
                     page : {
                         label : appDesk.i18n('Add a page'),
-                        action : function() {
-                            $nos.nos.tabs.add({
+                        action : function(ui) {
+                            $nos(ui).tab('add', {
                                 url: 'admin/nos/page/page/add',
                                 title: appDesk.i18n('Add a page')._()
                             });

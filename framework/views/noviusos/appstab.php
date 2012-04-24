@@ -14,13 +14,13 @@
 require(['jquery-nos'], function($nos) {
 	$nos(function() {
 		//$('#switcher').themeswitcher();
-        $nos('#apps').sortable({
+        var apps = $nos('#apps').sortable({
             update: function() {
                 var orders = {};
                 $nos('.app').each(function(i) {
                     orders[$nos(this).data('key')] = {order: i};
                 });
-                $nos.nos.saveUserConfiguration('misc.apps', orders);
+                $nos(apps).xhr('saveUserConfig', 'misc.apps', orders);
             }
         });
 		<?php if ($background) { ?>
@@ -55,12 +55,13 @@ require(['jquery-nos'], function($nos) {
 require(['jquery-nos'], function($nos) {
 	$nos('a.app').click(function(e) {
 		e.preventDefault();
-        var tab = $nos(this).data('launcher');
-		$nos.nos.tabs.open($nos.extend({
+        var $launcher = $nos(this),
+	        tab = $launcher.data('launcher');
+		$launcher.tab($nos.extend({
 			app: true,
 			iconSize: 32,
 			labelDisplay: false
-		}, tab), true);
+		}, tab));
 	});
 });
 </script>

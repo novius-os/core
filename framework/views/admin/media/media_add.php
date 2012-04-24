@@ -11,7 +11,7 @@
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
-		$nos.nos.tabs.update($nos('#<?= $uniqid = uniqid('id_') ?>'), {
+		$nos('#<?= $uniqid = uniqid('id_') ?>').tab('update', {
 			label : <?= json_encode(__('Add a media')) ?>,
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
 		});
@@ -28,9 +28,9 @@ $form_attributes['enctype'] = 'multipart/form-data';
 $fieldset->set_config('form_attributes', $form_attributes);
 ?>
 
-<?= $fieldset->open('admin/nos/media/media/upload'); ?>
-<?= $fieldset->build_hidden_fields(); ?>
 <div class="page line ui-widget" id="<?= $uniqid ?>">
+	<?= $fieldset->open('admin/nos/media/media/upload'); ?>
+	<?= $fieldset->build_hidden_fields(); ?>
 	<div class="unit col c1" style="z-index:99;"></div>
 	<div class="unit col c8" style="z-index:99;">
         <div class="line" style="margin-bottom:1em;">
@@ -63,15 +63,14 @@ $fieldset->set_config('form_attributes', $form_attributes);
     <div class="unit col c3 lastUnit">
         <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
     </div>
+	<?= $fieldset->close(); ?>
 </div>
-<?= $fieldset->close(); ?>
-
-
 
 <script type="text/javascript">
 require([
     'jquery-nos',
-    'order!jquery-form'
+    'order!jquery-form',
+	'order!static/novius-os/admin/config/media/seo_compliant'
 ],
 function($nos) {
     $nos(function() {
@@ -81,9 +80,8 @@ function($nos) {
 		        .bind('ajax_success', function() {
 			        $nos(this).dialog('close');
 		        })
-	            .form('ajax')
-	            .end(),
-            $file = $container.find(':file[name=media]')
+	            .end();
+        var    $file = $container.find(':file[name=media]')
 	            .change(function() {
 		            var path = $file.val();
 
@@ -110,7 +108,7 @@ function($nos) {
 			$title = $container.find('input[name=media_title]')
 				.bind('change keyup', function() {
 					if ($same_title.is(':checked')) {
-						$slug.val(seo_compliant($title.val()));
+						$slug.val($nos.seoCompliant($title.val()));
 					}
 				}),
 			$slug = $container.find('input[name=slug]'),
@@ -127,9 +125,4 @@ function($nos) {
 	    $same_title.triggerHandler('change');
     });
 });
-
-
-<?php
-include __DIR__.'/seo_compliant.js';
-?>
 </script>

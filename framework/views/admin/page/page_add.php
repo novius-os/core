@@ -13,7 +13,7 @@
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
-		$nos.nos.tabs.update({
+		$nos('#<?= $uniqid = uniqid('id_'); ?>').tab('update', {
 			label : <?= json_encode(__('Add a page')) ?>,
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
 		});
@@ -21,7 +21,7 @@ require(['jquery-nos-ostabs'], function ($nos) {
 });
 </script>
 
-<div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+<div class="page line ui-widget" id="<?= $uniqid ?>">
     <div id="<?= $uniqid_tabs = uniqid('tabs_') ?>" style="width: 92.4%; clear:both; margin:0 auto 1em;">
         <ul style="width: 5%;">
             <?php

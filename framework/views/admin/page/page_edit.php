@@ -9,13 +9,15 @@
  */
 
 ?>
+<div id="<?= $uniqid = uniqid('id_') ?>"></div>
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
-		$nos.nos.tabs.update({
-			label : <?= json_encode($page->page_title) ?>,
-			iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
-		});
+		$nos('#<?= $uniqid ?>').tab('update', {
+				label : <?= json_encode($page->page_title) ?>,
+				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
+			})
+			.remove();
 	});
 });
 </script>
