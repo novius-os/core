@@ -38,7 +38,7 @@ $large = !empty($large) && $large == true;
                 echo '</td>';
             }
 			?>
-                <td>
+                <td class="table-field">
 			<?php
             if (!empty($title)) {
                 $title = (array) $title;
@@ -48,7 +48,7 @@ $large = !empty($large) && $large == true;
                     if ($first) {
                         $first = false;
                     } else {
-                        echo '</td><td>';
+                        echo '</td><td class="table-field">';
                     }
                     $field = $fieldset->field($name);
                     $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
