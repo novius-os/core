@@ -176,6 +176,10 @@ class Model_Page_Page extends \Nos\Orm\Model {
     }
 
 	public function _event_before_save() {
+        // New objects don't need to check if the virtual_name has changed
+        if ($this->is_new()) {
+            return;
+        }
 		$diff = $this->get_diff();
 
 		if (!empty($diff[0]['page_virtual_name'])) {
