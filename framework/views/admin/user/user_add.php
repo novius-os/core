@@ -12,7 +12,7 @@
 <script type="text/javascript">
     require(['jquery-nos-ostabs'], function ($nos) {
         $nos(function () {
-            $nos.nos.tabs.update({
+	        $nos('#<?= $uniqid = uniqid('id_'); ?>').tab('update', {
                 label : <?= \Format::forge()->to_json('Add a user') ?>,
                 iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
             });
@@ -39,7 +39,7 @@ foreach ($fieldset->field() as $field) {
 }
 ?>
 
-<div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+<div class="page line ui-widget" id="<?= $uniqid ?>">
     <?= $fieldset->open('admin/nos/user/form/add'); ?>
     <?= View::forge('form/layout_standard', array(
         'fieldset' => $fieldset,

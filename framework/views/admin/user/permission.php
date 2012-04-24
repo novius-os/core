@@ -127,18 +127,7 @@ foreach ($apps as $app => $perms) {
 			    $checkboxes.wijcheckbox('refresh');
 	        });
 
-	        $form.find('form').submit(function(e) {
-	            e.preventDefault();
-	            $nos(this).ajaxSubmit({
-	                dataType: 'json',
-	                success: function(json) {
-	                    $nos.nos.ajax.success(json);
-	                },
-	                error: function() {
-	                    $nos.notify('An error occured', 'error');
-	                }
-	            });
-	        });
+	        $form.find('form').form('ajax');
 	    });
     });
 </script>

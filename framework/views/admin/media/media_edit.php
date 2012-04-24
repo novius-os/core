@@ -11,7 +11,7 @@
 <script type="text/javascript">
 require(['jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
-		$nos.nos.tabs.update($nos('#<?= $uniqid = uniqid('id_') ?>'), {
+		$nos('#<?= $uniqid = uniqid('id_') ?>').tab('update', {
 			label : <?= json_encode($media->media_title) ?>,
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
 		});
@@ -71,11 +71,12 @@ $fieldset->set_config('form_attributes', $form_attributes);
 <script type="text/javascript">
 require([
     'jquery-nos',
-    'order!jquery-form'
+    'order!jquery-form',
+	'order!static/novius-os/admin/config/media/seo_compliant'
 ],
 function($nos) {
     $nos(function() {
-        var $container = $nos('#<?= $uniqid ?>').form().form('ajax');
+        var $container = $nos('#<?= $uniqid ?>').form();
 
         var $file       = $container.find(':file[name=media]');
 		var $title      = $container.find('input[name=media_title]');
@@ -108,7 +109,7 @@ function($nos) {
 		// Same title and description (alt)
 		$title.bind('change keyup', function() {
 			if ($same_title.is(':checked')) {
-				$slug.val(seo_compliant($title.val()));
+				$slug.val($nos.seoCompliant($title.val()));
 			}
 		});
 		$same_title.change(function() {
@@ -125,9 +126,4 @@ function($nos) {
         });
     });
 });
-
-
-<?php
-include __DIR__.'/seo_compliant.js';
-?>
 </script>

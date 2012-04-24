@@ -14,129 +14,27 @@ define('jquery-nos', [
     'order!wijmo-complete'
 ], function($) {
     "use strict";
-    var undefined = void(0);
-
-    $.nos = {
-        dispatchEvent : function(event) {
-            if (window.parent != window && window.parent.$nos) {
-                return window.parent.$nos.nos.dispatchEvent(event);
+    var undefined = void(0),
+        $nos = window.$nos = $.sub(),
+        $noviusos = undefined,
+        noviusos = function() {
+            if ($noviusos === undefined) {
+                $noviusos = $nos('.nos-ostabs');
             }
-            if ($.nos.$noviusos) {
-                $.nos.$noviusos.ostabs('dispatchEvent', event);
-            }
-        },
-
-        /** Execute an ajax request
-         *
-         * @param url
-         * @param data
-         */
-        ajax : {
-            request : function(options) {
-                options = $.extend({
-                    dataType : 'json',
-                    type     : 'POST',
-                    data     : {}
-                }, options);
-
-                // Internal callbacks for JSON dataType
-                if (options.dataType == 'json') {
-                    if ($.isFunction(options.success)) {
-                        var old_success = options.success;
-                        options.success = function(json) {
-                            json.user_success = old_success;
-                            $.nos.ajax.success(json);
-                        }
-                    } else {
-                        options.success = $.nos.ajax.success;
-                    }
-
-                    if ($.isFunction(options.error)) {
-                        var old_error = options.error;
-                        options.error = function(json) {
-                            $.nos.ajax.error(json);
-                            old_error.apply(this, arguments);
-                        }
-                    } else {
-                        options.error = $.nos.ajax.error;
-                    }
-                }
-
-                $.ajax(options);
-            },
-            success : function(json) {
-                if (json.error) {
-                    if ($.isArray(json.error)) {
-                        $.each(json.error, function() {
-                            $nos.notify(this, 'error');
-                        });
-                    } else {
-                        $nos.notify(json.error, 'error');
-                    }
-                }
-                if (json.notify) {
-                    if ($.isArray(json.notify)) {
-                        $.each(json.notify, function() {
-                            $nos.notify(this);
-                        });
-                    } else {
-                        $nos.notify(json.notify);
-                    }
-                }
-                if (json.dispatchEvent) {
-                    if ($.isArray(json.dispatchEvent)) {
-                        $.each(json.dispatchEvent, function(i, event) {
-                            $.nos.dispatchEvent(event);
-                        });
-                    } else {
-                        $.nos.dispatchEvent(json.dispatchEvent);
-                    }
-                }
-                // Call user callback
-                if ($.isFunction(json.user_success)) {
-                    json.user_success.apply(this, arguments);
-                }
-
-                // Close at the end!
-                if (json.redirect) {
-                    document.location = json.redirect;
-                }
-                if (json.closeTab) {
-                    $.nos.tabs.close();
-                }
-                if (json.replaceTab) {
-                    $.nos.tabs.replace(json.replaceTab);
-                }
-            },
-            error: function(x, e) {
-                // http://www.maheshchari.com/jquery-ajax-error-handling/
-                if (x.status != 0) {
-                    $nos.notify('Connection error!', 'error');
-                } else if (e == 'parsererror') {
-                    $nos.notify('Request seemed a success, but we could not read the answer.');
-                } else if (e == 'timeout') {
-                    $nos.notify('Time out (server is busy?). Please try again.');
-                }
-            }
-        },
-
-        saveUserConfiguration: function(key, configuration) {
-            this.ajax.request({
-                url: '/admin/nos/noviusos/save_user_configuration',
-                data: {
-                    key: key,
-                    configuration: configuration
-                }
-            });
-        }
-    };
-
-    var $nos = window.$nos = $.sub();
+            return $noviusos;
+        };
 
     $nos.extend({
+        dispatchEvent : function(event) {
+            if (window.parent != window && window.parent.$nos) {
+                return window.parent.$nos.dispatchEvent(event);
+            }
+            noviusos().ostabs('dispatchEvent', event);
+        },
+
         notify : function( options, type ) {
             if (window.parent != window && window.parent.$nos) {
-                return window.parent.$nos.nos.notify( options, type );
+                return window.parent.$nos.notify( options, type );
             }
             if ( !$.isPlainObject( options ) ) {
                 options = {title : options};
@@ -147,7 +45,7 @@ define('jquery-nos', [
             if ( $.isPlainObject( options ) ) {
                 require([
                     'link!static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
-                    'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.min'
+                    'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify'
                 ], function() {
                     var o = {
                         pnotify_history : false,
@@ -167,6 +65,121 @@ define('jquery-nos', [
     });
 
     $nos.fn.extend({
+        xhr : function() {
+            var args = Array.prototype.slice.call(arguments),
+                method = 'request';
+            if (args.length > 0 && $.inArray(args[0], ['request', 'success', 'error', 'saveUserConfig']) !== -1) {
+                method = args.shift();
+            }
+            switch (method) {
+                case 'request' :
+                    var options = $.extend({
+                                dataType : 'json',
+                                type     : 'POST',
+                                data     : {}
+                            }, args[0] || {}),
+                        old_success = options.success,
+                        old_error = options.error,
+                        self = this;
+
+                    // Internal callbacks for JSON dataType
+                    if (options.dataType == 'json') {
+                        options.success = function(json) {
+                            if ($.isFunction(options.old_success)) {
+                                json.user_success = old_success;
+                            }
+                            self.xhr('success', json);
+                        };
+
+                        options.error = function(json) {
+                            self.xhr('error', json);
+                            if ($.isFunction(old_error)) {
+                                old_error.apply(this, arguments);
+                            }
+                        };
+                    }
+
+                    return $.ajax(options);
+                    break;
+
+                case 'success' :
+                    var json = args[0];
+                    if (json.error) {
+                        if ($.isArray(json.error)) {
+                            $.each(json.error, function() {
+                                $nos.notify(this, 'error');
+                            });
+                        } else {
+                            $nos.notify(json.error, 'error');
+                        }
+                    }
+                    if (json.notify) {
+                        if ($.isArray(json.notify)) {
+                            $.each(json.notify, function() {
+                                $nos.notify(this);
+                            });
+                        } else {
+                            $nos.notify(json.notify);
+                        }
+                    }
+                    if (json.dispatchEvent) {
+                        if ($.isArray(json.dispatchEvent)) {
+                            $.each(json.dispatchEvent, function(i, event) {
+                                $nos.dispatchEvent(event);
+                            });
+                        } else {
+                            $nos.dispatchEvent(json.dispatchEvent);
+                        }
+                    }
+                    // Call user callback
+                    if ($.isFunction(json.user_success)) {
+                        json.user_success.apply(this, arguments);
+                    }
+
+                    var dialog = this.closest('.ui-dialog-content').size();
+                    if (dialog) {
+                        if (json.closeTab) {
+                            this.tab('close');
+                        }
+                    } else {
+                        if (json.redirect) {
+                            document.location.href = json.redirect;
+                        }
+                        if (json.replaceTab) {
+                            this.tab('add', {url : url}, false)
+                                .tab('close');
+                        }
+                    }
+                    break;
+
+                case 'error' :
+                    var x = args[0],
+                        e = args[1];
+                    // http://www.maheshchari.com/jquery-ajax-error-handling/
+                    if (x.status != 0) {
+                        $nos.notify('Connection error!', 'error');
+                    } else if (e == 'parsererror') {
+                        $nos.notify('Request seemed a success, but we could not read the answer.');
+                    } else if (e == 'timeout') {
+                        $nos.notify('Time out (server is busy?). Please try again.');
+                    }
+                    break;
+
+                case 'saveUserConfig' :
+                    var key = args[0],
+                        configuration = args[1];
+                    this.xhr({
+                        url: '/admin/nos/noviusos/save_user_configuration',
+                        data: {
+                            key: key,
+                            configuration: configuration
+                        }
+                    });
+                    break;
+            }
+            return this;
+        },
+
         media : function(data) {
 
             data = data || {};
@@ -275,8 +288,8 @@ define('jquery-nos', [
                         $context.ajaxForm({
                             dataType: 'json',
                             success: function(json) {
-                                $.nos.ajax.success(json);
-                                $context.triggerHandler('ajax_success', [json]);
+                                $context.xhr('success', json)
+                                    .triggerHandler('ajax_success', [json]);
                             },
                             error: function() {
                                 $nos.notify('An error occured', 'error');
@@ -349,6 +362,7 @@ define('jquery-nos', [
                         oldClose = options.close,
                         oldOpen = options.open,
                         $container = this.closest('.nos-dispatcher, body'),
+                        self = this,
                         $dialog = $('<div></div>').appendTo($container);
 
                     options.close = function() {
@@ -412,7 +426,7 @@ define('jquery-nos', [
                                         $dialog.empty()
                                             .wijdialog('destroy')
                                             .remove();
-                                        $.nos.ajax.success(json);
+                                        self.xhr('success', json);
                                     }
                                 }
                             }
@@ -438,9 +452,27 @@ define('jquery-nos', [
         tab : function() {
             var args = Array.prototype.slice.call(arguments),
                 method = 'open';
-            if (args.length > 0 && $.inArray(args[0], ['open', 'close']) !== -1) {
+            if (args.length > 0 && $.inArray(args[0], ['open', 'close', 'add', 'update', 'init']) !== -1) {
                 method = args.shift();
             }
+
+            var getIndex = function(context) {
+                if (window.parent != window && window.parent.$nos) {
+                    return window.parent.$nos(window.frameElement).data('nos-ostabs-index');
+                }
+                if (context === 'current') {
+                    return noviusos().ostabs('current').index;
+                }
+                if ($.isNumeric(context)) {
+                    return context;
+                }
+                var $panel = $(context).parents('.nos-ostabs-panel-content')
+                if ($panel.size()) {
+                    return $panel.data('nos-ostabs-index');
+                }
+                return false;
+            }
+
             switch (method) {
                 case 'open' :
                     var tab = args[0] || {},
@@ -453,7 +485,44 @@ define('jquery-nos', [
                             title: tab.label
                         }, dialogOptions));
                     } else {
-                        $nos.nos.tabs.add(tab);
+                        if (window.parent != window && window.parent.$nos) {
+                            return window.parent.$nos(window.frameElement).tab('open', tab, dialogOptions);
+                        }
+                        if (noviusos().length) {
+                            var tabs = noviusos().ostabs('tabs'),
+                                sel = false;
+                            $.each(tabs, function(i, t) {
+                                if (t.url === tab.url) {
+                                    sel = i;
+                                    return false;
+                                }
+                            });
+                            if (sel !== false) {
+                                return noviusos().ostabs('select', sel + 4); // Add 4 because appstab and tray are before and not return by tabs
+                            } else {
+                                this.tab('add', tab);
+                            }
+                        } else if (tab.url) {
+                            window.open(tab.url);
+                        }
+                    }
+                    break;
+
+                case 'add' :
+                    var tab = args[0],
+                        end = args[1];
+                    if (window.parent != window && window.parent.$nos) {
+                        return window.parent.$nos(window.frameElement).tab('add', tab, end);
+                    }
+                    var index;
+                    if (end !== undefined && end !== true) {
+                        index = getIndex('current') + 1;
+                    }
+                    if (noviusos().length) {
+                        index = noviusos().ostabs('add', tab, index);
+                        noviusos().ostabs('select', index);
+                    } else if (tab.url) {
+                        window.open(tab.url);
                     }
                     break;
 
@@ -462,8 +531,53 @@ define('jquery-nos', [
                     if ($dialog.size()) {
                         this.dialog('close');
                     } else {
-                        $nos.nos.tabs.close();
+                        if (window.parent != window && window.parent.$nos) {
+                            return window.parent.$nos(window.frameElement).tab('close');
+                        }
+                        var index = getIndex(this);
+                        if (noviusos().length) {
+                            noviusos().ostabs('remove', index);
+                        }
                     }
+                    break;
+
+                case 'update' :
+                    var tab = args[0];
+                    if (window.parent != window && window.parent.$nos) {
+                        return window.parent.$nos(window.frameElement).tab('update', tab);
+                    }
+                    if (this.size() && !this.closest('.ui-dialog-content').size()) {
+                        if (noviusos().length) {
+                            var index = getIndex(this);
+                            noviusos().ostabs('update', index, tab);
+                        }
+                    }
+                    break;
+
+                case 'init' :
+                    var configuration = args[0],
+                        fct = function(e) {
+                            if (noviusos().length) {
+                                noviusos().xhr('saveUserConfig', 'tabs', {selected: $noviusos.ostabs('option', 'selected'), tabs: $noviusos.ostabs('tabs')});
+                            }
+                        };
+                    $noviusos = this;
+                    $.extend(configuration, {
+                        add: fct,
+                        remove: fct,
+                        select: fct,
+                        show: fct,
+                        drag: fct
+                    });
+
+                    if (configuration['user_configuration']['tabs']) {
+                        if (!configuration['options']) {
+                            configuration['options'] = {};
+                        }
+                        configuration['initTabs'] = configuration['user_configuration']['tabs']['tabs'];
+                        configuration['selected'] = configuration['user_configuration']['tabs']['selected'];
+                    }
+                    $noviusos.ostabs(configuration);
                     break;
             }
             return this;

@@ -33,7 +33,7 @@ require([
 						}
 					}),
                 inspectorData = parent.data('inspector'),
-                table_heights = $nos.nos.grid.getHeights(),
+                table_heights = $nos.grid.getHeights(),
                 showFilter = inspectorData.grid.showFilter || false,
 				rendered = false;
 

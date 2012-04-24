@@ -26,7 +26,7 @@ require(['jquery-nos'], function($nos) {
 
 	    $container.find('button[data-id=confirmation]').click(function(e) {
             e.preventDefault();
-            $nos.nos.ajax.request({
+		    $container.xhr({
                 url : 'admin/nos/user/user/delete_user_confirm',
                 method : 'POST',
                 data : {

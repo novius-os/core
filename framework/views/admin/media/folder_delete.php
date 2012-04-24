@@ -58,7 +58,7 @@ require(['jquery-nos'], function($nos) {
                 $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
                 return;
             }
-            $nos.nos.ajax.request({
+	        $container.xhr({
                 url : 'admin/nos/media/actions/delete_folder_confirm',
                 method : 'POST',
                 data : {

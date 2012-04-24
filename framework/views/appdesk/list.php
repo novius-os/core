@@ -13,6 +13,6 @@
 <div id="<?= $id ?>"></div>
 <script type="text/javascript">
 require(['jquery-nos-appdesk'], function($nos) {
-    $nos.nos.appdeskAdd("<?= $id ?>", <?= $appdesk ?>);
+    $nos.appdeskAdd("<?= $id ?>", <?= $appdesk ?>);
 });
 </script>

@@ -12,11 +12,12 @@
 <script type="text/javascript">
 require(['jquery-nos', 'jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
-		var $div = $nos('#<?= $uniqid = uniqid('id_') ?>').form();
-		$nos.nos.tabs.update($div, {
-			label : '<?= $user->fullname() ?>',
-			iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
-		});
+		$nos('#<?= $uniqid = uniqid('id_') ?>')
+			.tab('update', {
+				label : '<?= $user->fullname() ?>',
+				iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
+			})
+			.form();
 	});
 });
 </script>
