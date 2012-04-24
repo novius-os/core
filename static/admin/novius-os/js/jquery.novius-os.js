@@ -85,7 +85,7 @@ define('jquery-nos', [
                     // Internal callbacks for JSON dataType
                     if (options.dataType == 'json') {
                         options.success = function(json) {
-                            if ($.isFunction(options.old_success)) {
+                            if ($.isFunction(old_success)) {
                                 json.user_success = old_success;
                             }
                             self.xhr('success', json);
