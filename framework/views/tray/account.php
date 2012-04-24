@@ -38,17 +38,17 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery-nos'], function($) {
-		$(function() {
-			$('#<?= $uniqid ?>').nos().form();
-			$('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
+    require(['jquery-nos'], function($nos) {
+		$nos(function() {
+			$nos('#<?= $uniqid ?>').form();
+			$nos('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
 				if (json.wallpaper_url) {
-					$('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
+					$nos('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
 				} else {
-					$('#noviusospanel').css('background-image', '');
+					$nos('#noviusospanel').css('background-image', '');
 				}
 			});
-			$('#<?= $uniqid ?> .tabs').wijtabs({
+			$nos('#<?= $uniqid ?> .tabs').wijtabs({
 				alignment: 'left'
 			});
 		});

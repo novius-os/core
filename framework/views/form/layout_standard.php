@@ -10,9 +10,9 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-	$(function() {
-		$("#<?= $uniqid1 = uniqid('id_') ?>,#<?= $uniqid2 = uniqid('id_') ?>").nos().form();
+require(['jquery-nos'], function($nos) {
+	$nos(function() {
+		$nos("#<?= $uniqid1 = uniqid('id_') ?>,#<?= $uniqid2 = uniqid('id_') ?>").nos().form();
 	});
 });
 </script>

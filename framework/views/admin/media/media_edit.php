@@ -9,9 +9,9 @@
  */
 ?>
 <script type="text/javascript">
-require(['jquery-nos-ostabs'], function ($) {
-	$(function () {
-		$.nos.tabs.update($('#<?= $uniqid = uniqid('id_') ?>'), {
+require(['jquery-nos-ostabs'], function ($nos) {
+	$nos(function () {
+		$nos.nos.tabs.update($nos('#<?= $uniqid = uniqid('id_') ?>'), {
 			label : <?= json_encode($media->media_title) ?>,
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
 		});
@@ -73,9 +73,9 @@ require([
     'jquery-nos',
     'order!jquery-form'
 ],
-function($) {
-    $(function() {
-        var $container = $('#<?= $uniqid ?>').nos().form().form('ajax');
+function($nos) {
+    $nos(function() {
+        var $container = $nos('#<?= $uniqid ?>').form().form('ajax');
 
         var $file       = $container.find(':file[name=media]');
 		var $title      = $container.find('input[name=media_title]');
@@ -112,7 +112,7 @@ function($) {
 			}
 		});
 		$same_title.change(function() {
-			if ($(this).is(':checked')) {
+			if ($nos(this).is(':checked')) {
 				$slug.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
                 $title.triggerHandler('change');
 			} else {
@@ -121,7 +121,7 @@ function($) {
 		}).triggerHandler('change');
 
         $container.find('form').bind('ajax_success', function() {
-            $(this).nos().dialog('close');
+            $nos(this).dialog('close');
         });
     });
 });

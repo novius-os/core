@@ -9,7 +9,7 @@
 
 define([
     'jquery-nos-appdesk'
-], function($) {
+], function($nos) {
     "use strict";
     return function(appDesk) {
         return {
@@ -24,7 +24,7 @@ define([
                     primary : true,
                     icon : 'pencil',
                     action : function(item) {
-                        $.nos.tabs.open({
+                        $nos.nos.tabs.open({
                             url : 'admin/nos/page/page/edit/' + item.id,
                             label : item.title
                         });
@@ -36,7 +36,7 @@ define([
                     primary : true,
                     icon : 'trash',
                     action : function(item, ui) {
-                        $(ui).nos().dialog({
+                        $nos(ui).dialog({
                             contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a page')._(),
@@ -61,7 +61,7 @@ define([
                     page : {
                         label : appDesk.i18n('Add a page'),
                         action : function() {
-                            $.nos.tabs.add({
+                            $nos.nos.tabs.add({
                                 url: 'admin/nos/page/page/add',
                                 title: appDesk.i18n('Add a page')._()
                             });

@@ -61,12 +61,12 @@
 	</form>
 </div>
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-	$(function() {
+require(['jquery-nos'], function($nos) {
+	$nos(function() {
 
 		var id = '<?= $uniqid ?>',
 			newimg = !'<?= $edit ?>',
-			$container = $('#' + id)
+			$container = $nos('#' + id)
 				.find('> form')
 				.submit(function(e) {
 					$container.find('button[data-id=save]').triggerHandler('click');
@@ -82,7 +82,7 @@ require(['jquery-nos'], function($) {
 				.end()
 				.find('button[data-id=save]')
 				.click(function(e) {
-					var img = $('<img />');
+					var img = $nos('<img />');
 
 					if (!media || !media.id) {
 						alert(<?= \Format::forge()->to_json(__('Please choose an image first')) ?>);
@@ -199,12 +199,12 @@ require(['jquery-nos'], function($) {
 
 		// Editing the current image
 		if (e.nodeName == 'IMG') {
-			var $img = $(e),
+			var $img = $nos(e),
 				media_id = $img.data('media-id');
 
 			// No data available yet, we need to fetch them
 			if (media_id) {
-				$.ajax({
+				$nos.ajax({
 					method: 'GET',
 					url: base_url + 'admin/media/info/media/' + media_id,
 					dataType: 'json',
@@ -220,8 +220,8 @@ require(['jquery-nos'], function($) {
 		$container.wijtabs({
 				alignment: 'left',
 				load: function(e, ui) {
-					var margin = $(ui.panel).outerHeight(true) - $(ui.panel).innerHeight();
-					$(ui.panel).height($dialog.height() - margin);
+					var margin = $nos(ui.panel).outerHeight(true) - $nos(ui.panel).innerHeight();
+					$nos(ui.panel).height($dialog.height() - margin);
 				},
 				disabledIndexes: newimg ? [1] : []
 			})
@@ -229,7 +229,7 @@ require(['jquery-nos'], function($) {
 			.css('width', '81%')
 			.addClass('box-sizing-border')
 			.end()
-			.nos().form();
+			.form();
 
 
 		if (!newimg) {

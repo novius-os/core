@@ -1912,16 +1912,16 @@
 
 			// Open the dialog popup (it returns the node inserted in the body)
             if (metadata.dialog.ajax || !edit) {
-                dialog = $(ui).nos().dialog($.extend({
-                    destroyOnClose : true,
+                dialog = $(ed.formElement).nos().dialog($.extend({
                     title: metadata.title
                 }, edit ? $.extend({}, metadata.dialog, {ajax : edit.data('config')}) : metadata.dialog));
             } else {
-                dialog = $(ui).nos().dialog($.extend({
-                    destroyOnClose : true,
+                // Open empty dialog
+                dialog = $(ed.formElement).nos().dialog($.extend({
                     title: metadata.title
                 }, $.extend({}, metadata.dialog, {contentUrl : null})));
 
+                // Post edit content in iframe in the empty dialog
                 var form = $('<form></form>')
                         .attr('action', metadata.dialog.contentUrl)
                         .attr('method', 'post')
@@ -1971,9 +1971,7 @@
             var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
 
 			var dialog = null;
-
-            dialog = $(ui).nos().dialog({
-                destroyOnClose : true,
+            dialog = $(ed.formElement).nos().dialog({
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
 				ajax: true,

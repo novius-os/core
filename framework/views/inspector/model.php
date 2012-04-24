@@ -14,9 +14,9 @@
 <script type="text/javascript">
 require([
 		'jquery-nos-listgrid'
-	], function( $, undefined ) {
-		$(function() {
-			var inspector = $('#<?= $id ?>').removeAttr('id'),
+	], function( $nos, undefined ) {
+		$nos(function() {
+			var inspector = $nos('#<?= $id ?>').removeAttr('id'),
 				connector = inspector.closest('.nos-inspector, body')
 					.on('langChange', function() {
 						if (inspectorData.langChange) {
@@ -33,7 +33,7 @@ require([
 						}
 					}),
                 inspectorData = parent.data('inspector'),
-                table_heights = $.nos.grid.getHeights(),
+                table_heights = $nos.nos.grid.getHeights(),
                 showFilter = inspectorData.grid.showFilter || false,
 				rendered = false;
 
@@ -77,7 +77,7 @@ require([
                         }
                     }),
                     currentCellChanged: function (e) {
-                        var row = $(e.target).noslistgrid("currentCell").row(),
+                        var row = $nos(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

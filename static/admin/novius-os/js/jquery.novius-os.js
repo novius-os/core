@@ -26,38 +26,6 @@ define('jquery-nos', [
             }
         },
 
-        notify : function( options, type ) {
-
-            if (window.parent != window && window.parent.$nos) {
-                return window.parent.$nos.nos.notify( options, type );
-            }
-            if ( !$.isPlainObject( options ) ) {
-                options = {title : options};
-            }
-            if ( type !== undefined ) {
-                $.extend(options, $.isPlainObject( type ) ? type : {type : type} );
-            }
-            if ( $.isPlainObject( options ) ) {
-                require([
-                    'link!static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
-                    'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.min'
-                ], function() {
-                    var o = {
-                        pnotify_history : false,
-                        pnotify_addclass : 'nos-notification'
-                    };
-                    $.each( options, function(key, val) {
-                        if ( key.substr( 0, 8 ) !== 'pnotify_' ) {
-                            key = 'pnotify_' + key;
-                        }
-                        o[key] = val;
-                    } );
-                    return $.pnotify( o );
-                });
-            }
-            return false;
-        },
-
         /** Execute an ajax request
          *
          * @param url
@@ -100,19 +68,19 @@ define('jquery-nos', [
                 if (json.error) {
                     if ($.isArray(json.error)) {
                         $.each(json.error, function() {
-                            $.nos.notify(this, 'error');
+                            $nos.notify(this, 'error');
                         });
                     } else {
-                        $.nos.notify(json.error, 'error');
+                        $nos.notify(json.error, 'error');
                     }
                 }
                 if (json.notify) {
                     if ($.isArray(json.notify)) {
                         $.each(json.notify, function() {
-                            $.nos.notify(this);
+                            $nos.notify(this);
                         });
                     } else {
-                        $.nos.notify(json.notify);
+                        $nos.notify(json.notify);
                     }
                 }
                 if (json.dispatchEvent) {
@@ -143,11 +111,11 @@ define('jquery-nos', [
             error: function(x, e) {
                 // http://www.maheshchari.com/jquery-ajax-error-handling/
                 if (x.status != 0) {
-                    $.nos.notify('Connection error!', 'error');
+                    $nos.notify('Connection error!', 'error');
                 } else if (e == 'parsererror') {
-                    $.nos.notify('Request seemed a success, but we could not read the answer.');
+                    $nos.notify('Request seemed a success, but we could not read the answer.');
                 } else if (e == 'timeout') {
-                    $.nos.notify('Time out (server is busy?). Please try again.');
+                    $nos.notify('Time out (server is busy?). Please try again.');
                 }
             }
         },
@@ -165,6 +133,39 @@ define('jquery-nos', [
 
     var $nos = window.$nos = $.sub();
 
+    $nos.extend({
+        notify : function( options, type ) {
+            if (window.parent != window && window.parent.$nos) {
+                return window.parent.$nos.nos.notify( options, type );
+            }
+            if ( !$.isPlainObject( options ) ) {
+                options = {title : options};
+            }
+            if ( type !== undefined ) {
+                $.extend(options, $.isPlainObject( type ) ? type : {type : type} );
+            }
+            if ( $.isPlainObject( options ) ) {
+                require([
+                    'link!static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
+                    'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.min'
+                ], function() {
+                    var o = {
+                        pnotify_history : false,
+                        pnotify_addclass : 'nos-notification'
+                    };
+                    $.each( options, function(key, val) {
+                        if ( key.substr( 0, 8 ) !== 'pnotify_' ) {
+                            key = 'pnotify_' + key;
+                        }
+                        o[key] = val;
+                    } );
+                    return $.pnotify( o );
+                });
+            }
+            return false;
+        }
+    });
+
     $nos.fn.extend({
         media : function(data) {
 
@@ -175,28 +176,29 @@ define('jquery-nos', [
                 },
                 $input = this;
 
-            var dialog = null;
+            var $dialog = null;
 
             var options = $.extend({
                 title: $input.attr('title') || 'File',
                 allowDelete : true,
                 choose: function(e) {
                     // Open the dialog to choose the file
-                    if (dialog == null) {
-                        dialog = $input.nos().dialog({
+                    if ($dialog === null) {
+                        $dialog = $input.dialog({
+                            destroyOnClose : false,
                             contentUrl: contentUrls[data.mode],
                             ajax: true,
                             title: 'Choose a media file'
                         });
-                        dialog.bind('select.media', function(e, item) {
+                        $dialog.bind('select.media', function(e, item) {
                             $input.inputFileThumb({
                                 file: item.thumbnail
                             });
                             $input.val(item.id);
-                            dialog.wijdialog('close');
+                            $dialog.wijdialog('close');
                         });
                     } else {
-                        dialog.wijdialog('open');
+                        $dialog.wijdialog('open');
                     }
                 }
             }, data.inputFileThumb || {});
@@ -277,7 +279,7 @@ define('jquery-nos', [
                                 $context.triggerHandler('ajax_success', [json]);
                             },
                             error: function() {
-                                $.nos.notify('An error occured', 'error');
+                                $nos.notify('An error occured', 'error');
                             }
                         });
                     });
@@ -330,34 +332,44 @@ define('jquery-nos', [
             }
             switch (method) {
                 case 'open' :
-                    var options = args[0] || {};
-                    if (options.destroyOnClose) {
-                        var oldClose = options.close;
-                        options.close = function() {
-                            if ($.isFunction(oldClose)) {
-                                oldClose.apply(this, arguments);
-                            }
-                            $(this).wijdialog('destroy')
+                    var arg = args[0] || {},
+                        options = $.extend(true, {}, {
+                                destroyOnClose : true,
+                                width: window.innerWidth - 200,
+                                height: window.innerHeight - 100,
+                                modal: true,
+                                captionButtons: {
+                                    pin: {visible: false},
+                                    refresh: {visible: arg.contentUrl != null && !arg.ajax},
+                                    toggle: {visible: false},
+                                    minimize: {visible: false},
+                                    maximize: {visible: false}
+                                }
+                            }, arg),
+                        oldClose = options.close,
+                        oldOpen = options.open,
+                        $container = this.closest('.nos-dispatcher, body'),
+                        $dialog = $('<div></div>').appendTo($container);
+
+                    options.close = function() {
+                        if ($.isFunction(oldClose)) {
+                            oldClose.apply($dialog, arguments);
+                        }
+                        if (options.destroyOnClose) {
+                            $dialog.wijdialog('destroy')
                                 .remove();
+                        } else {
+                            $dialog.closest('.ui-dialog').hide().appendTo($container);
+                        }
+                    };
+                    if (!options.destroyOnClose) {
+                        options.open = function() {
+                            if ($.isFunction(oldOpen)) {
+                                oldOpen.apply($dialog, arguments);
+                            }
+                            $dialog.closest('.ui-dialog').appendTo('body');
                         };
                     }
-
-                    // Default options
-                    options = $.extend(true, {}, {
-                        width: window.innerWidth - 200,
-                        height: window.innerHeight - 100,
-                        modal: true,
-                        captionButtons: {
-                            pin: {visible: false},
-                            refresh: {visible: options.contentUrl != null && !options.ajax},
-                            toggle: {visible: false},
-                            minimize: {visible: false},
-                            maximize: {visible: false}
-                        }
-                    }, options);
-
-                    var where   = $.nos.$noviusos.ostabs ? $.nos.$noviusos.ostabs('current').panel : $('body');
-                    var $dialog = $(document.createElement('div')).appendTo(where);
 
                     if (options['content'] !== undefined) {
                         $dialog.append(options.content);
@@ -387,8 +399,6 @@ define('jquery-nos', [
                                         responseText = r;
                                     });
 
-
-
                                     try {
                                         var json = $.parseJSON(responseText);
                                         // If the dialog ajax URL returns a valid JSON string, don't show the dialog
@@ -396,29 +406,22 @@ define('jquery-nos', [
                                     } catch (e) {}
 
                                     if (proceed) {
-                                        $dialog.wijdialog('open');
+                                        $dialog.wijdialog('open')
+                                            .html( responseText );
                                     } else {
-                                        $dialog.empty();
-                                        $dialog.wijdialog('destroy');
-                                        $dialog.remove();
+                                        $dialog.empty()
+                                            .wijdialog('destroy')
+                                            .remove();
                                         $.nos.ajax.success(json);
                                     }
-
-                                    // inject the full result
-                                    $dialog.html( responseText );
                                 }
                             }
                         });
                     } else {
                         $dialog.wijdialog(options);
                     }
-                    if (proceed) {
-                        if ($.isFunction(options['onLoad'])) {
-                            options['onLoad']();
-                        }
-                        $dialog.bind('wijdialogclose', function(event, ui) {
-                            $dialog.closest('.ui-dialog').hide().appendTo(where);
-                        });
+                    if (proceed && $.isFunction(options.onLoad)) {
+                        options.onLoad();
                     }
 
                     return $dialog;
@@ -426,9 +429,7 @@ define('jquery-nos', [
 
                 case 'close' :
                     this.closest(':wijmo-wijdialog')
-                        .wijdialog('close')
-                        .wijdialog('destroy')
-                        .remove();
+                        .wijdialog('close');
                     break;
             }
             return this;

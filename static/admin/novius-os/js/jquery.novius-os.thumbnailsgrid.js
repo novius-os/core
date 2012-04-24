@@ -139,7 +139,7 @@ define('jquery-nos-thumbnailsgrid',
 									notify.text = notify.text.replace('log-in again', "<a href=\"" + json.login_page + "\">log-in again</a>");
 								}
 							} catch (e) {}
-							$nos.nos.notify(notify);
+							$nos.notify(notify);
 						}
 						self.uiOverlay.hide();
 						log(jqXHR, textStatus, errorThrown);

@@ -13,9 +13,9 @@
 <script type="text/javascript">
 require([
 		'jquery-nos-treegrid'
-	], function( $, table, undefined ) {
-		$(function() {
-			var inspector = $('#<?= $id ?>').removeAttr('id'),
+	], function( $nos, table, undefined ) {
+		$nos(function() {
+			var inspector = $nos('#<?= $id ?>').removeAttr('id'),
 				connector = inspector.closest('.nos-inspector, body')
 					.on('langChange', function() {
 						if (inspectorData.langChange) {
@@ -40,7 +40,7 @@ require([
                     height : '100%',
                     width : '100%'
                 })
-                .nostreegrid($.extend({
+                .nostreegrid($nos.extend({
 		            treeOptions : {
 			            lang : connector.data('nosLang') || ''
 		            },
@@ -49,7 +49,7 @@ require([
                     allowColSizing : true,
                     allowColMoving : true,
                     currentCellChanged : function(e) {
-                        var row = $(e.target).nostreegrid("currentCell").row(),
+                        var row = $nos(e.target).nostreegrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

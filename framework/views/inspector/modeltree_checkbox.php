@@ -13,10 +13,10 @@
 <script type="text/javascript">
 	require([
 		'jquery-nos-treegrid'
-	], function( $, table, undefined ) {
-		$(function() {
+	], function( $nos, table, undefined ) {
+		$nos(function() {
 			var params = <?= \Format::forge()->to_json($params) ?>,
-				container = $('#<?= $id ?>').removeAttr('id')
+				container = $nos('#<?= $id ?>').removeAttr('id')
 					.css({
                         height: params.height || '150px',
                         width: params.width || ''
@@ -38,7 +38,7 @@
 							movable : false,
 							treeUrl : params.treeUrl,
 							treeColumnIndex : 1,
-							treeOptions : $.extend(true, {
+							treeOptions : $nos.extend(true, {
 								lang : connector.data('nosLang') || ''
 							}, params.treeOptions || {}),
 							preOpen : params.selected || {},
@@ -50,12 +50,12 @@
 								}
 							},
 							rowStyleFormatter : function(args) {
-								if (args.type == $.wijmo.wijgrid.rowType.header) {
+								if (args.type == $nos.wijmo.wijgrid.rowType.header) {
 									args.$rows.hide();
 								}
 							},
 							currentCellChanged : function(e) {
-								var row = $(e.target).nostreegrid("currentCell").row(),
+								var row = $nos(e.target).nostreegrid("currentCell").row(),
 									data = row ? row.data : false;
 
 								if (data && rendered) {
@@ -78,9 +78,9 @@
 							rendered : function() {
 								rendered = true;
 								table.css("height", "auto");
-								if ($.isPlainObject(params.selected)) {
-									$.each(params.selected, function(i, selected) {
-										if ($.isPlainObject(selected) && selected.id) {
+								if ($nos.isPlainObject(params.selected)) {
+									$nos.each(params.selected, function(i, selected) {
+										if ($nos.isPlainObject(selected) && selected.id) {
 											container.find(':checkbox[value=' + selected.id + ']').prop('checked', true);
 											table.data('nostreegrid');
 										}
@@ -101,9 +101,9 @@
 				width : 35,
 				ensurePxWidth : true,
 				cellFormatter : function(args) {
-					if ($.isPlainObject(args.row.data)) {
+					if ($nos.isPlainObject(args.row.data)) {
 
-						$('<input type="checkbox" />').attr({
+						$nos('<input type="checkbox" />').attr({
 								name : params.input_name + '[]',
 								value : args.row.data._id
 							})
@@ -114,10 +114,10 @@
 				}
 			});
 
-			if ($.isPlainObject(params.selected)) {
-				$.each(params.selected, function(i, selected) {
-					if ($.isPlainObject(selected) && selected.id) {
-						$('<input type="hidden" />').attr({
+			if ($nos.isPlainObject(params.selected)) {
+				$nos.each(params.selected, function(i, selected) {
+					if ($nos.isPlainObject(selected) && selected.id) {
+						$nos('<input type="hidden" />').attr({
 								name : params.input_name + '[]',
 								value : selected.id
 							})

@@ -10,10 +10,10 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos', 'jquery-nos-ostabs'], function ($) {
-	$(function () {
-		var $div = $('#<?= $uniqid = uniqid('id_') ?>').nos().form();
-		$.nos.tabs.update($div, {
+require(['jquery-nos', 'jquery-nos-ostabs'], function ($nos) {
+	$nos(function () {
+		var $div = $nos('#<?= $uniqid = uniqid('id_') ?>').form();
+		$nos.nos.tabs.update($div, {
 			label : '<?= $user->fullname() ?>',
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
 		});

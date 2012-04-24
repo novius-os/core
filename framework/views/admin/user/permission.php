@@ -84,16 +84,16 @@ foreach ($apps as $app => $perms) {
 
 
 <script type="text/javascript">
-    require(["jquery-nos"], function($) {
-	    $(function() {
-		    var $form = $('#<?= $uniqid ?>').nos().form(),
+    require(["jquery-nos"], function($nos) {
+	    $nos(function() {
+		    var $form = $nos('#<?= $uniqid ?>').form(),
 			    $applications = $form.find('.applications'),
 			    $items = $applications.find("div.item"),
 			    $checkboxes = $items.find(":checkbox"),
 			    $access_to_everything = $applications.find(":checkbox.access_to_everything");
 
 		    $items.click(function() {
-	            var $checkbox = $(this).find('div.maincheck :checkbox');
+	            var $checkbox = $nos(this).find('div.maincheck :checkbox');
 	            $checkbox.attr('checked', !$checkbox.is(':checked'));
 	            $checkbox.change();
 	            $checkbox.wijcheckbox('refresh');
@@ -102,7 +102,7 @@ foreach ($apps as $app => $perms) {
 		    $checkboxes.change(function() {
 				var all_checked = true;
 			    $checkboxes.each(function() {
-					if (!$(this).is(':checked')) {
+					if (!$nos(this).is(':checked')) {
 						all_checked = false;
 					}
 				});
@@ -114,7 +114,7 @@ foreach ($apps as $app => $perms) {
 		    $access_to_everything.change(function() {
 				var all_checked = true;
 			    $checkboxes.each(function() {
-					if (!$(this).is(':checked')) {
+					if (!$nos(this).is(':checked')) {
 						all_checked = false;
 					}
 				});
@@ -129,13 +129,13 @@ foreach ($apps as $app => $perms) {
 
 	        $form.find('form').submit(function(e) {
 	            e.preventDefault();
-	            $(this).ajaxSubmit({
+	            $nos(this).ajaxSubmit({
 	                dataType: 'json',
 	                success: function(json) {
-	                    $.nos.ajax.success(json);
+	                    $nos.nos.ajax.success(json);
 	                },
 	                error: function() {
-	                    $.nos.notify('An error occured', 'error');
+	                    $nos.notify('An error occured', 'error');
 	                }
 	            });
 	        });
