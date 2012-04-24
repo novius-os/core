@@ -52,14 +52,18 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
 		return $this->rules;
 	}
 
-    public function build()
-    {
+    public function generate_auto_id() {
         $form = $this->fieldset()->form();
         if ($form->get_config('auto_id', false) === true and $this->get_attribute('id') == '')
         {
             $auto_id = $form->get_config('auto_id_prefix', '').str_replace(array('[', ']', '->'), array('-', '', '_'), $this->name);
             $this->set_attribute('id', $auto_id);
         }
+    }
+
+    public function build()
+    {
+        $this->generate_auto_id();
         $required = $this->get_attribute('required', null);
         if ($required) {
             $label = $this->label;

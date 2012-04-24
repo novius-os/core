@@ -249,16 +249,9 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			if (!empty($options['action']) && isset($settings[$options['action']]) && false === $settings[$options['action']]) {
 				continue;
 			}
-			//if (isset($settings['widget']['options']))
-			//{
-			//    foreach ($settings['widget']['options'] as $key => $value)
-			//    {
-			//        $settings['widget']['options'][$key] = __($value) ?: $value;
-			//    }
-			//}
 
-			$label       = isset($settings['label']) ? $settings['label'] : $p;
-			$attributes  = isset($settings['form']) ? $settings['form'] : array();
+			$label      = isset($settings['label']) ? $settings['label'] : $p;
+			$attributes = isset($settings['form']) ? $settings['form'] : array();
 			if (!empty($settings['widget'])) {
 				 $class = $settings['widget'];
 				 $attributes['widget_options'] = isset($settings['widget_options']) ? $settings['widget_options'] : array();
@@ -415,7 +408,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $this->set_config('auto_id_prefix', 'form'.$uniqid.'_');
             $this->set_config('form_attributes', $form_attributes);
             foreach ($this->fields as $field) {
-                $field->set_attribute('id', '');
+                $id = $field->get_attribute('id');
+                if (!empty($id)) {
+                    $field->set_attribute('id', '');
+                }
             }
         }
 
@@ -446,8 +442,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
             }
 
             //if (isset($instance->{$k})) {
-                $field = $instance->{$k};
-                $populate[$k] = $field;
+            $populate[$k] = $instance->{$k};
             //}
         }
 
