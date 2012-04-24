@@ -13,10 +13,10 @@
 <script type="text/javascript">
 	require([
 		'jquery-nos-treegrid'
-	], function( $, table, undefined ) {
-		$(function() {
+	], function( $nos, table, undefined ) {
+		$nos(function() {
 			var params = <?= \Format::forge()->to_json($params) ?>,
-				container = $('#<?= $id ?>').removeAttr('id')
+				container = $nos('#<?= $id ?>').removeAttr('id')
 					.css({
                         height: params.height || '150px',
                         width: params.width || ''
@@ -37,7 +37,7 @@
 							movable : false,
 							treeUrl : params.treeUrl,
 							treeColumnIndex : 1,
-							treeOptions : $.extend(true, {
+							treeOptions : $nos.extend(true, {
 								lang : connector.data('nosLang') || ''
 							}, params.treeOptions || {}),
 							preOpen : params.selected || {},
@@ -49,12 +49,12 @@
 								}
 							},
 							rowStyleFormatter : function(args) {
-								if (args.type == $.wijmo.wijgrid.rowType.header) {
+								if (args.type == $nos.wijmo.wijgrid.rowType.header) {
 									args.$rows.hide();
 								}
 							},
 							currentCellChanged : function(e) {
-								var row = $(e.target).nostreegrid("currentCell").row(),
+								var row = $nos(e.target).nostreegrid("currentCell").row(),
 									data = row ? row.data : false;
 
 								if (data && rendered) {
@@ -68,7 +68,7 @@
 							rendered : function() {
 								rendered = true;
 								table.css("height", "auto");
-								if ($.isPlainObject(params.selected) && params.selected.id) {
+								if ($nos.isPlainObject(params.selected) && params.selected.id) {
 									var radio = container.find(':radio[value=' + params.selected.id + ']')
 										.prop('checked', true),
 										nostreegrid = table.data('nostreegrid');
@@ -90,9 +90,9 @@
 				width : 35,
 				ensurePxWidth : true,
 				cellFormatter : function(args) {
-					if ($.isPlainObject(args.row.data)) {
+					if ($nos.isPlainObject(args.row.data)) {
 
-						$('<input type="radio" />').attr({
+						$nos('<input type="radio" />').attr({
 								name : params.input_name,
 								value : args.row.data._id
 							})

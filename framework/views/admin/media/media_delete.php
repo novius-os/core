@@ -38,9 +38,9 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-    $(function() {
-        var $container    = $('#<?= $uniqid ?>').nos().form();
+require(['jquery-nos'], function($nos) {
+    $nos(function() {
+        var $container    = $nos('#<?= $uniqid ?>').form();
         var $verification = $container.find('input[data-id=verification]');
         var $confirmation = $container.find('button[data-id=confirmation]');
 
@@ -55,10 +55,10 @@ require(['jquery-nos'], function($) {
         $confirmation.click(function(e) {
             e.preventDefault();
             if ($verification.length && $verification.val() != $verification.data('verification')) {
-                $.nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
+                $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
                 return;
             }
-            $.nos.ajax.request({
+            $nos.nos.ajax.request({
                 url : 'admin/nos/media/actions/delete_media_confirm',
                 method : 'POST',
                 data : {

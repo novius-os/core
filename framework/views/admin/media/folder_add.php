@@ -57,9 +57,9 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'order!jquery-form'], function($) {
-    $(function() {
-        var $container = $('#<?= $uniqid ?>').nos().form();
+require(['jquery-nos', 'order!jquery-form'], function($nos) {
+    $nos(function() {
+        var $container = $nos('#<?= $uniqid ?>').form();
 
 		var $title      = $container.find('input[name=medif_title]');
 		var $seo_title  = $container.find('input[name=medif_path]');
@@ -72,7 +72,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 			}
 		});
 		$same_title.change(function() {
-			if ($(this).is(':checked')) {
+			if ($nos(this).is(':checked')) {
 				$seo_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
                 $title.triggerHandler('change');
 			} else {
@@ -86,17 +86,17 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
         });
 
         $container.find('form').submit(function(e) {
-	        var $form = $(this);
+	        var $form = $nos(this);
 	        $form.ajaxSubmit({
                 dataType: 'json',
                 success: function(json) {
                     if (json.closeDialog) {
-	                    $form.nos().tab('close');
+	                    $form.tab('close');
                     }
-                    $.nos.ajax.success(json);
+                    $nos.nos.ajax.success(json);
                 },
                 error: function() {
-                    $.nos.notify('An error occured', 'error');
+                    $nos.notify('An error occured', 'error');
                 }
             });
             e.preventDefault();
@@ -104,7 +104,7 @@ require(['jquery-nos', 'order!jquery-form'], function($) {
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            $(this).nos().tab('close');
+            $nos(this).tab('close');
         });
     });
 });

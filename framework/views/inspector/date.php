@@ -14,13 +14,13 @@
 <script type="text/javascript">
 require([
 		'jquery-nos-listgrid'
-	], function( $, undefined ) {
-		$(function() {
-			var label_custom = $('#<?= $id ?>').removeAttr('id')
+	], function( $nos, undefined ) {
+		$nos(function() {
+			var label_custom = $nos('#<?= $id ?>').removeAttr('id')
                     .css({
                         display : 'inline-block'
                     }).hide(),
-                inspector = $('<table></table>').insertAfter(label_custom),
+                inspector = $nos('<table></table>').insertAfter(label_custom),
                 parent = inspector.parent().bind({
                         widgetResize: function() {
                             label_custom.appendTo(parent);
@@ -30,12 +30,12 @@ require([
                 inspectorData = parent.data('inspector'),
 				dates = label_custom.find(':input').datepicker('option', 'onSelect', function( selectedDate ) {
 						var option = this === label_custom.find(':input:first')[0] ? "minDate" : "maxDate",
-							instance = $( this ).data( "datepicker" ),
+							instance = $nos( this ).data( "datepicker" ),
 							begin = label_custom.find(':input:first').val(),
 						    end = label_custom.find(':input:last').val(),
 						    label = "<?= $label_custom ?>";
 
-						var date = $.datepicker.parseDate( instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
+						var date = $nos.datepicker.parseDate( instance.settings.dateFormat || $nos.datepicker._defaults.dateFormat, selectedDate, instance.settings );
 						dates.not( this ).datepicker( "option", option, date );
 
 						if (begin || end) {
@@ -49,7 +49,7 @@ require([
 							} else {
 								label = 'Since ' + begin;
 							}
-                            if ($.isFunction(inspectorData.selectionChanged)) {
+                            if ($nos.isFunction(inspectorData.selectionChanged)) {
                                 inspectorData.selectionChanged(begin + '|' + end, label);
                             }
 						}
@@ -78,12 +78,12 @@ require([
                         {
                             headerText : inspectorData.label,
                             cellFormatter: function (args) {
-                                if ($.isPlainObject(args.row.data) && args.row.data.value === 'custom') {
+                                if ($nos.isPlainObject(args.row.data) && args.row.data.value === 'custom') {
                                     args.$container.css({
                                             'white-space' : 'normal',
                                             'padding-left' : '10px'
                                         });
-                                    $('<span></span>').text(args.row.data.title)
+                                    $nos('<span></span>').text(args.row.data.title)
                                         .css({
                                                 'white-space' : 'nowrap',
                                                 'margin-right' : '10px'
@@ -103,7 +103,7 @@ require([
                     ],
                     data: <?= $content ?>,
                     currentCellChanged: function (e) {
-                        var row = $(e.target).noslistgrid("currentCell").row(),
+                        var row = $nos(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

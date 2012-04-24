@@ -10,17 +10,17 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-    $(function() {
-	    $('#login').nos().form();
+require(['jquery-nos'], function($nos) {
+    $nos(function() {
+	    $nos('#login').form();
         <?php if (!empty($error)) { ?>
-        $.nos.notify(<?= json_encode(array(
+        $nos.notify(<?= json_encode(array(
             'title' => $error,
             'type' => 'error',
             'addclass' => 'nos-login-error',
         )) ?>);
         <?php } ?>
-        var $email = $('#email');
+        var $email = $nos('#email');
         $email.select();
     });
 });

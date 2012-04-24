@@ -86,15 +86,15 @@
 	require([
 		'jquery-nos',
 		'static/novius-os/admin/config/page/form.js'
-	], function($, callback_fn) {
-		$(function() {
-			var $tabs = $('#<?= $uniqid_tabs ?>');
-			$('#<?= $uniqid ?>').css('display', 'block')
-				.nos().initOnShow();
+	], function($nos, callback_fn) {
+		$nos(function() {
+			var $tabs = $nos('#<?= $uniqid_tabs ?>');
+			$nos('#<?= $uniqid ?>').css('display', 'block')
+				.initOnShow();
 			$tabs.wijtabs({
 				alignment: 'left',
 				show: function(e, ui) {
-					$(ui.panel).nos().initOnShow()
+					$nos(ui.panel).initOnShow()
 						.bind('blank_slate', callback_fn).trigger('blank_slate');
 				}
 			});
@@ -104,11 +104,11 @@
 			$tabs.find('> div').css({
 				width : '94%'
 			});
-			$('#<?= $uniqids[$item->get_lang()] ?>').css('display', 'block')
-				.nos().initOnShow();
+			$nos('#<?= $uniqids[$item->get_lang()] ?>').css('display', 'block')
+				.initOnShow();
 			$tabs.wijtabs('select', '#<?= $uniqids[$item->get_lang()] ?>');
 			$tabs.find('div.page_lang').css('display', 'block')
-				.nos().initOnShow();
+				.initOnShow();
 		});
 	});
 </script>

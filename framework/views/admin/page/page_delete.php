@@ -34,10 +34,10 @@
         ?>
         <p><?= __('This page has no sub-pages and can be safely deleted.') ?></p>
         <p><?= __('Please confirm the suppression below.') ?></p>
-        <?php
+<?php
     } else {
         if ($lang_count > 1) {
-            ?>
+?>
             <p><?= strtr(__('The page exists in <strong>{count} languages</strong>.'), array(
                 '<strong>' => '<strong title="'.implode(', ', $languages_list).'">',
                 '{count}' => $lang_count,
@@ -54,10 +54,10 @@
                 ?>
             </select>
             <p>&nbsp;</p>
-            <?php
+<?php
         }
         if ($children_count > 0) {
-            ?>
+?>
             <p><?= strtr(__(
                     $children_count == 1 ? 'This page has <strong>1 sub-page</strong>.'
                                          : 'This page has <strong>{count} sub-pages</strong>.'
@@ -69,10 +69,10 @@
                 '{count}' => '<input data-id="verification1" data-verification="'.$children_count.'" size="'.(strlen($children_count) + 1).'" />',
             )); ?></p>
             <p>&nbsp;</p>
-            <?php
+<?php
         }
     }
-    ?></p>
+?></p>
     <p>
         <button type="submit" class="primary ui-state-error" data-icon="trash" data-id="confirmation"><?= __('Confirm the deletion') ?></button>
         &nbsp; <?= __('or') ?> &nbsp;
@@ -81,9 +81,9 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-    $(function() {
-        var $container     = $('#<?= $uniqid ?>').nos().form();
+require(['jquery-nos'], function($nos) {
+    $nos(function() {
+        var $container     = $nos('#<?= $uniqid ?>').form();
         var $verification1 = $container.find('input[data-id=verification1]');
         var $verification2 = $container.find('input[data-id=verification2]');
         var $confirmation  = $container.find('button[data-id=confirmation]');
@@ -101,15 +101,15 @@ require(['jquery-nos'], function($) {
         $confirmation.click(function(e) {
             e.preventDefault();
             if ($verification1.length && $verification1.val() != $verification1.data('verification')) {
-                $.nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
+                $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
                 return;
             }
             if ($verification2.length && $verification2.val() != $verification2.data('verification')) {
-                $.nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
+                $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
                 return;
             }
 
-            $.nos.ajax.request({
+            $nos.nos.ajax.request({
                 url : 'admin/nos/page/page/delete_page_confirm',
                 method : 'POST',
                 data : $container.find('form').serialize(),

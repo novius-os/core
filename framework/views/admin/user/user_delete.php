@@ -20,37 +20,27 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-    $(function() {
-        var $container    = $('#<?= $uniqid ?>').nos().form();
-        var $confirmation = $container.find('button[data-id=confirmation]');
+require(['jquery-nos'], function($nos) {
+    $nos(function() {
+        var $container    = $nos('#<?= $uniqid ?>').form();
 
-        var $dialog       = $.nos.data('dialog');
-        //var $dialog       = window.parent.jQuery(':wijmo-wijdialog:last');
-        var closeDialog = function() {
-            $dialog && $dialog
-                .wijdialog('close')
-                .wijdialog('destroy')
-                .remove();
-        }
-
-        $confirmation.click(function(e) {
+	    $container.find('button[data-id=confirmation]').click(function(e) {
             e.preventDefault();
-            $.nos.ajax.request({
+            $nos.nos.ajax.request({
                 url : 'admin/nos/user/user/delete_user_confirm',
                 method : 'POST',
                 data : {
                     id : <?= $user->user_id ?>
                 },
                 success : function(json) {
-	                $confirmation.nos().dialog('close');
+	                $container.dialog('close');
                 }
             });
         });
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            $(this).nos().dialog('close');
+	        $container.dialog('close');
         });
 
     });

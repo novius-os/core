@@ -13,9 +13,9 @@
 <script type="text/javascript">
 require([
 		'jquery-nos'
-	], function( $, undefined ) {
-		$(function() {
-			$('input[name=<?= $name ?>]').datepicker({
+	], function( $nos, undefined ) {
+		$nos(function() {
+			$nos('input[name=<?= $name ?>]').datepicker({
 				showOn : 'both',
 				buttonImage: 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
 				buttonImageOnly : true,

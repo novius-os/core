@@ -10,28 +10,28 @@
 define([
 	'wysiwyg',
 	'jquery-nos'
-], function(a,$) {
+], function(a, $nos) {
     "use strict";
     return function() {
 
-        var $container = $(this);
+        var $container = $nos(this);
         if ($container.data('already-processed')) {
             return;
         }
 
         $container.find('input[name=page_meta_noindex]').change(function() {
-            $(this).closest('p').nextAll()[$(this).is(':checked') ? 'hide' : 'show']();
+            $nos(this).closest('p').nextAll()[$nos(this).is(':checked') ? 'hide' : 'show']();
         }).change();
 
 
         $container.find('input[name=page_menu]').change(function(e) {
-            if ($(this).is(':disabled')) {
+            if ($nos(this).is(':disabled')) {
                 e.preventDefault();
                 e.stopPropagation();
                 return;
             }
-            var $siblings = $(this).closest('p').nextAll();
-            if ($(this).is(':checked')) {
+            var $siblings = $nos(this).closest('p').nextAll();
+            if ($nos(this).is(':checked')) {
                 $siblings.show();
             } else {
                 $siblings.hide();
@@ -44,30 +44,30 @@ define([
         $container.find('select[name=page_template]').bind('change', function() {
             $container.data('already-processed', true);
             var $wysiwyg = $container.find('[data-id=wysiwyg]');
-            $.ajax({
+            $nos.ajax({
                 url: 'admin/nos/page/ajax/wysiwyg/' + from_id,
                 data: {
-                    template_id: $(this).val()
+                    template_id: $nos(this).val()
                 },
                 dataType: 'json',
                 success: function(data) {
 
-                    $wysiwyg.nos().initOnShow('init', function() {
+                    $wysiwyg.initOnShow('init', function() {
                         var ratio = $wysiwyg.width() * 3 / 5;
                         $wysiwyg.empty().css({
                             height: ratio,
                             overflow: 'visible'
                         });
-                        $.each(data.layout, function(i) {
+                        $nos.each(data.layout, function(i) {
                             var coords = this.split(',');
-                            var bloc = $('<div></div>').css({
+                            var bloc = $nos('<div></div>').css({
                                 position: 'absolute',
                                 left:   Math.round(coords[0] / data.cols * 100) + '%',
                                 top:    Math.round(coords[1] / data.rows * ratio),
                                 width:  Math.round(coords[2] / data.cols * 100) + '%',
                                 height: Math.round(coords[3] / data.rows * ratio)
                             }).append(
-                                $('<textarea></textarea>')
+                                $nos('<textarea></textarea>')
                                 .val(data.content[i])
                                 .attr({name: 'wysiwyg[' + i + ']'})
                                 .addClass('wysiwyg')
@@ -92,7 +92,7 @@ define([
 
         var $template_unit = $container.find('select[name=page_template]').closest('div.unit');
         $container.find('select[name=page_type]').change(function() {
-            var val = $(this).val();
+            var val = $nos(this).val();
             var $wysiwyg = $container.find('[data-id=wysiwyg]');
             var $external = $container.find('[data-id=external]');
             var $internal = $container.find('[data-id=internal]');
@@ -130,7 +130,7 @@ define([
             $checkbox.attr('checked', true).wijcheckbox("refresh");
         }
         $checkbox.change(function() {
-            if ($(this).is(':checked')) {
+            if ($nos(this).is(':checked')) {
                 $menu_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
                 $title.triggerHandler('change');
             } else {

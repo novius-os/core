@@ -9,12 +9,12 @@
 
 define([
     'jquery-nos-appdesk'
-], function($) {
+], function($nos) {
     "use strict";
     return function(appDesk) {
 
         // Remove all primary actions
-        $.each(appDesk.actions, function() {
+        $nos.each(appDesk.actions, function() {
             this.primary = false;
         });
 

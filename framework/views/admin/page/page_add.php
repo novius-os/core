@@ -11,9 +11,9 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos-ostabs'], function ($) {
-	$(function () {
-		$.nos.tabs.update({
+require(['jquery-nos-ostabs'], function ($nos) {
+	$nos(function () {
+		$nos.nos.tabs.update({
 			label : <?= json_encode(__('Add a page')) ?>,
 			iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
 		});
@@ -68,20 +68,21 @@ require(['jquery-nos-ostabs'], function ($) {
 require([
     'jquery-nos',
 	'static/novius-os/admin/config/page/form.js'
-], function($, callback_fn) {
-	$(function() {
-        var $tabs = $('#<?= $uniqid_tabs ?>');
-        $tabs.wijtabs({
-            alignment: 'left',
-            show: function(e, ui) {
-                $(ui.panel).bind('blank_slate', callback_fn).trigger('blank_slate');
-            }
-        });
-        $tabs.find('> ul').css({
-            width : '5%'
-        });
-        $tabs.find('> div').css({
-            width : '94%'
-        });
+], function($nos, callback_fn) {
+	$nos(function() {
+        $nos('#<?= $uniqid_tabs ?>')
+	        .wijtabs({
+	            alignment: 'left',
+	            show: function(e, ui) {
+	                $nos(ui.panel).bind('blank_slate', callback_fn).trigger('blank_slate');
+	            }
+	        })
+	        .find('> ul').css({
+	            width : '5%'
+	        })
+            .end()
+	        .find('> div').css({
+	            width : '94%'
+	        });
 	});
 });</script>

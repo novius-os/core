@@ -29,7 +29,7 @@ if (empty($publishable)) {
 </p>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
+require(['jquery-nos'], function($nos) {
     <?php
     $formatter = \Format::forge();
     ?>
@@ -50,9 +50,9 @@ require(['jquery-nos'], function($) {
 
     var initial_status = '<?= empty($object) || $object->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>';
 
-    $(function() {
-        var $buttonset = $('#<?= $buttonset ?>');
-        var $label     = $('#<?= $label ?>');
+    $nos(function() {
+        var $buttonset = $nos('#<?= $buttonset ?>');
+        var $label     = $nos('#<?= $label ?>');
 
         $buttonset.buttonset({
             text : false,
@@ -61,7 +61,7 @@ require(['jquery-nos'], function($) {
             }
         });
         $buttonset.find(':radio').change(function() {
-            $label.text(labels[initial_status][$(this).val()]);
+            $label.text(labels[initial_status][$nos(this).val()]);
         })
         $buttonset.find(':checked').triggerHandler('change');
 

@@ -9,7 +9,7 @@
 
 define([
     'jquery-nos-appdesk'
-], function($) {
+], function() {
     "use strict";
     return function(appDesk) {
         return {

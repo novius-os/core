@@ -10,7 +10,7 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
+require(['jquery-nos'], function($nos) {
 	var top = window;
 	while (top.parent != top) {
 		top = top.parent;

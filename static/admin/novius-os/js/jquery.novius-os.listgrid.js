@@ -86,7 +86,7 @@ define('jquery-nos-listgrid',
 							notify.text = notify.text.replace('log-in again', "<a href=\"" + json.login_page + "\">log-in again</a>");
 						}
 					} catch (e) {}
-					$nos.nos.notify(notify);
+					$nos.notify(notify);
 				}
 				self._overlayHide();
                 if ($.isFunction(old_ajaxError)) {

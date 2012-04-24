@@ -24,9 +24,9 @@ if ($css) {
 if ($js) {
 ?>
 <script type="text/javascript">
-require(['jquery-nos-ostabs'], function($) {
-	$(function() {
-		$.nos.tabs.update({
+require(['jquery-nos-ostabs'], function($nos) {
+	$nos(function() {
+		$nos.nos.tabs.update({
 			label : 'Not implemented yet'
 		});
 	});

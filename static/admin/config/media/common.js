@@ -9,7 +9,7 @@
 
 define([
     'jquery-nos-appdesk'
-], function($) {
+], function($nos) {
     "use strict";
     return function(appDesk) {
         return {
@@ -20,7 +20,7 @@ define([
                     icon : 'pencil',
                     label : appDesk.i18n('Edit'),
                     action : function(item, ui) {
-                        $(ui).nos().tab({
+                        $nos(ui).tab({
                             url: 'admin/nos/media/media/edit/' + item.id,
                             label: appDesk.i18n('Edit a media')._()
                         });
@@ -32,7 +32,7 @@ define([
                     icon : 'trash',
                     label : appDesk.i18n('Delete'),
                     action : function(item, ui) {
-                        $(ui).nos().dialog({
+                        $nos(ui).dialog({
                             contentUrl: 'admin/nos/media/actions/delete_media/' + item.id,
                             ajax : true,
                             title: appDesk.i18n('Delete a media')._(),
@@ -56,18 +56,18 @@ define([
 
                         var image = new Image();
                         image.onerror = function() {
-                            $.nos.notify('Image not found', 'error');
+                            $nos.notify('Image not found', 'error');
                         }
                         image.onload = function() {
                             // Create the lightbox
-                            var lightbox = $('<div><a href="/' + item.path + '" rel="wijlightbox"><img src="/' + item.path + '" title="' + item.title + '" style="width:0;height:0;" /></a></div>')
+                            var lightbox = $nos('<div><a href="/' + item.path + '" rel="wijlightbox"><img src="/' + item.path + '" title="' + item.title + '" style="width:0;height:0;" /></a></div>')
                             .css({
                                 position : 'absolute',
                                 dislplay : 'none',
                                 width : 1,
                                 height: 1
                             })
-                            .css($(ui || this).offset())
+                            .css($nos(ui || this).offset())
                             .appendTo(document.body)
                             .wijlightbox({
                                 zIndex : 1201,
@@ -76,7 +76,7 @@ define([
                                 dialogButtons: 'fullsize',
                                 modal : true,
                                 open : function() {
-                                    $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
+                                    $nos('.wijmo-wijlightbox-overlay').css('z-index', 1200);
                                 },
                                 close : function(e) {
                                     lightbox.wijlightbox('destroy');
@@ -102,7 +102,7 @@ define([
                     media : {
                         label : appDesk.i18n('Add a media'),
                         action : function(ui) {
-                            $(ui).nos().tab({
+                            $nos(ui).tab({
                                 url: 'admin/nos/media/media/add',
                                 label: appDesk.i18n('Add a media')._()
                             });
@@ -111,7 +111,7 @@ define([
                     folder : {
                         label : appDesk.i18n('Add a folder'),
                         action : function(ui) {
-                            $(ui).nos().tab({
+                            $nos(ui).tab({
                                 url: 'admin/nos/media/folder/add',
                                 label: 'Add a folder'
                             }, {
@@ -179,7 +179,7 @@ define([
                                             label : appDesk.i18n('Add a media in this folder'),
                                             icon : 'plus',
                                             action : function(item, ui) {
-                                                $(ui).nos().tab({
+                                                $nos(ui).tab({
                                                     url: 'admin/nos/media/media/add/' + item.id,
                                                     label: 'Add a media in the "' + item.title + '" folder'
                                                 });
@@ -190,7 +190,7 @@ define([
                                             label : appDesk.i18n('Add a sub-folder to this folder'),
                                             icon : 'folder-open',
                                             action : function(item, ui) {
-                                                $(ui).nos().tab({
+                                                $nos(ui).tab({
                                                     url: 'admin/nos/media/folder/add/' + item.id,
                                                     label: 'Add a sub-folder in "' + item.title + '"'
                                                 }, {
@@ -204,7 +204,7 @@ define([
                                             label : appDesk.i18n('Edit this folder'),
                                             icon : 'pencil',
                                             action : function(item, ui) {
-                                                $(ui).nos().tab({
+                                                $nos(ui).tab({
                                                     url: 'admin/nos/media/folder/edit/' + item.id,
                                                     label: 'Edit the "' + item.title + '" folder'
                                                 }, {
@@ -218,7 +218,7 @@ define([
                                             label : appDesk.i18n('Delete this folder'),
                                             icon : 'trash',
                                             action : function(item, ui) {
-                                                $(ui).nos().dialog({
+                                                $nos(ui).dialog({
                                                     contentUrl: 'admin/nos/media/actions/delete_folder/' + item.id,
                                                     ajax : true,
                                                     title: 'Delete the "' + item.title + '" folder',
@@ -244,7 +244,7 @@ define([
                                     headerText : appDesk.i18n('Type of file'),
                                     dataKey : 'title',
                                     cellFormatter : function(args) {
-                                        if ($.isPlainObject(args.row.data)) {
+                                        if ($nos.isPlainObject(args.row.data)) {
                                             var text = "";
                                             if (args.row.data.icon) {
                                                 text += "<img style=\"vertical-align:middle\" src=\"static/novius-os/admin/novius-os/img/16/" + args.row.data.icon + "\"> ";

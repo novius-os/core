@@ -63,9 +63,10 @@ class Widget_Date_Picker extends \Fieldset_Field {
 <script type="text/javascript">
 	require([
 		'jquery-nos'
-	], function( $, undefined ) {
-		$(function() {
-			$('input#$id').datepicker($('input#$id').data('datepicker-options'));
+	], function( \$nos, undefined ) {
+		\$nos(function() {
+			var \$input = \$nos('input#$id');
+			\$input.datepicker(\$input.data('datepicker-options'));
 		});
 	});
 </script>

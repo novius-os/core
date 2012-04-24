@@ -14,9 +14,9 @@
 <script type="text/javascript">
 require([
 		'jquery-nos-listgrid'
-	], function( $, table, undefined ) {
-		$(function() {
-			var inspector = $('#<?= $id ?>').removeAttr('id'),
+	], function( $nos, table, undefined ) {
+		$nos(function() {
+			var inspector = $nos('#<?= $id ?>').removeAttr('id'),
 				parent = inspector.parent().bind({
 						widgetResize: function() {
                             inspector.noslistgrid('setSize', parent.width(), parent.height());
@@ -39,7 +39,7 @@ require([
                     columns : inspectorData.grid.columns,
                     data: <?= $content ?>,
                     currentCellChanged: function (e) {
-                        var row = $(e.target).noslistgrid("currentCell").row(),
+                        var row = $nos(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

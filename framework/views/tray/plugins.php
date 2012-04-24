@@ -90,10 +90,10 @@
 </div>
 
 <script type="text/javascript">
-	require(['jquery-nos'], function ($) {
-		$(function() {
-			$('#<?= $uniqid ?>').nos().form();
-			$(".app_list table").wijgrid({
+	require(['jquery-nos'], function ($nos) {
+		$nos(function() {
+			$nos('#<?= $uniqid ?>').form();
+			$nos(".app_list table").wijgrid({
 				columns: [
 					{  },
 					{ width: 100, ensurePxWidth: true }
@@ -103,7 +103,7 @@
 	$flash = \Session::get_flash('notification.plugins');
 	if (!empty($flash)) {
 ?>
-			$.nos.notify(<?= \Format::forge()->to_json($flash); ?>);
+			$nos.notify(<?= \Format::forge()->to_json($flash); ?>);
 <?php
 	}
 ?>

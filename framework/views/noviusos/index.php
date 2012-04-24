@@ -12,9 +12,9 @@
 
 <div id="noviusos"></div>
 <script type="text/javascript">
-require(['jquery-nos-ostabs'], function( $ ) {
-		$(function() {
-			$.nos.initialize(<?= $ostabs ?>);
+require(['jquery-nos-ostabs'], function( $nos ) {
+		$nos(function() {
+			$nos.nos.initialize(<?= $ostabs ?>);
 		});
 	});
 </script>

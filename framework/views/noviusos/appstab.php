@@ -11,20 +11,20 @@
 ?>
 <div id="switcher"></div>
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-	$(function() {
+require(['jquery-nos'], function($nos) {
+	$nos(function() {
 		//$('#switcher').themeswitcher();
-        $('#apps').sortable({
+        $nos('#apps').sortable({
             update: function() {
                 var orders = {};
-                $('.app').each(function(i) {
-                    orders[$(this).data('key')] = {order: i};
+                $nos('.app').each(function(i) {
+                    orders[$nos(this).data('key')] = {order: i};
                 });
-                $.nos.saveUserConfiguration('misc.apps', orders);
+                $nos.nos.saveUserConfiguration('misc.apps', orders);
             }
         });
 		<?php if ($background) { ?>
-		$('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
+		$nos('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
 		<?php } ?>
 	});
 });
@@ -52,11 +52,11 @@ require(['jquery-nos'], function($) {
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($) {
-	$('a.app').click(function(e) {
+require(['jquery-nos'], function($nos) {
+	$nos('a.app').click(function(e) {
 		e.preventDefault();
-        var tab = $(this).data('launcher');
-		$.nos.tabs.open($.extend({
+        var tab = $nos(this).data('launcher');
+		$nos.nos.tabs.open($nos.extend({
 			app: true,
 			iconSize: 32,
 			labelDisplay: false
