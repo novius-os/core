@@ -51,7 +51,7 @@ define([
                     primary : true,
                     iconClasses : 'nos-icon16 nos-icon16-eye',
                     action : function(item) {
-                        window.open(item.visualise);
+                        window.open(item.previewUrl);
                     }
                 }
             },

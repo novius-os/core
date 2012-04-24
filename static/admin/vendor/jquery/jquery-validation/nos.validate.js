@@ -19,7 +19,8 @@ define(['jquery', 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery
                 .css({
                     background : 'transparent',
                     border  : '0',
-                    padding : '0 4px'
+                    padding : '0 4px',
+                    verticalAlign: 'middle'
                 })
                 .html('<span class="ui-icon ui-icon-alert nos-icon16"></span>');
 

@@ -19,9 +19,9 @@ class NotFoundException extends \Exception {}
 
 class Controller_Front extends Controller {
 
-    public $page;
 
     public $template;
+    public $is_preview = false;
 
     protected $_view;
 
@@ -36,10 +36,14 @@ class Controller_Front extends Controller {
     public $meta_robots      = 'index,follow';
     public $metas            = array();
 
+    public $page;
+
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
 	    $url = substr(str_replace('.html', '', $_SERVER['REDIRECT_URL']), 1);
+
+        $this->is_preview = \Input::get('_preview', false);
 
         $cache_path = $url;
         $cache_path = (empty($url) ? 'index/' : $url).$cache_path;
@@ -163,7 +167,10 @@ class Controller_Front extends Controller {
      * Find the page in the database and fill in the page variable.
      */
     protected function _find_page() {
-        $where = array(array('page_published', 1));
+        $where = array();
+        if (!$this->is_preview) {
+            $where[] = array('page_published', 1);
+        }
         if (empty($this->url)) {
             $where[] = array('page_entrance', 1);
         } else {
