@@ -453,7 +453,7 @@ define('jquery-nos', [
                             title: tab.label
                         }, dialogOptions));
                     } else {
-                        $.nos.tabs.add(tab);
+                        $nos.nos.tabs.add(tab);
                     }
                     break;
 
@@ -462,7 +462,7 @@ define('jquery-nos', [
                     if ($dialog.size()) {
                         this.dialog('close');
                     } else {
-                        $.nos.tabs.close();
+                        $nos.nos.tabs.close();
                     }
                     break;
             }
