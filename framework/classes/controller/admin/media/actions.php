@@ -191,7 +191,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
                 'notify' => 'Folder successfully deleted.',
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => array('nos_media_media', 'nos_media_folders'),
+					'target' => array('nos_media_media', 'nos_media_folder'),
                 ),
             );
         } catch (\Exception $e) {

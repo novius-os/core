@@ -406,14 +406,19 @@ define('jquery-nos-appdesk',
                                     textAlign: 'right'
                                 }).append(
                                     $('<button />').button({
-                                        label : o.texts.cancel,
-                                        icons : {primary : 'ui-icon-gear'}
-                                    }).click( function() {self.uiCustomViewDialog.wijdialog('close');self.uiCustomViewDialog.remove();} )
+                                            label : o.texts.cancel,
+                                            icons : {primary : 'ui-icon-gear'}
+                                        }).click( function() {
+                                            self.uiCustomViewDialog.dialog('close');
+                                        })
                                 ).append(
                                     $('<button />').button({
-                                        label : o.texts.save,
-                                        icons : {primary : 'ui-icon-gear'}
-                                    }).click( function() {self._uiCustomViewDialogSave();self.uiCustomViewDialog.wijdialog('close');self.uiCustomViewDialog.remove();} )
+                                            label : o.texts.save,
+                                            icons : {primary : 'ui-icon-gear'}
+                                        }).click( function() {
+                                            self._uiCustomViewDialogSave();
+                                            self.uiCustomViewDialog.dialog('close');
+                                        })
                                 )
                             );
                         }
@@ -1678,8 +1683,8 @@ define('jquery-nos-appdesk',
                     }
                 });
 
-                if (params.reload) {
-                    dispatcher.on('reload.' + params.reload, function() {
+                if (params.reloadEvent) {
+                    dispatcher.on('reload.' + params.reloadEvent, function() {
                         div.appdesk('gridReload');
                     });
                 }

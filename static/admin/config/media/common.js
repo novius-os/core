@@ -95,7 +95,7 @@ define([
                 label : appDesk.i18n('Media center'),
                 iconUrl : 'static/novius-os/admin/novius-os/img/32/media.png'
             },
-            reload : 'nos_media_media',
+            reloadEvent : 'nos_media_media',
             appdesk : {
                 splittersVertical : 300,
                 adds : {
@@ -159,10 +159,10 @@ define([
                 inspectors : {
                     folders : {
                         vertical : true,
-                        widget_id : 'nos_media_folders',
                         label : appDesk.i18n('Folders'),
                         url : 'admin/nos/media/inspector/folder/list',
                         inputName : 'folder_id',
+                        reloadEvent : 'nos_media_folder',
                         treeGrid : {
                             treeUrl : 'admin/nos/media/inspector/folder/json',
                             sortable : false,
@@ -234,7 +234,6 @@ define([
                     },
                     extensions : {
                         vertical : true,
-                        widget_id : 'nos_media_extensions',
                         label : appDesk.i18n('Type of file'),
                         url : 'admin/nos/media/inspector/extension/list',
                         inputName : 'media_extension[]',
@@ -268,7 +267,7 @@ define([
                     },
                     preview : {
                         vertical : true,
-                        widget_id : 'nos_media_preview',
+                        reloadEvent : 'nos_media_media',
                         label : appDesk.i18n('Preview'),
                         preview : true,
                         options : {

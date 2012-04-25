@@ -1957,7 +1957,7 @@
 
             dialog.bind('save.enhancer', function(e, json) {
                 save(json);
-                dialog.wijdialog('close');
+                dialog.dialog('close');
             });
         },
 
@@ -1981,7 +1981,7 @@
 			});
             dialog.bind('insert.media', function(e, img) {
                 // Cleanup
-                dialog.wijdialog('close');
+                dialog.dialog('close');
 
                 var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
                 if (editCurrentImage) {

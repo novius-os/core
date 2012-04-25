@@ -153,7 +153,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => 'nos_media_folders',
+					'target' => 'nos_media_folder',
                 ),
 			);
 		} catch (\Exception $e) {
@@ -225,7 +225,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 				'closeDialog' => true,
 				'dispatchEvent' => array(
 					'event' => 'reload',
-					'target' => array('nos_media_media', 'nos_media_folders'),
+					'target' => array('nos_media_media', 'nos_media_folder'),
                 ),
 			);
 

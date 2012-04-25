@@ -18,11 +18,96 @@ define('jquery-nos', [
         $nos = window.$nos = $.sub(),
         $noviusos = undefined,
         noviusos = function() {
-            if ($noviusos === undefined) {
-                $noviusos = $nos('.nos-ostabs');
+                if ($noviusos === undefined) {
+                    $noviusos = $nos('.nos-ostabs');
+                }
+                return $noviusos;
+            },
+        dialogEvent = {
+            dialogOpened : [],
+            dialogFocused : -1,
+            open : function($dialog) {
+                var self = this,
+                    callbacks = $dialog.data('callbacks.nosdialog');
+                self.dialogOpened.push($dialog[0]);
+                if (!$.isPlainObject(callbacks)) {
+                    $dialog.data('callbacks.nosdialog', {});
+                }
+            },
+            focus : function($dialog) {
+                var self = this,
+                    callbacks = $dialog.data('callbacks.nosdialog'),
+                    index = $.inArray($dialog[0], self.dialogOpened);
+
+                if (index !== -1) {
+                    self.dialogOpened.splice(index, 1);
+                }
+                self.dialogOpened.push($dialog[0]);
+                self.dialogFocused = $dialog[0];
+
+                if ($.isPlainObject(callbacks)) {
+                    $.each(callbacks, function(i, event) {
+                        self.fireDialogEvent($dialog, event);
+                    });
+                    $dialog.data('callbacks.nosdialog', {});
+                }
+            },
+            close : function($dialog) {
+                var self = this,
+                    index = $.inArray($dialog[0], self.dialogOpened);
+
+                if (index !== -1) {
+                    self.dialogOpened.splice(index, 1);
+                }
+                if (index > 0) {
+                    self.focus($(self.dialogOpened[index - 1]));
+                }
+            },
+            fireDialogEvent : function($dialog, event) {
+                var $iframe = $dialog.find('> iframe');
+
+                var e = $.Event(event.event, {
+                    namespace : event.type || null,
+                    data : event.data || null
+                });
+
+                if ($iframe.size()) {
+                    if ($iframe[0].contentDocument.$) {
+                        $iframe[0].contentDocument.$('body').trigger(e);
+                    }
+                } else {
+                    // @todo Figure out why we need this try catch.
+                    // Adding a media throws an TypeError exception : unknown method 'trigger' on DOMWindow
+                    try {
+                        $dialog.trigger(e);
+                    } catch (e) {
+                        log(e);
+                    }
+                }
+            },
+            dispatchEvent : function(event) {
+                var self = this;
+
+                if (!$.isPlainObject(event)) {
+                    event = {
+                        event : event
+                    };
+                }
+                $.each(self.dialogOpened, function() {
+                    var $dialog = $(this);
+                    if (this === self.dialogFocused) {
+                        self.fireDialogEvent($dialog, event);
+                    } else {
+                        var callbacks = $dialog.data('callbacks.nosdialog');
+                        if ($.isPlainObject(callbacks)) {
+                            callbacks[event.event + (event.type ? '.' + event.type : '')] = event;
+                        }
+                    }
+                });
             }
-            return $noviusos;
+
         };
+
 
     $nos.extend({
         dispatchEvent : function(event) {
@@ -30,6 +115,7 @@ define('jquery-nos', [
                 return window.parent.$nos.dispatchEvent(event);
             }
             noviusos().ostabs('dispatchEvent', event);
+            dialogEvent.dispatchEvent(event);
         },
 
         notify : function( options, type ) {
@@ -85,7 +171,7 @@ define('jquery-nos', [
                     // Internal callbacks for JSON dataType
                     if (options.dataType == 'json') {
                         options.success = function(json) {
-                            if ($.isFunction(options.old_success)) {
+                            if ($.isFunction(old_success)) {
                                 json.user_success = old_success;
                             }
                             self.xhr('success', json);
@@ -94,7 +180,7 @@ define('jquery-nos', [
                         options.error = function(json) {
                             self.xhr('error', json);
                             if ($.isFunction(old_error)) {
-                                old_error.apply(this, arguments);
+                                old_error.apply(this, args);
                             }
                         };
                     }
@@ -122,18 +208,9 @@ define('jquery-nos', [
                             $nos.notify(json.notify);
                         }
                     }
-                    if (json.dispatchEvent) {
-                        if ($.isArray(json.dispatchEvent)) {
-                            $.each(json.dispatchEvent, function(i, event) {
-                                $nos.dispatchEvent(event);
-                            });
-                        } else {
-                            $nos.dispatchEvent(json.dispatchEvent);
-                        }
-                    }
                     // Call user callback
                     if ($.isFunction(json.user_success)) {
-                        json.user_success.apply(this, arguments);
+                        json.user_success.apply(this, args);
                     }
 
                     var dialog = this.closest('.ui-dialog-content').size();
@@ -146,8 +223,17 @@ define('jquery-nos', [
                             document.location.href = json.redirect;
                         }
                         if (json.replaceTab) {
-                            this.tab('add', {url : url}, false)
+                            this.tab('add', {url : json.replaceTab}, false)
                                 .tab('close');
+                        }
+                    }
+                    if (json.dispatchEvent) {
+                        if ($.isArray(json.dispatchEvent)) {
+                            $.each(json.dispatchEvent, function(i, event) {
+                                $nos.dispatchEvent(event);
+                            });
+                        } else {
+                            $nos.dispatchEvent(json.dispatchEvent);
                         }
                     }
                     break;
@@ -194,7 +280,7 @@ define('jquery-nos', [
             var options = $.extend({
                 title: $input.attr('title') || 'File',
                 allowDelete : true,
-                choose: function(e) {
+                choose: function() {
                     // Open the dialog to choose the file
                     if ($dialog === null) {
                         $dialog = $input.dialog({
@@ -208,10 +294,10 @@ define('jquery-nos', [
                                 file: item.thumbnail
                             });
                             $input.val(item.id);
-                            $dialog.wijdialog('close');
+                            $dialog.dialog('close');
                         });
                     } else {
-                        $dialog.wijdialog('open');
+                        $dialog.dialog('open');
                     }
                 }
             }, data.inputFileThumb || {});
@@ -228,15 +314,15 @@ define('jquery-nos', [
 
         form : function() {
             var args = Array.prototype.slice.call(arguments),
-                method = 'ui';
+                method = 'ui',
+                $context = this;
             if (args.length > 0 && $.inArray(args[0], ['ui', 'validate', 'ajax']) !== -1) {
                 method = args.shift();
             }
             switch (method) {
                 case 'ui' :
-                    var $form = this;
-                    $form.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
-                    $form.find(":input[type='submit'],button").each(function() {
+                    $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
+                    $context.find(":input[type='submit'],button").each(function() {
                             var options = {};
                             var icon = $(this).data('icon');
                             if (icon) {
@@ -246,17 +332,17 @@ define('jquery-nos', [
                             }
                             $(this).button(options);
                         });
-                    $form.find("select").filter(':not(.notransform)').nos().initOnShow('init', function() {
+                    $context.find("select").filter(':not(.notransform)').nos().initOnShow('init', function() {
                             $(this).wijdropdown();
                         });
-                    $form.find(":input[type=checkbox]").nos().initOnShow('init', function() {
+                    $context.find(":input[type=checkbox]").nos().initOnShow('init', function() {
                         $(this).wijcheckbox();
                     });
-                    $form.find('.expander').each(function() {
+                    $context.find('.expander').each(function() {
                             var $this = $(this);
                             $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
                         });
-                    $form.find('.accordion').wijaccordion({
+                    $context.find('.accordion').wijaccordion({
                             header: "h3",
                             selectedIndexChanged : function(e, args) {
                                 $(e.target).find('.ui-accordion-content').eq(args.newIndex).nos().initOnShow();
@@ -265,8 +351,7 @@ define('jquery-nos', [
                     break;
 
                 case 'validate' :
-                    var $context = this,
-                        params = args[0] || {};
+                    var params = args[0] || {};
                     if (!$context.is('form')) {
                         $context = $context.find('form');
                     }
@@ -280,7 +365,6 @@ define('jquery-nos', [
                     break;
 
                 case 'ajax' :
-                    var $context = this;
                     if (!$context.is('form')) {
                         $context = $context.find('form');
                     }
@@ -345,45 +429,64 @@ define('jquery-nos', [
             }
             switch (method) {
                 case 'open' :
+                    if (this.is('.ui-dialog')) {
+                        this.wijdialog('open');
+                        return this;
+                    }
+
                     var arg = args[0] || {},
                         options = $.extend(true, {}, {
-                                destroyOnClose : true,
-                                width: window.innerWidth - 200,
-                                height: window.innerHeight - 100,
-                                modal: true,
-                                captionButtons: {
-                                    pin: {visible: false},
-                                    refresh: {visible: arg.contentUrl != null && !arg.ajax},
-                                    toggle: {visible: false},
-                                    minimize: {visible: false},
-                                    maximize: {visible: false}
-                                }
-                            }, arg),
-                        oldClose = options.close,
-                        oldOpen = options.open,
+                            destroyOnClose : true,
+                            width: window.innerWidth - 200,
+                            height: window.innerHeight - 100,
+                            modal: true,
+                            captionButtons: {
+                                pin: {visible: false},
+                                refresh: {visible: arg.contentUrl != null && !arg.ajax},
+                                toggle: {visible: false},
+                                minimize: {visible: false},
+                                maximize: {visible: false}
+                            }
+                        }, arg),
+                        oldCallbacks = {
+                            open : options.open,
+                            close : options.close,
+                            focus : options.focus
+                        },
                         $container = this.closest('.nos-dispatcher, body'),
                         self = this,
-                        $dialog = $('<div></div>').appendTo($container);
+                        $dialog = $('<div></div>').addClass('nos-dispatcher')
+                            .appendTo($container);
 
-                    options.close = function() {
-                        if ($.isFunction(oldClose)) {
-                            oldClose.apply($dialog, arguments);
-                        }
-                        if (options.destroyOnClose) {
-                            $dialog.wijdialog('destroy')
-                                .remove();
-                        } else {
-                            $dialog.closest('.ui-dialog').hide().appendTo($container);
-                        }
-                    };
-                    if (!options.destroyOnClose) {
-                        options.open = function() {
-                            if ($.isFunction(oldOpen)) {
-                                oldOpen.apply($dialog, arguments);
+                    $.extend(options, {
+                            close : function(e, ui) {
+                                dialogEvent.close($dialog);
+                                if ($.isFunction(oldCallbacks.close)) {
+                                    oldCallbacks.close.apply($dialog, arguments);
+                                }
+                                if (options.destroyOnClose) {
+                                    $dialog.wijdialog('destroy')
+                                        .remove();
+                                } else {
+                                    $dialog.closest('.ui-dialog').hide().appendTo($container);
+                                }
+                            },
+                            focus : function(e, ui) {
+                                dialogEvent.focus($dialog);
+                                if ($.isFunction(oldCallbacks.focus)) {
+                                    oldCallbacks.focus.apply($dialog, arguments);
+                                }
+                            },
+                            open : function(e, ui) {
+                                dialogEvent.open($dialog);
+                                if ($.isFunction(oldCallbacks.open)) {
+                                    oldCallbacks.open.apply($dialog, arguments);
+                                }
+                                if (!options.destroyOnClose) {
+                                    $dialog.closest('.ui-dialog').appendTo('body');
+                                }
                             }
-                            $dialog.closest('.ui-dialog').appendTo('body');
-                        };
-                    }
+                        });
 
                     if (options['content'] !== undefined) {
                         $dialog.append(options.content);
@@ -449,46 +552,49 @@ define('jquery-nos', [
             return this;
         },
 
+        listenEvent : function(event, callback) {
+            this.closest('.nos-dispatcher, body').on(event, callback);
+        },
+
         tab : function() {
             var args = Array.prototype.slice.call(arguments),
-                method = 'open';
+                method = 'open',
+                getIndex = function(context) {
+                        if (window.parent != window && window.parent.$nos) {
+                            return window.parent.$nos(window.frameElement).data('nos-ostabs-index');
+                        }
+                        if (context === 'current') {
+                            return noviusos().ostabs('current').index;
+                        }
+                        if ($.isNumeric(context)) {
+                            return context;
+                        }
+                        var $panel = $(context).parents('.nos-ostabs-panel-content');
+                        if ($panel.size()) {
+                            return $panel.data('nos-ostabs-index');
+                        }
+                        return false;
+                    },
+                self = this;
             if (args.length > 0 && $.inArray(args[0], ['open', 'close', 'add', 'update', 'init']) !== -1) {
                 method = args.shift();
             }
 
-            var getIndex = function(context) {
-                if (window.parent != window && window.parent.$nos) {
-                    return window.parent.$nos(window.frameElement).data('nos-ostabs-index');
-                }
-                if (context === 'current') {
-                    return noviusos().ostabs('current').index;
-                }
-                if ($.isNumeric(context)) {
-                    return context;
-                }
-                var $panel = $(context).parents('.nos-ostabs-panel-content')
-                if ($panel.size()) {
-                    return $panel.data('nos-ostabs-index');
-                }
-                return false;
-            }
-
             switch (method) {
                 case 'open' :
-                    var tab = args[0] || {},
-                        dialogOptions = args[1] || {},
-                        dialog = this.closest('.ui-dialog-content').size();
-                    if (dialog) {
-                        this.dialog($.extend({
-                            contentUrl: tab.url,
-                            ajax : !tab.iframe,
-                            title: tab.label
-                        }, dialogOptions));
-                    } else {
-                        if (window.parent != window && window.parent.$nos) {
-                            return window.parent.$nos(window.frameElement).tab('open', tab, dialogOptions);
-                        }
-                        if (noviusos().length) {
+                    (function() {
+                        var tab = args[0] || {},
+                            dialogOptions = args[1] || {},
+                            dialog = self.closest('.ui-dialog-content').size();
+                        if (dialog) {
+                            self.dialog($.extend({
+                                contentUrl: tab.url,
+                                ajax : !tab.iframe,
+                                title: tab.label
+                            }, dialogOptions));
+                        } else if (window.parent != window && window.parent.$nos) {
+                            window.parent.$nos(window.frameElement).tab('open', tab, dialogOptions);
+                        } else if (noviusos().length) {
                             var tabs = noviusos().ostabs('tabs'),
                                 sel = false;
                             $.each(tabs, function(i, t) {
@@ -500,84 +606,89 @@ define('jquery-nos', [
                             if (sel !== false) {
                                 return noviusos().ostabs('select', sel + 4); // Add 4 because appstab and tray are before and not return by tabs
                             } else {
-                                this.tab('add', tab);
+                                self.tab('add', tab);
                             }
                         } else if (tab.url) {
                             window.open(tab.url);
                         }
-                    }
+                    })();
                     break;
 
                 case 'add' :
-                    var tab = args[0],
-                        end = args[1];
-                    if (window.parent != window && window.parent.$nos) {
-                        return window.parent.$nos(window.frameElement).tab('add', tab, end);
-                    }
-                    var index;
-                    if (end !== undefined && end !== true) {
-                        index = getIndex('current') + 1;
-                    }
-                    if (noviusos().length) {
-                        index = noviusos().ostabs('add', tab, index);
-                        noviusos().ostabs('select', index);
-                    } else if (tab.url) {
-                        window.open(tab.url);
-                    }
+                    (function() {
+                        var tab = args[0],
+                            end = args[1];
+                        if (window.parent != window && window.parent.$nos) {
+                            window.parent.$nos(window.frameElement).tab('add', tab, end);
+                        } else {
+                            var index;
+                            if (end !== undefined && end !== true) {
+                                index = getIndex('current') + 1;
+                            }
+                            if (noviusos().length) {
+                                index = noviusos().ostabs('add', tab, index);
+                                noviusos().ostabs('select', index);
+                            } else if (tab.url) {
+                                window.open(tab.url);
+                            }
+                        }
+                    })();
                     break;
 
                 case 'close' :
-                    var $dialog = this.closest(':wijmo-wijdialog');
-                    if ($dialog.size()) {
-                        this.dialog('close');
-                    } else {
-                        if (window.parent != window && window.parent.$nos) {
-                            return window.parent.$nos(window.frameElement).tab('close');
+                    (function() {
+                        var $dialog = self.closest(':wijmo-wijdialog');
+                        if ($dialog.size()) {
+                            self.dialog('close');
+                        } else if (window.parent != window && window.parent.$nos) {
+                            window.parent.$nos(window.frameElement).tab('close');
+                        } else {
+                            var index = getIndex(self);
+                            if (noviusos().length) {
+                                noviusos().ostabs('remove', index);
+                            }
                         }
-                        var index = getIndex(this);
-                        if (noviusos().length) {
-                            noviusos().ostabs('remove', index);
-                        }
-                    }
+                    })();
                     break;
 
                 case 'update' :
-                    var tab = args[0];
-                    if (window.parent != window && window.parent.$nos) {
-                        return window.parent.$nos(window.frameElement).tab('update', tab);
-                    }
-                    if (this.size() && !this.closest('.ui-dialog-content').size()) {
-                        if (noviusos().length) {
-                            var index = getIndex(this);
+                    (function() {
+                        var tab = args[0];
+                        if (window.parent != window && window.parent.$nos) {
+                            window.parent.$nos(window.frameElement).tab('update', tab);
+                        } else if (self.size() && !self.closest('.ui-dialog-content').size() && noviusos().length) {
+                            var index = getIndex(self);
                             noviusos().ostabs('update', index, tab);
                         }
-                    }
+                    })();
                     break;
 
                 case 'init' :
-                    var configuration = args[0],
-                        fct = function(e) {
-                            if (noviusos().length) {
-                                noviusos().xhr('saveUserConfig', 'tabs', {selected: $noviusos.ostabs('option', 'selected'), tabs: $noviusos.ostabs('tabs')});
-                            }
-                        };
-                    $noviusos = this;
-                    $.extend(configuration, {
-                        add: fct,
-                        remove: fct,
-                        select: fct,
-                        show: fct,
-                        drag: fct
-                    });
+                    (function() {
+                        var configuration = args[0],
+                            fct = function() {
+                                if (noviusos().length) {
+                                    noviusos().xhr('saveUserConfig', 'tabs', {selected: $noviusos.ostabs('option', 'selected'), tabs: $noviusos.ostabs('tabs')});
+                                }
+                            };
+                        $noviusos = self;
+                        $.extend(configuration, {
+                            add: fct,
+                            remove: fct,
+                            select: fct,
+                            show: fct,
+                            drag: fct
+                        });
 
-                    if (configuration['user_configuration']['tabs']) {
-                        if (!configuration['options']) {
-                            configuration['options'] = {};
+                        if (configuration['user_configuration']['tabs']) {
+                            if (!configuration['options']) {
+                                configuration['options'] = {};
+                            }
+                            configuration['initTabs'] = configuration['user_configuration']['tabs']['tabs'];
+                            configuration['selected'] = configuration['user_configuration']['tabs']['selected'];
                         }
-                        configuration['initTabs'] = configuration['user_configuration']['tabs']['tabs'];
-                        configuration['selected'] = configuration['user_configuration']['tabs']['selected'];
-                    }
-                    $noviusos.ostabs(configuration);
+                        $noviusos.ostabs(configuration);
+                    })();
                     break;
             }
             return this;
