@@ -354,14 +354,14 @@ table.title-fields {
 
 .table-field, .row-field {
 
-    > input {
+    > input, > textarea {
         display : table-cell;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
         width   : 100%;
     }
 
-    > input[size] {
+    > input[size], > textarea[cols] {
         width: auto;
         -moz-box-sizing: content-box;
         box-sizing: content-box;

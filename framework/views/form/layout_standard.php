@@ -38,7 +38,7 @@ $large = !empty($large) && $large == true;
                 echo '</td>';
             }
 			?>
-                <td class="table-field">
+                <td>
 			<?php
             if (!empty($title)) {
                 $title = (array) $title;
@@ -48,14 +48,14 @@ $large = !empty($large) && $large == true;
                     if ($first) {
                         $first = false;
                     } else {
-                        echo '</td><td class="table-field">';
+                        echo '</td><td>';
                     }
                     $field = $fieldset->field($name);
                     $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
                     echo ' '.$field
                             ->set_attribute('placeholder',$placeholder)
                             ->set_attribute('title', $placeholder)
-                            ->set_attribute('class', 'title '.($field->type == 'file' ? '' : ''/*'c'.$size*/))
+                            ->set_attribute('class', 'title')
                             ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
                             ->build();
                 }
@@ -68,13 +68,22 @@ $large = !empty($large) && $large == true;
         if (!empty($subtitle)) {
             ?>
             <div class="line" style="overflow:visible;">
-			<?php
-            $fieldset->form()->set_config('field_template',  "\t\t{label}{required} {field} {error_msg}</td>\n");
-            foreach ((array) $subtitle as $field) {
-                echo '<div class="unit col">'.$fieldset->field($field)->build().'</div>';
-            }
-            $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-			?>
+                <table style="width:100%;margin-bottom:1em;">
+                    <tr>
+                        <?php
+                        $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+                        foreach ((array) $subtitle as $name) {
+                            $field = $fieldset->field($name);
+                            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+                            echo $field
+                                 ->set_attribute('placeholder',$placeholder)
+                                 ->set_attribute('title', $placeholder)
+                                 ->build();
+                        }
+                        $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+                        ?>
+                    </tr>
+                </table>
             </div>
         <?php
         }
@@ -109,10 +118,16 @@ $large = !empty($large) && $large == true;
         if (empty($_id)) {
             // Nothing
         } else {
-            if (empty($menu[$admin])) {
+            if (empty($menu)) {
                 // Display below current content, in a new line
             } else if (isset($menu[$admin]['fields'])) {
                 array_unshift($menu[$admin]['fields'], '_id');
+            } else if (!isset($menu[$admin])) {
+                $menu[$admin] = array(
+                    'header_class'  => 'faded',
+                    'content_class' => 'faded',
+                    'fields' => array('_id'),
+                );
             } else {
                 array_unshift($menu[$admin], '_id');
             }
@@ -160,6 +175,6 @@ $large = !empty($large) && $large == true;
 </div>
 
 <?php
-if (empty($menu) && !empty($_id)) {
-    echo '<div class="line"><div class="unit col c1"></div><div class="unit">ID : '.$_id.'</div></div>';
+if (!empty($id) && empty($menu) && !empty($_id)) {
+    echo '<div class="line">'.($large ? '' : '<div class="unit col c1"></div>').'<div class="unit">ID : '.$_id.'</div></div>';
 }
