@@ -44,14 +44,6 @@ require(['jquery-nos'], function($nos) {
         var $verification = $container.find('input[data-id=verification]');
         var $confirmation = $container.find('button[data-id=confirmation]');
 
-        var $dialog = $container.closest(':wijmo-wijdialog');
-        var closeDialog = function() {
-            $dialog && $dialog
-                .wijdialog('close')
-                .wijdialog('destroy')
-                .remove();
-        }
-
         $confirmation.click(function(e) {
             e.preventDefault();
             if ($verification.length && $verification.val() != $verification.data('verification')) {
@@ -65,14 +57,14 @@ require(['jquery-nos'], function($nos) {
                     id : <?= $folder->medif_id ?>
                 },
                 success : function(json) {
-                    closeDialog();
+	                $container.dialog('close');
                 }
             });
         });
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            closeDialog();
+	        $container.dialog('close');
         });
 
     });

@@ -37,6 +37,12 @@ require([
                 showFilter = inspectorData.grid.showFilter || false,
 				rendered = false;
 
+			if (inspectorData.reloadEvent) {
+				inspector.listenEvent('reload.' + inspectorData.reloadEvent, function() {
+					parent.trigger('widgetReload');
+				});
+			}
+
             inspector.css({
                     height : '100%',
                     width : '100%'
@@ -92,11 +98,7 @@ require([
                         rendered = true;
                         inspector.css('height', 'auto');
                     }
-                })
-	            .closest('.nos-connector')
-	            .on('reload.' + inspectorData.widget_id, function() {
-		            parent.trigger('widgetReload');
-	            });
+                });
 		});
 	});
 </script>

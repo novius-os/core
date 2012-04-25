@@ -88,14 +88,6 @@ require(['jquery-nos'], function($nos) {
         var $verification2 = $container.find('input[data-id=verification2]');
         var $confirmation  = $container.find('button[data-id=confirmation]');
 
-        var $dialog = $container.closest(':wijmo-wijdialog');
-        var closeDialog = function() {
-            $dialog && $dialog
-                .wijdialog('close')
-                .wijdialog('destroy')
-                .remove();
-        }
-
         // Create a form so we can retrieve its data with jQuery.serialize()
         $container.wrapInner('<form></form>');
         $confirmation.click(function(e) {
@@ -114,14 +106,14 @@ require(['jquery-nos'], function($nos) {
                 method : 'POST',
                 data : $container.find('form').serialize(),
                 success : function(json) {
-                    closeDialog();
+	                $container.dialog('close');
                 }
             });
         });
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();
-            closeDialog();
+	        $container.dialog('close');
         });
 
     });

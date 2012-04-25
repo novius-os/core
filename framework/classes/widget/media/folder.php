@@ -39,7 +39,7 @@ class Widget_Media_Folder extends \Fieldset_Field {
         return $this->template((string) \Request::forge('nos/admin/media/inspector/folder/list')->execute(array('inspector/modeltree_radio', array(
 	        'params' => array(
 		        'treeUrl' => 'admin/nos/media/inspector/folder/json',
-		        'widget_id' => 'nos_media_folders',
+		        'reloadEvent' => 'nos_media_folder',
 	            'input_name' => $this->get_name(),
 	            'selected' => array(
 		            'id' => $folder_id,

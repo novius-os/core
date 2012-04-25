@@ -36,6 +36,12 @@ require([
                 inspectorData = parent.data('inspector'),
 				rendered = false;
 
+			if (inspectorData.reloadEvent) {
+				inspector.listenEvent('reload.' + inspectorData.reloadEvent, function() {
+					parent.trigger('widgetReload');
+				});
+			}
+
             inspector.css({
                     height : '100%',
                     width : '100%'
@@ -64,11 +70,7 @@ require([
                         rendered = true;
                         inspector.css("height", "auto");
                     }
-                }, inspectorData.treeGrid))
-	            .closest('.nos-connector')
-	            .on('reload.' + inspectorData.widget_id, function() {
-		            parent.trigger('widgetReload');
-	            });
+                }, inspectorData.treeGrid));
 		});
 	});
 </script>

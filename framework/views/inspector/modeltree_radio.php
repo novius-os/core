@@ -32,6 +32,12 @@
 					}),
 				rendered = false,
 				init = function() {
+					if (params.reloadEvent) {
+						container.listenEvent('reload.' + params.reloadEvent, function() {
+							table.nostreegrid('reload');
+						});
+					}
+
 					table.nostreegrid({
 							sortable : false,
 							movable : false,
@@ -77,10 +83,6 @@
 								}
 							},
 							columns: params.columns
-						})
-						.closest('.nos-connector')
-						.on('reload.' + params.widget_id, function() {
-							parent.trigger('widgetReload');
 						});
 				};
 

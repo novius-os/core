@@ -76,8 +76,8 @@ require(['jquery-nos'], function($nos) {
 				.end()
 				.find('a[data-id=close]')
 				.click(function(e) {
-					$dialog.wijdialog('close');
 					e.preventDefault();
+					$container.dialog('close');
 				})
 				.end()
 				.find('button[data-id=save]')
