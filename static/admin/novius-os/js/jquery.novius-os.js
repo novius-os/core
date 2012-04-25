@@ -223,8 +223,7 @@ define('jquery-nos', [
                             document.location.href = json.redirect;
                         }
                         if (json.replaceTab) {
-                            this.tab('add', {url : json.replaceTab}, false)
-                                .tab('close');
+                            this.tab('update', {url : json.replaceTab});
                         }
                     }
                     if (json.dispatchEvent) {
@@ -563,12 +562,6 @@ define('jquery-nos', [
                         if (window.parent != window && window.parent.$nos) {
                             return window.parent.$nos(window.frameElement).data('nos-ostabs-index');
                         }
-                        if (context === 'current') {
-                            return noviusos().ostabs('current').index;
-                        }
-                        if ($.isNumeric(context)) {
-                            return context;
-                        }
                         var $panel = $(context).parents('.nos-ostabs-panel-content');
                         if ($panel.size()) {
                             return $panel.data('nos-ostabs-index');
@@ -617,13 +610,13 @@ define('jquery-nos', [
                 case 'add' :
                     (function() {
                         var tab = args[0],
-                            end = args[1];
+                            place = args[1] || 'end';
                         if (window.parent != window && window.parent.$nos) {
-                            window.parent.$nos(window.frameElement).tab('add', tab, end);
+                            window.parent.$nos(window.frameElement).tab('add', tab, place);
                         } else {
                             var index;
-                            if (end !== undefined && end !== true) {
-                                index = getIndex('current') + 1;
+                            if ($.inArray(place, ['before', 'after']) !== -1) {
+                                index = getIndex(self) + (place === 'before' ? -1 : 1);
                             }
                             if (noviusos().length) {
                                 index = noviusos().ostabs('add', tab, index);

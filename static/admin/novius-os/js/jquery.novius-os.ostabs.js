@@ -283,6 +283,7 @@ define('jquery-nos-ostabs',
             }
 
             self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTray).add(self.uiOstabsTabs).find("li:has(a[href])");
+
             self.anchors = self.lis.map(function() {
                 return $( "a", this )[ 0 ];
             });
@@ -296,7 +297,8 @@ define('jquery-nos-ostabs',
                 // since a[href=#fragment-identifier] does unexpectedly not match.
                 // Thus normalize href attribute...
                 var hrefBase = href.split( "#" )[ 0 ],
-                    baseEl;
+                    baseEl,
+                    $panel;
                 if ( hrefBase && ( hrefBase === location.toString().split( "#" )[ 0 ] ||
                         ( baseEl = $( "base" )[ 0 ]) && hrefBase === baseEl.href ) ) {
                     href = a.hash;
@@ -305,7 +307,8 @@ define('jquery-nos-ostabs',
 
                 // inline tab
                 if ( fragmentId.test( href ) ) {
-                    self.panels = self.panels.add( self.element.find( self._sanitizeSelector( href ) ) );
+                    $panel = self.element.find( self._sanitizeSelector( href ) );
+                    self.panels = self.panels.add( $panel );
                 // remote tab
                 // prevent loading the page itself if href is just "#"
                 } else if ( href && href !== "#" ) {
@@ -318,7 +321,7 @@ define('jquery-nos-ostabs',
 
                     var id = self._tabId( a );
                     a.href = "#" + id;
-                    var $panel = self.element.find( "#" + id );
+                    $panel = self.element.find( "#" + id );
                     if ( !$panel.length ) {
                         self.lis.eq(i);
                         $panel = $( '<div></div>' )
@@ -330,6 +333,8 @@ define('jquery-nos-ostabs',
                     }
                     self.panels = self.panels.add( $panel );
                 }
+                $panel.find( '.nos-ostabs-panel-content' )
+                    .data( 'nos-ostabs-index', i );
             });
 
             // initialization from scratch
@@ -831,29 +836,36 @@ define('jquery-nos-ostabs',
                 return false;
             }
 
-            var $li = self.lis.eq( index );
+            var replaceTab = !!tab.url,
+                $li = self.lis.eq( index );
 
             tab = $.extend( {}, $li.data( 'ui-ostab' ), tab );
 
-            if ( self.options.selected == index ) {
-                $( 'title' ).text( tab.label );
+            if (replaceTab) {
+                this.remove(index);
+                this.add(tab, index);
+                this.select(index);
+            } else {
+                if ( self.options.selected == index ) {
+                    $( 'title' ).text( tab.label );
+                }
+
+                var $newLi = self._add(tab),
+                    $newA = $newLi.find('a');
+
+                $li.data( 'ui-ostab', tab )
+                    .attr('title', tab.label || '')
+                    .addClass($newLi.attr('class'))
+                    .css({
+                        height: $newLi.css('height'),
+                        bottom: $newLi.css('bottom')
+                    })
+                    .find('a')
+                    .empty()
+                    .append($newA.children());
+
+                $newLi.remove();
             }
-
-            var $newLi = self._add(tab),
-                $newA = $newLi.find('a');
-
-            $li.data( 'ui-ostab', tab )
-                .attr('title', tab.label || '')
-                .addClass($newLi.attr('class'))
-                .css({
-                    height: $newLi.css('height'),
-                    bottom: $newLi.css('bottom')
-                })
-                .find('a')
-                .empty()
-                .append($newA.children());
-
-            $newLi.remove();
 
             return self;
         },
