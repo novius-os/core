@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div id="<?= $uniqid = uniqid('id_') ?>">
+<div class="page" id="<?= $uniqid = uniqid('id_') ?>">
     <?php
     $fieldset->set_config('field_template', '{field}');
 

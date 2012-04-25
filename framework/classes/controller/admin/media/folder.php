@@ -50,6 +50,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
             'medif_path' => array(
                 'form' => array(
                     'type' => 'text',
+                    'size' => 30,
                 ),
                 'label' => __('SEO, folder URL:'),
             ),
@@ -91,6 +92,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
             'medif_path' => array(
                 'form' => array(
                     'type' => 'text',
+                    'size' => 30,
                     'value' => $basename,
                 ),
                 'label' => __('SEO, folder URL:'),
