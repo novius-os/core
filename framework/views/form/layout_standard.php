@@ -26,7 +26,7 @@ $large = !empty($large) && $large == true;
 
 <div class="line ui-widget" id="<?= $uniqid1 ?>" style="margin-bottom:1em;">
 	<?= $large ? '' : '<div class="unit col c1"></div>'; ?>
-	<div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="z-index:99;">
+	<div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="z-index:1099;">
         <table class="title-fields" style="margin-bottom:1em;">
             <tr>
 			<?php
@@ -90,7 +90,7 @@ $large = !empty($large) && $large == true;
         ?>
 	</div>
     <div class="unit col c1"></div>
-	<div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>" style="position:relative;z-index:98;">
+	<div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>" style="position:relative;z-index:1098;">
 		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
         <?php
             echo \View::forge('form/publishable', array(
@@ -137,7 +137,7 @@ $large = !empty($large) && $large == true;
     if (!empty($menu)) {
         $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
         ?>
-        <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;margin-bottom:1em;">
+        <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:1098;margin-bottom:1em;">
              <div class="accordion fieldset">
                 <?php
                 foreach ((array) $menu as $title => $options) {
