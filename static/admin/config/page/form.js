@@ -120,21 +120,47 @@ define([
 
         var $title      = $container.find('input[name=page_title]');
         var $menu_title = $container.find('input[name=page_menu_title]');
-        var $checkbox   = $container.find('input[data-id=same_title]');
+        var $checkbox_menu   = $container.find('input[data-id=same_menu_title]');
         $title.bind('change keyup', function() {
-            if ($checkbox.is(':checked')) {
+            if ($checkbox_menu.is(':checked')) {
                 $menu_title.val($title.val());
             }
         });
         if ($title.val() == $menu_title.val() || $menu_title.val() == '') {
-            $checkbox.attr('checked', true).wijcheckbox("refresh");
+            $checkbox_menu.attr('checked', true).wijcheckbox("refresh");
         }
-        $checkbox.change(function() {
+        $checkbox_menu.change(function() {
             if ($nos(this).is(':checked')) {
                 $menu_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
                 $title.triggerHandler('change');
             } else {
                 $menu_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+            }
+        }).triggerHandler('change');
+
+        var replace_url = function(text)  {
+            if (!text) {
+                return text;
+            }
+            return text.replace(/ +/, '_');
+        }
+
+        var $virtual_name  = $container.find('input[name=page_virtual_name]');
+        var $checkbox_url = $container.find('input[data-id=same_url_title]');
+        $title.bind('change keyup', function() {
+            if ($checkbox_url.is(':checked')) {
+                $virtual_name.val(replace_url($title.val()));
+            }
+        });
+        if (replace_url($title.val()) == $virtual_name.val() || $virtual_name.val() == '') {
+            $checkbox_url.attr('checked', true).wijcheckbox("refresh");
+        }
+        $checkbox_url.change(function() {
+            if ($nos(this).is(':checked')) {
+                $virtual_name.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                $title.triggerHandler('change');
+            } else {
+                $virtual_name.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
             }
         }).triggerHandler('change');
     }

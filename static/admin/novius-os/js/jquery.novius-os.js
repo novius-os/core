@@ -398,22 +398,22 @@ define('jquery-nos', [
                     }
                     this.each(function() {
                         var $el = $(this);
+
+                        $el.addClass('nos-init-on-show')
+                            .one('nos-init-on-show', callback);
+
                         if ($el.is(':visible')) {
-                            callback.call($el);
-                        } else {
-                            $el.addClass('nos-init-on-show')
-                                .data('nos-init-on-show', callback);
+                            $el.trigger('nos-init-on-show');
                         }
                     });
                     break;
 
                 case 'show' :
                     this.find('.nos-init-on-show:visible').each(function() {
-                        var $el = $(this),
-                            callback = $el.data('nos-init-on-show');
+                        var $el = $(this);
 
-                        $el.removeClass('nos-init-on-show');
-                        callback.call(this);
+                        $el.removeClass('nos-init-on-show')
+                           .trigger('nos-init-on-show');
                     });
                     break;
             }
