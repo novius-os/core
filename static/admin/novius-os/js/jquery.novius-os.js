@@ -397,7 +397,7 @@ define('jquery-nos', [
                         return;
                     }
                     this.each(function() {
-                        var $el = $(this);
+                        var $el = $nos(this);
 
                         $el.addClass('nos-init-on-show')
                             .one('nos-init-on-show', callback);
@@ -409,13 +409,53 @@ define('jquery-nos', [
                     break;
 
                 case 'show' :
-                    this.find('.nos-init-on-show:visible').each(function() {
-                        var $el = $(this);
+                    var $el = $nos(this);
+                    if (!$el.is('.nos-init-on-show')) {
+                        return this;
+                    }
 
-                        $el.removeClass('nos-init-on-show')
-                           .trigger('nos-init-on-show');
+                    // Show the element
+                    $el.css('display', 'block');
+
+                    if (!$el.is(':visible')) {
+                        return this;
+                    }
+                    $el.removeClass('nos-init-on-show').trigger('nos-init-on-show');
+
+
+                    var $children = $el.find('.nos-init-on-show').filter(function() {
+                        return $(this).parents('.nos-init-on-show').length == 0;
                     });
-                    break;
+
+                    // Cascade on the children
+                    $children.each(function() {
+                        $nos(this).initOnShow();
+                    });
+                    /*
+                    var $el = $nos(this);
+
+                    $el.css('display', 'block')
+                    if (!$el.is(':visible')) {
+                        // Will be triggered by a higher.nos-init-on-show DOM element handler
+                        //log($el, 'is not visible, delaying onShow()');
+                        //$el.closest('.nos-init-on-show').one('nos-init-on-show', function() {
+                        //    $el.initOnShow('show');
+                        //});
+                        return this;
+                    }
+
+                    $el.removeClass('nos-init-on-show')
+                       .css('display', 'block')
+                       .trigger('nos-init-on-show');
+
+                    // Cascade on the children
+                    //log($el.find('.nos-init-on-show:visible'));
+                    $el.find('.nos-init-on-show:visible').each(function() {
+                        log(this);
+                        $nos(this).initOnShow('show');
+                    });
+                    */
+                   break;
             }
             return this;
         },

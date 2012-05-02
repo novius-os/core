@@ -13,27 +13,57 @@
 require(['jquery-nos'], function($nos) {
 	$nos(function() {
         var $header  = $nos("#<?= $uniqid1 = uniqid('id_') ?>").form();
-        var $content = $nos("#<?= $uniqid2 = uniqid('id_') ?>").form();
+        var $content = $nos("#<?= $uniqid2 = uniqid('id_') ?>");
 
         $content.initOnShow('init', function() {
 
-            setTimeout(function() {
                 var height = $header
-                    .addClass('ui-widget-content')
-                    .css({
+                .addClass('ui-widget-content')
+                .css({
                         'zIndex':100
-                    })
-                    .outerHeight();
-                $content
-                    .addClass('fill-parent')
-                    .addClass('ui-widget-content').css({
-                        top: height
-                    });
+                })
+               .outerHeight();
+            $content.form()
+                .addClass('fill-parent')
+                .addClass('ui-widget-content').css({
+                    top: height
+                });
                 $header.css('position', 'absolute');
                 $header.css($header.offsetParent());
-            }, 0)
         });
-        $content.css('display', 'block').initOnShow();
+        $content.initOnShow();
+        log($content);
+	});
+
+	$nos(function() {
+        return true;
+        var $header  = $nos("#<?= $uniqid1 ?>")
+        var $content = $nos("#<?= $uniqid2 ?>");
+
+        $header.initOnShow('init', function() {
+            $header
+                .addClass('ui-widget-content')
+                .css($header.offsetParent())
+                .css({
+                    position: 'absolute',
+                    zIndex:100
+                })
+            return;
+
+            $header.form();
+        });
+        $content.initOnShow('init', function() {
+            var height = $header.outerHeight();
+            $content
+                .addClass('fill-parent')
+                .addClass('ui-widget-content').css({
+                    position: 'absolute',
+                    top: height
+                });
+            $content.form();
+        });
+        $header.initOnShow();
+        $content.initOnShow();
 	});
 });
 </script>

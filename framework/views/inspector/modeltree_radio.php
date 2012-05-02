@@ -106,6 +106,7 @@
 			});
 
             table.css({
+                    display: 'none',
                     height : '100%',
                     width : '100%'
                 });
