@@ -11,56 +11,29 @@
 ?>
 <script type="text/javascript">
 require(['jquery-nos'], function($nos) {
+
 	$nos(function() {
-        var $header  = $nos("#<?= $uniqid1 = uniqid('id_') ?>").form();
+        var $header  = $nos("#<?= $uniqid1 = uniqid('id_') ?>")
         var $content = $nos("#<?= $uniqid2 = uniqid('id_') ?>");
-
-        $content.initOnShow('init', function() {
-
-                var height = $header
-                .addClass('ui-widget-content')
-                .css({
-                        'zIndex':100
-                })
-               .outerHeight();
-            $content.form()
-                .addClass('fill-parent')
-                .addClass('ui-widget-content').css({
-                    top: height
-                });
-                $header.css('position', 'absolute');
-                $header.css($header.offsetParent());
-        });
-        $content.initOnShow();
-        log($content);
-	});
-
-	$nos(function() {
-        return true;
-        var $header  = $nos("#<?= $uniqid1 ?>")
-        var $content = $nos("#<?= $uniqid2 ?>");
 
         $header.initOnShow('init', function() {
             $header
                 .addClass('ui-widget-content')
-                .css($header.offsetParent())
                 .css({
                     position: 'absolute',
                     zIndex:100
                 })
-            return;
 
             $header.form();
         });
         $content.initOnShow('init', function() {
-            var height = $header.outerHeight();
             $content
                 .addClass('fill-parent')
                 .addClass('ui-widget-content').css({
-                    position: 'absolute',
-                    top: height
+                    position: 'absolute'
                 });
             $content.form();
+            $content.css('top', $header.outerHeight());
         });
         $header.initOnShow();
         $content.initOnShow();
@@ -75,7 +48,7 @@ $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_cla
 $large = !empty($large) && $large == true;
 ?>
 
-<div id="<?= $uniqid1 ?>" class="line ui-widget nos-fixed-header" style="margin-bottom:1em;">
+<div id="<?= $uniqid1 ?>" class="line ui-widget nos-fixed-header" style="display: none;margin-bottom:1em;">
 	<?= $large ? '' : '<div class="unit col c1"></div>'; ?>
 	<div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="">
         <table class="title-fields" style="margin-bottom:1em;">

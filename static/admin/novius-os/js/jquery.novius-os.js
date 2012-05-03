@@ -347,6 +347,8 @@ define('jquery-nos', [
                                 $(e.target).find('.ui-accordion-content').eq(args.newIndex).nos().initOnShow();
                             }
                         });
+                        // @todo Check usefulness of this
+                        //.find('.ui-accordion-content:first').initOnShow();
                     break;
 
                 case 'validate' :
@@ -403,58 +405,37 @@ define('jquery-nos', [
                             .one('nos-init-on-show', callback);
 
                         if ($el.is(':visible')) {
-                            $el.trigger('nos-init-on-show');
+                            $el.initOnShow();
                         }
                     });
                     break;
 
                 case 'show' :
-                    var $el = $nos(this);
-                    if (!$el.is('.nos-init-on-show')) {
-                        return this;
-                    }
+
+                    // If the element has the class .nos-init-on-show, we display it and trigger the nos-init-on-show events
+                    // If the element does not have the class .nos-init-on-show, we search for children and triggers the initOnShow()
+                    // Either ways, if the element is hidden, we do nothing, it'll be triggered by a parent when it's shown
 
                     // Show the element
-                    $el.css('display', 'block');
+                    if (this.is('.nos-init-on-show')) {
+                        this.css('display', 'block');
+                    }
 
-                    if (!$el.is(':visible')) {
+                    // Cancel if it's not visible
+                    if (!this.is(':visible')) {
                         return this;
                     }
-                    $el.removeClass('nos-init-on-show').trigger('nos-init-on-show');
 
+                    // Trigger the events
+                    if (this.is('.nos-init-on-show')) {
+                        this.removeClass('nos-init-on-show').trigger('nos-init-on-show');
+                    }
 
-                    var $children = $el.find('.nos-init-on-show').filter(function() {
+                    // Cascade on the children
+                    this.find('.nos-init-on-show').filter(function() {
                         return $(this).parents('.nos-init-on-show').length == 0;
-                    });
+                    }).initOnShow();
 
-                    // Cascade on the children
-                    $children.each(function() {
-                        $nos(this).initOnShow();
-                    });
-                    /*
-                    var $el = $nos(this);
-
-                    $el.css('display', 'block')
-                    if (!$el.is(':visible')) {
-                        // Will be triggered by a higher.nos-init-on-show DOM element handler
-                        //log($el, 'is not visible, delaying onShow()');
-                        //$el.closest('.nos-init-on-show').one('nos-init-on-show', function() {
-                        //    $el.initOnShow('show');
-                        //});
-                        return this;
-                    }
-
-                    $el.removeClass('nos-init-on-show')
-                       .css('display', 'block')
-                       .trigger('nos-init-on-show');
-
-                    // Cascade on the children
-                    //log($el.find('.nos-init-on-show:visible'));
-                    $el.find('.nos-init-on-show:visible').each(function() {
-                        log(this);
-                        $nos(this).initOnShow('show');
-                    });
-                    */
                    break;
             }
             return this;
