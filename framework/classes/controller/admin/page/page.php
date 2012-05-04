@@ -64,10 +64,7 @@ class Controller_Admin_Page_Page extends Controller {
             'success' => function() use ($page) {
                 return array(
                     'notify' => 'Page sucessfully added.',
-                    'dispatchEvent' => array(
-                        'event' => 'reload',
-                        'target' => 'nos_page',
-                    ),
+                    'dispatchEvent' => 'reload.nos_page',
                     'replaceTab' => 'admin/nos/page/page/edit/'.$page->page_id,
                 );
             }
@@ -174,10 +171,7 @@ class Controller_Admin_Page_Page extends Controller {
             'success' => function() {
                 return array(
                     'notify' => 'Page sucessfully saved.',
-                    'dispatchEvent' => array(
-                        'event' => 'reload',
-                        'target' => 'nos_page',
-                    ),
+                    'dispatchEvent' => 'reload.nos_page',
                 );
             }
         ));
@@ -258,10 +252,7 @@ class Controller_Admin_Page_Page extends Controller {
 
 			$body = array(
 				'notify' => 'Page successfully deleted.',
-                'dispatchEvent' => array(
-	                'event' => 'reload',
-                    'target' => 'nos_page',
-                ),
+                'dispatchEvent' => 'reload.nos_page',
 			);
 
         } catch (\Exception $e) {

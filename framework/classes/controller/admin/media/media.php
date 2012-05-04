@@ -170,10 +170,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 			$body = array(
 				'notify' => 'File successfully added.',
 				'closeDialog' => true,
-				'dispatchEvent' => array(
-					'event' => 'reload',
-					'target' => 'nos_media_media',
-				),
+				'dispatchEvent' => 'reload.nos_media_media',
                 'replaceTab' => 'admin/nos/media/media/edit/'.$media->media_id,
 			);
         } catch (\Exception $e) {
@@ -273,10 +270,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'File successfully saved.',
-				'dispatchEvent' => array(
-					'event' => 'reload',
-					'target' => 'nos_media_media',
-				),
+				'dispatchEvent' => 'reload.nos_media_media',
 			);
         } catch (\Exception $e) {
 			$body = array(

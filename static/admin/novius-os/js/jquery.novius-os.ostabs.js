@@ -470,7 +470,7 @@ define('jquery-nos-ostabs',
                             //$( this ).removeClass( "nos-ostabs-hide" );
                             resetStyle( $show, showFx );
                             fireCallbacks($show);
-                            self._firePanelEvent($show, {event : 'showPanel'});
+                            self._firePanelEvent($show, $.Event('showPanel'));
                         });
                 }
                 : function( clicked, $show ) {
@@ -482,7 +482,7 @@ define('jquery-nos-ostabs',
                     $li.addClass( "nos-ostabs-selected ui-state-active" );
                     $show.removeClass( "nos-ostabs-hide" );
                     fireCallbacks($show);
-                    self._firePanelEvent($show, {event : 'showPanel'});
+                    self._firePanelEvent($show, $.Event('showPanel'));
                 };
 
             // Hide a tab, $show is optional...
@@ -1008,12 +1008,6 @@ define('jquery-nos-ostabs',
             var self = this,
                 o = self.options;
 
-            if (!$.isPlainObject(event)) {
-                event = {
-                    event : event
-                };
-            }
-
             $.each(self.panels, function(i) {
                 var $panel = $(this);
                 if (i === o.selected) {
@@ -1021,7 +1015,7 @@ define('jquery-nos-ostabs',
                 } else {
                     var callbacks = $panel.data('callbacks.ostabs');
                     if ($.isPlainObject(callbacks)) {
-                        callbacks[event.event + (event.type ? '.' + event.type : '')] = event;
+                        callbacks[event.type + (event.namespace ? '.' + event.namespace : '')] = event;
                     }
                 }
             });
@@ -1032,22 +1026,17 @@ define('jquery-nos-ostabs',
         _firePanelEvent : function($dispatcher, event) {
             $dispatcher = $dispatcher.is('.nos-dispatcher') ? $dispatcher : $dispatcher.find('.nos-dispatcher');
 
-            var e = $.Event(event.event, {
-                namespace : event.type || null,
-                data : event.data || null
-            });
-
             if ($dispatcher.is('iframe')) {
                 if ($dispatcher[0].contentDocument.$) {
-                    $dispatcher[0].contentDocument.$('body').trigger(e);
+                    $dispatcher[0].contentDocument.$('body').trigger(event);
                 }
             } else {
                 // @todo Figure out why we need this try catch.
                 // Adding a media throws an TypeError exception : unknown method 'trigger' on DOMWindow
                 try {
-                    $dispatcher.trigger(e);
+                    $dispatcher.trigger(event);
                 } catch (e) {
-                    log(e);
+                    log('_firePanelEvent error', e, event);
                 }
             }
         },

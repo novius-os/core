@@ -59,11 +59,7 @@ class Controller_Admin_User_User extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'User permanently deleted.',
-                'dispatchEvent' => array(
-                    'event' => 'reload',
-	                'target' => 'nos_user_user',
-                ),
-
+                'dispatchEvent' => 'reload.nos_user_user',
 			);
         } catch (\Exception $e) {
             // Easy debug
