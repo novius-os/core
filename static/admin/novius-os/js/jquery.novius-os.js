@@ -116,6 +116,7 @@ define('jquery-nos', [
             }
             noviusos().ostabs('dispatchEvent', event);
             dialogEvent.dispatchEvent(event);
+            return $nos;
         },
 
         notify : function( options, type ) {
