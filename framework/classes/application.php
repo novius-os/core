@@ -179,7 +179,20 @@ class Application {
 			$new_properties = \Arr::merge($new_properties, \Config::get('local_templates'));
 		}
 
-        // if none of the page use the template, we save the new configuration
+	    if ($property == 'enhancers') {
+		    $models = array();
+		    foreach ($new_properties as $enhancer => $config) {
+			    if (isset($config['models_url_enhanced']) && is_array($config['models_url_enhanced'])) {
+				    foreach ($config['models_url_enhanced'] as $model) {
+						$models[$model][] = $enhancer;
+				    }
+			    }
+		    }
+		    \Config::set('models_url_enhanced', $models);
+		    \Config::save(APPPATH.'data'.DS.'config'.DS.'models_url_enhanced.php', 'models_url_enhanced');
+	    }
+
+	    // if none of the page use the template, we save the new configuration
         \Config::set($property, $new_properties);
         \Config::save(APPPATH.'data'.DS.'config'.DS.$property.'.php', $property);
 

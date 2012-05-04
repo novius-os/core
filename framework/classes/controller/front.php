@@ -62,10 +62,10 @@ class Controller_Front extends Controller {
 
 	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
 	        $url_enhanced = \Config::get("url_enhanced", array());
-	        $url_enhanced[$url.'/'] = $url.'/';
+	        $url_enhanced[$url.'/'] = 0;
 
 	        $_404 = true;
-	        foreach ($url_enhanced as $tempurl) {
+	        foreach ($url_enhanced as $tempurl => $page_id) {
 		        if (substr($url.'/', 0, strlen($tempurl)) === $tempurl) {
 			        $_404 = false;
 			        $this->url = $tempurl != '/' ? substr($tempurl, 0, -1) : '';

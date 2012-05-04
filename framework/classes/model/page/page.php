@@ -203,8 +203,6 @@ class Model_Page_Page extends \Nos\Orm\Model {
 				))
 				->where('page_virtual_url', 'LIKE', $old_virtual_url.'%')
 				->execute();
-
-			static::_remove_url_enhanced($diff[0]['page_virtual_url']);
 		}
 
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
@@ -214,6 +212,9 @@ class Model_Page_Page extends \Nos\Orm\Model {
 			$content .= $text;
 		}
 
+		static::_remove_url_enhanced($this->page_id);
+		static::_remove_page_enhanced($this->page_id);
+
 		$urlEnhancer = false;
 		$regexps = array(
 			'`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`' => 2,
@@ -221,37 +222,61 @@ class Model_Page_Page extends \Nos\Orm\Model {
 		);
 		foreach ($regexps as $regexp => $name_index) {
 			preg_match_all($regexp, $content, $matches);
-			foreach ($matches[$name_index] as $name) {
+			foreach ($matches[$name_index] as $i => $name) {
 				$config = \Config::get("enhancers.$name", false);
 				if ($config && !empty($config['urlEnhancer'])) {
-					$urlEnhancer = true;
+					\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
+
+					$url_enhanced = \Config::get("url_enhanced", array());
+					$url = str_replace('.html', '/', $this->page_virtual_url);
+					$url_enhanced[$url] = $this->page_id;
+
+					\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
+
+					\Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'page_enhanced');
+
+					$page_enhanced = \Config::get("page_enhanced", array());
+					$page_enhanced[$name][$this->page_id] = array(
+						'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
+						'lang' => $this->page_lang,
+					);
+
+					\Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
 					break 2;
 				}
 			}
 		}
-
-		if ($urlEnhancer) {
-			\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
-
-			$url_enhanced = \Config::get("url_enhanced", array());
-			$url = str_replace('.html', '/', $this->page_virtual_url);
-			$url_enhanced[$url] = $url;
-
-			\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
-		}
 	}
 
 	public function _event_after_delete() {
-		static::_remove_url_enhanced($this->page_virtual_url);
+		static::_remove_url_enhanced($this->page_id);
+		static::_remove_page_enhanced($this->page_id);
 	}
 
-	static protected function _remove_url_enhanced($url) {
+	static protected function _remove_url_enhanced($id) {
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
 
 		$url_enhanced = \Config::get("url_enhanced", array());
-		$url = str_replace('.html', '/', $url);
-		unset($url_enhanced[$url]);
+
+		foreach (array_keys($url_enhanced, $id) as $url => $id) {
+			unset($url_enhanced[$url]);
+		}
 
 		\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
+	}
+
+	static protected function _remove_page_enhanced($id) {
+		\Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'page_enhanced');
+
+		$page_enhanced = \Config::get("page_enhanced", array());
+		$enhancers = array_filter($page_enhanced, function ($val) use ($id) {
+			return isset($val[$id]);
+		});
+
+		foreach ($enhancers as $enhancer => $array) {
+			unset($page_enhanced[$enhancer][$id]);
+		}
+
+		\Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
 	}
 }
