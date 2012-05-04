@@ -91,6 +91,11 @@ if (false === $media) {
 
 if (false !== $send_file && is_file($send_file)) {
 	//Nos\Tools_File::$use_xsendfile = false;
+
+    // This is a 404 error handler, so force status 200
+    header('HTTP/1.0 200 Ok');
+    header('HTTP/1.1 200 Ok');
+
     Nos\Tools_File::send($send_file);
 }
 

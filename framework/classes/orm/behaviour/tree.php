@@ -170,6 +170,15 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     }
 
+    public function find_root($object) {
+        $parent = $object;
+        while (!empty($parent)) {
+            $root = $parent;
+            $parent = $this->find_parent($parent);
+        }
+        return $root;
+    }
+
     public function get_parent($object) {
         return $object->get($this->_properties['parent_relation']);
     }

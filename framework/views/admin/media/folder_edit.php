@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div id="<?= $uniqid = uniqid('id_') ?>">
+<div class="page" id="<?= $uniqid = uniqid('id_') ?>">
     <?php
     $fieldset->set_config('field_template', '{field}');
 
@@ -40,12 +40,15 @@
                 <?= $fieldset->field('medif_path')->build(); ?>
             </td>
         </tr>
+        <tr>
+            <td></td>
+            <td>
+                <?= $fieldset->field('save')->build(); ?>
+                &nbsp; <?= __('or') ?> &nbsp;
+                <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
+            </td>
+        </tr>
     </table>
-    <p>
-        <?= $fieldset->field('save')->build(); ?>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
-    </p>
     <?= $fieldset->close(); ?>
 </div>
 

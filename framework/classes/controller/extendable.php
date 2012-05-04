@@ -136,7 +136,8 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		    }
 	    }
 
-        $translatable  = $model::behaviours('Nos\Orm_Behaviour_Translatable');
+        $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
+        $tree         = $model::behaviours('Nos\Orm_Behaviour_Tree');
         if ($translatable) {
             if (empty($config['lang'])) {
                 // No inspector, we only search items in their primary language
@@ -191,8 +192,8 @@ class Controller_Extendable extends \Fuel\Core\Controller {
                     $query = $callback($query);
                 }
             }
-
-            foreach ($query->get() as $object) {
+            $objects = $query->get();
+            foreach ($objects as $object) {
                 $item = array();
 	            $dataset = $config['dataset'];
 	            $actions = \Arr::get($dataset, 'actions', array());
@@ -231,8 +232,11 @@ class Controller_Extendable extends \Fuel\Core\Controller {
                 foreach ($keys as $key => $common_id) {
                     $items[$key]['lang'] = $langs[$common_id];
                 }
-                $all_langs = array_unique(\Arr::flatten($langs));
-
+                if ($tree) {
+                    $all_langs = reset($objects)->find_root()->get_all_lang();
+                } else {
+                    $all_langs = array_unique(\Arr::flatten($langs));
+                }
 
                 foreach ($items as &$item) {
                     $flags = '';

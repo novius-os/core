@@ -303,9 +303,12 @@ define('jquery-nos-thumbnailsgrid',
 		_itemThumbnail : function(container, item, index) {
 			var self = this,
 				o = self.options,
-				thumbnail = item.thumbnail || item.thumbnailAlternate;
+				thumbnail = item.thumbnail || item.thumbnailAlternate,
+                colour = item.colour;
 
-			if (thumbnail) {
+            if (colour) {
+                self._loadColour(container, colour);
+            } else if (thumbnail) {
 				self._loadImg(container, item, thumbnail);
 			} else {
 				self._loadImgDefault(container);
@@ -340,16 +343,26 @@ define('jquery-nos-thumbnailsgrid',
 			return self;
 		},
 
-		_loadImgDefault : function(container) {
-			var self = this,
-				o = self.options;
+        _loadImgDefault : function(container) {
+            var self = this,
+                o = self.options;
 
-			$('<div></div>')
-				.addClass('nos-thumbnailsgrid-thumb-img-default')
-				.prependTo(container);
+            $('<div></div>')
+                .addClass('nos-thumbnailsgrid-thumb-img-default')
+                .prependTo(container);
 
-			return self;
-		},
+            return self;
+        },
+
+        _loadColour : function(container, colour) {
+            var self = this;
+
+            log(colour);
+            $(container)
+                .css('backgroundColor', colour);
+
+            return self;
+        },
 
 		select : function(index) {
 			var self = this,

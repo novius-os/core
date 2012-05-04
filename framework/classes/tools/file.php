@@ -48,24 +48,46 @@ class Tools_File {
 
     /**
      *
-     * @param type $file
-     * @param type $url
+     * @param  string  $file  Absolute path to local file
+     * @param  string  $mime  Mime type. Default = null (automatic)
+     * @param  bool    $exit  Should we exit? Default = true
      */
-    public static function send($file) {
-        // This is a 404 error handler, so force status 200
-        header('HTTP/1.0 200 Ok');
-        header('HTTP/1.1 200 Ok');
+    public static function send($file, $mime = null, $exit = true) {
 
-        // Send Content-Type
-        header('Content-Type: '.static::content_type($file));
+        $file = realpath($file);
 
-        // X-Sendfile is better when available
-        if (static::$use_xsendfile) {
-            header(static::$xsendfile_header.': '.$file);
-        } else {
-            readfile($file);
+        if (is_file($file)) {
+
+            // Send Content-Type
+            if ($mime === null) {
+                $mime = static::content_type($file);
+            }
+
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
+            ! ini_get('safe_mode') and set_time_limit(0);
+
+            header('Content-Type: '.$mime);
+
+            // Check whether the file is in the data directory
+            $data_path = APPPATH.'data';
+            $xsendfile_allowed = substr($file, 0, strlen($data_path)) != $data_path;
+
+            // X-Sendfile is better when available
+            if (static::$use_xsendfile and $xsendfile_allowed) {
+                header(static::$xsendfile_header.': '.$file);
+            } else {
+                readfile($file);
+            }
         }
-        exit();
+
+		if ($exit) {
+			\Event::shutdown();
+			exit;
+		}
     }
 
     /**

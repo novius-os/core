@@ -11,8 +11,32 @@
 ?>
 <script type="text/javascript">
 require(['jquery-nos'], function($nos) {
+
 	$nos(function() {
-		$nos("#<?= $uniqid1 = uniqid('id_') ?>,#<?= $uniqid2 = uniqid('id_') ?>").nos().form();
+        var $header  = $nos("#<?= $uniqid1 = uniqid('id_') ?>")
+        var $content = $nos("#<?= $uniqid2 = uniqid('id_') ?>");
+
+        $header.initOnShow('init', function() {
+            $header
+                .addClass('ui-widget-content')
+                .css({
+                    position: 'absolute',
+                    zIndex:100
+                })
+
+            $header.form();
+        });
+        $content.initOnShow('init', function() {
+            $content
+                .addClass('fill-parent')
+                .addClass('ui-widget-content').css({
+                    position: 'absolute'
+                });
+            $content.form();
+            $content.css('top', $header.outerHeight());
+        });
+        $header.initOnShow();
+        $content.initOnShow();
 	});
 });
 </script>
@@ -24,9 +48,9 @@ $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_cla
 $large = !empty($large) && $large == true;
 ?>
 
-<div class="line ui-widget" id="<?= $uniqid1 ?>" style="margin-bottom:1em;">
+<div id="<?= $uniqid1 ?>" class="line ui-widget nos-fixed-header" style="display: none;margin-bottom:1em;">
 	<?= $large ? '' : '<div class="unit col c1"></div>'; ?>
-	<div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="z-index:99;">
+	<div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="">
         <table class="title-fields" style="margin-bottom:1em;">
             <tr>
 			<?php
@@ -38,7 +62,7 @@ $large = !empty($large) && $large == true;
                 echo '</td>';
             }
 			?>
-                <td class="table-field">
+                <td>
 			<?php
             if (!empty($title)) {
                 $title = (array) $title;
@@ -48,14 +72,14 @@ $large = !empty($large) && $large == true;
                     if ($first) {
                         $first = false;
                     } else {
-                        echo '</td><td class="table-field">';
+                        echo '</td><td>';
                     }
                     $field = $fieldset->field($name);
                     $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
                     echo ' '.$field
                             ->set_attribute('placeholder',$placeholder)
                             ->set_attribute('title', $placeholder)
-                            ->set_attribute('class', 'title '.($field->type == 'file' ? '' : ''/*'c'.$size*/))
+                            ->set_attribute('class', 'title')
                             ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
                             ->build();
                 }
@@ -68,20 +92,29 @@ $large = !empty($large) && $large == true;
         if (!empty($subtitle)) {
             ?>
             <div class="line" style="overflow:visible;">
-			<?php
-            $fieldset->form()->set_config('field_template',  "\t\t{label}{required} {field} {error_msg}</td>\n");
-            foreach ((array) $subtitle as $field) {
-                echo '<div class="unit col">'.$fieldset->field($field)->build().'</div>';
-            }
-            $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-			?>
+                <table style="width:100%;margin-bottom:1em;">
+                    <tr>
+                        <?php
+                        $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+                        foreach ((array) $subtitle as $name) {
+                            $field = $fieldset->field($name);
+                            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+                            echo $field
+                                 ->set_attribute('placeholder',$placeholder)
+                                 ->set_attribute('title', $placeholder)
+                                 ->build();
+                        }
+                        $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+                        ?>
+                    </tr>
+                </table>
             </div>
         <?php
         }
         ?>
 	</div>
     <div class="unit col c1"></div>
-	<div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>" style="position:relative;z-index:98;">
+	<div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>" style="position:relative;">
 		<p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
         <?php
             echo \View::forge('form/publishable', array(
@@ -92,74 +125,83 @@ $large = !empty($large) && $large == true;
 	<?= $large ? '' : '<div class="unit col c1 lastUnit"></div>' ?>
 </div>
 
-<div class="line ui-widget" id="<?= $uniqid2 ?>">
-    <?php
-    $menu = empty($menu) ? array() : (array) $menu;
-    ?>
-	<?= $large ? '' : '<div class="unit col c1"></div>' ?>
-	<div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;margin-bottom:1em;">
-		<?= is_array($content) ? implode($content) : $content ?>
-	</div>
+<div id="<?= $uniqid2 ?>" class="nos-fixed-content" style="display:none;">
+    <div class="line ui-widget" style="margin: 2em;">
+        <?php
+        $menu = empty($menu) ? array() : (array) $menu;
+        ?>
+        <?= $large ? '' : '<div class="unit col c1"></div>' ?>
+        <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;margin-bottom:1em;">
+            <?= is_array($content) ? implode($content) : $content ?>
+        </div>
 
-	<?php
-    if (!empty($id)) {
-        $_id = $fieldset->field($id);
-        $_id = !empty($_id) ? $_id->get_value() : null;
-        $admin = __('Admin');
-        if (empty($_id)) {
-            // Nothing
-        } else {
-            if (empty($menu[$admin])) {
-                // Display below current content, in a new line
-            } else if (isset($menu[$admin]['fields'])) {
-                array_unshift($menu[$admin]['fields'], '_id');
+        <?php
+        if (!empty($id)) {
+            $_id = $fieldset->field($id);
+            $_id = !empty($_id) ? $_id->get_value() : null;
+            $admin = __('Admin');
+            if (empty($_id)) {
+                // Nothing
             } else {
-                array_unshift($menu[$admin], '_id');
+                if (empty($menu)) {
+                    // Display below current content, in a new line
+                } else if (isset($menu[$admin]['fields'])) {
+                    array_unshift($menu[$admin]['fields'], '_id');
+                } else if (!isset($menu[$admin])) {
+                    $menu[$admin] = array(
+                        'header_class'  => 'faded',
+                        'content_class' => 'faded',
+                        'fields' => array('_id'),
+                    );
+                } else {
+                    array_unshift($menu[$admin], '_id');
+                }
             }
         }
-    }
 
-    if (!empty($menu)) {
-        $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
-        ?>
-        <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;z-index:98;margin-bottom:1em;">
-             <div class="accordion fieldset">
-                <?php
-                foreach ((array) $menu as $title => $options) {
-                    if (!isset($options['fields'])) {
-                        $options = array('fields' => $options);
-                    }
-                    ?>
-                    <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $title ?></a></h3>
-                    <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
-                        <?php
-                        foreach ((array) $options['fields'] as $field) {
-                            try {
-                                if ($field instanceof \View) {
-                                    echo $field;
-                                } else if ($field == '_id') {
-                                    echo '<p>ID : '.$_id.'</p>';
-                                } else {
-                                    echo '<p>'.$fieldset->field($field)->build().'</p>';
-                                }
-                            } catch (\Exception $e) {
-                                throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
-                            }
+        if (!empty($menu)) {
+            $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
+            ?>
+            <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;margin-bottom:1em;">
+                 <div class="accordion fieldset">
+                    <?php
+                    foreach ((array) $menu as $title => $options) {
+                        if (!isset($options['fields'])) {
+                            $options = array('fields' => $options);
                         }
                         ?>
-                    </div>
-                    <?php
-                }
-                ?>
+                        <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $title ?></a></h3>
+                        <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
+                            <?php
+                            foreach ((array) $options['fields'] as $field) {
+                                try {
+                                    if ($field instanceof \View) {
+                                        echo $field;
+                                    } else if ($field == '_id') {
+                                        echo '<p>ID : '.$_id.'</p>';
+                                    } else {
+                                        echo '<p>'.$fieldset->field($field)->build().'</p>';
+                                    }
+                                } catch (\Exception $e) {
+                                    throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
+                                }
+                            }
+                            ?>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                 </div>
              </div>
-         </div>
-        <?php
-        }
-        ?>
-	<?= $large ? '' : '<div class="unit lastUnit"></div>' ?>
-</div>
+            <?php
+            }
+            ?>
+        <?= $large ? '' : '<div class="unit lastUnit"></div>' ?>
+    </div>
 
-<?php
-if (empty($menu) && !empty($_id)) {
-    echo '<div class="line"><div class="unit col c1"></div><div class="unit">ID : '.$_id.'</div></div>';
-}
+    <?php
+    if (!empty($id) && empty($menu) && !empty($_id)) {
+        echo '<div class="line" style="margin: -2em 2em 2em;">'.($large ? '' : '<div class="unit col c1"></div>').'<div class="unit">ID : '.$_id.'</div></div>';
+    }
+    ?>
+</div>
