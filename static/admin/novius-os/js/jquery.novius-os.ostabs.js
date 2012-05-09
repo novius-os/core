@@ -60,7 +60,7 @@ define('jquery-nos-ostabs',
 
             $(window).resize(function() {
                 if (o.selected) {
-                    self._firePanelEvent(self.panels.eq(o.selected), {event : 'resizePanel'});
+                    self._firePanelEvent(self.panels.eq(o.selected), $.Event('resizePanel'));
                 }
             });
         },
@@ -323,13 +323,13 @@ define('jquery-nos-ostabs',
                     a.href = "#" + id;
                     $panel = self.element.find( "#" + id );
                     if ( !$panel.length ) {
-                        self.lis.eq(i);
+                        var tab = self.lis.eq(i).data( 'ui-ostab');
                         $panel = $( '<div></div>' )
                             .attr( "id", id )
                             .addClass( "nos-ostabs-panel ui-widget-content ui-corner-bottom nos-ostabs-hide")
                             .appendTo( self.element );
 
-                        self._actions($panel, i);
+                        self._actions($panel, i, tab.actions || []);
                     }
                     self.panels = self.panels.add( $panel );
                 }
@@ -576,12 +576,14 @@ define('jquery-nos-ostabs',
             return index;
         },
 
-        _actions: function( $panel, index ) {
+        _actions: function( $panel, index, other_actions) {
             var self = this,
                 o = self.options;
 
             var li = self.lis.eq(index),
                 a =  self.anchors.eq(index);
+
+            $panel.find('.nos-ostabs-actions').remove();
 
             var actions = $( '<div></div>' )
                 .addClass( 'nos-ostabs-actions ui-state-active' )
@@ -627,6 +629,30 @@ define('jquery-nos-ostabs',
                     .appendTo( reload );
             }
 
+            $.each(other_actions, function() {
+                var action = this;
+
+                var $el = $( '<a href="#"></a>' )
+                    .addClass( 'nos-ostabs-action' )
+                    .click(function(e) {
+                        e.preventDefault();
+                        if ($.isFunction(action.click)) {
+                            action.click(e, {ui : $el, action : action});
+                        }
+                    })
+                    .appendTo( links );
+                var icon = $( '<span></span>' ).addClass( 'ui-icon' )
+                    .text( action.label || '' )
+                    .appendTo( $el );
+                if ( action.iconUrl ) {
+                    icon.css( 'background-image', 'url("' + action.iconUrl + '") !important' );
+                } else {
+                    icon.addClass( action.iconClasses );
+                }
+                $( '<span></span>' ).text( action.label || '' )
+                    .appendTo( $el );
+
+            });
         },
 
         _tabsWidth: function() {
@@ -720,7 +746,8 @@ define('jquery-nos-ostabs',
                 iconClasses: 'ui-icon ui-icon-document',
                 iconUrl: '',
                 iconSize: 16,
-                panelId: false
+                panelId: false,
+                actions : []
             }, tab);
 
 
@@ -740,7 +767,6 @@ define('jquery-nos-ostabs',
             if ( !tab.labelDisplay ) {
                 label.hide();
             }
-
             var li = $( '<li></li>' ).append( a )
                 .attr('title', tab.label)
                 .addClass( 'ui-corner-top ui-state-default').data( 'ui-ostab', tab )
@@ -837,9 +863,9 @@ define('jquery-nos-ostabs',
             }
 
             var replaceTab = !!tab.url,
-                $li = self.lis.eq( index );
+                $li = self.lis.eq( index);
 
-            tab = $.extend( {}, $li.data( 'ui-ostab' ), tab );
+            tab = $.extend({}, $li.data( 'ui-ostab' ), tab );
 
             if (replaceTab) {
                 this.remove(index);
@@ -851,7 +877,8 @@ define('jquery-nos-ostabs',
                 }
 
                 var $newLi = self._add(tab),
-                    $newA = $newLi.find('a');
+                    $newA = $newLi.find('a'),
+                    $panel = self.panels.eq( index );
 
                 $li.data( 'ui-ostab', tab )
                     .attr('title', tab.label || '')
@@ -863,6 +890,8 @@ define('jquery-nos-ostabs',
                     .find('a')
                     .empty()
                     .append($newA.children());
+
+                self._actions($panel, index, tab.actions || []);
 
                 $newLi.remove();
             }
@@ -999,7 +1028,9 @@ define('jquery-nos-ostabs',
                 tabs = [];
             self.uiOstabsTabs.find( 'li:not(.nos-ostabs-newtab)' )
                 .each(function() {
-                    tabs.push( $(this).data('ui-ostab') );
+                    var tab = $.extend({}, $(this).data('ui-ostab'));
+                    delete tab.actions;
+                    tabs.push(tab);
                 });
             return tabs;
         },

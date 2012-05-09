@@ -15,7 +15,16 @@ require(['jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
 		$nos('#<?= $uniqid ?>').tab('update', {
 				label : <?= json_encode($page->page_title) ?>,
-				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
+				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
+			    actions : [
+				    {
+					    label : <?= json_encode(_('Visualise')) ?>,
+					    click : function() {
+						    window.open(<?= json_encode($page->get_href()) ?>);
+					    },
+					    iconClasses : 'nos-icon16 nos-icon16-eye'
+				    }
+			    ]
 			})
 			.remove();
 	});

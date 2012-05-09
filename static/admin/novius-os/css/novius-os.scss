@@ -65,12 +65,11 @@ a:hover {
     background-image: url(../img/icons/eye-616161.png);
 }
 */
-.nos-icon16-eye
+.nos-icon16-eye, .ui-state-active .nos-icon16-eye,
 {
     background-image: url(../img/icons/eye-38667f.png);
 }
-.ui-state-highlight .nos-icon16-eye
-{
+.ui-state-highlight .nos-icon16-eye {
     background-image: url(../img/icons/eye-2e83ff.png);
 }
 
