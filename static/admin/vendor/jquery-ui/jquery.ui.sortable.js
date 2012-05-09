@@ -1,7 +1,7 @@
-/*
- * jQuery UI Sortable 1.8.18
+/*!
+ * jQuery UI Sortable 1.8.20
  *
- * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -468,8 +468,8 @@ $.widget("ui.sortable", $.ui.mouse, {
 
 	_intersectsWithPointer: function(item) {
 
-		var isOverElementHeight = $.ui.isOverAxis(this.positionAbs.top + this.offset.click.top, item.top, item.height),
-			isOverElementWidth = $.ui.isOverAxis(this.positionAbs.left + this.offset.click.left, item.left, item.width),
+		var isOverElementHeight = (this.options.axis === 'x') || $.ui.isOverAxis(this.positionAbs.top + this.offset.click.top, item.top, item.height),
+			isOverElementWidth = (this.options.axis === 'y') || $.ui.isOverAxis(this.positionAbs.left + this.offset.click.left, item.left, item.width),
 			isOverElement = isOverElementHeight && isOverElementWidth,
 			verticalDirection = this._getDragVerticalDirection(),
 			horizontalDirection = this._getDragHorizontalDirection();
@@ -1075,7 +1075,7 @@ $.widget("ui.sortable", $.ui.mouse, {
 });
 
 $.extend($.ui.sortable, {
-	version: "1.8.18"
+	version: "1.8.20"
 });
 
 })(jQuery);
