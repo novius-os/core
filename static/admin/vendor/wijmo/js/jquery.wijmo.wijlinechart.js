@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -469,7 +469,7 @@
 
 			if (seriesEle.path) {
 				obj = $(seriesEle.path.node).data("wijchartDataObj");
-				if (obj.visible || obj.display === "show") {
+				if (obj.visible) {
 					seriesEle.path.show();
 					if (seriesEle.path.shadow) {
 						seriesEle.path.shadow.show();
@@ -545,7 +545,7 @@
 						legendIcon = self.legendIcons[i];
 						legendIcon.attr({
 							fill: legendIcon.attr("stroke")
-						});
+						});						
 					}
 				}
 				//add marker to legendIcons
@@ -553,7 +553,7 @@
 					for (i = 0, ii = chartsSeries.length; i < ii; i++) {
 						chartSeries = chartsSeries[i];
 						chartSeriesStyle = chartsSeriesStyles[i];
-						if (chartSeries.legendEntry && 
+						if (chartSeries.legendEntry &&
 								chartSeries.display !== "exclude") {
 							if (chartSeries.markers && chartSeries.markers.visible) {
 								legendIcon = self.legendIcons[idx];
@@ -571,9 +571,11 @@
 									type = "circle";
 								}
 								dot = self.canvas.paintMarker(type, x, y, 3);
-								$.wijraphael.addClass($(dot.node), "chart-legend-dot wijchart-legend");
+								$.wijraphael.addClass($(dot.node), 
+									"chart-legend-dot wijchart-legend");
 								dot.attr(markerStyle);
-								$(dot.node).data("index", i);
+								$(dot.node).data("index", i)
+									.data("legendIndex", idx);
 								self.legendDots.push(dot);
 							}
 							idx++;
@@ -583,7 +585,7 @@
 					for (i = chartsSeries.length - 1; i >= 0; i--) {
 						chartSeries = chartsSeries[i];
 						chartSeriesStyle = chartsSeriesStyles[i];
-						if (chartSeries.legendEntry && 
+						if (chartSeries.legendEntry &&
 								chartSeries.display !== "exclude") {
 							if (chartSeries.markers && chartSeries.markers.visible) {
 								legendIcon = self.legendIcons[idx];
@@ -601,9 +603,12 @@
 									type = "circle";
 								}
 								dot = self.canvas.paintMarker(type, x, y, 3);
-								$.wijraphael.addClass($(dot.node), "chart-legend-dot wijchart-canvas-object wijchart-legend");
+								$.wijraphael.addClass($(dot.node),
+									"chart-legend-dot wijchart-canvas-object" + 
+									" wijchart-legend");
 								dot.attr(markerStyle);
-								$(dot.node).data("index", i);
+								$(dot.node).data("index", i)
+									.data("legendIndex", idx);
 								self.legendDots.push(dot);
 							}
 							idx++;
@@ -612,24 +617,24 @@
 				}
 			}
 		},
-		
+
 		_mouseDown: function (e, args) {
 			$.wijmo.wijchartcore.prototype._mouseDown.apply(this, arguments);
 		},
-		
+
 		_mouseUp: function (e, args) {
 			$.wijmo.wijchartcore.prototype._mouseUp.apply(this, arguments);
 		},
-		
+
 		_mouseOver: function (e, lineSeries) {
 			var self = this;
-			
+
 			if (!lineSeries || lineSeries.type !== "line") {
 				return;
 			}
-			
+
 			$.wijmo.wijchartcore.prototype._mouseOver.apply(this, arguments);
-			
+
 			if (lineSeries.path.removed) {
 				return;
 			}
@@ -648,34 +653,34 @@
 				if (lineSeries.lineHoverStyle) {
 					lineSeries.path.wijAttr(lineSeries.lineHoverStyle);
 				}
-		
+
 				self.hoverLine = lineSeries;
 				self.hoverPoint = null;
 			}
 		},
-		
+
 		_mouseOut: function (e, args) {
 			$.wijmo.wijchartcore.prototype._mouseOut.apply(this, arguments);
 		},
-		
+
 		_mouseMove: function (e, args) {
 			$.wijmo.wijchartcore.prototype._mouseMove.apply(this, arguments);
 		},
-		
+
 		_click: function (e, args) {
 			$.wijmo.wijchartcore.prototype._click.apply(this, arguments);
 		},
-		
+
 		_mouseMoveInsidePlotArea: function (e, mousePos) {
 			var self = this,
 				tooltip = self.tooltip,
 				hint = self.options.hint,
-				markers, 
-				idx = 0, 
+				markers,
+				idx = 0,
 				p, point, valueX, valueY,
 				s = null,
-				dataObj = null, 
-				op = null, 
+				dataObj = null,
+				op = null,
 				title = hint.title,
 				content = hint.content,
 				isTitleFunc = $.isFunction(title),
@@ -694,7 +699,7 @@
 				}
 				markers = self.hoverLine.lineMarkers;
 				idx = -1;
-				p = {x: 0, y: 0};
+				p = { x: 0, y: 0 };
 				$.each(markers, function (i, marker) {
 					if (marker.removed) {
 						return true;
@@ -719,11 +724,12 @@
 						return;
 					}
 					point = $(markers[idx].node).data("wijchartDataObj");
-					
+
 					if (point) {
 						if (self.hoverPoint && !self.hoverPoint.isSymbol) {
 							if (!self.hoverPoint.removed) {
-								self.hoverPoint.marker.wijAttr(self.hoverPoint.markerStyle);
+								self.hoverPoint.marker
+									.wijAttr(self.hoverPoint.markerStyle);
 								self.hoverPoint.marker.transform("s1");
 							}
 						}
@@ -744,14 +750,14 @@
 						if (isTitleFunc) {
 							op.title = function () {
 								var obj = {
-										pointIndex: idx,
-										lineIndex: dataObj.lineSeries.index,
-										x: valueX,
-										y: valueY,
-										label: dataObj.lineSeries.label,
-										data: dataObj,
-										fmt: title
-									},
+									pointIndex: idx,
+									lineIndex: dataObj.lineSeries.index,
+									x: valueX,
+									y: valueY,
+									label: dataObj.lineSeries.label,
+									data: dataObj,
+									fmt: title
+								},
 									fmt = $.proxy(obj.fmt, obj),
 									tit = fmt();
 								return tit;
@@ -760,14 +766,14 @@
 						if (isContentFunc) {
 							op.content = function () {
 								var obj = {
-										pointIndex: idx,
-										lineIndex: dataObj.lineSeries.index,
-										x: valueX,
-										y: valueY,
-										label: dataObj.lineSeries.label,
-										data: dataObj,
-										fmt: content
-									},
+									pointIndex: idx,
+									lineIndex: dataObj.lineSeries.index,
+									x: valueX,
+									y: valueY,
+									label: dataObj.lineSeries.label,
+									data: dataObj,
+									fmt: content
+								},
 									fmt = $.proxy(obj.fmt, obj),
 									con = fmt();
 								return con;
@@ -781,25 +787,27 @@
 					tooltip.showAt(p);
 				}
 			}
-			
-			$.wijmo.wijchartcore.prototype._mouseMoveInsidePlotArea.apply(self, arguments);
+
+			$.wijmo.wijchartcore.prototype
+				._mouseMoveInsidePlotArea.apply(self, arguments);
 		},
-		
+
 		_mouseMoveOutsidePlotArea: function (e, mousePos) {
 			var self = this;
 			self._clearHoverState();
-			$.wijmo.wijchartcore.prototype._mouseMoveOutsidePlotArea.apply(self, arguments);
+			$.wijmo.wijchartcore.prototype
+				._mouseMoveOutsidePlotArea.apply(self, arguments);
 		},
-		
+
 		_clearHoverState: function () {
 			var self = this,
 			tooltip = self.tooltip,
 			hint = self.options.hint;
-		
+
 			if (hint.enable && tooltip) {
 				tooltip.hide();
 			}
-			
+
 			if (self.hoverLine) {
 				if (!self.hoverLine.path.removed) {
 					self.hoverLine.path.wijAttr(self.hoverLine.lineStyle);
@@ -822,7 +830,7 @@
 			if (!self.aniPathsAttr) {
 				self.aniPathsAttr = [];
 			}
-			
+
 			opt = {
 				bounds: self.canvasBounds,
 				widgetName: self.widgetName,
@@ -841,7 +849,7 @@
 				chartLabelStyle: o.chartLabelStyle,
 				chartLabelFormatString: o.chartLabelFormatString,
 				isXTime: self.axisInfo.x.isTime,
-				isYTime: self.axisInfo.y.isTime || 
+				isYTime: self.axisInfo.y.isTime ||
 					self.axisInfo.y[0].isTime,
 				//isYTime: self.axisInfo.y.isTime,
 				disabled: o.disabled,
@@ -855,13 +863,13 @@
 				mouseMove: $.proxy(self._mouseMove, self),
 				click: $.proxy(self._click, self)
 			};
-			
+
 			self.chartElement.wijline(opt);
 		}
 
 	});
 
-}(jQuery));
+} (jQuery));
 
 (function ($) {
 	"use strict";
@@ -964,6 +972,7 @@
 			fieldsAniPathAttr, idx, duration, easing) {
 		var aniPathAttr,
 			diffAttr;
+			//visible = path.attr("visible");
 		if (path.shadow) {
 			path.shadow.hide();
 		}
@@ -976,7 +985,7 @@
 		if (!$.isEmptyObject(diffAttr)) {
 			path.attr(aniPathAttr.path);
 			path.wijAnimate(diffAttr, duration, easing, function () {
-				if (path.shadow) {
+				if (path.shadow && path.visible !== false) {
 					path.shadow.show();
 				}
 				if (path.tracker) {
@@ -1034,7 +1043,7 @@
 		diffPath = path.attr().path;
 		path.attr({path: aniPathAttr});
 		path.wijAnimate({path: diffPath}, duration, easing, function () {
-			if (path.shadow) {
+			if (path.shadow && path.visible !== false) {
 				path.shadow.show();
 			}
 			if (path.tracker) {
@@ -1247,8 +1256,8 @@
 					defaultChartLabels, aniLabelsAttr, chartLabelEles,
 					chartLabelFormatString, needAnimated, firstYPoint, 
 					lastYPoint, valX, valY, lineData.y[j], axis, fitType, isXTime, 
-					isYTime, j, lineMarkerStyle, lineMarkerHoverStyle, lineSeries, paintSymbol, 
-					showChartLabels, symbols, valuesX, valuesY, valsY, 
+					isYTime, j, lineMarkerStyle, lineMarkerHoverStyle, lineSeries, 
+					paintSymbol, showChartLabels, symbols, valuesX, valuesY, valsY, 
 					lineSeries.display, stacked);
 			});
 			
@@ -1458,6 +1467,7 @@
 			if (path.area) {
 				path.area.hide();
 			}
+			path.visible = false;
 		}
 
 		if (lineSeries.markers.style) {
@@ -1916,9 +1926,9 @@
 
 					var tar = $(e.target),
 						data,
-						lineSeries = null, 
-						style = null,
-						idx = 0;
+						lineSeries = null; 
+						//style = null,
+						//idx = 0;
 					if (tar.data("owner")) {
 						tar = tar.data("owner");
 					}
@@ -2064,9 +2074,9 @@
 						click.call(element, e, data);
 					}
 				}
-			},
-			h = null,
-			elePos = element.offset();
+			};
+			//h = null,
+			//elePos = element.offset();
 		$(".wijlinechart", element[0])
 			.live("mousedown." + widgetName,
 				$.proxy(proxyObj.mousedown, proxyObj))

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -320,11 +320,21 @@ function wijmoASPNetParseOptionsReviewer(o, k) {
                     o[k] = d;
                 }
                 break;
-            case "object":
-                for (k in v) {
-                    wijmoASPNetParseOptionsReviewer(v, k);
-                }
-                break;
+               case "object":
+               	if (v.needQuotes !== undefined && v.valueString !== undefined) {
+               		if (!v.needQuotes) {
+               			o[k] = eval(v.valueString);
+               		}
+               		else {
+               			o[k] = v.valueString;
+               		}
+               	}
+               	else {
+               		for (k in v) {
+               			wijmoASPNetParseOptionsReviewer(v, k);
+               		}
+               	}
+               	break;
         }
     }
 }

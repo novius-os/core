@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -257,9 +257,11 @@
 			} else if ($.isPlainObject(o[key])) {
 				if (key === "panel1" &&
 					value.collapsed !== undefined) {
+					//if(value.collapsed�� { o.panel2.collapsed = false; }
 					self._setPanel1Collapsed(value.collapsed);
 				} else if (key === "panel2" &&
 					value.collapsed !== undefined) {
+					//if(value.collapsed�� { o.panel1.collapsed = false; }
 					self._setPanel2Collapsed(value.collapsed);
 				}
 				o[key] = $.extend(true, o[key], value);
@@ -676,10 +678,12 @@
 					distance = width - barW;
 				}
 
+				//todo: missing logic of both collapse equals "true".
 				if (o.panel1.collapsed) {
 					//element.addClass(vSplitterCssPrefix + collapsedCss);
 					expander.addClass(vSplitterCssPrefix + collapsedCss);
 					pnl1.css("display", "none");
+					pnl2.css("display", "");				
 					distance = 0;
 				} else {
 					//element.addClass(vSplitterCssPrefix + expandedCss);
@@ -713,6 +717,7 @@
 					//element.addClass(hSplitterCssPrefix + collapsedCss);
 					expander.addClass(hSplitterCssPrefix + collapsedCss);
 					pnl1.css("display", "none");
+					pnl2.css("display", "");
 					distance = 0;
 				} else {
 					//element.addClass(hSplitterCssPrefix + expandedCss);

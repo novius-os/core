@@ -1,7 +1,7 @@
 /*globals jQuery window */
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -424,7 +424,7 @@
 					disabledWidth = ele.outerWidth(),
 					disabledHeight = ele.outerHeight(),
 					div = $("<div></div>")
-					.addClass("ui-state-disabled")
+					.addClass(disableCss)
 					.css({
 						"z-index": "99999",
 						position: "absolute",
@@ -498,7 +498,7 @@
 			.fadeOut(600);
 		},
 
-		_applyContainerStyle: function (isHorizontal) {
+		_applyContainerStyle: function (isHorizontal, isPreviewCreated) {
 			/// <summary>
 			/// Apply special styles. after create dom element.
 			/// </summary>
@@ -509,7 +509,7 @@
 				listSize = 0,
 				size, left = 0,
 				dir = isHorizontal ? "left" : "top",
-				i = 0,
+				i = 0, citem,
 				sizeKey = isHorizontal ? "width" : "height";
 
 			size = self.itemBound[isHorizontal ? "w" : "h"];
@@ -526,13 +526,22 @@
 				list.css(style);
 			}
 			else {
+				citem = list.find(">li:first");
+				// if preview mode the cuurent item is the second item of ul
+				if (o.preview && !!isPreviewCreated) {
+					citem = citem.next(); //previewNum
+				}
+				i = citem.data("itemIndex");
+
 				for (i; i < self.currentIdx; i++) {
-					list.find("li:first").appendTo(list);
+				    list.children("li:first").appendTo(list);
 				}
 
 				if (o.preview) {
-					for (i = 0; i < previewNum; i++) {
-						list.find("li:last").prependTo(list);
+					if (!isPreviewCreated) {
+						for (i = 0; i < previewNum; i++) {
+							list.children("li:last").prependTo(list);
+						}
 					}
 					left = -size * previewNum;
 				}
@@ -582,7 +591,14 @@
 				else {
 					self[n] = $(self._createBtn(btnCss, iconCss));
 				}
-				self[n].bind("click." + self.widgetName, $.proxy(self[func], self))
+				//self[n].bind("click." + self.widgetName, $.proxy(self[func], self))
+				self[n].bind("click." + self.widgetName, function (event) {
+					var btn = $(this);
+					if (btn.hasClass(disableCss)) {
+						return;
+					}
+					self[func].call(self);
+				})
 			    .appendTo(self.container);
 			});
 
@@ -676,7 +692,9 @@
 				self.list = el;
 				self.container = el.parent();
 			}
-			else { return; }
+			else {
+				return;
+			}
 
 			self.itemBound = self._getItemBound();
 
@@ -729,7 +747,6 @@
 				dir = isH ? "left" : "top",
 				antiDir = isH ? "right" : "bottom",
 				bound;
-			//if (o.display === 1) {
 
 			size = self.itemBound[isH ? "w" : "h"];
 			offset = self.offset = Math.round(size / 4);
@@ -819,9 +836,7 @@
 		_createItem: function (item, idx) {
 			var self = this,
 				o = self.options,
-				img, span,
-				w = self.itemBound.w,
-				h = self.itemBound.h;
+				img, span;
 
 			img = item.addClass(itemCss)
 			.addClass(clearfixCss)
@@ -829,13 +844,7 @@
 			.attr("role", "img")
 			.addClass("wijmo-wijcarousel-image");
 
-			if (!self.itemWidth || !self.itemHeight) {
-				item.width(w).height(h);
-				self.itemWidth = w - (item.outerWidth(true) - w);
-				self.itemHeight = h - (item.outerHeight(true) - h);
-			}
-			item.width(self.itemWidth).height(self.itemHeight);
-
+			self._applyItemBound(item);
 			span = item.children("span:eq(0)").hide();
 			self._createCaption(item, img, span);
 
@@ -845,6 +854,19 @@
 			}
 			item.data("itemIndex", idx);
 			return item;
+		},
+
+		_applyItemBound: function (item) {
+			var self = this,
+				w = self.itemBound.w,
+				h = self.itemBound.h;
+
+			if (!self.itemWidth || !self.itemHeight) {
+				item.width(w).height(h);
+				self.itemWidth = w - (item.outerWidth(true) - w);
+				self.itemHeight = h - (item.outerHeight(true) - h);
+			}
+			item.width(self.itemWidth).height(self.itemHeight);
 		},
 
 		_createCaption: function (item, img, span) {
@@ -860,20 +882,23 @@
 
 					overlay = $(captionHtml)
 					.addClass("wijmo-wijcarousel-caption")
-					.width(self.itemWidth)
 					.appendTo(item);
 
 					text = $(captionHtml)
 					.addClass("ui-widget-content wijmo-wijcarousel-text")
 					.append(content)
-					.width(self.itemWidth)
 					.appendTo(item);
 
-					height = content.outerHeight(true);
-					text.height(height);
-					overlay.height(height);
+					self._applyCaptionStyle(overlay, text);
 				}
 			}
+		},
+
+		_applyCaptionStyle: function (overlay, text) {
+			var caption = overlay.add(text), height;
+			caption.width(this.itemWidth);
+			height = text.children("span").height();
+			caption.height(height);
 		},
 
 		_showCaption: function (idx, lastIndex) {
@@ -986,7 +1011,9 @@
 						.append($("<img>")
 						.attr("src", thumbOpt.images[idx]));
 				}
-				else { return; }
+				else {
+					return;
+				}
 			}
 			ul.append(item);
 		},
@@ -1014,6 +1041,16 @@
 				self._activePagerItem(li);
 			}
 
+			//Add support for jUICE!
+			if(thumbOpt) {
+				$.each(["mousedown", "mouseup","mouseover","mouseout","click"],function(i,n){
+					var c = thumbOpt[n];
+					if (c && (typeof c === "string") && window[c]) {
+						thumbOpt[n] = window[c];
+					}
+				});
+			}			
+			//end
 			self.pager.bind("mouseover." + self.widgetName, function (event) {
 				self._pageingEvents(event, "mouseover", thumbOpt, isDot, function (li) {
 					li.addClass(hoverCss);
@@ -1135,6 +1172,7 @@
 			}
 			self.pager.width(self.pager.width() + 1);
 			$.extend(position, o.pagerPosition);
+			o.pagerPosition = position;
 			self.pager.addClass("wijmo-wijcarousel-pager").position(position);
 
 		},
@@ -1295,6 +1333,74 @@
 			$.Widget.prototype.destroy.apply(this);
 		},
 
+		_resetDom: function () {
+			var self = this;
+
+			//reset list item container
+			self._applyListStyle();
+			self.list.children("li").each(function (idx) {
+				var li = $(this),
+				caption = li.children("div.wijmo-wijcarousel-caption"),
+				text = li.children("div.wijmo-wijcarousel-text");
+				self._applyItemBound(li);
+				self._setStyle(caption.add(text), function () {
+					self._applyCaptionStyle(caption, text);
+				});
+			});
+			self._applyContainerStyle(self.isHorizontal, true);
+
+			//reset preview
+			if (self.options.preview) {
+				self._createPreview();
+			}
+
+			//reset controls(button, pager, controls)
+			self._setStyle(self.prevBtn.add(self.nextBtn), function () {
+				self._applyBtnStyle(self.isHorizontal);
+			});
+
+			self._setStyle(self.pager, function () {
+				self.pager.position(self.options.pagerPosition);
+			});
+
+			self._setStyle(self.controls, function () {
+				self.controls.position(self.options.controlPosition);
+			});
+		},
+
+		_setStyle: function (control, func) {
+			var isShow = true;
+			if (!control || control.length === 0) {
+				return;
+			}
+
+			if (control.css("display") == "none") {
+				isShow = false;
+				control.css("display", "");
+			}
+			func.call(this);
+			if (!isShow) {
+				control.css("display", "none");
+			}
+
+		},
+
+		refresh: function () {
+			/// <summary>
+			/// Refresh the carousel.
+			/// Reset the layout, scrolled
+			/// </summary>
+			var self = this, o = self.options, el = self.element;
+
+			//reset variable
+			self.width = el.width() || 640;
+			self.height = el.height() || 480;
+			self.itemWidth = self.itemHeight = 0;
+
+			self._resetDom();
+			self.pause();
+		},
+
 		play: function () {
 			/// <summary>
 			/// Start displaying the images in order automatically.
@@ -1313,8 +1419,8 @@
                 .removeClass(playBtnCss)
                 .addClass(pauseBtnCss);
 				self.progressBar.animate({
-					width: "100%" 
-				},o.interval,
+					width: "100%"
+				}, o.interval,
 				function () {
 					self._scroll("next", o.step);
 				});
@@ -1325,7 +1431,7 @@
 				}
 				self.timeout = window.setTimeout(function () {
 					self.next();
-				},o.interval);
+				}, o.interval);
 			}
 			self.isPlaying = true;
 		},
@@ -1396,7 +1502,6 @@
 			list = self.list,
             offset = 0,
             mask, i,
-            currentItem,
 			isHorizontal = o.orientation === "horizontal",
             option = {},
             size = self.itemBound[isHorizontal ? "w" : "h"],
@@ -1446,7 +1551,7 @@
 				else {
 					for (i = 0; i < step; i++) {
 						offset -= size;
-						list.find("li:last").prependTo(list);
+						list.children("li:last").prependTo(list);
 					}
 					css[dir] = offset;
 					option[dir] = previewOffset;
@@ -1501,7 +1606,7 @@
 					}
 					if (action === "next") {
 						for (i = 0; i < scrolled; i++) {
-							list.find("li:first").appendTo(list);
+							list.children("li:first").appendTo(list);
 						}
 						if (dir) {
 							css[dir] = left;
@@ -1663,7 +1768,7 @@
 					if (item.data("itemIndex") >= index) {
 						item.data("itemIndex", item.data("itemIndex") + 1);
 					}
-				});				
+				});
 			}
 			else {
 				li.insertAfter(self._getItemByIndex(self.count - 1));

@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, navigator*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -380,6 +380,13 @@
 					}
 					if (chartSeries.legendEntry &&
 							chartSeries.display !== "exclude") {
+						if ((chartSeries.data.x === undefined &&
+						chartSeries.data.xy === undefined) ||
+						chartSeries.data.y === undefined &&
+						chartSeries.data.xy === undefined
+							) {
+							return true;
+						}
 						legendIcon = self.legendIcons[idx];
 						box = legendIcon.wijGetBBox();
 						x = box.x + box.width / 2;
@@ -392,8 +399,15 @@
 						"wijchart-legend-dot wijchart-canvas-object wijchart-legend");
 						dot.attr(style);
 						self.legendDots.push(dot);
+						$(dot.node).data("legendIndex",
+							$(self.legends[idx].node).data("legendIndex"))
+							.data("index", $(self.legends[idx].node).data("index"));
 						self.legendEles.push(dot);
-
+						if (chartSeries.visible === false) {
+							$(self.legends[i].node).data("dotOpacity",
+							dot.attr("opacity") || 1);
+							dot.attr("opacity", 0.3);
+						}
 						idx++;
 					}
 				});
@@ -447,7 +461,8 @@
 				target = tooltip.target;
 
 			if (target) {
-				o.style.stroke = target.getAttribute("stroke") ||
+				o.style.stroke = o.style.stroke || 
+				target.getAttribute("stroke") ||
 				target.getAttribute("fill") || "#ffffff";
 				target.attrs = { stroke: o.style.stroke };
 			}
@@ -524,13 +539,16 @@
 								if (ele.remove) {
 									ele.remove();
 								}
-								ele = null;
+								eles[i] = null;
 							}
 						});
 					}
-					eles = [];
+					fields.chartElements[key] = null;
 				});
-				fields.chartElements = [];
+				fields.chartElements = {};
+				$(fields.clipRect.element).stop().remove();
+				fields.render.destroy();				
+				fields.clipRect.destroy();
 			}
 
 			self.canvas.clear();
@@ -599,10 +617,10 @@
 				widgetName = options.widgetName,
 				canvas = options.canvas,
 				ani = options.animation,
-				seTrans = options.seriesTransition,
+				//seTrans = options.seriesTransition,
 				seriesList = options.seriesList,
 				seriesStyles = options.seriesStyles,
-				//seriesHoverStyles = options.seriesHoverStyles,
+				seriesHoverStyles = options.seriesHoverStyles,
 				isXTime = options.isXTime,
 				isYTime = options.isYTime,
 				zoomOnHover = options.zoomOnHover,
@@ -641,8 +659,13 @@
 					.addClass("vmlcontainer").get(0), element.width(), element.height());
 			}
 			
+			
+
 			clipRect = Render.clipRect(0, 0, 0, element.height());
 			g = Render.g().clip(clipRect).add();
+
+			fields.render = Render;
+			fields.clipRect = clipRect;
 
 			function bindLiveEvents() {
 				var isFunction = $.isFunction;
@@ -678,8 +701,8 @@
 						if (zoomOnHover) {
 							seriesIndex = dataObj.seriesIndex;
 							if (dot.attr) {
-//								style = $.extend(true, dot.attr(), 
-//									seriesHoverStyles[seriesIndex]);
+								style = $.extend(true, dot.attr(), 
+									seriesHoverStyles[seriesIndex]);
 								dot.attr(style);
 							}
 							if (document.createElementNS) {
@@ -761,8 +784,10 @@
 				if (!style.fill && style.stroke) {
 					style.fill = style.stroke;
 				}
-				
-				$.each(valuesY, function (j, valY) {
+				if (valuesX === undefined) {
+					return true;
+				}
+				$.each(valuesY, function (j, valY) {					
 					var valX = valuesX[j],
 						X = 0,
 						Y = 0,
@@ -798,30 +823,40 @@
 						style["stroke-width"] = 1;
 					}
 
-					//delete style.fill;
-					dot = Render.symbol(type, X, Y, markerWidth).attr(style).add(g);
+					
+					//handle gradient fill.
+					//fill = style.fill;
+					//fill = fill.replace(/[\(\)\s,\xb0#]/g, "_");
+					
+					dot = Render.symbol(type, X, Y, markerWidth)
+					.attr(style)
+					.add(g);
 					dot.attr({
 						"class": "wijchart-canvas-object wijscatterchart"
 					});
-					dotData.dot = dot;
-					dotData.x = valuesX[j];
-					dotData.y = valuesY[j];
-					dotData.seriesIndex = i;
-					dotData.index = j;
-					dotData.markerType = type;
-					dotData.label = series.label;
-					dotData.series = series;
-					dotData.data = series.data;
-					dotData.type = "scatter";
+
+					dotData = $.extend(true, {
+						dot: dot,
+						x: valuesX[j],
+						y: valuesY[j],
+						seriesIndex: i,
+						index: j,
+						markerType: type,
+						type: "scatter"
+					}, series);
+
 					$(dot.element).data("wijchartDataObj", dotData);
 					scatter.push(dot);
 					tooltipTars.push($.extend({}, dot, {node: dot.element}));
 					seriesEle.push(dot);
+					if (series.visible === false) {
+						dot.hide();
+					}
 				});
 				scatters.push(scatter);
 				seriesEles.push(seriesEle);
 			});
-			if (ani.enabled || seTrans.enabled) {				
+			if (ani.enabled) {				
 				if (bgColor === "transparent") {
 					bgColor = "white";
 				}
@@ -898,7 +933,9 @@
 	L = 'L',
 	SVGRenderer,
 	VMLRenderer,
-	VMLElement;
+	VMLElement,
+	regRadialGradient = /^r(?:\(([^,]+?)[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*([^\)]+?)\))?/,
+	regLinearGradient = /^(\d{1,3})\-(?:((?:[a-zA-Z]+)|(?:\#[0-9a-fA-F]{6})|(?:\#[0-9a-fA-F]{3}))\-)(?:(?:((?:(?:[a-zA-Z]+)|(?:\#[0-9a-fA-F]{6})|(?:\#[0-9a-fA-F]{3}))(?:\:\d{1,3})?)\-)?)*((?:[a-zA-Z]+)|(?:\#[0-9a-fA-F]{6})|(?:\#[0-9a-fA-F]{3}))$/;
 
 	function isString(s) {
 		return typeof s === 'string';
@@ -951,6 +988,15 @@
 		return el;
 	}
 
+	function destroyObjectProperties(obj) {
+		$.each(obj, function (key, node) {
+			if (obj[key] && obj[key].destroy) {
+				obj[key].destroy();
+			}
+			delete obj[key];
+		});
+	}
+
 	function SVGElement() { }
 
 	SVGElement.prototype = {
@@ -962,6 +1008,7 @@
 			var key,
 				value,
 				element = this.element,
+				renderer = this.renderer,
 				nodeName = element.nodeName,
 				skipAttr,
 				ret = this;
@@ -998,10 +1045,15 @@
 							value = 'M 0 0';
 						}
 						this.d = value; 
+					// apply gradients
+					} else if (key === 'fill') {
+						value = renderer.color(value, element, key);
+
 					} else if (nodeName === 'circle' && (key === 'x' || 
 						key === 'y')) {
 						key = { x: 'cx', y: 'cy'}[key] || key;						
-					}			
+					}
+								
 					if (jQuery.browser.safari && key === 'stroke-width' && value === 0) {
 						value = 0.000001;
 					}					
@@ -1193,7 +1245,62 @@
 			self.added = true;
 
 			return self;
-		},		
+		},
+		
+		safeRemoveChild: function (element) {
+			var parentNode = element.parentNode;
+			if (parentNode) {
+				parentNode.removeChild(element);
+			}
+		},
+
+		/**
+		 * Destroy the element and element wrapper
+		 */
+		destroy: function () {
+			var wrapper = this,
+				element = wrapper.element || {},
+				shadows = wrapper.shadows,
+				box = wrapper.box,				
+				i;
+
+			// remove events
+			element.onclick = element.onmouseout = element.onmouseover = 
+			element.onmousemove = null;
+
+			if (wrapper.clipPath) {
+				wrapper.clipPath = wrapper.clipPath.destroy();
+			}
+
+			// Destroy stops in case this is a gradient object
+			if (wrapper.stops) {
+				for (i = 0; i < wrapper.stops.length; i++) {
+					wrapper.stops[i] = wrapper.stops[i].destroy();
+				}
+				wrapper.stops = null;
+			}
+
+			// remove element
+			wrapper.safeRemoveChild(element);
+
+			// destroy shadows
+			if (shadows) {
+				each(shadows, function (shadow) {
+					wrapper.safeRemoveChild(shadow);
+				});
+			}
+
+			// destroy label box
+			if (box) {
+				box.destroy();
+			}
+
+			$.each(wrapper, function (key, obj) {
+				delete wrapper[key];
+			});		
+			return null;
+		},
+				
 		empty: function () {
 			var element = this.element,
 			childNodes = element.childNodes,
@@ -1201,6 +1308,7 @@
 
 			while (i--) {
 				element.removeChild(childNodes[i]);
+				$(childNodes[i]).remove();
 			}
 		},
 
@@ -1208,6 +1316,7 @@
 			var ele = this.element,
 				parentNode = ele.parentNode;
 			parentNode.removeChild(ele);
+			$(ele).remove();
 		}
 	};
 
@@ -1229,6 +1338,7 @@
 				boxWrapper.element = container;
 				boxWrapper.render = self;
 				self.defs = $("defs", container).get(0);
+				self.gradients = {};
 			}
 			else {
 				boxWrapper = self.createElement('svg')
@@ -1240,6 +1350,7 @@
 				self.box = boxWrapper.element;
 				self.boxWrapper = boxWrapper;
 				self.defs = this.createElement('defs').add();
+				self.gradients = {};
 				self.setSize(width, height);
 			}
 			self.url = isIE ? '' : loc.href.replace(/#.*?$/, ''); 
@@ -1248,7 +1359,8 @@
 		destroy: function () {
 			var self = this;
 			self.box = null;
-			self.boxWrapper = self.boxWrapper.destroy();
+			destroyObjectProperties(self.gradients || {});
+			self.gradients = null;
 			return null;
 		},
 
@@ -1438,6 +1550,186 @@
 			wrapper.id = id;
 			wrapper.clipPath = clipPath;
 			return wrapper;
+		},
+
+		gradientCache: {},
+
+		_parsegradientcolor: function (gradient) {
+			var self = this, 
+				dots = [], dot, par, i, start, end, ii, j, d;
+
+			if (self.gradientCache[gradient]) {
+				return self.gradientCache[gradient];
+			}
+            for (i = 0, ii = gradient.length; i < ii; i++) {
+				dot = {};
+                par = gradient[i].match(/^([^:]*):?([\d\.]*)/);
+                dot.color = Raphael.getRGB(par[1]);
+                if (dot.color.error) {
+                    return null;
+                }
+                dot.color = dot.color.hex;
+				if (par[2]) {
+					dot.offset = par[2] + "%";
+				}
+                dots.push(dot);
+            }
+            for (i = 1, ii = dots.length - 1; i < ii; i++) {
+                if (!dots[i].offset) {
+                    start = parseFloat(dots[i - 1].offset || 0);
+                    end = 0;
+                    for (j = i + 1; j < ii; j++) {
+                        if (dots[j].offset) {
+                            end = dots[j].offset;
+                            break;
+                        }
+                    }
+                    if (!end) {
+                        end = 100;
+                        j = ii;
+                    }
+                    end = parseFloat(end);
+                    d = (end - start) / (j - i + 1);
+                    for (; i < j; i++) {
+                        start += d;
+                        dots[i].offset = start + "%";
+                    }
+                }
+            }
+			self.gradientCache[gradient] = dots;
+            return dots;
+		},
+			/**
+		 * Take a color and return it if it's a string, make it a gradient if it's a
+		 * gradient configuration object. Prior to Highstock, an array was used to define
+		 * a linear gradient with pixel positions relative to the SVG. In newer versions
+		 * we change the coordinates to apply relative to the shape, using coordinates
+		 * 0-1 within the shape. To preserve backwards compatibility, linearGradient
+		 * in this definition is an object of x1, y1, x2 and y2.
+		 *
+		 * @param {Object} color The color or config object
+		 */
+		color: function (color, elem, prop) {
+			var self = this,
+				type = "color",
+				fx = 0.5,
+				fy = 0.5,
+				gradients = self.gradients,
+				gradientObject,
+				gradient, x1, y1, x2, y2,
+				stopColor, vector, max,
+				stopOpacity, key = color, id, angle, stops;
+
+			if (regLinearGradient.test(color)) {
+				type = "linear";
+			}
+			else {
+				color = color.replace(regRadialGradient, function (all, _fx, _fy) {
+					type = "radial";
+					if (_fx && _fy) {
+						fx = parseFloat(_fx);
+						fy = parseFloat(_fy);
+						var dir = ((fy > 0.5) * 2 - 1);
+						if (Math.pow(fx - 0.5, 2) + Math.pow(fy - 0.5, 2) > 0.25 &&
+						(fy = Math.sqrt(0.25 - Math.pow(fx - 0.5, 2)) * dir + 0.5) &&
+						fy !== 0.5) {
+							fy = fy.toFixed(5) - 1e-5 * dir;
+						}
+					}
+					return "";
+				});
+			}			
+			
+			if (type === "linear" || type === "radial") {
+				gradient = color.split(/\s*\-\s*/);	
+							
+				if (type === "linear") {
+					angle = gradient.shift();
+					angle = -parseFloat(angle);
+					if (isNaN(angle)) {
+						return color;
+					}
+					vector = [0, 0, Math.cos(Raphael.rad(angle)),
+						Math.sin(Raphael.rad(angle))];
+					max = 1 / (Math.max(Math.abs(vector[2]), 
+					Math.abs(vector[3])) || 1);
+					vector[2] *= max;
+					vector[3] *= max;
+					if (vector[2] < 0) {
+						vector[0] = -vector[2];
+						vector[2] = 0;
+					}
+					if (vector[3] < 0) {
+						vector[1] = -vector[3];
+						vector[3] = 0;
+					}
+
+					x1 = vector[0];
+					y1 = vector[1];
+					x2 = vector[2];
+					y2 = vector[3];
+
+				}			
+
+				// If the gradient with the same setup is already created, reuse it
+				if (gradients[key]) {
+					id = attr(gradients[key].element, 'id');
+				// If not, create a new one and keep the reference.
+				} else {
+
+					stops = this._parsegradientcolor(gradient);
+					$.each(stops, function (i, stop) {
+						stop.offset = stop.offset ? stop.offset: i ? "100%" : "0%";
+					});
+
+					id = PREFIX + _counter ++;
+					gradientObject = self.createElement(type + "Gradient")
+						.attr(type === "radial" ? {
+							id: id,
+							fx: fx,
+							fy: fy
+						} : {
+							id: id,
+							x1: x1,
+							y1: y1,
+							x2: x2,
+							y2: y2
+						});
+						
+					$(this.defs).append(gradientObject.element);
+
+					// The gradient needs to keep a list of stops 
+					// to be able to destroy them
+					gradientObject.stops = [];
+					$.each(stops, function (i, stop) {
+						var stopObject;						
+						stopColor = stop.color;
+						stopOpacity = 1;
+						
+						stopObject = self.createElement('stop').attr({
+							offset: stop.offset,
+							'stop-color': stopColor,
+							'stop-opacity': stopOpacity
+						}).add(gradientObject);
+
+						// Add the stop element to the gradient
+						gradientObject.stops.push(stopObject);
+					});
+
+					// Keep a reference to the gradient object so it is 
+					// possible to reuse it and destroy it later
+					gradients[key] = gradientObject;
+				}
+				return 'url(#' + id + ')';
+			}
+			else {
+				// Remove the opacity attribute added above. 
+				// Does not throw if the attribute is not there.
+				elem.removeAttribute(prop + '-opacity');
+
+				return color;
+			}
+
 		}
 	}; 
 
@@ -1497,6 +1789,7 @@
 					elemStyle = element.style,
 					nodeName = element.nodeName,
 					symbolName = self.symbolName,
+					renderer = self.renderer,
 					childNodes,
 					hasSetSymbolSize,
 					shadows = self.shadows,
@@ -1587,6 +1880,7 @@
 								elemStyle.color = value;
 							} else {
 								element.filled = value !== NONE ? true : false;
+								value = renderer.color(value, element, key);
 								key = 'fillcolor';
 							}
 						}						
@@ -1650,6 +1944,7 @@
 				while (i--) {
 					node = childNodes[i];
 					node.parentNode.removeChild(node);
+					$(node).remove();
 				}
 			},
 
@@ -1741,6 +2036,88 @@
 						});
 					}
 				});
+			},
+
+			/**
+			 * Take a color and return it if it's a string, make it a gradient if it's a
+			 * gradient configuration object, and apply opacity.
+			 *
+			 * @param {Object} color The color or config object
+			 */
+			color: function (color, elem, prop) {
+				var markup,
+					self = this,
+					type = "color",					
+					gradient,
+					stopColor,					
+					color1,					
+					color2,					
+					colors = [], ele, strokeNodes,
+					fxfy, stops, angle = 0;
+
+				if (regLinearGradient.test(color)) {
+					type = "linear";
+				}
+				else {
+					color = color.replace(regRadialGradient, function (all, fx, fy) {
+						type = "radial";
+						if (fx && fy) {
+							fx = parseFloat(fx);
+							fy = parseFloat(fy);
+							if (Math.pow(fx - 0.5, 2) + Math.pow(fy - 0.5, 2) > 0.25) { 
+								fy = Math.sqrt(0.25 - Math.pow(fx - 0.5, 2)) * 
+								((fy > 0.5) * 2 - 1) + 0.5;
+							}
+							fxfy = fx + " " + fy;
+						}
+						return "";
+					});
+					type = "radial";
+				}
+				
+				if (type === "linear" || type === "radial") {
+					gradient = color.split(/\s*\-\s*/);
+					if (type === "linear") {
+						angle = gradient.shift();
+						angle = -parseFloat(angle);
+					}
+					stops = self._parsegradientcolor(gradient);
+					
+					$.each(stops, function (i, stop) {
+						stop.offset = stop.offset ? stop.offset : i ? "100%" : "0%";
+						colors.push(stop.offset + " " + stop.color);
+						stopColor = stop.color;					
+
+						if (!i) { // first
+							color1 = stopColor;
+						} else {
+							color2 = stopColor;
+						}
+					});
+
+					if (type === "radial") {
+						markup = ['<fill colors="', colors.join(), '" angle="0"',
+						 '" focusposition="', fxfy, '" color="', color1, 
+						 '" color2="', color2, '" focussize="0 0"',
+						' type="gradientTitle" focus="100%" method="none" />'];
+					}
+					else {
+						markup = ['<fill colors="', colors.join(), '" angle="', 
+						angle,						
+							'" type="gradient" focus="100%" method="sigma" />'];
+					}
+					ele = createElement(self.prepVML(markup));
+					$(elem).append(ele);
+				}
+
+				else {
+					strokeNodes = elem.getElementsByTagName(prop);
+					if (strokeNodes.length) {
+						strokeNodes[0].opacity = 1;
+					}
+					return color;
+				}
+
 			},
 
 			prepVML: function (markup) {

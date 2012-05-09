@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -696,13 +696,45 @@
 			var args = { date: date };
 			if (this._trigger("beforeSelect", null, args) === false) { return false; }
 
-			if (!o.selectionMode.days || (!e.metaKey && !e.shiftKey)) { this.unSelectAll(); }
+			if (!o.selectionMode.days || (!e.metaKey && !e.shiftKey && !e.ctrlKey)) { this.unSelectAll(); }
 
-			var selected = true;
-			if (!!o.selectionMode.days && e.shiftKey && this.element.data("lastdate.wijcalendar")) {
-				this._selectRange(this.element.data("lastdate.wijcalendar"), date);
+			var selected = false;
+			if (!!o.selectionMode.days) {
+				if (e.shiftKey && this.element.data("lastdate.wijcalendar")) {
+					this._selectRange(this.element.data("lastdate.wijcalendar"), date);
+					selected = true;
+				} else {
+					if (e.ctrlKey) {
+						this.element.data("lastdate.wijcalendar", date);
+						
+						var selDates = o.selectedDates, exist = false, dates = new Array();
+						$.each(selDates, function (i, d) {
+							if (date.getFullYear() === d.getFullYear() &&
+								date.getMonth() === d.getMonth() &&
+								date.getDate() === d.getDate()) {
+								exist = true;
+								return false;
+							}
+						});
+						
+						if (exist) {
+							this.unSelectDate(date);
+						} else {
+							this.selectDate(date);
+						}
+						
+						selDates = o.selectedDates;
+						$.each(selDates, function (i, d) {
+							dates.push(new Date(d));
+						});
+							
+						this._trigger('selectedDatesChanged', null, { dates: dates });
+						selected = true;
+					} 
+				}
 			}
-			else {
+			
+			if (!selected) {
 				this.element.data("lastdate.wijcalendar", date);
 				selected = this.selectDate(date);
 				this._trigger('selectedDatesChanged', null, { dates: [date] });

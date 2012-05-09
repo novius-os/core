@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -70,7 +70,7 @@
             ///	Determines the name of player to host the content.
             /// Default: ''
             /// Type: String
-            /// Possible values are: 'inline', 'iframe', 'img', 'swf', 'flv', 'wmp', 'qt'
+            /// Possible values are: 'inline', 'iframe', 'img', 'swf', 'flv', 'wmp', 'qt', 'wijvideo'
             /// Code example:
             ///  $("#id").wijlightbox({
             ///      player: 'img'
@@ -111,7 +111,7 @@
             /// Possible values are: 'close', 'fullSize' separated by '|'.
             /// Code example:
             ///  $("#id").wijlightbox({
-            ///      dialogButtons: 'close|fullsize'
+            ///      dialogButtons: 'close|fullSize'
             ///  });
             ///	</summary>
             dialogButtons: 'close',
@@ -614,25 +614,6 @@
             this.content = $('<div></div>').addClass('wijmo-wijlightbox-content')
 				.appendTo(this.frame);
 
-            if (o.clickPause) {
-                if (this._groupMode() && (o.autoPlay || (this.ctrlButtons && this.ctrlButtons.indexOf('play') >= 0))) {
-                    this.content.click(function () {
-                        self[!self.isPlaying() ? 'play' : 'stop']();
-                    });
-                }
-            } else {
-                if (this._groupMode()) {
-                    this.content.click(function (e) {
-                        var rect = $.extend({}, $(this).offset(), { width: $(this).outerWidth(true), height: $(this).outerHeight(true) });
-                        if (e.pageX >= rect.left && e.pageX < (rect.left + rect.width / 2)) {
-                            self.back();
-                        } else {
-                            self.next();
-                        }
-                    });
-                }
-            }
-
             // Active a panel
             // use "activeIndex" option or try to retrieve:
             // 1. from cookie
@@ -649,6 +630,7 @@
             // sanity check - default to first page...
             o.activeIndex = ((o.activeIndex >= 0 && o.groupItems[o.activeIndex]) || o.activeIndex < 0) ? o.activeIndex : 0;
 
+			this._initClickBehavior();
             this._createTimerBar();
             this._createDialogButtons();
             this._createCtrlButtons();
@@ -668,30 +650,8 @@
             if (this._groupMode()) {
                 this._createNavButtons();
             }
-
-            if (o.showControlsOnHover) {
-                this.frame.bind({
-                    'mouseenter': function () {
-                        if (self.container.data('moving.wijlightbox')) {
-                            return false;
-                        }
-                        self._showAccessories(true);
-                    },
-                    'mouseleave': function () {
-                        if (self.container.data('moving.wijlightbox')) {
-                            return false;
-                        }
-
-                        self._hideAccessories(true);
-                    },
-                    'mousemove': function () {
-                        if (self.container.data('moving.wijlightbox') === false && self.container.data('accessvisible.wijlightbox') === false) {
-                            self.frame.trigger('mouseenter');
-                        }
-                    }
-                });
-            }
-
+			
+			this._initHoverBehavior();
             this.container.width(this.frame.outerWidth());
         },
 
@@ -737,8 +697,73 @@
                 case 'textPosition':
                     this._resetText();
                     break;
+					
+				case 'clickPause':
+					this._initClickBehavior();
+					break;
+					
+				case 'showNavButtons':
+					this._createNavButtons();
+					break;
+					
+				case 'showControlsOnHover':
+					this._initHoverBehavior();
+					break;
             }
         },
+		
+		_initClickBehavior: function(){
+			var o = this.options, self = this;
+
+			this.content.unbind('click');
+			if (o.clickPause) {
+                if (this._groupMode()) {
+                    this.content.click(function () {
+                        self[!self.isPlaying() ? 'play' : 'stop']();
+                    });
+                }
+            } else {
+                if (this._groupMode()) {
+                    this.content.click(function (e) {
+						if (self.isPlaying()) { return false; };
+                        var rect = $.extend({}, $(this).offset(), { width: $(this).outerWidth(true), height: $(this).outerHeight(true) });
+                        if (e.pageX >= rect.left && e.pageX < (rect.left + rect.width / 2)) {
+                            self.back();
+                        } else {
+                            self.next();
+                        }
+                    });
+                }
+            }
+		},
+		
+		_initHoverBehavior: function() {
+			var o = this.options, self = this;
+			this.frame.unbind('.wijlightbox');
+		
+			if (o.showControlsOnHover) {
+				this.frame.bind({
+					'mouseenter.wijlightbox': function () {
+						if (self.container.data('moving.wijlightbox')) {
+							return false;
+						}
+						self._showAccessories(true);
+					},
+					'mouseleave.wijlightbox': function () {
+						if (self.container.data('moving.wijlightbox')) {
+							return false;
+						}
+
+						self._hideAccessories(true);
+					},
+					'mousemove.wijlightbox': function () {
+						if (self.container.data('moving.wijlightbox') === false && self.container.data('accessvisible.wijlightbox') === false) {
+							self.frame.trigger('mouseenter');
+						}
+					}
+				});
+			}
+		},
 
         _getPlugins: function () {
             var plugins = this.container.data('plugins.wijlightbox');
@@ -803,7 +828,7 @@
             if ($a.length > 0 && $a[0].tagName.toLowerCase() === 'a') {
                 var rel = $a.attr('rel'),
 					opt = {},
-					props = ['href', 'player', 'title', 'alt', 'height', 'width', 'gallery'];
+					props = ['href', 'player', 'title', 'alt', 'height', 'width', 'gallery', 'wijvideosrc'];
 
                 $.each(props, function (i, o) {
                     opt[o] = $a.attr(o) || '';
@@ -848,7 +873,11 @@
                 if (!opt.gallery) {
                     $a.bind({
                         'click': function (e) {
-                            self._open($img, opt);
+							e.stopPropagation();
+							e.preventDefault();
+							if (!o.disabled) {
+								self._open($img, opt);
+							}
                             return false;
                         }
                     });
@@ -857,7 +886,11 @@
                     o.groupItems[index] = opt;
                     $a.bind({
                         'click': function (e) {
-                            self._open($img, index);
+							e.stopPropagation();
+							e.preventDefault();
+							if (!o.disabled) {
+								self._open($img, index);
+							}
                             return false;
                         }
                     });
@@ -1243,6 +1276,7 @@
             if (buttons.length === 1 && buttons[0] === o.dialogButtons) {
                 buttons = o.dialogButtons.split(',');
             }
+
             $.each(buttons, function (index, name) {
                 name = $.trim(name);
                 if (name === 'close' && !this.closeBtn) {
@@ -1389,6 +1423,7 @@
                         if ($(this).hasClass('wijmo-wijlightbox-counter-active')) { return false; }
 
                         self.show(parseInt($(this).text(), 10) - 1);
+						return false;
                     });
                 } else {
                     var fmt = o.counterFormat || "[i] of [n]";
@@ -1454,7 +1489,7 @@
         },
 
         _getUrl: function (item) {
-            var o = this.options, url = item.href, rootUrl = o.rootUrl;
+            var o = this.options, url = (typeof item === 'string') ? item : item.href, rootUrl = o.rootUrl;
             if (rootUrl && rootUrl.length > 0) {
                 if (rootUrl.indexOf('//') === -1) {
                     rootUrl = window.location.protocol + '//' + window.location.host + (rootUrl.startsWith('/') ? '' : '/') + rootUrl;
@@ -2168,6 +2203,12 @@
 
                 self._refreshNavButtons();
                 self._refreshDialogButtons();
+				
+				var data = {
+					index: o.activeIndex,
+					item: o.groupItems[o.activeIndex]
+				};
+				self._trigger('show', null, data);
                 self._trigger('open');
             };
 
@@ -2206,7 +2247,9 @@
 
                 this.container.data('fullsize.wijlightbox', false);
                 $win.unbind('resize.wijlightbox', $.proxy(this, '_resizeHandler'));
-                self._resize();
+                self._resize(function(){
+					self._adjustPlayerSize(self.content.innerWidth(), self.content.innerHeight());
+				});
             } else {
                 this.container.data('fullsize.wijlightbox', true);
                 $win.bind('resize.wijlightbox', $.proxy(this, '_resizeHandler'));
@@ -2225,6 +2268,8 @@
                     self.frame.width(toRect.width);
                     self.container.width(self.frame.outerWidth());
                     self._createText();
+					
+					self._adjustPlayerSize(self.content.innerWidth(), self.content.innerHeight());					
                 });
             }
 
@@ -2257,7 +2302,8 @@
 				swfExt = ["swf"],
 				flvExt = ["flv", "m4v"],
 				qtExt = ["dv", "mov", "moov", "movie", "mp4", "avi", "mpg", "mpeg"],
-				wmpExt = ["asf", "avi", "mpg", "mpeg", "wm", "wmv"];
+				wmpExt = ["asf", "avi", "mpg", "mpeg", "wm", "wmv"],
+				html5Video = ["mp4", "mpg", "mpeg", "ogg", "ogv"];
 
             var ext = this._getExt(url);
             if (ext) {
@@ -2276,9 +2322,21 @@
                 if ($.inArray(ext, qtExt) >= 0) {
                     return "qt";
                 }
+				if ($.inArray(ext, html5Video) >= 0) {
+                    return "wijvideo";
+                }
             }
             return "iframe";
         },
+		
+		_adjustPlayerSize: function(width, height) {
+			var player = this.container.data('player.wijlightbox');
+            if (player) {
+				if (player['adjustSize']){
+					player.adjustSize(width, height);
+				}
+            }
+		},
 
         _removePlayer: function () {
             var player = this.container.data('player.wijlightbox');
@@ -2477,6 +2535,21 @@
             if (lo.showMovieControls) {
                 this.height += qtControllerHeight;
             }
+
+            if (onload && $.isFunction(onload)) {
+                onload.apply(lightbox);
+            }
+        },
+		wijvideo: function (lightbox, item, onload, onerror) {
+            this.name = 'wijvideo';
+            var lo = lightbox.options;
+            this.id = 'wijvideohost';
+            this.lightbox = lightbox;
+            this.item = item;
+            this.url = this.lightbox._getUrl(item);
+			this.wijvideosrc = (!!item.wijvideosrc && item.wijvideosrc !== "") ? this.lightbox._getUrl(item.wijvideosrc) : null;
+            this.width = item.width ? parseInt(item.width, 10) : lo.width;
+            this.height = item.height ? parseInt(item.height, 10) : lo.height;
 
             if (onload && $.isFunction(onload)) {
                 onload.apply(lightbox);
@@ -2760,8 +2833,51 @@
         remove: function () {
             try {
                 document[this.id].Stop();
+				document[this.id] = null;
             } catch (e) { }
 
+            this.$container.remove();
+        },
+        fadeOut: function (duration, complete) {
+			complete.call(); return;
+            if (this.$container) {
+                this.$container.fadeOut(duration, complete);
+            }
+        },
+        fadeIn: function (duration, complete) {
+			complete.call(); return;
+            if (this.$container) {
+                this.$container.fadeIn(duration, complete);
+            }
+        },
+        getElement: function () {
+            return this.$container;
+        }
+    });
+
+	$.extend($.wijmo.wijlightbox.wijvideo.prototype, {
+        appendTo: function ($content) {
+			var lo = this.lightbox.options;
+            this.$container = $('<video/>').css({
+                overflow: 'hidden'
+            }).attr({
+				width: this.width,
+                height: this.height,
+				autoPlay: (lo.autoPlayMovies ? 'true' : 'false'),
+				controls: (lo.showMovieControls ? 'controls' : '')
+			}).appendTo($content);
+			
+			if (!!this.url){
+				$('<source/>').attr({src: this.url}).appendTo(this.$container);
+			}
+			
+			if (!!this.wijvideosrc){
+				$('<source/>').attr({src: this.wijvideosrc}).appendTo(this.$container);
+			}
+			
+			this.$container.wijvideo({fullScreenButtonVisible: false});
+        },
+        remove: function () {
             this.$container.remove();
         },
         fadeOut: function (duration, complete) {
@@ -2776,9 +2892,12 @@
         },
         getElement: function () {
             return this.$container;
-        }
+        },
+		adjustSize: function(width, height) {
+			this.$container.wijvideo('setWidth', width);
+			this.$container.wijvideo('setHeight', height);
+		}
     });
-
 
     $.extend($.wijmo.wijlightbox, {
         overlay: function (lightbox, waiting) {
@@ -2788,6 +2907,9 @@
 				.css({
 				    width: this.width(),
 				    height: this.height()
+				}).bind("click", function () {
+					lightbox._close();
+					return false;
 				});
 
             if ($.fn.bgiframe) {

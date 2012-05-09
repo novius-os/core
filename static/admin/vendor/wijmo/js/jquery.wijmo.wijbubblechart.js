@@ -1,7 +1,7 @@
 /*globals jQuery Raphael Globalize*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -505,6 +505,39 @@
 			}
 		},
 
+		_clearChartElement: function () {
+			var self = this,
+				o = self.options,
+				fields = self.chartElement.data("fields");
+
+			$.wijmo.wijchartcore.prototype._clearChartElement.apply(self, arguments);
+
+			if (fields && fields.bubbleInfos) {
+				$.each(fields.bubbleInfos, function (i, n) {
+					if (n.bubble) {
+						n.bubble.wijRemove();
+					}
+					if (n.dcl) {
+						n.dcl.wijRemove();
+					}
+					if (n.symbol) {
+						n.symbol.wijRemove();
+					}
+				});
+			}
+
+			if (fields && fields.bubbles) {
+				self._destroyRaphaelArray(fields.bubbles);
+			}
+			self.element.removeData("plotInfos");
+
+			if (!o.seriesTransition.enabled) {
+				if (fields && fields.bubblesAnimationInfos) {
+					fields.bubblesAnimationInfos = null;
+				}
+			}
+		},
+
 		destroy: function () {
 			/// <summary>
 			/// Remove the functionality completely. This will return the 
@@ -630,17 +663,18 @@
 				box = null,
 				x = 0,
 				y = 0,
+				r = 0,
 				markerStyle = null,
 				type = null,
 				dot = null;
-			$.extend(true, o, {
-				legend: {
-					size: {
-						width: 30,
-						height: 3
-					}
-				}
-			});
+			//			$.extend(true, o, {
+			//				legend: {
+			//					size: {
+			//						width: 30,
+			//						height: 3
+			//					}
+			//				}
+			//			});
 
 			$.wijmo.wijchartcore.prototype._paintLegend.apply(self, arguments);
 
@@ -663,10 +697,11 @@
 							if (chartSeries.markers) {
 								type = chartSeries.markers.type;
 							}
-							legendIcon = self.legendIcons[i];
+							legendIcon = self.legendIcons[idx];
 							box = legendIcon.wijGetBBox();
 							x = box.x + box.width / 2;
 							y = box.y + box.height / 2;
+							r = Math.min(box.width, box.height);
 							markerStyle = chartSeries.markerStyle;
 							markerStyle = $.extend({
 								fill: chartSeriesStyle.stroke,
@@ -676,14 +711,19 @@
 							if (!type) {
 								type = "circle";
 							}
-							dot = self.canvas.paintMarker(type, x, y, 7);
+							dot = self.canvas.paintMarker(type, x, y, r / 2);
 							$.wijraphael.addClass($(dot.node),
 							"chart-legend-dot wijchart-canvas-object wijchart-legend");
 							dot.attr(markerStyle);
-							$(dot.node).data("index", i);
+							$(dot.node).data("index", i)
+								.data("legendIndex", idx);
 							legendIcon.remove();
-							self.legendIcons[i] = dot;
-
+							self.legendIcons[idx] = dot;
+							if (!!chartSeries.visible) {
+								$(self.legends[idx].node)
+								.data("dotOpacity", dot.attr("opacity") || 1);
+								dot.attr("opacity", 0.3);
+							}
 							idx++;
 						}
 					}
@@ -696,7 +736,7 @@
 							if (chartSeries.markers) {
 								type = chartSeries.markers.type;
 							}
-							legendIcon = self.legendIcons[i];
+							legendIcon = self.legendIcons[idx];
 							box = legendIcon.wijGetBBox();
 							x = box.x + box.width / 2;
 							y = box.y + box.height / 2;
@@ -713,7 +753,12 @@
 							$.wijraphael.addClass($(dot.node), "chart-legend-dot");
 							dot.attr(markerStyle);
 							legendIcon.remove();
-							self.legendIcons[i] = dot;
+							self.legendIcons[idx] = dot;
+							if (!!chartSeries.visible) {
+								$(self.legends[idx].node)
+								.data("dotOpacity", dot.attr("opacity") || 1);
+								dot.attr("opacity", 0.3);
+							}
 							idx++;
 						}
 					}
@@ -747,6 +792,10 @@
 				var data = series.data,
 					markers = series.markers || {},
 					markerType = markers.type || "circle";
+
+				if (data.y1 === undefined) {
+					return true;
+				}
 				$.each(data.y1, function (i, yval) {
 					var r = $.wijbubble.transform(yval, o.maximumSize, o.minimumSize,
 						self.canvasBounds, bubMin, bubDiff,
@@ -1240,7 +1289,7 @@
 						}
 					});
 				}
-			}			
+			}
 
 			function getSymbol(symbols, index) {
 				var symbol;
@@ -1333,7 +1382,15 @@
 					bubbleRadius = options.bubbleRadius,
 					dcl, imgWidth, imgHeight;
 
+				if (data.y1 === undefined) {
+					return;
+				}
+
 				$.each(data.y1, function (i, y1) {
+					if (data.x === undefined || data.y === undefined) {
+						return true;
+					}
+
 					var x = data.x[i],
 						y = data.y[i],
 						markers = series.markers || {},
@@ -1402,8 +1459,18 @@
 					}
 					$(bubble.node).data("wijchartDataObj", wijchartDataObj);
 
-					tracker = bubble.clone()
-					.attr({ opacity: 0.01, fill: "white", "fill-opacity": 0.01 });
+					tracker = bubble.clone();
+					//.attr({ opacity: 0.01, fill: "white", "fill-opacity": 0.01 });
+
+					// in vml, if the tracker has a stroke, the boder is black.
+					if ($.browser.msie && $.browser.version < 9) {
+						tracker.attr({ opacity: 0.01, fill: "white", 
+						"stroke-width": 0, "fill-opacity": 0.01 });
+					}
+					else {
+						tracker.attr({ opacity: 0.01, fill: "white", 
+						"fill-opacity": 0.01 });
+					}
 
 					$(tracker.node).data("owner", $(bubble.node));
 					$.wijraphael.addClass($(tracker.node),
@@ -1434,6 +1501,16 @@
 					};
 					bubbleInfos.push(bubbleInfo);
 					serieEles.push(bubbleInfo);
+					if (series.visible === false) {
+						bubble.hide();
+						if (dcl) {
+							dcl.hide();
+						}
+						tracker.hide();
+						if (symbolEl) {
+							symbolEl.hide();
+						}
+					}
 				});
 				fields.bubbleInfos = bubbleInfos;
 				seriesEles.push(serieEles);
@@ -1499,7 +1576,7 @@
 							target = target.data("owner");
 						}
 						dataObj = target.data("wijchartDataObj");
-						bubble = dataObj.bubble;					
+						bubble = dataObj.bubble;
 
 						if (dataObj.symbol) {
 							return;
@@ -1528,7 +1605,7 @@
 							target = target.data("owner");
 						}
 						dataObj = target.data("wijchartDataObj");
-						bubble = dataObj.bubble;						
+						bubble = dataObj.bubble;
 						if (!dataObj.hoverStyle) {
 							if (bubble) {
 								bubble.attr({ opacity: "0.8" });
@@ -1608,7 +1685,7 @@
 				case "tri":
 				case "invertedTri":
 					val = Math.sqrt(val / (3 * Math.sin(Math.PI / 6) *
-		Math.cos(Math.PI / 6)));
+				Math.cos(Math.PI / 6)));
 					break;
 				case "box":
 					val = Math.sqrt(val / 2);

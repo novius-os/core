@@ -1,7 +1,7 @@
 /*globals jQuery,window,document*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -199,7 +199,8 @@
 			/// A value that specifies the selection mode of wijcombobox.
 			/// Default: "Single".
 			/// Type: String.
-			/// Code example: $("#tags").wijcombobox("option", "selectionMode", "multiple")
+			/// Code example: $("#tags").wijcombobox("option", 
+			/// "selectionMode", "multiple")
 			/// </summary>
 			/// <remarks>
 			/// Possible options are: "single" and "multiple".
@@ -210,7 +211,8 @@
 			/// the multiple selected items text in the textbox.
 			/// Default: ",".
 			/// Type: String.
-			/// Code example: $("#tags").wijcombobox("option", "multipleSelectionSeparator", ";")
+			/// Code example: $("#tags").wijcombobox("option", 
+			/// "multipleSelectionSeparator", ";")
 			/// </summary>
 			multipleSelectionSeparator: ",",
 			/// <summary>
@@ -1357,13 +1359,19 @@
 			//menuElement.zIndex(self.element.zIndex() + 1);
 			menuElement.zIndex(self.element.zIndex() + 100);
 			//end for 18124
+			
 			if (self._comboDiv) {
-				self.menu.setTemplateItems(items);	
+				//update for case 20689 at 2012/4/11
+				if (!self.listHasCreated) {
+					self.menu.setTemplateItems(items);	
+					self.menu.renderList();
+					self.listHasCreated = true;
+				}
 			} else {
 				self.menu.setItems(items);
+				self.menu.renderList();
 			}
 			
-			self.menu.renderList();
 			// show dropdown
 			self.menu.element.show();
 			if (o.dropdownWidth === "auto") {
@@ -1378,10 +1386,14 @@
 			menuElement.css("padding", oldPadding);
 
 			dropDownHeight = o.dropdownHeight;
+			
+			/*update for fix issue:dropdownHeight
+			 * take no effect when the original 
+			 * element is select
 			if (self._select !== undefined) {
 				dropDownHeight = 20 * self._menuUL
 				.children(".wijmo-wijlist-item:first").outerHeight();
-			}
+			}*/
 			//For fixing bug 15778
 			//h = Math.min(self._menuUL.outerHeight() + verticalBorder, dropDownHeight); 
 			if (menuElement.children(".wijmo-wijsuperpanel-header")) {

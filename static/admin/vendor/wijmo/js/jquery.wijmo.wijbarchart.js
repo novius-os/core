@@ -1,7 +1,7 @@
 /*globals jQuery, Globalize*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -188,7 +188,7 @@
 			/// data.y: the y valuue of the bar.
 			///	</param>
 			mouseDown: null,
-			/// <summary>
+			/// <summary>BarChartSeries
 			/// Fires when the user releases a mouse button
 			/// while the pointer is over the chart element.
 			/// Default: null.
@@ -330,18 +330,25 @@
 		_create: function () {
 			var self = this,
 				o = self.options,
-				defFill = self._getDefFill();
+				defFill = self._getDefFill(),
+				compass;
+			//			if (o.horizontal) {
+			//				$.extend(true, o.axis, {
+			//					x: {
+			//						compass: "west"
+			//					},
+			//					y: {
+			//						compass: "south"
+			//					}
+			//				});
+			//			}
 
 			if (o.horizontal) {
-				$.extend(true, o.axis, {
-					x: {
-						compass: "west"
-					},
-					y: {
-						compass: "south"
-					}
-				});
+				compass = o.axis.y.compass || "south";
+				o.axis.y.compass = o.axis.x.compass || "west";
+				o.axis.x.compass = compass;
 			}
+
 
 			$.extend(true, {
 				compass: "east"
@@ -353,6 +360,7 @@
 					style.fill = defFill[idx];
 				}
 			});
+			defFill = null;
 
 			$.wijmo.wijchartcore.prototype._create.apply(self, arguments);
 			self.chartElement.addClass("wijmo-wijbarchart");
@@ -395,6 +403,21 @@
 			}
 
 			element.data("fields", null);
+		},
+
+		_clearChartElement: function () {
+			var self = this,
+				o = self.options,
+				fields = self.chartElement.data("fields");
+
+			$.wijmo.wijchartcore.prototype._clearChartElement.apply(self, arguments);
+			self.element.removeData("plotInfos");
+
+			if (!o.seriesTransition.enabled) {
+				if (fields && fields.aniBarsAttr) {
+					fields.aniBarsAttr = null;
+				}
+			}
 		},
 
 		_isBarChart: function () {
@@ -517,7 +540,7 @@
 					bar.dcl.show();
 				}
 
-				if (bar.animatedBar) {
+				if (bar.animatedBar && !bar.animatedBar.removed) {
 					bar.animatedBar.show();
 				}
 			});
@@ -538,7 +561,7 @@
 					bar.dcl.hide();
 				}
 
-				if (bar.animatedBar) {
+				if (bar.animatedBar && !bar.animatedBar.removed) {
 					bar.animatedBar.hide();
 				}
 			});
@@ -586,7 +609,7 @@
 				i = 0,
 				xLen = 0;
 
-			for (i = 0; i < seriesList.length; i++) {
+			for (i = 0; i < seriesList.length && seriesList[i].data.x; i++) {
 				xLen = seriesList[i].data.x.length;
 
 				if (len < xLen) {
@@ -608,6 +631,30 @@
 			}
 		}
 	});
+
+	function XSpec(nx) {
+		var self = this;
+
+		self.x = nx;
+		self.paSpec = [];
+
+		self.stackValues = function () {
+			var len = self.paSpec.length,
+							ps0;
+
+			if (len > 1) {
+				ps0 = self.paSpec[0];
+				$.each(self.paSpec, function (idx, ps) {
+					if (idx === 0) {
+						return true;
+					}
+
+					ps.y += ps0.y;
+					ps0 = ps;
+				});
+			}
+		};
+	}
 
 	$.fn.extend({
 		wijbar: function (options) {
@@ -644,7 +691,6 @@
 				mouseOut = options.mouseOut,
 				mouseMove = options.mouseMove,
 				click = options.click,
-				tooltip = options.tooltip,
 							xscale = getScaling(inverted, xaxis.max,
 										xaxis.min, inverted ? height : width),
 			//				yscale = getScaling(!inverted, yaxis.max,
@@ -663,6 +709,8 @@
 				clusterInfos,
 				isYTime = options.isYTime,
 				isXTime = options.isXTime;
+
+
 
 			function getMinDX(x) {
 				var minDx = Number.MAX_VALUE,
@@ -693,33 +741,11 @@
 				return x;
 			}
 
+
+
 			function barPointList(seriesList) {
 				var x = [],
 					getXSortedPoints = $.wijchart.getXSortedPoints;
-
-				function XSpec(nx) {
-					var self = this;
-
-					self.x = nx;
-					self.paSpec = [];
-
-					self.stackValues = function () {
-						var len = self.paSpec.length,
-							ps0;
-
-						if (len > 1) {
-							ps0 = self.paSpec[0];
-							$.each(self.paSpec, function (idx, ps) {
-								if (idx === 0) {
-									return true;
-								}
-
-								ps.y += ps0.y;
-								ps0 = ps;
-							});
-						}
-					};
-				}
 
 				function addSeriesData(idx, series) {
 					var points = getXSortedPoints(series),
@@ -738,6 +764,10 @@
 
 					if (x) {
 						jlim = x.length;
+					}
+
+					if (points === undefined) {
+						return;
 					}
 
 					$.each(points, function (p, point) {
@@ -987,7 +1017,6 @@
 					barHeight = 0;
 				}
 
-
 				if (animated) {
 					if (start === -1) {
 						if (inverted) {
@@ -999,13 +1028,26 @@
 
 					if (r) {
 						if (inverted) {
-							bar = canvas.roundRect(rf.x, rf.y, barWidth,
+							if (y > yaxis.origin) {
+								bar = canvas.roundRect(rf.x, rf.y, barWidth,
 											barHeight, 0, 0, r, r).hide();
+							}
+							else {
+								bar = canvas.roundRect(rf.x, rf.y, barWidth,
+											barHeight, r, r, 0, 0).hide();
+							}
 							animatedBar = canvas.rect(start, rf.y, 0,
 											barHeight);
 						} else {
-							bar = canvas.roundRect(rf.x, rf.y, barWidth,
+							if (y > yaxis.origin) {
+								bar = canvas.roundRect(rf.x, rf.y, barWidth,
 											barHeight, r, 0, 0, r).hide();
+							}
+							else {
+								bar = canvas.roundRect(rf.x, rf.y, barWidth,
+											barHeight, 0, r, r, 0).hide();
+							}
+
 							animatedBar = canvas.rect(rf.x, start,
 											rf.width, 0);
 						}
@@ -1036,8 +1078,27 @@
 					animatedBar.r = r;
 				} else {
 					if (r) {
-						bar = canvas.roundRect(rf.x, rf.y,
+						if (inverted) {
+							if (y > yaxis.origin) {
+								bar = canvas.roundRect(rf.x, rf.y,
 							barWidth, barHeight, 0, 0, r, r);
+							}
+							else {
+								bar = canvas.roundRect(rf.x, rf.y,
+							barWidth, barHeight, r, r, 0, 0);
+							}
+						}
+						else {
+							if (y > yaxis.origin) {
+								bar = canvas.roundRect(rf.x, rf.y, barWidth,
+											barHeight, r, 0, 0, r);
+							}
+							else {
+								bar = canvas.roundRect(rf.x, rf.y, barWidth,
+											barHeight, 0, r, r, 0);
+							}
+						}
+
 					} else {
 						bar = canvas.rect(rf.x, rf.y,
 							barWidth, barHeight);
@@ -1127,7 +1188,7 @@
 						sx = (bw * (ns * (1 - clusterOverlap) + clusterOverlap));
 					}
 
-					// calculate the first series rectangle
+					// calculate the first series rectangle					
 					rp = { x: xs.x - sx / 2, y: 0, width: bw, height: ps[0].y };
 
 					$.each(ps, function (sIdx, points) {
@@ -1137,6 +1198,12 @@
 
 						if (!seriesEles[sIdx]) {
 							seriesEles[sIdx] = [];
+						}
+
+						// if the array data.x's length is more than the data.y's, 
+						// the rp.height is undefined. it will cause wrong.
+						if (rp.height === undefined) {
+							return true;
 						}
 
 						var idx = points.sIdx,
@@ -1165,8 +1232,19 @@
 						tracker = bar.clone()
 						// In IE, if the tracker has an stroke width, 
 						// the bar will show an black border.
-						.attr({ opacity: 0.01, fill: "white", "stroke-width": 0, 
-						"fill-opacity": 0.01 });
+						.attr({ opacity: 0.01, fill: "white", "stroke-width": 0,
+							"fill-opacity": 0.01
+						});
+						if (series.visible === false) {
+							bar.hide();
+							if (barInfo.dcl) {
+								barInfo.dcl.hide();
+							}
+							tracker.hide();
+							if (bar.shadow) {
+								bar.shadow.hide();
+							}
+						}
 						addClass($(bar.node), "wijchart-canvas-object wijbarchart");
 						$(bar.node).data("wijchartDataObj", $.extend(true, {
 							index: pIdx,
@@ -1192,6 +1270,8 @@
 						}
 						rects[sIdx][pIdx] = barInfo.rect;
 						seriesEles[sIdx][pIdx] = barInfo;
+						bar = null;
+						tracker = null;
 					});
 				});
 
@@ -1281,6 +1361,7 @@
 									b.shadow = null;
 								}
 								b.wijRemove();
+								//bar.animatedBar = null;
 								b = null;
 							}
 						});
@@ -1350,9 +1431,6 @@
 				//					tooltip = canvas.tooltip(bars, hint);
 				//				}
 
-				if (tooltip) {
-					tooltip.setTargets(chartElements.bars);
-				}
 
 				$(".wijbarchart", element[0])
 					.live("mousedown." + widgetName, function (e) {
@@ -1368,6 +1446,7 @@
 							}
 							dataObj = target.data("wijchartDataObj");
 							mouseDown.call(element, e, dataObj);
+							dataObj = null;
 						}
 					})
 					.live("mouseup." + widgetName, function (e) {
@@ -1382,6 +1461,7 @@
 							}
 							dataObj = target.data("wijchartDataObj");
 							mouseUp.call(element, e, dataObj);
+							dataObj = null;
 						}
 					})
 					.live("mouseover." + widgetName, function (e) {
@@ -1396,6 +1476,7 @@
 							}
 							dataObj = target.data("wijchartDataObj");
 							mouseOver.call(element, e, dataObj);
+							dataObj = null;
 						}
 					})
 					.live("mouseout." + widgetName, function (e) {
@@ -1421,6 +1502,7 @@
 						if (isFunction(mouseOut)) {
 							mouseOut.call(element, e, dataObj);
 						}
+						dataObj = null;
 						//if (tooltip) {
 						//	tooltip.hide();
 						//}
@@ -1449,6 +1531,7 @@
 						if (isFunction(mouseMove)) {
 							mouseMove.call(element, e, dataObj);
 						}
+						dataObj = null;
 						//end of code for adding hover state effect.
 					})
 					.live("click." + widgetName, function (e) {

@@ -1,7 +1,7 @@
-/*globals $, Raphael, jQuery, document, window, Globalize*/
+/*globals $, Raphael, jQuery, document, window, Globalize, wijmoASPNetParseOptions*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -46,7 +46,7 @@
 		},
 
 		paintShadow: function (element, offset, stroke) {
-			if (element.removed) {
+			if (element.removed || $(element).parent().length === 0) {
 				return;
 			}
 			var shadow = element.clone(),
@@ -56,7 +56,7 @@
 			shadow.insertBefore(element);
 			shadow.attr({
 				// translation: newOffset + " " + newOffset,
-				transform: Raphael.format("...T{0},{1}",  newOffset, newOffset),
+				transform: Raphael.format("...T{0},{1}", newOffset, newOffset),
 				stroke: newStroke,
 				"stroke-width": newOffset
 			});
@@ -100,7 +100,7 @@
 				points = [],
 				sortedX = seriesX;
 
-			if (seriesX.length === 0) {
+			if (seriesX === undefined || seriesX.length === 0) {
 				return;
 			}
 
@@ -150,7 +150,7 @@
 				"A", innerR, innerR, 0, +largeAngle, 1, innerS.x, innerS.y,
 				"L", outerS.x, outerS.y, "z"];
 		},
-		
+
 		getFirstValidListValue: function (values) {
 			var val;
 			$.each(values, function (idx, value) {
@@ -164,12 +164,12 @@
 			});
 			return val;
 		},
-		
+
 		getLastValidListValue: function (values) {
 			var vals = [].concat(values).reverse();
 			return $.wijchart.getFirstValidListValue(vals);
 		},
-		
+
 		isHole: function (val, hole) {
 			if (val === null) {
 				return true;
@@ -177,7 +177,8 @@
 				return true;
 			}
 			if (typeof val !== "undefined") {
-				if (val === hole) {
+				// for datetime, if use val === hole it returns false.
+				if (val - hole === 0) {
 					return true;
 				}
 				return false;
@@ -274,7 +275,7 @@
 			height = o.height,
 			gapLength = o.calloutLength / 2,
 			offsetLength = 0,
-			// oX,oY is the default offset of the tooltip
+		// oX,oY is the default offset of the tooltip
 			oX = 0,
 			oY = 0,
 			selector,
@@ -401,7 +402,7 @@
 					}, d);
 				}
 			},
-			
+
 			_clearTimers = function () {
 				if (intentShowTimer) {
 					_clearIntentTimer(intentShowTimer);
@@ -500,25 +501,25 @@
 				case "eastsouth":
 				case "eastnorth":
 					arr = ["M", p.x + offset, p.y + offset, "l",
-						-offset, -offset, "l", offset, -offset, "Z"];
+					-offset, -offset, "l", offset, -offset, "Z"];
 					break;
 				case "west":
 				case "westsouth":
 				case "westnorth":
 					arr = ["M", p.x - offset, p.y - offset, "l",
-						offset, offset, "l", -offset, offset, "Z"];
+					offset, offset, "l", -offset, offset, "Z"];
 					break;
 				case "north":
 				case "northeast":
 				case "northwest":
 					arr = ["M", p.x - offset, p.y - offset, "l",
-						offset, offset, "l", offset, -offset, "Z"];
+					offset, offset, "l", offset, -offset, "Z"];
 					break;
 				case "south":
 				case "southeast":
 				case "southwest":
 					arr = ["M", p.x - offset, p.y + offset, "l",
-						offset, -offset, "l", offset, offset, "Z"];
+					offset, -offset, "l", offset, offset, "Z"];
 					break;
 				}
 				return arr;
@@ -566,7 +567,7 @@
 						if (duration) {
 							callout.animate({
 								"translation": (-width / 2 + offset + calloutOffset) +
-									",0"
+								",0"
 							}, duration);
 						} else {
 							callout.translate(-width / 2 + offset + calloutOffset, 0);
@@ -577,7 +578,7 @@
 						if (duration) {
 							callout.animate({
 								"translation": "0," + (-height / 2 +
-								offset + calloutOffset)
+							offset + calloutOffset)
 							}, duration);
 						} else {
 							callout.translate(0, -height / 2 + offset + calloutOffset);
@@ -858,6 +859,8 @@
 						y: point.y
 					},
 					anim = null;
+
+				$.wijraphael.clearRaphaelCache();
 				position = _convertCompassToPosition(compass);
 				newPoint.x += offsetX + oX;
 				newPoint.y += offsetY + oY;
@@ -907,7 +910,7 @@
 				if (content) {
 					// content.translate(0, titleBox.height / 2 +
 					// contentBox.height / 2);
-					content.transform(Raphael.format("...T0,{0}", 
+					content.transform(Raphael.format("T0,{0}",
 					titleBox.height / 2 + contentBox.height / 2));
 				}
 				if (o.closeBehavior === "sticky") {
@@ -917,17 +920,17 @@
 							o.width > contentBox.width + closeBtnLength * 2) {
 						// closeBtn.translate(o.width - closeBtnLength,
 						// closeBtnLength);
-						closeBtn.transform(Raphael.format("...T{0},{1}", 
+						closeBtn.transform(Raphael.format("T{0},{1}",
 						o.width - closeBtnLength, closeBtnLength));
 					} else if (titleBox.width >= contentBox.width - closeBtnLength * 2) {
 						// closeBtn.translate(titleBox.width +
 						// closeBtnLength, closeBtnLength);
-						closeBtn.transform(Raphael.format("...T{0},{1}", 
+						closeBtn.transform(Raphael.format("T{0},{1}",
 						titleBox.width + closeBtnLength, closeBtnLength));
 					} else {
 						// closeBtn.translate(contentBox.width -
 						// closeBtnLength, closeBtnLength);
-						closeBtn.transform(Raphael.format("...T{0},{1}", 
+						closeBtn.transform(Raphael.format("T{0},{1}",
 						contentBox.width - closeBtnLength, closeBtnLength));
 					}
 
@@ -1019,7 +1022,8 @@
 					ox = newPoint.x - lastPoint.x;
 					oy = newPoint.y - lastPoint.y;
 					anim = Raphael.animation({ transform: Raphael
-					.format("...T{0},{1}", ox, oy)}, duration);
+					.format("...T{0},{1}", ox, oy)
+					}, duration);
 					if (container) {
 						// container.animate({ "translation": ox + "," + oy },
 						// duration);
@@ -1112,20 +1116,20 @@
 				}
 				// set.toFront();
 				/*
-				 * if (o.closeBehavior === "auto") {
-				 * $(container.node).bind("mouseover.Rtooltip", function (e) {
-				 * _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
-				 * _hide(e); }); if (title) { $.each(title, function (i, t) {
-				 * $(t.node).bind("mouseover.Rtooltip", function (e) {
-				 * _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
-				 * _hide(e); }); }); } if (content) { $.each(content, function
-				 * (i, c) { $(c.node).bind("mouseover.Rtooltip", function (e) {
-				 * _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
-				 * _hide(e); }); }); } if (callout) {
-				 * $(callout.node).bind("mouseover.Rtooltip", function (e) {
-				 * _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
-				 * _hide(e); }); } }
-				 */
+				* if (o.closeBehavior === "auto") {
+				* $(container.node).bind("mouseover.Rtooltip", function (e) {
+				* _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
+				* _hide(e); }); if (title) { $.each(title, function (i, t) {
+				* $(t.node).bind("mouseover.Rtooltip", function (e) {
+				* _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
+				* _hide(e); }); }); } if (content) { $.each(content, function
+				* (i, c) { $(c.node).bind("mouseover.Rtooltip", function (e) {
+				* _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
+				* _hide(e); }); }); } if (callout) {
+				* $(callout.node).bind("mouseover.Rtooltip", function (e) {
+				* _clearTimers(); }).bind("mouseout.Rtooltip", function (e) {
+				* _hide(e); }); } }
+				*/
 			},
 
 			_createTooltip = function (point, e) {
@@ -1170,7 +1174,7 @@
 					return;
 				}
 
-				_createTooltipEles(point, tit, cont, o.windowCollisionDetection, 
+				_createTooltipEles(point, tit, cont, o.windowCollisionDetection,
 					o.compass, o.offsetX, o.offsetY);
 			},
 
@@ -1242,10 +1246,10 @@
 					break;
 				case "custom":
 					break;
-				/*
-				 * case "rightClick": $(tar.node).bind("contextmenu.Rtooltip",
-				 * function (e) { _show(e); }); break;
-				 */ 
+					/*
+					* case "rightClick": $(tar.node).bind("contextmenu.Rtooltip",
+					* function (e) { _show(e); }); break;
+					*/ 
 				}
 			},
 
@@ -1262,7 +1266,7 @@
 					}
 				}
 			},
-			
+
 			_bindLiveEventBySelector = function () {
 				if (selector) {
 					switch (o.triggers) {
@@ -1287,11 +1291,11 @@
 						break;
 					case "custom":
 						break;
-					/*
-					 * case "rightClick":
-					 * $(tar.node).bind("contextmenu.Rtooltip", function (e) {
-					 * _show(e); }); break;
-					 */ 
+						/*
+						* case "rightClick":
+						* $(tar.node).bind("contextmenu.Rtooltip", function (e) {
+						* _show(e); }); break;
+						*/ 
 					}
 				}
 			},
@@ -1362,7 +1366,7 @@
 				this.setTargets = function (targets) {
 					_bindLiveEvent(targets);
 				};
-				
+
 				this.setSelector = function (sel) {
 					selector = sel;
 					_bindLiveEventBySelector();
@@ -1396,7 +1400,7 @@
 			}
 		}
 	};
-}(jQuery));
+} (jQuery));
 
 (function ($) {
 	"use strict";
@@ -1431,6 +1435,14 @@
 			// / </remarks>
 			// / </summary>
 			height: null,
+			/// <summary>
+			/// a value that determines the culture ID name.
+			/// Default: "",
+			/// Type: String
+			/// Code example:
+			/// $("#chartcore").wijchartcore({culture: "zh"})
+			/// </summary>
+			culture: "",
 			// / <summary>
 			// / An array collection that contains the data to be charted.
 			// / Default: [].
@@ -1910,7 +1922,8 @@
 			// / "stroke-dasharray":"- "}}},tickMajor:{position:"none",
 			// / style:{fill:"black"},factor:1},tickMinor:{position:"none",
 			// /
-			// style:{fill:"black"},factor:1},annoMethod:"values", annoFormatString:"",valueLabels:[]}.
+			/// style:{fill:"black"},factor:1},annoMethod:"values", 
+			/// annoFormatString:"",valueLabels:[]}.
 			// / Type: Object.
 			// / Code example:
 			// / $("#chartcore").wijchartcore({axis:{
@@ -2806,6 +2819,25 @@
 			// / });
 			// / </summary>
 			shadow: true,
+			/// <summary>
+			/// A dataview object to bind data to chart seriesLists
+			/// Default: null
+			/// Type: Object
+			/// Code example:
+			/// $("#chartcore").wijchartcore({
+			/// dataSource: dv
+			/// })
+			/// </summary>
+			dataSource: null,
+			/// <summary>
+			/// bind a field to each series's data x array
+			/// Type: object
+			/// Code example:
+			/// $("#chartcore").wijchartcore({
+			///		x:{ bind: "fieldA"}
+			/// })
+			/// </summary>
+			data: null,
 			// / <summary>
 			// / Fires before the series changes. This event can be cancelled.
 			// / "return false;" to cancel the event.
@@ -2917,8 +2949,17 @@
 			}
 			// end for disabled option
 
-			if (key === "seriesTransition" || key === "animation" ||
-				key === "disabled") {
+			// fixed a issue that when set the disabled option, 
+			// because the chart is paint by
+			// wij***chart plugin, and the disabled set to the plugin 
+			// as a value, not a refrence,
+			// so the plugin's disabled value can't change 
+			// when set the disabled to charts.
+			// now, we just repaint the chart.
+
+			if (key === "seriesTransition" || key === "animation") {
+			//||
+			//	key === "disabled") {
 				return;
 			}
 
@@ -2930,6 +2971,16 @@
 				}
 			}
 
+			if (key === "seriesList" || key === "seriesStyles" ||
+				key === "seriesHoverStyles") {
+				//backup the styles. when drawed the charts, restore the styles.
+				self.styles = {
+					style: $.extend({ }, o.seriesStyles),
+					hoverStyles: $.extend({ }, o.seriesHoverStyles)
+				};
+				self._initStyles();
+			}
+
 			if (key === "seriesList" || key === "seriesHoverStyles") {
 				hoverStyleLen = o.seriesHoverStyles.length;
 				for (idx = hoverStyleLen; idx < len; idx++) {
@@ -2938,6 +2989,38 @@
 			}
 
 			self.redraw();
+		},
+
+		// if the series's lenth is more than the styles's length, extend the styles.
+		_initStyles: function () {
+			var o = this.options,
+				styles = o.seriesStyles,
+				hoverStyles = o.seriesHoverStyles,
+				stylesLen, seriesLen, hoverStylesLen, i;
+
+			if (o.seriesList) {
+				seriesLen = o.seriesList.length || 0;
+			}
+
+			if (o.seriesStyles) {
+				stylesLen = o.seriesStyles.length || 0;
+			}
+
+			if (o.seriesHoverStyles) {
+				hoverStylesLen = o.seriesHoverStyles.length || 0;
+			}
+
+			if (seriesLen > stylesLen && stylesLen) {
+				for (i = stylesLen; i < seriesLen; i++) {
+					styles[i] = styles[i % stylesLen];
+				}
+			}
+
+			if (seriesLen > hoverStylesLen && hoverStylesLen) {
+				for (i = hoverStylesLen; i < seriesLen; i++) {
+					hoverStyles[i] = hoverStyles[i % hoverStylesLen];
+				}
+			}
 		},
 
 		// widget creation:
@@ -2951,6 +3034,40 @@
 
 			self.updating = 0;
 			self.innerState = {};
+
+			// Add for parse date options for jUICE. D.H
+			if ($.isFunction(window["wijmoASPNetParseOptions"])) {
+				wijmoASPNetParseOptions(o);
+			}
+
+			// backup the styles. when drawed the charts, restore the styles.
+			// when postback the styles, if doesn't clone the styles, 
+			// the serverside will get the extended styles. when the add a series data,
+			// the extend style will wrong.
+			self.styles = {
+				style: $.extend({ }, o.seriesStyles),
+				hoverStyles: $.extend({ }, o.seriesHoverStyles)
+			};
+
+			// Extend seriesStyle
+			self._initStyles();
+
+			if (o.hint && typeof o.hint.content === "string" && window[o.hint.content]) {
+				o.hint.content = window[o.hint.content];
+			}
+			if (o.hint && typeof o.hint.title === "string" && window[o.hint.title]) {
+				o.hint.title = window[o.hint.title];
+			}
+
+			self.headerEles = [];
+			self.footerEles = [];
+			self.legendEles = [];
+			self.axisEles = [];
+			self.legends = [];
+			self.legendIcons = [];
+			self.legendDots = [];
+			self.chartLabelEles = [];
+			self.seriesEles = [];
 
 			if (self.element.length > 0) {
 				if (self.element.is("table")) {
@@ -2971,40 +3088,39 @@
 					self.chartElement = self.element;
 				}
 
-				// add for fixing bug 16039 by wuhao 2011/7/7
-				if (o.disabled) {
-					self.disable();
-				}
+			
 				// end for bug 16039
 
 				self.chartElement.addClass("ui-widget");
 				canvas = new Raphael(self.chartElement[0], width, height);
 				self.canvas = canvas;
+
+				// add for fixing bug 16039 by wuhao 2011/7/7
+				if (o.disabled) {
+					self.disable();
+				}
 				
 				// add custom attribute to canvas
+				// fixed the issue 20422 by dail on 2012-3-12, If user set 
+				// rotation and scale. the transform will only effect on scale.
 				canvas.customAttributes.rotation = function (num) {
-				    return {transform: "...R" + num};
+				    //return {transform: "...R" + num};
+					this.transform("...R" + num);
 				};
 				canvas.customAttributes.scale = function (num) {
-					return {transform: "...S" + num};
+					//return {transform: "...S" + num};
+					this.transform("...S" + num);
 				};
 				canvas.customAttributes.translation = function (x, y) {
-					return {transform: Raphael.format("...T{0},{1}", x, y)};
+					//return {transform: Raphael.format("...T{0},{1}", x, y)};
+					this.transform(Raphael.format("...T{0},{1}", x, y));
 				};
 				// end
 
 				self._bindLiveEvents();
 			}
 
-			self.headerEles = [];
-			self.footerEles = [];
-			self.legendEles = [];
-			self.axisEles = [];
-			self.legends = [];
-			self.legendIcons = [];
-			self.legendDots = [];
-			self.chartLabelEles = [];
-			self.seriesEles = [];
+			
 		},
 		
 		_getDefFill: function () {
@@ -3024,6 +3140,10 @@
 				];
 			return defFill;
 		},
+
+		_getCulture: function (name) {
+            return Globalize.findClosestCulture(name || this.options.culture);
+        },
 
 		_handleDisabledOption: function (disabled, ele) {
 			var self = this;
@@ -3063,10 +3183,76 @@
 				});
 		},
 
+		_bindData: function () {
+			var self = this,
+				o = self.options,
+				dataSource = o.dataSource,
+				seriesList = o.seriesList,
+				shareData = o.data, sharedXList;
+
+			
+			$.each(seriesList, function (i, series) {
+				var data = series.data, dataX, dataY,
+					ds = series.dataSource || dataSource;
+
+				if (ds && data) {
+					dataX = data.x;
+					dataY = data.y;
+					if (dataX && dataX.bind) {
+						data.x = self._getBindData(ds, dataX.bind);	
+					}
+					else if (shareData && shareData.x && shareData.x.bind) {
+						if (sharedXList === undefined) {
+							sharedXList = self._getBindData(ds, shareData.x.bind);
+						}
+						data.x = sharedXList;
+					}
+
+					if (dataY && dataY.bind) {
+						data.y = self._getBindData(ds, dataY.bind);
+					}
+				}
+			});
+			
+		},
+
+		_getBindData: function (dataSource, bind) {
+			if ($.isArray(dataSource)) {
+				var arr = [];
+				$.each(dataSource, function (i, data) {
+					if (data && data[bind]) {
+						arr.push(data[bind]);
+					}
+				});
+				return arr;
+			}
+			return null;
+		},
+
+		_hanldSharedXData: function () {
+			var self = this,
+				o = self.options,
+				seriesList = o.seriesList,
+				data = o.data;
+
+			if (data) {
+				$.each(seriesList, function (i, series) {
+					var d = series.data;
+					if (d.x === undefined || d.x === null && $.isArray(data.x)) {
+						d.x = data.x;
+					}
+				});
+			}
+		},
+
 		_init: function () {
 			var self = this,
 				o = self.options;
 			
+			// bind dataSource
+			self._bindData();
+			self._hanldSharedXData();
+
 			$.each(o.seriesList, function (i, series) {
 				var data = series.data,
 					idx;
@@ -3105,6 +3291,10 @@
 			}
 
 			self.element.empty();
+
+			if (self.styles) {
+				self.styles = null;
+			}
 
 			// Add for fixing bug 16039
 			if (self.disabledDiv) {
@@ -3324,83 +3514,77 @@
 			}
 		},
 
+		_destroyRaphaelArray: function (objs) {
+			if (!objs) {
+				return;
+			}
+			var len = objs.length, 
+				i = 0, ele, obj;
+
+			for (; len && i < len; i++) {
+				ele = objs[i];
+				if (ele && ele[0]) {
+					obj = $(ele.node);
+					obj.unbind().removeData();
+					ele.wijRemove();
+					obj.remove();
+					obj = null;
+				}
+				objs[i] = null;
+			}
+		},
+
 		_clearChartElement: function () {
 			var self = this,
-				fields = self.chartElement.data("fields");
+				fields = self.chartElement.data("fields");				
 
-			if (self.headerEles.length) {
-				$.each(self.headerEles, function (idx, headerEle) {
-					headerEle.wijRemove();
-					headerEle = null;
-				});
-				self.headerEles = [];
+			self._destroyRaphaelArray(self.headerEles);
+			self._destroyRaphaelArray(self.footerEles);
+			self._destroyRaphaelArray(self.legendEles);
+			self._destroyRaphaelArray(self.legends);
+			self._destroyRaphaelArray(self.legendIcons);
+			self._destroyRaphaelArray(self.legendDots);
+			self._destroyRaphaelArray(self.axisEles);
+			self._destroyRaphaelArray(self.chartLabelEles);
+
+			if (self.tooltip) {
+				self.tooltip.destroy();
+				self.tooltip = null;
 			}
-			if (self.footerEles.length) {
-				$.each(self.footerEles, function (idx, footerEle) {
-					footerEle.wijRemove();
-					footerEle = null;
-				});
-				self.footerEles = [];
+
+			if (fields && fields.trackers) {
+				self._destroyRaphaelArray(fields.trackers);
+				fields.trackers = null;
 			}
-			if (self.legendEles.length) {
-				$.each(self.legendEles, function (idx, legendEle) {
-					legendEle.wijRemove();
-					legendEle = null;
-				});
-				self.legendEles = [];
-			}
-			if (self.legends.length) {
-				$.each(self.legends, function (idx, legend) {
-					legend.wijRemove();
-					legend = null;
-				});
-				self.legends = [];
-			}
-			if (self.legendIcons.length) {
-				$.each(self.legendIcons, function (idx, legendIcon) {
-					legendIcon.wijRemove();
-					legendIcon = null;
-				});
-				self.legendIcons = [];
-			}
-			if (self.legendDots.length) {
-				$.each(self.legendDots, function (idx, legendDot) {
-					legendDot.wijRemove();
-					legendDot = null;
-				});
-				self.legendDots = [];
-			}
-			if (self.axisEles.length) {
-				$.each(self.axisEles, function (idx, axisEle) {
-					axisEle.wijRemove();
-					axisEle = null;
-				});
-				self.axisEles = [];
-			}
-			if (self.chartLabelEles.length) {
-				$.each(self.chartLabelEles, function (idx, chartLabelEle) {
-					chartLabelEle.wijRemove();
-					chartLabelEle = null;
-				});
-				self.chartLabelEles = [];
-			}
-			
+			self.headerEles = [];
+			self.footerEles = [];
+			self.legendEles = [];
+			self.legends = [];
+			self.legendIcons = [];
+			self.legendDots = [];
+			self.axisEles = [];
+			self.chartLabelEles = [];		
+
 			if (fields && fields.chartElements) {
 				$.each(fields.chartElements, function (key, eles) {
-					if (eles.length) {
-						$.each(eles, function (i, ele) {
-							if (ele[0] !== null) {
-								if (ele.removed && ele.removed === false)
-								//ele.stop().wijRemove();
-								ele = null;
-							}
-						});
-					}
-					eles = [];
+					self._destroyRaphaelArray(eles);
 				});
+				fields.chartElements = null;
+			}
+
+			if (fields && fields.seriesEles) {
+				fields.seriesEles = null;
+			}
+			
+			if (self.seriesEles) {
+				self.seriesEles = [];
 			}
 
 			self.canvas.clear();
+			self.innerState = null;			
+			self.axisInfo = null;
+			self.seriesGroup = null;
+			self.lastAxisOffset = null;			
 			self.innerState = {};
 		},
 
@@ -3463,6 +3647,13 @@
 
 			self.rendered = true;
 
+			// restore the backup options.
+			if (self.styles) {
+				o.seriesStyles = self.styles.style;
+				o.seriesHoverStyles = self.styles.hoverStyles;
+			}
+
+			//$.wijraphael.clearRaphaelCache();
 			if (hidden) {
 				element.css("left", oldLeft);
 				element.css("position", oldPosition);
@@ -3635,7 +3826,9 @@
 				canvasHeight = canvasBounds.endY - canvasBounds.startY,
 				iconWidth = legend.size.width,
 				iconHeight = legend.size.height,
+				titleBox,
 				titleHeight = 0,
+				titleWidth = 0,
 				maxWidth = 0,
 				maxHeight = 0,
 				totalWidth = 0,
@@ -3651,7 +3844,8 @@
 				top,
 				legendContainer,
 				legendIconStyles = [],
-				idx = 0;
+				idx = 0,
+				legendIndex = 0;
 
 			if (legend.text && legend.text.length) {
 				legendTitle = self._text(0, 0, legend.text);
@@ -3683,11 +3877,14 @@
 						text,
 						textStyle,
 						chtStyle,
+						isline = false,
+						seriesType = series.type,
 						icon;
 						
-					idx++;	
+						
 					// if (series.legendEntry) {
-					if (series.legendEntry && series.display !== "exclude") {
+					if (series.legendEntry && 
+						series.display !== "exclude") {						
 						text = self._text(0, 0, series.label);
 						$.wijraphael.addClass($(text.node), 
 						"wijchart-legend-text wijchart-legend");
@@ -3701,16 +3898,45 @@
 						icon.attr(chtStyle);
 						self.legendIcons.push(icon);
 						legendIconStyles.push(chtStyle);
-						
+						if (self.widgetName === "wijcompositechart") {
+							isline = seriesType === "line" ||
+								seriesType === "spline" ||
+								seriesType === "bezier" ||
+								seriesType === "area";
+						}
+						else {
+							isline = self.widgetName === "wijlinechart";
+						}
+						if (series.visible === false && !isline) {
+							$(text.node).data("hidden", true)
+							.data("textOpacity", 
+								text.attr("opacity") || 1);							
+							text.attr("opacity", 0.3);
+						}
+						$(text.node).data("legendIndex", legendIndex)
+							.data("index", idx);
+						//$(icon.node).data("legendIndex", legendIndex)
+						//	.data("index", idx);
+
+						legendIndex++;
 					}
+					idx++;
 				}
 
 				if (series.type === "pie" && series.legendEntry) {
 					$.each(series.data, function (j, data) {
-						data = $.extend({ legendEntry: series.legendEntry }, data);
-						drawSeriesLegend(data);
+						data = $.extend({ legendEntry: series.legendEntry }, data);	
+						drawSeriesLegend(data);						
 					});
+				} else if (self._isPieChart()) {
+					//fix tfs issue 20705
+					drawSeriesLegend(series);
 				} else {
+					if ((series.data.x === undefined && series.data.xy === undefined) ||
+						(series.data.xy === undefined && series.data.y === undefined)
+					) {
+						return true;
+					}					
 					drawSeriesLegend(series);
 				}
 			});
@@ -3719,7 +3945,9 @@
 			textMargin = legend.textMargin;
 
 			if (legendTitle) {
-				titleHeight = legendTitle.wijGetBBox().height;
+				titleBox = legendTitle.wijGetBBox();
+				titleHeight = titleBox.height;
+				titleWidth = titleBox.width;
 			}
 
 			$.each(self.legends, function (idx, legend) {
@@ -3780,11 +4008,21 @@
 				}
 			}
 
+			// Fixed issue 20405 by dail. If all series 's legendEntry set to false.
+			// and the compass set to south or north, the columnNum is zero.
+			if (columnNum === 0) {
+				columnNum = 1;
+			}
+
 			width = columnNum * (maxWidth + iconWidth + legendMargin) +
 				columnNum * (textMargin.left + textMargin.right);
 			height = maxHeight * Math.ceil(legendLen / columnNum) +
 				titleHeight + Math.ceil(legendLen / columnNum) *
 				(textMargin.top + textMargin.bottom);
+			
+			//fix tfs 20705
+			width = width > titleWidth ? width : titleWidth;
+			//end comments
 
 			point = self._calculatePosition(compass, width, height);
 			left = point.x - width / 2;
@@ -3806,8 +4044,7 @@
 			offsetY = titleHeight;
 
 			$.each(self.legends, function (idx, leg) {
-				var seriesIdx = legend.reversed ? tempSeriesList.length - 1 - idx : idx,
-					bBox = leg.wijGetBBox(),
+				var bBox = leg.wijGetBBox(),
 					icon = self.legendIcons[idx],
 					x = left + index * (iconWidth + maxWidth + legendMargin) +
 						(index + 1) * textMargin.left + index * textMargin.right,
@@ -3818,14 +4055,22 @@
 				// icon.transform(Raphael.format("...T{0},{1}", x, y -
 				// icon.wijGetBBox().height / 2));
 				icon.wijRemove();
+				icon = null;
 				icon = self.canvas.rect(x, iconY, iconWidth, iconHeight);
-				$(icon.node).data("index", seriesIdx);
+
+				$(icon.node).data("legendIndex", $(leg.node).data("legendIndex"))
+					.data("index", $(leg.node).data("index"));
+				//$(icon.node).data("index", seriesIdx);
 				$.wijraphael.addClass($(icon.node), 
 				"wijchart-legend-icon wijchart-legend");
 				self.legendIcons[idx] = icon;
 				chtStyle = legendIconStyles[idx];
 				if (chtStyle) {
 					icon.attr(chtStyle);
+					if ($(leg.node).data("hidden") === true) {
+						$(leg.node).data("iconOpacity", icon.attr("opacity") || 1);
+						icon.attr("opacity", 0.3);
+					}
 				}
 
 				// leg.translate(x + iconWidth + legendMargin + bBox.width / 2,
@@ -3833,7 +4078,7 @@
 				leg.transform(Raphael.format("...T{0},{1}", 
 				x + iconWidth + legendMargin + bBox.width / 2, y));
 				leg.toFront();
-				$(leg.node).data("index", seriesIdx);
+				//$(leg.node).data("index", seriesIdx);
 
 				index++;
 
@@ -3895,6 +4140,7 @@
 					break;
 				}
 				tempText.wijRemove();
+				tempText = null;
 			}
 
 			return textBounds;
@@ -3972,7 +4218,8 @@
 			var target = tooltip.target;
 
 			if (target) {
-				tooltip.options.style.stroke = target.attrs.stroke ||
+				tooltip.options.style.stroke = tooltip.options.style.stroke ||
+					target.attrs.stroke ||
 					target.attrs.fill;
 			}
 		},
@@ -4193,11 +4440,13 @@
 								break;
 							}
 							if (!isNaN(offsetX) && !isNaN(offsetY)) {
-								if (offsetY !== self.axisInfo.y[key].offset && offsetY !== 0) {
+								if (offsetY !== self.axisInfo.y[key].offset && 
+									offsetY !== 0) {
 									self.axisInfo.y[key].offset = offsetY;
 									self.axisInfo.y[key].vOffset = offsetX;
 								}
-								if (offsetX !== self.axisInfo.x.offset && offsetX !== 0) {
+								if (offsetX !== self.axisInfo.x.offset && 
+									offsetX !== 0) {
 									self.axisInfo.x.offset = offsetX;
 									self.axisInfo.x.vOffset = offsetY;
 								}
@@ -4329,7 +4578,7 @@
 				extent = null,
 				innerAxisInfo, innerAxisOptions,
 				oppositeAxisInfo, oppositeAxisOptions,
-				bounds = self.canvasBounds,
+				//bounds = self.canvasBounds,
 				compass, origin, max, min,				
 				//oppositeDir = dir === "x" ? "y" : "x",
 
@@ -4338,7 +4587,8 @@
 				//origin = axisOptions[oppositeDir].origin,
 				//max = axisInfo[oppositeDir].max,
 				//min = axisInfo[oppositeDir].min,
-				d = 0, offset, lastOffset;
+				//d = 0, 
+				offset, lastOffset;
 
 			if (dir === "y") {
 				innerAxisInfo = axisInfo.y[key];
@@ -4370,38 +4620,38 @@
 				innerAxisInfo.maxExtent = offset;
 			
 //				
-//				if (origin !== null && origin >= min && origin <= max) {
-//					if (compass === "south") {
-//						d = (origin - min) / (max - min) * (bounds.endY - bounds.startY);
-//					} else {
-//						d = (max - origin) / (max - min) * (bounds.endY - bounds.startY);
-//					}
-
-//					offset -= d;
-
-//					if (offset < 0) {
-//						offset = 0;
-//					}
+//			if (origin !== null && origin >= min && origin <= max) {
+//				if (compass === "south") {
+//					d = (origin - min) / (max - min) * (bounds.endY - bounds.startY);
+//				} else {
+//					d = (max - origin) / (max - min) * (bounds.endY - bounds.startY);
 //				}
+
+//				offset -= d;
+
+//				if (offset < 0) {
+//					offset = 0;
+//				}
+//			}
 				break;				
 			case "east":
 			case "west":
 				offset = extent.width;
 				innerAxisInfo.maxExtent = offset;				
-//				if (origin !== null && origin >= min && origin <= max) {
-//					if (compass === "west") {
-//						d = (origin - min) / (max - min) * (bounds.endX - bounds.startX);
+//			if (origin !== null && origin >= min && origin <= max) {
+//				if (compass === "west") {
+//				d = (origin - min) / (max - min) * (bounds.endX - bounds.startX);
 
-//					} else {
-//						d = (max - origin) / (max - min) * (bounds.endX - bounds.startX);
-//					}				
+//				} else {
+//					d = (max - origin) / (max - min) * (bounds.endX - bounds.startX);
+//				}				
 
-//					offset -= d;
+//				offset -= d;
 
-//					if (offset < 0) {
-//						offset = 0;
-//					}
+//				if (offset < 0) {
+//					offset = 0;
 //				}
+//			}
 				break;
 			}
 			if (dir === "y" && lastAxisOffset[compass]) {
@@ -4461,6 +4711,7 @@
 			}
 			bbox = textElement.wijGetBBox();
 			textElement.wijRemove();
+			textElement = null;
 			return {
 				width: bbox.width + marginLeft + marginRight,
 				height: bbox.height + marginBottom + marginTop
@@ -4545,7 +4796,8 @@
 							mtv = mtv.value;
 							if (formatString && formatString.length) {
 								// mtv = $.format(mtv, formatString);
-								mtv = Globalize.format(mtv, formatString);
+								mtv = Globalize.format(mtv, formatString, 
+									self._getCulture());
 							}
 						}
 					} else if (axisOptions.annoMethod === "values") {
@@ -4555,10 +4807,11 @@
 							}
 
 							// mtv = $.format(mtv, formatString);
-							mtv = Globalize.format(mtv, formatString);
+							mtv = Globalize.format(mtv, formatString, self._getCulture());
 						} else if (is100pc && axisInfo.id === "y") {
 							// mtv = $.format(mtv, "p0");
-							mtv = Globalize.format(mtv, "p0");
+							mtv = Globalize.format(mtv, "p0", 
+								self._getCulture());
 						}
 					}
 
@@ -4599,6 +4852,7 @@
 										};
 								}
 								txtClone.wijRemove();
+								txtClone = null;
 								size = txt.wijGetBBox();
 							}
 						}
@@ -4614,7 +4868,7 @@
 						 */
 					}
 					txt.wijRemove();
-
+					txt = null;
 					if (size.width > maxExtent.width) {
 						maxExtent.width = size.width;
 					}
@@ -5010,12 +5264,13 @@
 			}
 			majorTickValues = self._getMajorTickValues(axisInfo, axisOptions);
 
-			if (tickMinor !== "none") {
-				tempMinorTickValues = self._getMinorTickValues(axisInfo, axisOptions);
-				minorTickValues = self._resetMinorTickValues(tempMinorTickValues,
+			//if (tickMinor !== "none") {
+			tempMinorTickValues = self._getMinorTickValues(axisInfo, axisOptions);
+			minorTickValues = self._resetMinorTickValues(tempMinorTickValues,
 						majorTickValues);
-			}
+			//}
 
+			//add comments here to fix tfs issue 20415,paint the axis inside the plotarea.
 			switch (compass) {
 			case "south":
 				startPoint.x = canvasBounds.startX;
@@ -5032,21 +5287,25 @@
 				isVertical = false;
 				break;
 			case "east":
-				startPoint.x = canvasBounds.endX;
+				//startPoint.x = canvasBounds.endX;
+				startPoint.x = canvasBounds.endX - thickness;
 				if (axisInfo.preStartOffset) {
 					startPoint.x += axisInfo.preStartOffset;
 				}
 				startPoint.y = canvasBounds.endY;
-				endPoint.x = canvasBounds.endX;
+				//endPoint.x = canvasBounds.endX;
+				endPoint.x = canvasBounds.endX - thickness;
 				endPoint.y = canvasBounds.startY;
 				break;
 			case "west":				
-				startPoint.x = canvasBounds.startX - thickness;
+				//startPoint.x = canvasBounds.startX - thickness;
+				startPoint.x = canvasBounds.startX;
 				if (axisInfo.preStartOffset) {
 					startPoint.x -= axisInfo.preStartOffset;
 				}
 				startPoint.y = canvasBounds.endY;
-				endPoint.x = canvasBounds.startX - thickness;
+				//endPoint.x = canvasBounds.startX - thickness;
+				endPoint.x = canvasBounds.startX;
 				endPoint.y = canvasBounds.startY;
 				break;
 			}
@@ -5092,7 +5351,8 @@
 						text = text.value;
 						if (formatString && formatString.length) {
 							// text = $.format(text, formatString);
-							text = Globalize.format(text, formatString);
+							text = Globalize.format(text, formatString, 
+								self._getCulture());
 						}
 					}
 				} else if (axisOptions.annoMethod === "values") {
@@ -5101,10 +5361,10 @@
 							text = $.fromOADate(val);
 						}
 						// text = $.format(text, formatString);
-						text = Globalize.format(text, formatString);
+						text = Globalize.format(text, formatString, self._getCulture());
 					} else if (is100Percent && axisInfo.id === "y") {
 						// text = $.format(val, "p0");
-						text = Globalize.format(val, "p0");
+						text = Globalize.format(val, "p0", self._getCulture());
 					}
 				}
 				/*
@@ -5139,17 +5399,23 @@
 				index++;
 			});
 
-			/*
-			 * if (!labels.width) { $.each(textInfos, function (idx, textInfo) {
-			 * var textElement = textInfo.text, offset = (textInfo.len - maxLen) /
-			 * 2; offset = labels.textAlign === "near" ? offset * -1 : offset;
-			 * 
-			 * if (isVertical) { //textElement.translate(offset, 0);
-			 * textElement.transform(Raphael.format("...T{0},{1}", offset, 0)); }
-			 * else { //textElement.translate(0, offset);
-			 * textElement.transform(Raphael.format("...T{0},{1}", 0, offset)); }
-			 * }); }
-			 */
+			
+			if (!labels.width) { 
+				$.each(textInfos, function (idx, textInfo) {
+					var textElement = textInfo.text, offset = (textInfo.len - maxLen) / 2;
+					offset = labels.textAlign === "near" ? offset * -1 : offset;
+			  
+					if (isVertical) { 
+						//textElement.translate(offset, 0);
+						textElement.transform(Raphael.format("...T{0},{1}", offset, 0)); 
+					}
+					else { 
+						//textElement.translate(0, offset);
+						textElement.transform(Raphael.format("...T{0},{1}", 0, offset)); 
+					}
+				}); 
+			}
+			 
 
 			$.each(minorTickValues, function (idx, val) {
 				var retInfo;
@@ -5684,12 +5950,11 @@
 		
 		_bindLegendEvents: function () {
 			var self = this,
-				disabled = self.options.disabled,
 				element = self.chartElement,
 				widgetName = self.widgetName;
 			$(".wijchart-legend", element[0])
 				.live("click." + widgetName, function (e) {
-					if (disabled) {
+					if (self.options.disabled) {
 						return;
 					}
 					var tar = $(e.target);
@@ -5707,10 +5972,11 @@
 			var self = this,
 				l = self.options.legend,
 				i = obj.data("index"),
+				legendIndex = obj.data("legendIndex"),
 				fields = self.chartElement.data("fields"),
 				seriesEles = self.seriesEles, seriesEle,
-				legendIcon = self.legendIcons[i], 
-				legend = self.legends[i], 
+				legendIcon = self.legendIcons[legendIndex], 
+				legend = self.legends[legendIndex], 
 				legendNode = $(legend.node),
 				idx = i, legendDot;
 	
@@ -6481,7 +6747,8 @@
 
 								if (formatString && formatString.length > 0) {
 									// value = $.format(value, formatString);
-									value = Globalize.format(value, formatString);
+									value = Globalize.format(value, formatString, 
+										self._getCulture());
 								} else {
 									value = value.toString();
 								}
@@ -6633,10 +6900,12 @@
 				if (isTime) {
 					// maxText = $.format($.fromOADate(maxData), formatString);
 					maxText = 
-					Globalize.format($.fromOADate(maxData), formatString);
+					Globalize.format($.fromOADate(maxData), formatString, 
+						self._getCulture());
 					// minText = $.format($.fromOADate(minData), formatString);
 					minText = 
-					Globalize.format($.fromOADate(minData), formatString);
+					Globalize.format($.fromOADate(minData), formatString, 
+						self._getCulture());
 
 					mx = self._text(-1000, -1000, maxText).attr(textStyle);
 					mn = self._text(-1000, -1000, minText).attr(textStyle);
@@ -6645,7 +6914,9 @@
 					sizeMin = mn.wijGetBBox();
 
 					mx.wijRemove();
+					mx = null;
 					mn.wijRemove();
+					mn = null;
 				} else {
 					prec = self._nicePrecision(dx);
 					_prec = prec + 1;
@@ -6663,7 +6934,9 @@
 					sizeMin = mn.wijGetBBox();
 
 					mx.wijRemove();
+					mx = null;
 					mn.wijRemove();
+					mn = null;
 				}
 
 				if (sizeMax.width < sizeMin.width) {

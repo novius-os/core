@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -887,7 +887,7 @@ wijMaskedTextProvider.prototype = {
 	
 	toString: function (ignorePasswordChar, includePrompt, includeLiterals, start, len) {
 		var val = this.inputWidget.options.text || "";
-		val = val.trim();
+		val = $.trim(val);
 		if (this.inputWidget.options.showNullText && !this.inputWidget.isFocused() && (val === "" || val === this.inputWidget.options.nullText)) {
 			return this.inputWidget.options.nullText;
 		}

@@ -1,7 +1,7 @@
 /*globals jQuery, Globalize*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -597,6 +597,11 @@
 				compass: "east"
 			}, o.hint);
 
+			// set the is100percent to default value.
+			if (o.is100Percent) {
+				o.is100Percent = false;
+			}
+
 			// default some fills
 			$.each(o.seriesStyles, function (idx, style) {
 				if (!style.fill) {
@@ -607,10 +612,16 @@
 			$.wijmo.wijchartcore.prototype._create.apply(self, arguments);
 			self.chartElement.addClass("wijmo-wijcompositechart");
 		},
-		/*
+
 		_setOption: function (key, value) {
-		$.wijmo.wijchartcore.prototype._setOption.apply(this, arguments);
-		},*/
+			var self = this,
+				o = self.options;
+
+			// ignore the is100Percent option.
+			if (key !== "is100Percent") {
+				$.wijmo.wijchartcore.prototype._setOption.apply(this, arguments);
+			}
+		},
 
 		destroy: function () {
 			var self = this,
@@ -632,6 +643,26 @@
 
 		_isBarChart: function () {
 			return true;
+		},
+
+		_clearChartElement: function () {
+			var self = this,
+				o = self.options,
+				element = self.chartElement,
+				fields = element.data("fields");
+			$.wijmo.wijchartcore.prototype._clearChartElement.apply(self, arguments);
+			if (fields && fields.ctracers) {
+				fields.ctracers = null;
+			}
+
+			self.element.removeData("plotInfos");
+
+			if (!o.seriesTransition.enabled) {
+				if (fields && fields.aniBarsAttr) {
+					fields.aniBarsAttr = null;
+				}
+			}
+
 		},
 
 		/*****************************
@@ -659,17 +690,17 @@
 				chartElements = fields.chartElements;
 
 			switch (type) {
-			case "bar":
-			case "column":
-				return chartElements.bars[index];
-			case "line":
-			case "area":
-				return chartElements.paths[index];
-			case "linemarkers":
-				return chartElements.markersSet[index];
-			case "pie":
-				//return chartElements.sectors[index];
-				return this._getPie(chartElements, index, seriesIndex);
+				case "bar":
+				case "column":
+					return chartElements.bars[index];
+				case "line":
+				case "area":
+					return chartElements.paths[index];
+				case "linemarkers":
+					return chartElements.markersSet[index];
+				case "pie":
+					//return chartElements.sectors[index];
+					return this._getPie(chartElements, index, seriesIndex);
 			}
 
 			return null;
@@ -726,85 +757,85 @@
 				showLabels = this.options.showChartLabels, dataObj;
 
 			switch (type) {
-			case "pie":
-				if (eles.sector) {
-					eles.sector.show();
-					if (eles.sector.shadow) {
-						eles.sector.shadow.show();
+				case "pie":
+					if (eles.sector) {
+						eles.sector.show();
+						if (eles.sector.shadow) {
+							eles.sector.shadow.show();
+						}
+						if (eles.sector.tracker) {
+							eles.sector.tracker.show();
+						}
 					}
-					if (eles.sector.tracker) {
-						eles.sector.tracker.show();
+					if (eles.label) {
+						eles.label.show();
 					}
-				}
-				if (eles.label) {
-					eles.label.show();
-				}
-				break;
-			case "line":
-			case "spline":
-			case "bezier":
-			case "area":
-				if (eles.markers) {
-					$.each(eles.markers, function (i, marker) {
-						dataObj = $(marker.node).data("wijchartDataObj");
-						if (dataObj && dataObj.lineSeries && dataObj.lineSeries.markers) {
-							if (!dataObj.lineSeries.markers.visible) {
-								return true;
+					break;
+				case "line":
+				case "spline":
+				case "bezier":
+				case "area":
+					if (eles.markers) {
+						$.each(eles.markers, function (i, marker) {
+							dataObj = $(marker.node).data("wijchartDataObj");
+							if (dataObj && dataObj.lineSeries && dataObj.lineSeries.markers) {
+								if (!dataObj.lineSeries.markers.visible) {
+									return true;
+								}
+							}
+							marker.show();
+						});
+					}
+
+					if (eles.dcl) {
+						$.each(eles.dcl, function (i, dcl) {
+							if (showLabels) {
+								dcl.show();
+							}
+						});
+					}
+
+					if (eles.path) {
+						dataObj = $(eles.path.node).data("wijchartDataObj");
+						if (dataObj.visible) {
+							eles.path.show();
+							if (eles.path.shadow) {
+								eles.path.shadow.show();
+							}
+							if (eles.path.area) {
+								eles.path.area.show();
+							}
+							if (eles.path.tracker) {
+								eles.path.tracker.show();
 							}
 						}
-						marker.show();
+					}
+					break;
+				case "bar":
+				case "column":
+					$.each(eles, function (i, bar) {
+						if (bar.bar) {
+							bar.bar.show();
+							if (bar.bar.shadow) {
+								bar.bar.shadow.show();
+							}
+							if (bar.bar.tracker) {
+								bar.bar.tracker.show();
+							}
+						}
+						if (bar.dcl) {
+							bar.dcl.show();
+						}
+						if (bar.animatedBar && !bar.animatedBar.removed) {
+							bar.animatedBar.show();
+						}
 					});
-				}
-
-				if (eles.dcl) {
-					$.each(eles.dcl, function (i, dcl) {
-						if (showLabels) {
-							dcl.show();
-						}
+					break;
+				case "scatter":
+					$.each(eles, function (i, dot) {
+						dot.show();
 					});
-				}
-
-				if (eles.path) {
-					dataObj = $(eles.path.node).data("wijchartDataObj");
-					if (dataObj.visible || dataObj.display === "show") {
-						eles.path.show();
-						if (eles.path.shadow) {
-							eles.path.shadow.show();
-						}
-						if (eles.path.area) {
-							eles.path.area.show();
-						}
-						if (eles.path.tracker) {
-							eles.path.tracker.show();
-						}
-					}
-				}
-				break;
-			case "bar":
-			case "column":
-				$.each(eles, function (i, bar) {
-					if (bar.bar) {
-						bar.bar.show();
-						if (bar.bar.shadow) {
-							bar.bar.shadow.show();
-						}
-						if (bar.bar.tracker) {
-							bar.bar.tracker.show();
-						}
-					}
-					if (bar.dcl) {
-						bar.dcl.show();
-					}
-					if (bar.animatedBar) {
-						bar.animatedBar.show();
-					}
-				});
-				break;
-			case "scatter":
-				$.each(eles, function (i, dot) {
-					dot.show();
-				});
-				break;
+					break;
 			}
 		},
 
@@ -813,74 +844,74 @@
 				eles = seriesEle.eles;
 
 			switch (type) {
-			case "pie":
-				if (eles.sector) {
-					eles.sector.hide();
-					if (eles.sector.shadow) {
-						eles.sector.shadow.hide();
-					}
-					if (eles.sector.tracker) {
-						eles.sector.tracker.hide();
-					}
-				}
-				if (eles.label) {
-					eles.label.hide();
-				}
-				break;
-			case "line":
-			case "spline":
-			case "bezier":
-			case "area":
-				if (eles.markers) {
-					$.each(eles.markers, function (i, marker) {
-						marker.hide();
-					});
-				}
-
-				if (eles.dcl) {
-					$.each(eles.dcl, function (i, dcl) {
-						dcl.hide();
-					});
-				}
-
-				if (eles.path) {
-					eles.path.hide();
-					if (eles.path.shadow) {
-						eles.path.shadow.hide();
-					}
-					if (eles.path.area) {
-						eles.path.area.hide();
-					}
-					if (eles.path.tracker) {
-						eles.path.tracker.hide();
-					}
-				}
-				break;
-			case "bar":
-			case "column":
-				$.each(eles, function (i, bar) {
-					if (bar.bar) {
-						bar.bar.hide();
-						if (bar.bar.shadow) {
-							bar.bar.shadow.hide();
+				case "pie":
+					if (eles.sector) {
+						eles.sector.hide();
+						if (eles.sector.shadow) {
+							eles.sector.shadow.hide();
 						}
-						if (bar.bar.tracker) {
-							bar.bar.tracker.hide();
+						if (eles.sector.tracker) {
+							eles.sector.tracker.hide();
 						}
 					}
-					if (bar.dcl) {
-						bar.dcl.hide();
+					if (eles.label) {
+						eles.label.hide();
 					}
-					if (bar.animatedBar) {
-						bar.animatedBar.hide();
+					break;
+				case "line":
+				case "spline":
+				case "bezier":
+				case "area":
+					if (eles.markers) {
+						$.each(eles.markers, function (i, marker) {
+							marker.hide();
+						});
 					}
-				});
-				break;
-			case "scatter":
-				$.each(eles, function (i, dot) {
-					dot.hide();
-				});
-				break;
+
+					if (eles.dcl) {
+						$.each(eles.dcl, function (i, dcl) {
+							dcl.hide();
+						});
+					}
+
+					if (eles.path) {
+						eles.path.hide();
+						if (eles.path.shadow) {
+							eles.path.shadow.hide();
+						}
+						if (eles.path.area) {
+							eles.path.area.hide();
+						}
+						if (eles.path.tracker) {
+							eles.path.tracker.hide();
+						}
+					}
+					break;
+				case "bar":
+				case "column":
+					$.each(eles, function (i, bar) {
+						if (bar.bar) {
+							bar.bar.hide();
+							if (bar.bar.shadow) {
+								bar.bar.shadow.hide();
+							}
+							if (bar.bar.tracker) {
+								bar.bar.tracker.hide();
+							}
+						}
+						if (bar.dcl) {
+							bar.dcl.hide();
+						}
+						if (bar.animatedBar && !bar.animatedBar.removed) {
+							bar.animatedBar.hide();
+						}
+					});
+					break;
+				case "scatter":
+					$.each(eles, function (i, dot) {
+						dot.hide();
+					});
+					break;
 			}
 		},
 
@@ -960,8 +991,8 @@
 					chart = {},
 					chartType = type,
 					pie = {},
-					style = styles[index],
-					hoverStyle = hoverStyles[index],
+					style = $.extend({}, styles[index]),
+					hoverStyle = $.extend({}, hoverStyles[index]),
 					yAxis = series.yAxis;
 
 				if (!type || type.length === 0) {
@@ -998,8 +1029,8 @@
 
 				if (type === "pie") {
 					$.each(series.data, function (j, data) {
-						style = styles[index];
-						hoverStyle = hoverStyles[index];
+						style = $.extend({}, styles[index]);
+						hoverStyle = $.extend({}, hoverStyles[index]);
 
 						if (!pie[seriesList]) {
 							pie[seriesList] = [];
@@ -1064,9 +1095,9 @@
 			$.each(charts, function (type, chart) {
 				var yAxisIndex = chart.yAxis;
 				switch (type) {
-				case "pie":
-					$.each(chart, function (idx, pie) {
-						var center = pie.center,
+					case "pie":
+						$.each(chart, function (idx, pie) {
+							var center = pie.center,
 						r = pie.radius || 50,
 						pieBounds = center ? {
 							startX: center.x - r,
@@ -1080,77 +1111,77 @@
 							endY: bounds.startY + 10 + 2 * r
 						};
 
+							tmpOptions = $.extend(true, {}, options, {
+								bounds: pieBounds,
+								radius: r
+							}, pie);
+
+							self.chartElement.wijpie(tmpOptions);
+							self.chartElement.data("fields").aniSectorAttrs = null;
+							self.chartElement.data("fields").aniLabelAttrs = null;
+							self._savechartData(type);
+						});
+
+						break;
+					case "bar":
+					case "column":
+
 						tmpOptions = $.extend(true, {}, options, {
-							bounds: pieBounds,
-							radius: r
-						}, pie);
-
-						self.chartElement.wijpie(tmpOptions);
-						self.chartElement.data("fields").aniSectorAttrs = null;
-						self.chartElement.data("fields").aniLabelAttrs = null;
-						self._savechartData(type);
-					});
-					
-					break;
-				case "bar":
-				case "column":
-
-					tmpOptions = $.extend(true, {}, options, {
-						stacked: o.stacked,
-						axis: o.axis,
-						clusterOverlap: o.clusterOverlap,
-						clusterWidth: o.clusterWidth,
-						clusterSpacing: o.clusterSpacing,
-						is100Percent: o.is100Percent,
-						clusterRadius: o.clusterRadius,
-						isYTime: self.axisInfo.y[0].isTime,
-						isXTime: self.axisInfo.x.isTime,
-						yAxisInfo: self.axisInfo.y,
-						yAxisIndex: yAxisIndex
-					}, chart);
-
-					self.chartElement.wijbar(tmpOptions);
-
-					self._savechartData(type);
-					break;
-				case "line":
-				case "spline":
-				case "bezier":
-				case "area":
-					chartgroup = self._getyAxisGroup(chart);
-					if (!self.aniPathsAttr) {
-						self.aniPathsAttr = [];
-					}
-					$.each(chartgroup, function (ykey, subchart) {
-						tmpOptions = $.extend(true, {}, options, {
+							stacked: o.stacked,
 							axis: o.axis,
-							isXTime: self.axisInfo.x.isTime,
+							clusterOverlap: o.clusterOverlap,
+							clusterWidth: o.clusterWidth,
+							clusterSpacing: o.clusterSpacing,
+							is100Percent: o.is100Percent,
+							clusterRadius: o.clusterRadius,
 							isYTime: self.axisInfo.y[0].isTime,
-							aniPathsAttr: self.aniPathsAttr,
-							chartLabelEles: self.chartLabelEles,
-							type: type === "area"? "area": "line"
-						}, subchart);
-						tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
-						self.chartElement.wijline(tmpOptions);
+							isXTime: self.axisInfo.x.isTime,
+							yAxisInfo: self.axisInfo.y,
+							yAxisIndex: yAxisIndex
+						}, chart);
 
-						self._savechartData(type, true);
-					});
-					break;
-				case "scatter":
-					chartgroup = self._getyAxisGroup(chart);
-					$.each(chartgroup, function (ykey, subchart) {
-						tmpOptions = $.extend(true, {}, options, {
-							axis: o.axis,
-							isXTime: self.axisInfo.x.isTime,
-							isYTime: self.axisInfo.y[0].isTime,
-							zoomOnHover: o.zoomOnHover
-						}, subchart);
-						tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
-						self.chartElement.wijscatter(tmpOptions);
+						self.chartElement.wijbar(tmpOptions);
 
 						self._savechartData(type);
-					});
-					break;
+						break;
+					case "line":
+					case "spline":
+					case "bezier":
+					case "area":
+						chartgroup = self._getyAxisGroup(chart);
+						$.each(chartgroup, function (ykey, subchart) {
+							if (!self.aniPathsAttr) {
+								self.aniPathsAttr = [];
+							}
+							tmpOptions = $.extend(true, {}, options, {
+								axis: o.axis,
+								isXTime: self.axisInfo.x.isTime,
+								isYTime: self.axisInfo.y[0].isTime,
+								aniPathsAttr: self.aniPathsAttr,
+								chartLabelEles: self.chartLabelEles,
+								type: type === "area" ? "area" : "line"
+							}, subchart);
+							tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
+							self.chartElement.wijline(tmpOptions);
+
+							self._savechartData(type, true);
+						});
+						break;
+					case "scatter":
+						chartgroup = self._getyAxisGroup(chart);
+						$.each(chartgroup, function (ykey, subchart) {
+							tmpOptions = $.extend(true, {}, options, {
+								axis: o.axis,
+								isXTime: self.axisInfo.x.isTime,
+								isYTime: self.axisInfo.y[0].isTime,
+								zoomOnHover: o.zoomOnHover
+							}, subchart);
+							tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
+							self.chartElement.wijscatter(tmpOptions);
+
+							self._savechartData(type);
+						});
+						break;
 				}
 			});
 			self.chartElement.data("fields").seriesEles = null;
@@ -1228,6 +1259,7 @@
 				op = null,
 				title = hint.title,
 				content = hint.content,
+				hintStyle = hint.style,
 				isTitleFunc = $.isFunction(title),
 				isContentFunc = $.isFunction(content),
 				data, bbox, position;
@@ -1275,7 +1307,7 @@
 				else if (data.type === "scatter") {
 					self._clearHoverState();
 					bbox = data.dot.getBBox();
-					op.style.stroke = target.attr("stroke");
+					op.style.stroke = hintStyle.stroke || target.attr("stroke");
 					self.tooltip.showAt({
 						x: bbox.x + bbox.width / 2,
 						y: bbox.y
@@ -1283,7 +1315,7 @@
 				}
 				else {
 					self._clearHoverState();
-					op.style.stroke = target.attr("stroke");
+					op.style.stroke = hintStyle.stroke || target.attr("stroke");
 					self.tooltip.showAt({
 						x: e.pageX - position.left,
 						y: e.pageY - position.top
@@ -1586,7 +1618,9 @@
 				if (series.type === "pie") {
 					return true;
 				}
-
+				if (series.data.x === undefined || series.data.y === undefined) {
+					return true;
+				}
 				xLen = series.data.x.length;
 
 				if (len < xLen) {

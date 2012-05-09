@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -220,7 +220,6 @@
                         self._trigger('triggerMouseDown');
                     },
                     'click': function (e) {
-                        if (!isLeftButton(e)) { return; }
                         self._stopEvent(e);
                         self._stopSpin();
                         self._removeState('active', $(this));
@@ -248,7 +247,7 @@
             if (this.spinUp && !o.disabled) {
                 this.spinUp.bind({
                     'mouseover': function () { self._addState('hover', $(this)); },
-                    'mouseout': function () { self._removeState('hover', $(this)); },
+                    'mouseout': function () { self._removeState('hover', $(this)); self._removeState('active', $(this)); self._stopSpin(); },
                     'mousedown': spinButtonDown,
                     'mouseup': spinButtonUp
                 });
@@ -257,7 +256,7 @@
             if (this.spinDown && !o.disabled) {
                 this.spinDown.bind({
                     'mouseover': function () { self._addState('hover', $(this)); },
-                    'mouseout': function () { self._removeState('hover', $(this)); },
+                    'mouseout': function () { self._removeState('hover', $(this)); self._removeState('active', $(this)); self._stopSpin(); },
                     'mousedown': spinButtonDown,
                     'mouseup': spinButtonUp
                 });

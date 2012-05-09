@@ -1,7 +1,7 @@
 /*globals window document clearTimeout setTimeout jQuery */
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -1235,9 +1235,10 @@
 
 				if (tooltip.count <= 0) {
 					tooltip.remove();
+					$.wijmo.wijtooltip._tooltips[key] = null;
 				}
 
-				$.wijmo.wijtooltip._tooltips[key] = null;
+				
 				//tooltip = null;
 			}
 		}

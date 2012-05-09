@@ -1,7 +1,7 @@
 /*globals jQuery,window,S,document */
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -335,28 +335,32 @@
 			},
 			///	<summary>
 			///	A hash object that contains variants for flash object.
-			/// Code Example: $("#id").wijgallery({  flashVars: { width:300,  height:400 } });
+			/// Code Example: 
+			/// $("#id").wijgallery({  flashVars: { width:300,  height:400 } });
 			///	</summary>
 			flashVars: {},
 			///	<summary>
 			///	Version of flash object.
 			/// Default: "9.0.115"
 			/// Type: String
-			/// Code Example: $("#id").wijgallery({  flashVersion: "8.0" })
+			/// Code Example: 
+			/// $("#id").wijgallery({  flashVersion: "8.0" })
 			///	</summary>
 			flashVersion: "9.0.115",
 			///	<summary>
 			///	The relative path and name of the flash vedio player.
 			/// Default: 'player\\player.swf'
 			/// Type: String
-			/// Code Example: $("#id").wijgallery({  flvPlayer: "player\\player2.swf " });
+			/// Code Example: 
+			/// $("#id").wijgallery({  flvPlayer: "player\\player2.swf " });
 			///	</summary>
 			flvPlayer: 'player\\player.swf',
 			///	<summary>
 			///	The relative path and name of the flash installation guide.
 			/// Default: 'player\\expressInstall.swf'
 			/// Type: String
-			/// Code Example: $("#id").wijgallery({  flashInstall: " player\expressInstall2.swf " });
+			/// Code Example: 
+			/// $("#id").wijgallery({  flashInstall: " player\expressInstall2.swf " });
 			///	</summary>
 			flashInstall: 'player\\expressInstall.swf',
 			///	<summary>
@@ -444,19 +448,19 @@
 
 			self.disabledEles.each(function () {
 				var ele = $(this),
-                eleOffset = ele.offset(),
-		        disabledWidth = ele.outerWidth(),
-		        disabledHeight = ele.outerHeight(),
-		        div = $("<div></div>")
-                .addClass("ui-state-disabled")
-		        .css({
-		        	"z-index": "99999",
-		        	position: "absolute",
-		        	width: disabledWidth,
-		        	height: disabledHeight,
-		        	left: eleOffset.left,
-		        	top: eleOffset.top
-		        });
+				eleOffset = ele.offset(),
+				disabledWidth = ele.outerWidth(),
+				disabledHeight = ele.outerHeight(),
+				div = $("<div></div>")
+				.addClass("ui-state-disabled")
+				.css({
+					"z-index": "99999",
+					position: "absolute",
+					width: disabledWidth,
+					height: disabledHeight,
+					left: eleOffset.left,
+					top: eleOffset.top
+				});
 				if ($.browser.msie) {
 					div.css("background-color", "white");
 					if ($.browser.version === "9.0") {
@@ -614,8 +618,8 @@
 			width = self.element.width() - (or ? 0 : (self.thumbs ?
 			self.thumbs.outerWidth(true) : 0));
 			return {
-				w: (width < 0 || !width) ? 750 : width,
-				h: (height < 0 || !height) ? 300 : height
+				w: (width < 2 || !width) ? 750 : width,
+				h: (height < 2 || !height) ? 300 : height
 			};
 		},
 
@@ -1245,7 +1249,7 @@
 		_animate: function (index) {
 			var self = this, o = self.options, animate = o.transitions,
 			hori = o.thumbnailOrientation === "horizontal",
-			width, height, wrapper, half, data, forward, scrollIdx,
+			width, height, wrapper, half, data, forward, 
 			effect = animate.animated, duration = animate.duration;
 
 			//if (!self.last.find("img").attr("src") && 
@@ -1568,9 +1572,10 @@
 		add: function (ui, index) {
 			/// <summary>
 			/// Adds a custom item with specified index.
-			/// The first parameter is the new item to add, it should be a jQuery Element or HTML string. 
+			/// The first parameter is the new item to add,
+			/// it should be a jQuery Element or HTML string. 
 			/// The second parameter is the index of item to add , 
-			/// If  no index specified the item will be added at the last of  item collection.
+			/// If  no index specified the item will be added at the last of item collection.
 			/// </summary>
 			var self = this, item, idx, data;
 			if (typeof ui === "string") {
@@ -1716,10 +1721,11 @@
 
 			S.flash.embedSWF(swf, id, width, height, version, express, flashvars, params);
 		},
-		//fixed bug for addRule because the id is strict for addRule .
+		//fixed bug for addRule because the id is strict for addRule IE .
 		//		_newId: function () {
 		//			var S4 = function () {
-		//				return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+		//				return (((1 + Math.random()) * 0x10000) | 0)
+		//				.toString(16).substring(1);
 		//			};
 		//			return (S4() + S4() + "-" + S4() + "-" + S4() +
 		//			"-" + S4() + "-" + S4() + S4() + S4());
@@ -1727,9 +1733,9 @@
 
 		_newId: function () {
 			var chars = "a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z",
-			charArray = [], id = "";
+			charArray = [], id = "", i;
 			charArray = chars.split("|");
-			for (var i = 0; i < 16; i++) {
+			for (i = 0; i < 16; i++) {
 				id += charArray[Math.round(Math.random() * 25)];
 			}
 			return id;

@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -251,8 +251,7 @@
 		},
 
 		_init: function () {
-			var self = this,
-				o = self.options;
+			var self = this;
 			//o.max = o.max > 360 ? 360 : o.max;
 			$.wijmo.wijgauge.prototype._init.apply(self, arguments);
 		},
@@ -278,13 +277,7 @@
 			}
 			self._redrawMarksAndLabels();
 			self._setPointer();
-		},
-
-		_set_ranges: function () {
-			var self = this;
-			self._removeRanges();
-			self._paintRanges();
-		},
+		},		
 
 		_set_width: function () {
 			var self = this;
@@ -804,12 +797,14 @@
 			if (!self.pointer) {
 				return;
 			}
+			$.wijmo.wijgauge.prototype._setPointer.apply(this, arguments);
 			if (animation.enabled) {
-				self.pointer.wijAnimate({ transform: "r" + angle + "," + 
+				self.pointer.stop().wijAnimate({ transform: "r" + angle + "," + 
 					self.centerPoint.x + "," + self.centerPoint.y
 				}, animation.duration, animation.easing);
 			}
 			else {
+				
 				//self.pointer.rotate(angle, self.centerPoint.x, self.centerPoint.y);
 				self.pointer.transform(Raphael.format("r{0},{1},{2}", 
 					angle, self.centerPoint.x, self.centerPoint.y));

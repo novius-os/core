@@ -1,7 +1,7 @@
-/*globals window,document,jQuery*/
+/*globals window,document,jQuery,setTimeout*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -145,7 +145,7 @@
 		},
 
 		_create: function () {
-			var self = this, a,
+			var self = this,
 				o = self.options;
 
 			//Add support for jUICE!
@@ -157,7 +157,7 @@
 					}
 				});
 			}
-
+			//end
 
 
 			$.ui.dialog.prototype._create.apply(self, arguments);
@@ -492,19 +492,25 @@
 					if ($.isFunction(animationSetting.callback)) {
 						animationSetting.callback(e);
 					}
-					self._enableDisableResizer(false);
+					if (o.resizable) {
+						self._enableDisableResizer(false);
+					}
 				});
 			}
 			else {
 				self.contentWrapper.show();
-				self._enableDisableResizer(false);
+				if (o.resizable) {
+					self._enableDisableResizer(false);
+				}
 				self.uiDialog.css("height", self.toggleHeight);
 			}
 		},
 
 		_collapseDialogContent: function (fireEvent) {
 			var self = this, o = self.options, animationSetting = o.collapsingAnimation;
-			self._enableDisableResizer(true);
+			if (o.resizable) {
+				self._enableDisableResizer(true);
+			}
 			self._toggleHeight = self.uiDialog[0].style.height;
 			self.uiDialog.height("auto");
 			if (fireEvent && animationSetting !== null) {
