@@ -1,7 +1,7 @@
 /*globals jQuery */
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -53,6 +53,15 @@
 			}).bind("blur." + self.widgetName, function () {
 				e.removeClass("ui-state-focus");
 			});
+			
+			//for case 20899
+			if (e.is(":disabled")) {
+				self._setOption("disabled", true);
+				e.addClass("ui-state-disabled");
+			} else {
+				self._setOption("disabled", false);
+				e.removeClass("ui-state-disabled");
+			}
 		},
 		destroy: function () {
 			/// Remove the functionality completely. 

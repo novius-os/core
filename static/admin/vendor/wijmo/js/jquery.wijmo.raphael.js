@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -41,7 +41,7 @@
 			}
 			//var value = Globalize.format(val, "N" + digits);
 			//return Globalize.parseFloat(value);
-			return Globalize.parseFloat(val.toFixed(digits));
+			return Globalize.parseFloat(val.toFixed(digits), 10, Globalize.culture("en"));
 		},
 		toOADate: function (time) {
 			var day = 24 * 60 * 60 * 1000,
@@ -90,6 +90,17 @@
 					$(this).addClass(classNames);
 				}
 			});
+		},
+
+		clearRaphaelCache: function () {			
+			Raphael.path2curve.cache = null;
+			Raphael.path2curve.count = null;
+			Raphael.parseTransformString.cache = null;
+			Raphael.parseTransformString.count = null;
+			Raphael.parsePathString.cache = null;
+			Raphael.parsePathString.count = null;
+			Raphael._pathToAbsolute.cache = null;
+			Raphael._pathToAbsolute.count = null;
 		},
 
 		getPositionByAngle: function (cx, cy, r, angle) {
@@ -309,7 +320,8 @@
 		});
 		totalY = 0;
 		//st.translate(x - st.getBBox().x, y - st.getBBox().y);
-		st.transform(Raphael.format("...t{0},{1}", x - st.getBBox().x, y - st.getBBox().y));
+		st.transform(Raphael.format("...t{0},{1}",
+			x - st.getBBox().x, y - st.getBBox().y));
 
 		return st;
 	};
@@ -366,7 +378,7 @@
 		function splitString(text, width, textStyle) {
 			var tempText = null,
 				bounds = null,
-				words = text.split(' '),
+				words = text.toString().split(' '),
 				lines = [],
 				line = [],
 				tempTxt = "";
@@ -451,14 +463,14 @@
 			bounds = texts.wijGetBBox();
 			if (texts.length > 1) {
 				$.each(texts, function (idx, txt) {
-					txt.attr({y: txt.attr("y") - bounds.height / 2});
+					txt.attr({ y: txt.attr("y") - bounds.height / 2 });
 					textBounds[idx].y -= bounds.height / 2;
 				});
 				center = {
 					x: bounds.x + bounds.width / 2,
 					y: bounds.y + bounds.height / 2
 				};
-				
+
 
 				$.each(texts, function (idx, txt) {
 					var math = Math,
@@ -502,7 +514,8 @@
 
 
 					txt.attr({
-						y: txt.attr("y") + newTxtCenter.y - rotatedTB.y - rotatedTB.height / 2
+						y: txt.attr("y") + newTxtCenter.y -
+							rotatedTB.y - rotatedTB.height / 2
 					});
 				});
 			} else {
@@ -648,16 +661,14 @@
 
 	Raphael.el.wijRemove = function () {
 		var self = this,
-			data;
+			jqobj;
 		if (self.removed) {
 			return;
 		}
 		if (self.node.parentNode) {
-			data = $(self.node).data();
-			if (data) {
-				$(self.node).removeData();
-			}
-			self.remove();
+			jqobj = $(self.node);
+			self.stop().remove();
+			jqobj.remove();
 		}
 	};
 
@@ -675,60 +686,60 @@
 		return this.getBBox();
 		/*
 		var self = this,
-			box = self.getBBox();
+		box = self.getBBox();
 		if (Raphael.vml && self.type === 'text') {
-			self.shape.style.display = "inline";
-			box.width = self.shape.scrollWidth;
-			box.height = self.shape.scrollHeight;
+		self.shape.style.display = "inline";
+		box.width = self.shape.scrollWidth;
+		box.height = self.shape.scrollHeight;
 		}
 		return box;
 		*/
 		//end comments
 		/*
 		var self = this,
-			box = self.getBBox(),
-			degreesAsRadians = null,
-			points = [],
-			newX,
-			newY,
-			newWidth,
-			newHeight,
-			p,
-			bb = { left: 0, right: 0, top: 0, bottom: 0 },
-			_px = 0,
-			transform = self.transform().toString();
+		box = self.getBBox(),
+		degreesAsRadians = null,
+		points = [],
+		newX,
+		newY,
+		newWidth,
+		newHeight,
+		p,
+		bb = { left: 0, right: 0, top: 0, bottom: 0 },
+		_px = 0,
+		transform = self.transform().toString();
 		//if (this.attrs && this.attrs.rotation) {
 		if (/r[^0]/i.test(transform)) {
-			//degreesAsRadians = self._.deg * Math.PI / 180;
-			degreesAsRadians = self._.deg;
-			points.push({ x: 0, y: 0 });
-			points.push({ x: box.width, y: 0 });
-			points.push({ x: 0, y: box.height });
-			points.push({ x: box.width, y: box.height });
-			for (_px = 0; _px < points.length; _px++) {
-				p = points[_px];
-				newX = parseInt((p.x * Math.cos(degreesAsRadians)) +
-						(p.y * Math.sin(degreesAsRadians)), 10);
-				newY = parseInt((p.x * Math.sin(degreesAsRadians)) +
-						(p.y * Math.cos(degreesAsRadians)), 10);
-				bb.left = Math.min(bb.left, newX);
-				bb.right = Math.max(bb.right, newX);
-				bb.top = Math.min(bb.top, newY);
-				bb.bottom = Math.max(bb.bottom, newY);
-			}
-			newWidth = parseInt(Math.abs(bb.right - bb.left), 10);
-			newHeight = parseInt(Math.abs(bb.bottom - bb.top), 10);
-			newX = (box.x + (box.width) / 2) - newWidth / 2;
-			newY = (box.y + (box.height) / 2) - newHeight / 2;
+		//degreesAsRadians = self._.deg * Math.PI / 180;
+		degreesAsRadians = self._.deg;
+		points.push({ x: 0, y: 0 });
+		points.push({ x: box.width, y: 0 });
+		points.push({ x: 0, y: box.height });
+		points.push({ x: box.width, y: box.height });
+		for (_px = 0; _px < points.length; _px++) {
+		p = points[_px];
+		newX = parseInt((p.x * Math.cos(degreesAsRadians)) +
+		(p.y * Math.sin(degreesAsRadians)), 10);
+		newY = parseInt((p.x * Math.sin(degreesAsRadians)) +
+		(p.y * Math.cos(degreesAsRadians)), 10);
+		bb.left = Math.min(bb.left, newX);
+		bb.right = Math.max(bb.right, newX);
+		bb.top = Math.min(bb.top, newY);
+		bb.bottom = Math.max(bb.bottom, newY);
+		}
+		newWidth = parseInt(Math.abs(bb.right - bb.left), 10);
+		newHeight = parseInt(Math.abs(bb.bottom - bb.top), 10);
+		newX = (box.x + (box.width) / 2) - newWidth / 2;
+		newY = (box.y + (box.height) / 2) - newHeight / 2;
 
-			return { x: newX, y: newY, width: newWidth, height: newHeight };
+		return { x: newX, y: newY, width: newWidth, height: newHeight };
 		}
 
 		box = self.getBBox();
 		if (Raphael.vml && self.type === 'text') {
-			self.shape.style.display = "inline";
-			box.width = self.shape.scrollWidth;
-			box.height = self.shape.scrollHeight;
+		self.shape.style.display = "inline";
+		box.width = self.shape.scrollWidth;
+		box.height = self.shape.scrollHeight;
 		}
 		return box;
 		*/
@@ -755,7 +766,7 @@
 			easing = jQEasing[easing];
 		}
 		this.animate(params, ms, easing, callback);
-
+		jQEasing = null;
 		if (shadow && shadow.offset) {
 			offset = shadow.offset;
 			if (params.x) {
@@ -815,7 +826,7 @@
 				case "x":
 					this.shadow.attr(name, value);
 					//this.shadow.attr("translation", "1 0");
-					this.shadow.attr("transform", "...t1,0")
+					this.shadow.attr("transform", "...t1,0");
 					break;
 				case "y":
 					this.shadow.attr(name, value);

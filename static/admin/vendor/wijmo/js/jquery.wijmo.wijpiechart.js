@@ -1,7 +1,7 @@
 /*globals Raphael,jQuery, window*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -481,7 +481,8 @@
 				}
 			}
 
-			o.radius = r;
+			//remove to fix a resize issue.
+			//o.radius = r;
 
 			canvasBounds.startX += width / 2 - r;
 			canvasBounds.endX = canvasBounds.startX + 2 * r;
@@ -586,7 +587,8 @@
 				startX = bounds.startX,
 				startY = bounds.startY,
 				seriesEles = [],
-				path, attr, pieID;
+				path, attr, pieID,
+				trackers = canvas.set();
 
 //			function getTooltipText(fmt, target) {
 //				var dataObj = $(target.node).data("wijchartDataObj"),
@@ -758,14 +760,26 @@
 								//sector.wijAnimate({
 								//	translation: offset.x + " " + offset.y
 								//}, duration, easing);
+								if (sector.shadow && !sector.shadow.removed) {
+									sector.shadow.hide();
+								}
+
 								sector.wijAnimate({
-									transform: Raphael.format("t{0},{1}", offset.x, offset.y)
+									transform: Raphael.format("t{0},{1}", 
+										offset.x, offset.y)
 								}, duration, easing);
 								if (sector.tracker && !sector.tracker.removed) {
 									sector.tracker.wijAnimate({
-										transform: Raphael.format("t{0},{1}", offset.x, offset.y)
+										transform: Raphael.format("t{0},{1}", 
+											offset.x, offset.y)
 									}, duration, easing);
 								}
+//								if(sector.shadow && !sector.shadow.removed){
+//									sector.shadow.wijAnimate({
+//										transform: Raphael.format("t{0},{1}", 
+///											offset.x, offset.y)
+//									}, duration, easing);
+//								}
 
 								explodeAnimationShowing = true;
 							//explodeAnimationShowings[index] = explodeAnimationShowing;
@@ -786,7 +800,7 @@
 							sector,
 							showAnimationTimer,
 							hideAnimationTimer,
-							explodeAnimationShowing;;
+							explodeAnimationShowing;
 						if (target.data("owner")) {
 							target = target.data("owner");
 						}
@@ -851,17 +865,27 @@
 								//sector.wijAnimate({
 								//	translation: -offset.x + " " + -offset.y
 								//}, duration, easing);
+								if (sector.shadow && !sector.shadow.removed) {
+									sector.shadow.show();
+								}
 								if (!sector.removed) {
 									sector.wijAnimate({
-										//transform: Raphael.format("t0,0", -offset.x, -offset.y)
+										//transform: Raphael.format("t0,0", 
+										//	-offset.x, -offset.y)
 										transform: "t0,0"
-									});
+									}, duration, easing);
 								}
 								if (sector.tracker && !sector.tracker.removed) {
 									sector.tracker.wijAnimate({
-										//transform: Raphael.format("t0,0", -offset.x, -offset.y)
+										//transform: Raphael.format("t0,0", 
+										//	-offset.x, -offset.y)
 										transform: "t0,0"
-									});
+									}, duration, easing);
+								}
+								if (sector.shadow && !sector.shadow.removed) {
+									sector.shadow.wijAnimate({
+										transform: "t0,0"
+									}, duration, easing);
 								}
 
 								offset = { x: 0, y: 0 };
@@ -942,8 +966,6 @@
 					total += series.data;
 				}
 			});
-			
-			var trackers = canvas.set();
 
 			$.each(seriesList, function (idx, series) {
 				var seriesStyle = $.extend({
@@ -1009,18 +1031,29 @@
 				tracker = sector.clone();
 				// in vml, if the tracker has a stroke, the boder is black.
 				if ($.browser.msie && $.browser.version < 9) {
-					tracker.attr({opacity: 0.01, fill: "white", "stroke-width": 0, "fill-opacity": 0.01});
+					tracker.attr({
+						opacity: 0.01, 
+						fill: "white", 
+						"stroke-width": 0, 
+						"fill-opacity": 0.01
+					});
 				}
 				else {
-					tracker.attr({opacity: 0.01, fill: "white", "fill-opacity": 0.01});
+					tracker.attr({
+						opacity: 0.01, 
+						fill: "white", 
+						"fill-opacity": 0.01
+					});
 				}
-				addClass($(tracker.node), "wijchart-canvas-object wijpiechart pietracker wijchart-tracker" + idx);
+				addClass($(tracker.node), "wijchart-canvas-object wijpiechart" + 
+					" pietracker wijchart-tracker" + idx);
 				$(tracker.node).data("owner", $(sector.node));
 				sector.tracker = tracker;
 				trackers.push(tracker);
 
 				// add class "wijmo-wijpiechart-series-n" to fix bug 18590
-				addClass($(sector.node), "wijchart-canvas-object wijpiechart wijmo-wijpiechart-series-" + idx);
+				addClass($(sector.node), "wijchart-canvas-object wijpiechart" + 
+					" wijmo-wijpiechart-series-" + idx);
 				//addClass($(sector.node), "wijchart-canvas-object wijpiechart");
 				//end comments
 				$(sector.node).data("wijchartDataObj", series);
@@ -1055,10 +1088,21 @@
 					$(label.node).data("wijchartDataObj", series);
 					tooltipTars.push(label);
 					labels.push(label);
-					labelAttrs[idx] = label.attr();
+					labelAttrs[idx] = label.attr();					
 				}
 
 				seriesEles.push({label: labels[idx], sector: sector});
+
+				if (series.visible === false) {
+					sector.hide();
+					if (labels[idx]) {
+						labels[idx].hide();
+					}
+					if (sector.shadow) {
+						sector.shadow.hide();
+					}
+					tracker.hide();
+				}
 
 				sectorAttrs[idx] = sector.attr();
 				sectors.push(sector);
@@ -1072,6 +1116,14 @@
 				series.type = "pie";
 				angle += anglePlus;
 			});
+			
+			//ensuring labels are rendered on top of pie slices.
+			if (labels && labels.length) {
+				$.each(labels, function (idx, label) {
+					label.toFront();
+				});
+			}
+			//end comments.
 
 			chartElements.sectors = sectors;
 			if (pieID) {

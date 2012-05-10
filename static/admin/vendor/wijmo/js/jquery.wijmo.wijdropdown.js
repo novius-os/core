@@ -1,7 +1,7 @@
 /*globals jQuery,document,window*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -62,6 +62,9 @@
 		_createSelect: function () {
 			var self = this,
 				ele = self.element,
+				width = ele.outerWidth(),
+				eleWidth = width,
+			//height = ele.height(),
 				selectWrap = ele.wrap("<div></div>").parent()
 					.addClass("ui-helper-hidden"),
 				container = selectWrap.wrap("<div></div>")
@@ -84,6 +87,7 @@
 					.appendTo(rightTrigger);
 
 
+			width = Math.max(width, container.width());
 			if (ele.get(0).tabIndex !== "") {
 				labelWrap.attr("tabindex", ele.attr("tabindex"));
 			}
@@ -98,9 +102,6 @@
 				.append(labelWrap)
 				.append(rightTrigger)
 				.append(listContainer);
-            selectWrap.removeClass("ui-helper-hidden");
-            var eleWidth = ele.outerWidth();
-            selectWrap.addClass("ui-helper-hidden");
 			eleWidth += parseInt(label.css("padding-left").replace(/px/, ""), 10);
 			eleWidth += parseInt(label.css("padding-right").replace(/px/, ""), 10);
 			eleWidth -= 16;
@@ -146,7 +147,8 @@
 				}
 			});
 
-			//update for fixing height setting is incorrect when execute refresh at 2011/11/30
+			//update for fixing height setting is incorrect when
+			//execute refresh at 2011/11/30
 			listContainer.height("");
 			//end for height setting
 
@@ -400,7 +402,10 @@
 				listContainer.parent().css("z-index", "99999");
 			}
 			if (showingAnimation) {
-				listContainer.stop().show(
+				//update for fixing 20652 issue by wh at 2012/3/19
+				//listContainer.stop().show(
+				listContainer.show(
+				//end for fixing issue 20652
 				showingAnimation.effect,
 				showingAnimation.options,
 				showingAnimation.speed,
@@ -421,7 +426,10 @@
 				return;
 			}
 			if (hidingAnimation) {
-				listContainer.stop(false, true).hide(
+				//update for fixing 20652 issue by wh at 2012/3/19
+				//listContainer.stop(false, true).hide(
+				listContainer.hide(
+				//end for fixing issue 20652
 				hidingAnimation.effect,
 				hidingAnimation.options,
 				hidingAnimation.speed,
@@ -542,8 +550,10 @@
 				//containerWidth = self._listContainer.width();
 				self._selectWrap.removeClass("ui-helper-hidden");
 				containerWidth = self.element.outerWidth();
-				containerWidth += parseInt(self._label.css("padding-left").replace(/px/, ""), 10);
-				containerWidth += parseInt(self._label.css("padding-right").replace(/px/, ""), 10);
+				containerWidth += parseInt(self._label.css("padding-left")
+				.replace(/px/, ""), 10);
+				containerWidth += parseInt(self._label.css("padding-right")
+				.replace(/px/, ""), 10);
 				containerWidth -= 16;
 				self._container.width(containerWidth);
 				self._selectWrap.addClass("ui-helper-hidden");

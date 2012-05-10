@@ -66,33 +66,23 @@ define('jquery-nos', [
             fireDialogEvent : function($dialog, event) {
                 var $iframe = $dialog.find('> iframe');
 
-                var e = $.Event(event.event, {
-                    namespace : event.type || null,
-                    data : event.data || null
-                });
-
                 if ($iframe.size()) {
                     if ($iframe[0].contentDocument.$) {
-                        $iframe[0].contentDocument.$('body').trigger(e);
+                        $iframe[0].contentDocument.$('body').trigger(event);
                     }
                 } else {
                     // @todo Figure out why we need this try catch.
                     // Adding a media throws an TypeError exception : unknown method 'trigger' on DOMWindow
                     try {
-                        $dialog.trigger(e);
+                        $dialog.trigger(event);
                     } catch (e) {
-                        log(e);
+                        log('fireDialogEvent error', e, event);
                     }
                 }
             },
             dispatchEvent : function(event) {
                 var self = this;
 
-                if (!$.isPlainObject(event)) {
-                    event = {
-                        event : event
-                    };
-                }
                 $.each(self.dialogOpened, function() {
                     var $dialog = $(this);
                     if (this === self.dialogFocused) {
@@ -100,7 +90,7 @@ define('jquery-nos', [
                     } else {
                         var callbacks = $dialog.data('callbacks.nosdialog');
                         if ($.isPlainObject(callbacks)) {
-                            callbacks[event.event + (event.type ? '.' + event.type : '')] = event;
+                            callbacks[event.type + (event.namespace ? '.' + event.namespace : '')] = event;
                         }
                     }
                 });
@@ -114,8 +104,21 @@ define('jquery-nos', [
             if (window.parent != window && window.parent.$nos) {
                 return window.parent.$nos.dispatchEvent(event);
             }
-            noviusos().ostabs('dispatchEvent', event);
-            dialogEvent.dispatchEvent(event);
+
+            var $noviusos = noviusos();
+            if (!$.isArray(event)) {
+                event = [event];
+            }
+            $.each(event, function() {
+                var e = this;
+                if ( !(e instanceof jQuery.Event) ) {
+                    e = $.Event(e);
+                }
+
+                $noviusos.ostabs('dispatchEvent', e);
+                dialogEvent.dispatchEvent(e);
+            });
+            return $nos;
         },
 
         notify : function( options, type ) {

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -295,14 +295,18 @@
 			}
 			
 			if (!!arr){
-				while( wijPop = arr.pop()){
-					if (wijPop.isVisible() && !!wijPop.options.autoHide){
-						if ($srcElement.get(0) != wijPop.element.get(0) && $srcElement.parents().index(wijPop.element) < 0) { 
-							wijPop.hide(); 
-						}else{
-							arr.push(wijPop);
+				while( wijPop = arr.pop()) {
+					if (wijPop.isVisible()) {
+						if (!!wijPop.options.autoHide){
+							if ($srcElement.get(0) != wijPop.element.get(0) && $srcElement.parents().index(wijPop.element) < 0) { 
+								wijPop.hide(); 
+							}else{
+								arr.push(wijPop);
+							}
+							
+							break;
 						}
-						
+					} else {
 						break;
 					}
 				}

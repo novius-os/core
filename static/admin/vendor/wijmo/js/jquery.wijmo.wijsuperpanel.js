@@ -1,7 +1,7 @@
 /*globals window document jQuery */
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -611,37 +611,37 @@
 				self.options[key] = value;
 			}
 			switch (key) {
-				case "allowResize":
-					self._initResizer();
-					break;
-				case "disabled":
-					if (value) {
-						if (hd !== undefined) {
-							hd.draggable("disable");
-						}
-						if (vd !== undefined) {
-							vd.draggable("disable");
-						}
-						if (r !== undefined) {
-							r.resizable("disable");
-						}
+			case "allowResize":
+				self._initResizer();
+				break;
+			case "disabled":
+				if (value) {
+					if (hd !== undefined) {
+						hd.draggable("disable");
 					}
-					else {
-						if (hd !== undefined) {
-							hd.draggable("enable");
-						}
-						if (vd !== undefined) {
-							vd.draggable("enable");
-						}
-						if (r !== undefined) {
-							r.resizable("enable");
-						}
+					if (vd !== undefined) {
+						vd.draggable("disable");
 					}
-					break;
-				case "mouseWheelSupport":
-				case "keyboardSupport":
-					self._bindElementEvents(self, f, self.element, o);
-					break;
+					if (r !== undefined) {
+						r.resizable("disable");
+					}
+				}
+				else {
+					if (hd !== undefined) {
+						hd.draggable("enable");
+					}
+					if (vd !== undefined) {
+						vd.draggable("enable");
+					}
+					if (r !== undefined) {
+						r.resizable("enable");
+					}
+				}
+				break;
+			case "mouseWheelSupport":
+			case "keyboardSupport":
+				self._bindElementEvents(self, f, self.element, o);
+				break;
 			}
 			return self;
 		},
@@ -986,7 +986,8 @@
 		_draggingInternal: function (data, self, scroller, originalElement) {
 			var dir = scroller.dir, h = dir === "h",
 			key = h ? "left" : "top",
-			//the parameter from draggable widget is supposed to be used instead of the style property of html element
+			//the parameter from draggable widget is supposed to 
+			//be used instead of the style property of html element
 			//left = parseFloat(originalElement[0].style[key].replace("px", "")) -
 			left = data.position[key] -
 			self._getScrollContainerPadding(key),
@@ -2043,7 +2044,7 @@
 		_createBarIfNeeded: function (hNeedScrollBar, scrollerWrapper,
 		dir, html, content) {
 			if (hNeedScrollBar) {
-				var self = this, o = self.options, data,
+				var self = this, data,
 				f = self._fields(),
 				strBarContainer = dir + "barContainer",
 				strBarDrag = dir + "barDrag",

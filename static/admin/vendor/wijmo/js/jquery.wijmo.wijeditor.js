@@ -1,6 +1,6 @@
 /*globals jQuery, alert, document, window, setTimeout, $, Components, netscape */
 /*
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -335,6 +335,9 @@
 
 		selector_dlg_ok = "." + css_dlg_buttons + " input:first",
 		selector_dlg_cancel = "." + css_dlg_buttons + " input:last",
+		
+		selector_input_ok = "." + css_dlg_buttons + " input[value='OK']",
+		selector_input_cancel = "." + css_dlg_buttons + " input[value='Cancel']",
 
 		imageTypeButton = ["Bold", "Italic", "UnderLine",
 							"StrikeThrough", "SubScript", "SuperScript",
@@ -445,7 +448,7 @@
 		Template: { name: "template", tip: 'Template',
 			css: css_ribbon_template
 		},
-		RemoveFormate: { name: "removeformat", tip: 'RemoveFormat',
+		RemoveFormat: { name: "removeformat", tip: 'RemoveFormat',
 			css: css_ribbon_removeformat
 		},
 		InsertBreak: { name: "insertbreak", tip: 'Insert Break',
@@ -674,7 +677,8 @@
 			/// </summary>
 			editorMode: "wysiwyg",
 			/// <summary>
-			/// Use Set this option to true if you want to switch the editor to FullScreen Mode. 
+			/// Use Set this option to true if you want to 
+			/// switch the editor to FullScreen Mode. 
 			/// All client area of the page will be covered by WebEditor. 
 			/// Default: false.
 			/// Type: Boolean.
@@ -736,8 +740,21 @@
 			/// Code example:
 			///  $("#wijeditor").wijeditor({
 			///		 mode: "simple",
-			///      simpleModeCommands: ["bold","undo"]
+			///      simpleModeCommands: ["Bold","Undo"]
 			///  });
+			/// Note: The buildin simple commands support the following commands:
+			/// "Form","Image","TextArea","Button","TextBox","List","DropDownList",
+			/// "HiddenField","Radio","CheckBox","JustifyLeft,"JustifyCenter",
+			/// "JustifyRight","JustifyFull","Border","NumberedList","BulletedList",
+			/// "Outdent","Indent","BackColor","ForeColor","Bold","Italic","UnderLine",
+			/// "SubScript","SuperScript","Template","RemoveFormat","InsertBreak",
+			/// "InsertParagraph","InsertPrint","InsertHR","Undo","Redo","Preview","Cleanup",
+			/// "Cut","Copy","Paste","SelectAll","Media","InsertSpecialChar","InsertDate","Find",
+			/// "Inspect","Spelling","InsertImage","Link","FontName","FontSize","BlockQuote","InsertCode"
+			/// The default simple mode commands are:
+			/// ["Bold", "Italic", "Link", "BlockQuote",
+			/// "StrikeThrough", "InsertDate", "InsertImage",
+			/// "NumberedList", "BulletedList", "InsertCode"]
 			/// </summary>
 			simpleModeCommands: null,
 			/// <summary>
@@ -780,6 +797,10 @@
 					self._handleDisabledOption(true, self.editor);
 				}
 			}, 40);
+			
+			//add for fixing issue 20372 by wh at 2012/3/9
+			self._continueSavingInputTextForUndo = false;
+			//enf for 20372
 		},
 
 		_createBigButton: function (tip, css, name, text) {
@@ -1214,7 +1235,7 @@
 			//remove format list
 			rbList = self._createRibbonList();
 			rbFontGrp.add(rbList);
-			rbList.add(self._createButtonByCommand("RemoveFormate"));
+			rbList.add(self._createButtonByCommand("RemoveFormat"));
 
 			//action name
 			rbFontGrp.add(self._createElement("div", "Font"));
@@ -1902,20 +1923,19 @@
 			doc = self._getDesignViewDocument(),
 			defaultFontName = o.defaultFontName,
 			defaultFontSize = o.defaultFontSize,
-			defaultFontNameKey = "", defaultFontSizeKey = "",
 			defaultFontStyleString = "<style type=\"text/css\"> body {";
 			
 			if ((defaultFontName === "" || defaultFontName === null) &&
-					(defaultFontSize === "" || defaultFontSize === null)){
+					(defaultFontSize === "" || defaultFontSize === null)) {
 				return;
 			}
 			
 			if (defaultFontName !== "" && defaultFontName !== null) {
-				defaultFontStyleString += "font-family: "+ defaultFontName +";";
+				defaultFontStyleString += "font-family: " + defaultFontName + ";";
 			}
 			
 			if (o.defaultFontSize !== "" && o.defaultFontSize !== null) {
-				defaultFontStyleString += " font-size: "+ defaultFontSize +";";
+				defaultFontStyleString += " font-size: " + defaultFontSize + ";";
 			}
 			
 			defaultFontStyleString += "}</style>";
@@ -1923,16 +1943,16 @@
 			//update for fix issue 19693 by wh at 2012/2/3
 			//$(defaultFontStyleString).appendTo(doc.head);
 			window.setTimeout(function () {
-				$(defaultFontStyleString).appendTo($("head",doc));
-				}, 200);
+				$(defaultFontStyleString).appendTo($("head", doc));
+			}, 200);
 			//end for issue 19693
 			
-			//init the button state			
-			self._setFontStyleButtonState(defaultFontName,cmd_fontname);
-			self._setFontStyleButtonState(defaultFontSize,cmd_fontsize);
+			//init the button state
+			self._setFontStyleButtonState(defaultFontName, cmd_fontname);
+			self._setFontStyleButtonState(defaultFontSize, cmd_fontsize);
 		},
 
-		_setFontStyleButtonState:function (defaultValue, cmd) {
+		_setFontStyleButtonState: function (defaultValue, cmd) {
 			var defaultKey = "";
 			if (!defaultValue || defaultValue === null) {
 				return;
@@ -1944,7 +1964,7 @@
 							return false;
 						}
 					});
-					$ribbon.wijribbon(setButtonChecked, defaultKey, true, cmd);
+			$ribbon.wijribbon(setButtonChecked, defaultKey, true, cmd);
 		},
 		
 		_setDesignModeForFF: function (self) {
@@ -2373,7 +2393,7 @@
 				footer = self._getFooter(),
 				content = self._getContent(),
 				cSelector = self.options.fullScreenContainerSelector,
-				$container = $(cSelector),
+				$container = $(cSelector), oriHtml = self._getDesignViewText(),
 				width, height, contentHeight;
 
 			if (fullScreenMode) {
@@ -2433,6 +2453,11 @@
 				.addClass(css_editor_fullscreen);
 				//end by wuhao
 				
+				self.sourceView.css({
+					width: width,
+					height: height
+				});
+				
 				$ribbon.wijribbon("updateRibbonSize");
 			} else {
 				//if ($oriParent) {
@@ -2447,6 +2472,11 @@
 				})
 				.removeClass(css_editor_fullscreen);
 
+				self.sourceView.css({
+					width: oriWidth,
+					height: oriHeight
+				});
+				
 				if (!self.options.fullScreenContainerSelector) {
 					$(document.documentElement).css({
 						overflow: self._oriDocOverFlow
@@ -2467,21 +2497,37 @@
 			self._addDefaultFontStyleToDesignView();
 			//end for adding
 			//update: contextmenu don't show when fullscreen mode
-			//update by wh at 2011/10/10
-			
+			//update by wh at 2011/10/10			
 			self._createWijMenu();
 			//end for contextmenu
+			
+			//update for fixing bug 20695 
+			if ($.browser.msie) {
+				window.setTimeout(function() {
+						self._setDesignViewText(oriHtml);
+						//for case 20731 fixing at 2012/4/23
+						if (wijParseInt($.browser.version) >= 9) {
+							self.sourceView.val(oriHtml);
+						}
+						},
+						40);
+			}
 		},
 
 		//fixed bug for customContextMenu
 		_createWijMenu: function () {
-			var self = this;
+			var self = this, doc = self._getDesignViewDocument();
 			if (self.contextMenu) {
 				self.contextMenu.wijmenu({
 					orientation: 'vertical',
 					trigger: self.designView,
 					triggerEvent: 'rtclick',
 					showing: function (e, sublist) {
+						//update for fixing issue 20382 by wh at 2012/3/12
+						if ($.browser.msie) {
+							rangeSelection = doc.selection.createRange();
+				        }
+						//end for 20382 issue.
 						sublist.show();
 						var offset = self.designView.offset(),
 						contentWindowScrollLeft = $($(self.designView)[0].contentWindow)
@@ -2500,6 +2546,9 @@
 					},
 					animation: { animated: "fade" },
 					select: function (e, item) {
+						//update for fixing 20488 by wh at 2012/3/14
+						self._setIESelection();
+						//end for 20488 issue.
 						self._contextMenuItemClick(e, item);
 					}
 				});
@@ -2786,27 +2835,39 @@
 				}
 				break;
 			case cmd_backcolor:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Set BackColor",
 			self._getDialogRes_BackColor(),
 			self.initBackColorDialog);
 				break;
 			case cmd_fontcolor:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Set ForeColor",
 			self._getDialogRes_ForeColor(),
 			self.initForeColorDialog);
 				break;
 			case cmd_inserttable:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Insert Table",
 			self._getDialogRes_Table(false),
@@ -2830,19 +2891,26 @@
 			self.initCleanUpDialog);
 				break;
 			case cmd_media:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Insert media",
 			self._getDialogRes_Media(),
 			self.initMediaDialog);
 				break;
 			case cmd_specialchar:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
-
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 				self._createDialog("Insert special character",
 			self._getDialogRes_SpecialCharacter(),
 			self.initSpecialCharacterDialog);
@@ -2860,36 +2928,52 @@
 			self.initTagInspectorDialog);
 				break;
 			case cmd_template:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Apply Template",
 			self._getDialogRes_Template(),
 			self.initTemplateDialog);
 				break;
 			case cmd_imagebrowser:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Image Browser",
 			self._getDialogRes_ImageBrowser(),
 			self.initImageBrowserDialog);
 				break;
 			case cmd_link:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 
 				self._createDialog("Insert hyperLink",
 			self._getDialogRes_Link(),
 			self.initHyperLinkDialog);
 				break;
 			case cmd_insertcode:
+				//update for fixing issue 20382 by wh at 2012/3/9
+				/*
 				if ($.browser.msie) {
 					rangeSelection = doc.selection.createRange();
-				}
+				}*/
+				self._saveSelectionForIE();
+				//end for 20382 issue
 				self._createDialog("Insert Code",
 				self._getDialogRes_Code(),
 				self.initInsertCodeDialog);
@@ -2930,6 +3014,14 @@
 			self._onDesignViewBlur();
 			//end for change happens
 		},
+		
+		_saveSelectionForIE: function () {
+			var cWin = this._getDesignViewWindow(), selection;
+			if ($.browser.msie) {
+				selection = cWin.document.selection;
+				rangeSelection = selection.createRange();
+			}
+		},
 
 		//added by Ryanwu@20110512.
 		_createDialog: function (title, content, callback) {
@@ -2938,6 +3030,12 @@
 
 			$dlg.html("").undelegate(self.widgetName).undelegate("." + self.widgetName)
 				.append(content);
+			//add for fixing issue 20444 by wh at 2012/3/13
+			if (self.subDialog) {
+				self.subDialog.html("").undelegate(self.widgetName)
+				.undelegate("." + self.widgetName);
+			}
+			//end for 20444 issue 
 			if (!$dlg.data("wijdialog")) {
 				$dlg.wijdialog({
 					width: "auto",
@@ -3220,8 +3318,14 @@
 					case 13:
 					case 46:
 						self._addtoUndoBuffer();
+						//update for fixing issue 20372 by wh at 2012/3/9
+						self._continueSavingInputTextForUndo = false;
+						//end for 20372 issue
 						break;
 					default:
+						//update for fixing issue 20372 by wh at 2012/3/9
+						self._continueSavingInputTextForUndo = true;
+						//end for 20372 issue
 						break;
 					}
 				}
@@ -3255,6 +3359,9 @@
 				case 'x':
 				case 'v':
 					self._addtoUndoBuffer();
+					//update for fixing issue 20372 by wh at 2012/3/9
+					self._continueSavingInputTextForUndo = false;
+					//end for 20372 issue
 					break;
 				}
 			}
@@ -3291,6 +3398,9 @@
 			var self = this, o = self.options, sourceView;
 
 			sourceView = self._getDesignViewText();
+			//update for fixing issue 20372 by wh at 2012/3/9
+			self._onTextChange();
+			//end for 20372 issue
 			if (o.mode === "bbcode") {
 				//Note: trim leading/trailing whitespace
 				//because when get the innerhtml from body, there 
@@ -3298,6 +3408,14 @@
 				sourceView = self._convertHtmlToBBCode($.trim(sourceView));
 			}
 			self.sourceView.val(sourceView);
+		},
+		
+		_onTextChange: function () {
+			var self = this;
+			if (self._continueSavingInputTextForUndo) {
+				self._addtoUndoBuffer();
+				self._continueSavingInputTextForUndo = false;
+			}
 		},
 
 		_onSourceViewBlur: function () {
@@ -3932,13 +4050,21 @@
 				$("." + css_linkdlg_target + " select", $dlg).val(self._getLinkTarget());
 			} catch (e) { }
 
-			if (address.length > 4 && address.substring(0, 4) === 'http') {
-				$("#radUrl", $dlg).attr("checked", "checked");
-			} else if (address.length > 6 && address.substring(0, 6) === 'mailto') {
-				$("#radMail", $dlg).attr("checked", "checked");
-			} else {
-				$("#radAnchor", $dlg).attr("checked", "checked");
+			$("#radAnchor", $dlg).attr("checked", "checked");
+			if (address.length > 6) {
+				if (address.substring(0, 4) === 'http') {
+					$("#radUrl", $dlg).attr("checked", "checked");
+				} else if (address.substring(0, 6) === 'mailto') {
+					$("#radMail", $dlg).attr("checked", "checked");
+				} else {
+					if (address.substring(0, 1) === '#') {
+	    				$("#radAnchor", $dlg).attr("checked", "checked");
+	                }else {
+	    				$("#radFile", $dlg).attr("checked", "checked");
+	    			}
+				}
 			}
+
 		},
 
 		_getLinkInnerHTML: function () {
@@ -3961,11 +4087,14 @@
 
 			self.focus();
 			inspElem = self._getInspectElement();
-
-			if (inspElem && inspElem.tagName === 'A') {
-				return self.fixAbsoluteUrlsIfNeeded(inspElem.href || '');
+			
+			try {
+				if (inspElem && inspElem.tagName === 'A') {
+					return self.fixAbsoluteUrlsIfNeeded(inspElem.href || '');
+				}
+			} catch (error) {
+				
 			}
-
 			return '';
 		},
 
@@ -4090,6 +4219,8 @@
 			} else if ($("#radMail", $dlg).is(":checked")) {
 				$anchor.hide();
 				$address.val('mailto:');
+			} else if ($("#radFile", $dlg).is(":checked")) {
+				$anchor.hide();
 			}
 		},
 		//end of link dialog.
@@ -4410,7 +4541,11 @@
 				self._onDesignViewBlur();
 				//end for change happens
 			})
-			.delegate(selector_dlg_cancel, "click." + self.widgetName, function () {
+			//update for fixing issue 20275 issue by wh at 2012/3/12
+			//note: jquery upgrade the first and last have some problems
+			//.delegate(selector_dlg_cancel, "click." + self.widgetName, function () {
+			.delegate(selector_input_cancel, "click." + self.widgetName, function () {
+		    //end for 20275 issue
 				self._closeDialog();
 			})
 			.delegate("." + css_tabledlg_bgcolor + " input:button",
@@ -4459,6 +4594,11 @@
 			}
 			html += '</table>';
 
+			if ($.browser.mozilla ||
+			 ($.browser.msie && wijParseInt($.browser.version) >= 9)) {
+				html += '<br />';
+			}
+
 			self.insertHTML(html);
 		},
 		////end of the insert table dialog.
@@ -4476,9 +4616,12 @@
 				self._onDesignViewBlur();
 				//end for change happens
 			})
-			.delegate(selector_dlg_cancel, "click." + self.widgetName, function () {
+			//update for fixing 20275 issue by wh at 2012/3/12
+			//.delegate(selector_dlg_cancel, "click." + self.widgetName, function () {
+			.delegate(selector_input_cancel, "click." + self.widgetName, function () {
 				self._closeDialog();
 			})
+			//end for 20275 issue
 			.delegate("." + css_tabledlg_bgcolor + " input:button",
 			"click." + self.widgetName, function () {
 				self.showTableColorDialog(this);
@@ -4662,12 +4805,16 @@
 				}
 			});
 
-			$subDlg.delegate(selector_dlg_ok, "click." + self.widgetName, function () {
+			//update for fixing issue 20275 by wh at 2012/3/12
+			//$subDlg.delegate(selector_dlg_ok,, "click." + self.widgetName, function () {
+			$subDlg.delegate(selector_input_ok, "click." + self.widgetName, function () {
 				self.submitTableColorDialog();
 			})
-			.delegate(selector_dlg_cancel, "click." + self.widgetName, function () {
+			//.delegate(selector_dlg_cancel, "click." + self.widgetName, function () {
+			.delegate(selector_input_cancel, "click." + self.widgetName, function () {
 				self.closeSubDialog();
 			});
+			//end for 20275 issue
 
 			if (bgcolor !== "") {
 				$("." + css_colordlg_color + " input", $subDlg).val(bgcolor);
@@ -4694,7 +4841,7 @@
 		},
 
 		_getEditableTable: function () {
-			var self = this,
+			var self = this, table,
 		editableTable, $editableTable;
 
 			editableTable = self._getSelectedElement();
@@ -4709,8 +4856,14 @@
 			if ($editableTable.is("td,tr,tbody")) {
 				editableTable = $editableTable.parents("table:first")[0];
 			} else {
-				wijAlert('Please select a table!');
-				return false;
+				table = $editableTable.find("table:only-child");
+				if ($.browser.msie && table.length) {
+					editableTable = table[0];
+				}
+				else {
+					wijAlert('Please select a table!');
+					return false;
+				}
 			}
 
 			inspectElement = editableTable;
@@ -4956,6 +5109,12 @@
 			var self = this,
 			$dlg = self.dialog;
 
+			//update for fixing issue 20316 by wh at 2012/3/14
+			if (self.tRange) {
+				self.tRange = null;
+			}
+			//end for 20316 issue.
+			
 			$dlg.delegate(selector_dlg_ok, "click." + self.widgetName, function () {
 				self.submitFindAction();
 			})
@@ -5538,9 +5697,10 @@
 			} else {
 				selection = win.getSelection();
 				parent = $(inspEl).closest("tr")[0];
-				rangeCount = parent.cells.length;
 
 				if (parent) {
+					rangeCount = parent.cells.length;
+
 					for (idx = 0; idx < rangeCount; idx++) {
 						cells.push(parent.cells[idx]);
 					}
@@ -6580,7 +6740,7 @@
 					if (!isEditable && doc[designMode] !== 'off') {
 						doc[designMode] = 'off';
 					} else if (isEditable && doc[designMode] !== 'on') {
-						doc[designMode] = 'on';
+					    doc[designMode] = 'on';
 					}
 				}
 

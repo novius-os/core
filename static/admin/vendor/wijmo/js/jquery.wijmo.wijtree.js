@@ -1,7 +1,7 @@
 /*globals jQuery,window*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -142,7 +142,7 @@
 			///	</summary>
 			collapseDelay: 0,
 			///	<summary>
-			///	The options for user to customize the jquery-ui-draggable plugin of wijtree.
+			///	Customize the jquery-ui-draggable plugin of wijtree.
 			/// Type:object.
 			/// Default:null.
 			/// Code example:$(".selector").wijtree("option","draggable",{
@@ -151,7 +151,7 @@
 			///	</summary>
 			draggable: null,
 			///	<summary>
-			///	The options for user to customize the jquery-ui-droppable plugin of wijtree.
+			///	Customize the jquery-ui-droppable plugin of wijtree.
 			/// Type:Number.
 			/// Default:0.
 			/// Code example:$(".selector").wijtree("option","droppable",{
@@ -438,33 +438,33 @@
 			var self = this, isResetHitArea = false, check;
 
 			switch (key) {
-				case "allowDrag":
-					self._setAllowDrag(value);
-					break;
-				case "allowDrop":
-					self._setAllowDrop(value);
-					break;
-				case "showCheckBoxes":
-					self._setCheckBoxes(value);
-					break;
-				case "showExpandCollapse":
-					if (self.options.showExpandCollapse !== value) {
-						isResetHitArea = true;
-					}
-					break;
-				case "disabled":
-					if (value) {
-						self.widgetDom.addClass("ui-state-disabled");
-					} else {
-						self.widgetDom.removeClass("ui-state-disabled");
-					}
-					check = self.element.find(":wijmo-wijtreecheck");
-					if (check.length) {
-						check.wijtreecheck("option", "disabled", value);
-					}
-					break;
-				default:
-					break;
+			case "allowDrag":
+				self._setAllowDrag(value);
+				break;
+			case "allowDrop":
+				self._setAllowDrop(value);
+				break;
+			case "showCheckBoxes":
+				self._setCheckBoxes(value);
+				break;
+			case "showExpandCollapse":
+				if (self.options.showExpandCollapse !== value) {
+					isResetHitArea = true;
+				}
+				break;
+			case "disabled":
+				if (value) {
+					self.widgetDom.addClass("ui-state-disabled");
+				} else {
+					self.widgetDom.removeClass("ui-state-disabled");
+				}
+				check = self.element.find(":wijmo-wijtreecheck");
+				if (check.length) {
+					check.wijtreecheck("option", "disabled", value);
+				}
+				break;
+			default:
+				break;
 			}
 			$.Widget.prototype._setOption.apply(self, arguments); //use Widget disable
 			if (isResetHitArea === true) {
@@ -587,7 +587,7 @@
 					dropNode, position, oldOwner, parent, brothers, idx,
 					oldPosition, newPosition = -1;
 				if (self._trigger("nodeBeforeDropped", event, ui) === false ||
-				!dragNode) {
+				!dragNode || o.disabled) {
 					return;
 				}
 				dropNode = dragNode._dropTarget;
@@ -1045,7 +1045,7 @@
 			/// Default:{}.
 			/// Code example:$(".selector").wijtreenode("ajaxParams",{}).
 			///	</summary>
-			params:{}
+			params: {}
 		},
 
 		/*widget Method*/
@@ -1148,6 +1148,10 @@
 				self.$navigateUrl.attr("href", "#");
 			}
 
+			//			if(!self.$navigateUrl.attr("accesskey") && self.options.accesskey) {
+			//				self.$navigateUrl.attr("accesskey", self.options.accesskey);
+			//			}
+
 			if (!self._isTemplate) {
 				self.$text = self.$navigateUrl.find("span:eq(0)");
 				if (self.$text.length === 0) {
@@ -1241,7 +1245,8 @@
 					}
 					if (self._hasChildren) {
 						//self.$nodes[o.expanded ? "show" : "hide"]();
-						// the performance "display:none" is must better then show, hide, fixed bug on adding lots of child nodes.
+						// the performance "display:none" is must better then show, 
+						// hide, fixed bug on adding lots of child nodes.
 						style = o.expanded ? "" : "none";
 						self.$nodes.css({ display: style });
 					}
@@ -1392,7 +1397,7 @@
 			var self = this, treeOption = self._tree.options,
 			trigger = expand ? "nodeExpanding" : "nodeCollapsing";
 
-			if(self._tree._trigger(trigger, null, {
+			if (self._tree._trigger(trigger, null, {
 				node : this,
 				params : this.options.params
 			}) === false) {
@@ -1487,7 +1492,7 @@
 					effect = animation.animated || animation.effect;
 					if ($.effects && !! effect) {
 						el[show ? "show" : "hide"](effect,
-								{},
+								{ easing: animation.easing },
 								animation.duration,
 								function () {
 									self._tree._trigger(event, null, self);
@@ -1600,7 +1605,7 @@
 				}
 				if (targetEl) {
 					dropNode = self._getNodeWidget(targetEl);
-					if (dropNode) {
+					if (dropNode && !dropNode._tree.options.disabled) {
 						if (targetEl.closest(".wijmo-wijtree-inner", self.element)
 						.length) {
 							self._insertPosition = "end"; //end,after,before
@@ -1795,7 +1800,7 @@
 
 		_onMouseDown: function (event) {
 			var el = $(event.target), node = event.data;
-			if (node._tree.options.allowDrag) {//prepare for drag
+			if (!node._tree.options.disabled && node._tree.options.allowDrag) {//prepare for drag
 				if (el.closest(".wijmo-wijtree-node", node.element).length > 0) {
 					node._beginDrag(event);
 				}
@@ -1864,6 +1869,7 @@
 					self._setSelected(false);
 				}
 				else if (o.selected &&
+				!self._tree._editMode &&
 				tree.options.allowEdit &&
 				!self._isTemplate) {
 					self._editNode();
@@ -1981,16 +1987,14 @@
 					break;
 				}
 				self._customKeyDown(e.keyCode);
-				if (!self._isTemplate) {
+				if (!self._isTemplate && e.keyCode !== $.ui.keyCode.ENTER) {
 					e.preventDefault();
 					e.stopPropagation();
 				}
 			}
 		},
 
-		_customKeyDown: function (keyCode) {
-
-		},
+		_customKeyDown: function (keyCode) { },
 
 		_prevNode: function (node) {
 			if (node.element.prev().length > 0) {
@@ -2514,6 +2518,12 @@
 			if (self.$checkBox) {
 				self.$checkBox[value ? 'show' : 'hide']();
 			}
+			else if (value) {
+				self.$checkBox = $("<div>");
+				self.$checkBox.insertBefore(self.$navigateUrl);
+				self.$checkBox.wijtreecheck();
+			}
+
 			if (self.$nodes) {
 				self.$nodes.children("li").each(function () {
 					var nodeWidget = self._getNodeWidget($(this));
@@ -2645,7 +2655,7 @@
 			var self = this, o = this.options;
 			if (self.element.is("div")) {
 				self.element.addClass("wijmo-checkbox ui-widget")
-				.attr("role","checkbox");
+				.attr("role", "checkbox");
 				self.$icon = $("<span>");
 				self.$icon.addClass("wijmo-checkbox-icon");
 				if (o.checkState === "check") {

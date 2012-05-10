@@ -4,7 +4,7 @@ clearTimeout,amplify*/
 /*jslint nomen: false*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -247,11 +247,10 @@ clearTimeout,amplify*/
 
 		_initBackground: function (animate, isRightToLeft) {
 			var s, i, oldBg, newBg, pageLabels, newPageIndPos,
-				o = this.options, viewType = o.viewType.toLowerCase();
+				self = this;
 			if (this._isInAnimate) {
 				return;
 			}
-
 			this._index = 0;
 			this._datesDef = this._getDatesDefinition();
 			this._min = 0;
@@ -261,12 +260,12 @@ clearTimeout,amplify*/
 			s = "";
 			for (i = 0; i < this._datesDef.length; i += 1) {
 				s += "<div class=\"wijmo-wijdatepager-pagelabel" +
-				(i == 0 ? " wijmo-wijdatepager-pagelabel-first" : "") +
+				(i === 0 ? " wijmo-wijdatepager-pagelabel-first" : "") +
 					(this._datesDef[i].range ?
 					" wijmo-wijdatepager-pagerange" : "") +
 					(this._datesDef[i].header ?
 					" wijmo-wijdatepager-pageheader ui-state-highlight" : "") +
-					(i == this._datesDef.length - 1 ?
+					(i === this._datesDef.length - 1 ?
 								" wijmo-wijdatepager-pagelabel-last" : "") +
 					"\">" +
 							this._datesDef[i].l + "</div>";
@@ -280,7 +279,6 @@ clearTimeout,amplify*/
 				newBg.html(s);
 
 				pageLabels = newBg.find(".wijmo-wijdatepager-pagelabel");
-				var self = this;
 				if (!isRightToLeft) {
 					oldBg.insertBefore(newBg);
 					newPageIndPos = $(pageLabels[this._index]).offset().left;
@@ -304,8 +302,9 @@ clearTimeout,amplify*/
 
 					newBg.css("opacity", 0).css("left", -oldBg.outerWidth(true))
 								.stop().animate({ left: "0px", opacity: 100 });
-					oldBg.css("left", 0).stop().animate({ left: oldBg.outerWidth(true) + "px", opacity: 0 }, function () {
-
+					oldBg.css("left", 0).stop()
+						.animate({ left: oldBg.outerWidth(true) + "px", opacity: 0 },
+					function () {
 						oldBg.remove();
 						self._isInAnimate = false;
 						self.invalidate();
@@ -343,7 +342,7 @@ clearTimeout,amplify*/
 		_getDatesDefinition: function () {
 			var o = this.options, viewType = o.viewType.toLowerCase(),
 					i, dt, curDt, nextDt, endDt, datesDef = [],
-					selectedDate = o.selectedDate, firstDayOfWeek = o.firstDayOfWeek;
+					selectedDate = o.selectedDate;
 
 			switch (viewType) {
 				case "week":
@@ -362,9 +361,10 @@ clearTimeout,amplify*/
 
 						nextDt = this._addDays(curDt, 7);
 						datesDef.push({
-							l: Globalize.format(curDt/*this._addDays(curDt, 6)*/, "MMM", this._getCulture()) +
+							l: Globalize.format(curDt, "MMM", this._getCulture()) +
 								" " + Globalize.format(curDt, "dd", this._getCulture()) +
-								"-" + Globalize.format(this._addDays(curDt, 6), "dd", this._getCulture()),
+								"-" + Globalize.format(this._addDays(curDt, 6),
+															"dd", this._getCulture()),
 							d: curDt,
 							d2: this._addDays(curDt, 6)
 						});
@@ -376,9 +376,9 @@ clearTimeout,amplify*/
 					}
 					break;
 				case "month":
-					dt = new Date(selectedDate.getFullYear() - 2, 0, 1);
-					datesDef.push({ l: dt.getFullYear(), d: dt, range: true });
 					dt = new Date(selectedDate.getFullYear() - 1, 0, 1);
+					datesDef.push({ l: dt.getFullYear(), d: dt, range: true });
+					dt = new Date(selectedDate.getFullYear(), 0, 1);
 					datesDef.push({ l: dt.getFullYear(), d: dt, header: true });
 
 					for (i = 0; i < 12; i += 1) {
@@ -397,7 +397,7 @@ clearTimeout,amplify*/
 					datesDef.push({ l: dt.getFullYear(), d: dt, range: true });
 					break;
 				default:
-				case "day":
+					//case "day":
 
 					dt = new Date(selectedDate.getFullYear(),
 													selectedDate.getMonth(), 0);
@@ -482,7 +482,7 @@ clearTimeout,amplify*/
 			}
 		},
 		_pagelabelHover: function (e) {
-			var target = $(e.target), ind;
+			var target = $(e.target);
 			if (target.hasClass("wijmo-wijdatepager-pageheader")) {
 				return;
 			}
@@ -498,7 +498,7 @@ clearTimeout,amplify*/
 						"<div class=\"wijmo-wijdatepager-tooltip-inner\">" +
 						"</div>" +
 "<div class=\"wijmo-wijdatepager-triangle\"></div>" +
-					"</div>")
+					"</div>");
 				this.element.append(this._tooltip);
 				this._tooltip.wijpopup();
 			}
@@ -553,6 +553,7 @@ clearTimeout,amplify*/
 
 			this._dragActivated = true;
 			this._setSelectedIndex(ind);
+			this._mouseDownTimeFix20555 = new Date().getTime();
 			this._startClientX = e.pageX;
 			this._startInd = ind;
 
@@ -571,10 +572,24 @@ clearTimeout,amplify*/
 			}
 
 			var startPage = this.element
-					.find(".wijmo-wijdatepager-pagelabel")[this._startInd],
-				newPos = startPage.offsetLeft + Math.round(startPage.offsetWidth / 2) +
-								(e.pageX - this._startClientX),
-				ind = this._findClosesPageIndexByPos(newPos);
+					.find(".wijmo-wijdatepager-pagelabel")[this._startInd], newPos, ind;
+			if (!startPage) {
+				return;
+			}
+			newPos = startPage.offsetLeft + Math.round(startPage.offsetWidth / 2) +
+								(e.pageX - this._startClientX);
+			ind = this._findClosesPageIndexByPos(newPos);
+
+
+			if (this._prevMoveInd === ind) {
+				// fix for [20534] case 1:
+				return;
+			}
+			this._prevMoveInd = ind;
+			if ((this._mouseDownTimeFix20555 + 150) > new Date().getTime()) {
+				// fix for [20555]
+				return;
+			}
 			if (ind !== -1 && ind !== this._index) {
 				this._setSelectedIndex(ind);
 			}
@@ -587,7 +602,7 @@ clearTimeout,amplify*/
 		},
 		_findClosesPageIndexByPos: function (pos) {
 			var pagelabels = this.element.find(".wijmo-wijdatepager-pages")
-					.find(".wijmo-wijdatepager-pagelabel"), i, offset;
+					.find(".wijmo-wijdatepager-pagelabel"), i;
 
 			for (i = 0; i < pagelabels.length; i += 1) {
 

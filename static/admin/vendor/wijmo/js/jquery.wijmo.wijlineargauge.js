@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -250,23 +250,27 @@
 				point = self._valueToPoint(value, 0),
 				position = opt.position || "inside",
 				offset = opt.offset || 0,
-				width = isMajor ? 2 : 1, length, markEle;
+				width = isMajor ? 2 : 1, length, markEle,
+				style = $.extend({}, opt.style);
 
 			length = baseLength * opt.factor;
 			if ($.isFunction(marker)) {
 				return marker.call(self, self.canvas, point, o);
 			}
 			else {
+				if (marker === "cross") {
+					style.stroke = style.fill;
+				}
 				if (o.orientation === "horizontal") {
 					markEle = $.wijgauge.paintMarker(self.canvas, marker,
-						point.x, point.y, width, length);
+						point.x, point.y, width, length, true);
 				}
 				else {
 					markEle = $.wijgauge.paintMarker(self.canvas, marker,
-						point.x, point.y, length, width);
+						point.x, point.y, length, width);					
 				}
 			}
-			markEle.attr(opt.style);
+			markEle.attr(style);
 			$.wijraphael.addClass($(markEle.node), "wijmo-wijlineargauge-mark");
 			self._applyPosition(markEle, position, offset, value);
 			return markEle;
@@ -279,32 +283,32 @@
 				isHorizontal = self.options.orientation === "horizontal",
 				bbox = ele.wijGetBBox();
 			switch (position) {
-			case "inside":
-				if (isHorizontal) {
-					top -= bbox.width / 2 + offset;
-				}
-				else {
-					left -= bbox.width / 2 + offset;
-				}
-				break;
-			case "outside":
-				if (isHorizontal) {
-					top += bbox.width / 2 + offset;
-				}
-				else {
-					left += bbox.width / 2 + offset;
-				}
-				break;
-			case "center":
-				if (isHorizontal) {
-					top -= offset;
-				}
-				else {
-					left -= offset;
-				}
-				break;
-			default:
-				break;
+				case "inside":
+					if (isHorizontal) {
+						top -= bbox.width / 2 + offset;
+					}
+					else {
+						left -= bbox.width / 2 + offset;
+					}
+					break;
+				case "outside":
+					if (isHorizontal) {
+						top += bbox.width / 2 + offset;
+					}
+					else {
+						left += bbox.width / 2 + offset;
+					}
+					break;
+				case "center":
+					if (isHorizontal) {
+						top -= offset;
+					}
+					else {
+						left -= offset;
+					}
+					break;
+				default:
+					break;
 			}
 
 			ele.attr("transform", "t" + left + "," + top);
@@ -358,7 +362,8 @@
 				pointer = pointerInfo.template.call(self.canvas, point,
 					$.extend({}, o.pointer, {
 						offset: offset,
-						length: length
+						length: length,
+						gaugeBBox: self._innerBbox
 					}));
 			}
 			else {
@@ -401,7 +406,7 @@
 			if (!self.pointer) {
 				return;
 			}
-
+			$.wijmo.wijgauge.prototype._setPointer.apply(this, arguments);
 			self._setLinearPointer(fromValue, endValue, o.value);
 		},
 
@@ -419,13 +424,14 @@
 				translation.y = endPoint.y - fromBbox.y - fromBbox.height / 2;
 			}
 			if (animation.enabled) {
-				self.pointer
-					.wijAnimate({ transform: "...t" + translation.x + 
-						"," + translation.y },
+				self.pointer.stop()
+					.wijAnimate({ transform: "...t" + translation.x +
+						"," + translation.y
+					},
 					animation.duration, animation.easing);
 			}
 			else {
-				self.pointer.attr("transform", "...t" + 
+				self.pointer.attr("transform", "...t" +
 					translation.x + "," + translation.y);
 			}
 		},

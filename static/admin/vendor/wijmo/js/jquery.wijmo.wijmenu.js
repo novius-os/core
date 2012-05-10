@@ -2,7 +2,7 @@
 
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -15,7 +15,7 @@
 * Wijmo Menu widget.
 *
 * Depends:
-* 	jquery.js
+*	jquery.js
 *	jquery.ui.core.js
 *	jquery.ui.widget.js
 *	jquery.wijmo.wijutil.js
@@ -163,7 +163,8 @@
 			/// Default: 200.
 			/// Type: Number.
 			/// Remark: This option can only be used in an iPod style menu.
-			/// When the menu's heiget is largger than this value, the menu shows a scroll bar.
+			/// When the menu's heiget is largger than this value,
+			/// the menu shows a scroll bar.
 			/// Code example: $(".selector").wijmenu("option", "maxHeight", 300)
 			/// </summary>
 			maxHeight: 200,
@@ -271,6 +272,10 @@
 				mode = o.mode,
 				ul, li, ele = self.element, sublist, breadcrumb,
 				keycode = $.ui.keyCode;
+
+			//fix for issus 2051 by Chandler.Zheng on 2012/03/19
+			self.clickNameSpace = "click.wijmenudoc" + self._newId();
+			//end comment
 
 			ele.hide();
 			self.cssPre = "wijmo-wijmenu";
@@ -644,9 +649,9 @@
 		setItemDisabled: function (selector, disabled) {
 			/// <summary>Disables a menu item. </summary>
 			/// <param name="selector" type="jQuery selector">
-			/// 	Indicates the item to be disabled.</param>
+			///		Indicates the item to be disabled.</param>
 			/// <param name="disabled" type="Boolean">
-			/// 	If the value is true, the item is disabled; 
+			///		If the value is true, the item is disabled; 
 			///		Otherwise, the item is enabled.
 			/// </param>
 			var items = $(selector, this.element);
@@ -794,7 +799,7 @@
 				}
 				if (triggerEle && triggerEle.length > 0) {
 					triggerEle.unbind(".wijmenu");
-					//$(document).unbind("click.wijmenudoc");
+					//$(document).unbind(self.clickNameSpace);
 				}
 			}
 		},
@@ -829,7 +834,8 @@
 				headerCss = "ui-widget-header ui-corner-all",
 				menuItemCss = "ui-widget " + menuitemCss +
 							" ui-state-default ui-corner-all",
-				menuLinkCss = menuCss + "-link ui-corner-all";
+				menuLinkCss = menuCss + "-link ui-corner-all",
+				menuTemplateCss = menuCss + "-template";
 
 			if (self.domObject) {
 				self._destroy();
@@ -906,7 +912,8 @@
 					}
 					else {
 						li.addClass(menuItemCss);
-						link.addClass(menuLinkCss);
+						//add css for keeping show state
+						link.addClass(menuTemplateCss);
 						if (hasSubmenu) {
 							if (!link.is(":input")) {
 								icon = $("<span>")
@@ -931,12 +938,18 @@
 					self._initTrigger(triggerEle);
 				}
 			}
-			$(document).bind("click.wijmenudoc", function (e) {
+			$(document).bind(self.clickNameSpace, function (e) {
 				///fixed when click the breadcrumb choose item link to show
 				/// the root menu in sliding menu.
 				if ($(e.target).parent().is(".wijmo-wijmenu-all-lists")) {
 					return;
 				}
+
+				// fix tfs issue 20650  by Chandler.Zheng on 2012-03-19
+				if ($(e.target).closest(o.trigger).is(o.trigger)) {
+					return;
+				}
+				//end comments
 
 				var obj = $(e.target).closest(".wijmo-wijmenu");
 				if (obj.length === 0) {
@@ -1011,6 +1024,7 @@
 				container = self.domObject.menucontainer,
 				o = self.options,
 				linkCss = "wijmo-wijmenu-link",
+				templateCss = "wijmo-wijmenu-template",
 				eastIconCss = "ui-icon-triangle-1-e",
 				southIconCss = "ui-icon-triangle-1-s",
 				parentItemCss = "wijmo-wijmenu-parent", itemDisabled;
@@ -1108,9 +1122,17 @@
 							self._hideSubmenu(subList);
 						}, o.hideDelay);
 					});
+//					$(this).find("ul").bind("mouseenter" + nameSpace,
+//					function (e) {
+//						if (o.disabled) {
+//							return;
+//						}
+//						clearTimeout(hideTimer);
+//					});
 
-
-					$(this).find("ul ." + linkCss + ",ul >.ui-widget-header,ul " +
+					$(this).find("ul ." + linkCss + 
+						", ul ." + templateCss + 
+						",ul >.ui-widget-header,ul " +
 						'>.wijmo-wijmenu-separator').bind("mouseenter" + nameSpace,
 					function (e) {
 						if (o.disabled) {
@@ -1209,7 +1231,8 @@
 		},
 
 		_killmenuItems: function () {
-			var ele = this.rootMenu;
+			var self = this,
+                ele = self.rootMenu;
 			ele.removeClass("wijmo-wijmenu-list ui-helper-reset " +
 				"wijmo-wijmenu-content ui-helper-clearfix");
 			ele.find("li").each(function () {
@@ -1228,7 +1251,7 @@
 				.show().css({ left: "", top: "", position: "" }).attr("hidden", "");
 			});
 			this.domObject.menucontainer.removeClass("");
-			$(document).unbind("click.wijmenudoc");
+			$(document).unbind(self.clickNameSpace);
 		},
 
 		_sroll: function () {
@@ -1730,12 +1753,22 @@
 			}
 			menucontainer = domObject.menucontainer;
 			if (ele.get(0) === menucontainer.get(0)) {
+				//fixed a bug which menu cannot shows up above other elements 
+				//when set an outer triggerEle
+				if (value) {
+					menucontainer.css("z-index", value);
+				}
+				else {
+					menucontainer.css("z-index", "");
+				}
+
 				return;
 			}
 			if (value) {
 				ele.parent().css("z-index", 999);
 				ele.css("z-index", value);
-				if (menucontainer.css("z-index") === 0) {
+				if ($.browser.msie && $.browser.version < 8 &&
+					menucontainer.css("z-index") === 0) {
 					menucontainer.css("z-index", 9950);
 				}
 			}
@@ -1743,7 +1776,8 @@
 				ele.css("z-index", "");
 				ele.parent().css("z-index", "");
 				if ($.browser.msie && $.browser.version < 8 &&
-				 $("ul:visible", element).length === 0) {
+				 $("ul:visible", element).length === 0 &&
+				 menucontainer.css("z-index") === 9950) {
 					menucontainer.css("z-index", "");
 				}
 			}
@@ -1789,6 +1823,17 @@
 			}
 			pOption = $.extend(pOption, o.position);
 			return pOption;
+		},
+
+		_newId: function () {
+			var charArray = ['a', 'b', 'c', 'd', 'e', 'f', 'g',
+			'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+			's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+                             id = "", i;
+			for (i = 0; i < 16; i++) {
+				id += charArray[Math.round(Math.random() * 25)];
+			}
+			return id;
 		}
 	});
 

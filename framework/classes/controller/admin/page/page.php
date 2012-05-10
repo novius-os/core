@@ -32,7 +32,6 @@ class Controller_Admin_Page_Page extends Controller {
 
     public function action_form($id = null) {
 
-
         $fields = \Config::load('nos::controller/admin/page/form_page', true);
 
         // $id is set: edit the page
@@ -201,10 +200,7 @@ class Controller_Admin_Page_Page extends Controller {
 
 			$body = array(
 				'notify' => 'Page successfully deleted.',
-                'dispatchEvent' => array(
-	                'event' => 'reload',
-                    'target' => 'nos_page',
-                ),
+                'dispatchEvent' => 'reload.nos_page',
 			);
 
         } catch (\Exception $e) {

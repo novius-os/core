@@ -10,7 +10,7 @@ amplify*/
 
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -285,7 +285,8 @@ block comments:
 
 		*/
 		var data = { rowsAffected: 0, rows: [] }, o, i,
-			selectRegexp, insertRegexp, match, tblName, tblDesc, tblData, k,
+			selectRegexp, insertRegexp, deleteRegexp,
+			match, tblName, tblDesc, tblData, k,
 			paramsDesc, paramName, s, orConditions;
 		if (!params) {
 			params = [];
@@ -295,12 +296,16 @@ block comments:
 		}
 		if (isAmplifyStoreUsed) {
 
+			//executeSql("DELETE FROM calendars " + "WHERE name='" + name + "'",
+			//executeSql("DELETE FROM events WHERE id='" + id + "'", [],
+
 			try {
 
 				selectRegexp = new RegExp("(SELECT) *(.*) *FROM (\\w+)");
 				insertRegexp =
 	new RegExp("(INSERT OR REPLACE|INSERT) *(.*) *INTO *(\\w*) *\\(([\\w|,| ]*)\\)");
-
+				deleteRegexp =
+    new RegExp("(DELETE) *(.*) *FROM (\\w+) *(\\w*)WHERE (\\w+)='*([^']+)");
 				if (sqlCommand.match(insertRegexp)) {
 					match = insertRegexp.exec(sqlCommand);
 					if (match && match.length > 1) {
@@ -370,7 +375,23 @@ block comments:
 							}
 						}
 					}
+				} else if (sqlCommand.match(deleteRegexp)) {
+					match = deleteRegexp.exec(sqlCommand);
 
+					if (match && match.length > 1) {
+						tblName = match[3];
+						tblDesc = amplifyTables[tblName];
+						tblData = amplify.store("wijevcal_tbl_" + tblName);
+						// match[5] key name (e.g. id)
+						// match[6] key value (e.g. ASD-AS@--FSAFS$%-!)
+						if (tblData) {
+							// qq: test for calendars
+							if (tblData[match[6]]) {
+								delete tblData[match[6]];
+							}
+						}
+						amplify.store("wijevcal_tbl_" + tblName, tblData);
+					}
 				}
 				if (successHandler) {
 					successHandler(data);
@@ -1182,6 +1203,11 @@ block comments:
 		///
 
 		_create: function () {
+			// Add for parse date options for jUICE. D.H
+			if ($.isFunction(window["wijmoASPNetParseOptions"])) {
+				wijmoASPNetParseOptions(this.options);
+			}
+			
 			var navigationbar, toolsBar, o = this.options;
 			// fix problem with array options:
 			if (!o.colors) {
@@ -1604,15 +1630,20 @@ block comments:
 				o.dataStorage.loadEvents(o.visibleCalendars,
 				loadEventsCallback, errorCallback);
 			} else if (o.webServiceUrl) {
+
 				$.ajax({
 					url: o.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=loadEvents",
+						"&command=loadEvents&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					/*dataType: "json",*/
 					contentType: "application/json; charset=utf-8",
-					data: { visibleCalendars: o.visibleCalendars },
-					success: loadEventsCallback
+					type: "POST",
+					data: "jsonData=" +
+						this._jsonStringify({ visibleCalendars: o.visibleCalendars }),
+					success: loadEventsCallback,
+					error: errorCallback
 				});
+
 			} else {
 
 				query = "SELECT * FROM events where ";
@@ -1930,26 +1961,27 @@ block comments:
 				this._editEventDialog.find(".wijmo-wijev-end-time").width(80).wijinputdate(
 					{
 						culture: this.options.culture,
-						dateFormat: "t",
+						dateFormat: "t"
+						/*,
 						dateChanged: $.proxy(function (e, args) {
-							var startDt = this._editEventDialog
-										.find(".wijmo-wijev-start-time")
-										.wijinputdate("option", "date"),
-								endDate = this._editEventDialog
-										.find(".wijmo-wijev-end")
-										.wijinputdate("option", "date");
-							if (args.date.getDate() !== endDate.getDate()) {
-								args.date.setDate(endDate.getDate());
-								this._editEventDialog
-										.find(".wijmo-wijev-end-time")
-										.wijinputdate("option", "date", args.date);
-							}
-							if (args.date < startDt) {
-								this._editEventDialog
-										.find(".wijmo-wijev-start-time")
-										.wijinputdate("option", "date", args.date);
-							}
-						}, this)
+						var startDt = this._editEventDialog
+						.find(".wijmo-wijev-start-time")
+						.wijinputdate("option", "date"),
+						endDate = this._editEventDialog
+						.find(".wijmo-wijev-end")
+						.wijinputdate("option", "date");
+						if (args.date.getDate() !== endDate.getDate()) {
+						args.date.setDate(endDate.getDate());
+						this._editEventDialog
+						.find(".wijmo-wijev-end-time")
+						.wijinputdate("option", "date", args.date);
+						}
+						if (args.date < startDt) {
+						this._editEventDialog
+						.find(".wijmo-wijev-start-time")
+						.wijinputdate("option", "date", args.date);
+						}
+						}, this)*/
 					});
 				this._editEventDialog.find(".wijmo-wijev-allday").wijcheckbox()
 					.change($.proxy(this._eventDialogEnsureTimePartState, this));
@@ -1962,13 +1994,18 @@ block comments:
 				this._editEventDialog.find(".wijmo-wijev-save")
 						.button().click($.proxy(function (e) {
 							var appt = this._editEventDialog.appt;
-							this._readApptDialogFields(this._editEventDialog, appt);
-							if (appt.prevData) {
-								this.updateEvent(appt);
-							} else {
-								this.addEvent(appt);
+							try {
+								this._validateAndReadApptDialogFields(
+													this._editEventDialog, appt);
+								if (appt.prevData) {
+									this.updateEvent(appt);
+								} else {
+									this.addEvent(appt);
+								}
+								this._editEventDialog.wijpopup("hide");
+							} catch (ex) {
+								alert(ex);
 							}
-							this._editEventDialog.wijpopup("hide");
 						}, this));
 				//////////
 				this._editEventDialog.wijpopup({
@@ -2139,29 +2176,35 @@ block comments:
 
 		},
 
-		_readApptDialogFields: function (dlg, appt) {
-			var startTime, endTime;
+		_validateAndReadApptDialogFields: function (dlg, appt) {
+			var startDate, endDate, startTime, endTime;
+			startDate = _toDayDate(dlg.find(".wijmo-wijev-start").wijinputdate("option", "date"));
+			endDate = _toDayDate(dlg.find(".wijmo-wijev-end").wijinputdate("option", "date"));
+			startTime = dlg.find(".wijmo-wijev-start-time")
+										.wijinputdate("option", "date");
+			endTime = dlg.find(".wijmo-wijev-end-time")
+										.wijinputdate("option", "date");
+
+			if (startDate.getTime() === endDate.getTime()
+						&& startTime.getTime() > endTime.getTime()) {
+				throw "The end date you entered occurs before the start date.";
+			}
+
 			appt.subject = dlg.find(".wijmo-wijev-subject").val();
 			appt.location = dlg.find(".wijmo-wijev-location").val();
-
-
-
-			appt.start = dlg.find(".wijmo-wijev-start").wijinputdate("option", "date");
-			appt.end = dlg.find(".wijmo-wijev-end").wijinputdate("option", "date");
+			appt.start = startDate;
+			appt.end = endDate;
 
 			if (dlg.find(".wijmo-wijev-allday").length > 0) {
 				appt.allday = dlg.find(".wijmo-wijev-allday")[0].checked;
 			}
 			if (!appt.allday) {
-				startTime = dlg.find(".wijmo-wijev-start-time")
-							.wijinputdate("option", "date");
 				appt.start = new Date(appt.start.getFullYear(),
 								appt.start.getMonth(), appt.start.getDate(),
 							startTime.getHours(), startTime.getMinutes(),
 							startTime.getSeconds());
 
-				endTime = dlg.find(".wijmo-wijev-end-time")
-							.wijinputdate("option", "date");
+
 				appt.end = new Date(appt.end.getFullYear(),
 								appt.end.getMonth(), appt.end.getDate(),
 							endTime.getHours(), endTime.getMinutes(),
@@ -2499,16 +2542,16 @@ block comments:
 				}
 				$.ajax({
 					url: this.options.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=deleteCalendar",
+						"&command=deleteCalendar&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					contentType: "application/json; charset=utf-8",
-					data: { calendar: k },
-					success: deleteCalendarCallback
+					type: "POST",
+					data: "jsonData=" + k,
+					success: deleteCalendarCallback,
+					error: deleteCalendarErrorCallback
 				});
 			} else {
-
-				executeSql("DELETE FROM calendars " +
-					"WHERE name='" + name + "'",
+				executeSql("DELETE FROM calendars " + "WHERE name='" + name + "'",
 					[],
 					deleteCalendarCallback,
 					deleteCalendarErrorCallback);
@@ -2610,11 +2653,13 @@ block comments:
 				}
 				$.ajax({
 					url: this.options.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=addCalendar",
+						"&command=addCalendar&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					contentType: "application/json; charset=utf-8",
-					data: { calendar: k },
-					success: addCalendarCallback
+					type: "POST",
+					data: "jsonData=" + k,
+					success: addCalendarCallback,
+					error: addCalendarErrorCallback
 				});
 			} else {
 				executeSql("INSERT OR REPLACE INTO calendars " +
@@ -2722,11 +2767,13 @@ block comments:
 				}
 				$.ajax({
 					url: this.options.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=updateCalendar",
+						"&command=updateCalendar&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					contentType: "application/json; charset=utf-8",
-					data: { calendar: k },
-					success: updateCalendarCallback
+					type: "POST",
+					data: "jsonData=" + k,
+					success: updateCalendarCallback,
+					error: updateCalendarErrorCallback
 				});
 			} else {
 				executeSql("INSERT OR REPLACE INTO calendars " +
@@ -2853,11 +2900,13 @@ block comments:
 				}
 				$.ajax({
 					url: this.options.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=addEvent",
+						"&command=addEvent&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					contentType: "application/json; charset=utf-8",
-					data: { event: k },
-					success: addEventCallback
+					type: "POST",
+					data: "jsonData=" + k,
+					success: addEventCallback,
+					error: addEventErrorCallback
 				});
 			} else {
 				executeSql("INSERT OR REPLACE INTO events " +
@@ -3029,11 +3078,13 @@ block comments:
 				}
 				$.ajax({
 					url: this.options.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=updateEvent",
+						"&command=updateEvent&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					contentType: "application/json; charset=utf-8",
-					data: { event: k },
-					success: updateEventCallback
+					type: "POST",
+					data: "jsonData=" + k,
+					success: updateEventCallback,
+					error: updateEventErrorCallback
 				});
 			} else {
 				executeSql("INSERT OR REPLACE INTO events " +
@@ -3551,11 +3602,13 @@ block comments:
 				}
 				$.ajax({
 					url: this.options.webServiceUrl + "?clientId=" + this.element[0].id +
-						"&command=deleteEvent",
+						"&command=deleteEvent&timestamp=" + new Date().getTime(),
 					dataType: "text",
 					contentType: "application/json; charset=utf-8",
-					data: { event: k },
-					success: deleteEventCallback
+					type: "POST",
+					data: "jsonData=" + k,
+					success: deleteEventCallback,
+					error: deleteEventErrorCallback
 				});
 			} else {
 				executeSql("DELETE FROM events WHERE id='" + id + "'", [],
@@ -3743,11 +3796,18 @@ block comments:
 			}
 		},
 
-
-		update: function () {
+		/// <summary>
+		/// Invalidates the entire surface of the control 
+		/// and causes the control to be redrawn.
+		/// </summary>
+		refresh: function () {
 			this.invalidate();
 		},
 
+		/// <summary>
+		/// Invalidates the entire surface of the control 
+		/// and causes the control to be redrawn.
+		/// </summary>
 		invalidate: function () {
 			var o = this.options;
 			switch (o.viewType.toLowerCase()) {
@@ -4673,7 +4733,6 @@ block comments:
 
 		},
 		_onAppointmentClick: function (e) {
-
 			var target = $(e.target), appt;
 			if (this._apptDragResizeFlag) {
 				return;
@@ -4723,6 +4782,11 @@ block comments:
 							target : target.parents(".wijmo-wijev-appointment"),
 				isResize = target.hasClass("wijmo-wijev-resizer") ||
 							target.parents(".wijmo-wijev-resizer").length > 0;
+
+			if (this.options.disabled) {
+				//fix for 20811
+				return;
+			}
 
 			this._isApptResize = isResize;
 			e.preventDefault();
@@ -4941,6 +5005,7 @@ this._getEventMarkup(this.findEventById(this.__targetAppt[0].className), true)
 			if (targetCell[0].className !== sourceCell[0].className) {
 				this.__targetAppt[0].parentNode.removeChild(this.__targetAppt[0]);
 				this.__targetAppt.appendTo(targetCell.find(".wijmo-wijev-monthcell"));
+				this.__targetApptChanged = true;
 			}
 		},
 
@@ -4954,13 +5019,15 @@ this._getEventMarkup(this.findEventById(this.__targetAppt[0].className), true)
 			$(document).unbind(".tmp_wijevcal");
 			this.element.find(".wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer")
 								.unbind(".tmp_wijevcal");
-
-			appt = this.findEventById(this.__targetAppt[0].className);
-			daysDiff = (curDayStart.getTime() -
+			if (this.__targetApptChanged) {
+				this.__targetApptChanged = false;
+				appt = this.findEventById(this.__targetAppt[0].className);
+				daysDiff = (curDayStart.getTime() -
 						_toDayDate(appt.start).getTime()) / (1000 * 60 * 60 * 24);
-			appt.start = this._addDays(appt.start, daysDiff);
-			appt.end = this._addDays(appt.end, daysDiff);
-			this.updateEvent(appt);
+				appt.start = this._addDays(appt.start, daysDiff);
+				appt.end = this._addDays(appt.end, daysDiff);
+				this.updateEvent(appt);
+			}
 		},
 
 		_onDayViewAllDayMouseOver: function (e) {
@@ -5380,14 +5447,26 @@ appt.subject +
 									dt.getHours(), dt.getMinutes() + num);
 		},
 		_addDays: function (dt, num) {
-			return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + num);
+			return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + num,
+							dt.getHours(), dt.getMinutes(), dt.getSeconds(),
+							dt.getMilliseconds());
 		},
-		_setTime: function (dt, timePart, daysDurationPart) {
+		_setTime: function (dt, timePart, daysTestPart) {
+			var daysDuration;
 			dt = new Date(dt);
 			dt.setHours(timePart.getHours());
 			dt.setMinutes(timePart.getMinutes());
 			dt.setSeconds(timePart.getSeconds());
 			dt.setMilliseconds(timePart.getMilliseconds());
+			if (daysTestPart) {
+				daysDuration = Math.floor((timePart.getTime() -
+											daysTestPart.getTime()) /
+														(1000 * 60 * 60 * 24));
+				if (daysDuration > 0) {
+					dt = this._addDays(dt, daysDuration);
+				}
+
+			}
 			return dt;
 		},
 		_addMonths: function (dt, num) {
@@ -5520,6 +5599,9 @@ appt.subject +
 				" (" + jqXHR.statusText + ")",
 				"error");
 				this.log("Error, requested url: " + ajaxSettings.url, "error");
+				if (jqXHR.responseText) {
+					this.log("Error, response text: " + jqXHR.responseText, "error");
+				}
 			} else {
 				this.status("Ajax error detected.", "error");
 				this.log("Error, requested url: " + ajaxSettings.url, "error");

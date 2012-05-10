@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -99,12 +99,19 @@
 					(value <= min && value >= max);
 			}
 		},
-		paintMarker: function (canvas, marker, x, y, length, width) {
+		paintMarker: function (canvas, marker, x, y, length, width, isHorizontal) {
+			var ele;
 			if (marker === "rect") {
 				return canvas.rect(x - length / 2, y - width / 2, length, width);
 			}
 			else {
-				return canvas.paintMarker(marker, x, y, length);
+				if (isHorizontal) {
+					ele = canvas.paintMarker(marker, x, y, width);
+				}
+				else {
+					ele = canvas.paintMarker(marker, x, y, length);
+				}
+				return ele;
 			}
 		},
 		formatString: function (str, format) {
@@ -543,6 +550,23 @@
 				self.disable();
 			}
 
+			// handle the juice's function type
+			if (o.face && o.face.template && 
+				typeof o.face.template === "string" && window[o.face.template]) {
+				o.face.template = window[o.face.template];
+			}
+
+			if (o.pointer && o.pointer.template && 
+				typeof o.pointer.template === "string" 
+				&& window[o.pointer.template]) {
+				o.pointer.template = window[o.pointer.template];
+			}
+
+			if(o.cap && o.cap.template &&
+				typeof o.cap.template === "string" && window[o.cap.template]) {
+				o.cap.template = window[o.cap.template];
+			}
+
 			self.element.addClass("ui-widget")
 			.toggleClass("ui-state-disabled", o.disabled);
 
@@ -698,6 +722,12 @@
 			this._set_margin(value, oldValue);
 		},
 
+		_set_ranges: function () {
+			var self = this;
+			self._removeRanges();
+			self._paintRanges();
+		},
+
 		_redrawMarksAndLabels: function () {
 			var self = this;
 			self._removeMarksAndLabels();
@@ -755,6 +785,7 @@
 				self._setOffPointerValue();
 				self._setPointer();
 			}
+			$.wijraphael.clearRaphaelCache();
 			self._triggerPainted();
 		},
 
@@ -963,7 +994,9 @@
 		//paint a pointer
 		_paintPointer: function () { },
 
-		_setPointer: function (value) { },
+		_setPointer: function (value) {
+			$.wijraphael.clearRaphaelCache();
+		},
 
 		_setOffPointerValue: function () {
 		 

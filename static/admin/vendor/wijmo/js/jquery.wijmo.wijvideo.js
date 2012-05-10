@@ -1,7 +1,7 @@
 /*globals jQuery,window,document*/
 /*
  * 
- * Wijmo Library 2.0.3
+ * Wijmo Library 2.0.8
  * http://wijmo.com/
  * 
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -23,10 +23,29 @@
 	var $video, $vidParent, $seekSlider, seek = false, fullScreen = false,
 		currentVolumn, $volumeSlider, $volumeBtn, $fullScreenBtn;
 	$.widget("wijmo.wijvideo", {
-
+		options: {
+			/// <summary>
+			/// A value that indicates whether to show the full screen button.
+			/// Type: Boolean.
+			/// Default: true.
+			/// Code example: $(".video").wijvideo("option", 
+			/// "fullScreenButtonVisible", false).
+			/// </summary>
+			fullScreenButtonVisible: true,            ///	<summary>
+            ///	Determines whether to display the controls only when hovering the mouse to the video.
+            /// Default: true
+            /// Type: Boolean
+            /// Code example:
+            ///  $(".video").wijvideo({
+            ///      showControlsOnHover: false
+            ///  });
+            ///	</summary>
+            showControlsOnHover: true
+		},
+		
 		_create: function () {
 			var self = this, pos, $playbtn, videoIsSupport,
-				interval; 
+				o = self.options, interval; 
 
 			if ($(this.element).is("video")) {
 				$video = $(this.element);
@@ -141,6 +160,12 @@
 						.css('display', 'none');
 					
 					self._initialToolTip();
+					
+					if (!o.showControlsOnHover) {
+						$('.wijmo-wijvideo-controls').show();
+						$vidParent.height($video.outerHeight() + 
+								$('.wijmo-wijvideo-controls').height());
+					}
 				}
 			}, 200);
 			
@@ -149,12 +174,14 @@
 			});
 
 			// display the bar on hover
-			$('.wijmo-wijvideo').hover(function () {
-				$('.wijmo-wijvideo-controls').stop(true, true).fadeIn();
-			},
-				function () {
-					$('.wijmo-wijvideo-controls').delay(300).fadeOut();
-				});
+			if (o.showControlsOnHover) {
+				$('.wijmo-wijvideo').hover(function () {
+					$('.wijmo-wijvideo-controls').stop(true, true).fadeIn();
+				},
+					function () {
+						$('.wijmo-wijvideo-controls').delay(300).fadeOut();
+					});
+			}
 
 			$playbtn = $vidParent.find('.wijmo-wijvideo-play > span');
 			$playbtn.click(function () {
@@ -179,6 +206,10 @@
 			}, function () {
 				$(this).removeClass("ui-state-hover");
 			});
+			
+			if (!self.options.fullScreenButtonVisible) {
+				$vidParent.find('.wijmo-wijvideo-fullscreen').hide();
+			}
 			
 			$volumeBtn.hover(function () {
 				$(this).addClass("ui-state-hover");
@@ -229,6 +260,89 @@
 				self._videoIsControls = true;
 			}
 			$video.removeAttr('controls');
+		},		
+		
+		_setOption: function (key, value) {
+			var self = this, o = self.options;
+
+			$.Widget.prototype._setOption.apply(self, arguments);
+
+			if (key === "fullScreenButtonVisible") {
+				o.fullScreenButtonVisible = value;
+				if (value) {
+					$vidParent.find('.wijmo-wijvideo-fullscreen').show();
+				} else {
+					$vidParent.find('.wijmo-wijvideo-fullscreen').hide();
+				}
+			} else if (key === "disabled") {
+				self._handleDisabledOption(value, self.element);
+			} else if (key === "showControlsOnHover") {
+				if (!value) {
+					$('.wijmo-wijvideo').unbind('mouseenter mouseleave');
+					window.setTimeout(function () {
+						$('.wijmo-wijvideo-controls').show();
+						$vidParent.height($video.outerHeight() + 
+								$('.wijmo-wijvideo-controls').height());
+					}, 200);
+				} else {
+					$vidParent.height($video.outerHeight());
+					$('.wijmo-wijvideo-controls').hide();
+					$('.wijmo-wijvideo').hover(function () {
+						$('.wijmo-wijvideo-controls').stop(true, true).fadeIn();
+					},
+						function () {
+							$('.wijmo-wijvideo-controls').delay(300).fadeOut();
+						});
+				}
+			}
+			//end for disabled option
+		},
+		
+		_handleDisabledOption: function (disabled, ele) {
+			var self = this;
+
+			if (disabled) {
+				if (!self.disabledDiv) {
+					self.disabledDiv = self._createDisabledDiv(ele);
+				}
+				self.disabledDiv.appendTo("body");
+				if ($.browser.msie) {
+					$('.wijmo-wijvideo').unbind('mouseenter mouseleave');
+				}
+			}
+			else {
+				if (self.disabledDiv) {
+					self.disabledDiv.remove();
+					self.disabledDiv = null;
+					if ($.browser.msie) {
+						$('.wijmo-wijvideo').hover(function () {
+							$('.wijmo-wijvideo-controls').stop(true, true).fadeIn();
+						},
+							function () {
+								$('.wijmo-wijvideo-controls').delay(300).fadeOut();
+						});
+					}
+				}
+			}
+		},		
+		
+		_createDisabledDiv: function (outerEle) {
+			var self = this,
+				ele = $vidParent,
+				eleOffset = ele.offset(),
+				disabledWidth = ele.outerWidth(),
+				disabledHeight = ele.outerHeight();
+
+			return $("<div></div>")
+						.addClass("ui-disabled")
+						.css({
+					"z-index": "99999",
+					position: "absolute",
+					width: disabledWidth,
+					height: disabledHeight,
+					left: eleOffset.left,
+					top: eleOffset.top
+				});
 		},
 		
 		_getVideoAttribute: function (name) {
@@ -435,7 +549,7 @@
 		_hideToolTips: function () {
 			$seekSlider.wijtooltip("hide");
 			$volumeBtn.wijtooltip("hide");
-			$fullScreenBtn.wijtooltip("hide");			
+			$fullScreenBtn.wijtooltip("hide");
 		},
 		
 		_getToolTipContent: function (currentTime) {
@@ -487,6 +601,56 @@
 			///	</summary>
 			
 			$video[0].pause();
+		},
+		
+		getWidth: function () {
+			///	<summary>
+			///	Gets the video width in pixel.
+			/// Code example: $("#element").wijvideo("getWidth");
+			///	</summary>
+			
+			return $video.outerWidth();
+		},
+		
+		setWidth: function (width) {
+			///	<summary>
+			///	Sets the video width in pixel.
+			/// Code example: $("#element").wijvideo("setWidth", 600);
+			///	</summary>
+			/// <param name="width" type="Number">Width value in pixel.</param>
+			
+			width = width || 600;
+			var origWidth = this.getWidth();
+			$video.attr('width', width);
+			$vidParent.width($video.outerWidth());
+			this._positionControls(this.getWidth() - origWidth);
+		},
+		
+		getHeight: function () {
+			///	<summary>
+			///	Gets the video height in pixel.
+			/// Code example: $("#element").wijvideo("getHeight");
+			///	</summary>
+			
+			return $video.outerHeight();
+		},
+		
+		setHeight: function (height) {
+			///	<summary>
+			///	Sets the video height in pixel.
+			/// Code example: $("#element").wijvideo("setHeight", 400);
+			///	</summary>
+			/// <param name="height" type="Number">Height value in pixel.</param>
+			
+			height = height || 400;
+			$video.attr('height', height);
+			if (o.showControlsOnHover) {
+				$vidParent.height($video.outerHeight());
+			} else {
+				$vidParent.height($video.outerHeight() + 
+						$('.wijmo-wijvideo-controls').height());
+			}
+			
 		}
 	});
 }(jQuery));

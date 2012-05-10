@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -156,7 +156,7 @@
 
 			var self = this;
 
-			$.Widget.prototype._setOption.apply(self, arguments);
+			$.ui.slider.prototype._setOption.apply(self, arguments);
 			this.options[key] = value;
 
 			//Add for support disabled option at 2011/7/8
@@ -616,7 +616,11 @@
 			if (self.options.disabled) {
 				return;
 			}
-			//
+			
+			//note: step1: slide the slider btn, the change event has fired;
+			//step2: then click the decre button, the change event don't fired.
+			self._mouseSliding = false;
+			//end
 			self._decreBtnHandle(self);
 			data = { buttonType: "decreButton", value: self.value() };
 			self._trigger('buttonClick', e, data);
@@ -636,7 +640,10 @@
 			if (self.options.disabled) {
 				return;
 			}
-			//
+			//note: step1: slide the slider btn, the change event has fired;
+			//step2: then click the decre button, the change event don't fired.
+			self._mouseSliding = false;
+			//end
 			self._increBtnHandle(self);
 			data = { buttonType: "increButton", value: self.value() };
 			self._trigger('buttonClick', e, data);

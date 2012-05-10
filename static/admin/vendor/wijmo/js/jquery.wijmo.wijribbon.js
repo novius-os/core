@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.0.3
+* Wijmo Library 2.0.8
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -181,8 +181,8 @@
 					$("." + css_button_text, button).addClass(css_state_active);
 				} else {
 					$("." + css_button_text, button).removeClass(css_state_active);
-					} 
-				}
+				} 
+			}
 		},
 		
 		_addActiveClassToLabelButtonText: function (button) { 
@@ -203,7 +203,7 @@
 		},
 		
 		_updateGroupElementTextState: function (button) {
-			var self = this, radioLabelEle; 
+			var radioLabelEle; 
 			if (!button) {
 				return;
 			}
@@ -490,7 +490,7 @@
 
 		updateRibbonSize: function () {
 			var self = this,
-				i,groupDropDown,
+				groupDropDown,
 				abbrevgroupContainer;
 
 			self.tabEle.children("div").each(function (i, tabPage) {
@@ -983,7 +983,8 @@
 		setButtonChecked: function (commandName, checked, name) {
 			/// <summary>
 			/// Set the button checked or not.
-			/// Code example: $("#element").wijribbon("setButtonChecked","superscript",false);
+			/// Code example: $("#element").wijribbon("setButtonChecked",
+			/// "superscript",false);
 			/// </summary>
 			/// <param name="commandName" type="String">
 			///  The command name of the button.
