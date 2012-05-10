@@ -12,41 +12,92 @@ namespace Nos;
 
 class Controller_Admin_Page_Page extends Controller {
 
-    public function action_add() {
+    public function action_crud($id = null) {
+        $page = $id === null ? null : Model_Page_Page::find($id);
+        return \View::forge('nos::admin/page/page_crud', array(
+            'page' => $page,
+        ), false);
+    }
 
-        $parent = Model_Page_Page::find(\Input::post('page_parent_id', 1));
-        $page   = Model_Page_Page::forge();
+    public function action_blank_slate($id = null) {
+        $page = $id === null ? null : Model_Page_Page::find($id);
+        return \View::forge('nos::form/layout_blank_slate', array(
+            'item'      => $page,
+            'lang'      => \Input::get('lang', ''),
+            'common_id' => \Input::get('common_id', ''),
+            'item_text' => __('page'),
+            'url_form'  => 'admin/nos/page/page/form',
+        ), false);
+    }
+
+    public function action_form($id = null) {
+
 
         $fields = \Config::load('nos::controller/admin/page/form_page', true);
-        $fields = \Arr::merge($fields, array(
-            'page_title' => array(
-                'validation' => array(
-                    'required',
-                    'min_length' => array(6),
+
+        // $id is set: edit the page
+        if ($id !== null) {
+            $page = Model_Page_Page::find($id);
+        } else {
+            // Create a new page
+            $create_from_id = \Input::get('create_from_id', 0);
+            if (empty($create_from_id)) {
+                $page = Model_Page_Page::forge();
+                $page->page_lang_common_id = \Input::get('common_id');
+            } else {
+                 $page_from = Model_Page_Page::find($create_from_id);
+                 $page      = clone $page_from;
+            }
+            $page->page_lang = \Input::get('lang');
+            if (!empty($page->page_lang_common_id)) {
+                $parent_page = Model_Page_Page::find($page->page_lang_common_id)->find_parent();
+            }
+            // Parent page is the root
+            if (empty($parent_page)) {
+                $parent_page = Model_Page_Page::find(1);
+            }
+            if (!empty($page->page_lang)) {
+                $parent_page = $parent_page->find_lang($page->page_lang);
+            }
+            $page->page_parent_id = $parent_page->page_id;
+
+            // Tweak the form for creation
+            $fields = \Arr::merge($fields, array(
+                'page_lang' => array(
+                    'form' => array(
+                        'type' => 'hidden',
+                        // We need to set manually the value here, because the lang field won't be populated (restricted by the Translatable behaviour)
+                        'value' => $page->page_lang,
+                    ),
                 ),
-            ),
-            'page_parent_id' => array(
+                'page_lang_common_id' => array(
+                    'form' => array(
+                        'type' => 'hidden',
+                    ),
+                ),
+                'page_parent_id' => array(
+                    'widget_options' => array(
+                        'lang' => $page->page_lang,
+                    ),
+                ),
+                'save' => array(
+                    'form' => array(
+                        'value' => __('Add'),
+                    ),
+                ),
+            ));
+        }
+
+        if (!empty($create_from_id)) {
+            $fields['create_from_id'] = array(
                 'form' => array(
                     'type' => 'hidden',
-                    'value' => $parent->page_id,
+                    'value' => $create_from_id,
                 ),
-            ),
-            'page_lang' => array(
-                'form' => array(
-                    'type' => 'hidden',
-                ),
-            ),
-            'page_lang_common_id' => array(
-                'form' => array(
-                    'type' => 'hidden',
-                ),
-            ),
-			'save' => array(
-				'form' => array(
-					'value' => __('Add'),
-				),
-			),
-        ));
+            );
+        }
+
+        $is_new = $page->is_new();
 
 		$fieldset = \Fieldset::build_from_config($fields, $page, array(
             'before_save' => function($page, $data) {
@@ -61,132 +112,24 @@ class Controller_Admin_Page_Page extends Controller {
                     $page->wysiwygs->$key = $text;
                 }
             },
-            'success' => function() use ($page) {
-                return array(
-                    'notify' => 'Page sucessfully added.',
-                    'dispatchEvent' => array(
-                        'event' => 'reload',
-                        'target' => 'nos_page',
-                    ),
-                    'replaceTab' => 'admin/nos/page/page/edit/'.$page->page_id,
+            'success' => function() use ($page, $is_new) {
+                $json = array(
+                    'notify' => $is_new ? __('Page sucessfully added.') : __('Page successfully saved.'),
+                    'dispatchEvent' => 'reload.nos_page',
                 );
+                if ($is_new) {
+                    $json['replaceTab'] = 'admin/nos/page/page/crud/'.$page->page_id;
+                }
+                return $json;
             }
         ));
 		$fieldset->js_validation();
-
-        return \View::forge('nos::admin/page/page_add', array(
-			'parent'   => $parent,
-			'page'     => $page,
-            'parent'   => $parent,
-			'fieldset' => $fieldset,
-		), false);
-    }
-
-    public function action_form() {
-
-        $create_from_id = \Input::get('create_from_id', 0);
-        if (empty($create_from_id)) {
-            $page                 = Model_Page_Page::forge();
-            $page->page_lang_common_id = \Input::get('common_id');
-        } else {
-             $page_from = Model_Page_Page::find($create_from_id);
-             $page      = clone $page_from;
-        }
-        $page->page_lang = \Input::get('lang');
-        $parent_page = Model_Page_Page::find($page->page_lang_common_id)->find_parent();
-        if ($parent_page) {
-            if (!empty($page->page_lang)) {
-                $parent_page = $parent_page->find_lang($page->page_lang);
-            }
-            $page->page_parent_id = $parent_page->page_id;
-        }
-        $fields = \Config::load('nos::controller/admin/page/form_page', true);
-        $fields = \Arr::merge($fields, array(
-            'page_title' => array(
-                'validation' => array(
-                    'required',
-                    'min_length' => array(6),
-                ),
-            ),
-            'page_lang' => array(
-                'form' => array(
-                    'type' => 'hidden',
-                    'value' => \Input::get('lang'),
-                ),
-            ),
-            'page_lang_common_id' => array(
-                'form' => array(
-                    'type' => 'hidden',
-                    'value' => $page->page_lang_common_id,
-                ),
-            ),
-            'page_parent_id' => array(
-                'widget_options' => array(
-                    'lang' => $page->page_lang,
-                ),
-            ),
-			'save' => array(
-				'form' => array(
-					'value' => __('Add'),
-				),
-			),
-        ));
-
-        if (!empty($create_from_id)) {
-            $fields['create_from_id'] = array(
-                'form' => array(
-                    'type' => 'hidden',
-                    'value' => $create_from_id,
-                ),
-            );
-        }
-
-		$fieldset = \Fieldset::build_from_config($fields, $page);
-		$fieldset->js_validation();
+        //$fieldset->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return \View::forge('nos::admin/page/page_form', array(
-			'item'     => $page,
-			'fieldset' => $fieldset,
-            'lang'     => $page->page_lang
-		), false);
-    }
-
-    public function action_edit($id) {
-
-        $page = Model_Page_Page::find($id);
-
-        $fields = \Config::load('nos::controller/admin/page/form_page', true);
-        \Arr::set($fields, 'id.form.value', $page->page_id);
-
-		$fieldset = \Fieldset::build_from_config($fields, $page, array(
-            'before_save' => function($page, $data) {
-                $parent = $page->find_parent();
-                // Event 'after_change_parent' will set the appropriate lang
-                //\Debug::dump($parent->id, $parent->get_lang(), $page->get_lang());
-                //\Debug::dump($parent->find_lang('en_GB')->id);
-                $page->set_parent($parent);
-                $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
-
-                foreach (\Input::post('wysiwyg', array()) as $key => $text) {
-                    $page->wysiwygs->$key = $text;
-                }
-            },
-            'success' => function() {
-                return array(
-                    'notify' => 'Page sucessfully saved.',
-                    'dispatchEvent' => array(
-                        'event' => 'reload',
-                        'target' => 'nos_page',
-                    ),
-                );
-            }
-        ));
-		$fieldset->js_validation();
-        $fieldset->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
-
-        return \View::forge('nos::admin/page/page_edit', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
+            'lang'     => $page->page_lang
 		), false);
     }
 

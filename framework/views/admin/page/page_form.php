@@ -8,8 +8,6 @@
  * @link http://www.novius-os.org
  */
 
-$page = $item;
-
 $fieldset->populate_with_instance($page);
 $fieldset->field('page_parent_id')->set_widget_options(array(
     'lang' => $lang,
@@ -34,7 +32,7 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
 
 ?>
 
-<?= $fieldset->open('admin/nos/page/page/'.($page->is_new() ? 'add' : 'edit/'.$page->page_id)) ?>
+<?= $fieldset->open('admin/nos/page/page/form/'.($page->is_new() ? '' : '/'.$page->page_id)) ?>
 <?= View::forge('form/layout_standard', array(
     'fieldset' => $fieldset,
     // Used by the behaviours (publishable, etc.)
@@ -81,3 +79,10 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
     ),
 ), false) ?>
 <?= $fieldset->close() ?>
+<script type="text/javascript">
+require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
+	$nos(function () {
+		callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
+	});
+});
+</script>

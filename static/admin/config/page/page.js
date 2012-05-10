@@ -25,7 +25,7 @@ define([
                     icon : 'pencil',
                     action : function(item, ui) {
                         $nos(ui).tab({
-                            url : 'admin/nos/page/page/edit/' + item.id,
+                            url : 'admin/nos/page/page/crud/' + item.id,
                             label : item.title
                         });
                     }
@@ -62,7 +62,7 @@ define([
                         label : appDesk.i18n('Add a page'),
                         action : function(ui) {
                             $nos(ui).tab('add', {
-                                url: 'admin/nos/page/page/add',
+                                url: 'admin/nos/page/page/crud',
                                 title: appDesk.i18n('Add a page')._()
                             });
                         }

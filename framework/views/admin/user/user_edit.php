@@ -53,7 +53,7 @@ foreach ($fieldset->field() as $field) {
             <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
                 <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
             </div>
-            <div id="<?= $uniqid ?>_permissions" class="fill-parent">
+            <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
                <?= $permissions ?>
             </div>
         </div>

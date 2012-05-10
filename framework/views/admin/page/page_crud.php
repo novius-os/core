@@ -14,7 +14,7 @@
 require(['jquery-nos-ostabs'], function ($nos) {
 	$nos(function () {
 		$nos('#<?= $uniqid ?>').tab('update', {
-				label : <?= json_encode($page->page_title) ?>,
+				label : <?= json_encode(empty($page) ? __('Add a page') : $page->page_title) ?>,
 				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png'
 			})
 			.remove();
@@ -22,20 +22,10 @@ require(['jquery-nos-ostabs'], function ($nos) {
 });
 </script>
 
-<?php
-    echo View::forge('nos::layouts/languages',
-        array(
-            'item' => $page,
-            'views' => array(
-                'blank' => array(
-                    'location' => 'nos::admin/page/page_form_blank_slate',
-                    'params'   => array()
-                ),
-                'view' => array(
-                    'location' => 'nos::admin/page/page_form',
-                    'params'   => array('fieldset' => $fieldset)
-                ),
-            ),
-        )
-    , false);
-
+<?= View::forge('nos::form/layout_languages', array(
+    'item' => $page,
+    'selected_lang' => $page === null ? null : $page->get_lang(),
+    'url_blank_slate' => 'admin/nos/page/page/blank_slate',
+    'url_form' => 'admin/nos/page/page/form',
+), false);
+?>
