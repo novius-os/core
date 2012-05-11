@@ -14,9 +14,12 @@ class Controller_Admin_Page_Page extends Controller {
 
     public function action_crud($id = null) {
         $page = $id === null ? null : Model_Page_Page::find($id);
-        return \View::forge('nos::admin/page/page_crud', array(
-            'page' => $page,
-        ), false);
+	    return \View::forge('nos::form/layout_languages', array(
+		    'item' => $page,
+		    'selected_lang' => $page === null ? null : $page->get_lang(),
+		    'url_blank_slate' => 'admin/nos/page/page/blank_slate',
+		    'url_form' => 'admin/nos/page/page/form',
+	    ), false);
     }
 
     public function action_blank_slate($id = null) {

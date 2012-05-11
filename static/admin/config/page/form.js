@@ -52,7 +52,7 @@ define([
                 dataType: 'json',
                 success: function(data) {
 
-                    $wysiwyg.initOnShow('init', function() {
+                    $wysiwyg.onShow('one', function() {
                         var ratio = $wysiwyg.width() * 3 / 5;
                         $wysiwyg.empty().css({
                             height: ratio,
