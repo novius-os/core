@@ -74,7 +74,7 @@ class Tools_File {
 
             // Check whether the file is in the data directory
             $data_path = APPPATH.'data';
-            $xsendfile_allowed = substr($file, 0, strlen($data_path)) != $data_path;
+            $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) != $data_path;
 
             // X-Sendfile is better when available
             if (static::$use_xsendfile and $xsendfile_allowed) {

@@ -15,6 +15,10 @@ require NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'autolo
 
 // Bootstrap the framework DO NOT edit this
 require_once COREPATH.'bootstrap.php';
+if (!MBSTRING) {
+	require_once NOSPATH.'mb_string.php';
+}
+
 
 Autoloader::add_classes(array(
 	// Add classes you want to override here

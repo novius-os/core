@@ -23,7 +23,7 @@ class Format extends \Fuel\Core\Format {
                 }
                 else
                 {
-                    if (substr($value,0,9) == 'function(')
+                    if (mb_substr($value,0,9) == 'function(')
                     {
                         $func_key="#".uniqid()."#";
                         $funcs[$func_key]=$value;

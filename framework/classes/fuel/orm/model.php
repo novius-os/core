@@ -254,11 +254,11 @@ class Model extends \Orm\Model {
 	public function pick() {
 		static $prefix = null;
 		if (null == $prefix) {
-			$prefix = substr(static::$_primary_key[0], 0, strpos(static::$_primary_key[0], '_') + 1);
-			$prefix_length = strlen($prefix);
+			$prefix = mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
+			$prefix_length = mb_strlen($prefix);
 		}
 		foreach (func_get_args() as $property) {
-			//if (substr($property, 0, $prefix_length) != $prefix) {
+			//if (mb_substr($property, 0, $prefix_length) != $prefix) {
 				$property = $prefix.$property;
 			//}
 			if (!empty($this->{$property})) {

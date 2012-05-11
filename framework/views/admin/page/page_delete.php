@@ -66,7 +66,7 @@
             )) ?></p>
             <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
             <p><?= strtr(__('Yes, I want to delete the page and all of its {count} sub-pages.'), array(
-                '{count}' => '<input data-id="verification1" data-verification="'.$children_count.'" size="'.(strlen($children_count) + 1).'" />',
+                '{count}' => '<input data-id="verification1" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
             )); ?></p>
             <p>&nbsp;</p>
 <?php

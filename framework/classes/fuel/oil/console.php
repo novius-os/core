@@ -111,7 +111,7 @@ class Console extends \Oil\Console
             $out = ob_get_contents();
             ob_end_clean();
 
-            if ((strlen($out) > 0) && (substr($out, -1) != PHP_EOL))
+            if ((mb_strlen($out) > 0) && (mb_substr($out, -1) != PHP_EOL))
             {
                 $out .= PHP_EOL;
             }
@@ -136,7 +136,7 @@ class Console extends \Oil\Console
         $sq = false;
         $dq = false;
 
-        for ($i = 0; $i < strlen($line); $i++)
+        for ($i = 0; $i < mb_strlen($line); $i++)
         {
             $c = $line{$i};
             if ($c == "'")
@@ -159,12 +159,12 @@ class Console extends \Oil\Console
         }
 
         $code = str_replace($okeq, '', $code);
-        if (strcspn($code, ';{=') != strlen($code))
+        if (strcspn($code, ';{=') != mb_strlen($code))
         {
             return false;
         }
 
-        $kw = preg_split("[^a-z0-9_]i", $code);
+        $kw = preg_split("[^a-z0-9_]iu", $code);
         foreach ($kw as $i)
         {
             if (in_array($i, $skip))
@@ -192,9 +192,9 @@ class Console extends \Oil\Console
         {
             foreach ($s as $j)
             {
-                if (substr($i, 0, strlen($j)) == $j)
+                if (mb_substr($i, 0, mb_strlen($j)) == $j)
                 {
-                    return trim(substr($i, strlen($j)));
+                    return trim(mb_substr($i, mb_strlen($j)));
                 }
             }
         }

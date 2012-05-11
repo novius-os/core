@@ -130,14 +130,14 @@ class Nos {
 
         \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
 
-		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
         foreach ($matches[2] as $match_id => $fct_id) {
 
             $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id], $controller);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
 		}
 
-		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u', $content, $matches);
         foreach ($matches[3] as $match_id => $fct_id) {
             $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id], $controller);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
@@ -185,7 +185,7 @@ class Nos {
 	protected static function _parse_medias(&$content) {
 
 		// Replace media URL
-		preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`', $content, $matches);
+		preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`u', $content, $matches);
 		if (!empty($matches[0])) {
 			$media_ids = array();
 			foreach ($matches[1] as $match_id => $media_id)
@@ -208,7 +208,7 @@ class Nos {
 	protected static function _parse_internals(&$content) {
 
 		// Replace internal links
-		preg_match_all('`nos://page/(\d+)`', $content, $matches);
+		preg_match_all('`nos://page/(\d+)`u', $content, $matches);
 		if (!empty($matches[0])) {
 			$page_ids = array();
 			foreach ($matches[1] as $match_id => $page_id)

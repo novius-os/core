@@ -30,7 +30,7 @@ class Controller_Admin_Page_Ajax extends \Controller {
 		foreach ($data['layout'] as $wysiwyg => $coords)
 		{
 			$text = empty($page) ? '' : $page->wysiwygs->{$wysiwyg};
-			preg_match_all('`src="nos://media/(\d+)(?:/(\d+)/(\d+))?"`', $text, $matches);
+			preg_match_all('`src="nos://media/(\d+)(?:/(\d+)/(\d+))?"`u', $text, $matches);
 			$ids      = array();
 			$replaces = array();
 			foreach ($matches[1] as $id)

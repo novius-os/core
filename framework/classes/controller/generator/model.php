@@ -44,22 +44,22 @@ class Controller_Generator_Model extends Controller_Generic_Admin {
     {
         $subdir        = Input::post('subdir');
         $namespace     = Input::post('namespace');
-        $namespace     = substr($namespace, -1) == '\\' ? substr($namespace, 0, -1) : $namespace;
-        $namespace     = substr($namespace, 0, 1) == '\\' ? substr($namespace, 1) : $namespace;
+        $namespace     = mb_substr($namespace, -1) == '\\' ? mb_substr($namespace, 0, -1) : $namespace;
+        $namespace     = mb_substr($namespace, 0, 1) == '\\' ? mb_substr($namespace, 1) : $namespace;
         $table         = Input::post('table');
         $classname     = Input::post('name');
         if ($classname == '') {
             $classname = 'Model_'.Inflector::classify($table);
         }
-        if (substr($classname, 0, 6) != 'Model_') {
+        if (mb_substr($classname, 0, 6) != 'Model_') {
             $classname = 'Model_'.$classname;
         }
         $filename      = str_replace('model_', '', Str::lower($classname));
-        if ($subdir && substr($classname, 0, 6 + strlen($subdir) + 1) != 'Model_'.ucfirst($subdir).'_') {
+        if ($subdir && mb_substr($classname, 0, 6 + mb_strlen($subdir) + 1) != 'Model_'.ucfirst($subdir).'_') {
             $classname = str_replace('Model_', 'Model_'.ucfirst($subdir).'_', $classname);
         }
         $props         = $this->_columns($table);
-        $columns       = preg_replace(array('/\)$/', '/=> \n  array/', '/\n  /', '/\n\t\t  /', '/ NULL\,/'), array("\t)", '=> array', "\n\t\t", "\n\t\t\t", ' null,'), var_export($props['columns'], true));
+        $columns       = preg_replace(array('/\)$/u', '/=> \n  array/u', '/\n  /u', '/\n\t\t  /u', '/ NULL\,/u'), array("\t)", '=> array', "\n\t\t", "\n\t\t\t", ' null,'), var_export($props['columns'], true));
         $pk            = $props['primary'];
 
         $manytomany          = '';
@@ -77,10 +77,10 @@ class Controller_Generator_Model extends Controller_Generic_Admin {
                 if ($model == '') {
                     $model = 'Model_'.Inflector::classify($table2);
                 }
-                if (substr($model, 0, 6) != 'Model_') {
+                if (mb_substr($model, 0, 6) != 'Model_') {
                     $model = 'Model_'.$model;
                 }
-                if ($subdir && substr($model, 0, 6 + strlen($subdir) + 1) != 'Model_'.ucfirst($subdir).'_') {
+                if ($subdir && mb_substr($model, 0, 6 + mb_strlen($subdir) + 1) != 'Model_'.ucfirst($subdir).'_') {
                     $model = str_replace('Model_', 'Model_'.ucfirst($subdir).'_', $model);
                 }
                 $model = '\\'.$namespace.'\\'.$model;
@@ -207,12 +207,12 @@ MODEL;
     {
         try {
             $model     = Input::get('model');
-            if (substr($model, 0, 6) == 'Model_') {
-                $model = substr($model, 6);
+            if (mb_substr($model, 0, 6) == 'Model_') {
+                $model = mb_substr($model, 6);
             }
             $namespace = Input::get('namespace');
-            $namespace = substr($namespace, -1) == '\\' ? substr($namespace, 0, -1) : $namespace;
-            $namespace = substr($namespace, 0, 1) != '\\' ? '\\'.$namespace : $namespace;
+            $namespace = mb_substr($namespace, -1) == '\\' ? mb_substr($namespace, 0, -1) : $namespace;
+            $namespace = mb_substr($namespace, 0, 1) != '\\' ? '\\'.$namespace : $namespace;
             $subdir    = Input::get('subdir');
 
             if (class_exists(($namespace ? $namespace.'\\' : '').'Model_'.($subdir ? ucfirst($subdir) : '').$model)) {

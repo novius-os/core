@@ -29,7 +29,7 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 // Boot the app
 require_once NOSPATH.'bootstrap.php';
 
-$resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`', $_SERVER['REDIRECT_URL'], $m);
+$resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $_SERVER['REDIRECT_URL'], $m);
 
 
 if ($resized) {

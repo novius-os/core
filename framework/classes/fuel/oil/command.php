@@ -15,7 +15,7 @@ class Command extends \Oil\Command
         //set up the environment
         if (($env = \Cli::option('env')))
         {
-            \Fuel::$env = constant('\Fuel::'. strtoupper($env)) ?: \Fuel::DEVELOPMENT;
+            \Fuel::$env = constant('\Fuel::'. mb_strtoupper($env)) ?: \Fuel::DEVELOPMENT;
         }
 
         // Remove flag options from the main argument list
@@ -43,7 +43,7 @@ class Command extends \Oil\Command
                     $action = isset($args[2]) ? $args[2]: 'help';
 
                     $subfolder = 'orm';
-                    if (is_int(strpos($action, '/')))
+                    if (is_int(mb_strpos($action, '/')))
                     {
                         list($action, $subfolder)=explode('/', $action);
                     }
@@ -176,7 +176,7 @@ class Command extends \Oil\Command
     {
         foreach ($actions as $key => $action)
         {
-            if (substr($action, 0, 1) === '-')
+            if (mb_substr($action, 0, 1) === '-')
             {
                 unset($actions[$key]);
             }

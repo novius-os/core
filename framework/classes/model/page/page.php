@@ -217,8 +217,8 @@ class Model_Page_Page extends \Nos\Orm\Model {
 
 		$urlEnhancer = false;
 		$regexps = array(
-			'`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`' => 2,
-			'`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`' => 3,
+			'`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u' => 2,
+			'`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u' => 3,
 		);
 		foreach ($regexps as $regexp => $name_index) {
 			preg_match_all($regexp, $content, $matches);

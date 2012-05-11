@@ -110,7 +110,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 throw new \Exception(__('Please pick a file from your hard drive.'));
             }
 
-            $pathinfo = pathinfo(strtolower($_FILES['media']['name']));
+            $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
             $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
             if (in_array($pathinfo['extension'], $disallowed_extensions)) {
@@ -199,7 +199,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
 
             if ($is_uploaded) {
-                $pathinfo = pathinfo(strtolower($_FILES['media']['name']));
+                $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
                 $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
                 if (in_array($pathinfo['extension'], $disallowed_extensions)) {
@@ -286,8 +286,8 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
      * @return string
      */
 	protected static function pretty_title($file) {
-		$file = substr($file, 0, strrpos($file, '.'));
-		$file = preg_replace('`[\W_-]+`', ' ', $file);
+		$file = mb_substr($file, 0, mb_strrpos($file, '.'));
+		$file = preg_replace('`[\W_-]+`u', ' ', $file);
 		$file = \Inflector::humanize($file, ' ');
 		return $file;
 	}

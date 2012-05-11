@@ -118,9 +118,9 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         }
 
         $quoted_sep = preg_quote($sep);
-        $slug = preg_replace("`[\s+]`", $sep, $slug);
-        $slug = preg_replace("`[^\w$quoted_sep]`i", '', $slug);
-        $slug = preg_replace("`$quoted_sep+`", $sep, $slug);
+        $slug = preg_replace("`[\s+]`u", $sep, $slug);
+        $slug = preg_replace("`[^\w$quoted_sep]`iu", '', $slug);
+        $slug = preg_replace("`$quoted_sep+`u", $sep, $slug);
         $slug = trim($slug, $sep);
 
         return $slug;
@@ -135,7 +135,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         }
 
         // empty or "/"
-        if (strlen($path) <= 1) {
+        if (mb_strlen($path) <= 1) {
             return false;
         }
 		$this->medif_path = $path;

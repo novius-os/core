@@ -150,7 +150,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
         $ext = pathinfo($this->media_file, PATHINFO_EXTENSION);
         if (!empty($ext)) {
             $ext = '.'.$ext;
-            $this->media_file = substr($this->media_file, 0, -strlen($ext));
+            $this->media_file = mb_substr($this->media_file, 0, -mb_strlen($ext));
         }
 
         $this->media_file = Model_Media_Folder::friendly_slug($this->media_file, $sep, $lowercase);
@@ -158,7 +158,7 @@ class Model_Media_Media extends \Nos\Orm\Model {
         if (empty($this->media_file)) {
             return false;
         }
-        $this->media_file .= strtolower($ext);
+        $this->media_file .= mb_strtolower($ext);
         return true;
     }
 

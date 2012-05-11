@@ -16,7 +16,7 @@ class Generate extends \Oil\Generate
         // Get the migration name
         $migration_name = \Str::lower(str_replace(array('-', '/'), '_', array_shift($args)));
 
-        if (empty($migration_name) or strpos($migration_name, ':'))
+        if (empty($migration_name) or mb_strpos($migration_name, ':'))
         {
             throw new Exception("Command is invalid.".PHP_EOL."\tphp oil g migration <migrationname> [<fieldname1>:<type1> |<fieldname2>:<type2> |..]");
         }
@@ -48,7 +48,7 @@ class Generate extends \Oil\Generate
             elseif (static::$scaffolding === false)
             {
                 // Increment the name of this
-                $migration_name = \Str::increment(substr($file_name, 4), 2);
+                $migration_name = \Str::increment(mb_substr($file_name, 4), 2);
             }
         }
 
@@ -62,7 +62,7 @@ class Generate extends \Oil\Generate
         foreach ($methods as $method_name)
         {
             // If the miration name starts with the name of the action method
-            if (substr($migration_name, 0, strlen($method_name)) === $method_name)
+            if (mb_substr($migration_name, 0, mb_strlen($method_name)) === $method_name)
             {
                 /**
                  *	Create an array of the subject the migration is about
@@ -106,7 +106,7 @@ class Generate extends \Oil\Generate
                 {
                     $name = str_replace(array('create_', 'add_', '_to_'), array('create-', 'add-', '-to-'), $migration_name);
 
-                    if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/i', $name, $deep_matches))
+                    if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/iu', $name, $deep_matches))
                     {
                         switch ($deep_matches[1])
                         {
@@ -142,7 +142,7 @@ class Generate extends \Oil\Generate
                         $field_array['name'] = array_shift($parts);
                         foreach ($parts as $part_i => $part)
                         {
-                            preg_match('/([a-z0-9_-]+)(?:\[([0-9a-z\,\s]+)\])?/i', $part, $part_matches);
+                            preg_match('/([a-z0-9_-]+)(?:\[([0-9a-z\,\s]+)\])?/iu', $part, $part_matches);
                             array_shift($part_matches);
 
                             if (count($part_matches) < 1)
@@ -236,7 +236,7 @@ class Generate extends \Oil\Generate
         // Build the migration
         list($up, $down)=$migration;
 
-        $migration_name = ucfirst(strtolower($migration_name));
+        $migration_name = ucfirst(mb_strtolower($migration_name));
 
         $migration = <<<MIGRATION
 <?php
@@ -258,7 +258,7 @@ class {$migration_name}
 MIGRATION;
 
         $number = isset($number) ? $number : static::_find_migration_number();
-        $filepath = $working_path . 'migrations/'.$number.'_' . strtolower($migration_name) . '.php';
+        $filepath = $working_path . 'migrations/'.$number.'_' . mb_strtolower($migration_name) . '.php';
 
         static::create($filepath, $migration, 'migration');
 

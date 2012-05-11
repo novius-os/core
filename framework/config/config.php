@@ -153,7 +153,7 @@ return array(
 	'module_paths' => array(
 		realpath(APPPATH.'applications').DS,
 		// Strip trailing "novius-os/framework/"
-		realpath(substr(NOSPATH, 0, -20).'lib').DS,
+		realpath(mb_substr(NOSPATH, 0, -20).'lib').DS,
 	),
 
 

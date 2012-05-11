@@ -80,7 +80,7 @@ class Model_User_User extends \Nos\Orm\Model {
 	}
 
     public static function hash_password($password) {
-        return substr($password, 0, 1).$password.substr($password, -1);
+        return mb_substr($password, 0, 1).$password.mb_substr($password, -1);
     }
 
     public function check_permission($app, $key) {

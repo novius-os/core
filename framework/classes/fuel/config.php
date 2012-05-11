@@ -46,7 +46,7 @@ class Config extends \Fuel\Core\Config {
 	}
 */
     public static function convertFileName($file, $from = 'load') {
-        if (is_string($file) && strpos($file, '::') !== false && substr($file, 0, 4) == 'nos_') {
+        if (is_string($file) && mb_strpos($file, '::') !== false && mb_substr($file, 0, 4) == 'nos_') {
             list($application, $configuration_path) = explode('::', $file);
             $file = 'nos::admin/'.$application.'/'.$configuration_path;
         }
