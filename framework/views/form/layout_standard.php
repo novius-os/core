@@ -132,7 +132,21 @@ $large = !empty($large) && $large == true;
         ?>
         <?= $large ? '' : '<div class="unit col c1"></div>' ?>
         <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;margin-bottom:1em;">
-            <?= is_array($content) ? implode($content) : $content ?>
+            <?php
+            if (is_array($content)) {
+                foreach ($content as $c) {
+                    if (is_callable($c)) {
+                        echo $c();
+                    } else {
+                        echo $c;
+                    }
+                }
+            } else if (is_callable($content)) {
+                echo $content();
+            } else {
+                echo $content;
+            }
+            ?>
         </div>
 
         <?php
