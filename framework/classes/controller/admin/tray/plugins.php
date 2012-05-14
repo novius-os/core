@@ -14,7 +14,7 @@ use Fuel\Core\File;
 use Fuel\Core\View;
 
 class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
-	public $template = 'nos::templates/html5';
+	public $template = 'nos::admin/html';
 
     public function action_index() {
 
@@ -58,7 +58,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		}
 
 
-        $this->template->body = View::forge('tray/plugins');
+        $this->template->body = View::forge('admin/tray/plugins');
 
         $this->template->body->set('installed', $app_installed);
         $this->template->body->set('others', $app_others);

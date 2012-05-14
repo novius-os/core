@@ -20,7 +20,7 @@ class Controller_Admin_Tray_Account extends \Controller {
 		$fieldset_infos    = Controller_Admin_User_Form::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
         $fieldset_display  = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
-        return View::forge('tray/account', array(
+        return View::forge('admin/tray/account', array(
 			'logged_user' => $user,
 			'fieldset_infos' => $fieldset_infos,
             'fieldset_display' => $fieldset_display,

@@ -12,7 +12,7 @@ namespace Nos;
 
 class Controller_Generic_Admin extends Controller_Template_Extendable {
 
-    public $template    = 'nos::templates/html5';
+    public $template    = 'nos::admin/html';
     public $bypass      = false;
 
 

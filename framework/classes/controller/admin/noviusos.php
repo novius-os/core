@@ -12,7 +12,7 @@ namespace Nos;
 
 class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 
-	public $template = 'nos::templates/html5';
+	public $template = 'nos::admin/html';
 
 	public function before($response = null) {
 		parent::before($response);
@@ -46,7 +46,7 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 
 	public function action_index()
 	{
-		$view = \View::forge('noviusos/index');
+		$view = \View::forge('admin/noviusos');
 
         $user = \Session::get('logged_user', false);
 
@@ -124,7 +124,7 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background');
         $background = $background_id ? Model_Media_Media::find($background_id) : false;
 
-		$view = \View::forge('noviusos/appstab', array(
+		$view = \View::forge('admin/appstab', array(
 			'apps'          => $apps,
 		));
         $view->set('background', $background, false);
