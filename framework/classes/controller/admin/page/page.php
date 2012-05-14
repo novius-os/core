@@ -13,7 +13,7 @@ namespace Nos;
 class Controller_Admin_Page_Page extends Controller {
 
     public function action_crud($id = null) {
-        $page = $id === null ? null : Model_Page_Page::find($id);
+        $page = $id === null ? null : Model_Page::find($id);
 	    return \View::forge('nos::form/layout_languages', array(
 		    'item' => $page,
 		    'selected_lang' => $page === null ? null : $page->get_lang(),
@@ -23,7 +23,7 @@ class Controller_Admin_Page_Page extends Controller {
     }
 
     public function action_blank_slate($id = null) {
-        $page = $id === null ? null : Model_Page_Page::find($id);
+        $page = $id === null ? null : Model_Page::find($id);
         return \View::forge('nos::form/layout_blank_slate', array(
             'item'      => $page,
             'lang'      => \Input::get('lang', ''),
@@ -39,24 +39,24 @@ class Controller_Admin_Page_Page extends Controller {
 
         // $id is set: edit the page
         if ($id !== null) {
-            $page = Model_Page_Page::find($id);
+            $page = Model_Page::find($id);
         } else {
             // Create a new page
             $create_from_id = \Input::get('create_from_id', 0);
             if (empty($create_from_id)) {
-                $page = Model_Page_Page::forge();
+                $page = Model_Page::forge();
                 $page->page_lang_common_id = \Input::get('common_id');
             } else {
-                 $page_from = Model_Page_Page::find($create_from_id);
+                 $page_from = Model_Page::find($create_from_id);
                  $page      = clone $page_from;
             }
             $page->page_lang = \Input::get('lang');
             if (!empty($page->page_lang_common_id)) {
-                $parent_page = Model_Page_Page::find($page->page_lang_common_id)->find_parent();
+                $parent_page = Model_Page::find($page->page_lang_common_id)->find_parent();
             }
             // Parent page is the root
             if (empty($parent_page)) {
-                $parent_page = Model_Page_Page::find(1);
+                $parent_page = Model_Page::find(1);
             }
             if (!empty($page->page_lang)) {
                 $parent_page = $parent_page->find_lang($page->page_lang);
@@ -139,7 +139,7 @@ class Controller_Admin_Page_Page extends Controller {
         if (empty($page_id)) {
             throw new \Exception('No page specified.');
         }
-        $page = Model_Page_Page::find($page_id);
+        $page = Model_Page::find($page_id);
         if (empty($page)) {
             throw new \Exception('Page not found.');
         }

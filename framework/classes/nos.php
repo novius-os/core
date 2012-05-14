@@ -53,7 +53,7 @@ class Nos {
     /**
      * Returns the pagefrom the main request
      *
-     * @return \Nos\Model_Page_Page
+     * @return \Nos\Model_Page
      */
     public static function main_page() {
         return static::main_controller()->page;
@@ -192,7 +192,7 @@ class Nos {
 			{
 				$media_ids[] = $media_id;
 			}
-			$medias = Nos\Model_Media_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+			$medias = Nos\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
 			foreach ($matches[1] as $match_id => $media_id)
 			{
 				if (!empty($matches[3][$match_id])) {
@@ -215,7 +215,7 @@ class Nos {
 			{
 				$page_ids[] = $page_id;
 			}
-			$pages = Nos\Model_Page_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+			$pages = Nos\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
 			foreach ($matches[1] as $match_id => $page_id)
 			{
 				$content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);

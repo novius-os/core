@@ -122,7 +122,7 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 
         $user = \Session::get('logged_user', false);
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background');
-        $background = $background_id ? Model_Media_Media::find($background_id) : false;
+        $background = $background_id ? Model_Media::find($background_id) : false;
 
 		$view = \View::forge('admin/appstab', array(
 			'apps'          => $apps,

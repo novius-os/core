@@ -17,7 +17,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
         if (empty($media_id)) {
             throw new \Exception('No media specified.');
         }
-        $media = Model_Media_Media::find($media_id);
+        $media = Model_Media::find($media_id);
         if (empty($media)) {
             throw new \Exception('Media not found.');
         }
@@ -65,7 +65,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'File successfully deleted.',
-                'dispatchEvent' => 'reload.nos_media_media',
+                'dispatchEvent' => 'reload.nos_media',
 			);
         } catch (\Exception $e) {
             // Easy debug
@@ -153,10 +153,10 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
             $escaped_folder_ids = array_filter($escaped_folder_ids);
             $escaped_folder_ids = implode(',', $escaped_folder_ids);
 
-            $pk = Model_Media_Media::primary_key();
+            $pk = Model_Media::primary_key();
             $pk = $pk[0];
             $table_folder = Model_Media_Folder::table();
-            $table_media  = Model_Media_Media::table();
+            $table_media  = Model_Media::table();
             $table_link   = Model_Media_Link::table();
 
             // Delete linked medias
@@ -185,7 +185,7 @@ class Controller_Admin_Media_Actions extends Controller_Extendable {
             \DB::commit_transaction();
             $body = array(
                 'notify' => 'Folder successfully deleted.',
-				'dispatchEvent' => array('reload.nos_media_media', 'reload.nos_media_folder'),
+				'dispatchEvent' => array('reload.nos_media', 'reload.nos_media_folder'),
             );
         } catch (\Exception $e) {
             \DB::rollback_transaction();

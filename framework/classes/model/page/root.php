@@ -17,7 +17,7 @@ class Model_Page_Root extends \Nos\Orm\Model {
 	protected static $_has_many = array(
 		'pages' => array(
 			'key_from'       => 'root_id',
-			'model_to'       => '\Nos\Model_Page_Page',
+			'model_to'       => '\Nos\Model_Page',
 			'key_to'         => 'page_root_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,

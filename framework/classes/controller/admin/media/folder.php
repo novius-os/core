@@ -222,7 +222,7 @@ class Controller_Admin_Media_Folder extends Controller_Extendable {
 			$body = array(
 				'notify' => 'Folder successfully edited.',
 				'closeDialog' => true,
-				'dispatchEvent' => array('reload.nos_media_media', 'reload.nos_media_folder'),
+				'dispatchEvent' => array('reload.nos_media', 'reload.nos_media_folder'),
 			);
 
         } catch (\Exception $e) {

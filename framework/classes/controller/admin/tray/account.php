@@ -65,7 +65,7 @@ class Controller_Admin_Tray_Account extends \Controller {
                 try {
                     $configuration = $user->getConfiguration();
 					if (!empty($data['background'])) {
-						$media = Model_Media_Media::find($data['background']);
+						$media = Model_Media::find($data['background']);
 						if (!empty($media)) {
 							\Arr::set($configuration, 'misc.display.background', $data['background']);
 							$notify = strtr(__('Your wallpaper is now "{title}"'), array(

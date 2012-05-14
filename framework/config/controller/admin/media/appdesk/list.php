@@ -13,7 +13,7 @@ I18n::load('media', 'nos_media');
 
 return array(
 	'query' => array(
-		'model' => 'Nos\Model_Media_Media',
+		'model' => 'Nos\Model_Media',
 		'related' => array(),
 		'limit' => 10,
 	),

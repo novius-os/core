@@ -17,7 +17,7 @@ class Model_Media_Link extends \Nos\Orm\Model {
 	public static $_belongs_to = array(
 		'media' => array(
 			'key_from' => 'medil_media_id',
-			'model_to' => 'Nos\Model_Media_Media',
+			'model_to' => 'Nos\Model_Media',
 			'key_to' => 'media_id',
 			'cascade_save' => false,
 			'cascade_delete' => false,
