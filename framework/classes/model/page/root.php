@@ -11,7 +11,7 @@
 namespace Nos;
 
 class Model_Page_Root extends \Nos\Orm\Model {
-    protected static $_table_name = 'os_page_root';
+    protected static $_table_name = 'nos_page_root';
     protected static $_primary_key = array('root_id');
 
 	protected static $_has_many = array(

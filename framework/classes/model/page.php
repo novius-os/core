@@ -14,7 +14,7 @@ use Fuel\Core\Uri;
 
 class Model_Page extends \Nos\Orm\Model {
 
-    protected static $_table_name = 'os_page';
+    protected static $_table_name = 'nos_page';
     protected static $_primary_key = array('page_id');
 
 	protected static $_has_many = array(

@@ -15,7 +15,7 @@ use Fuel\Core\Uri;
 \Autoloader::add_class('PasswordHash', NOSPATH.'vendor'.DS.'phpass'.DS.'PasswordHash.php');
 
 class Model_User extends \Nos\Orm\Model {
-    protected static $_table_name = 'os_user';
+    protected static $_table_name = 'nos_user';
     protected static $_primary_key = array('user_id');
 
 	protected static $_delete;
@@ -24,7 +24,7 @@ class Model_User extends \Nos\Orm\Model {
         'roles' => array(
             'key_from' => 'user_id',
             'key_through_from' => 'user_id', // column 1 from the table in between, should match a posts.id
-            'table_through' => 'os_user_role', // both models plural without prefix in alphabetical order
+            'table_through' => 'nos_user_role', // both models plural without prefix in alphabetical order
             'key_through_to' => 'role_id', // column 2 from the table in between, should match a users.id
             'model_to' => 'Nos\Model_User_Role',
             'key_to' => 'role_id',
