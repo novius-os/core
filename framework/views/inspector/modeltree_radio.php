@@ -109,7 +109,7 @@
                     height : '100%',
                     width : '100%'
                 });
-			table.nos().initOnShow('init', init);
+			table.nos().onShow('one', init);
 		});
 	});
 </script>

@@ -29,15 +29,15 @@ class Widget {
         $output = '';
 
         $attrs['name'] = $attributes['name'].'_year';
-        $attrs['value'] = substr($attributes['value'], 0, 4);
+        $attrs['value'] = mb_substr($attributes['value'], 0, 4);
         $output .= html_tag('input', Form::attr_to_string($attrs));
 
         $attrs['name'] = $attributes['name'].'_month';
-        $attrs['value'] = substr($attributes['value'], 5, 2);
+        $attrs['value'] = mb_substr($attributes['value'], 5, 2);
         $output .= html_tag('input', Form::attr_to_string($attrs));
 
         $attrs['name'] = $attributes['name'].'_day';
-        $attrs['value'] = substr($attributes['value'], 8, 2);
+        $attrs['value'] = mb_substr($attributes['value'], 8, 2);
         $output .= html_tag('input', Form::attr_to_string($attrs));
 
         return $output;

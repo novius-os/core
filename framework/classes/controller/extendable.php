@@ -55,13 +55,13 @@ class Controller_Extendable extends \Fuel\Core\Controller {
     protected static function getLocation() {
         // @todo use get_called_class() instead
         $controller = explode('\\', \Request::active()->controller);
-        $module_name = strtolower($controller[0]);
-        $file_name   = strtolower(str_replace('_', DS, $controller[1]));
+        $module_name = mb_strtolower($controller[0]);
+        $file_name   = mb_strtolower(str_replace('_', DS, $controller[1]));
         $location = array($module_name, $file_name);
         if ($module_name == 'nos') {
             $submodule = explode('_', $controller[1]);
             if ($submodule[0] == 'Controller' && $submodule[1] == 'Admin' && count($submodule) > 2) {
-                $location[] = strtolower($submodule[2]);
+                $location[] = mb_strtolower($submodule[2]);
             }
         }
 
@@ -163,7 +163,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 
         // Copied over and adapted from $query->count()
         $select = \Arr::get($model::primary_key(), 0);
-        $select = (strpos($select, '.') === false ? $query->alias().'.'.$select : $select);
+        $select = (mb_strpos($select, '.') === false ? $query->alias().'.'.$select : $select);
         // Get the columns
         $columns = \DB::expr('DISTINCT '.\Database_Connection::instance()->quote_identifier($select).' AS group_by_pk');
         // Remove the current select and

@@ -14,7 +14,7 @@ class Refine extends Oil\Refine
     {
 
 
-        $task = strtolower($task);
+        $task = mb_strtolower($task);
 
         // Make sure something is set
         if (empty($task) or $task === 'help')

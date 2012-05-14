@@ -80,9 +80,37 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
 ), false) ?>
 <?= $fieldset->close() ?>
 <script type="text/javascript">
-require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
-	$nos(function () {
-		callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
+	require(['jquery-nos-ostabs'], function ($nos) {
+		$nos(function () {
+			var tabInfos = {
+				label : <?= json_encode(empty($page) ? __('Add a page') : $page->page_title) ?>,
+				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
+				url : 'admin/nos/page/page/crud<?= empty($page) ? '' : '/'.$page->page_id ?>'
+			};
+<?php
+	if (!empty($page)) {
+?>
+			tabInfos.actions = [
+				{
+					label : <?= json_encode(_('Visualise')) ?>,
+					click : function() {
+						window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
+					},
+					iconClasses : 'nos-icon16 nos-icon16-eye'
+				}
+			];
+<?php
+	}
+?>
+			var $el = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
+			$el.onShow('bind', function() {
+				$el.tab('update', tabInfos);
+			});
+		});
 	});
-});
+	require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
+		$nos(function () {
+			callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
+		});
+	});
 </script>

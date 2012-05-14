@@ -26,21 +26,21 @@ class Controller_Admin_Page_Ajax extends \Controller {
 
         $data['layout'] = (array) $data['layout'];
 
-		$page = empty($page_id) ? null : Model_Page_Page::find($page_id);
+		$page = empty($page_id) ? null : Model_Page::find($page_id);
 		foreach ($data['layout'] as $wysiwyg => $coords)
 		{
 			$text = empty($page) ? '' : $page->wysiwygs->{$wysiwyg};
-			preg_match_all('`src="nos://media/(\d+)(?:/(\d+)/(\d+))?"`', $text, $matches);
+			preg_match_all('`src="nos://media/(\d+)(?:/(\d+)/(\d+))?"`u', $text, $matches);
 			$ids      = array();
 			$replaces = array();
 			foreach ($matches[1] as $id)
 			{
 				$ids[] = $id;
 			}
-			$medias = \Nos\Model_Media_Media::find($ids);
+			$medias = \Nos\Model_Media::find($ids);
 			foreach ($matches[1] as $k => $id)
 			{
-				$media = \Nos\Model_Media_Media::find($id);
+				$media = \Nos\Model_Media::find($id);
 				list($width, $height) = array($matches[2][$k], $matches[3][$k]);
 				if ($width && $height && ($width != $media->media_width || $height != $media->media_height))
 				{

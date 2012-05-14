@@ -3,7 +3,11 @@
     foreach ($fields as $field_name) {
         $field = $fieldset->field($field_name);
         if (!empty($field)) {
-            echo $field->build();
+            if (isset($callback)) {
+                $callback($field);
+            } else {
+                echo $field->build();
+            }
         }
     }
     ?>

@@ -58,7 +58,7 @@ class Controller_Appdesk_List extends Controller_Generic_Admin {
             );
         }
 
-		$view = View::forge('appdesk/list');
+		$view = View::forge('admin/appdesk');
 
 		$locales = \Config::get('locales', array());
 

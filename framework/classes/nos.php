@@ -53,7 +53,7 @@ class Nos {
     /**
      * Returns the pagefrom the main request
      *
-     * @return \Nos\Model_Page_Page
+     * @return \Nos\Model_Page
      */
     public static function main_page() {
         return static::main_controller()->page;
@@ -130,14 +130,14 @@ class Nos {
 
         \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
 
-		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
         foreach ($matches[2] as $match_id => $fct_id) {
 
             $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id], $controller);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
 		}
 
-		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`', $content, $matches);
+		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u', $content, $matches);
         foreach ($matches[3] as $match_id => $fct_id) {
             $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id], $controller);
 			$content = str_replace($matches[0][$match_id], $function_content, $content);
@@ -185,14 +185,14 @@ class Nos {
 	protected static function _parse_medias(&$content) {
 
 		// Replace media URL
-		preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`', $content, $matches);
+		preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`u', $content, $matches);
 		if (!empty($matches[0])) {
 			$media_ids = array();
 			foreach ($matches[1] as $match_id => $media_id)
 			{
 				$media_ids[] = $media_id;
 			}
-			$medias = Nos\Model_Media_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+			$medias = Nos\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
 			foreach ($matches[1] as $match_id => $media_id)
 			{
 				if (!empty($matches[3][$match_id])) {
@@ -208,14 +208,14 @@ class Nos {
 	protected static function _parse_internals(&$content) {
 
 		// Replace internal links
-		preg_match_all('`nos://page/(\d+)`', $content, $matches);
+		preg_match_all('`nos://page/(\d+)`u', $content, $matches);
 		if (!empty($matches[0])) {
 			$page_ids = array();
 			foreach ($matches[1] as $match_id => $page_id)
 			{
 				$page_ids[] = $page_id;
 			}
-			$pages = Nos\Model_Page_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+			$pages = Nos\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
 			foreach ($matches[1] as $match_id => $page_id)
 			{
 				$content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);

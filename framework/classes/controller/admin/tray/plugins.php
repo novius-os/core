@@ -14,7 +14,7 @@ use Fuel\Core\File;
 use Fuel\Core\View;
 
 class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
-	public $template = 'nos::templates/html5';
+	public $template = 'nos::admin/html';
 
     public function action_index() {
 
@@ -58,7 +58,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		}
 
 
-        $this->template->body = View::forge('tray/plugins');
+        $this->template->body = View::forge('admin/tray/plugins');
 
         $this->template->body->set('installed', $app_installed);
         $this->template->body->set('others', $app_others);
@@ -128,7 +128,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 
 		$root_files = array();
 		foreach ($files as $k => $f) {
-			if (substr($f, -1) == '/' && substr_count($f, '/') <= 1) {
+			if (mb_substr($f, -1) == '/' && substr_count($f, '/') <= 1) {
 				$root_files[] = $f;
 			}
 		}
@@ -164,7 +164,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 		}
 
 		usort($files, function($a, $b) {
-			return strlen($a) > strlen($b);
+			return mb_strlen($a) > mb_strlen($b);
 		});
 
 		// @todo better error handling ?
@@ -175,11 +175,11 @@ class Controller_Admin_Tray_Plugins extends Controller_Generic_Admin {
 			@mkdir($path, 0777);
 			umask($old);
 
-			$root_length = strlen($root);
+			$root_length = mb_strlen($root);
 
 			foreach ($files as $file) {
-				$dest = $path.DS.substr($file, $root_length);
-				if (substr($file, -1) == '/') {
+				$dest = $path.DS.mb_substr($file, $root_length);
+				if (mb_substr($file, -1) == '/') {
 					is_dir($dest) || @mkdir($dest, 0777);
 				} else {
 					copy('zip://'.$zip_file.'#'.$file, $dest);

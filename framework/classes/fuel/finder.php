@@ -62,7 +62,7 @@ class Finder extends Fuel\Core\Finder {
 		$found  = array();
 
 		// Init namespace and active module
-		$is_namespaced = strripos($file, '::');
+		$is_namespaced = mb_strripos($file, '::');
 
 		if (false === $is_namespaced) {
 			$request        = class_exists('Request', false) ? $request = Request::active() : false;
@@ -73,10 +73,10 @@ class Finder extends Fuel\Core\Finder {
 				$namespace_path = \Autoloader::namespace_path(self::normalize_namespace($active_module));
 			}
 		} else {
-			$namespace         = self::normalize_namespace(substr($file, 0, $is_namespaced));
-			$file_no_ns        = substr($file, $is_namespaced + 2);
+			$namespace         = self::normalize_namespace(mb_substr($file, 0, $is_namespaced));
+			$file_no_ns        = mb_substr($file, $is_namespaced + 2);
 			$active_module     = false;
-			\Fuel::add_module(strtolower($namespace));
+			\Fuel::add_module(mb_strtolower($namespace));
 			$namespace_path    = \Autoloader::namespace_path($namespace);
 		}
 
@@ -94,7 +94,7 @@ class Finder extends Fuel\Core\Finder {
 
 			// -8 = strip the classes directory
 			if (!empty($namespace_path)) {
-				$search[] = substr($namespace_path, 0, -8).$directory.DS;
+				$search[] = mb_substr($namespace_path, 0, -8).$directory.DS;
 			}
 
 			if ($active_module && $active_module != 'nos') {

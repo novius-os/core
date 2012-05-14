@@ -41,7 +41,7 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
-	    $url = substr(str_replace('.html', '', $_SERVER['REDIRECT_URL']), 1);
+	    $url = mb_substr(str_replace('.html', '', $_SERVER['REDIRECT_URL']), 1);
 
         $this->is_preview = \Input::get('_preview', false);
 
@@ -66,11 +66,11 @@ class Controller_Front extends Controller {
 
 	        $_404 = true;
 	        foreach ($url_enhanced as $tempurl => $page_id) {
-		        if (substr($url.'/', 0, strlen($tempurl)) === $tempurl) {
+		        if (mb_substr($url.'/', 0, mb_strlen($tempurl)) === $tempurl) {
 			        $_404 = false;
-			        $this->url = $tempurl != '/' ? substr($tempurl, 0, -1) : '';
+			        $this->url = $tempurl != '/' ? mb_substr($tempurl, 0, -1) : '';
 			        $this->enhancerUrlPath = $tempurl != '/' ? $tempurl : '';
-			        $this->enhancerUrl = ltrim(str_replace(substr($tempurl, 0, -1), '', $url), '/');
+			        $this->enhancerUrl = ltrim(str_replace(mb_substr($tempurl, 0, -1), '', $url), '/');
 			        try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
@@ -179,7 +179,7 @@ class Controller_Front extends Controller {
         }
 
         // Liste toutes les pages ayant le bon nom
-        $pages = Model_Page_Page::find('all', array(
+        $pages = Model_Page::find('all', array(
             'where' => $where,
         ));
 
@@ -233,7 +233,7 @@ class Controller_Front extends Controller {
     }
 
     public function rebuild_cache($cache) {
-        $this->page = new Model_Page_Page();
+        $this->page = new Model_Page();
         foreach ($cache['page'] as $field => $value) {
             $this->page->{'page_'.$field} = $value;
         }

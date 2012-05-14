@@ -47,7 +47,7 @@ class Widget_Page_Selector extends \Fieldset_Field {
 	            'input_name' => $this->get_name(),
 	            'selected' => array(
 		            'id' => $page_id,
-		            'model' => 'Nos\\Model_Page_Page',
+		            'model' => 'Nos\\Model_Page',
 	            ),
 		        'columns' => array(
 			        array(

@@ -13,6 +13,6 @@ namespace Nos;
 use Fuel\Core\Uri;
 
 class Model_User_Permission extends \Nos\Orm\Model {
-    protected static $_table_name = 'os_role_permission';
+    protected static $_table_name = 'nos_role_permission';
     protected static $_primary_key = array('perm_role_id', 'perm_application', 'perm_key');
 }

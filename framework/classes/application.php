@@ -166,7 +166,7 @@ class Application {
 
             // we check that deleted templates are not used on the page
             if ($deleted_properties) {
-                $pages = Model_Page_Page::find('all', array('where' => array(array('page_template', 'IN', $deleted_properties))));
+                $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', $deleted_properties))));
                 if (count($pages) > 0) {
                 	print_r($pages);
                     throw new \Exception('Some page include those partials and can therefore not be deleted !');

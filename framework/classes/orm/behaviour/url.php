@@ -45,8 +45,8 @@ class Orm_Behaviour_Url extends Orm_Behaviour
 				if (isset($enhancers[$enhancer]) && isset($enhancers[$enhancer]['get_url_model']) && isset($page_enhanced[$enhancer])) {
 					$function = $enhancers[$enhancer]['get_url_model'];
 					foreach ($page_enhanced[$enhancer] as $page_id => $params) {
-						if ($page = Model_Page_Page::find($page_id)) {
-							if ($url = call_user_func($function, $object, array('urlPath' => substr($page->get_href(), 0, -5).'/', 'enhancer_config' => $params))) {
+						if ($page = Model_Page::find($page_id)) {
+							if ($url = call_user_func($function, $object, array('urlPath' => mb_substr($page->get_href(), 0, -5).'/', 'enhancer_config' => $params))) {
 								if ($url && $first) {
 									return $url;
 								}

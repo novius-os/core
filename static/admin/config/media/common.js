@@ -95,7 +95,7 @@ define([
                 label : appDesk.i18n('Media center'),
                 iconUrl : 'static/novius-os/admin/novius-os/img/32/media.png'
             },
-            reloadEvent : 'nos_media_media',
+            reloadEvent : 'nos_media',
             appdesk : {
                 splittersVertical : 300,
                 adds : {
@@ -267,7 +267,7 @@ define([
                     },
                     preview : {
                         vertical : true,
-                        reloadEvent : 'nos_media_media',
+                        reloadEvent : 'nos_media',
                         label : appDesk.i18n('Preview'),
                         preview : true,
                         options : {

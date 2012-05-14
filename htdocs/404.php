@@ -29,7 +29,7 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 // Boot the app
 require_once NOSPATH.'bootstrap.php';
 
-$resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`', $_SERVER['REDIRECT_URL'], $m);
+$resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $_SERVER['REDIRECT_URL'], $m);
 
 
 if ($resized) {
@@ -42,12 +42,12 @@ if ($resized) {
 }
 
 $media = false;
-$res = \DB::select()->from(\Nos\Model_Media_Media::table())->where(array(
+$res = \DB::select()->from(\Nos\Model_Media::table())->where(array(
     array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
 ))->execute()->as_array();
 
 if ($res) {
-    $media = \Nos\Model_Media_Media::forge(reset($res));
+    $media = \Nos\Model_Media::forge(reset($res));
     $media->freeze();
 }
 

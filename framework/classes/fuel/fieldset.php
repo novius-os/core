@@ -53,7 +53,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
     public function build_hidden_fields() {
         $output = '';
         foreach ($this->field() as $field) {
-            if (false != strpos(get_class($field), 'Widget_')) {
+            if (false != mb_strpos(get_class($field), 'Widget_')) {
                 continue;
             }
             if ($field->type == 'hidden') {
@@ -92,7 +92,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
                     // Computes the error message, replacing :args placeholders with {n}
                     $error = new \Validation_Error($f, '', array($name => ''), array());
                     $error = $error->get_message();
-                    preg_match_all('`:param:(\d+)`', $error, $m);
+                    preg_match_all('`:param:(\d+)`u', $error, $m);
                     foreach ($m[1] as $int) {
                         $error = str_replace(':param:'.$int, '{' . ($int - 1).'}', $error);
                     }
@@ -159,8 +159,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 */
 	public function populate($input, $repopulate = false) {
 		foreach ($this->fields as $f) {
-			$class = strtolower(\Inflector::denamespace(get_class($f)));
-			if (substr($class, 0, 6) == 'widget' && isset($input->{$f->name})) {
+			$class = mb_strtolower(\Inflector::denamespace(get_class($f)));
+			if (mb_substr($class, 0, 6) == 'widget' && isset($input->{$f->name})) {
 				$f->populate($input);
 			}
 		}
@@ -175,7 +175,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 */
 	public function repopulate($repopulate = false) {
 
-		$input = strtolower($this->form()->get_attribute('method', 'post')) == 'get' ? \Input::get() : \Input::post();
+		$input = mb_strtolower($this->form()->get_attribute('method', 'post')) == 'get' ? \Input::get() : \Input::post();
 
 		foreach ($this->fields as $f) {
 
@@ -184,7 +184,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			{
 				continue;
 			}
-			if (substr(strtolower(\Inflector::denamespace(get_class($f))), 0, 6) == 'widget')
+			if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 6) == 'widget')
 			{
 				// Widgets populates themselves
 				$f->repopulate($input);
@@ -206,8 +206,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $values = \Input::post();
             foreach ($this->fields as $f)
 			{
-				$class = strtolower(\Inflector::denamespace(get_class($f)));
-				if (substr($class, 0, 6) == 'widget') {
+				$class = mb_strtolower(\Inflector::denamespace(get_class($f)));
+				if (mb_substr($class, 0, 6) == 'widget') {
 					$values[$f->name] = $f->get_value();
 				}
             }
@@ -369,7 +369,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				if (!empty($options['complete']) && is_callable($options['complete'])) {
 					call_user_func($options['complete'], $data);
 				} else {
-                    self::defaultComplete($data, $model, $config, $options);
+                    \Response::json(self::defaultComplete($data, $model, $config, $options));
                 }
 			} else {
 				 \Response::json(array(
@@ -482,6 +482,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
 					continue;
 				}
 
+                if(isset($config['dont_save']) && $config['dont_save'])
+                {
+                    continue;
+                }
+
 				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
 					call_user_func($config['before_save'], $object, $data);
 				} else {
@@ -546,6 +551,6 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			}
 		}
 
-		\Response::json($json_response);
+		return $json_response;
 	}
 }

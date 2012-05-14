@@ -14,7 +14,7 @@ class Controller_Admin_Media_Info extends Controller_Admin_Noviusos {
 
 	public function action_media($id)
 	{
-		$media = Model_Media_Media::find($id);
+		$media = Model_Media::find($id);
 
 		if (!empty($media)) {
 			\Config::load('nos::controller/admin/media/appdesk/list', true);
