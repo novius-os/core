@@ -369,7 +369,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				if (!empty($options['complete']) && is_callable($options['complete'])) {
 					call_user_func($options['complete'], $data);
 				} else {
-                    self::defaultComplete($data, $model, $config, $options);
+                    \Response::json(self::defaultComplete($data, $model, $config, $options));
                 }
 			} else {
 				 \Response::json(array(
@@ -482,6 +482,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
 					continue;
 				}
 
+                if(isset($config['dont_save']) && $config['dont_save'])
+                {
+                    continue;
+                }
+
 				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
 					call_user_func($config['before_save'], $object, $data);
 				} else {
@@ -546,6 +551,6 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			}
 		}
 
-		\Response::json($json_response);
+		return $json_response;
 	}
 }
