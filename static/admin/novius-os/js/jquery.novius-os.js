@@ -226,7 +226,10 @@ define('jquery-nos', [
                             document.location.href = json.redirect;
                         }
                         if (json.replaceTab) {
-                            this.tab('update', {url : json.replaceTab});
+                            this.tab('update', {
+                                url : json.replaceTab,
+                                reload : true
+                            });
                         }
                     }
                     if (json.dispatchEvent) {
@@ -334,10 +337,10 @@ define('jquery-nos', [
                             }
                             $(this).button(options);
                         });
-                    $context.find("select").filter(':not(.notransform)').nos().initOnShow('init', function() {
+                    $context.find("select").filter(':not(.notransform)').nos().onShow('one', function() {
                             $(this).wijdropdown();
                         });
-                    $context.find(":input[type=checkbox]").nos().initOnShow('init', function() {
+                    $context.find(":input[type=checkbox]").nos().onShow('one', function() {
                         $(this).wijcheckbox();
                     });
                     $context.find('.expander').each(function() {
@@ -347,11 +350,11 @@ define('jquery-nos', [
                     $context.find('.accordion').wijaccordion({
                             header: "h3",
                             selectedIndexChanged : function(e, args) {
-                                $(e.target).find('.ui-accordion-content').eq(args.newIndex).nos().initOnShow();
+                                $(e.target).find('.ui-accordion-content').eq(args.newIndex).nos().onShow();
                             }
                         });
                         // @todo Check usefulness of this
-                        //.find('.ui-accordion-content:first').initOnShow();
+                        //.find('.ui-accordion-content:first').onShow();
                     break;
 
                 case 'validate' :
@@ -389,57 +392,64 @@ define('jquery-nos', [
             return this;
         },
 
-        initOnShow : function() {
+        onShow : function() {
             var args = Array.prototype.slice.call(arguments),
                 method = 'show';
-            if (args.length > 0 && $.inArray(args[0], ['init', 'show']) !== -1) {
+            if (args.length > 0 && $.inArray(args[0], ['one', 'bind', 'show']) !== -1) {
                 method = args.shift();
             }
             switch (method) {
-                case 'init' :
+                case 'one' :
+                case 'bind' :
                     var callback = args[0];
                     if (!$.isFunction(callback)) {
                         return;
                     }
                     this.each(function() {
-                        var $el = $nos(this);
+                        var $el = $nos(this),
+                            nb_bind = $el.data('nos-on-show') || 0;
 
-                        $el.addClass('nos-init-on-show')
-                            .one('nos-init-on-show', callback);
+                        $el.addClass('nos-on-show')
+                            .data('nos-on-show', nb_bind + (method === 'bind' ? 1 : 0))
+                            [method]('nos-on-show', callback);
 
                         if ($el.is(':visible')) {
-                            $el.initOnShow();
+                            $el.onShow();
                         }
                     });
                     break;
 
                 case 'show' :
-
-                    // If the element has the class .nos-init-on-show, we display it and trigger the nos-init-on-show events
-                    // If the element does not have the class .nos-init-on-show, we search for children and triggers the initOnShow()
+                    // If the element has the class .nos-on-show, we display it and trigger the nos-on-show events
+                    // If the element does not have the class .nos-on-show, we search for children and triggers the onShow()
                     // Either ways, if the element is hidden, we do nothing, it'll be triggered by a parent when it's shown
 
                     // Show the element
-                    if (this.is('.nos-init-on-show')) {
-                        this.css('display', 'block');
-                    }
+                    this.not('.nos-on-show-exec').addClass('nos-on-show-exec').each(function() {
+                        var $el = $nos(this),
+                            nb_bind = $el.data('nos-on-show') || 0;
 
-                    // Cancel if it's not visible
-                    if (!this.is(':visible')) {
-                        return this;
-                    }
+                        if ($el.is('.nos-on-show')) {
+                            $el.css('display', 'block');
+                        }
 
-                    // Trigger the events
-                    if (this.is('.nos-init-on-show')) {
-                        this.removeClass('nos-init-on-show').trigger('nos-init-on-show');
-                    }
+                        // Cancel if it's not visible
+                        if (!$el.is(':visible')) {
+                            return true;
+                        }
 
-                    // Cascade on the children
-                    this.find('.nos-init-on-show').filter(function() {
-                        return $(this).parents('.nos-init-on-show').length == 0;
-                    }).initOnShow();
+                        // Trigger the events
+                        if ($el.is('.nos-on-show')) {
+                            if (!nb_bind) {
+                                $el.removeClass('nos-on-show');
+                            }
+                            $el.trigger('nos-on-show');
+                        }
 
-                   break;
+                        // Cascade on the children
+                        $el.find('.nos-on-show').not('.nos-on-show-exec').onShow();
+                    }).removeClass('nos-on-show-exec');
+                    break;
             }
             return this;
         },
@@ -675,7 +685,8 @@ define('jquery-nos', [
                             window.parent.$nos(window.frameElement).tab('update', tab);
                         } else if (self.size() && !self.closest('.ui-dialog-content').size() && noviusos().length) {
                             var index = getIndex(self);
-                            noviusos().ostabs('update', index, tab);
+                            noviusos().ostabs('update', index, tab)
+                                .xhr('saveUserConfig', 'tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
                         }
                     })();
                     break;
@@ -685,7 +696,7 @@ define('jquery-nos', [
                         var configuration = args[0],
                             fct = function() {
                                 if (noviusos().length) {
-                                    noviusos().xhr('saveUserConfig', 'tabs', {selected: $noviusos.ostabs('option', 'selected'), tabs: $noviusos.ostabs('tabs')});
+                                    noviusos().xhr('saveUserConfig', 'tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
                                 }
                             };
                         $noviusos = self;

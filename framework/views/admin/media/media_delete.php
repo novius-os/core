@@ -25,7 +25,7 @@
         )) ?></p>
         <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
         <p><?= strtr(__('Yes, I want to delete all {count} usage of the media.'), array(
-            '{count}' => '<input data-id="verification" data-verification="'.$usage_count.'" size="'.(strlen($usage_count) + 1).'" />',
+            '{count}' => '<input data-id="verification" data-verification="'.$usage_count.'" size="'.(mb_strlen($usage_count) + 1).'" />',
         )); ?></p>
         <?php
     }

@@ -16,7 +16,7 @@ class Controller_Admin_User_User extends Controller_Extendable {
         if (empty($user_id)) {
             throw new \Exception('No user specified.');
         }
-        $media = Model_User_User::find($user_id);
+        $media = Model_User::find($user_id);
         if (empty($media)) {
             throw new \Exception('User not found.');
         }
@@ -59,7 +59,7 @@ class Controller_Admin_User_User extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'User permanently deleted.',
-                'dispatchEvent' => 'reload.nos_user_user',
+                'dispatchEvent' => 'reload.nos_user',
 			);
         } catch (\Exception $e) {
             // Easy debug

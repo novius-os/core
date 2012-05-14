@@ -12,15 +12,15 @@ namespace Nos;
 
 use Fuel\Core\Uri;
 
-class Model_Page_Page extends \Nos\Orm\Model {
+class Model_Page extends \Nos\Orm\Model {
 
-    protected static $_table_name = 'os_page';
+    protected static $_table_name = 'nos_page';
     protected static $_primary_key = array('page_id');
 
 	protected static $_has_many = array(
 		'children' => array(
 			'key_from'       => 'page_id',
-			'model_to'       => '\Nos\Model_Page_Page',
+			'model_to'       => '\Nos\Model_Page',
 			'key_to'         => 'page_parent_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
@@ -30,7 +30,7 @@ class Model_Page_Page extends \Nos\Orm\Model {
 	protected static $_belongs_to = array(
 		'parent' => array(
 			'key_from'       => 'page_parent_id',
-			'model_to'       => '\Nos\Model_Page_Page',
+			'model_to'       => '\Nos\Model_Page',
 			'key_to'         => 'page_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
@@ -98,12 +98,12 @@ class Model_Page_Page extends \Nos\Orm\Model {
     const LOCK_EDITION  = 2;
 
     /**
-     * Alias to Model:find('all') with appropriate sort for Model_Page_Page
+     * Alias to Model:find('all') with appropriate sort for Model_Page
      *
      * @param array  $where
      * @param array  $order_by
      * @param array  $options   Additional options to pass on to the ::find() method
-     * @return array of \Nos\Model_Page_Page
+     * @return array of \Nos\Model_Page
      */
     public static function search($where, $order_by = array(), $options = array()) {
         isset($order_by['page_sort']) or $order_by['page_sort'] = 'ASC';
@@ -217,8 +217,8 @@ class Model_Page_Page extends \Nos\Orm\Model {
 
 		$urlEnhancer = false;
 		$regexps = array(
-			'`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`' => 2,
-			'`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`' => 3,
+			'`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u' => 2,
+			'`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u' => 3,
 		);
 		foreach ($regexps as $regexp => $name_index) {
 			preg_match_all($regexp, $content, $matches);

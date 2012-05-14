@@ -71,7 +71,7 @@ foreach ($fieldset->field() as $field) {
         $nos(function() {
             var $container = $nos('#<?= $uniqid ?>');
             var $tabs = $container.find('.tabs');
-            $tabs.css('display', 'block').initOnShow();
+            $tabs.css('display', 'block').onShow();
             $tabs.wijtabs({
                 alignment: 'left'
             });

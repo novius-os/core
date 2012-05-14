@@ -13,7 +13,7 @@ namespace Nos;
 use Fuel\Core\Uri;
 
 class Model_Media_Folder extends \Nos\Orm\Model {
-    protected static $_table_name = 'os_media_folder';
+    protected static $_table_name = 'nos_media_folder';
     protected static $_primary_key = array('medif_id');
 
 	protected static $_has_many = array(
@@ -26,7 +26,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
 		),
         'media' => array(
 			'key_from'       => 'medif_id',
-			'model_to'       => '\Nos\Model_Media_Media',
+			'model_to'       => '\Nos\Model_Media',
 			'key_to'         => 'media_folder_id',
 			'cascade_save'   => false,
 			'cascade_delete' => false,
@@ -60,7 +60,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
     public function delete_public_cache() {
 
         // Delete cached media entries
-        $path_public     = DOCROOT.Model_Media_Media::$public_path.$this->medif_path;
+        $path_public     = DOCROOT.Model_Media::$public_path.$this->medif_path;
         $path_thumbnails = str_replace(DOCROOT.'media/', DOCROOT.'cache/media/', $path_public);
         try {
             // delete_dir($path, $recursive, $delete_top)
@@ -91,7 +91,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
     public function count_media() {
         /// get_ids_children($include_self)
         $folder_ids = $this->get_ids_children(true);
-        return Model_Media_Media::count(array(
+        return Model_Media::count(array(
             'where' => array(
                 array('media_folder_id', 'IN', $folder_ids),
             ),
@@ -118,9 +118,9 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         }
 
         $quoted_sep = preg_quote($sep);
-        $slug = preg_replace("`[\s+]`", $sep, $slug);
-        $slug = preg_replace("`[^\w$quoted_sep]`i", '', $slug);
-        $slug = preg_replace("`$quoted_sep+`", $sep, $slug);
+        $slug = preg_replace("`[\s+]`u", $sep, $slug);
+        $slug = preg_replace("`[^\w$quoted_sep]`iu", '', $slug);
+        $slug = preg_replace("`$quoted_sep+`u", $sep, $slug);
         $slug = trim($slug, $sep);
 
         return $slug;
@@ -135,7 +135,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         }
 
         // empty or "/"
-        if (strlen($path) <= 1) {
+        if (mb_strlen($path) <= 1) {
             return false;
         }
 		$this->medif_path = $path;
@@ -164,7 +164,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         }
         if ($cascade_media) {
             // 1 request for each updated folder
-            \DB::update(Model_Media_Media::table())
+            \DB::update(Model_Media::table())
                 ->value('media_path', $this->medif_path)
                 ->where('media_folder_id', $this->medif_id)
                 ->execute();

@@ -25,7 +25,7 @@
         )) ?></p>
         <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
         <p><?= strtr(__('Yes, I want to delete all {count} files from the media centre.'), array(
-            '{count}' => '<input data-id="verification" data-verification="'.$media_count.'" size="'.(strlen($media_count) + 1).'" />',
+            '{count}' => '<input data-id="verification" data-verification="'.$media_count.'" size="'.(mb_strlen($media_count) + 1).'" />',
         )); ?></p>
         <?php
     }

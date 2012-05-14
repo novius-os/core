@@ -14,7 +14,7 @@ use Str;
 
 class Controller_Admin_Login extends Controller_Template_Extendable {
 
-	public $template = 'nos::templates/html5';
+	public $template = 'nos::admin/html';
 
     public function before($response = null) {
         parent::before($response);
@@ -33,7 +33,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 		\Asset::add_path('static/novius-os/admin/novius-os/');
 		\Asset::css('login.css', array(), 'css');
 
-        $this->template->body = \View::forge('misc/login', array(
+        $this->template->body = \View::forge('admin/login', array(
 			'error' => $error,
 		));
         return $this->template;
@@ -41,7 +41,7 @@ class Controller_Admin_Login extends Controller_Template_Extendable {
 
     public function action_reset() {
 
-        $this->template->body = \View::forge('misc/login_reset');
+        $this->template->body = \View::forge('admin/login_reset');
         return $this->template;
     }
 

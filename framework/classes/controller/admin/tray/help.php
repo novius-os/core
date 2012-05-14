@@ -12,6 +12,6 @@ namespace Nos;
 
 class Controller_Admin_Tray_Help extends \Controller {
     public function action_index() {
-        return \View::forge('nos::tray/help');
+        return \View::forge('nos::admin/tray/help');
 	}
 }

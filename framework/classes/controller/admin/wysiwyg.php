@@ -5,7 +5,7 @@ namespace Nos;
 class Controller_Admin_Wysiwyg extends \Controller {
 
 	public function action_image($edit = false) {
-		$view = \View::forge('nos::tinymce/image');
+		$view = \View::forge('nos::admin/media/wysiwyg_image');
 		$view->set('edit', $edit, false);
 		return $view;
 	}

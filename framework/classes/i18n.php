@@ -41,7 +41,7 @@ class I18n
         list($remaining, $encoding) = explode('.', $remaining.'.');
         list($language, $country) = explode('_', $remaining.'_');
         if (!$country) {
-            $country = strtoupper($language);
+            $country = mb_strtoupper($language);
         }
         static::$_locale = $language.'_'.$country;
     }
@@ -54,7 +54,7 @@ class I18n
 	public static function load($file, $group = null)
 	{
 		$languages = static::$fallback;
-		array_unshift($languages, static::$_locale, substr(static::$_locale, 0, 2));
+		array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
 
 		$_messages = array();
 		foreach ($languages as $lang)

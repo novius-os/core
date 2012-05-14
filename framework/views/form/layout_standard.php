@@ -16,7 +16,7 @@ require(['jquery-nos'], function($nos) {
         var $header  = $nos("#<?= $uniqid1 = uniqid('id_') ?>")
         var $content = $nos("#<?= $uniqid2 = uniqid('id_') ?>");
 
-        $header.initOnShow('init', function() {
+        $header.onShow('one', function() {
             $header
                 .addClass('ui-widget-content')
                 .css({
@@ -26,7 +26,7 @@ require(['jquery-nos'], function($nos) {
 
             $header.form();
         });
-        $content.initOnShow('init', function() {
+        $content.onShow('one', function() {
             $content
                 .addClass('fill-parent')
                 .addClass('ui-widget-content').css({
@@ -35,8 +35,8 @@ require(['jquery-nos'], function($nos) {
             $content.form();
             $content.css('top', $header.outerHeight());
         });
-        $header.initOnShow();
-        $content.initOnShow();
+        $header.onShow();
+        $content.onShow();
 	});
 });
 </script>

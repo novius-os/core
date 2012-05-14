@@ -14,7 +14,7 @@ class Auth {
 
 	public static function login($login, $password) {
 
-		$user = Model_User_User::find('all', array(
+		$user = Model_User::find('all', array(
 			'where' => array(
 				'user_email' => $login,
 			),
@@ -37,7 +37,7 @@ class Auth {
 		if (empty($logged_user)) {
 			return false;
 		} else {
-            $logged_user = Model_User_User::find_by_user_id($logged_user->id); // We reload the user
+            $logged_user = Model_User::find_by_user_id($logged_user->id); // We reload the user
             \Session::set('logged_user', $logged_user);
 			return true;
         }

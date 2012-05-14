@@ -10,13 +10,16 @@
 
 // Load in the Autoloader
 require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
-require NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'autoloader.php';
-//class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
+class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
 
 // Bootstrap the framework DO NOT edit this
 require_once COREPATH.'bootstrap.php';
+if (!MBSTRING) {
+	require_once NOSPATH.'mb_string.php';
+}
 
-Autoloader::add_classes(array(
+
+\Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
 	'Date'              => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'date.php',
@@ -26,9 +29,7 @@ Autoloader::add_classes(array(
 	'Finder'            => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'finder.php',
 	'Fieldset'          => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset.php',
 	'Fieldset_Field'    => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset_field.php',
-	'Format'            => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'format.php',
 	'Response'          => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'response.php',
-    'Controller'        => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'controller.php',
     'Arr'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'arr.php',
     'Generate'          => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'generate.php',
     'Command'           => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'command.php',

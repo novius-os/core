@@ -20,7 +20,7 @@ class Controller_Admin_Tray_Account extends \Controller {
 		$fieldset_infos    = Controller_Admin_User_Form::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
         $fieldset_display  = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
-        return View::forge('tray/account', array(
+        return View::forge('admin/tray/account', array(
 			'logged_user' => $user,
 			'fieldset_infos' => $fieldset_infos,
             'fieldset_display' => $fieldset_display,
@@ -65,7 +65,7 @@ class Controller_Admin_Tray_Account extends \Controller {
                 try {
                     $configuration = $user->getConfiguration();
 					if (!empty($data['background'])) {
-						$media = Model_Media_Media::find($data['background']);
+						$media = Model_Media::find($data['background']);
 						if (!empty($media)) {
 							\Arr::set($configuration, 'misc.display.background', $data['background']);
 							$notify = strtr(__('Your wallpaper is now "{title}"'), array(

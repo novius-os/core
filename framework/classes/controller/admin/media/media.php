@@ -53,7 +53,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 	public function action_edit($media_id = null) {
 
-		$media = Model_Media_Media::find($media_id);
+		$media = Model_Media::find($media_id);
         $pathinfo = pathinfo($media->media_file);
         $ext = $pathinfo['extension'];
         $filename = $pathinfo['filename'];
@@ -110,14 +110,14 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 throw new \Exception(__('Please pick a file from your hard drive.'));
             }
 
-            $pathinfo = pathinfo(strtolower($_FILES['media']['name']));
+            $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
             $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
             if (in_array($pathinfo['extension'], $disallowed_extensions)) {
                 throw new \Exception(__('This extension is not allowed due to security reasons.'));
             }
 
-            $media = new Model_Media_Media();
+            $media = new Model_Media();
 
             $media->media_folder_id     = \Input::post('media_folder_id', 1);
             $media->media_application = \Input::post('media_application', null);
@@ -152,7 +152,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
             // Create the directory if needed
 			$dest_dir = dirname($dest).'/';
-            $base_dir = APPPATH.\Nos\Model_Media_Media::$private_path;
+            $base_dir = APPPATH.\Nos\Model_Media::$private_path;
             $remaining_dir = str_replace($base_dir, '', $dest_dir);
             // chmod  is 0777 here because it should be restricted with by the umask
 			is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
@@ -170,7 +170,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 			$body = array(
 				'notify' => 'File successfully added.',
 				'closeDialog' => true,
-				'dispatchEvent' => 'reload.nos_media_media',
+				'dispatchEvent' => 'reload.nos_media',
                 'replaceTab' => 'admin/nos/media/media/edit/'.$media->media_id,
 			);
         } catch (\Exception $e) {
@@ -189,7 +189,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
         }
         try {
 
-            $media = Model_Media_Media::find(\Input::post('media_id', -1));
+            $media = Model_Media::find(\Input::post('media_id', -1));
 
             if (empty($media)) {
                 throw new \Exception('Media not found.');
@@ -199,7 +199,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
             $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
 
             if ($is_uploaded) {
-                $pathinfo = pathinfo(strtolower($_FILES['media']['name']));
+                $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
                 $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
                 if (in_array($pathinfo['extension'], $disallowed_extensions)) {
@@ -246,7 +246,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
                 } else {
                     // Create the directory if needed
                     $dest_dir = dirname($dest);
-                    $base_dir = APPPATH.\Nos\Model_Media_Media::$public_path;
+                    $base_dir = APPPATH.\Nos\Model_Media::$public_path;
                     $remaining_dir = str_replace($base_dir, '', $dest_dir);
                     // chmod  is 0777 here because it should be restricted with by the umask
                     is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
@@ -270,7 +270,7 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
 
 			$body = array(
 				'notify' => 'File successfully saved.',
-				'dispatchEvent' => 'reload.nos_media_media',
+				'dispatchEvent' => 'reload.nos_media',
 			);
         } catch (\Exception $e) {
 			$body = array(
@@ -286,8 +286,8 @@ class Controller_Admin_Media_Media extends Controller_Extendable {
      * @return string
      */
 	protected static function pretty_title($file) {
-		$file = substr($file, 0, strrpos($file, '.'));
-		$file = preg_replace('`[\W_-]+`', ' ', $file);
+		$file = mb_substr($file, 0, mb_strrpos($file, '.'));
+		$file = preg_replace('`[\W_-]+`u', ' ', $file);
 		$file = \Inflector::humanize($file, ' ');
 		return $file;
 	}

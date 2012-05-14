@@ -16,9 +16,9 @@ return array(
 	'tree' => array(
 		'models' => array(
 			array(
-				'model' => 'Nos\Model_Page_Page',
+				'model' => 'Nos\Model_Page',
 				'order_by' => 'page_sort',
-				'childs' => array('Nos\Model_Page_Page'),
+				'childs' => array('Nos\Model_Page'),
 				'dataset' => array(
 					'id' => 'page_id',
 					'title' => 'page_title',
@@ -38,14 +38,14 @@ return array(
 		),
 		'roots' => array(
 			array(
-				'model' => 'Nos\Model_Page_Page',
+				'model' => 'Nos\Model_Page',
 				'where' => array(array('page_parent_id', 'IS', \DB::expr('NULL'))),
 				'order_by' => 'page_sort',
 			),
 		),
 	),
 	'query' => array(
-		'model' => 'Nos\Model_Page_Page',
+		'model' => 'Nos\Model_Page',
 		'related' => array(),
 	),
 	'search_text' => 'page_title',
@@ -94,7 +94,7 @@ return array(
         },
         'actions' => array(
             'delete' => function($page) {
-                return $page->page_lock != Nos\Model_Page_Page::LOCK_DELETION;
+                return $page->page_lock != Nos\Model_Page::LOCK_DELETION;
             }
         ),
 	),

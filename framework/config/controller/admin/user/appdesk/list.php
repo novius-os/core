@@ -13,7 +13,7 @@ I18n::load('user', 'nos_user');
 
 return array(
 	'query' => array(
-		'model' => 'Nos\Model_User_User',
+		'model' => 'Nos\Model_User',
 		'related' => array('roles'),
 	),
 	'search_text' => array(

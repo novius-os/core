@@ -23,7 +23,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
 
     public function action_add() {
 
-        $user = Model_User_User::forge();
+        $user = Model_User::forge();
 
         return \View::forge('nos::admin/user/user_add', array(
             'fieldset' => static::fieldset_add($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'),
@@ -34,7 +34,7 @@ class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
         if ($id === false) {
             $user = null;
         } else {
-            $user = Model_User_User::find($id);
+            $user = Model_User::find($id);
         }
         $role = reset($user->roles);
 

@@ -18,7 +18,7 @@ use Date;
 
 class Controller_Ui_Date extends \Fuel\Core\Controller_Template {
 
-    public $template = 'ui/date';
+    public $template = 'form/date';
 
     public function action_index($name, $value = '')
     {

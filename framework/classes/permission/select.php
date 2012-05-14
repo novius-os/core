@@ -29,7 +29,7 @@ class Permission_Select extends Permission_Driver {
 	}
 
 	public function display($role) {
-		echo \View::forge('nos::permission/driver/select', array(
+		echo \View::forge('nos::admin/user/permission/driver_select', array(
 			'role'        => $role,
 			'application' => $this->application,
 			'identifier'  => $this->identifier,

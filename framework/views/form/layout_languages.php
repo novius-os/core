@@ -43,21 +43,21 @@ require([
 
     $nos(function() {
         var $tabs = $nos('#<?= $uniqid_tabs ?>');
-        $tabs.initOnShow('init', function() {
-            $tabs.find('div.page_lang').initOnShow('init', callback_fn).bind('blank_slate', callback_fn);
+        $tabs.onShow('one', function() {
+            $tabs.find('div.page_lang').onShow('one', callback_fn).bind('blank_slate', callback_fn);
             $tabs.wijtabs({
                 alignment: 'left',
                 ajax: true,
                 cache: true,
                 panelTemplate: '<div class="fill-parent" style="padding:0;"></div>',
                 show: function(e, ui) {
-                    $nos(ui.panel).initOnShow();
+                    $nos(ui.panel).onShow();
                 }
             });
             $tabs.wijtabs('select', <?= $selected_index ?>);
 	        $tabs.find('> div').addClass('fill-parent').addClass('nos-tabs-lang-content');
         });
-        $tabs.initOnShow();
+        $tabs.onShow();
     });
 });
 </script>

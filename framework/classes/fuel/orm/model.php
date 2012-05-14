@@ -254,11 +254,11 @@ class Model extends \Orm\Model {
 	public function pick() {
 		static $prefix = null;
 		if (null == $prefix) {
-			$prefix = substr(static::$_primary_key[0], 0, strpos(static::$_primary_key[0], '_') + 1);
-			$prefix_length = strlen($prefix);
+			$prefix = mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
+			$prefix_length = mb_strlen($prefix);
 		}
 		foreach (func_get_args() as $property) {
-			//if (substr($property, 0, $prefix_length) != $prefix) {
+			//if (mb_substr($property, 0, $prefix_length) != $prefix) {
 				$property = $prefix.$property;
 			//}
 			if (!empty($this->{$property})) {
@@ -516,8 +516,8 @@ class Model_Media_Provider
 	public function __set($property, $value)
 	{
 		// Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
-		$media_id = (string) ($value instanceof \Nos\Model_Media_Media ? $value->media_id : $value);
-		$media = \Nos\Model_Media_Media::find($media_id);
+		$media_id = (string) ($value instanceof \Nos\Model_Media ? $value->media_id : $value);
+		$media = \Nos\Model_Media::find($media_id);
 		if (is_null($media))
 		{
 			$pk = $this->parent->primary_key();

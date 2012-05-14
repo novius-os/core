@@ -862,12 +862,13 @@ define('jquery-nos-ostabs',
                 return false;
             }
 
-            var replaceTab = !!tab.url,
+            var replaceTab = !!tab.url && tab.reload,
                 $li = self.lis.eq( index);
 
             tab = $.extend({}, $li.data( 'ui-ostab' ), tab );
 
             if (replaceTab) {
+                delete tab.reload;
                 this.remove(index);
                 this.add(tab, index);
                 this.select(index);

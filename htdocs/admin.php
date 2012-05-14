@@ -30,7 +30,7 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 require_once NOSPATH.'bootstrap.php';
 
 $uri = \Input::uri();
-if (substr($uri, 0, 6) != '/admin')
+if (mb_substr($uri, 0, 6) != '/admin')
 {
 	$uri = '/admin'.$uri;
 }

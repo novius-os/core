@@ -34,13 +34,13 @@ class PubliCache {
         echo '<pre>';
         $delete = array();
         foreach ($files as $file1 => $files1) {
-            $link = substr($dir.$file1, 0, -1);
+            $link = mb_substr($dir.$file1, 0, -1);
             print_r(array($link));
             if (is_link($link)) {
                 $linked = readlink($link).'/';
                 $files2 = \Fuel\Core\File::read_dir($linked, 1);
                 foreach ($files2 as $file2 => $files3) {
-                    unlink(substr($linked.$file2, 0, -1));
+                    unlink(mb_substr($linked.$file2, 0, -1));
                 }
                 //$delete[] = $linked;
                 rmdir($linked);

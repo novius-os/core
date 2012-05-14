@@ -84,8 +84,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param  array  $where
      * @param  array  $order_by
      * @param  array  $options
-     * @see \Nos\Model_Page_Page::search
-     * @return array of \Nos\Model_Page_Page
+     * @see \Nos\Model_Page::search
+     * @return array of \Nos\Model_Page
      */
     public function find_children($object, $where = array(), $order_by = array(), $options = array()) {
         // Search items whose parent is self
