@@ -176,7 +176,7 @@ class Application {
 
 		// Local templates get replaced, everytime and have priority over applications
 		if ($property == 'templates') {
-			$new_properties = \Arr::merge($new_properties, \Config::get('local_templates'));
+			$new_properties = array_merge($new_properties, \Config::get('local_templates'));
 		}
 
 	    if ($property == 'enhancers') {
