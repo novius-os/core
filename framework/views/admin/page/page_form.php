@@ -94,7 +94,7 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
 				{
 					label : <?= json_encode(_('Visualise')) ?>,
 					click : function() {
-						window.open(<?= json_encode($page->get_href()) ?>);
+						window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
 					},
 					iconClasses : 'nos-icon16 nos-icon16-eye'
 				}
