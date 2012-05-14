@@ -440,32 +440,41 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 			return;
 		}
 
-		// Change parent for tree relations
-		$behaviour_tree = $model_from::behaviours('Nos\Orm_Behaviour_Tree');
-		if (!empty($behaviour_tree)) {
-			$parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
-			$from->set_parent($parent);
-		}
+        try {
 
-		// Change sort order
-		$behaviour_sort = $model_from::behaviours('Nos\Orm_Behaviour_Sortable');
-		if (!empty($behaviour_sort)) {
-			switch($params['targetType']) {
-				case 'before':
-					$from->move_before($to);
-					break;
+            // Change parent for tree relations
+            $behaviour_tree = $model_from::behaviours('Nos\Orm_Behaviour_Tree');
+            if (!empty($behaviour_tree)) {
+                $parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
+                $from->set_parent($parent);
+            }
 
-				case 'after':
-					$from->move_after($to);
-					break;
+            // Change sort order
+            $behaviour_sort = $model_from::behaviours('Nos\Orm_Behaviour_Sortable');
+            if (!empty($behaviour_sort)) {
+                switch($params['targetType']) {
+                    case 'before':
+                        $from->move_before($to);
+                        break;
 
-				case 'in':
-					$from->move_to_last_position();
-					break;
-			}
-		}
+                    case 'after':
+                        $from->move_after($to);
+                        break;
 
-		\Response::json(array());
+                    case 'in':
+                        $from->move_to_last_position();
+                        break;
+                }
+            }
+        } catch (\Exception $e) {
+            \Response::json(array(
+                'error' => $e->getMessage(),
+            ));
+        }
+
+		\Response::json(array(
+            'success' => true,
+        ));
 	}
 
 	public function tree_selected(array $tree_config, array $params)

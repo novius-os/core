@@ -441,7 +441,7 @@ class Model extends \Orm\Model {
 		{
 			if ($this->is_changed($key))
 			{
-				$diff[0][$key] = $this->_original[$key];
+				$diff[0][$key] = array_key_exists($key, $this->_original) ? $this->_original[$key] : null;
 				$diff[1][$key] = $val;
 			}
 		}
@@ -497,6 +497,7 @@ class Model extends \Orm\Model {
 class Model_Media_Provider
 {
 	protected $parent;
+    protected $iterator = array();
 
 	public function __construct($parent)
 	{
@@ -544,13 +545,39 @@ class Model_Media_Provider
 		$value = $this->__get($value);
 		return (!empty($value));
 	}
+
+    function rewind() {
+        $keys = array();
+        foreach($this->parent->linked_medias as $wysiwyg) {
+            $keys[] = $wysiwyg->medil_key;
+        }
+        $this->iterator = $keys;
+        reset($keys);
+    }
+
+    function current() {
+        return $this->__get(current($this->iterator));
+    }
+
+    function key() {
+        return current($this->iterator);
+    }
+
+    function next() {
+        next($this->iterator);
+    }
+
+    function valid() {
+        return false !== current($this->iterator);
+    }
 }
 
 
 
-class Model_Wysiwyg_Provider
+class Model_Wysiwyg_Provider implements \Iterator
 {
 	protected $parent;
+    protected $iterator = array();
 
 	public function __construct($parent)
 	{
@@ -590,5 +617,30 @@ class Model_Wysiwyg_Provider
 		$value = $this->__get($value);
 		return (!empty($value));
 	}
+
+    function rewind() {
+        $keys = array();
+        foreach($this->parent->linked_wysiwygs as $wysiwyg) {
+            $keys[] = $wysiwyg->wysiwyg_key;
+        }
+        $this->iterator = $keys;
+        reset($keys);
+    }
+
+    function current() {
+        return $this->__get(current($this->iterator));
+    }
+
+    function key() {
+        return current($this->iterator);
+    }
+
+    function next() {
+        next($this->iterator);
+    }
+
+    function valid() {
+        return false !== current($this->iterator);
+    }
 }
 

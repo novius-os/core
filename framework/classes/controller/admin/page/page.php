@@ -105,7 +105,7 @@ class Controller_Admin_Page_Page extends Controller {
                 //\Debug::dump($parent->id, $parent->get_lang(), $page->get_lang());
                 //\Debug::dump($parent->find_lang('en_GB')->id);
                 $page->set_parent($parent);
-                $page->page_level = $parent->page_level + 1;
+                $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
                 foreach (\Input::post('wysiwyg', array()) as $key => $text) {
                     $page->wysiwygs->$key = $text;

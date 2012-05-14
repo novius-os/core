@@ -30,7 +30,7 @@ define('jquery-nos-appdesk',
 			defaultView : 'grid',
             locales : {},
 			texts : {
-                allLanguages : 'All languages',
+                allLanguages : 'All',
 				addDropDown : 'Select an action',
 				columns : 'Columns',
 				showFiltersColumns : 'Filters column header',
@@ -273,31 +273,33 @@ define('jquery-nos-appdesk',
                 return self;
             }
 
-            self.uiLangsDropDown = $('<select></select>').appendTo(self.uiLangsDropDownContainer);
+            //self.uiLangsDropDown = $('<select></select>').appendTo(self.uiLangsDropDownContainer);
+            if (o.selectedLang.length && o.selectedLang.length == 0) {
+                var first = true;
+                $.each(o.locales, function(key, locale) {
+                    if (first) {
+                        o.selectedLang = key;
+                        first = false;
+                    }
+                });
+            }
 
-            self.uiLangsDropDown.append(
-                $('<option></option>')
-                    .attr({
-                        'value': '',
-                        'selected': (!o.selectedLang)
-                    })
-                    .append(o.texts.allLanguages)
-            );
+            var date = new Date();
+            var uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
 
             $.each(o.locales, function(key, locale) {
-                self.uiLangsDropDown.append(
-                    $('<option></option>')
-                        .attr({
-                            'value': key,
-                            'selected': (o.selectedLang == key)
-                        })
-                        .append(locale)
+                var flag = key.split('_')[1].toLowerCase();
+                self.uiLangsDropDownContainer.append(
+                    $('<input type="radio" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedLang == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
                 );
             });
 
-            self.uiLangsDropDown.wijdropdown();
+            self.uiLangsDropDownContainer.append(
+                $('<input type="radio" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedLang == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allLanguages + '</label>')
+            );
+            self.uiLangsDropDownContainer.buttonset();
 
-            self.uiLangsDropDown.change(function() {
+            self.uiLangsDropDownContainer.find('input[name=' + uniqid + ']').change(function() {
                 var select = $nos(this);
 
                 o.selectedLang = select.val();
@@ -307,7 +309,7 @@ define('jquery-nos-appdesk',
                 self.gridReload();
                 self.dispatcher.data('nosLang', o.selectedLang)
                     .trigger('langChange');
-            });
+            }).trigger('change');
 
             return self;
         },

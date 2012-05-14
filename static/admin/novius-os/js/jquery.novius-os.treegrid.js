@@ -471,21 +471,26 @@ define('jquery-nos-treegrid',
                 },
                 dataType : 'json',
                 success : function (data, textStatus) {
-                    self.draggedIndex = false;
-                    if (self.dropTarget === 'in') {
-                        self._removeNode(dragNode);
-                        self._toggle(dropped, true);
-                    } else {
-                        var oldParent = self._getTreeNode(dragNode.treePath),
-                            newParent = self._getTreeNode(dropNode.treePath),
-                            newParentIndex = $.inArray(newParent, self.data()),
-                            $tr = self.element.find('tr.wijmo-wijgrid-row').eq(newParentIndex);
+                    if (data.success) {
+                        self.draggedIndex = false;
+                        if (self.dropTarget === 'in') {
+                            self._removeNode(dragNode);
+                            self._toggle(dropped, true);
+                        } else {
+                            var oldParent = self._getTreeNode(dragNode.treePath),
+                                newParent = self._getTreeNode(dropNode.treePath),
+                                newParentIndex = $.inArray(newParent, self.data()),
+                                $tr = self.element.find('tr.wijmo-wijgrid-row').eq(newParentIndex);
 
-                        self._removeNode(dragNode);
-                        delete oldParent.treeChilds[dragNode.treeHash];
-                        delete oldParent.treeChilds.length;
-                        oldParent.treeChilds = self._completeChilds(oldParent, oldParent.treeChilds);
-                        self._toggle($tr, true);
+                            self._removeNode(dragNode);
+                            delete oldParent.treeChilds[dragNode.treeHash];
+                            delete oldParent.treeChilds.length;
+                            oldParent.treeChilds = self._completeChilds(oldParent, oldParent.treeChilds);
+                            self._toggle($tr, true);
+                        }
+                    }
+                    if (data.error) {
+                        $nos.notify(data.error, 'error');
                     }
                 },
                 error : function(jqXHR, textStatus, errorThrown) {

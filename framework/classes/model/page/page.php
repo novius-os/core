@@ -175,11 +175,14 @@ class Model_Page_Page extends \Nos\Orm\Model {
         return array_keys(\Config::get('locales'));
     }
 
+    public function _event_after_change_parent() {
+
+        $parent = $this->find_parent();
+        $this->page_virtual_url = $parent !== null ? str_replace('.html', '', $parent->page_virtual_url).'/' : '';
+        $this->page_virtual_url .= $this->page_virtual_name.'.html';
+    }
+
 	public function _event_before_save() {
-        // New objects don't need to check if the virtual_name has changed
-        if ($this->is_new()) {
-            return;
-        }
 		$diff = $this->get_diff();
 
 		if (!empty($diff[0]['page_virtual_name'])) {
@@ -208,7 +211,7 @@ class Model_Page_Page extends \Nos\Orm\Model {
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
 		$content = '';
-		foreach (\Input::post('wysiwyg', array()) as $text) {
+		foreach ($this->wysiwygs as $text) {
 			$content .= $text;
 		}
 

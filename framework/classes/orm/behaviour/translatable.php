@@ -170,15 +170,25 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      */
     public function after_change_parent(\Nos\Orm\Model $object) {
 
+        static $in_progress = array();
+
+        // Prevents looping in the observer
+        $objects = $this->find_lang($object, 'all');
+        if (in_array($object->id, $in_progress)) {
+            return;
+        }
+        $in_progress = array_keys($objects);
+
         // This event has been sent from the tree behaviour, so we don't need to check it exists
         $new_parent = $object->find_parent();
 
-        foreach ($this->find_lang($object, 'all') as $item) {
+        foreach ($objects as $item) {
             $parent = $new_parent === null ? null : $new_parent->find_lang($item->get_lang());
-            $item->set_parent_no_observers($parent);
+            $item->set_parent($parent);
 
             $item->save();
         }
+        $in_progress = array();
     }
 
     /**
