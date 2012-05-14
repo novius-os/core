@@ -357,7 +357,6 @@ define('jquery-nos-thumbnailsgrid',
         _loadColour : function(container, colour) {
             var self = this;
 
-            log(colour);
             $(container)
                 .css('backgroundColor', colour);
 
