@@ -62,6 +62,7 @@
 		_createSelect: function () {
 			var self = this,
 				ele = self.element,
+            	// @todo : Fixed Novius OS
 				width = ele.outerWidth(),
 				eleWidth = width,
 			//height = ele.height(),
@@ -549,6 +550,7 @@
 				//execute refresh method at 2011/11/30
 				//containerWidth = self._listContainer.width();
 				self._selectWrap.removeClass("ui-helper-hidden");
+				// @todo : Fixed Novius OS
 				containerWidth = self.element.outerWidth();
 				containerWidth += parseInt(self._label.css("padding-left")
 				.replace(/px/, ""), 10);
