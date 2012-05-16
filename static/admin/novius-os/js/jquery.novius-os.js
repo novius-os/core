@@ -488,7 +488,7 @@ define('jquery-nos', [
                         },
                         $container = this.closest('.nos-dispatcher, body'),
                         self = this,
-                        $dialog = $('<div></div>').addClass('nos-dispatcher')
+                        $dialog = $nos('<div></div>').addClass('nos-dispatcher')
                             .appendTo($container);
 
                     $.extend(options, {
