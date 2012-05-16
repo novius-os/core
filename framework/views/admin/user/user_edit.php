@@ -39,27 +39,17 @@ foreach ($fieldset->field() as $field) {
 }
 ?>
 
-<div class="page line ui-widget  fill-parent" id="<?= $uniqid ?>">
-    <div style="margin-left: 4%; margin-right: 4%; height: 28px;">
-        <h1 class="title" style="float:left;"><?= $user->fullname(); ?></h1>
+<div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
+    <ul style="width: 15%;">
+        <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
+        <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
+    </ul>
+    <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
+        <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
     </div>
-	<? /*<div class="unit col c1"></div>
-	<div class="unit col c10" id="line_first" style="position:relative;"> */ ?>
-        <div class="tabs fill-parent" style="width: 92.4%; clear:both; margin:0 auto 1em;display:none;padding:0;">
-            <ul style="width: 15%;">
-                <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
-                <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
-            </ul>
-            <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
-                <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
-            </div>
-            <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
-               <?= $permissions ?>
-            </div>
-        </div>
-
-    <? /* </div>
-    <div class="unit lastUnit"></div> */ ?>
+    <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
+       <?= $permissions ?>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -70,16 +60,12 @@ foreach ($fieldset->field() as $field) {
     ], function($nos) {
         $nos(function() {
             var $container = $nos('#<?= $uniqid ?>');
-            var $tabs = $container.find('.tabs');
-            $tabs.css('display', 'block').onShow();
-            $tabs.wijtabs({
+            $container.css('display', 'block').onShow();
+            $container.wijtabs({
                 alignment: 'left'
             });
-            $tabs.find('> ul').css({
-                width : '15%'
-            });
 
-            $tabs.find('> div').addClass('fill-parent').css({
+            $container.find('> div').addClass('fill-parent').css({
                 left: '15%',
                 width : '85%'
             });

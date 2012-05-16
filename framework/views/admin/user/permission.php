@@ -9,14 +9,14 @@
  */
 
 ?>
-<div class="permissions" id="<?= $uniqid = uniqid('id_') ?>">
+<div class="nos-fixed-header ui-widget-content" style="z-index:100;right:20px;">
+    <?= render('form/action_or_cancel') ?>
+</div>
+
+<div class="permissions fill-parent" id="<?= $uniqid = uniqid('id_') ?>" style="overflow:auto;">
 
 <form action="admin/nos/user/form/save_permissions" method="POST">
   <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
-
-    <div class="actions_zone">
-        <?= render('form/action_or_cancel') ?>
-    </div>
 
 	<div class="applications">
 	    <div class="application all">
@@ -91,6 +91,8 @@ foreach ($apps as $app => $perms) {
 			    $items = $applications.find("div.item"),
 			    $checkboxes = $items.find(":checkbox"),
 			    $access_to_everything = $applications.find(":checkbox.access_to_everything");
+
+            $form.prev().form();
 
 		    $items.click(function() {
 	            var $checkbox = $nos(this).find('div.maincheck :checkbox');
