@@ -251,7 +251,7 @@
 
 			function makeItNice(ed) {
 
-				var $body = $(ed.getBody());
+                var $body = $(ed.getBody());
 				// Rebuilds the enhancer, as if we just inserted them (adds the action links like delete)
 				$body.find('.nosEnhancer, .nosEnhancerInline').each(function() {
 					var enhancer = $(this);
@@ -282,18 +282,32 @@
 				// Empty enhancer previews (data and useful informations are stored as html attributes on the higest div)
 				content.filter('.nosEnhancer, .nosEnhancerInline').empty();
 				content.find('.nosEnhancer, .nosEnhancerInline').empty();
+
+                // Replace image SRC
+				content.find('img').filter(function() {
+					return $(this).data('mediaId') || ($(this).data('media') || {}).id;
+				}).replaceWith(function() {
+					var $img = $(this);
+					var media = $img.data('media');
+                    var media_id = (media && media.id) ? media.id : $img.data('mediaId');
+					var src = 'nos://media/' + media_id;
+
+					if ($img.attr('width') && $img.attr('height')) {
+						src += '/' + $img.attr('width') + '/' + $img.attr('height');
+					}
+					return $('<img />').attr({
+                        'data-media-id': media_id,
+						src:    $img.attr('src'),
+						title:  $img.attr('title'),
+						alt:    $img.attr('alt'),
+						style:  $img.attr('style')
+					})
+				});
+
 				o.content = $('<div></div>').append(content).html();
 			});
 
 			ed.onSetContent.add(function(ed, o) {
-				var content = $(o.content);
-
-				content.find('img').filter(function() {
-					return $(this).data('media-id');
-				}).addClass('nosMedia');
-
-				o.content = $('<div></div>').append(content).html();
-
 				setTimeout(function() {
 					makeItNice(ed);
 				}, 1);
@@ -302,24 +316,24 @@
 			ed.onSaveContent.add(function(ed, o) {
 				var content = $(o.content);
 
-				content.find('img.nosMedia').replaceWith(function() {
+				content.find('img').filter(function() {
+					return $(this).data('mediaId') || ($(this).data('media') || {}).id;// || $(this).attr('src').substr(0, 12) == 'nos://media/';
+				}).replaceWith(function() {
 					var $img = $(this);
 					var media = $img.data('media');
-					var src = 'nos://media/';
-					if (media && media.id) {
-						src += media.id;
-					} else {
-						src += $img.data('media-id');
-					}
+                    var media_id = (media && media.id) ? media.id : $img.data('media-id');
+					var src = 'nos://media/' + media_id;
+
 					if ($img.attr('width') && $img.attr('height')) {
 						src += '/' + $img.attr('width') + '/' + $img.attr('height');
 					}
-					return $('<img />').attr({
+					var $new_img = $('<img />').attr({
 						src:    src,
 						title:  $img.attr('title'),
 						alt:    $img.attr('alt'),
 						style:  $img.attr('style')
-					})
+					});
+                    return $new_img;
 				});
 				o.content = $('<div></div>').append(content).html();
 			});
