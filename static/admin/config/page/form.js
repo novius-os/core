@@ -142,7 +142,7 @@ define([
             if (!text) {
                 return text;
             }
-            return text.replace(/ +/, '_');
+            return text.replace(/ +/, '-');
         }
 
         var $virtual_name  = $container.find('input[name=page_virtual_name]');
