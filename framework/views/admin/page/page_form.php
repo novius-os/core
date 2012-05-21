@@ -30,6 +30,14 @@ $fieldset->field('page_virtual_name')->set_template('{label}{required} <br /> <d
 
 $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} <br />$checkbox_menu {error_msg}</span>\n");
 
+$form_attributes = $fieldset->get_config('form_attributes');
+
+if (!isset($form_attributes['class'])) {
+    $form_attributes['class'] = '';
+}
+$form_attributes['class'] .= ' fill-parent';
+$fieldset->set_config('form_attributes', $form_attributes);
+
 ?>
 
 <?= $fieldset->open('admin/nos/page/page/form/'.($page->is_new() ? '' : '/'.$page->page_id)) ?>
@@ -103,6 +111,8 @@ $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_clas
 	}
 ?>
 			var $el = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
+            $el.addClass('fill-parent');
+            $el.css('overflow', 'auto');
 			$el.onShow('bind', function() {
 				$el.tab('update', tabInfos);
 			});

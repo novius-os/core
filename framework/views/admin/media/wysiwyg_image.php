@@ -206,7 +206,7 @@ require(['jquery-nos'], function($nos) {
 			if (media_id) {
 				$nos.ajax({
 					method: 'GET',
-					url: base_url + 'admin/media/info/media/' + media_id,
+					url: base_url + 'admin/nos/media/info/media/' + media_id,
 					dataType: 'json',
 					success: function(item) {
 						tinymce_image_select(item, $img);
@@ -223,7 +223,10 @@ require(['jquery-nos'], function($nos) {
 					var margin = $nos(ui.panel).outerHeight(true) - $nos(ui.panel).innerHeight();
 					$nos(ui.panel).height($dialog.height() - margin);
 				},
-				disabledIndexes: newimg ? [1] : []
+				disabledIndexes: newimg ? [1] : [],
+                show: function(e, ui) {
+                    $nos(ui.panel).onShow();
+                }
 			})
 			.find('.wijmo-wijtabs-content')
 			.css('width', '81%')
