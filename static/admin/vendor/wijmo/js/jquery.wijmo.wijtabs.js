@@ -953,6 +953,7 @@
 				 }
 			 });
 
+             // @todo : Fixed Novius OS
 			 var content = this.element.find('.wijmo-wijtabs-content');
 			 if (content.length) {
 				 content.replaceWith(content.contents());
