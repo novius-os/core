@@ -4,7 +4,7 @@
         $field = $fieldset->field($field_name);
         if (!empty($field)) {
             if (isset($callback)) {
-                $callback($field);
+                $callback($field_name);
             } else {
                 echo $field->build();
             }
