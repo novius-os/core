@@ -10,10 +10,10 @@
 
 return array(
 	'_root_' => 'nos/admin/noviusos/index',
-	'admin' => 'nos/admin/noviusos/index',
+	'^admin' => 'nos/admin/noviusos/index',
 
 	//'admin/nos/(:any)' => 'nos/$1',
-	'admin/(:segment)/(:any)' => '$1/admin/$2',
+	'^admin/(:segment)/(:any)' => '$1/admin/$2',
 	//'(:any)' => 'nos/admin/dispatch/$1',
 
 	'_404_' => null,

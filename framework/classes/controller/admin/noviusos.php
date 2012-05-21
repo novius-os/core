@@ -101,7 +101,7 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
 
         \Config::load('nos::admin/launchers_default', true);
         $launchers_default = \Config::get('nos::admin/launchers_default', array());
-        $launchers = array_merge($launchers, $launchers_default);
+		$launchers = array_merge($launchers, $launchers_default);
         //$app_installed = \Config::mergeWithUser('misc.apps', $app_installed);
 
         $apps = array();

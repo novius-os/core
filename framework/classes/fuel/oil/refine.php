@@ -36,7 +36,8 @@ class Refine extends Oil\Refine
         {
             try
             {
-                $path = \Fuel::add_module($module);
+	            \Module::load($module);
+                $path = \Module::exists($module);
                 \Finder::instance()->add_path($path);
             }
             catch (\FuelException $e)

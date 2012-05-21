@@ -40,7 +40,7 @@ class Finder extends Fuel\Core\Finder {
 		list($section,) = explode('/', $directory,  2);
 
 		// Do we need to override the default behaviour?
-		if ($file[0] === '/' or $file[1] === ':' or !in_array($section, array('views', 'config', 'lang'))) {
+		if ($file[0] === '/' or (isset($file[1]) and $file[1] === ':') or !in_array($section, array('views', 'config', 'lang'))) {
 			return parent::locate($directory, $file, $ext, $multiple, $cache);
 		}
 
@@ -70,14 +70,14 @@ class Finder extends Fuel\Core\Finder {
 			$file_no_ns     = $file;
 			$active_module  = $request ? $request->module : false;
 			if ($active_module) {
-				$namespace_path = \Autoloader::namespace_path(self::normalize_namespace($active_module));
+				$namespace_path = Module::exists($active_module);
 			}
 		} else {
 			$namespace         = self::normalize_namespace(mb_substr($file, 0, $is_namespaced));
 			$file_no_ns        = mb_substr($file, $is_namespaced + 2);
 			$active_module     = false;
-			\Fuel::add_module(mb_strtolower($namespace));
-			$namespace_path    = \Autoloader::namespace_path($namespace);
+			Module::load(mb_strtolower($namespace));
+			$namespace_path    = Module::exists(mb_strtolower($namespace));
 		}
 
 		$local_config_path = APPPATH.$directory.DS;
@@ -87,14 +87,9 @@ class Finder extends Fuel\Core\Finder {
 		if ($context == 'config.save') {
 			$search = array($local_config_path);
 		} else {
-
-			if ($active_module == 'nos' && $directory == 'views') {
-				$search[] = APPPATH.$directory.DS.'novius-os'.DS;
-			}
-
 			// -8 = strip the classes directory
 			if (!empty($namespace_path)) {
-				$search[] = mb_substr($namespace_path, 0, -8).$directory.DS;
+				$search[] = $namespace_path.$directory.DS;
 			}
 
 			if ($active_module && $active_module != 'nos') {

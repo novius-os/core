@@ -11,7 +11,7 @@
 /**
  * Set error reporting and display errors settings.  You will want to change these when in production.
  */
-error_reporting(E_ALL);
+error_reporting(-1);
 ini_set('display_errors', 1);
 
 define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
@@ -41,15 +41,15 @@ $response = Request::forge('nos/front/index', false)->execute()->response();
 // This will add the execution time and memory usage to the output.
 // Comment this out if you don't use it.
 $bm = Profiler::app_total();
-$response->body(str_replace(array('{exec_time}', '{mem_usage}'), array(round($bm[0], 4), round($bm[1] / pow(1024, 2), 3)), $response->body()));
+$response->body(
+	str_replace(
+		array('{exec_time}', '{mem_usage}'),
+		array(round($bm[0], 4), round($bm[1] / pow(1024, 2), 3)),
+		$response->body()
+	)
+);
 
 $response->send(true);
-
-// Fire off the shutdown event
-Event::shutdown();
-
-// Make sure everything is flushed to the browser
-ob_end_flush();
 
 if (!empty($_GET['testing'])) {
     $fp = fopen('/tmp/'.$_GET['testing'].'.log', 'a+');
