@@ -43,6 +43,8 @@ class Controller_Front extends Controller {
 	    // Strip out leading / and trailing .html
 	    $url = mb_substr(str_replace('.html', '', $_SERVER['REDIRECT_URL']), 1);
 
+        //print_r($_SERVER['REDIRECT_URL']);
+
         $this->is_preview = \Input::get('_preview', false);
 
         $cache_path = $url;
@@ -59,6 +61,7 @@ class Controller_Front extends Controller {
             $content = $publi_cache->execute($this);
         } catch (CacheNotFoundException $e) {
             $publi_cache->start();
+
 
 	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
 	        $url_enhanced = \Config::get("url_enhanced", array());
@@ -79,6 +82,7 @@ class Controller_Front extends Controller {
 			        } catch (\Exception $e) {
 				        // Cannot generate cache: fatal error...
 				        //@todo : cas de la page d'erreur
+
                         $_404 = true;
 				        exit($e->getMessage());
 			        }
@@ -89,12 +93,13 @@ class Controller_Front extends Controller {
 			        break;
 		        }
 	        }
+
 	        if ($_404) {
-                \Event::trigger('front.404NotFound', array('url' => $this->url));
-                if (!\Event::has_events('front.404NotFound')) {
-                    echo 404;
-                    $this->response->status = 404;
-                    //@todo : cas du 404 natif
+
+                if (!\Event::trigger('front.404NotFound', array('url' => $this->url))) {
+                    // If no redirection then we display 404
+                    $_SERVER['REDIRECT_URL'] = '/';
+                    return $this->router('index', $params);
                 }
 	        }
         }

@@ -149,8 +149,7 @@ class Model extends \Orm\Model {
 	 * @see \Orm\Model::__construct()
 	 */
 	public function __construct() {
-        $this->medias   = new Model_Media_Provider($this);
-        $this->wysiwygs = new Model_Wysiwyg_Provider($this);
+        $this->initProviders();
 		call_user_func_array('parent::__construct', func_get_args());
 	}
 
@@ -490,6 +489,30 @@ class Model extends \Orm\Model {
 
 		return $diff;
 	}
+
+    public function __clone() {
+        parent::__clone();
+        $wysiwygs = array();
+        $medias = array();
+        foreach ($this->wysiwygs as $key => $wysiwyg) {
+            $wysiwygs[$key] = $wysiwyg;
+        }
+        foreach ($this->medias as $key => $media) {
+            $medias[$key] = $media;
+        }
+        $this->initProviders();
+        foreach ($wysiwygs as $key => $wysiwyg) {
+            $this->wysiwygs->{$key} = $wysiwyg;
+        }
+        foreach ($medias as $key => $media) {
+            $this->medias->{$key} = $media;
+        }
+    }
+
+    protected function initProviders() {
+        $this->medias   = new Model_Media_Provider($this);
+        $this->wysiwygs = new Model_Wysiwyg_Provider($this);
+    }
 }
 
 
@@ -569,6 +592,10 @@ class Model_Media_Provider
 
     function valid() {
         return false !== current($this->iterator);
+    }
+
+    function setParent($obj) {
+        $this->parent = $obj;
     }
 }
 
