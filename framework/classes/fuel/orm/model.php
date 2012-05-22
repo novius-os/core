@@ -267,13 +267,7 @@ class Model extends \Orm\Model {
 	 */
 	public static function search($where, $order_by = array(), $options = array()) {
 
-		try {
-			static::_callAllBehaviours(get_called_class(), 'before_search', array(&$where, &$order_by, &$options));
-		} catch (\Exception $e) {
-			if ($e->getMessage() !== 'no behaviour') {
-				throw $e;
-			}
-		}
+		static::_callAllBehaviours(get_called_class(), 'before_search', array(&$where, &$order_by, &$options));
 
 		$options = \Arr::merge($options, array(
 			'where'    => $where,
