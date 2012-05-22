@@ -56,24 +56,24 @@ class Controller_Front extends Controller {
 
 		\Event::trigger('front.start');
 
-        $publi_cache = PubliCache::forge('pages'.DS.$cache_path);
+        $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
-            $content = $publi_cache->execute($this);
+            $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
-            $publi_cache->start();
+            $cache->start();
 
 	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
 	        $url_enhanced = \Config::get("url_enhanced", array());
 	        $url_enhanced[$url.'/'] = 0;
 
 	        $_404 = true;
-	        foreach ($url_enhanced as $tempurl => $page_id) {
-		        if (mb_substr($url.'/', 0, mb_strlen($tempurl)) === $tempurl) {
+	        foreach ($url_enhanced as $temp_url => $page_id) {
+		        if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
 			        $_404 = false;
-			        $this->pageUrl = $tempurl != '/' ? mb_substr($tempurl, 0, -1).'.html' : '';
-			        $this->enhancerUrlPath = $tempurl != '/' ? $tempurl : '';
-			        $this->enhancerUrl = ltrim(str_replace(mb_substr($tempurl, 0, -1), '', $url), '/');
+			        $this->pageUrl = $temp_url != '/' ? mb_substr($temp_url, 0, -1).'.html' : '';
+			        $this->enhancerUrlPath = $temp_url != '/' ? $temp_url : '';
+			        $this->enhancerUrl = ltrim(str_replace(mb_substr($temp_url, 0, -1), '', $url), '/');
 			        try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
@@ -87,8 +87,8 @@ class Controller_Front extends Controller {
 			        }
 
 		            echo $this->_view->render();
-			        $publi_cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
-			        $content = $publi_cache->execute();
+			        $cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
+			        $content = $cache->execute();
 			        break;
 		        }
 	        }
