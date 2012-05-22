@@ -42,7 +42,6 @@ if (!MBSTRING) {
     'Nos\Orm\Query'     => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'query.php',
 	'Nos\Orm\Model'     => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'model.php',
     'Str'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'str.php',
-    'Uri'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'uri.php',
 ));
 
 function __($_message, $default = null)

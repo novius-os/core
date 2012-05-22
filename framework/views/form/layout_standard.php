@@ -144,7 +144,7 @@ $large = !empty($large) && $large == true;
             <?php
             if (!empty($id)) {
                 $_id = $fieldset->field($id);
-                $_id = !empty($_id) ? $_id->get_value() : null;
+                $_id = !empty($_id) ? $_id->value : null;
                 $admin = __('Admin');
                 if (empty($_id)) {
                     // Nothing

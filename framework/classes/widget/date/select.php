@@ -90,14 +90,6 @@ class Widget_Date_Select extends \Fieldset_Field {
         }));
     }
 
-	/*
-	public function js_validation() {
-		return array(
-			 array('valid_date', array($this->name)),
-		);
-	}
-	*/
-
     protected static function _get_month_names() {
         static $months = null;
         empty($months) and $months = array(
