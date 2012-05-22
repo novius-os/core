@@ -124,7 +124,7 @@ class PubliCache {
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
-		\Nos::main_controller()->expires = \Date::forge($expires)->format("%H:%M:%S");;
+		\Nos\Nos::main_controller()->expires = \Date::forge($expires)->format("%H:%M:%S");;
     }
 
     public function save($duration = -1, $controller = null) {

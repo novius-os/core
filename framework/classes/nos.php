@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+namespace Nos;
+
 class Nos {
 
     /**
@@ -28,9 +30,9 @@ class Nos {
 
         if (!empty($rewrites)) {
             if (is_array($rewrites)) {
-                $rewrites[0] = Inflector::friendly_title($rewrites[0], '-', true);
+                $rewrites[0] = \Inflector::friendly_title($rewrites[0], '-', true);
                 if (!empty($rewrites[1])) {
-                    $rewrites[1] = Inflector::friendly_title($rewrites[1], '-', true);
+                    $rewrites[1] = \Inflector::friendly_title($rewrites[1], '-', true);
                 }
             } else {
                 $rewrites = array((string) $rewrites);
@@ -47,7 +49,7 @@ class Nos {
      * @return \Nos\Controller
      */
     public static function main_controller() {
-        return Request::main()->controller_instance;
+        return \Request::main()->controller_instance;
     }
 
     /**
@@ -77,14 +79,14 @@ class Nos {
 
         ob_start();
         try {
-            $request = Request::forge($where);
+            $request = \Request::forge($where);
 
 	        $response = $request->execute($args['args']);
             $cache_cleanup = $request->controller_instance->cache_cleanup;
 
             if (!empty($cache_cleanup)) {
                 \Fuel::$profiling && \Profiler::console($cache_cleanup);
-                Nos::main_controller()->cache_cleanup[] = $cache_cleanup;
+                static::main_controller()->cache_cleanup[] = $cache_cleanup;
             }
             echo $response;
             //echo $response->response();
@@ -93,7 +95,7 @@ class Nos {
             throw $e;
         } catch (\Exception $e) {
             $content = null;
-            \Fuel::$profiling && Console::logError($e, "HMVC request '$where' failed.");
+            \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
             if (\Fuel::$profiling) throw $e;
         }
         $content = ob_get_clean();
@@ -109,15 +111,15 @@ class Nos {
      */
     public static function parse_wysiwyg($content, $controller) {
 
-		Nos::_parse_enhancers($content, $controller);
-		Nos::_parse_medias($content);
-		Nos::_parse_internals($content);
+		static::_parse_enhancers($content, $controller);
+	    static::_parse_medias($content);
+	    static::_parse_internals($content);
 
 		$content = strtr($content, array(
-			'nos://anchor/' => \Nos::main_controller()->url,
+			'nos://anchor/' => static::main_controller()->url,
 		));
 
-		foreach(Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
+		foreach(\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
 			is_callable($c) && call_user_func_array($c, array(&$content));
 		}
 
@@ -128,7 +130,7 @@ class Nos {
         // Fetch the available functions
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
-        \Fuel::$profiling && Profiler::mark('Recherche des fonctions dans la page');
+        \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
 		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
         foreach ($matches[2] as $match_id => $fct_id) {
@@ -152,7 +154,7 @@ class Nos {
         // Check if the function exists
         $name   = $fct_id;
 
-        $config = Config::get("enhancers.$name", false);
+        $config = \Config::get("enhancers.$name", false);
         $found  = $config !== false;
 
 	    if (!empty($config['urlEnhancer'])) {
@@ -162,7 +164,7 @@ class Nos {
 		    );
 	    }
 
-        false && \Fuel::$profiling && Profiler::console(array(
+        false && \Fuel::$profiling && \Profiler::console(array(
             'function_id'   => $fct_id,
             'function_name' => $name,
             'controller'    => get_class($controller),
@@ -177,7 +179,7 @@ class Nos {
             }
         } else {
             $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$name.' not found in '.get_class($controller).'.' : '';
-            \Fuel::$profiling && Console::logError(new Exception(), 'Enhancer'.$name.' not found in '.get_class($controller).'.');
+            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$name.' not found in '.get_class($controller).'.');
         }
         return $function_content;
     }
@@ -192,7 +194,7 @@ class Nos {
 			{
 				$media_ids[] = $media_id;
 			}
-			$medias = Nos\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+			$medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
 			foreach ($matches[1] as $match_id => $media_id)
 			{
 				if (!empty($matches[3][$match_id])) {
@@ -215,7 +217,7 @@ class Nos {
 			{
 				$page_ids[] = $page_id;
 			}
-			$pages = Nos\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+			$pages = Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
 			foreach ($matches[1] as $match_id => $page_id)
 			{
 				$content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);
