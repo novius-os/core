@@ -69,7 +69,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
         if ($this->js_validation) {
             foreach ($this->fields as $f) {
 
-                $rules = $f->js_validation();
+                $rules = $f->rules;
 
                 if (empty($rules)) {
                     continue;
@@ -117,7 +117,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 	public function form_name($value) {
 		if ($field = $this->field('form_name')) {
-			return $field->get_value() == $value;
+			return $field->value == $value;
 		}
 		$this->add('form_name', '', array('type' => 'hidden', 'value' => $value));
 	}
@@ -128,7 +128,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 * @return  \Fuel\Core\Fieldset_Field
 	 */
 	public function add_field(\Fuel\Core\Fieldset_Field $field) {
-		$name = $field->get_name();
+		$name = $field->name;
 		if (empty($name))
 		{
 			throw new \InvalidArgumentException('Cannot create field without name.');
@@ -142,7 +142,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		}
 
 		// Make sure fieldset is current
-		if ($field->get_fieldset() != $this) {
+		if ($field->fieldset() != $this) {
 			\Error::notice('A field added through add() must have the correct parent fieldset.');
 			return false;
 		}
@@ -208,12 +208,12 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			{
 				$class = mb_strtolower(\Inflector::denamespace(get_class($f)));
 				if (mb_substr($class, 0, 6) == 'widget') {
-					$values[$f->name] = $f->get_value();
+					$values[$f->name] = $f->value;
 				}
             }
 			return $values;
 		}
-		return $this->field($name)->get_value();
+		return $this->field($name)->value;
 	}
 
 	/**

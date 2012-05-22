@@ -198,6 +198,43 @@ class Model extends \Orm\Model {
 		}
 	}
 
+	public function _update_original_relations($relations = null)
+	{
+		if (is_null($relations))
+		{
+			$this->_original_relations = array();
+			$relations = $this->_data_relations;
+		}
+		else
+		{
+			foreach ($relations as $key => $rel)
+			{
+				// Unload the just fetched relation from the originals
+				unset($this->_original_relations[$rel]);
+
+				// Unset the numeric key and set the data to update by the relation name
+				unset($relations[$key]);
+				$relations[$rel] = $this->_data_relations[$rel];
+			}
+		}
+
+		foreach ($relations as $rel => $data)
+		{
+			if (is_array($data))
+			{
+				$this->_original_relations[$rel] = array();
+				foreach ($data as $obj)
+				{
+					$this->_original_relations[$rel][] = $obj ? $obj->implode_pk($obj) : null;
+				}
+			}
+			else
+			{
+				$this->_original_relations[$rel] = $data ? $data->implode_pk($data) : null;
+			}
+		}
+	}
+
 	public static function add_properties($properties) {
 		static::$_properties = Arr::merge(static::$_properties, $properties);
 	}
@@ -450,40 +487,33 @@ class Model extends \Orm\Model {
 			$rel = static::relations($key);
 			if ($rel->singular)
 			{
-                if (isset($val)) {
-                    $new_pk = $val->implode_pk($val);
-                } else {
-                    $new_pk = null;
-                }
-				if ((! isset($this->_original_relations[$key]))
-					or $new_pk != $this->_original_relations[$key])
+				if (empty($this->_original_relations[$key]) !== empty($val)
+					or ( ! empty($this->_original_relations[$key])
+						and $new_pk = $val->implode_pk($val)
+						and $this->_original_relations[$key] !== $new_pk))
 				{
-
 					$diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
-					$diff[1][$key] = $new_pk;
+					$diff[1][$key] = isset($val) ? $new_pk : null;
 				}
 			}
 			else
 			{
-				// $this->_original_relations[$key] can be not set (case of children width page)
-				$original_pks = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : array();
+				$original_pks = $this->_original_relations[$key];
+				$new_pks = array();
 				foreach ($val as $v)
 				{
 					if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks))
 					{
-						$diff[0][$key] = null;
-						$diff[1][$key] = isset($diff[1][$key]) ? $diff[1][$key] + array($new_pk) : array($new_pk);
+						$new_pks[] = $new_pk;
 					}
 					else
 					{
 						$original_pks = array_diff($original_pks, array($new_pk));
 					}
 				}
-				if (count($original_pks)) {
-					$diff[0][$key] = $original_pks;
-					if (!isset($diff[1][$key])) {
-						$diff[1][$key] = null;
-					}
+				if ( ! empty($original_pks) or ! empty($new_pks)) {
+					$diff[0][$key] = empty($original_pks) ? null : $original_pks;
+					$diff[1][$key] = empty($new_pks) ? null : $new_pks;
 				}
 			}
 		}

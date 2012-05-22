@@ -39,12 +39,12 @@ class Widget_Page_Selector extends \Fieldset_Field {
      * @return type
      */
     public function build() {
-		$page_id = $this->get_value();
+		$page_id = $this->value;
         return $this->template((string) \Request::forge('nos/admin/page/inspector/page/list')->execute(array('inspector/modeltree_radio', array(
 	        'params' => array(
 		        'treeUrl' => 'admin/nos/page/inspector/page/json',
 		        'reloadEvent' => 'nos_page',
-	            'input_name' => $this->get_name(),
+	            'input_name' => $this->name,
 	            'selected' => array(
 		            'id' => $page_id,
 		            'model' => 'Nos\\Model_Page',
