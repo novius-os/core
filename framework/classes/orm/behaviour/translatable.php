@@ -332,15 +332,19 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         return $data;
     }
 
-    public function before_search(&$where, &$order_by = array(), &$options = array()) {
-        foreach ($where as $k => $w) {
-            if ($w[0] == 'lang_main') {
-                if ($w[1] == true) {
-                    $where[$k] = array($this->_properties['single_id_property'], 'IS NOT', null);
-                } else if ($w[1] == false) {
-                    $where[$k] = array($this->_properties['single_id_property'], 'IS', null);
-                }
-            }
-        }
-    }
+	public function before_find(&$id, &$options) {
+		if (array_key_exists('where', $options)) {
+			$where = $options['where'];
+			foreach ($where as $k => $w) {
+				if ($w[0] == 'lang_main') {
+					if ($w[1] == true) {
+						$where[$k] = array($this->_properties['single_id_property'], 'IS NOT', null);
+					} else if ($w[1] == false) {
+						$where[$k] = array($this->_properties['single_id_property'], 'IS', null);
+					}
+				}
+			}
+			$options['where'] = $where;
+		}
+	}
 }

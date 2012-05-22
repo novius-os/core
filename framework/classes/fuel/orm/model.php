@@ -257,23 +257,11 @@ class Model extends \Orm\Model {
         } catch (\Exception $e) {}
     }
 
-	/**
-	 * Alias to Model:find('all')
-	 *
-	 * @param  array  $where
-	 * @param  array  $order_by
-	 * @param  array  $options   Additional options to pass on to the ::find() method
-	 * @return array
-	 */
-	public static function search($where, $order_by = array(), $options = array()) {
+	public static function find($id = null, array $options = array()) {
 
-		static::_callAllBehaviours(get_called_class(), 'before_search', array(&$where, &$order_by, &$options));
+		static::_callAllBehaviours(get_called_class(), 'before_find', array(&$id, &$options));
 
-		$options = \Arr::merge($options, array(
-			'where'    => $where,
-			'order_by' => $order_by,
-		));
-		return static::find('all', $options);
+		return parent::find($id, $options);
 	}
 
 	/**
