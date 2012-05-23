@@ -10,28 +10,17 @@
 
 namespace Nos;
 
-class Widget_Date_Picker extends \Fieldset_Field {
+class Widget_Time_Picker extends \Fieldset_Field {
 
 	protected $options = array(
-		'showOn'            => 'both',
-		'buttonImage'       => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
-		'buttonImageOnly'   => true,
-		'autoSize'          => true,
-		'dateFormat'        => 'yy-mm-dd',
-		'showButtonPanel'   => true,
-		'changeMonth'       => true,
-		'changeYear'        => true,
-		'showOtherMonths'   => true,
-		'selectOtherMonths' => true,
-		'gotoCurrent'       => true,
-		'firstDay'          => 1,
-		'showAnim'          => 'slideDown',
-	);
+        'timeFormat' => 'hh:mm',
+        'separator' => ' ',
+    );
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset) {
 
         $attributes['type']  = 'text';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' datepicker';
+		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' timepicker';
 
 		if (empty($attributes['id'])) {
 			$attributes['id'] = uniqid('date_');
@@ -42,7 +31,7 @@ class Widget_Date_Picker extends \Fieldset_Field {
 		unset($attributes['widget_options']);
 
         if (empty($attributes['size'])) {
-            $attributes['size'] = 9;
+            $attributes['size'] = 5;
         }
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
@@ -57,7 +46,7 @@ class Widget_Date_Picker extends \Fieldset_Field {
 
 	    $this->fieldset()->append($this->js_init());
 
-		$this->set_attribute('data-datepicker-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+		$this->set_attribute('data-timepicker-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
         return (string) parent::build();
     }
 
@@ -66,11 +55,13 @@ class Widget_Date_Picker extends \Fieldset_Field {
 		return <<<JS
 <script type="text/javascript">
 	require([
-		'jquery-nos'
+		'jquery-nos',
+        'static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon',
+        'link!static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon.css',
 	], function( \$nos, undefined ) {
 		\$nos(function() {
 			var \$input = \$nos('input#$id');
-			\$input.datepicker(\$input.data('datepicker-options'));
+			\$input.timepicker(\$input.data('timepicker-options'));
 		});
 	});
 </script>
@@ -78,3 +69,4 @@ JS;
 	}
 
 }
+
