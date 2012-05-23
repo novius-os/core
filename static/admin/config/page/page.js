@@ -60,9 +60,9 @@ define([
                 adds: {
                     page : {
                         label : appDesk.i18n('Add a page'),
-                        action : function(ui) {
+                        action : function(ui, appdesk) {
                             $nos(ui).tab('add', {
-                                url: 'admin/nos/page/page/crud',
+                                url: 'admin/nos/page/page/crud?lang=' + appdesk.lang,
                                 title: appDesk.i18n('Add a page')._()
                             });
                         }
