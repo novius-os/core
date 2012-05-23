@@ -41,7 +41,11 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
-	    $url = mb_substr(str_replace('.html', '', $_SERVER['REDIRECT_URL']), 1);
+	    $this->url = mb_substr($_SERVER['REDIRECT_URL'], 1);
+	    $url = str_replace('.html', '', $this->url);
+	    $this->url = \URI::base().$this->url;
+
+        //print_r($_SERVER['REDIRECT_URL']);
 
         $this->is_preview = \Input::get('_preview', false);
 
@@ -60,6 +64,7 @@ class Controller_Front extends Controller {
         } catch (CacheNotFoundException $e) {
             $publi_cache->start();
 
+
 	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
 	        $url_enhanced = \Config::get("url_enhanced", array());
 	        $url_enhanced[$url.'/'] = 0;
@@ -68,7 +73,7 @@ class Controller_Front extends Controller {
 	        foreach ($url_enhanced as $tempurl => $page_id) {
 		        if (mb_substr($url.'/', 0, mb_strlen($tempurl)) === $tempurl) {
 			        $_404 = false;
-			        $this->url = $tempurl != '/' ? mb_substr($tempurl, 0, -1) : '';
+			        $this->pageUrl = $tempurl != '/' ? mb_substr($tempurl, 0, -1).'.html' : '';
 			        $this->enhancerUrlPath = $tempurl != '/' ? $tempurl : '';
 			        $this->enhancerUrl = ltrim(str_replace(mb_substr($tempurl, 0, -1), '', $url), '/');
 			        try {
@@ -79,6 +84,7 @@ class Controller_Front extends Controller {
 			        } catch (\Exception $e) {
 				        // Cannot generate cache: fatal error...
 				        //@todo : cas de la page d'erreur
+
                         $_404 = true;
 				        exit($e->getMessage());
 			        }
@@ -89,12 +95,12 @@ class Controller_Front extends Controller {
 			        break;
 		        }
 	        }
+
 	        if ($_404) {
-                \Event::trigger('front.404NotFound', array('url' => $this->url));
-                if (!\Event::has_events('front.404NotFound')) {
-                    echo 404;
-                    $this->response->status = 404;
-                    //@todo : cas du 404 natif
+                if (!\Event::trigger('front.404NotFound', array('url' => $this->pageUrl))) {
+                    // If no redirection then we display 404
+                    $_SERVER['REDIRECT_URL'] = '/';
+                    return $this->router('index', $params);
                 }
 	        }
         }
@@ -155,7 +161,7 @@ class Controller_Front extends Controller {
 
         // Scan all wysiwyg
         foreach ($this->template['layout'] as $wysiwyg_name => $layout) {
-            $content = \Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
+            $content = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
 
             $this->page_title = $this->page->page_title;
 
@@ -171,10 +177,10 @@ class Controller_Front extends Controller {
         if (!$this->is_preview) {
             $where[] = array('page_published', 1);
         }
-        if (empty($this->url)) {
+        if (empty($this->pageUrl)) {
             $where[] = array('page_entrance', 1);
         } else {
-            $where[] = array('page_virtual_url', $this->url.'.html');
+            $where[] = array('page_virtual_url', $this->pageUrl);
             //$where[] = array('page_parent_id', 'IS NOT', null);
         }
 

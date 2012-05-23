@@ -15,6 +15,7 @@ use Event;
 class Controller extends Controller_Extendable {
 
     public $url;
+	public $pageUrl;
 	public $enhancerUrl;
 	public $enhancerUrlPath;
 

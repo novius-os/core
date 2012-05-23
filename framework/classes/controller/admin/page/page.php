@@ -16,7 +16,7 @@ class Controller_Admin_Page_Page extends Controller {
         $page = $id === null ? null : Model_Page::find($id);
 	    return \View::forge('nos::form/layout_languages', array(
 		    'item' => $page,
-		    'selected_lang' => $page === null ? null : $page->get_lang(),
+		    'selected_lang' => \Input::get('lang', $page === null ? null : $page->get_lang()),
 		    'url_blank_slate' => 'admin/nos/page/page/blank_slate',
 		    'url_form' => 'admin/nos/page/page/form',
 	    ), false);

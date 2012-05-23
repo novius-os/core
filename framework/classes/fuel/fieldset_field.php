@@ -36,22 +36,6 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
         }
     }
 
-    public function get_fieldset() {
-        return $this->fieldset;
-    }
-
-    public function get_name() {
-        return $this->name;
-    }
-
-    public function get_value() {
-        return $this->value;
-    }
-
-	public function js_validation() {
-		return $this->rules;
-	}
-
     public function generate_auto_id() {
         $form = $this->fieldset()->form();
         if ($form->get_config('auto_id', false) === true and $this->get_attribute('id') == '')
