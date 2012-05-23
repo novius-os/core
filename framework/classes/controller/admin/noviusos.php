@@ -116,7 +116,6 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
         }
         if (count($apps) > 0) {
             $apps = \Arr::sort($apps, 'order', 'asc');
-
         }
 
         //\Debug::dump($apps);
