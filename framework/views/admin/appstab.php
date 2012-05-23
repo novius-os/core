@@ -18,7 +18,7 @@ require(['jquery-nos'], function($nos) {
             update: function() {
                 var orders = {};
                 $nos('.app').each(function(i) {
-                    orders[$nos(this).data('key')] = {order: i};
+                    orders[$nos(this).data('launcher').key] = {order: i};
                 });
                 $nos(apps).xhr('saveUserConfig', 'misc.apps', orders);
             }

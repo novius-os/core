@@ -102,7 +102,7 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
         \Config::load('nos::admin/launchers_default', true);
         $launchers_default = \Config::get('nos::admin/launchers_default', array());
 		$launchers = array_merge($launchers, $launchers_default);
-        //$app_installed = \Config::mergeWithUser('misc.apps', $app_installed);
+        $launchers = \Config::mergeWithUser('misc.apps', $launchers);
 
         $apps = array();
         foreach ($launchers as $key => $app) {
@@ -116,6 +116,7 @@ class Controller_Admin_Noviusos extends Controller_Template_Extendable {
         }
         if (count($apps) > 0) {
             $apps = \Arr::sort($apps, 'order', 'asc');
+
         }
 
         //\Debug::dump($apps);
