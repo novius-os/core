@@ -97,8 +97,7 @@ class Controller_Front extends Controller {
 	        }
 
 	        if ($_404) {
-
-                if (!\Event::trigger('front.404NotFound', array('url' => $this->url))) {
+                if (!\Event::trigger('front.404NotFound', array('url' => $this->pageUrl))) {
                     // If no redirection then we display 404
                     $_SERVER['REDIRECT_URL'] = '/';
                     return $this->router('index', $params);

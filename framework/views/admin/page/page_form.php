@@ -100,7 +100,7 @@ $fieldset->set_config('form_attributes', $form_attributes);
 ?>
 			tabInfos.actions = [
 				{
-					label : <?= json_encode(_('Visualise')) ?>,
+					label : <?= json_encode(__('Visualise')) ?>,
 					click : function() {
 						window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
 					},
