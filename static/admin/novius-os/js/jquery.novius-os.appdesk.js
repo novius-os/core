@@ -278,7 +278,7 @@ define('jquery-nos-appdesk',
             }
 
             //self.uiLangsDropDown = $('<select></select>').appendTo(self.uiLangsDropDownContainer);
-            if (o.selectedLang.length && o.selectedLang.length == 0) {
+            if ((o.selectedLang || {}).length && o.selectedLang.length == 0) {
                 var first = true;
                 $.each(o.locales, function(key, locale) {
                     if (first) {
