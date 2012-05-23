@@ -41,6 +41,10 @@ class Widget_Date_Picker extends \Fieldset_Field {
 		}
 		unset($attributes['widget_options']);
 
+        if (empty($attributes['size'])) {
+            $attributes['size'] = 9;
+        }
+
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
