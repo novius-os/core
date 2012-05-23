@@ -30,7 +30,9 @@ if (!MBSTRING) {
 	'Fieldset'          => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset.php',
 	'Fieldset_Field'    => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'fieldset_field.php',
 	'Response'          => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'response.php',
-    'Arr'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'arr.php',
+	'Module'            => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'module.php',
+	'ModuleNotFoundException' => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'module.php',
+	'Arr'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'arr.php',
     'Generate'          => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'generate.php',
     'Command'           => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'command.php',
     'Nos\Oil\Console'   => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'oil'.DIRECTORY_SEPARATOR.'console.php',
@@ -40,7 +42,6 @@ if (!MBSTRING) {
     'Nos\Orm\Query'     => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'query.php',
 	'Nos\Orm\Model'     => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'orm'.DIRECTORY_SEPARATOR.'model.php',
     'Str'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'str.php',
-    'Uri'               => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR.'uri.php',
 ));
 
 function __($_message, $default = null)
@@ -68,6 +69,7 @@ Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOP
 spl_autoload_register(function($class) {
 	$class = ltrim($class, '\\');
 	list($application, $whatever) = explode('\\', $class.'\\');
+	// can not use Inflector::words_to_upper because is not loaded
 	$application = explode('_', $application);
 	foreach ($application as &$part) {
 		$part = ucfirst($part);
@@ -94,8 +96,15 @@ $config_app    = include(APPPATH.'config/config.php');
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
 
-Autoloader::add_namespace('Nos', NOSPATH.'classes'.DS);
-Autoloader::add_namespace('App', APPPATH.'classes'.DS);
+Module::load('nos', NOSPATH);
+
+define('URL_ADMIN', Uri::base(false).'admin/');
+define('PHP_BEGIN', '<?php ');
+define('PHP_END', ' ?>');
+Module::load('app', APPPATH);
+
+//Autoloader::add_namespace('Nos', NOSPATH.'classes'.DS);
+//Autoloader::add_namespace('App', APPPATH.'classes'.DS);
 
 Config::load('namespaces', true);
 
@@ -104,17 +113,6 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 }
 
 chdir(DOCROOT);
-
-define('URL_ADMIN', Uri::base(false).'admin/');
-define('PHP_BEGIN', '<?php ');
-define('PHP_END', ' ?>');
-
-require_once NOSPATH.'classes'.DS.'nos.php';
-
-// Site bootstrap
-if (is_file(APPPATH.'bootstrap.php')) {
-	require_once APPPATH.'bootstrap.php';
-}
 
 define('CACHE_DURATION_PAGE',     5);
 define('CACHE_DURATION_FUNCTION', 10);

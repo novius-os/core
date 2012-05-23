@@ -46,7 +46,7 @@ class Widget_Media extends \Fieldset_Field {
         parent::build();
 
 		$this->fieldset()->append($this->js_init());
-		$media_id = $this->get_value();
+		$media_id = $this->value;
 		if (!empty($media_id)) {
 			$media = \Nos\Model_Media::find($media_id);
 			if (!empty($media)) {
