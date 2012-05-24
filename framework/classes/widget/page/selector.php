@@ -10,56 +10,58 @@
 
 namespace Nos;
 
-class Widget_Page_Selector extends \Fieldset_Field {
+class Widget_Page_Selector extends \Nos\Widget_Selector {
 
-	protected $widget_options = array();
+    public function before_construct(&$attributes, &$rules) {
+        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' nos-page';
 
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
-
-		//$attributes['type']   = 'hidden';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' nos-page';
-
-		if (empty($attributes['id'])) {
-			$attributes['id'] = uniqid('page_');
-		}
-		if (!empty($attributes['widget_options'])) {
-			$this->set_widget_options($attributes['widget_options']);
-		}
-		unset($attributes['widget_options']);
-
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
+        if (empty($attributes['id'])) {
+            $attributes['id'] = uniqid('page_');
+        }
     }
 
-    public function set_widget_options(array $options) {
-        $this->widget_options = \Arr::merge($this->widget_options, $options);
-    }
-
-    /**
-     * How to display the field
-     * @return type
-     */
     public function build() {
-		$page_id = $this->value;
-        return $this->template((string) \Request::forge('nos/admin/page/inspector/page/list')->execute(array('inspector/modeltree_radio', array(
-	        'params' => array(
-		        'treeUrl' => 'admin/nos/page/inspector/page/json',
-		        'reloadEvent' => 'nos_page',
-	            'input_name' => $this->name,
-	            'selected' => array(
-		            'id' => $page_id,
-		            'model' => 'Nos\\Model_Page',
-	            ),
-		        'columns' => array(
-			        array(
-				        'dataKey' => 'title',
-			        )
-		        ),
-                'treeOptions' => array(
-                    'lang' => \Arr::get($this->widget_options, 'lang', null)
-                ),
-		        'height' => \Arr::get($this->widget_options, 'height', '150px'),
-		        'width' => \Arr::get($this->widget_options, 'width', null),
-		    ),
-        )))->response());
+        return $this->template(static::widget(array(
+            'input_name' => $this->name,
+            'selected' => array(
+                'id' => $this->value,
+            ),
+            'treeOptions' => array(
+                'lang' => \Arr::get($this->widget_options, 'lang', null),
+            ),
+            'height' => \Arr::get($this->widget_options, 'height', '150px'),
+            'width' => \Arr::get($this->widget_options, 'width', null),
+        )));
+    }
+
+    public static function widget($options = array()) {
+        $options = \Arr::merge(array(
+            'treeUrl' => 'admin/nos/page/inspector/page/json',
+            'reloadEvent' => 'nos_page',
+            'input_name' => null,
+            'selected' => array(
+                'id' => null,
+                'model' => 'Nos\\Model_Page',
+            ),
+            'columns' => array(
+                array(
+                    'dataKey' => 'title',
+                )
+            ),
+            'treeOptions' => array(
+                'lang' => null
+            ),
+            'height' => '150px',
+            'width' => null,
+        ), $options);
+
+        return (string) \Request::forge('nos/admin/page/inspector/page/list')->execute(
+            array(
+                'inspector/modeltree_radio',
+                array(
+                    'params' => $options,
+                )
+            )
+        )->response();
     }
 }
