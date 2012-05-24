@@ -203,13 +203,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	public function value($name = null) {
 		if ($name === null)
 		{
-            $values = \Input::post();
+            $values = array();
             foreach ($this->fields as $f)
 			{
-				$class = mb_strtolower(\Inflector::denamespace(get_class($f)));
-				if (mb_substr($class, 0, 6) == 'widget') {
-					$values[$f->name] = $f->value;
-				}
+                $values[$f->name] = $f->value;
             }
 			return $values;
 		}
@@ -424,8 +421,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
         foreach ($this->fields as $k => $f) {
             $populateCallback = \Arr::get($this->config_used, "$k.populate");
             if ($populateCallback && is_callable($populateCallback)) {
-                $field = call_user_func($populateCallback, $instance);
-                $populate[$k] = $field;
+                $populate[$k] = call_user_func($populateCallback, $instance);
                 continue;
             }
 

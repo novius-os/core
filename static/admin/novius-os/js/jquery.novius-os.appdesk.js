@@ -231,7 +231,9 @@ define('jquery-nos-appdesk',
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     if ($.isFunction(first.action)) {
-                        first.action($(this));
+                        first.action($(this), {
+                            lang: o.selectedLang
+                        });
                     } else {
                         $nos(this).tab('add', {
                             iframe : true,
@@ -250,7 +252,9 @@ define('jquery-nos-appdesk',
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         if ($.isFunction(add.action)) {
-                            add.action($(this));
+                            add.action($(this), {
+                                lang: o.selectedLang
+                            });
                         } else {
                             $nos(this).tab('add', {
                                 iframe : true,
@@ -274,7 +278,7 @@ define('jquery-nos-appdesk',
             }
 
             //self.uiLangsDropDown = $('<select></select>').appendTo(self.uiLangsDropDownContainer);
-            if (o.selectedLang.length && o.selectedLang.length == 0) {
+            if ((o.selectedLang || {}).length && o.selectedLang.length == 0) {
                 var first = true;
                 $.each(o.locales, function(key, locale) {
                     if (first) {
@@ -309,7 +313,9 @@ define('jquery-nos-appdesk',
                 self.gridReload();
                 self.dispatcher.data('nosLang', o.selectedLang)
                     .trigger('langChange');
-            }).trigger('change');
+            }).filter(function() {
+                return $(this).val() == o.selectedlang;
+            });
 
             return self;
         },

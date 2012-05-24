@@ -12,6 +12,8 @@
 /**
  * Set error reporting and display errors settings.  You will want to change these when in production.
  */
+
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -28,6 +30,8 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Boot the app
 require_once NOSPATH.'bootstrap.php';
+
+
 
 $resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $_SERVER['REDIRECT_URL'], $m);
 
@@ -99,10 +103,12 @@ if (false !== $send_file && is_file($send_file)) {
     Nos\Tools_File::send($send_file);
 }
 
-// TODO header 404
 // real 404
+$response = Request::forge('nos/front/index', false)->execute()->response();
+$response->send(true);
 
-
+header('HTTP/1.0 404 Ok');
+header('HTTP/1.1 404 Ok');
 
 // Fire off the shutdown event
 Event::shutdown();

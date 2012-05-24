@@ -15,14 +15,18 @@
         <?php
         $locales = Config::get('locales', array());
         $selected_index = 0;
+        $i = 0;
         if ($item === null) {
             foreach ($locales as $locale => $text) {
+                if ($locale == $selected_lang) {
+                    $selected_index = $i;
+                }
                 echo '<li style="text-align: center;"><a href="'.$url_blank_slate.'?lang='.$locale.'">'.Nos\Helper::flag($locale).'</a></li>';
+                $i++;
             }
         } else {
             $main_lang = $item->find_main_lang();
             $possible  = $main_lang->get_possible_lang();
-            $i = 0;
             foreach ($possible as $locale) {
                 if ($locale == $selected_lang) {
                     $selected_index = $i;
