@@ -589,6 +589,18 @@ define('jquery-nos', [
             this.closest('.nos-dispatcher, body').on(event, callback);
         },
 
+        refreshNosPanel : function () { //@todo : see where it can be moved
+            $.ajax({
+                url: '/admin/nos/noviusos/appstab',
+                success: function(data) {
+                    var $panelContent = $('#noviusospanel > .nos-ostabs-panel-content');
+                    if ($panelContent.length) {
+                        $panelContent.html(data);
+                    }
+                }
+            });
+        },
+
         tab : function() {
             var args = Array.prototype.slice.call(arguments),
                 method = 'open',

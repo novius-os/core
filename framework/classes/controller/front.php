@@ -30,7 +30,8 @@ class Controller_Front extends Controller {
     public $raw_css    = array();
     public $raw_js     = array();
 
-    public $page_title       = '';
+	public $base_href        = '';
+	public $page_title       = '';
     public $meta_description = '';
     public $meta_keywords    = '';
     public $meta_robots      = 'index,follow';
@@ -41,9 +42,9 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
+	    $this->base_href = \URI::base();
 	    $this->url = mb_substr($_SERVER['REDIRECT_URL'], 1);
 	    $url = str_replace('.html', '', $this->url);
-	    $this->url = \URI::base().$this->url;
 
         //print_r($_SERVER['REDIRECT_URL']);
 
@@ -57,12 +58,12 @@ class Controller_Front extends Controller {
 
 		\Event::trigger('front.start');
 
-        $publi_cache = PubliCache::forge('pages'.DS.$cache_path);
+        $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
-            $content = $publi_cache->execute($this);
+            $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
-            $publi_cache->start();
+            $cache->start();
 
 
 	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
@@ -70,12 +71,12 @@ class Controller_Front extends Controller {
 	        $url_enhanced[$url.'/'] = 0;
 
 	        $_404 = true;
-	        foreach ($url_enhanced as $tempurl => $page_id) {
-		        if (mb_substr($url.'/', 0, mb_strlen($tempurl)) === $tempurl) {
+	        foreach ($url_enhanced as $temp_url => $page_id) {
+		        if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
 			        $_404 = false;
-			        $this->pageUrl = $tempurl != '/' ? mb_substr($tempurl, 0, -1).'.html' : '';
-			        $this->enhancerUrlPath = $tempurl != '/' ? $tempurl : '';
-			        $this->enhancerUrl = ltrim(str_replace(mb_substr($tempurl, 0, -1), '', $url), '/');
+			        $this->pageUrl = $temp_url != '/' ? mb_substr($temp_url, 0, -1).'.html' : '';
+			        $this->enhancerUrlPath = $temp_url != '/' ? $temp_url : '';
+			        $this->enhancerUrl = ltrim(str_replace(mb_substr($temp_url, 0, -1), '', $url), '/');
 			        try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
@@ -90,8 +91,8 @@ class Controller_Front extends Controller {
 			        }
 
 		            echo $this->_view->render();
-			        $publi_cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
-			        $content = $publi_cache->execute();
+			        $cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
+			        $content = $cache->execute();
 			        break;
 		        }
 	        }
@@ -113,22 +114,42 @@ class Controller_Front extends Controller {
     }
 
     protected function _handle_head(&$content) {
-        $head = array();
+	    $replaces  = array(
+		    'base_href'         => array(
+			    'pattern' => '/<base [^>]*\/?>/iu',
+			    'replace' => '<base href="content" />',
+		    ),
+		    'page_title'        => array(
+			    'pattern' => '/<title>[^<]*<\/title>/iu',
+			    'replace' => '<title>content</title>',
+		    ),
+		    'meta_description'  => array(
+			    'pattern' => '/<meta [^>]*name=\"?description[^>]*\"? *\/?>/iu',
+			    'replace' => '<meta name="description" content="content">',
+		    ),
+		    'meta_keywords'     => array(
+			    'pattern' => '/<meta [^>]*name=\"?keywords[^>]*\"? *\/?>/iu',
+			    'replace' => '<meta name="keywords" content="content">',
+		    ),
+		    'meta_robots'       => array(
+			    'pattern' => '/<meta [^>]*name=\"?robots[^>]*\"? *\/?>/iu',
+			    'replace' => '<meta name="robots" content="content">',
+		    ),
+	    );
+	    $begin_head = '';
+	    foreach ($replaces as $prop => $replace) {
+		    if (!empty($this->{$prop})) {
+			    $content = preg_replace($replace['pattern'], str_replace('content', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']), $content, -1, $count);
+			    if (!$count) {
+				    $begin_head .= "\n".preg_replace('/content/iu', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']);
+			    }
+		    }
+	    }
+	    if ($begin_head) {
+		    $content = preg_replace('/<head>/ui', '<head>'.$begin_head."\n", $content);
+	    }
 
-        if (!empty($this->page_title)) {
-            $head[] = '<title>'.$this->page_title.'</title>';
-			//$content = str_ireplace('<head>', '<head><title>'.$this->page_title.'</title>', $content);
-        }
-
-        if (!empty($this->meta_robots)) {
-            $head[] = '<meta name="robots" content="'.$this->meta_robots.'">';
-        }
-        if (!empty($this->meta_keywords)) {
-            $head[] = '<meta name="keywords" content="'.$this->meta_keywords.'">';
-        }
-        if (!empty($this->meta_description)) {
-            $head[] = '<meta name="description" content="'.$this->meta_description.'">';
-        }
+	    $head = array();
 
         foreach ($this->assets_css as $css) {
             $head[] = '<link href="'.$css.'" rel="stylesheet" type="text/css">';

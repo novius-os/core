@@ -57,18 +57,22 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         // @todo publication start / end
 	}
 
-	public function before_search(&$where, &$order_by = array(), &$options = array()) {
-		foreach ($where as $k => $w) {
-			if ($w[0] == 'published') {
-                $bool = $this->_properties['publication_bool_property'];
-				if ($w[1] === true) {
-					$where[$k] = array($bool, 1);
-				} else if ($w[1] === false) {
-					$where[$k] = array($bool, 0);
-				} else {
-                    unset($where[$k]);
-                }
+	public function before_query(&$options) {
+		if (array_key_exists('where', $options)) {
+			$where = $options['where'];
+			foreach ($where as $k => $w) {
+				if ($w[0] == 'published') {
+                    $bool = $this->_properties['publication_bool_property'];
+					if ($w[1] === true) {
+						$where[$k] = array($bool, 1);
+					} else if ($w[1] === false) {
+						$where[$k] = array($bool, 0);
+					} else {
+						unset($where[$k]);
+					}
+				}
 			}
+			$options['where'] = $where;
 		}
 	}
 

@@ -10,48 +10,67 @@
 
 namespace Nos;
 
-class Widget_Media_Folder extends \Fieldset_Field {
+class Widget_Media_Folder extends \Nos\Widget_Selector {
 
-	protected $options = array();
 
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
+    public function before_construct(&$attributes, &$rules) {
+        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' media';
 
-		//$attributes['type']   = 'hidden';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' media';
+        if (empty($attributes['id'])) {
+            $attributes['id'] = uniqid('media_');
+        }
+    }
 
-		if (empty($attributes['id'])) {
-			$attributes['id'] = uniqid('media_');
-		}
-		if (!empty($attributes['widget_options'])) {
-			$this->options = \Arr::merge($this->options, $attributes['widget_options']);
-		}
-		unset($attributes['widget_options']);
-
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
+    public function build() {
+        return $this->template(static::widget(array(
+            'input_name' => $this->name,
+            'selected' => array(
+                'id' => $this->value,
+            ),
+            'treeOptions' => array(
+                'lang' => \Arr::get($this->widget_options, 'lang', null),
+            ),
+            'height' => \Arr::get($this->widget_options, 'height', '150px'),
+            'width' => \Arr::get($this->widget_options, 'width', null),
+        )));
     }
 
     /**
-     * How to display the field
-     * @return type
+     * Construct the radio selector widget
+     * When using a fieldset,
+     * build() method should be overwritten to call the template() method on widget() response
+     * @static
+     * @abstract
+     * @param array $options
      */
-    public function build() {
-		$folder_id = $this->value;
-        return $this->template((string) \Request::forge('nos/admin/media/inspector/folder/list')->execute(array('inspector/modeltree_radio', array(
-	        'params' => array(
-		        'treeUrl' => 'admin/nos/media/inspector/folder/json',
-		        'reloadEvent' => 'nos_media_folder',
-	            'input_name' => $this->name,
-	            'selected' => array(
-		            'id' => $folder_id,
-		            'model' => 'Nos\\Model_Media_Folder',
-	            ),
-		        'columns' => array(
-			        array(
-				        'dataKey' => 'title',
-			        )
-		        ),
-		        'height' => '150px',
-		    ),
-        )))->response());
+    public static function widget($options = array()) {
+        $options = \Arr::merge(array(
+            'treeUrl' => 'admin/nos/media/inspector/folder/json',
+            'reloadEvent' => 'nos_media_folder',
+            'input_name' => null,
+            'selected' => array(
+                'id' => null,
+                'model' => 'Nos\\Model_Media_Folder',
+            ),
+            'columns' => array(
+                array(
+                    'dataKey' => 'title',
+                )
+            ),
+            'treeOptions' => array(
+                'lang' => null
+            ),
+            'height' => '150px',
+            'width' => null,
+        ), $options);
+
+        return (string) \Request::forge('nos/admin/media/inspector/folder/list')->execute(
+            array(
+                'inspector/modeltree_radio',
+                array(
+                    'params' => $options,
+                )
+            )
+        )->response();
     }
 }

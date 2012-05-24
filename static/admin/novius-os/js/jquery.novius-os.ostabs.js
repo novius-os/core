@@ -172,6 +172,7 @@ define('jquery-nos-ostabs',
                     self._add( o.appsTab, self.uiOstabsAppsTab )
                     .addClass( 'nos-ostabs-appstab' )
                     .removeClass( 'ui-state-default' );
+                    self.uiOstabsAppsTab.find('> li > a:first').click(function() {$nos().refreshNosPanel();})
                 } else {
                     self.uiOstabsAppsTab = $( '<ul></ul>' );
                 }
