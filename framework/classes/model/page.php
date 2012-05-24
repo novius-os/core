@@ -67,7 +67,7 @@ class Model_Page extends \Nos\Orm\Model {
             ),
 		),
 		'Nos\Orm_Behaviour_Tree' => array(
-			'events' => array('before_find', 'after_delete'),
+			'events' => array('before_query', 'after_delete'),
 			'parent_relation' => 'parent',
 			'children_relation' => 'children',
 		),

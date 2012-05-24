@@ -57,7 +57,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         // @todo publication start / end
 	}
 
-	public function before_find(&$id, &$options) {
+	public function before_query(&$options) {
 		if (array_key_exists('where', $options)) {
 			$where = $options['where'];
 			foreach ($where as $k => $w) {

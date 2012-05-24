@@ -257,11 +257,11 @@ class Model extends \Orm\Model {
         } catch (\Exception $e) {}
     }
 
-	public static function find($id = null, array $options = array()) {
+	public static function query($options = array()) {
 
-		static::_callAllBehaviours(get_called_class(), 'before_find', array(&$id, &$options));
+		static::_callAllBehaviours(get_called_class(), 'before_query', array(&$options));
 
-		return parent::find($id, $options);
+		return parent::query($options);
 	}
 
 	/**

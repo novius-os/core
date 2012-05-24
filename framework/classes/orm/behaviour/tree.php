@@ -40,7 +40,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         }
 	}
 
-	public function before_find(&$id, &$options) {
+	public function before_query(&$options) {
 		if (array_key_exists('where', $options)) {
 			$where = $options['where'];
 			foreach ($where as $k => $w) {

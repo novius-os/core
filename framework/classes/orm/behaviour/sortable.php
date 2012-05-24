@@ -25,7 +25,7 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 		$this->_properties = call_user_func($class . '::observers', get_class($this));
 	}
 
-	public function before_find(&$id, &$options) {
+	public function before_query(&$options) {
 		if (array_key_exists('order_by', $options)) {
 			$order_by = $options['order_by'];
 	        if (!empty($order_by['default_sort'])) {
