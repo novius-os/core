@@ -34,6 +34,14 @@ class Widget_Page_Selector extends \Nos\Widget_Selector {
         )));
     }
 
+    /**
+     * Construct the radio selector widget
+     * When using a fieldset,
+     * build() method should be overwritten to call the template() method on widget() response
+     * @static
+     * @abstract
+     * @param array $options
+     */
     public static function widget($options = array()) {
         $options = \Arr::merge(array(
             'treeUrl' => 'admin/nos/page/inspector/page/json',

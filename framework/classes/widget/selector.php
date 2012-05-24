@@ -38,13 +38,4 @@ abstract class Widget_Selector extends \Fieldset_Field {
      */
     abstract public function before_construct(&$attributes, &$rules);
 
-    /**
-     * Construct the radio selector widget
-     * When using a fieldset,
-     * build() method should be overwritten to call the template() method on widget() response
-     * @static
-     * @abstract
-     * @param array $options
-     */
-    abstract public static function widget($options = array());
 }
