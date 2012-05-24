@@ -25,11 +25,15 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 		$this->_properties = call_user_func($class . '::observers', get_class($this));
 	}
 
-	public function before_search(&$where, &$order_by = array(), &$options = array()) {
-        if (!empty($order_by['default_sort'])) {
-            unset($order_by['default_sort']);
-            $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
-        }
+	public function before_query(&$options) {
+		if (array_key_exists('order_by', $options)) {
+			$order_by = $options['order_by'];
+	        if (!empty($order_by['default_sort'])) {
+	            unset($order_by['default_sort']);
+	            $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
+	        }
+			$options['order_by'] = $order_by;
+		}
 	}
 
     /**

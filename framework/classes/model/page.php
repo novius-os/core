@@ -67,7 +67,7 @@ class Model_Page extends \Nos\Orm\Model {
             ),
 		),
 		'Nos\Orm_Behaviour_Tree' => array(
-			'events' => array('before_search', 'after_delete'),
+			'events' => array('before_query', 'after_delete'),
 			'parent_relation' => 'parent',
 			'children_relation' => 'children',
 		),
@@ -97,18 +97,12 @@ class Model_Page extends \Nos\Orm\Model {
     const LOCK_DELETION = 1;
     const LOCK_EDITION  = 2;
 
-    /**
-     * Alias to Model:find('all') with appropriate sort for Model_Page
-     *
-     * @param array  $where
-     * @param array  $order_by
-     * @param array  $options   Additional options to pass on to the ::find() method
-     * @return array of \Nos\Model_Page
-     */
-    public static function search($where, $order_by = array(), $options = array()) {
-        isset($order_by['page_sort']) or $order_by['page_sort'] = 'ASC';
-        return parent::search($where, $order_by, $options);
-    }
+	public static function find($id = null, array $options = array()) {
+		if (array_key_exists('order_by', $options)) {
+			isset($options['order_by']['page_sort']) or $options['order_by']['page_sort'] = 'ASC';
+		}
+		return parent::find($id, $options);
+	}
 
     /**
      * Returns the href and target attributes for an HTML link <a>

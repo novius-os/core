@@ -13,7 +13,7 @@ namespace Nos;
 class CacheNotFoundException extends \Exception {}
 class CacheExpiredException extends \Exception {}
 
-class PubliCache {
+class FrontCache {
 
     /**
      * Loads any default caching settings when available
@@ -145,7 +145,7 @@ class PubliCache {
                 }'."\n";
             }
             $this->_content .= '?>';
-            \Fuel::$profiling && \Profiler::console('PubliCache:'.\Fuel::clean_path($this->_path).' saved for '.$duration.' s.');
+            \Fuel::$profiling && \Profiler::console('FrontCache:'.\Fuel::clean_path($this->_path).' saved for '.$duration.' s.');
         }
 
         while(ob_get_level() >= $this->_level) {

@@ -40,21 +40,25 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         }
 	}
 
-	public function before_search(&$where, &$order_by = array(), &$options = array()) {
-		foreach ($where as $k => $w) {
-			if ($w[0] == 'parent') {
-                $property = $this->_parent_relation->key_from[0];
-				if ($w[1] === null) {
-					$where[$k] = array($property, 'IS', null);
-				} else {
-                    $id = $w[1]->id;
-                    if (empty($id)) {
-                        unset($where[$k]);
-                    } else {
-                        $where[$k] = array($property, $id);
-                    }
+	public function before_query(&$options) {
+		if (array_key_exists('where', $options)) {
+			$where = $options['where'];
+			foreach ($where as $k => $w) {
+				if ($w[0] == 'parent') {
+					$property = $this->_parent_relation->key_from[0];
+					if ($w[1] === null) {
+						$where[$k] = array($property, 'IS', null);
+					} else {
+						$id = $w[1]->id;
+						if (empty($id)) {
+							unset($where[$k]);
+						} else {
+							$where[$k] = array($property, $id);
+						}
+					}
 				}
 			}
+			$options['where'] = $where;
 		}
 	}
 
@@ -158,7 +162,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         if (empty($ids)) {
             return array();
         }
-        return $object::search(array(array(\Arr::get($object->primary_key(), 0), 'IN', $this->get_ids_children($object, $include_self))));
+        return $object::find('all', array('where' => array(array(\Arr::get($object->primary_key(), 0), 'IN', $this->get_ids_children($object, $include_self)))));
     }
 
     protected static function _populate_id_children($current_item, $children_relation, &$array) {
