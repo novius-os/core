@@ -56,12 +56,23 @@ class Controller_Admin_Page_Page extends Controller {
             }
             // Parent page is the root
             if (empty($parent_page)) {
-                $parent_page = Model_Page::find(1);
+                $parent_page = Model_Page::find('first', array(
+                    'where' => array(
+                        array('page_parent_id', 'IS', \Db::expr('NULL')),
+                    ),
+                    'order_by' => array('page_id' => 'ASC'),
+                ));
             }
-            if (!empty($page->page_lang)) {
+            if (!empty($page->page_lang) && !empty($page_parent)) {
                 $parent_page = $parent_page->find_lang($page->page_lang);
             }
-            $page->page_parent_id = $parent_page->page_id;
+            if (!empty($parent_page)) {
+                $page->page_parent_id = $parent_page->page_id;
+            } else {
+                $page->page_parent_id = null;
+                $page->page_home     = 1;
+                $page->page_entrance = 1;
+            }
 
             // Tweak the form for creation
             $fields = \Arr::merge($fields, array(
