@@ -23,7 +23,7 @@ use Asset, Format, Input, Session, View, Uri;
  * @package  app
  * @extends  Controller
  */
-class Controller_Appdesk_List extends Controller_Generic_Admin {
+class Controller_Appdesk_List extends Controller_Admin_Application {
 
 	protected $appdesk = array();
 

@@ -15,7 +15,7 @@ use Fuel\Core\View;
 use Fuel\Core\Config;
 
 
-class Controller_Inspector_Data extends Controller_Extendable {
+class Controller_Inspector_Data extends Controller_Admin_Application {
 
 	protected $config = array(
 		'data' => '',

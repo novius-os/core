@@ -15,7 +15,7 @@ use \Format;
 use \View;
 use \Config;
 
-class Controller_Inspector_Model extends Controller_Extendable {
+class Controller_Inspector_Model extends Controller_Admin_Application {
 
     protected $config = array(
         'model' => '',

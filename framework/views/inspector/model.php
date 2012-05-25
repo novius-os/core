@@ -29,6 +29,8 @@ require([
 	                        inspector.noslistgrid('setSize', parent.width(), parent.height());
 						},
 						widgetReload : function() {
+
+                            inspector.wijgrid('doRefresh');
 							inspector.noslistgrid('option', 'pageSize', Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row));
 						}
 					}),

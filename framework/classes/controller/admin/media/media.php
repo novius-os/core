@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Media extends Controller_Extendable {
+class Controller_Admin_Media_Media extends Controller {
 
 	public function action_add($folder_id = null) {
 

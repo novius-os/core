@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_Noviusos extends Controller_Template_Extendable {
+class Controller_Admin_Noviusos extends Controller {
 
 	public $template = 'nos::admin/html';
 

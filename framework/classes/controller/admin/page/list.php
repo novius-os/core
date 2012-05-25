@@ -12,6 +12,6 @@ namespace Nos;
 
 use Fuel\Core\Config;
 
-class Controller_Admin_Page_List extends Controller_Appdesk_List {
+class Controller_Admin_Page_List extends Controller_Admin_Appdesk {
 
 }

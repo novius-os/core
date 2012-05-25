@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_User_Form extends \Nos\Controller_Generic_Admin {
+class Controller_Admin_User_Form extends \Nos\Controller_Admin_Application {
 
     public function before($response = null) {
         if (\Request::active()->action == 'edit' &&\Request::active()->method_params[0] == \Session::user()->user_id) {

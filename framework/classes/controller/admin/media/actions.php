@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Actions extends Controller_Extendable {
+class Controller_Admin_Media_Actions extends Controller {
 
 
     protected static function  _get_media_with_permission($media_id, $permission) {

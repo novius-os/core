@@ -10,8 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\Config;
-
-class Controller_Admin_Media_List extends Controller_Admin_Appdesk {
+class Controller_Admin_Auth extends Controller {
 
 }
