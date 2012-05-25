@@ -111,7 +111,19 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         $model = $config['model'];
         $pk = \Arr::get($model::primary_key(), 0);
 
-        $query = \Nos\Orm\Query::forge($model, $model::connection());
+        $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
+        $options = array();
+        if ($translatable) {
+            if (empty($config['lang'])) {
+                $options['where'] = array(array('lang_main', true));
+            } else {
+                $options['where'] = array(array('lang', $config['lang']));
+            }
+            $common_ids = array();
+            $keys = array();
+        }
+
+        $query = $model::query($options);
         foreach ($config['related'] as $related) {
             $query->related($related);
         }
@@ -136,21 +148,6 @@ class Controller_Extendable extends \Fuel\Core\Controller {
 		    }
 	    }
 
-        $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
-        $tree         = $model::behaviours('Nos\Orm_Behaviour_Tree');
-        if ($translatable) {
-            if (empty($config['lang'])) {
-                // No inspector, we only search items in their primary language
-                $query->where($translatable['single_id_property'], 'IS NOT', null);
-            } else if (is_array($config['lang'])) {
-                // Multiple langs
-                $query->where($translatable['lang_property'], 'IN', $config['lang']);
-            } else  {
-                $query->where($translatable['lang_property'],  '=', $config['lang']);
-            }
-            $common_ids = array();
-            $keys = array();
-        }
         $count = $query->count();
         if ($only_count) {
             return array(
@@ -162,12 +159,11 @@ class Controller_Extendable extends \Fuel\Core\Controller {
         }
 
         // Copied over and adapted from $query->count()
-        $select = \Arr::get($model::primary_key(), 0);
-        $select = (mb_strpos($select, '.') === false ? $query->alias().'.'.$select : $select);
+        $select = (mb_strpos($pk, '.') === false ? $query->alias().'.'.$pk : $pk);
         // Get the columns
-        $columns = \DB::expr('DISTINCT '.\Database_Connection::instance()->quote_identifier($select).' AS group_by_pk');
+        $columns = \DB::expr('DISTINCT '.\Database_Connection::instance()->quote_identifier($pk).' AS group_by_pk');
         // Remove the current select and
-        $new_query = call_user_func('DB::select', $columns);
+        $new_query = \DB::select($columns);
         // Set from table
         $new_query->from(array($model::table(), $query->alias()));
 
@@ -232,7 +228,7 @@ class Controller_Extendable extends \Fuel\Core\Controller {
                 foreach ($keys as $key => $common_id) {
                     $items[$key]['lang'] = $langs[$common_id];
                 }
-                if ($tree) {
+                if ($model::behaviours('Nos\Orm_Behaviour_Tree')) {
                     $all_langs = reset($objects)->find_root()->get_all_lang();
                 } else {
                     $all_langs = array_unique(\Arr::flatten($langs));
