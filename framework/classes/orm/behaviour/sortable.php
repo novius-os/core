@@ -80,7 +80,10 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
             $conditions[] = array('parent', $obj->get_parent());
         }
         $i = 1;
-        $unsorted = $obj->search($conditions, array('default_sort' => 'ASC'));
+        $unsorted = $obj::find('all', array(
+            'where' => $conditions,
+            'order_by' => array('default_sort' => 'ASC')
+        ));
         foreach ($unsorted as $u) {
             $u->set($sort_property, $i++);
             $u->save();

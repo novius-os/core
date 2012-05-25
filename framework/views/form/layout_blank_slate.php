@@ -10,6 +10,8 @@
 
 
 $locales = Config::get('locales', array());
+empty($tabInfos) and $tabInfos = array();
+empty($url_crud) or $tabInfos['url'] = $url_crud.($item === null ? '': '/'.$item->id).'?lang='.$lang;
 
 $labels     = array();
 $items_lang = array();
@@ -92,6 +94,14 @@ require(['jquery-nos'], function ($nos) {
             var $form = $(this);
             $container.load($form.get(0).action, $form.serialize());
         });
+
+        var tabInfos = <?= json_encode($tabInfos) ?>;
+
+        if (tabInfos.length > 0) {
+            $container.onShow('bind', function() {
+                $container.tab('update', tabInfos);
+            });
+        }
     });
 });
 </script>

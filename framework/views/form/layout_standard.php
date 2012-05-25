@@ -35,7 +35,7 @@ $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_cla
 $large = !empty($large) && $large == true;
 ?>
 
-<div id="<?= $uniqid_fixed ?>" class="col <?= $large ? 'c4' : 'c4' ?> nos-fixed-header ui-widget-content" style="z-index:100;">
+<div id="<?= $uniqid_fixed ?>" class="nos-fixed-header ui-widget-content" style="z-index:100;">
     <p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
     <?php
         echo \View::forge('form/publishable', array(
