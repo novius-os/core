@@ -24,12 +24,18 @@ class Controller_Admin_Page_Page extends Controller {
 
     public function action_blank_slate($id = null) {
         $page = $id === null ? null : Model_Page::find($id);
+        $lang = \Input::get('lang', '');
         return \View::forge('nos::form/layout_blank_slate', array(
             'item'      => $page,
-            'lang'      => \Input::get('lang', ''),
+            'lang'      => $lang,
             'common_id' => \Input::get('common_id', ''),
             'item_text' => __('page'),
             'url_form'  => 'admin/nos/page/page/form',
+            'url_crud'  => 'admin/nos/page/page/crud',
+            'tabInfos' => array(
+                'label'   =>  __('Add a page'),
+                'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+            ),
         ), false);
     }
 
