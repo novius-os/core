@@ -88,13 +88,16 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param  array  $where
      * @param  array  $order_by
      * @param  array  $options
-     * @see \Nos\Model_Page::search
-     * @return array of \Nos\Model_Page
+     * @return array of \Orm\Model
      */
     public function find_children($object, $where = array(), $order_by = array(), $options = array()) {
         // Search items whose parent is self
         $where[] = array('parent', $object);
-        return $object->search($where, $order_by, $options);
+        $options = \Arr::merge($options, array(
+            'where'    => $where,
+            'order_by' => $order_by,
+        ));
+        return $object::find('all', $options);
     }
 
     /**
