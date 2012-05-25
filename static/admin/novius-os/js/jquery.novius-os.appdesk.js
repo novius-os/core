@@ -277,8 +277,12 @@ define('jquery-nos-appdesk',
                 return self;
             }
 
+            if (o.selectedLang && o.selectedLang.length) {
+                o.selectedLang = null;
+            }
+
             //self.uiLangsDropDown = $('<select></select>').appendTo(self.uiLangsDropDownContainer);
-            if ((o.selectedLang || {}).length && o.selectedLang.length == 0) {
+            if (o.selectedLang == null) {
                 var first = true;
                 $.each(o.locales, function(key, locale) {
                     if (first) {
