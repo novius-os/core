@@ -24,12 +24,18 @@ class Controller_Admin_Page_Page extends Controller {
 
     public function action_blank_slate($id = null) {
         $page = $id === null ? null : Model_Page::find($id);
+        $lang = \Input::get('lang', '');
         return \View::forge('nos::form/layout_blank_slate', array(
             'item'      => $page,
-            'lang'      => \Input::get('lang', ''),
+            'lang'      => $lang,
             'common_id' => \Input::get('common_id', ''),
             'item_text' => __('page'),
             'url_form'  => 'admin/nos/page/page/form',
+            'url_crud'  => 'admin/nos/page/page/crud',
+            'tabInfos' => array(
+                'label'   =>  __('Add a page'),
+                'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+            ),
         ), false);
     }
 
@@ -52,16 +58,29 @@ class Controller_Admin_Page_Page extends Controller {
             }
             $page->page_lang = \Input::get('lang');
             if (!empty($page->page_lang_common_id)) {
-                $parent_page = Model_Page::find($page->page_lang_common_id)->find_parent();
+                $page_main = Model_Page::find($page->page_lang_common_id);
+                $parent_page = $page_main->find_parent();
             }
             // Parent page is the root
             if (empty($parent_page)) {
-                $parent_page = Model_Page::find(1);
+                $parent_page = Model_Page::find('first', array(
+                    'where' => array(
+                        array('page_parent_id', 'IS', \Db::expr('NULL')),
+                    ),
+                    'order_by' => array('page_id' => 'ASC'),
+                ));
             }
-            if (!empty($page->page_lang)) {
+            if (!empty($page->page_lang) && !empty($page_parent)) {
                 $parent_page = $parent_page->find_lang($page->page_lang);
             }
-            $page->page_parent_id = $parent_page->page_id;
+            // Root page
+            if (empty($parent_page) || (!empty($page_main) && $page_main->page_parent_id == null)) {
+                $page->page_parent_id = null;
+                $page->page_home     = 1;
+                $page->page_entrance = 1;
+            } else {
+                $page->page_parent_id = $parent_page->page_id;
+            }
 
             // Tweak the form for creation
             $fields = \Arr::merge($fields, array(

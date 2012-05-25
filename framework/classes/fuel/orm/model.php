@@ -260,7 +260,7 @@ class Model extends \Orm\Model {
 
 		static::_callAllBehaviours(get_called_class(), 'before_query', array(&$options));
 
-		return parent::query($options);
+        return Query::forge(get_called_class(), static::connection(), $options);
 	}
 
 	/**

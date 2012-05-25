@@ -85,18 +85,20 @@ class Controller_Appdesk_List extends Controller_Admin_Application {
 		    }
 
 		    $value = Input::get('inspectors.search');
-		    $condition = $config['search_text'];
-		    if (is_callable($condition)) {
-			    $query = $condition($value, $query);
-		    } else if (is_array($condition)) {
-			    $query->and_where_open();
-				foreach ($condition as $field) {
-					$query->or_where(array($field, 'LIKE', '%'.$value.'%'));
-				}
-			    $query->and_where_close();
-		    } else {
-			    $query->where(array($condition, 'LIKE', '%'.$value.'%'));
-		    }
+            if (! empty($value)) {
+                $condition = $config['search_text'];
+                if (is_callable($condition)) {
+                    $query = $condition($value, $query);
+                } else if (is_array($condition)) {
+                    $query->and_where_open();
+                    foreach ($condition as $field) {
+                        $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                    }
+                    $query->and_where_close();
+                } else {
+                    $query->where(array($condition, 'LIKE', '%'.$value.'%'));
+                }
+            }
 
 		    Filter::apply($query, $config);
 
