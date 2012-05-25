@@ -52,7 +52,8 @@ class Controller_Admin_Page_Page extends Controller {
             }
             $page->page_lang = \Input::get('lang');
             if (!empty($page->page_lang_common_id)) {
-                $parent_page = Model_Page::find($page->page_lang_common_id)->find_parent();
+                $page_main = Model_Page::find($page->page_lang_common_id);
+                $parent_page = $page_main->find_parent();
             }
             // Parent page is the root
             if (empty($parent_page)) {
@@ -66,12 +67,13 @@ class Controller_Admin_Page_Page extends Controller {
             if (!empty($page->page_lang) && !empty($page_parent)) {
                 $parent_page = $parent_page->find_lang($page->page_lang);
             }
-            if (!empty($parent_page)) {
-                $page->page_parent_id = $parent_page->page_id;
-            } else {
+            // Root page
+            if (empty($parent_page) || (!empty($page_main) && $page_main->page_parent_id == null)) {
                 $page->page_parent_id = null;
                 $page->page_home     = 1;
                 $page->page_entrance = 1;
+            } else {
+                $page->page_parent_id = $parent_page->page_id;
             }
 
             // Tweak the form for creation
