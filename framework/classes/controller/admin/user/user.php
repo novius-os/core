@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_User_User extends Controller_Extendable {
+class Controller_Admin_User_User extends Controller {
 
     protected static function  _get_user_with_permission($user_id, $permission) {
         if (empty($user_id)) {

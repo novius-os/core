@@ -18,7 +18,7 @@ use Fuel\Core\Config;
 
 use Date;
 
-class Controller_Inspector_Date extends Controller_Extendable {
+class Controller_Inspector_Date extends Controller_Admin_Application {
 
 	protected $config = array(
 		'input_begin'           => 'date_begin',

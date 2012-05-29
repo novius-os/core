@@ -81,7 +81,10 @@ class Nos {
         try {
             $request = \Request::forge($where);
 
+
 	        $response = $request->execute($args['args']);
+
+
             $cache_cleanup = $request->controller_instance->cache_cleanup;
 
             if (!empty($cache_cleanup)) {
@@ -94,6 +97,7 @@ class Nos {
         } catch (\Nos\NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
+            return __('An unexpected exception occured.');
             $content = null;
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
             if (\Fuel::$profiling) throw $e;
@@ -155,6 +159,7 @@ class Nos {
         $name   = $fct_id;
 
         $config = \Config::get("enhancers.$name", false);
+
         $found  = $config !== false;
 
 	    if (!empty($config['urlEnhancer'])) {
