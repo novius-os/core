@@ -1,5 +1,7 @@
 .wijmo-wijupload
 {
+    overflow:hidden;
+    position:relative;
 }
 
 .wijmo-wijupload ul
@@ -49,7 +51,7 @@
 {
 	width: 16px;
 	height: 16px;
-	background-image: url("../images/ui-anim_basic_16x16.gif");
+	background-image: url("images/ui-anim_basic_16x16.gif");
 	display: block;
 	float: left;
 	top: 25%;

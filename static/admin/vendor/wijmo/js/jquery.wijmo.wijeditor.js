@@ -1,6 +1,6 @@
 /*globals jQuery, alert, document, window, setTimeout, $, Components, netscape */
 /*
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -1722,6 +1722,8 @@
 		_setOption: function (key, value) {
 			var self = this,
 			o = self.options,
+			oldMode = o.mode,
+			ribbonParent = $ribbon.parent(),
 			oldCustomContextMenu = o.customContextMenu;
 
 			$.Widget.prototype._setOption.apply(self, arguments);
@@ -1746,6 +1748,16 @@
 				}
 			} else if (key === "disabled") {
 				self._handleDisabledOption(value, self.editor);
+			} else if (key === "showFooter") {
+				if (value){
+					if (!($("." + css_editor_footer).is(":visible"))) {
+						$("." + css_editor_footer).show();
+					}
+				} else {
+					if (($("." + css_editor_footer).is(":visible"))) {
+						$("." + css_editor_footer).hide();
+					}
+				}
 			} else if (key === "commandButtonClick") {
 				o.commandButtonClick = value;
 			} else if (key === "customContextMenu") {
@@ -1764,7 +1776,27 @@
 					.remove();
 					self.contextMenu = undefined;
 				}
-			}
+				} else if (key === "mode" && value !== oldMode) {
+					$ribbon.wijribbon("destroy");
+					$ribbon.remove();
+					if (value === "ribbon") {
+						$ribbon = $(self._getDefaultRibbonMarkup());
+					} else if (value === "bbcode") {
+						$ribbon = $(self._getSimpleToolBar(defaultBBCodeModeCommands));
+					}
+					else {
+						$ribbon = 
+							$(self._getSimpleToolBar(defaultSimpleModeCommands));
+						}
+					
+					ribbonParent.append($ribbon);
+					$ribbon.wijribbon({
+						click: function (e, data) {
+							self._ribbonCommand(data.commandName, data.name);
+							self._trigger('commandButtonClick', e, data);
+						}
+					});
+				}
 		},
 
 		_getHeader: function () {

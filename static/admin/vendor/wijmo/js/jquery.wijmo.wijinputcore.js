@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -210,7 +210,7 @@
 
             var isLeftButton = function (e) { return (!e.which ? e.button : e.which) === 1; };
             var o = this.options, self = this;
-            if (this.triggerBtn && !o.disabled) {
+            if (this.triggerBtn && !o.disabledState) {
                 this.triggerBtn.bind({
                     'mouseover': function () { self._addState('hover', $(this)); },
                     'mouseout': function () { self._removeState('hover', $(this)); },
@@ -244,7 +244,7 @@
                 self._removeState('active', $(this));
             };
 
-            if (this.spinUp && !o.disabled) {
+            if (this.spinUp && !o.disabledState) {
                 this.spinUp.bind({
                     'mouseover': function () { self._addState('hover', $(this)); },
                     'mouseout': function () { self._removeState('hover', $(this)); self._removeState('active', $(this)); self._stopSpin(); },
@@ -253,7 +253,7 @@
                 });
             }
 
-            if (this.spinDown && !o.disabled) {
+            if (this.spinDown && !o.disabledState) {
                 this.spinDown.bind({
                     'mouseover': function () { self._addState('hover', $(this)); },
                     'mouseout': function () { self._removeState('hover', $(this)); self._removeState('active', $(this)); self._stopSpin(); },
@@ -281,8 +281,10 @@
             this._endUpdate();
             this._updateText();
 
-            if (this.options.disabled) {
+            if (this.options.disabledState) {
+				var dis = o.disabled;
                 this.disable();
+				o.disabled = dis;
             }
 
 			this.element.data('initialized', true);

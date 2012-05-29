@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -119,7 +119,13 @@
 				return format.call(this, str);
 			}
 			else if (format !== "") {
-				return format.replace(/\{0\}/g, str);
+				var reg = /\{0(?::((?:n|d|p|c)\d?))?\}/gi, match, formater;
+				if (reg.test(format)) {
+					match = format.match(reg);
+					formater = RegExp.$1;
+					return format.replace(/\{0(?::(?:(?:n|d|p|c)\d?))?\}/gi, 
+						Globalize.format(str, formater));
+				}
 			}
 			return str;
 		}
@@ -557,12 +563,12 @@
 			}
 
 			if (o.pointer && o.pointer.template && 
-				typeof o.pointer.template === "string" 
-				&& window[o.pointer.template]) {
+				typeof o.pointer.template === "string" && 
+					window[o.pointer.template]) {
 				o.pointer.template = window[o.pointer.template];
 			}
 
-			if(o.cap && o.cap.template &&
+			if (o.cap && o.cap.template &&
 				typeof o.cap.template === "string" && window[o.cap.template]) {
 				o.cap.template = window[o.cap.template];
 			}

@@ -52,6 +52,7 @@
     color: inherit;
     padding: 3px 5px 3px 5px;
     outline: none;
+    margin: 0;
 }
 
 .wijmo-wijcombobox .wijmo-wijcombobox-label
@@ -64,7 +65,7 @@
 }
 .wijmo-wijcombobox-loading
 {
-    background: transparent url('../images/ui-anim_basic_16x16.gif') right center no-repeat;
+    background: transparent url('images/waiting.gif') right center no-repeat;
 }
 /* dropdown list trigger
  ----------------------------------*/
@@ -297,6 +298,11 @@
     text-align: right;
 }
 
+.wijmo-wijinput-date
+{
+    padding: 5px;
+}
+
 .wijmo-wijinput-date, .wijmo-wijinput-mask
 {
     float: left;
@@ -337,19 +343,15 @@
     border-top: none;
     border-left: none;
 }
-.wijmo-wijgrid
+.wijmo-wijinput-mask
+{
+    padding: 5px;
+}.wijmo-wijgrid
 {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
     overflow: hidden;
-}
-
-.wijmo-wijgrid-loading
-{
-    background: transparent url('../images/waiting.gif') left top no-repeat;
-    min-height: 16px;
-    min-width: 16px;
 }
 
 .wijmo-wijgrid .wijmo-wijsuperpanel
@@ -537,7 +539,8 @@
     border-bottom: none;
 }
 
-.wijmo-wijgrid tr.wijmo-wijgrid-row td
+.wijmo-wijgrid tr.wijmo-wijgrid-row td,
+.wijmo-wijgrid tr.wijmo-wijgrid-row th
 {
     border: none;
     border-right-color: inherit;
@@ -629,7 +632,7 @@
     border-right: 0px none;
 }
 
-/*
+/* 
  *    Scrolling
  */
 
@@ -658,7 +661,7 @@
 {
     background-color: #626262;
 }
-/*
+/*        
         .ui-wijgrid-split-area
         {
             left: 0px;
@@ -681,7 +684,7 @@
         .ui-wijgrid-splits-enabled .ui-wijgrid-split-area-nw, .ui-wijgrid-splits-enabled .ui-wijgrid-split-area-sw
         {
             overflow-y: hidden;
-        }
+        }       
 */
 
 .wijmo-wijgrid-filterlist
@@ -871,7 +874,37 @@
 .wijmo-wijgrid-group-area
 {
     height: 35px;
-}.wijmo-wijtree
+}
+
+/* loading overlay */
+.wijmo-wijgrid
+{
+    position: relative;
+}
+.wijmo-wijgrid-loading 
+{
+    z-index: 99;
+}
+.wijmo-wijgrid-overlay
+{
+    z-index: 99;
+}
+.wijmo-wijgrid-loadingtext
+{
+    position: absolute;
+    opacity: 1;
+    z-index: 100;
+    padding: 0.4em;
+    font-size: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+}
+.wijmo-wijgrid-loadingtext .ui-icon
+{
+    display: inline-block;
+    margin-right: 0.4em;
+}    
+/* loading overlay */
+.wijmo-wijtree
 {
     width: 360px;
     padding: 0.5em;
@@ -905,6 +938,11 @@
     clear: both;
     font-weight: normal;
     margin: 0 20px 0 0;
+}
+.wijmo-wijtree .wijmo-wijtree-list /*fix bug #21078 "The height of UL always equals 0"*/
+{
+    float: left; 
+    width: 100%; /*force the ul to a newline*/
 }
 
 .wijmo-wijtree-inner
@@ -949,15 +987,15 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     padding: 0;
     width: 100%;
     float: left;
-    clear:left;
+    clear:left;	
     margin: 0 0 0 16px;
-    display: inline; /*fix margin-left doubled when float set to left on ie 6*/
+    display: inline; /*fix margin-left doubled when float set to left on ie 6*/	
     width:100%;
 }
 
 .wijmo-wijtree .wijmo-wijtree-allexpanded .wijmo-wijtree-item
 {
-   margin: 0 0 0 0;
+   margin: 0 0 0 0;     
 }
 
 .wijmo-wijtree .wijmo-wijtree-list .ui-icon
@@ -971,13 +1009,13 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     padding: 0;
     width: 100%;
     float: left;
-    clear:left;
+    clear:left;	
 }
 
 .wijmo-wijtree-insertion
 {
 	height:1px;
-	font-size:0px;/*fix ie 6 issue*/
+	font-size:0px;/*fix ie 6 issue*/	
 }
 
 .wijmo-wijtree-node .wijmo-wijtextbox
@@ -988,6 +1026,8 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     margin:0 0 0 0.5em;
 }.wijmo-wijupload
 {
+    overflow:hidden;
+    position:relative;
 }
 
 .wijmo-wijupload ul
@@ -1037,7 +1077,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 {
 	width: 16px;
 	height: 16px;
-	background-image: url("../images/ui-anim_basic_16x16.gif");
+	background-image: url("images/ui-anim_basic_16x16.gif");
 	display: block;
 	float: left;
 	top: 25%;
@@ -1073,17 +1113,17 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 	margin: 3px 0;
 }
 
-.wijmo-wijwizard .wijmo-wijwizard-panel
-{
-	display: block;
-	border-width: 0;
-	padding: 1em 1.4em;
-	background: none;
+.wijmo-wijwizard .wijmo-wijwizard-panel 
+{ 
+	display: block; 
+	border-width: 0; 
+	padding: 1em 1.4em; 
+	background: none; 
 }
 
-.wijmo-wijwizard .wijmo-wijwizard-hide
-{
-	display: none !important;
+.wijmo-wijwizard .wijmo-wijwizard-hide 
+{ 
+	display: none !important; 
 }
 
 .wijmo-wijwizard-buttons
@@ -1119,7 +1159,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 }
 .wijmo-wijribbon .ui-button .ui-button-text
 {
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .wijmo-wijribbon .wijmo-wijribbon-panel
@@ -1153,12 +1193,13 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     padding: 0.2em;
 }
 
-.wijmo-wijribbon .ui-button .ui-button-text.ui-state-hover
+.wijmo-wijribbon .ui-button .ui-button-text.ui-state-hover,.wijmo-wijribbon .ui-button .ui-button-text.ui-state-active
 {
-    margin: -1px;
+    border: none;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+    text-decoration: none;
 }
 
 
@@ -1192,6 +1233,12 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     width: 3.5em;
     height: 52px;
     color: #000;
+    text-decoration: none;
+}
+
+.wijmo-wijribbon-bigbutton:visited
+{
+    text-decoration: none;
 }
 
 .wijmo-wijribbon .wijmo-wijribbon-dropdownbutton
@@ -1216,6 +1263,8 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 .wijmo-wijribbon .wijmo-wijribbon-bigbutton .ui-button-text
 {
     padding: 3em 0 0;
+    letter-spacing: -1px;
+    font-size: 10px;    
 }
 
 .wijmo-wijribbon .wijmo-wijribbon-splitbutton
@@ -1690,7 +1739,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 
 .wijmo-wijribbon .ui-icon, .wijmo-wijribbon-abbrevicon
 {
-    background-image: url(../images/wijeditor/wijmo-ui-icons_000000_240x112.png);
+    background-image: url(images/wijeditor/wijmo-ui-icons_000000_240x112.png);
 }
 
 .wijmo-wijribbon .ui-icon, .wijmo-wijribbon .ui-tabs-panel, .wijmo-wijribbon .wijmo-wijribbon-panel .wijmo-wijribbon-groups, .wijmo-wijribbon
@@ -1763,6 +1812,10 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 .wijmo-wijribbon-simple .ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text
 {
     padding: 0.4em 2.1em 0.4em 0.4em;
+}
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a
+{
+    text-decoration: none;
 }
 .wijmo-wijeditor .wijmo-wijeditor-container
 {
@@ -1864,7 +1917,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 /* -------------- ribbon css ------------------------------------  */
 .wijmo-wijeditor .wijmo-wijribbon .wijmo-wijribbon-actions
 {
-    width: 14em;
+    width: 15em;
 }
 
 .wijmo-wijeditor .wijmo-wijribbon .wijmo-wijribbon-font
@@ -2331,14 +2384,14 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 
 .wijmo-wijeditor .wijmo-wijeditor-colorcanvas .wijmo-wijeditor-wheel
 {
-    background: transparent url(../images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -218px;
+    background: transparent url(images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -218px;
     width: 195px;
     height: 195px;
 }
 
 .wijmo-wijeditor .wijmo-wijeditor-colorcanvas .wijmo-wijeditor-overlay
 {
-    background: transparent url(../images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -67px;
+    background: transparent url(images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -67px;
 }
 
 .wijmo-wijeditor .wijmo-wijeditor-colorcanvas .wijmo-wijeditor-marker
@@ -2347,7 +2400,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     height: 17px;
     margin: -8px 0 0 -8px;
     overflow: hidden;
-    background: transparent url(../images/wijeditor/wijmo-ui-editor.png) no-repeat 0 0;
+    background: transparent url(images/wijeditor/wijmo-ui-editor.png) no-repeat 0 0;
 }
 /* ---------------- end of color dialog css ------------------- */
 
@@ -2637,189 +2690,189 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 /* 16px */
 .wijmo-wijrating .wijmo-wijrating-normal
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat 0px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat 0px 0px;
 	opacity: 0.50;
 }
 
 .wijmo-wijrating .wijmo-wijrating-rated
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat 0px -16px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat 0px -16px;
 	opacity: 1;
 }
 
 .wijmo-wijrating .wijmo-wijrating-hover
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat 0px -32px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat 0px -32px;
 	opacity: 1;
 }
 
 /* 24px */
 .wijmo-wijrating .wijmo-wijrating-normal-24
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -16px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -16px 0px;
 	opacity: 0.50;
 }
 
 .wijmo-wijrating .wijmo-wijrating-rated-24
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -16px -24px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -16px -24px;
 	opacity: 1;
 }
 
 .wijmo-wijrating .wijmo-wijrating-hover-24
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -16px -48px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -16px -48px;
 	opacity: 1;
 }
 
 /* 32px */
 .wijmo-wijrating .wijmo-wijrating-normal-32
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -40px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -40px 0px;
 	opacity: 0.50;
 }
 
 .wijmo-wijrating .wijmo-wijrating-rated-32
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -40px -32px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -40px -32px;
 	opacity: 1;
 }
 
 .wijmo-wijrating .wijmo-wijrating-hover-32
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -40px -64px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -40px -64px;
 	opacity: 1;
 }
 
 /* Thumb */
 .wijmo-wijrating .wijmo-wijrating-normal-thumbup
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -72px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -72px 0px;
 	opacity: 0.50;
 }
 
 .wijmo-wijrating .wijmo-wijrating-rated-thumbup
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -72px -16px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -72px -16px;
 	opacity: 1;
 }
 
 .wijmo-wijrating .wijmo-wijrating-hover-thumbup
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -72px -32px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -72px -32px;
 	opacity: 1;
 }
 
 /* Thumb Down */
 .wijmo-wijrating .wijmo-wijrating-normal-thumbdown
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -88px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -88px 0px;
 	opacity: 0.50;
 }
 
 .wijmo-wijrating .wijmo-wijrating-rated-thumbdown
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -88px -16px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -88px -16px;
 	opacity: 1;
 }
 
 .wijmo-wijrating .wijmo-wijrating-hover-thumbdown
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -88px -32px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -88px -32px;
 	opacity: 1;
 }
 
 /* Bars */
 .wijmo-wijrating .wijmo-wijrating-normal-bar-11
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -103px 0px;
-	opacity: 0.50;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -103px 0px;
+	opacity: 0.50;    
 }
 .wijmo-wijrating .wijmo-wijrating-rated-bar-11
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -115px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -115px 0px;
 }
 .wijmo-wijrating .wijmo-wijrating-hover-bar-11
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -126px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -126px 0px;
 }
 
 
 .wijmo-wijrating .wijmo-wijrating-normal-bar-21
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -137px 0px;
-	opacity: 0.50;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -137px 0px;
+	opacity: 0.50;    
 }
 .wijmo-wijrating .wijmo-wijrating-rated-bar-21
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -148px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -148px 0px;
 }
 .wijmo-wijrating .wijmo-wijrating-hover-bar-21
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -159px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -159px 0px;
 }
 
 
 
 .wijmo-wijrating .wijmo-wijrating-normal-bar-31
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -170px 0px;
-	opacity: 0.50;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -170px 0px;
+	opacity: 0.50;    
 }
 .wijmo-wijrating .wijmo-wijrating-rated-bar-31
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -181px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -181px 0px;
 }
 .wijmo-wijrating .wijmo-wijrating-hover-bar-31
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -192px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -192px 0px;
 }
 
 
 
 .wijmo-wijrating .wijmo-wijrating-normal-bar-41
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -203px 0px;
-	opacity: 0.50;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -203px 0px;
+	opacity: 0.50;    
 }
 .wijmo-wijrating .wijmo-wijrating-rated-bar-41
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -214px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -214px 0px;
 }
 .wijmo-wijrating .wijmo-wijrating-hover-bar-41
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -225px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -225px 0px;
 }
 
 
 
 .wijmo-wijrating .wijmo-wijrating-normal-bar-51
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -236px 0px;
-	opacity: 0.50;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -236px 0px;
+	opacity: 0.50;    
 }
 .wijmo-wijrating .wijmo-wijrating-rated-bar-51
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -247px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -247px 0px;
 }
 .wijmo-wijrating .wijmo-wijrating-hover-bar-51
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -258px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -258px 0px;
 }
 
 
 .wijmo-wijrating .wijmo-wijrating-normal-bar-61
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -269px 0px;
-	opacity: 0.50;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -269px 0px;
+	opacity: 0.50;    
 }
 .wijmo-wijrating .wijmo-wijrating-rated-bar-61
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -280px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -280px 0px;
 }
 .wijmo-wijrating .wijmo-wijrating-hover-bar-61
 {
-	background: transparent url("../images/wijrating/wijmo-ui-rating.png") no-repeat -291px 0px;
+	background: transparent url("images/wijrating/wijmo-ui-rating.png") no-repeat -291px 0px;
 }.wijmo-wijcarousel
 {
     position: relative;
@@ -2929,7 +2982,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     overflow: hidden;
     margin: 5px 0;
 }
-
+        
 .wijmo-wijcarousel-horizontal-multi .wijmo-wijcarousel-item
 {
     overflow: hidden;
@@ -2971,14 +3024,19 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 	 top:0px;
 	 left:0px;
      background: #555;
-     opacity: 0.5;
+     opacity: 0.5;    
      filter: alpha(opacity = 50);
 	 cursor: pointer;
 }
 
 .wijmo-wijcarousel .wijmo-wijcarousel-current .wijmo-wijcarousel-mask
 {
-	opacity: 0;
+    display: none;
+}
+
+.wijmo-wijcarousel .wijmo-wijcarousel-current .wijmo-wijcarousel-mask
+{
+	opacity: 0;     
 	filter: alpha(opacity = 0);
 	cursor: default;
 }
@@ -2999,7 +3057,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 .wijmo-wijcarousel .wijmo-wijcarousel-caption
 {
     background: #555;
-    opacity: 0.5;
+    opacity: 0.5;    
     filter: alpha(opacity = 50);
     cursor: default;
     overflow: hidden;
@@ -3228,7 +3286,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 /*     box-shadow: 0 0 50px rgba(0,0,0,0.50);
     -moz-box-shadow: 0 0 50px rgba(0,0,0,0.50);
     -webkit-box-shadow: 0 0 50px rgba(0,0,0,0.50);
-*/
+*/   
 }
 
 .wijmo-wijgallery .wijmo-wijgallery-content
@@ -3328,7 +3386,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     border: none;
     display: block;
     position: absolute;
-    background: transparent url('../images/waiting.gif') no-repeat scroll;
+    background: transparent url('images/waiting.gif') no-repeat scroll;
 }
 
 .wijmo-wijgallery .wijmo-wijcarousel-item
@@ -3380,7 +3438,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 }
 .wijmo-wijgallery .wijmo-wijgallery-current
 {
-
+ 
 }
 .wijmo-wijgallery .wijmo-wijgallery-content .wijmo-wijgallery-small-image {
 /*    border-width: 5px;
@@ -3618,7 +3676,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     border: none;
     display: block;
     position: relative;
-    background: transparent url('../images/waiting.gif') no-repeat scroll;
+    background: transparent url('images/waiting.gif') no-repeat scroll;
 }
 
 .wijmo-wijdatepager
@@ -3756,7 +3814,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 {
     margin-right: 0;
 }
-
+ 
 
 .wijmo-wijev-navigationbar .wijmo-wijev-title
 {
@@ -3802,7 +3860,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     padding: 0;
     margin: 2px 12px;
 	clear: none;
-	float: left;
+	float: left;    	
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-headercontainer .wijmo-wijev-dayheadercolumn
@@ -3838,7 +3896,10 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     font-weight: normal;
     padding: 0 6px;
     cursor: pointer;
-
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-weekview .wijmo-wijev-headercontainer .wijmo-wijev-dayheadercolumn .wijmo-wijev-daylabel
+{
+	cursor: default;
 }
 
 
@@ -3870,7 +3931,7 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     padding: 16px 6px;
     font-weight: normal;
     opacity: 0;
-
+    
 }
 
 .wijmo-wijev .wijmo-wijev-listview .wijmo-wijev-headercontainer .wijmo-wijev-sizer .wijmo-wijev-gmtlabel,
@@ -3889,10 +3950,10 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     position: relative;
 }
 
-.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-timeinterval,
-.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-content,
+.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-timeinterval, 
+.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-content, 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-content .wijmo-wijev-title,
-.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-timeruler .wijmo-wijev-timerulerinterval,
+.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-timeruler .wijmo-wijev-timerulerinterval, 
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer
 {
     box-sizing: border-box;
@@ -3922,7 +3983,12 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
-    padding-left: 20px;
+    padding-left: 20px;    
+}
+
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-monthview .wijmo-wijev-appointment
+{
+	cursor: default;
 }
 
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-appointment .wijmo-wijev-colordot
@@ -3944,8 +4010,8 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     height: 17px;
     line-height: 17px;
     white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    text-overflow: ellipsis;	
+    overflow: hidden;    
     width: 100%;
 }
 /**/
@@ -3955,6 +4021,10 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
 	cursor: pointer;
 	clear:both;
 	height: 17px;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-dayview .wijmo-wijev-allday-cell .wijmo-wijev-appointment
+{
+	cursor: default;
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-allday-cell .wijmo-wijev-appointment .wijmo-wijev-colordot
@@ -3966,22 +4036,22 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
-    margin: 2px;
+    margin: 2px;	
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-allday-cell .wijmo-wijev-appointment .wijmo-wijev-event-title
 {
-
+    
     height: 17px;
     line-height: 17px;
     margin-left: 4px;
-    /* Note: all day event title should not be wrapped to the next line:
+    /* Note: all day event title should not be wrapped to the next line: 
 float:left removed.
 	*/
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-
+    
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment
@@ -3990,7 +4060,7 @@ float:left removed.
     height: 15px;
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0;    
     border-radius: 4px;
     box-shadow: 2px 2px 3px rgba(0,0,0,0.10), inset 1px 1px 0 rgba(255,255,255,0.25);
 /*fix for:
@@ -4001,11 +4071,11 @@ when a new appointment is created the resizer bar appears on top of the content
 /*
 fix for:
 Current time indicator is under certain colors of appointments
-*/
+*/    
 	z-index: 999;
     -moz-opacity: .95;
     filter: alpha(opacity=95);
-    opacity: .95;
+    opacity: .95;    
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-resizer
@@ -4021,6 +4091,10 @@ Current time indicator is under certain colors of appointments
     -moz-opacity: .40;
     filter: alpha(opacity=40);
     opacity: .40;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-resizer
+{
+	cursor: default;
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-resizer .ui-icon
@@ -4133,6 +4207,11 @@ Current time indicator is under certain colors of appointments
     text-align: right;
     cursor: pointer;
 }
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer .wijmo-wijev-monthcellheader
+{
+	cursor: default;
+}
+
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer .wijmo-wijev-monthcellheader:hover
 {
     text-decoration: underline;
@@ -4150,6 +4229,11 @@ Current time indicator is under certain colors of appointments
 	bottom: 0px;
 	cursor: pointer;
 }
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-monthcell-showmore
+{
+	cursor: default;
+}
+
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer .wijmo-wijev-monthcellheader .wijmo-wijev-todaylabel
 {
 	float:left;
@@ -4209,6 +4293,8 @@ Current time indicator is under certain colors of appointments
     width: 63px;
     *width: 70px;
     text-transform: lowercase;
+    overflow: hidden;
+    text-overflow: ellipsis;    
 }
 
 .wijmo-wijev-event-dialog a
@@ -4231,6 +4317,10 @@ Current time indicator is under certain colors of appointments
 .wijmo-wijev-event-dialog .wijmo-wijev-color
 {
     cursor: pointer;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-event-dialog .wijmo-wijev-color
+{
+	cursor: default;
 }
 
 .wijmo-wijev-event-dialog .wijmo-wijev-delete
@@ -4411,6 +4501,10 @@ div.wijmo-wijev .ui-state-highlight
     border: solid 1px transparent;
     margin: 4px;
 }
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-listcolor
+{
+	cursor: default;
+}
 
 .wijmo-wijev-listcolor:hover
 {
@@ -4465,7 +4559,7 @@ div.wijmo-wijev .ui-state-highlight
 .wijmo-wijev-viewdetails
 {
     display: none;
-    height: 100%;
+    height: 100%;    
     position: relative;
 }
 .wijmo-wijev-list-details
@@ -4497,6 +4591,11 @@ div.wijmo-wijev .ui-state-highlight
     border-right: none;
     margin-bottom: -1px;
     cursor: pointer;
+}
+
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-viewdetails .wijmo-wijev-agenda-container li.wijmo-wijev-agenda-event
+{
+	cursor: default;
 }
 
 .wijmo-wijev-viewdetails .wijmo-wijev-agenda-event-color
@@ -4603,7 +4702,7 @@ div.wijmo-wijev .ui-state-highlight
     padding:0;
     padding: 5px;
     background: none;
-    border: none;
+    border: none;   
 }
 
 .wijmo-wijev-navigationbar .wijmo-wijev-next, .wijmo-wijev-event-dialog .wijmo-wijev-cancel,
@@ -4612,9 +4711,9 @@ div.wijmo-wijev .ui-state-highlight
     float: right;
 }
 
-.wijmo-wijev-event-dialog .wijmo-wijev-brief-content,
-.wijmo-wijev-event-dialog .wijmo-wijev-detailed-content,
-.wijmo-wijevcal .wijmo-wijev-scrollpanel,
+.wijmo-wijev-event-dialog .wijmo-wijev-brief-content, 
+.wijmo-wijev-event-dialog .wijmo-wijev-detailed-content, 
+.wijmo-wijevcal .wijmo-wijev-scrollpanel, 
 .wijmo-wijev-today
 {
     border: none;
@@ -4664,7 +4763,7 @@ div.wijmo-wijev .ui-state-highlight
 
 .wijmo-wijev-event-dialog .wijmo-wijdropdown
 {
-	display: inline-block;
+	display: inline-block;	
 }
 .wijmo-wijev-event-dialog .wijmo-wijev-calendar,
 .wijmo-wijev-event-dialog .wijmo-wijev-repeat
@@ -4700,7 +4799,7 @@ div.wijmo-wijev .ui-state-highlight
     padding: 0 4px;
     text-align: right;
     width: 63px;
-    margin-left: 0;
+    margin-left: 0;    
 }
 
 .wijmo-wijev-event-dialog .wijmo-checkbox .wijmo-checkbox-box {
@@ -4727,24 +4826,24 @@ div.wijmo-wijev .ui-state-highlight
 {
 	background-color: #ffffff;
     width: 100%;
-    height: 100%;
-    position: absolute;
+    height: 100%;	
+    position: absolute;   
     z-index: 1001;
 	-moz-opacity: .35;
     filter: alpha(opacity=35);
-    opacity: .35;
+    opacity: .35;      
     display: none;
 }
 .wijmo-wijev-loading
 {
-	background: transparent url('../images/waiting.gif') no-repeat scroll;
-	background-position: center center;
+	background: transparent url('images/waiting.gif') no-repeat scroll;
+	background-position: center center;	
     width: 100%;
     height: 100%;
     left: 0px;
-    top: 0px;
+    top: 0px;        
     border: none;
-    position: absolute;
+    position: absolute;   
     z-index: 1002;
     display: none;
 }
@@ -4755,8 +4854,8 @@ div.wijmo-wijev .ui-state-highlight
 	left: 50%;
 	bottom: 30%;
 	width: 200px;
-	margin-left: -100px;
+	margin-left: -100px;	
     text-overflow: ellipsis;
     overflow: hidden;
-    text-align: center;
+    text-align: center;	
 }

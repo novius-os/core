@@ -1,7 +1,7 @@
 /*globals jQuery, Globalize*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -671,7 +671,7 @@
 				widgetName = options.widgetName,
 				inverted = options.horizontal,
 				stacked = options.stacked,
-				seriesList = [].concat(options.seriesList),
+				seriesList = $.arrayClone(options.seriesList),
 				nSeries = seriesList.length,
 				seriesStyles = [].concat(options.seriesStyles.slice(0, nSeries)),
 				seriesHoverStyles = [].concat(
@@ -1246,7 +1246,7 @@
 							}
 						}
 						addClass($(bar.node), "wijchart-canvas-object wijbarchart");
-						$(bar.node).data("wijchartDataObj", $.extend(true, {
+						$(bar.node).data("wijchartDataObj", $.extend(false, {
 							index: pIdx,
 							bar: bar,
 							type: "bar",

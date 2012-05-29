@@ -1,17 +1,17 @@
 /*globals jQuery,document,window*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
-*
+* 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
 * http://www.wijmo.com/license
 *
 * * Wijmo Dropdown widget.
-*
+* 
 * Depends:
 *	jquery.js
 *	jquery.ui.js
@@ -118,12 +118,16 @@
 			self._selectWrap = selectWrap;
 			self._labelWrap = labelWrap;
 			self._container = container;
+			
+			//update for fixed tooltip can't take effect
+			container.attr("title",ele.attr("title"));
+			ele.removeAttr("title");
 		},
 
 		_buildList: function (list, listContainer, eleWidth) {
 			var self = this,
 				ele = self.element, height;
-
+			
 			listContainer.show();
 
 			ele.children().each(function (i, n) {
@@ -147,12 +151,12 @@
 					list.append(group);
 				}
 			});
-
-			//update for fixing height setting is incorrect when
+			
+			//update for fixing height setting is incorrect when 
 			//execute refresh at 2011/11/30
 			listContainer.height("");
 			//end for height setting
-
+			
 			height = listContainer.height();
 			height = list.outerHeight() < height ? list.outerHeight() : height;
 
@@ -160,11 +164,11 @@
 				height: height,
 				width: eleWidth
 			});
-
+			
 			//update for fixing can't show all dropdown items by wuhao at 2012/2/24
 			list.setOutWidth(list.parent().parent().innerWidth() - 18);
 			//end for issue
-
+			
 			if (listContainer.data("wijsuperpanel")) {
 				listContainer.wijsuperpanel("paintPanel");
 				self.superpanel = listContainer.data("wijsuperpanel");
@@ -175,7 +179,7 @@
 			if ($.fn.bgiframe) {
 				self.superpanel.element.bgiframe();
 			}
-
+			
 			//update for fixing can't show all dropdown items by wuhao at 2012/2/24
 			//list.setOutWidth(list.parent().parent().innerWidth());
 			if (!self.superpanel.vNeedScrollBar) {
@@ -183,7 +187,7 @@
 				self.superpanel.refresh();
 			}
 			//end for issue
-
+			
 			listContainer.hide();
 		},
 
@@ -474,10 +478,10 @@
 				}
 			}
 		},
-
+		
 		_setValueToEle: function () {
 			var self = this, ele = self.element;
-
+			
 			self.oldVal = ele.val();
 			ele.val(self._value);
 			if (self.oldVal !== self._value) {
@@ -544,7 +548,7 @@
 				if (!self._list) {
 					return;
 				}
-
+				
 				self._listContainer.show();
 				//update for fixing width settings is wrong when
 				//execute refresh method at 2011/11/30
@@ -560,7 +564,7 @@
 				self._container.width(containerWidth);
 				self._selectWrap.addClass("ui-helper-hidden");
 				//end for fixing width settings at 2011/11/30
-
+				
 				self._list.empty();
 				self._buildList(self._list, self._listContainer, containerWidth);
 				self._value = self.element.val();
@@ -632,13 +636,19 @@
 		},
 
 		destroy: function () {
-			/// Remove the functionality completely.
+			
+			//update for fixed tooltip can't take effect
+			this.element.attr("title", this._container.attr("title"));
+			
+			/// Remove the functionality completely. 
 			/// This will return the element back to its pre-init state.
 			this.element.closest(".wijmo-wijdropdown")
 			.find(">div.wijmo-dropdown-trigger,>div.wijmo-dropdown," +
 			">a").remove();
 			this.element.unwrap().unwrap().removeData("maxZIndex");
+
 			$.Widget.prototype.destroy.apply(this);
+
 		}
 	});
 } (jQuery));
