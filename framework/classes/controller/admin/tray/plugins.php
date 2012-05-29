@@ -30,7 +30,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Admin_Application {
             $plugins['local'][trim($plugin, '/\\')] = $metadata;
         }
 
-		\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
 
 		$app_installed = \Config::get('app_installed', array());
 		$app_others = array();
@@ -45,7 +45,7 @@ class Controller_Admin_Tray_Plugins extends Controller_Admin_Application {
 			}
 		}
 
-		// Get the differences between the metadata files
+        // Get the differences between the metadata files
 		static::array_diff_key_assoc($app_installed, $plugins['local'], $diff);
 	    foreach ($app_installed as $app_name => &$metadata) {
 			$instance = new \Nos\Application($app_name);
@@ -57,12 +57,13 @@ class Controller_Admin_Tray_Plugins extends Controller_Admin_Application {
 			}
 		}
 
-
         $this->template->body = View::forge('admin/tray/plugins');
 
         $this->template->body->set('installed', $app_installed);
         $this->template->body->set('others', $app_others);
         $this->template->body->set('allow_upload', \Config::get('allow_plugin_upload', false));
+
+        return $this->template;
     }
 
 	public function action_add($app_name) {
