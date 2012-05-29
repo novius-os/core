@@ -180,14 +180,16 @@ class Controller_Front extends Controller {
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->page->page_id);
 
+        $this->page_title = $this->page->page_title;
+
+        $wysiwyg = array();
+
         // Scan all wysiwyg
         foreach ($this->template['layout'] as $wysiwyg_name => $layout) {
-            $content = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
 
-            $this->page_title = $this->page->page_title;
-
-            $this->_view->set('wysiwyg_'.$wysiwyg_name, $content, false);
+            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
         }
+        $this->_view->set('wysiwyg', $wysiwyg, false);
     }
 
     /**
