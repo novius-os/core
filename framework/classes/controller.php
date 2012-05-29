@@ -339,6 +339,21 @@ class Controller extends \Fuel\Core\Controller {
                     $query = $callback($query);
                 }
             }
+
+            if (!empty($config['order_by'])) {
+                $orders_by = $config['order_by'];
+                if (!is_array($orders_by)) {
+                    $orders_by = array($orders_by);
+                }
+                foreach ($orders_by as $order_by => $direction) {
+                    if (!is_string($order_by)) {
+                        $order_by = $direction;
+                        $direction = 'ASC';
+                    }
+                    $query->order_by($order_by, $direction);
+                }
+            }
+
             $objects = $query->get();
             foreach ($objects as $object) {
                 $item = array();
