@@ -1967,7 +1967,7 @@
             if (metadata.dialog.ajax || !edit) {
                 dialog = $(ed.formElement).nos().dialog($.extend({
                     title: metadata.title
-                }, edit ? $.extend({}, metadata.dialog, {ajax : edit.data('config')}) : metadata.dialog));
+                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
             } else {
                 // Open empty dialog
                 dialog = $(ed.formElement).nos().dialog($.extend({
