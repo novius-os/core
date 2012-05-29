@@ -101,10 +101,10 @@ Module::load('nos', NOSPATH);
 define('URL_ADMIN', Uri::base(false).'admin/');
 define('PHP_BEGIN', '<?php ');
 define('PHP_END', ' ?>');
-Module::load('app', APPPATH);
+Module::load('local', APPPATH);
 
 //Autoloader::add_namespace('Nos', NOSPATH.'classes'.DS);
-//Autoloader::add_namespace('App', APPPATH.'classes'.DS);
+//Autoloader::add_namespace('Local', APPPATH.'classes'.DS);
 
 Config::load('namespaces', true);
 
