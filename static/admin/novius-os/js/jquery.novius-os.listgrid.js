@@ -19,9 +19,7 @@ define('jquery-nos-listgrid',
     "use strict";
 	$.widget( "nos.noslistgrid", $.wijmo.wijgrid, {
 		options: {
-            texts : {
-                loading : 'Loading...'
-            }
+            loadingText : 'Loading...'
 		},
 
 		_create: function() {
@@ -34,24 +32,6 @@ define('jquery-nos-listgrid',
 			var self = this,
 				o = self.options;
 
-			if ($.isFunction(o.dataLoading)) {
-                var old_dataLoading = o.dataLoading;
-            }
-            o.dataLoading = function() {
-                self._overlayShow();
-                if ($.isFunction(old_dataLoading)) {
-                    old_dataLoading.apply(this, arguments);
-                }
-            };
-            if ($.isFunction(o.dataLoaded)) {
-                var old_dataLoaded = o.dataLoaded;
-            }
-            o.dataLoaded = function() {
-                self._overlayHide();
-                if ($.isFunction(old_dataLoaded)) {
-                    old_dataLoaded.apply(this, arguments);
-                }
-            };
             if ($.isFunction(o.columnResized)) {
                 var old_columnResized = o.columnResized;
             }
@@ -88,45 +68,13 @@ define('jquery-nos-listgrid',
 					} catch (e) {}
 					$nos.notify(notify);
 				}
-				self._overlayHide();
                 if ($.isFunction(old_ajaxError)) {
                     old_ajaxError.apply(this, arguments);
                 }
             };
 
             $.wijmo.wijgrid.prototype._init.call(self);
-		},
-
-		_overlayShow : function() {
-			var self = this,
-                o = self.options;
-
-            self.uiOverlay = $('<div></div>')
-                .addClass('wijmo-wijgrid-overlay ui-widget-overlay')
-                .appendTo(self.outerDiv);
-            self.uiOverlayText = $('<span><span></span>' + o.texts.loading + '</span>')
-                .addClass('wijmo-wijgrid-loadingtext ui-widget-content ui-corner-all')
-                .find('span')
-                .addClass('ui-icon ui-icon-clock')
-                .end()
-                .appendTo(self.outerDiv);
-
-            self.uiOverlayText.css({
-                marginLeft : (self.uiOverlayText.width() * -1 / 2) + 'px',
-                marginTop : (self.uiOverlayText.height() * -1 / 2) + 'px'
-            });
-
-			return self;
-		},
-
-        _overlayHide : function() {
-            var self = this;
-
-            self.uiOverlay.remove();
-            self.uiOverlayText.remove();
-
-            return self;
-        }
+		}
     });
 	return $nos;
 });
