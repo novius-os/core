@@ -537,7 +537,7 @@
 
                     p = DOM.getParent(n, 'A');
                     link = !!p;
-                    anchor = link && !!p.name;
+                    anchor = link && (p.name || (p.id && !p.href));
 
                     m.items['link'].setDisabled(anchor);
                     m.items['link'].setActive(link && !anchor);
@@ -1516,7 +1516,7 @@
             }
 
 			if (c = cm.get('anchor')) {
-				c.setActive(!co && !!p && p.name);
+                c.setActive(!co && !!p && (p.name || (p.id && !p.href)));
 			}
 
 			p = getParent('IMG');
