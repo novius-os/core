@@ -21,10 +21,10 @@ class Controller_Front_Application extends Controller {
 
     public $default_config = array();
 
-    public function before($response = null) {
+    public function before() {
         $this->main_controller = \Nos\Nos::main_controller();
 
-        return parent::before($response);
+        return parent::before();
     }
 
     public function trigger($event, $data = '', $return_type = 'string') {

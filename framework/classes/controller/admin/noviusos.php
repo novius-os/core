@@ -14,8 +14,8 @@ class Controller_Admin_Noviusos extends Controller {
 
 	public $template = 'nos::admin/html';
 
-	public function before($response = null) {
-		parent::before($response);
+	public function before() {
+		parent::before();
 
 		if (!\Nos\Auth::check()) {
 			\Response::redirect('/admin/nos/login' . ($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
