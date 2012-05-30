@@ -537,6 +537,7 @@ define('jquery-nos', [
                             url: contentUrl,
                             type: 'GET',
                             dataType: "html",
+                            data : options.ajaxData || {},
                             // Complete callback (responseText is used internally)
                             complete: function( jqXHR, status, responseText ) {
                                 // Store the response as specified by the jqXHR object

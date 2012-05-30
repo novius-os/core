@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -249,7 +249,7 @@
 
 		_setOption: function (key, value) {
 			var self = this,
-				o = self.options,
+				o = self.options, expander,
 				oldValue = $.extend({}, o[key]);
 
 			if (key === "fullSplit") {
@@ -279,6 +279,11 @@
 				} else if (key === "splitterDistance") {
 					self.refresh(false, false);
 					self._trigger("sized");
+				} else if (key === "showExpander") {
+					expander = self._fields.expander;
+					if (expander && expander.length) {
+						expander.css("display", value ? "" : "none");
+					}
 				}
 			}
 
@@ -683,7 +688,7 @@
 					//element.addClass(vSplitterCssPrefix + collapsedCss);
 					expander.addClass(vSplitterCssPrefix + collapsedCss);
 					pnl1.css("display", "none");
-					pnl2.css("display", "");				
+					pnl2.css("display", "");
 					distance = 0;
 				} else {
 					//element.addClass(vSplitterCssPrefix + expandedCss);
@@ -1015,29 +1020,30 @@
 	"use strict";
 	$.ui.plugin.add("resizable", "wijanimate", {
 		stop: function (event, ui) {
-			var self = $(this).data("resizable"), 
-				o = self.options, 
-				element = self.element, 
-				pr = self._proportionallyResizeElements, 
-				ista = pr.length && (/textarea/i).test(pr[0].nodeName), 
+			var self = $(this).data("resizable"),
+				o = self.options,
+				element = self.element,
+				pr = self._proportionallyResizeElements,
+				ista = pr.length && (/textarea/i).test(pr[0].nodeName),
 				soffseth = ista && $.ui.hasScroll(pr[0], 'left') ?
 							 0 : self.sizeDiff.height,
-				soffsetw = ista ? 0 : self.sizeDiff.width, 
+				soffsetw = ista ? 0 : self.sizeDiff.width,
 				style, left, top;
 
 			element.css("width", self.originalSize.width)
 				.css("height", self.originalSize.height);
 
-			style = { width: (self.size.width - soffsetw), 
-					height: (self.size.height - soffseth) };
-			left = (parseInt(element.css('left'), 10) + 
+			style = { width: (self.size.width - soffsetw),
+				height: (self.size.height - soffseth)
+			};
+			left = (parseInt(element.css('left'), 10) +
 					(self.position.left - self.originalPosition.left)) || null;
-			top = (parseInt(element.css('top'), 10) + 
+			top = (parseInt(element.css('top'), 10) +
 					(self.position.top - self.originalPosition.top)) || null;
 
-			element.animate($.extend(style, top && left ? { 
+			element.animate($.extend(style, top && left ? {
 				top: top,
-				left: left 
+				left: left
 			} : {}), {
 				duration: o.animateDuration,
 				easing: o.animateEasing,
@@ -1064,4 +1070,4 @@
 			});
 		}
 	});
-}(jQuery));
+} (jQuery));

@@ -13,52 +13,12 @@ namespace Nos;
 class Nos {
 
     /**
-     * Rewrites an URL according to conventions
-     *
-     * @param   array   $params
-     *  - url   : the base URL to use for rewrite
-     *  - title : the first part of the rewrited URL (slug)
-     *  - ids   : a string or array of following parameters. A string won't be friendly_title'ized
-     * @return  string  The rewrited URL
-     */
-    public static function rewrite_url($url = null, array $rewrites = array()) {
-        // No URL provided, we use the one from the main page
-        if ($url === null) {
-            $url = self::main_page()->get_href();
-        }
-        $url  = str_replace('.html', '/', $url);
-
-        if (!empty($rewrites)) {
-            if (is_array($rewrites)) {
-                $rewrites[0] = \Inflector::friendly_title($rewrites[0], '-', true);
-                if (!empty($rewrites[1])) {
-                    $rewrites[1] = \Inflector::friendly_title($rewrites[1], '-', true);
-                }
-            } else {
-                $rewrites = array((string) $rewrites);
-            }
-            $url .= implode(',', $rewrites);
-        }
-        $url .= '.html';
-        return $url;
-    }
-
-    /**
      * Returns the controller instance from the main request
      *
      * @return \Nos\Controller
      */
     public static function main_controller() {
         return \Request::main()->controller_instance;
-    }
-
-    /**
-     * Returns the pagefrom the main request
-     *
-     * @return \Nos\Model_Page
-     */
-    public static function main_page() {
-        return static::main_controller()->page;
     }
 
     /**
@@ -153,7 +113,7 @@ class Nos {
     protected static function __parse_enhancers($fct_id, $args, $controller) {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
-        )));
+        )), true);
 
         // Check if the function exists
         $name   = $fct_id;
@@ -162,13 +122,6 @@ class Nos {
 
         $found  = $config !== false;
 
-	    if (!empty($config['urlEnhancer'])) {
-		    $args = array(
-			    'url' => $controller->enhancerUrl,
-			    'config' => $args,
-		    );
-	    }
-
         false && \Fuel::$profiling && \Profiler::console(array(
             'function_id'   => $fct_id,
             'function_name' => $name,
@@ -176,7 +129,7 @@ class Nos {
         ));
 
         if ($found) {
-            $function_content = self::hmvc((!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']).'/main', array(
+            $function_content = self::hmvc((!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']), array(
                 'args'        => array($args),
             ));
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {

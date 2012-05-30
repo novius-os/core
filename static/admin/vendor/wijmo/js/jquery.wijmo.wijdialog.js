@@ -1,7 +1,7 @@
 /*globals window,document,jQuery,setTimeout*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -159,6 +159,7 @@
 			}
 			//end
 
+			self.form = self.element.closest("form[id]"); // for asp.net
 
 			$.ui.dialog.prototype._create.apply(self, arguments);
 			self.uiDialog.addClass("wijmo-wijdialog");
@@ -167,6 +168,10 @@
 			self._attachDraggableResizableEvent();
 			self.originalPosition = o.position;
 			self.isPin = false;
+
+			if (self.form.length) {
+				self.uiDialog.appendTo(self.form);
+			}
 		},
 
 		_makeDraggable: function () {
@@ -814,6 +819,16 @@
 			}
 		},
 
+		_appendToBody: function (dlg) {
+			if (!this.innerFrame) {
+				dlg.appendTo(document.body);
+			}
+			else {
+				this.uiDialogTitlebar.prependTo(dlg);
+				dlg.show();
+			}
+		},
+
 		restore: function () {
 			/// <summary>
 			///		Restores wijdialog to normal size.
@@ -850,13 +865,8 @@
 
 				dlg.css("position", "absolute");
 				dlg.css("float", "");
-				if (!self.innerFrame) {
-					dlg.appendTo(document.body);
-				}
-				else {
-					self.uiDialogTitlebar.prependTo(dlg);
-					dlg.show();
-				}
+
+				self._appendToBody(dlg);
 
 				self._enableDisableResizer(false);
 				if (!self.isPin) {
@@ -1051,6 +1061,7 @@
 
 	$.extend($.ui.dialog.overlay, {
 		create: function (dialog) {
+			$.ui.dialog.latestDlg = dialog;
 			if (this.instances.length === 0) {
 				// prevent use of anchors and inputs
 				// we use a setTimeout in case the overlay is created from an
@@ -1061,8 +1072,13 @@
 						$(document).bind($.ui.dialog.overlay.events, function (event) {
 							// stop events if the z-index of the target is < the z-index of the overlay
 							// we cannot return true when we don't want to cancel the event (#3523)
+							// var dlg = $(event.target).closest(".wijmo-wijdialog");
+							//	if (!dlg.length) {
+							//	dlg = dialog.element;
+							// }
+
 							if ($(event.target).zIndex() < $.ui.dialog.overlay.maxZ &&
-							!$.contains(dialog.element[0], event.target)) {
+							!$.contains($.ui.dialog.latestDlg.element[0], event.target)) {
 								return false;
 							}
 						});

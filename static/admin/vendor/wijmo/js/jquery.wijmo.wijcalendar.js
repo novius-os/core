@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -752,6 +752,16 @@
 				}
 			}
 
+			return false;
+		},
+		
+		_onMouseUp: function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			var o = this.options, self = this;
+			self.element.data('dragging.wijcalendar', false);
+			
 			return false;
 		},
 
@@ -1518,7 +1528,7 @@
 		},
 
 		_bindEvents: function () {
-			if (!this.element.data('preview.wijcalendar') && !this.options.disabled) {
+			if (!this.element.data('preview.wijcalendar') && !this.options.disabledState) {
 				this.element.find('div .wijmo-wijcalendar-navbutton').unbind().bind('mouseout.wijcalendar', function () {
 					var el = $(this);
 					el.removeClass('ui-state-hover');
@@ -1537,6 +1547,10 @@
 					}
 				}).bind('click.wijcalendar', $.proxy(this._onNavButtonClicked, this));
 
+				this.element.unbind.bind({
+					"mouseup.wijcalendar": $.proxy(this._onMouseUp, this)
+				});
+				
 				this.element.find(".ui-datepicker-title").unbind().bind('mouseout.wijcalendar', function () {
 					$(this).removeClass('ui-state-hover');
 				}).bind('mouseover.wijcalendar', function () {
@@ -1599,7 +1613,7 @@
 				allowSelDay = (!!o.selectionMode.day || !!o.selectionMode.days);
 
 			previewMode = previewMode || false;
-			if (!previewMode && !o.disabled && allowSelDay && this._isSelectable(dayType)) {
+			if (!previewMode && !o.disabledState && allowSelDay && this._isSelectable(dayType)) {
 				cssCell += " wijmo-wijcalendar-day-selectable";
 			}
 
@@ -2300,7 +2314,7 @@
 					hw.writeAttribute('role', 'columnheader');
 					hw.writeTagRightChar();
 
-					if (!!o.selectionMode.month && !previewMode && !o.disabled) {
+					if (!!o.selectionMode.month && !previewMode && !o.disabledState) {
 						hw.writeBeginTag('a');
 						hw.writeAttribute('class', 'ui-icon ui-icon-triangle-1-se');
 						hw.writeSelfClosingTagEnd();
@@ -2667,7 +2681,7 @@
 					if (outofRange) {
 						cls = cls + ' ui-datepicker-other-month  ui-priority-secondary ui-datepicker-unselectable';
 					} else {
-						if (!o.disabled) {
+						if (!o.disabledState) {
 							cls += " wijmo-wijcalendar-day-selectable";
 						}
 					}

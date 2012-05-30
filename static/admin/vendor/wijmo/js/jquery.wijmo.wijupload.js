@@ -2,7 +2,7 @@
 
 /*
 * 
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 * 
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -43,40 +43,40 @@
 		wijuploadFrm,
 
         _getFileName = function (fileName) { // Trim path on IE.
-			if (fileName.indexOf("\\") > -1) {
-				fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-			}
-			return fileName;
+        	if (fileName.indexOf("\\") > -1) {
+        		fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+        	}
+        	return fileName;
         },
 
         _getFileNameByInput = function (fileInput) {
-			var files = fileInput.files, name = "";
+        	var files = fileInput.files, name = "";
 
-			if (files) {
-				$.each(files, function (i, n) {
-					name += _getFileName(n.name) + "; ";
-				});
-				if (name.length) {
-					name = name.substring(0, name.lastIndexOf(";"));
-				}
-			}
-			else {
-				name = _getFileName(fileInput.value);
-			}
+        	if (files) {
+        		$.each(files, function (i, n) {
+        			name += _getFileName(n.name) + "; ";
+        		});
+        		if (name.length) {
+        			name = name.substring(0, name.lastIndexOf(";"));
+        		}
+        	}
+        	else {
+        		name = _getFileName(fileInput.value);
+        	}
 
-			return name;
+        	return name;
         },
 
         _getFileSize = function (file) {
-			var files = file.files, size = 0;
-			if (files && files.length > 0) {
-				$.each(files, function (i, n) {
-					if (n.size) {
+        	var files = file.files, size = 0;
+        	if (files && files.length > 0) {
+        		$.each(files, function (i, n) {
+        			if (n.size) {
         				size += n.size;
-					}
-				});
-			}
-			return size;
+        			}
+        		});
+        	}
+        	return size;
         };
 
 	wijuploadXhr = function (uploaderId, fileRow, action) {
@@ -129,7 +129,7 @@
 					};
 
 
-            		xhttpr.onreadystatechange = function (e) {
+					xhttpr.onreadystatechange = function (e) {
 						if (this.readyState === 4) {
 							var response = this.responseText, obj;
 							uploadedSize += files[idx].size;
@@ -516,6 +516,11 @@
 				self._handleDisabledOption(value, self.upload);
 			}
 			//end for disabled option
+			else if (key === "accept") {
+				if (self.input) {
+					self.input.attr("accept", value);
+				}
+			}
 		},
 
 		_handleDisabledOption: function (disabled, ele) {
@@ -609,7 +614,7 @@
 			if (el.is(":input") &&
 				el.attr("type") === "file") {
 				self.isCreateByInput = true;
-				self.maxDisplay = (el.attr("multiple")||self.options.multiple) ? 0 : 1;
+				self.maxDisplay = (el.attr("multiple") || self.options.multiple) ? 0 : 1;
 
 				self.upload = el.css({
 					display: "none"
@@ -835,9 +840,9 @@
 				uploader.onProgress = function (obj) {
 					var progressSpan = $("." + uploadProgressClass, this.fileRow),
                     data = {
-						sender: obj.fileName,
-						loaded: obj.loaded,
-						total: obj.total
+                    	sender: obj.fileName,
+                    	loaded: obj.loaded,
+                    	total: obj.total
                     },
                     id = this.inputFile.attr("id");
 					if (obj.supportProgress) {
@@ -930,12 +935,9 @@
 			return true;
 		},
 
-		_wijcancel: function (fileInput) {
+		_wijcancel: function (fileInput) { },
 
-		},
-
-		_upload: function (fileRow) {
-		},
+		_upload: function (fileRow) { },
 
 		_bindEvents: function () {
 			var self = this,
@@ -977,6 +979,13 @@
 					if (self._trigger("upload", e, fileInput) === false) {
 						return false;
 					}
+					if (self.options.autoSubmit) {
+						//when autoSubmit set to "true", will trigger "totalUpload" immediately.
+						self.uploadAll = true;
+						if (self._trigger("totalUpload", e, null) === false) {
+							return false;
+						}
+					}
 					self.totalUploadFiles++;
 					self._upload(fileRow);
 					if (uploader && self._wijUpload()) {
@@ -1010,9 +1019,7 @@
 				});
 		},
 
-		_wijuploadAll: function (uploadBtns) {
-
-		},
+		_wijuploadAll: function (uploadBtns) { },
 
 		_wijFileRowRemoved: function (fileRow, fileInput, isComplete) {
 			this._setAddBtnState();

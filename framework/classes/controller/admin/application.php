@@ -16,8 +16,8 @@ class Controller_Admin_Application extends Controller_Admin_Auth {
     public $bypass   = false;
 
 
-    public function before($response = null) {
-        $ret = parent::before($response);
+    public function before() {
+        $ret = parent::before();
         $location = $this->getLocation();
         list($application, $file_name) = $location;
         if ($application == 'nos' && isset($location[2])) {

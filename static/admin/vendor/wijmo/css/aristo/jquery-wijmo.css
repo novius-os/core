@@ -1,16 +1,16 @@
-/*
- *
+/* 
+ * 
  * Wijmo Aristo Theme
  * http://wijmo.com/
- *
+ * 
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
- *
+ * 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://www.wijmo.com/license
- *
+ * 
  * Based on the Aristo theme concept created by 280 North and Pinvoke (https://github.com/280north/aristo).
- *
+ * 
 */
 
 /* Layout helpers
@@ -1742,7 +1742,7 @@ button.ui-button::-moz-focus-inner
 }
 .ui-slider .ui-slider-handle
 {
-
+    
     background: #83b0ca url(images/ui-bg_highlight-soft_100_83b0ca_1x100.png) repeat-x top;
     border-color: #8ab0c6;
     /*
@@ -1997,10 +1997,10 @@ button.ui-button::-moz-focus-inner
 
 .wijmo-wijcalendar-preview-wrapper .wijmo-wijcalendar table.ui-datepicker-calendar
 {
-    width: 85.8%;
+    width: 85.8%;   
 }
 
-.wijmo-wijcalendar .wijmo-wijcalendar-nextpreview-button
+.wijmo-wijcalendar .wijmo-wijcalendar-nextpreview-button 
 {
 
 }
@@ -2553,7 +2553,7 @@ margin-left:10px;
 border:solid 1px #587e93;
 }
 
-.wijmo-wijmenu-child .wijmo-wijmenu-link.ui-state-focus
+.wijmo-wijmenu-child .wijmo-wijmenu-link.ui-state-focus 
 {
     background: #7389a5;
     color: #fff;

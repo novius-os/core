@@ -1,7 +1,7 @@
 /*globals window document jQuery */
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -1365,20 +1365,15 @@
 			ele.removeClass(uiStateHover);
 		},
 
-		scrollChildIntoView: function (child1) {
-			/// <summary>
-			/// Scroll children DOM element to view. 
-			/// </summary>
-			/// <param name="child" type="DOMElement/JQueryObj">
-			/// The child to scroll to.
-			/// </param>
-
-			var child = $(child1), f, cWrapper, tempWrapper, left, top,
+		_getScorllOffset: function (child1) {
+			
+			var child = $(child1), f, cWrapper, tempWrapper,// left, top,
 			childOffset, templateOffset, cWrapperOffset,
-			tDistance, bDistance, lDistance, rDistance;
+			tDistance, bDistance, lDistance, rDistance,
+			result = { left: null, top: null };
 
 			if (child.size() === 0) {
-				return;
+				return result;
 			}
 			f = this._fields();
 			cWrapper = f.contentWrapper;
@@ -1394,37 +1389,64 @@
 
 			lDistance = childOffset.left - templateOffset.left;
 			if (childOffset.left < cWrapperOffset.left) {
-				left = lDistance;
+				result.left = lDistance;
 			}
 			else if (childOffset.leftWidth > cWrapperOffset.leftWidth) {
 				rDistance = childOffset.leftWidth - templateOffset.left -
 				cWrapper.innerWidth();
 				if (lDistance < rDistance) {
-					left = lDistance;
+					result.left = lDistance;
 				}
 				else {
-					left = rDistance;
+					result.left = rDistance;
 				}
 			}
 
 			tDistance = childOffset.top - templateOffset.top;
 			if (childOffset.top < cWrapperOffset.top) {
-				top = tDistance;
+				result.top = tDistance;
 			}
 			else if (childOffset.topHeight > cWrapperOffset.topHeight) {
 				bDistance = childOffset.topHeight - templateOffset.top -
 				cWrapper.innerHeight();
 				if (tDistance < bDistance) {
-					top = tDistance;
+					result.top = tDistance;
 				}
 				else {
-					top = bDistance;
+					result.top = bDistance;
 				}
 			}
-			if (left !== undefined) {
+
+			return result;
+		},
+
+		needToScroll: function (child1) {
+			/// <summary>
+			/// Determine whether scoll the child DOM element to view 
+			/// need to scroll the scroll bar
+			/// </summary>
+			/// <param name="child" type="DOMElement/JQueryObj">
+			/// The child to scroll to.
+			/// </param>
+			var offset = this._getScorllOffset(child1);
+			return offset.top !== null || offset.left !== null;
+		},
+
+		scrollChildIntoView: function (child1) {
+			/// <summary>
+			/// Scroll children DOM element to view. 
+			/// </summary>
+			/// <param name="child" type="DOMElement/JQueryObj">
+			/// The child to scroll to.
+			/// </param>
+			var offset = this._getScorllOffset(child1),
+				left = offset.left,
+				top = offset.top;
+
+			if (left !== null) {
 				this.hScrollTo(left);
 			}
-			if (top !== undefined) {
+			if (top !== null) {
 				this.vScrollTo(top);
 			}
 		},
@@ -1533,7 +1555,7 @@
 			/// </returns>
 			var self = this, ele = self.element, focused, o, f, templateWrapper;
 			if (ele.is(":visible")) {
-				focused = document.activeElement;
+				focused = typeof document.activeElement != 'unknown' ? document.activeElement : undefined;
 				o = self.options;
 				f = self._fields();
 				if (!f.initialized) {

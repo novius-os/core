@@ -98,7 +98,7 @@
 /* -------------- ribbon css ------------------------------------  */
 .wijmo-wijeditor .wijmo-wijribbon .wijmo-wijribbon-actions
 {
-    width: 14em;
+    width: 15em;
 }
 
 .wijmo-wijeditor .wijmo-wijribbon .wijmo-wijribbon-font
@@ -565,14 +565,14 @@
 
 .wijmo-wijeditor .wijmo-wijeditor-colorcanvas .wijmo-wijeditor-wheel
 {
-    background: transparent url(../images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -218px;
+    background: transparent url(images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -218px;
     width: 195px;
     height: 195px;
 }
 
 .wijmo-wijeditor .wijmo-wijeditor-colorcanvas .wijmo-wijeditor-overlay
 {
-    background: transparent url(../images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -67px;
+    background: transparent url(images/wijeditor/wijmo-ui-editor.png) no-repeat 0 -67px;
 }
 
 .wijmo-wijeditor .wijmo-wijeditor-colorcanvas .wijmo-wijeditor-marker
@@ -581,7 +581,7 @@
     height: 17px;
     margin: -8px 0 0 -8px;
     overflow: hidden;
-    background: transparent url(../images/wijeditor/wijmo-ui-editor.png) no-repeat 0 0;
+    background: transparent url(images/wijeditor/wijmo-ui-editor.png) no-repeat 0 0;
 }
 /* ---------------- end of color dialog css ------------------- */
 

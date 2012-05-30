@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -184,8 +184,10 @@
 
 		 _init: function () {
 			 var o = this.options;
-			 if (o.disabled){
+			 if (o.disabledState){
+				var dis = o.disabled;
 				this.disable();
+				o.disabled = dis;
 			 }else{
 				 if (o.autoPlay) {
 					 this.play();

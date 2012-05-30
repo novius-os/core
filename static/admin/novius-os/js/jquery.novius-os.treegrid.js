@@ -143,6 +143,7 @@ define('jquery-nos-treegrid',
 
             $.nos.noslistgrid.prototype._init.call(self);
 
+            self._activateSpinner();
             self._datasource();
             self.treeDataSource.proxy.options.data.deep = 2;
             if ($.isPlainObject(o.preOpen)) {
@@ -212,6 +213,7 @@ define('jquery-nos-treegrid',
                     try {
                         self.ensureControl(true);
                     } catch (e) {}
+                    self._deactivateSpinner();
                 },
                 reader: {
                     read: function (dataSource) {

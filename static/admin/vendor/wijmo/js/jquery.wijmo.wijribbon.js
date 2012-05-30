@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -557,6 +557,13 @@
 					groupInfos = [],
 					pageWidth;
 
+				//update for fixed issue 21292 by wh at 2012/5/8
+				if($tabPage.data("destroy.tabs")) {
+					$tabPage.remove();
+					return;
+				}
+				//end 
+				
 				if (!isTabVisible) {
 					$tabPage.removeClass(css_tabs_hide);
 				}

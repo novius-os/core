@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -923,7 +923,7 @@
 
         _groupMode: function () {
             var self = this, o = this.options;
-            return (o.groupItems && o.groupItems.length > 0);
+            return (o.groupItems && o.groupItems.length > 1);
         },
 
         _resetText: function () {

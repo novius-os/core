@@ -20,7 +20,7 @@
 {
     margin-right: 0;
 }
-
+ 
 
 .wijmo-wijev-navigationbar .wijmo-wijev-title
 {
@@ -66,7 +66,7 @@
     padding: 0;
     margin: 2px 12px;
 	clear: none;
-	float: left;
+	float: left;    	
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-headercontainer .wijmo-wijev-dayheadercolumn
@@ -102,7 +102,10 @@
     font-weight: normal;
     padding: 0 6px;
     cursor: pointer;
-
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-weekview .wijmo-wijev-headercontainer .wijmo-wijev-dayheadercolumn .wijmo-wijev-daylabel
+{
+	cursor: default;
 }
 
 
@@ -134,7 +137,7 @@
     padding: 16px 6px;
     font-weight: normal;
     opacity: 0;
-
+    
 }
 
 .wijmo-wijev .wijmo-wijev-listview .wijmo-wijev-headercontainer .wijmo-wijev-sizer .wijmo-wijev-gmtlabel,
@@ -153,10 +156,10 @@
     position: relative;
 }
 
-.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-timeinterval,
-.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-content,
+.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-timeinterval, 
+.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-content, 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-content .wijmo-wijev-title,
-.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-timeruler .wijmo-wijev-timerulerinterval,
+.wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-timeruler .wijmo-wijev-timerulerinterval, 
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer
 {
     box-sizing: border-box;
@@ -186,7 +189,12 @@
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
-    padding-left: 20px;
+    padding-left: 20px;    
+}
+
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-monthview .wijmo-wijev-appointment
+{
+	cursor: default;
 }
 
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-appointment .wijmo-wijev-colordot
@@ -208,8 +216,8 @@
     height: 17px;
     line-height: 17px;
     white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    text-overflow: ellipsis;	
+    overflow: hidden;    
     width: 100%;
 }
 /**/
@@ -219,6 +227,10 @@
 	cursor: pointer;
 	clear:both;
 	height: 17px;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-dayview .wijmo-wijev-allday-cell .wijmo-wijev-appointment
+{
+	cursor: default;
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-allday-cell .wijmo-wijev-appointment .wijmo-wijev-colordot
@@ -230,22 +242,22 @@
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
-    margin: 2px;
+    margin: 2px;	
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-allday-cell .wijmo-wijev-appointment .wijmo-wijev-event-title
 {
-
+    
     height: 17px;
     line-height: 17px;
     margin-left: 4px;
-    /* Note: all day event title should not be wrapped to the next line:
+    /* Note: all day event title should not be wrapped to the next line: 
 float:left removed.
 	*/
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-
+    
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment
@@ -254,7 +266,7 @@ float:left removed.
     height: 15px;
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0;    
     border-radius: 4px;
     box-shadow: 2px 2px 3px rgba(0,0,0,0.10), inset 1px 1px 0 rgba(255,255,255,0.25);
 /*fix for:
@@ -265,11 +277,11 @@ when a new appointment is created the resizer bar appears on top of the content
 /*
 fix for:
 Current time indicator is under certain colors of appointments
-*/
+*/    
 	z-index: 999;
     -moz-opacity: .95;
     filter: alpha(opacity=95);
-    opacity: .95;
+    opacity: .95;    
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-resizer
@@ -285,6 +297,10 @@ Current time indicator is under certain colors of appointments
     -moz-opacity: .40;
     filter: alpha(opacity=40);
     opacity: .40;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-resizer
+{
+	cursor: default;
 }
 
 .wijmo-wijev .wijmo-wijev-dayview .wijmo-wijev-daycolumn .wijmo-wijev-appointment .wijmo-wijev-resizer .ui-icon
@@ -397,6 +413,11 @@ Current time indicator is under certain colors of appointments
     text-align: right;
     cursor: pointer;
 }
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer .wijmo-wijev-monthcellheader
+{
+	cursor: default;
+}
+
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer .wijmo-wijev-monthcellheader:hover
 {
     text-decoration: underline;
@@ -414,6 +435,11 @@ Current time indicator is under certain colors of appointments
 	bottom: 0px;
 	cursor: pointer;
 }
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-monthcell-showmore
+{
+	cursor: default;
+}
+
 .wijmo-wijev .wijmo-wijev-monthview .wijmo-wijev-monthcellcontainer .wijmo-wijev-monthcellheader .wijmo-wijev-todaylabel
 {
 	float:left;
@@ -473,6 +499,8 @@ Current time indicator is under certain colors of appointments
     width: 63px;
     *width: 70px;
     text-transform: lowercase;
+    overflow: hidden;
+    text-overflow: ellipsis;    
 }
 
 .wijmo-wijev-event-dialog a
@@ -495,6 +523,10 @@ Current time indicator is under certain colors of appointments
 .wijmo-wijev-event-dialog .wijmo-wijev-color
 {
     cursor: pointer;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-event-dialog .wijmo-wijev-color
+{
+	cursor: default;
 }
 
 .wijmo-wijev-event-dialog .wijmo-wijev-delete
@@ -675,6 +707,10 @@ div.wijmo-wijev .ui-state-highlight
     border: solid 1px transparent;
     margin: 4px;
 }
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-listcolor
+{
+	cursor: default;
+}
 
 .wijmo-wijev-listcolor:hover
 {
@@ -729,7 +765,7 @@ div.wijmo-wijev .ui-state-highlight
 .wijmo-wijev-viewdetails
 {
     display: none;
-    height: 100%;
+    height: 100%;    
     position: relative;
 }
 .wijmo-wijev-list-details
@@ -761,6 +797,11 @@ div.wijmo-wijev .ui-state-highlight
     border-right: none;
     margin-bottom: -1px;
     cursor: pointer;
+}
+
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-viewdetails .wijmo-wijev-agenda-container li.wijmo-wijev-agenda-event
+{
+	cursor: default;
 }
 
 .wijmo-wijev-viewdetails .wijmo-wijev-agenda-event-color
@@ -867,7 +908,7 @@ div.wijmo-wijev .ui-state-highlight
     padding:0;
     padding: 5px;
     background: none;
-    border: none;
+    border: none;   
 }
 
 .wijmo-wijev-navigationbar .wijmo-wijev-next, .wijmo-wijev-event-dialog .wijmo-wijev-cancel,
@@ -876,9 +917,9 @@ div.wijmo-wijev .ui-state-highlight
     float: right;
 }
 
-.wijmo-wijev-event-dialog .wijmo-wijev-brief-content,
-.wijmo-wijev-event-dialog .wijmo-wijev-detailed-content,
-.wijmo-wijevcal .wijmo-wijev-scrollpanel,
+.wijmo-wijev-event-dialog .wijmo-wijev-brief-content, 
+.wijmo-wijev-event-dialog .wijmo-wijev-detailed-content, 
+.wijmo-wijevcal .wijmo-wijev-scrollpanel, 
 .wijmo-wijev-today
 {
     border: none;
@@ -928,7 +969,7 @@ div.wijmo-wijev .ui-state-highlight
 
 .wijmo-wijev-event-dialog .wijmo-wijdropdown
 {
-	display: inline-block;
+	display: inline-block;	
 }
 .wijmo-wijev-event-dialog .wijmo-wijev-calendar,
 .wijmo-wijev-event-dialog .wijmo-wijev-repeat
@@ -964,7 +1005,7 @@ div.wijmo-wijev .ui-state-highlight
     padding: 0 4px;
     text-align: right;
     width: 63px;
-    margin-left: 0;
+    margin-left: 0;    
 }
 
 .wijmo-wijev-event-dialog .wijmo-checkbox .wijmo-checkbox-box {
@@ -991,24 +1032,24 @@ div.wijmo-wijev .ui-state-highlight
 {
 	background-color: #ffffff;
     width: 100%;
-    height: 100%;
-    position: absolute;
+    height: 100%;	
+    position: absolute;   
     z-index: 1001;
 	-moz-opacity: .35;
     filter: alpha(opacity=35);
-    opacity: .35;
+    opacity: .35;      
     display: none;
 }
 .wijmo-wijev-loading
 {
-	background: transparent url('../images/waiting.gif') no-repeat scroll;
-	background-position: center center;
+	background: transparent url('images/waiting.gif') no-repeat scroll;
+	background-position: center center;	
     width: 100%;
     height: 100%;
     left: 0px;
-    top: 0px;
+    top: 0px;        
     border: none;
-    position: absolute;
+    position: absolute;   
     z-index: 1002;
     display: none;
 }
@@ -1019,8 +1060,8 @@ div.wijmo-wijev .ui-state-highlight
 	left: 50%;
 	bottom: 30%;
 	width: 200px;
-	margin-left: -100px;
+	margin-left: -100px;	
     text-overflow: ellipsis;
     overflow: hidden;
-    text-align: center;
+    text-align: center;	
 }

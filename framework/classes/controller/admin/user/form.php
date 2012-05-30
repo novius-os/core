@@ -12,11 +12,11 @@ namespace Nos;
 
 class Controller_Admin_User_Form extends \Nos\Controller_Admin_Application {
 
-    public function before($response = null) {
+    public function before() {
         if (\Request::active()->action == 'edit' && ($user = \Session::user()) && \Request::active()->method_params[0] == $user->user_id) {
             $this->bypass = true;
         }
-        $ret = parent::before($response);
+        $ret = parent::before();
 
         return $ret;
     }
