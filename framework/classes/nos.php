@@ -153,7 +153,7 @@ class Nos {
     protected static function __parse_enhancers($fct_id, $args, $controller) {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
-        )));
+        )), true);
 
         // Check if the function exists
         $name   = $fct_id;
@@ -162,13 +162,6 @@ class Nos {
 
         $found  = $config !== false;
 
-	    if (!empty($config['urlEnhancer'])) {
-		    $args = array(
-			    'url' => $controller->enhancerUrl,
-			    'config' => $args,
-		    );
-	    }
-
         false && \Fuel::$profiling && \Profiler::console(array(
             'function_id'   => $fct_id,
             'function_name' => $name,
@@ -176,7 +169,7 @@ class Nos {
         ));
 
         if ($found) {
-            $function_content = self::hmvc((!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']).'/main', array(
+            $function_content = self::hmvc((!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']), array(
                 'args'        => array($args),
             ));
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
