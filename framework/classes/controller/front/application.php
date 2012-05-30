@@ -14,19 +14,18 @@ use Event;
 
 class Controller_Front_Application extends Controller {
 
-    public $url;
-    public $pageUrl;
-    public $enhancerUrl;
-    public $enhancerUrlPath;
-
-    public $enhancerUrl_segments;
+    public $main_controller;
 
     public $cache;
     public $cache_cleanup;
 
-    public $nesting_level;
-
     public $default_config = array();
+
+    public function before($response = null) {
+        $this->main_controller = \Nos\Nos::main_controller();
+
+        return parent::before($response);
+    }
 
     public function trigger($event, $data = '', $return_type = 'string') {
         Event::trigger(get_called_class().'.'.$event, $this, 'array');

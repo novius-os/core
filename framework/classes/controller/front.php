@@ -19,6 +19,10 @@ class NotFoundException extends \Exception {}
 
 class Controller_Front extends Controller {
 
+    public $url;
+    public $pageUrl;
+    public $enhancerUrl;
+    public $enhancerUrlPath;
 
     public $template;
     public $is_preview = false;
