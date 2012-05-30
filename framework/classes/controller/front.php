@@ -100,8 +100,12 @@ class Controller_Front extends Controller {
 	        if ($_404) {
                 if (!\Event::trigger('front.404NotFound', array('url' => $this->pageUrl))) {
                     // If no redirection then we display 404
-                    $_SERVER['REDIRECT_URL'] = '/';
-                    return $this->router('index', $params);
+                    if (!empty($url)) {
+                        $_SERVER['REDIRECT_URL'] = '/';
+                        return $this->router('index', $params);
+                    } else {
+                        exit('No home page defined. Please check you created a page and it\'s published');
+                    }
                 }
 	        }
         }
