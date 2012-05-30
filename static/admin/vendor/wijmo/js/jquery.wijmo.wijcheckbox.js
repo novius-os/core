@@ -1,7 +1,7 @@
 /*globals jQuery*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -122,6 +122,9 @@
 					boxElement.removeClass("ui-state-hover").not(".ui-state-focus")
 					.addClass("ui-state-default");
 				});
+				
+				//update for fixed tooltip can't take effect 
+				checkboxElement.attr("title", ele.attr("title"));
 			}
 		},
 

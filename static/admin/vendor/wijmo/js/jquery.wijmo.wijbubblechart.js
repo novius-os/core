@@ -1,7 +1,7 @@
 /*globals jQuery Raphael Globalize*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -1166,7 +1166,7 @@
 				currentIndex = 0,
 				bounds = o.bounds,
 				canvas = o.canvas,
-				seriesList = o.seriesList,
+				seriesList = $.arrayClone(o.seriesList),
 				seriesStyles = o.seriesStyles,
 				seriesHoverStyles = o.seriesHoverStyles,
 				xAxisInfo = o.xAxisInfo,
@@ -1438,7 +1438,7 @@
 					if (symbol) {
 						bubble.attr("opacity", 0.1);
 					}
-					wijchartDataObj = $.extend(true, {
+					wijchartDataObj = $.extend(false, {
 						index: i,
 						bubble: bubble,
 						style: seriesStyle,

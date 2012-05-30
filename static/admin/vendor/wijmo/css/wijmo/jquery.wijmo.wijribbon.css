@@ -10,7 +10,7 @@
 }
 .wijmo-wijribbon .ui-button .ui-button-text
 {
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .wijmo-wijribbon .wijmo-wijribbon-panel
@@ -44,12 +44,13 @@
     padding: 0.2em;
 }
 
-.wijmo-wijribbon .ui-button .ui-button-text.ui-state-hover
+.wijmo-wijribbon .ui-button .ui-button-text.ui-state-hover,.wijmo-wijribbon .ui-button .ui-button-text.ui-state-active
 {
-    margin: -1px;
+    border: none;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+    text-decoration: none;
 }
 
 
@@ -83,6 +84,12 @@
     width: 3.5em;
     height: 52px;
     color: #000;
+    text-decoration: none;
+}
+
+.wijmo-wijribbon-bigbutton:visited
+{
+    text-decoration: none;
 }
 
 .wijmo-wijribbon .wijmo-wijribbon-dropdownbutton
@@ -107,6 +114,8 @@
 .wijmo-wijribbon .wijmo-wijribbon-bigbutton .ui-button-text
 {
     padding: 3em 0 0;
+    letter-spacing: -1px;
+    font-size: 10px;    
 }
 
 .wijmo-wijribbon .wijmo-wijribbon-splitbutton
@@ -581,7 +590,7 @@
 
 .wijmo-wijribbon .ui-icon, .wijmo-wijribbon-abbrevicon
 {
-    background-image: url(../images/wijeditor/wijmo-ui-icons_000000_240x112.png);
+    background-image: url(images/wijeditor/wijmo-ui-icons_000000_240x112.png);
 }
 
 .wijmo-wijribbon .ui-icon, .wijmo-wijribbon .ui-tabs-panel, .wijmo-wijribbon .wijmo-wijribbon-panel .wijmo-wijribbon-groups, .wijmo-wijribbon
@@ -654,4 +663,8 @@
 .wijmo-wijribbon-simple .ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text
 {
     padding: 0.4em 2.1em 0.4em 0.4em;
+}
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a
+{
+    text-decoration: none;
 }

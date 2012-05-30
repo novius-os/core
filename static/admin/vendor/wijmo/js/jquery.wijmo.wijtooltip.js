@@ -1,7 +1,7 @@
 /*globals window document clearTimeout setTimeout jQuery */
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -101,7 +101,8 @@
 			/// </summary>
 			showCallout: true,
 			/// <summary>
-			/// Sets showAnimation and hideAnimation if they are not specified individually.
+			/// Sets showAnimation and hideAnimation if they are 
+			/// not specified individually.
 			/// Default: { animated: "fade", duration: 500, easing: null }.
 			/// Type: Object.
 			/// Remark: User's standard animation setting syntax from other widgets.
@@ -358,7 +359,7 @@
 				tooltip = self._tooltip,
 				o = self.options;
 
-			if (!tooltip) {
+			if (!tooltip || o.disabled) {
 				return;
 			}
 
@@ -374,10 +375,11 @@
 				o.ajaxCallback.call(self.element);
 				return;
 			}
+			self._setText();
 
 			tooltip._showAnimationTimer =
 				setTimeout(function () {
-					self._setText();
+					//self._setText();
 					oldTipPos = tooltip.offset();
 					if (o.mouseTrailing) {
 						self._setCalloutCss();
@@ -563,11 +565,15 @@
 
 			if (o.mouseTrailing) {
 				element.bind("mousemove.tooltip", function (e) {
+					if (o.disabled) {
+						return;
+					}
 					var offset = o.position.offset || "",
 					offsets = offset.split(" ");
 					if (offsets.length === 2) {
-						self.showAt({ x: e.pageX + parseInt(offsets[0], 10), 
-							y: e.pageY + parseInt(offsets[1], 10) });
+						self.showAt({ x: e.pageX + parseInt(offsets[0], 10),
+							y: e.pageY + parseInt(offsets[1], 10)
+						});
 					}
 					else {
 						self.showAt({ x: e.pageX, y: e.pageY });
@@ -578,14 +584,14 @@
 			switch (o.triggers) {
 			case "hover":
 				element.bind("mouseover.tooltip", $.proxy(self.show, self))
-			.bind("mouseout.tooltip", $.proxy(self._hideIfNeeded, self));
+				.bind("mouseout.tooltip", $.proxy(self._hideIfNeeded, self));
 				break;
 			case "click":
 				element.bind("click.tooltip", $.proxy(self.show, self));
 				break;
 			case "focus":
 				element.bind("focus.tooltip", $.proxy(self.show, self))
-			.bind("blur.tooltip", $.proxy(self._hideIfNeeded, self));
+				.bind("blur.tooltip", $.proxy(self._hideIfNeeded, self));
 				break;
 			case "rightClick":
 				element.bind("contextmenu.tooltip", function (e) {
@@ -602,7 +608,7 @@
 				closeBehavior = o.closeBehavior;
 
 			if (closeBehavior === "sticky" || o.modal ||
-				closeBehavior === "none") {
+				closeBehavior === "none" || o.disabled) {
 				return;
 			}
 
@@ -1099,7 +1105,7 @@
 				else {
 					return retValue;
 				}
-			} else if (window[content] && 
+			} else if (window[content] &&
 					$.isFunction(window[content])) {
 				// if window[content/title] is a function, then get the
 				// function value.
@@ -1238,7 +1244,7 @@
 					$.wijmo.wijtooltip._tooltips[key] = null;
 				}
 
-				
+
 				//tooltip = null;
 			}
 		}

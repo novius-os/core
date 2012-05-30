@@ -3,7 +3,7 @@
 
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -3084,7 +3084,7 @@
 				}
 			}
 
-			if (!this.options.allowKeyboardNavigation) {
+			if (!this.options.allowKeyboardNavigation || (args.which === $.ui.keyCode.TAB)) {
 				return true;
 			}
 
@@ -3380,10 +3380,10 @@
 			return tableSection.insertRow(-1);
 		},
 
-		_createCell: function (rowType, rowIndex, dataCellIndex, column) {
+		_createCell: function (rowInfo, dataCellIndex, column) {
 			var rt = $.wijmo.wijgrid.rowType;
 
-			switch (rowType) {
+			switch (rowInfo.type) {
 				case rt.header:
 					return "<th><div class=\"wijmo-wijgrid-innercell\"></div></th>";
 
@@ -3396,17 +3396,17 @@
 			}
 		},
 
-		_cellCreated: function ($cell, cellIndex, column, rowInfo, state, attr, style) {
+		_cellRendered: function ($cell, column, rowInfo, state, attr, style) {
 			$.wijmo.wijgrid.dataPrefix($cell, this._data$prefix, "renderState", state);
 
-			this.cellStyleFormatter.format($cell, cellIndex, column, rowInfo, state, attr, style);
+			this.cellStyleFormatter.format($cell, column, rowInfo, state, attr, style);
 
 			this._changeRenderState($cell, $.wijmo.wijgrid.renderState.rendering, false);
 		},
 
-		_rowCreated: function (rowInfo, rowAttr, rowStyle) {
+		_rowRendered: function (rowInfo, rowAttr, rowStyle) {
 			$.wijmo.wijgrid.dataPrefix(true, rowInfo.$rows, this._data$prefix, {
-				dataTableRowIndex: rowInfo._dataTableRowIndex,
+				sectionRowIndex: rowInfo.sectionRowIndex,
 				dataRowIndex: rowInfo.dataRowIndex,
 				rowType: rowInfo.type,
 				dataItemIndex: rowInfo.dataItemIndex,
@@ -3419,7 +3419,7 @@
 			this._changeRenderState(rowInfo.$rows, $.wijmo.wijgrid.renderState.rendering, false);
 		},
 
-		_createRowInfo: function (rowObj, rowType /*opt*/, renderState /*opt*/, dataTableRowIndex /*opt*/, dataRowIndex /*opt*/, dataItemIndex/*opt*/, virtualDataItemIndex/*opt*/) {
+		_createRowInfo: function (rowObj, rowType /*opt*/, renderState /*opt*/, sectionRowIndex /*opt*/, dataRowIndex /*opt*/, dataItemIndex/*opt*/, virtualDataItemIndex/*opt*/) {
 			var dataTable = this.dataTable,
 				sourceDataRow = null,
 				$rows = (rowObj[1] ? $(rowObj) : $(rowObj[0])),
@@ -3434,8 +3434,8 @@
 				renderState = $getData($rows, this._data$prefix, "renderState");
 			}
 
-			if (isNaN(dataTableRowIndex)) {
-				dataTableRowIndex = $getData($rows, this._data$prefix, "dataTableRowIndex");
+			if (isNaN(sectionRowIndex)) {
+				sectionRowIndex = $getData($rows, this._data$prefix, "sectionRowIndex");
 			}
 
 			if (isNaN(dataRowIndex)) {
@@ -3450,8 +3450,8 @@
 				virtualDataItemIndex = $getData($rows, this._data$prefix, "virtualDataItemIndex");
 			}
 
-			if (dataTableRowIndex >= 0) {
-				tmp = dataTable[dataTableRowIndex].originalRowIndex;
+			if ((sectionRowIndex >= 0) && (rowType & $.wijmo.wijgrid.rowType.data)) {
+				tmp = dataTable[sectionRowIndex].originalRowIndex;
 				if (tmp >= 0) {
 					sourceDataRow = this.data()[tmp];
 				}
@@ -3465,7 +3465,7 @@
 				dataRowIndex: dataRowIndex,
 				dataItemIndex: dataItemIndex,
 				virtualDataItemIndex: virtualDataItemIndex,
-				_dataTableRowIndex: dataTableRowIndex
+				sectionRowIndex: sectionRowIndex
 			};
 		},
 
@@ -7696,16 +7696,6 @@
 			return "";
 		},
 
-		ensureTBody: function (domTable) {
-			if (domTable) {
-				return (domTable.tBodies && domTable.tBodies.length > 0)
-					? domTable.tBodies[0]
-					: domTable.appendChild(document.createElement("tbody"));
-			}
-
-			return null;
-		},
-
 		rowTypeFromCss: function ($rows) {
 			var test = /wijmo-wijgrid-(\S+)row/.exec($rows.attr("class"));
 
@@ -8550,12 +8540,10 @@
 })(jQuery);(function ($) {
 	"use strict";
 	$.extend($.wijmo.wijgrid, {
-		htmlTableAccessor: function (domTable) {
+		htmlTableAccessor: function (domTable, skipOffsets, ensureTBody, ensureColgroup) {
 			var offsets = [],
 				width = 0,
 				table = domTable;
-
-			_buildOffsets();
 
 			function _buildOffsets() {
 				var rowSpan = [],
@@ -8698,15 +8686,51 @@
 
 			this.colGroupTag = function () {
 				var cgs = table.getElementsByTagName("colgroup");
-
-				return (cgs !== null && cgs.length > 0) ? cgs[0] : null;
+				return (cgs && cgs[0]) || null;
 			};
 
 			this.colTags = function () {
 				var colGroup = this.colGroupTag();
-
-				return (colGroup !== null) ? colGroup.getElementsByTagName("col") : [];
+				return (colGroup && colGroup.getElementsByTagName("col")) || [];
 			};
+
+			this.ensureTBody = function () {
+				return (table.tBodies && table.tBodies[0]) || table.appendChild(document.createElement("tbody"));
+			};
+
+			this.ensureTHead = function () {
+				return (table.tHead && table.tHead[0]) || table.createTHead();
+			};
+
+			this.ensureTFoot = function () {
+				return (table.tFoot && table.tFoot[0]) || table.createTFoot();
+			};
+
+			this.ensureColGroup = function () {
+				var colGroup = table.getElementsByTagName("colgroup");
+				return (colGroup && colGroup[0]) || table.appendChild(document.createElement("colgroup"));
+			};
+
+			this.appendCol = function (domCol /*opt*/) {
+				var colGroup = this.ensureColGroup();
+				return (domCol && colGroup.appendChild(domCol)) || colGroup.appendChild(document.createElement("col"));
+			};
+
+			// ** initialization 
+
+			if (ensureColgroup) { // important: colGroup must preceed tBody in a table
+				this.ensureColGroup();
+			}
+
+			if (ensureTBody) {
+				this.ensureTBody();
+			}
+
+			if (!skipOffsets) {
+				_buildOffsets();
+			}
+
+			// initialization **
 		}
 	});
 })(jQuery);(function ($) {
@@ -9306,6 +9330,7 @@
 			return { vScrollBarVisibility: vScrollBarVisibility, hScrollBarVisibility: hScrollBarVisibility };
 		},
 
+		// ** rendering
 		_postRender: function () {
 			this.ensureDisabledState();
 		},
@@ -9315,19 +9340,305 @@
 		},
 
 		_renderContent: function () {
+			this._renderCOLS();
+			this._renderHeader();
+
+			if (this._wijgrid.options.showFilter) {
+				this._renderFilter();
+			}
+
+			this._renderBody();
+
+			if (this._wijgrid.options.showFooter) {
+				this._renderFooter();
+			}
+		},
+
+		_renderCOLS: function () {
+			var visibleLeaves = this._wijgrid._field("visibleLeaves"),
+				leaf, domCol,
+				i, len;
+
+			for (i = 0, len = visibleLeaves.length; i < len; i++) {
+				leaf = visibleLeaves[i];
+				domCol = this._createCol(leaf, i);
+
+				this._appendCol(domCol, leaf, i);
+			}
+		},
+
+		_renderHeader: function () {
+			var $rt = $.wijmo.wijgrid.rowType,
+				cht = this._wijgrid._field("columnHeadersTable"),
+				i, height,
+				rowInfo;
+
+			if (cht && (height = cht.length)) {
+				for (i = 0; i < height; i++) {
+					rowInfo = this._buildRowInfo($rt.header, i, -1, -1, -1);
+					this._renderRow(rowInfo, null, cht[i]);
+				}
+			}
+		},
+
+		_renderFilter: function () {
+			var rowInfo = this._buildRowInfo($.wijmo.wijgrid.rowType.filter, -1, -1, -1, -1);
+			this._renderRow(rowInfo, this._wijgrid._field("visibleLeaves"), null);
+		},
+
+		_renderBody: function () {
+			var $rt = $.wijmo.wijgrid.rowType,
+				visibleLeaves = this._wijgrid._field("visibleLeaves"),
+				data = this._wijgrid.dataTable,
+				dataRowIndex = -1,
+				virtualDataItemIndexBase = 0,
+				i, len,
+				rowInfo, dataRow, isDataRow;
+
+			if (this._wijgrid._dataStore.dataMode() === $.wijmo.wijgrid.dataMode.dynamical) {
+				virtualDataItemIndexBase = this._wijgrid.options.pageIndex * this._wijgrid.options.pageSize;
+			}
+
+			// render rows 
+			for (i = 0, len = data.length; i < len; i++) {
+				dataRow = data[i];
+				isDataRow = (dataRow.rowType & $rt.data) !== 0;
+
+				rowInfo = this._buildRowInfo(dataRow.rowType,
+					i,
+					isDataRow ? ++dataRowIndex : -1,
+					isDataRow ? dataRow.originalRowIndex : -1,
+					isDataRow ? virtualDataItemIndexBase + dataRow.originalRowIndex : -1);
+
+				this._renderRow(rowInfo, visibleLeaves, dataRow);
+			}
+		},
+
+		_renderFooter: function () {
+			var rowInfo = this._buildRowInfo($.wijmo.wijgrid.rowType.footer, -1, -1, -1, -1);
+			this._renderRow(rowInfo, this._wijgrid._field("visibleLeaves"), null);
+		},
+
+		// overridable:
+
+		_createRow: function (rowType, sectionRowIndex, originalDataRowIndex) {
 			throw "not implemented";
 		},
 
-		_setColumnWidth: function (index, px) {
-			var th = this.getHeaderCell(index),
-				cols = this.getJoinedCols(index);
+		_appendCell: function (rowInfo, cellIndex, $cell) {
+			throw "not implemented";
+		},
 
-			if (px) {
-				$(th).setOutWidth(px);
-				$.each(cols, function (idx, col) {
-					$(col).setOutWidth(px);
+		_createCol: function (column, visibleIdx) {
+			throw "not implemented";
+		},
+
+		_appendCol: function (domCol, column, visibleIdx) {
+			throw "not implemented";
+		},
+
+
+		_buildRowInfo: function (type, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex) {
+			var row = this._createRow(type, sectionRowIndex, dataItemIndex),
+				rowInfo = this._wijgrid._createRowInfo(row, type, $.wijmo.wijgrid.renderState.rendering, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex);
+
+			return rowInfo;
+		},
+
+		_renderRow: function (rowInfo, visibleLeaves, item) {
+			var $rt = $.wijmo.wijgrid.rowType,
+				rowAttr, rowStyle;
+
+			switch (rowInfo.type) {
+				case $rt.filter:
+					this._renderFilterRow(rowInfo, visibleLeaves);
+					break;
+
+				case $rt.footer:
+					this._renderFooterRow(rowInfo, visibleLeaves);
+					break;
+
+				case $rt.header:
+					this._renderHeaderRow(rowInfo, item);
+					break;
+
+				case $rt.data:
+				case $rt.data | $rt.dataAlt:
+					this._renderDataRow(rowInfo, visibleLeaves, item);
+					rowAttr = item.__attr;
+					rowStyle = item.__style;
+					break;
+
+				case $rt.emptyDataRow:
+				case $rt.groupHeader:
+				case $rt.groupFooter:
+					this._renderSpannedRow(rowInfo, visibleLeaves, item);
+					rowAttr = item.__attr;
+					rowStyle = item.__style;
+					break;
+
+				default:
+					throw "unknown rowType";
+			}
+
+			this._rowRendered(rowInfo, rowAttr, rowStyle);
+		},
+
+		_renderCell: function (rowInfo, value, useHtml, leaf, attr, style) {
+			var $cell = $(this._wijgrid._createCell(rowInfo, leaf.dataIndex, leaf)),
+				$container = (rowInfo.type === $.wijmo.wijgrid.rowType.filter)
+					? $cell
+					: $cell.children("div");
+
+			this._appendCell(rowInfo, leaf.visLeavesIdx, $cell);
+
+			if (useHtml) {
+				$container.html(value);
+			} else {
+				this._wijgrid.cellFormatter.format($container, leaf, value, rowInfo);
+			}
+
+			this._wijgrid._cellRendered($cell, leaf, rowInfo, $.wijmo.wijgrid.renderState.rendering, attr, style);
+		},
+
+		_renderDataRow: function (rowInfo, visibleLeaves, dataRow) {
+			var i, len, leaf,
+				dataIndex, cellValue,
+				cellAttr, cellStyle, useHtml = false;
+
+			for (i = 0, len = visibleLeaves.length; i < len; i++) {
+				leaf = visibleLeaves[i];
+				dataIndex = leaf.dataIndex;
+				cellValue = null;
+
+				if (dataIndex >= 0 && (!dataRow[dataIndex] || (dataRow[dataIndex].visible === false))) {
+					continue; // spanned cell?
+				}
+
+				if (leaf.dataParser) { // TODO!!
+					cellValue = (dataIndex >= 0)
+						? this._wijgrid._toStr(leaf, dataRow[dataIndex].value)
+						: null; // unbounded column
+				} else {
+					if (dataIndex >= 0) {
+						cellValue = dataRow[dataIndex].html; // use original html
+						useHtml = true;
+					}
+				}
+
+				cellAttr = (dataIndex >= 0) ? dataRow[dataIndex].__attr : null;
+				cellStyle = (dataIndex >= 0) ? dataRow[dataIndex].__style : null;
+
+				this._renderCell(rowInfo, cellValue, useHtml, leaf, cellAttr, cellStyle);
+			}
+
+		},
+
+		_renderFilterRow: function (rowInfo, visibleLeaves) {
+			var i, len, leaf;
+
+			for (i = 0, len = visibleLeaves.length; i < len; i++) {
+				leaf = visibleLeaves[i];
+				this._renderCell(rowInfo, $.wijmo.wijgrid.filterHelper.getSingleValue(leaf.filterValue), false, leaf);
+			}
+
+		},
+
+		_renderFooterRow: function (rowInfo, visibleLeaves) {
+			var i, len;
+
+			for (i = 0, len = visibleLeaves.length; i < len; i++) {
+				this._renderCell(rowInfo, "", false, visibleLeaves[i]);
+			}
+		},
+
+		_renderHeaderRow: function (rowInfo, item) {
+			var i, len,
+				thX = 0,
+				span;
+
+			for (i = 0, len = item.length; i < len; i++) {
+				span = item[i];
+
+				if (span.column && span.column.parentVis) {
+					span.column.thX = thX++;
+					span.column.thY = rowInfo.sectionRowIndex;
+
+					this._renderCell(rowInfo, span.column.headerText, false, span.column, { colSpan: span.colSpan, rowSpan: span.rowSpan });
+				}
+			}
+		},
+
+		_renderSpannedRow: function (rowInfo, visibleLeaves, dataRow) {
+			var i, leaf,
+				len = Math.min(visibleLeaves.length, dataRow.length);
+
+			for (i = 0; i < len; i++) {
+				this._renderCell(rowInfo, dataRow[i].html, true, visibleLeaves[i], dataRow[i].__attr, dataRow[i].__style);
+			}
+		},
+
+		_rowRendered: function (rowInfo, rowAttr, rowStyle) {
+			this._wijgrid._rowRendered(rowInfo, rowAttr, rowStyle);
+		},
+
+		// rendering **
+
+		// ** sizing
+
+		_adjustWidthArray: function (maxWidthArray, minWidthArray, expectedWidth, ensureColumnsPxWidth, autoExpandColumnIndex) {
+			var maxWidth = this._sumWidthArray(maxWidthArray),
+				minWidth = this._sumWidthArray(minWidthArray),
+				widthArray = [],
+				adjustWidth,
+				expandCount = 0,
+				expandWidth, remainingWidth,
+				bFirst = true;
+
+			if (maxWidth <= expectedWidth) {
+				$.extend(true, widthArray, maxWidthArray);
+				if (maxWidth === expectedWidth || ensureColumnsPxWidth) {
+					return widthArray;
+				} else {
+					adjustWidth = expectedWidth - maxWidth;
+				}
+			} else {
+				$.extend(true, widthArray, minWidthArray);
+				if (minWidth >= expectedWidth) {
+					return widthArray;
+				} else {
+					adjustWidth = expectedWidth - minWidth;
+				}
+			}
+
+			$.each(widthArray, function (index, colWidth) {
+				if (!colWidth.real) {
+					expandCount++;
+				}
+			});
+
+			if (expandCount !== 0) {
+				if (autoExpandColumnIndex !== undefined
+					&& (autoExpandColumnIndex > -1 && autoExpandColumnIndex < widthArray.length)
+					&& !widthArray[autoExpandColumnIndex].real) {
+					widthArray[autoExpandColumnIndex].width += adjustWidth;
+					return widthArray;
+				}
+
+				expandWidth = Math.floor(adjustWidth / expandCount);
+				remainingWidth = adjustWidth - expandWidth * expandCount;
+				$.each(widthArray, function (index, colWidth) {
+					if (!colWidth.real) {
+						colWidth.width += expandWidth;
+						if (bFirst) {
+							colWidth.width += remainingWidth;
+							bFirst = false;
+						}
+					}
 				});
 			}
+
+			return widthArray;
 		},
 
 		_getColumnWidth: function (index, widthArray) {
@@ -9369,6 +9680,18 @@
 			}
 		},
 
+		_setColumnWidth: function (index, px) {
+			var th = this.getHeaderCell(index),
+				cols = this.getJoinedCols(index);
+
+			if (px) {
+				$(th).setOutWidth(px);
+				$.each(cols, function (idx, col) {
+					$(col).setOutWidth(px);
+				});
+			}
+		},
+
 		_setTableWidth: function (tableArray, expectedWidth, expandColumnWidth, expandIndex) {
 			var after, diff;
 
@@ -9395,60 +9718,9 @@
 			});
 
 			return minWidth;
-		},
-
-		_adjustWidthArray: function (maxWidthArray, minWidthArray, expectedWidth, ensureColumnsPxWidth, autoExpandColumnIndex) {
-			var maxWidth = this._sumWidthArray(maxWidthArray),
-				minWidth = this._sumWidthArray(minWidthArray),
-				widthArray = [],
-				adjustWidth,
-				expandCount = 0,
-				expandWidth, remainingWidth,
-				bFirst = true;
-
-			if (maxWidth <= expectedWidth) {
-				$.extend(true, widthArray, maxWidthArray);
-				if (maxWidth === expectedWidth || ensureColumnsPxWidth) {
-					return widthArray;
-				} else {
-					adjustWidth = expectedWidth - maxWidth;
-				}
-			} else {
-				$.extend(true, widthArray, minWidthArray);
-				if (minWidth >= expectedWidth) {
-					return widthArray;
-				} else {
-					adjustWidth = expectedWidth - minWidth;
-				}
-			}
-
-			$.each(widthArray, function (index, colWidth) {
-				if (!colWidth.real) {
-					expandCount++;
-				}
-			});
-			if (expandCount !== 0) {
-				if (autoExpandColumnIndex !== undefined
-					&& (autoExpandColumnIndex > -1 && autoExpandColumnIndex < widthArray.length)
-					&& !widthArray[autoExpandColumnIndex].real) {
-					widthArray[autoExpandColumnIndex].width += adjustWidth;
-					return widthArray;
-				}
-
-				expandWidth = Math.floor(adjustWidth / expandCount);
-				remainingWidth = adjustWidth - expandWidth * expandCount;
-				$.each(widthArray, function (index, colWidth) {
-					if (!colWidth.real) {
-						colWidth.width += expandWidth;
-						if (bFirst) {
-							colWidth.width += remainingWidth;
-							bFirst = false;
-						}
-					}
-				});
-			}
-			return widthArray;
 		}
+
+		// sizing **
 
 		// private abstract **
 	});
@@ -9642,11 +9914,16 @@
 
 		// ** private abstract
 
+		//  ** render
+		_preRender: function () {
+			this._dataTable = new $.wijmo.wijgrid.htmlTableAccessor(this._wijgrid.element[0], true, true, true); // skip offsets, ensure tbody + colgroup
+		},
+
 		_postRender: function () {
 			this._wijgrid.element
 				.find("> tbody").addClass("ui-widget-content wijmo-wijgrid-data");
 
-			this._dataTable = new $.wijmo.wijgrid.htmlTableAccessor(this._wijgrid.element[0]);
+			this._dataTable = new $.wijmo.wijgrid.htmlTableAccessor(this._wijgrid.element[0]); // create with offsets
 
 			// set width on td inner div of each column after all styles are applied to grid.
 			this._wijgrid.element
@@ -9656,205 +9933,50 @@
 			this._base();
 		},
 
-		_preRender: function () {
+		_createRow: function (rowType, sectionRowIndex, originalDataRowIndex) {
+			var $rt = $.wijmo.wijgrid.rowType,
+				row;
+
+			switch (rowType) {
+				case $rt.header:
+				case $rt.filter:
+					row = this._wijgrid._createRow(this._dataTable.ensureTHead(), rowType, sectionRowIndex);
+					break;
+
+				case $rt.footer:
+					row = this._wijgrid._createRow(this._dataTable.ensureTFoot(), rowType, sectionRowIndex);
+					break;
+
+				default: // tbody
+					row = this._wijgrid._createRow(this._dataTable.ensureTBody(), rowType, originalDataRowIndex);
+			}
+
+			return [row];
 		},
 
-		_renderContent: function () {
-			var visibleLeaves = this._wijgrid._field("visibleLeaves"),
-				table = this._wijgrid.element[0],
-				tHead = null,
-				columnHeadersTable, span, width, ri, height, domRow, thX, ci,
-				$domCell, $container,
-				i, len, leaf,
-				colGroup, col,
-				data, tBody, rowLen,
-				dataRow, dataRowLen,
-				cellLen, dataIndex, cellIndex, doBreak,
-				cellValue, dataValue, rowInfo,
-				cellAttr, cellStyle,
-				dataRowIndex = -1,
-				virtualDataItemIndexBase = 0,
-				$rt = $.wijmo.wijgrid.rowType,
-				$rs = $.wijmo.wijgrid.renderState,
-				isDataRow;
+		_rowRendered: function (rowInfo, rowAttr, rowStyle) {
+			var domRow = rowInfo.$rows[0];
 
-			// colgroup
-			colGroup = document.createElement("colgroup");
-			for (i = 0, len = visibleLeaves.length; i < len; i++) {
-				col = document.createElement("col");
-				colGroup.appendChild(col);
+			if (!domRow.cells.length) {
+				domRow.parentNode.removeChild(domRow);
+			} else {
+				this._base(rowInfo, rowAttr, rowStyle);
 			}
-			table.appendChild(colGroup);
-			// end colgroup
+		},
 
-			// create header
-			columnHeadersTable = this._wijgrid._field("columnHeadersTable");
-			if (columnHeadersTable && columnHeadersTable.length) {
-				tHead = table.createTHead();
-				width = columnHeadersTable[0].length;
+		_appendCell: function (rowInfo, cellIndex, $cell) {
+			rowInfo.$rows.append($cell);
+		},
 
-				for (ri = 0, height = columnHeadersTable.length; ri < height; ri++) {
-					domRow = this._wijgrid._createRow(tHead, $rt.header, ri);
+		_createCol: function (column, visibleIdx) {
+			return document.createElement("col");
+		},
 
-					rowInfo = this._wijgrid._createRowInfo([domRow], $rt.header, $rs.rendering, -1, -1, -1, -1);
-					thX = 0;
-
-					for (ci = 0; ci < width; ci++) {
-						span = columnHeadersTable[ri][ci];
-
-						if (span.column && span.column.parentVis) {
-							span.column.thX = thX++;
-							span.column.thY = ri;
-
-							$domCell = $(this._wijgrid._createCell($rt.header, ri, span.column.dataIndex /*ci*/, span.column));
-
-							$container = $domCell.children("div");
-							domRow.appendChild($domCell[0]);
-							this._wijgrid.cellFormatter.format($container, span.column, span.column.headerText, rowInfo);
-							this._wijgrid._cellCreated($domCell, ci, span.column, rowInfo, $rs.rendering, { colSpan: span.colSpan, rowSpan: span.rowSpan });
-						} // end if
-					} // for ci
-
-					this._wijgrid._rowCreated(rowInfo);
-
-				} // for ri
-			} // end if
-			// create header end
-
-			// create filter
-			if (this._wijgrid.options.showFilter) {
-				if (!tHead) {
-					tHead = table.createTHead();
-				}
-
-				domRow = this._wijgrid._createRow(tHead, $rt.filter, -1);
-				rowInfo = this._wijgrid._createRowInfo([domRow], $rt.filter, $rs.rendering, -1, -1, -1, -1);
-
-				for (i = 0, len = visibleLeaves.length; i < len; i++) {
-					leaf = visibleLeaves[i];
-					$domCell = $(this._wijgrid._createCell($rt.filter, undefined, /*i*/ leaf.dataIndex, leaf));
-					domRow.appendChild($domCell[0]);
-					this._wijgrid.cellFormatter.format($domCell, leaf, $.wijmo.wijgrid.filterHelper.getSingleValue(leaf.filterValue), rowInfo);
-					this._wijgrid._cellCreated($domCell, i, leaf, rowInfo, $rs.rendering);
-				}
-
-				this._wijgrid._rowCreated(rowInfo);
-			}
-			// create filter end
-
-			// create body **
-			data = this._wijgrid.dataTable;
-
-			tBody = $.wijmo.wijgrid.ensureTBody(table);
-
-			if (this._wijgrid._dataStore.dataMode() === $.wijmo.wijgrid.dataMode.dynamical) {
-				virtualDataItemIndexBase = this._wijgrid.options.pageIndex * this._wijgrid.options.pageSize;
-			}
-
-			// render rows 
-			for (ri = 0, rowLen = data.length; ri < rowLen; ri++) {
-				dataRow = data[ri];
-				dataRowLen = dataRow.length;
-				isDataRow = (dataRow.rowType & $rt.data) !== 0;
-
-				domRow = this._wijgrid._createRow(tBody, dataRow.rowType, dataRow.originalRowIndex);
-
-				rowInfo = this._wijgrid._createRowInfo([domRow], dataRow.rowType, $rs.rendering,
-					ri,
-					isDataRow ? ++dataRowIndex : -1,
-					isDataRow ? dataRow.originalRowIndex : -1,
-					isDataRow ? virtualDataItemIndexBase + dataRow.originalRowIndex : -1);
-
-				// render cells
-				for (ci = 0, cellLen = visibleLeaves.length; ci < cellLen; ci++) {
-					leaf = visibleLeaves[ci];
-					dataIndex = leaf.dataIndex;
-
-					cellIndex = 0;
-					doBreak = false;
-
-					switch (dataRow.rowType) {
-						case $rt.data:
-						case $rt.data | $rt.dataAlt:
-							cellIndex = dataIndex; // use [leaf -> data] mapping
-
-							if (cellIndex >= 0 && (!dataRow[cellIndex] || (dataRow[cellIndex].visible === false))) {
-								continue; // spanned cell ?
-							}
-							break;
-
-						case $rt.emptyDataRow:
-						case $rt.groupHeader:
-						case $rt.groupFooter:
-							cellIndex = ci; // just iterate through all dataRow cells.
-
-							if (cellIndex >= dataRowLen) {
-								doBreak = true; // don't extend group headers\ footers with additional cells
-							}
-							break;
-					}
-
-					if (doBreak) {
-						break;
-					}
-
-					$domCell = $(this._wijgrid._createCell(dataRow.rowType, dataRow.originalRowIndex, cellIndex, leaf));
-					$container = $domCell.children("div");
-
-					domRow.appendChild($domCell[0]);
-
-					if ((dataRow.rowType & $rt.data) && leaf.dataParser) {
-						cellValue = null;
-
-						if (cellIndex >= 0) { // cellIndex is equal to leaf.dataIndex here
-							dataValue = dataRow[cellIndex].value;
-							cellValue = this._wijgrid._toStr(leaf, dataValue);
-						} else { // unbound column
-						}
-
-						this._wijgrid.cellFormatter.format($container, leaf, cellValue, rowInfo);
-					} else {
-						if (cellIndex >= 0) {
-							$container.html(dataRow[cellIndex].html); // use original html
-						}
-					}
-
-					cellAttr = (cellIndex >= 0) ? dataRow[cellIndex].__attr : null;
-					cellStyle = (cellIndex >= 0) ? dataRow[cellIndex].__style : null;
-
-					this._wijgrid._cellCreated($domCell, ci, leaf, rowInfo, $rs.rendering, cellAttr, cellStyle);
-				} // for ci
-
-				if (!domRow.cells.length) {
-					tBody.removeChild(domRow);
-				} else {
-					this._wijgrid._rowCreated(rowInfo, dataRow.__attr, dataRow.__style);
-				}
-			} // for ri
-			// ** create body
-
-			// footer **
-			if (this._wijgrid.options.showFooter) {
-				domRow = this._wijgrid._createRow(table.createTFoot(), $rt.footer, -1);
-				rowInfo = this._wijgrid._createRowInfo([domRow], $rt.footer, $rs.rendering, -1, -1, -1, -1);
-
-				for (ci = 0, cellLen = visibleLeaves.length; ci < cellLen; ci++) {
-					leaf = visibleLeaves[ci];
-
-					$domCell = $(this._wijgrid._createCell($rt.footer, undefined, leaf.dataIndex /*ci*/, leaf));
-
-					$container = $domCell.children("div");
-
-					domRow.appendChild($domCell[0]);
-
-					this._wijgrid.cellFormatter.format($container, leaf, "", rowInfo);
-					this._wijgrid._cellCreated($domCell, ci, leaf, rowInfo, $rs.rendering);
-				}
-
-				this._wijgrid._rowCreated(rowInfo);
-			}
-			// ** footer
+		_appendCol: function (domCol, column, visibleIdx) {
+			this._dataTable.appendCol(domCol);
 		}
+
+		// render **
 
 		// private abstract **
 
@@ -9869,16 +9991,22 @@
 
 		ctor: function (wijgrid) {
 			this._base(wijgrid);
+
 			this._verScrollBarSize = 18;
 			this._mouseWheelHandler = $.proxy(this._onMouseWheel, this);
 			this._rowsCount = null; // total rows count
+
 			this._viewTables = {}; // rendered DOM tables
-			this._table00 = null;
-			this._table01 = null;
-			this._table10 = null;
-			this._table11 = null;
+			this._splitAreas = {}; // rendered split areas
+
 			this._scroller = null; // scrolling div
 			this.element = wijgrid.element; // table element
+
+			this._staticDataRowIndex = wijgrid._getStaticIndex(true);
+			this._staticColumnIndex = wijgrid._getRealStaticColumnIndex();
+			this._staticAllColumnIndex = (this._staticColumnIndex === -1)
+				? -1
+				: wijgrid._field("visibleLeaves")[this._staticColumnIndex].leavesIdx;
 		},
 
 		dispose: function () {
@@ -9891,10 +10019,10 @@
 				o = wijgrid.options,
 				staticColumnIndex = wijgrid._getRealStaticColumnIndex(),
 				bWest = index <= staticColumnIndex,
-				$tableNW = $(this._table00.element()),
-				$tableNE = $(this._table01.element()),
-				$tableSW = $(this._table10.element()),
-				$tableSE = $(this._table11.element()),
+				$tableNW = $(this._viewTables.nw.element()),
+				$tableNE = $(this._viewTables.ne.element()),
+				$tableSW = $(this._viewTables.sw.element()),
+				$tableSE = $(this._viewTables.se.element()),
 				tableArray = bWest ? [$tableNW, $tableSW] : [$tableNE, $tableSE],
 				tableWidth = (bWest ? $tableNW.width() : $tableNE.width()) + value - oldValue,
 				frozener = wijgrid._field("frozener"),
@@ -9906,13 +10034,9 @@
 
 			this._base(index, value);
 
-			this._setTableWidth(tableArray,
-								tableWidth,
-								value,
-								index);
+			this._setTableWidth(tableArray, tableWidth, value, index);
 
 			try {
-				//if (o.staticColumnIndex >= 0) { // interpreted as bool, use _getRealStaticColumnIndex() to get the actual value.
 				if (staticColumnIndex >= 0) {
 					o.splitDistanceX = $tableNW[0].offsetWidth;
 				} else {
@@ -9929,7 +10053,7 @@
 			$tableSE.height(Math.max($tableSE.height(), $tableSW.height()));
 
 			try {
-				if (wijgrid._getRealStaticRowIndex() >= 0) { // interpreted as bool, use _getRealStaticRowIndex() to get the actual value.
+				if (wijgrid._getRealStaticRowIndex() >= 0) {
 					o.splitDistanceY = Math.max($tableNW[0].offsetHeight, $tableNE[0].offsetHeight);
 				} else {
 					o.splitDistanceY = 0;
@@ -9947,10 +10071,10 @@
 			var rowObjsArray,
 				wijgrid = this._wijgrid,
 				o = wijgrid.options,
-				$tableNW = $(this._table00.element()),
-				$tableNE = $(this._table01.element()),
-				$tableSW = $(this._table10.element()),
-				$tableSE = $(this._table11.element()),
+				$tableNW = $(this._viewTables.nw.element()),
+				$tableNE = $(this._viewTables.ne.element()),
+				$tableSW = $(this._viewTables.sw.element()),
+				$tableSE = $(this._viewTables.se.element()),
 				frozener = wijgrid._field("frozener"),
 				scrollValue = this.getScrollValue();
 
@@ -9968,7 +10092,7 @@
 			$tableSE.height(Math.max($tableSE.height(), $tableSW.height()));
 
 			try {
-				if (wijgrid._getRealStaticRowIndex() >= 0) { // interpreted as bool, use _getRealStaticRowIndex() to get the actual value.
+				if (wijgrid._getRealStaticRowIndex() >= 0) {
 					o.splitDistanceY = Math.max($tableNW[0].offsetHeight, $tableNE[0].offsetHeight);
 				} else {
 					o.splitDistanceY = 0;
@@ -10002,8 +10126,8 @@
 
 		getFixedAreaVisibleBounds: function () {
 			var bounds = this.getVisibleAreaBounds(),
-				neBounds = $.wijmo.wijgrid.bounds(this._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-ne:first")),
-				nwBounds = $.wijmo.wijgrid.bounds(this._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-nw:first")),
+				neBounds = $.wijmo.wijgrid.bounds(this._splitAreas.ne),
+				nwBounds = $.wijmo.wijgrid.bounds(this._splitAreas.nw),
 				horBounds = null,
 				verBounds = null;
 
@@ -10034,10 +10158,10 @@
 				options = wijgrid.options,
 				gridWidth = this._getGridWidth(options.scrollMode),
 				panelModes = this._getMappedScrollMode(),
-				needVBar = this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._table01.element()), options.scrollMode, wijgrid._autoHeight);
+				needVBar = this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), options.scrollMode, wijgrid._autoHeight);
 
 			this._scroller.width(gridWidth);
-			wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-ne").width(gridWidth - options.splitDistanceX - (needVBar ? this._verScrollBarSize : 0));
+			this._splitAreas.ne.width(gridWidth - options.splitDistanceX - (needVBar ? this._verScrollBarSize : 0));
 
 			if (!this._scroller.data("wijsuperpanel")) {
 				this._scroller.wijsuperpanel({
@@ -10049,19 +10173,17 @@
 					hScroller: { scrollBarVisibility: panelModes.hScrollBarVisibility, scrollValue: scrollValue.type === "fixed" ? scrollValue.hScrollValue : null },
 					//auto adjusting height with hscrollbar shown
 					hScrollerActivating: function (e, data) {
-						var diff, areaSW;
+						var diff;
 						if (wijgrid._autoHeight) {
 							diff = wijgrid.element.height() + options.splitDistanceY - data.contentLength;
 							if (diff > 0) {
-								//areaSW = self._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-sw");
-								//areaSW.height(areaSW.height() + diff);
 								self._scroller.height(self._scroller.height() + diff);
 								self._scroller.wijsuperpanel("paintPanel");
 								return false;
 							}
 						}
-						areaSW = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-sw");
-						areaSW.height(data.contentLength - options.splitDistanceY);
+
+						self._splitAreas.sw.height(data.contentLength - options.splitDistanceY);
 					}
 				});
 			}
@@ -10070,12 +10192,6 @@
 			}
 
 			this._scroller.find(".wijmo-wijsuperpanel-hbarcontainer, .wijmo-wijsuperpanel-vbarcontainer").css("zIndex", 5);
-
-			/*
-			this._wijgrid.outerDiv
-			.find(".wijmo-wijgrid-split-area-ne") // area ne (01)
-			.width(this._scroller.wijsuperpanel("getContentElement").parent().width());
-			*/
 
 			// synchronize scroll left of top table with bottom table
 			//this._onScrolled();
@@ -10178,10 +10294,10 @@
 				expandIndex,
 				mode = o.scrollMode,
 				visibleLeaves = wijgrid._field("visibleLeaves"),
-				$tableSE = $(this._table11.element()),
-				$tableNE = $(this._table01.element()),
-				$tableSW = $(this._table10.element()),
-				$tableNW = $(this._table00.element()),
+				$tableSE = $(this._viewTables.se.element()),
+				$tableNE = $(this._viewTables.ne.element()),
+				$tableSW = $(this._viewTables.sw.element()),
+				$tableNW = $(this._viewTables.nw.element()),
 				outerDiv = wijgrid.outerDiv;
 
 			if (this._scroller.data("wijsuperpanel")) {
@@ -10194,7 +10310,6 @@
 
 			this.fooRow = fooRow = rowObj
 				.clone()
-			//.removeClass() // remove all classes
 				.removeAttr("datarowindex")
 				.addClass("wijmo-wijgrid-foorow")
 				.appendTo(rowObj.parent()).show().height(0).css({ "font-size": "0" });
@@ -10202,11 +10317,9 @@
 			// fooRowCells belong to the bottom table
 			this.fooRowCells = fooRow
 				.find(">td")
-			//.removeClass() // remove all classes
 				.height(0)
 				.css({ "border-top": "0", "border-bottom": "0" })
 				.find(">div.wijmo-wijgrid-innercell")
-			//force the height of fooRow to 0
 				.css({ "padding-top": "0px", "padding-bottom": "0px" })
 					.empty();
 
@@ -10273,18 +10386,16 @@
 				self._setColumnWidth(index, colWidth.width);
 			});
 
-			//if (o.staticColumnIndex >= 0) {
 			if (staticColumnIndex >= 0) {
 				expandIndex = staticColumnIndex;
 				this._setTableWidth([$tableNW, $tableSW],
-									this._sumWidthArray(resultWidthArray, 0, expandIndex),
-									resultWidthArray[expandIndex].width,
-									expandIndex);
+					this._sumWidthArray(resultWidthArray, 0, expandIndex),
+					resultWidthArray[expandIndex].width,
+					expandIndex);
 			}
 
 			//set the size of area after setting the width of column
 			try {
-				//if (o.staticColumnIndex >= 0) { // interpreted as bool, use _getRealStaticColumnIndex() to get the actual value.
 				if (staticColumnIndex >= 0) {
 					o.splitDistanceX = $tableNW[0].offsetWidth;
 				} else {
@@ -10301,9 +10412,9 @@
 			expandIndex = resultWidthArray.length - 1;
 			if (expandIndex !== -1) {
 				this._setTableWidth([$tableNE, $tableSE],
-									this._sumWidthArray(resultWidthArray, staticColumnIndex + 1, expandIndex),
-									resultWidthArray[expandIndex].width,
-									expandIndex);
+					this._sumWidthArray(resultWidthArray, staticColumnIndex + 1, expandIndex),
+					resultWidthArray[expandIndex].width,
+					expandIndex);
 			}
 
 			$tableSE.css("height", "");
@@ -10314,8 +10425,7 @@
 
 			//set the size of area after setting the width of column
 			try {
-				//if (o.staticRowIndex >= 0) { // interpreted as bool, use _getRealStaticRowIndex() to get the actual value.
-				if (wijgrid._getRealStaticRowIndex() >= 0) { // interpreted as bool, use _getRealStaticRowIndex() to get the actual value.
+				if (wijgrid._getRealStaticRowIndex() >= 0) {
 					o.splitDistanceY = Math.max($tableNW[0].offsetHeight, $tableNE[0].offsetHeight);
 				} else {
 					o.splitDistanceY = 0;
@@ -10336,7 +10446,6 @@
 						}
 					});
 
-					//if (o.staticColumnIndex >= 0) {
 					if (staticColumnIndex >= 0) {
 						expandIndex = staticColumnIndex;
 						this._setTableWidth([$tableNW, $tableSW],
@@ -10347,7 +10456,6 @@
 
 					//set the size of area after setting the width of column
 					try {
-						//if (o.staticColumnIndex >= 0) { // interpreted as bool, use _getRealStaticColumnIndex() to get the actual value.
 						if (staticColumnIndex >= 0) {
 							o.splitDistanceX = $tableNW[0].offsetWidth;
 						} else {
@@ -10362,9 +10470,9 @@
 					expandIndex = resultWidthArray.length - 1;
 					if (expandIndex !== -1) {
 						this._setTableWidth([$tableNE, $tableSE],
-											this._sumWidthArray(resultWidthArray, staticColumnIndex + 1, expandIndex),
-											resultWidthArray[expandIndex].width,
-											expandIndex);
+							this._sumWidthArray(resultWidthArray, staticColumnIndex + 1, expandIndex),
+							resultWidthArray[expandIndex].width,
+							expandIndex);
 					}
 
 					$tableSE.css("height", "");
@@ -10375,8 +10483,7 @@
 
 					//set the size of area after setting the width of column
 					try {
-						//if (o.staticRowIndex >= 0) { // interpreted as bool, use _getRealStaticRowIndex() to get the actual value.
-						if (wijgrid._getRealStaticRowIndex() >= 0) { // interpreted as bool, use _getRealStaticRowIndex() to get the actual value.
+						if (wijgrid._getRealStaticRowIndex() >= 0) {
 							o.splitDistanceY = Math.max($tableNW[0].offsetHeight, $tableNE[0].offsetHeight);
 						} else {
 							o.splitDistanceY = 0;
@@ -10396,7 +10503,6 @@
 		// ** DOMTable abstraction
 
 		focusableElement: function () {
-			//return this._table11.element();
 			return this._wijgrid.outerDiv;
 		},
 
@@ -10460,7 +10566,9 @@
 				table = table.parentNode;
 			}
 
-			return (table === this._table00.element() || table === this._table01.element()) ? index : index + this._wijgrid._getRealStaticRowIndex() + 1;
+			return (table === this._viewTables.nw.element() || table === this._viewTables.ne.element())
+				? index
+				: index + this._wijgrid._getRealStaticRowIndex() + 1;
 		},
 
 		getCell: function (absColIdx, absRowIdx) {
@@ -10501,21 +10609,21 @@
 			}
 
 			if (owner !== null) {
-				if (owner === this._table00.element()) {
-					htmlTable = this._table00;
+				if (owner === this._viewTables.nw.element()) {
+					htmlTable = this._viewTables.nw;
 				}
 				else {
-					if (owner === this._table01.element()) {
-						htmlTable = this._table01;
+					if (owner === this._viewTables.ne.element()) {
+						htmlTable = this._viewTables.ne;
 						flag = true;
 					}
 					else {
-						if (owner === this._table10.element()) {
-							htmlTable = this._table10;
+						if (owner === this._viewTables.sw.element()) {
+							htmlTable = this._viewTables.sw;
 						}
 						else {
-							if (owner === this._table11.element()) {
-								htmlTable = this._table11;
+							if (owner === this._viewTables.se.element()) {
+								htmlTable = this._viewTables.se;
 								flag = true;
 							}
 						}
@@ -10574,11 +10682,11 @@
 
 			if (allRowsFixed || rowsFixedSlice) {
 				if (fixedColIdx >= 0 && fixedColIdx < lastColIdx) {
-					table0 = this._table00;
-					table1 = this._table01;
+					table0 = this._viewTables.nw;
+					table1 = this._viewTables.ne;
 				}
 				else {
-					table0 = (fixedColIdx < 0) ? this._table01 : this._table00;
+					table0 = (fixedColIdx < 0) ? this._viewTables.ne : this._viewTables.nw;
 				}
 				sectionLength = table0.getSectionLength(rowScope);
 				if (rowIndex < sectionLength) {
@@ -10595,11 +10703,11 @@
 				}
 
 				if (fixedColIdx >= 0 && fixedColIdx < lastColIdx) {
-					table0 = this._table10;
-					table1 = this._table11;
+					table0 = this._viewTables.sw;
+					table1 = this._viewTables.se;
 				}
 				else {
-					table0 = (fixedColIdx < 0) ? this._table11 : this._table10;
+					table0 = (fixedColIdx < 0) ? this._viewTables.se : this._viewTables.sw;
 				}
 
 				row0 = table0.getSectionRow(rowIndex, rowScope);
@@ -10622,12 +10730,12 @@
 
 			if (byColumn) {
 				if (index <= fixedColIdx) {
-					t0 = this._table00;
-					t1 = this._table10;
+					t0 = this._viewTables.nw;
+					t1 = this._viewTables.sw;
 				}
 				else {
-					t0 = this._table01;
-					t1 = this._table11;
+					t0 = this._viewTables.ne;
+					t1 = this._viewTables.se;
 
 					idx = idx - (fixedColIdx + 1);
 				}
@@ -10643,12 +10751,12 @@
 			}
 			else {
 				if (index <= fixedRowIdx) {
-					t0 = this._table00;
-					t1 = this._table01;
+					t0 = this._viewTables.nw;
+					t1 = this._viewTables.ne;
 				}
 				else {
-					t0 = this._table10;
-					t1 = this._table11;
+					t0 = this._viewTables.sw;
+					t1 = this._viewTables.se;
 
 					idx = idx - (fixedRowIdx + 1);
 				}
@@ -10669,7 +10777,7 @@
 		},
 
 		subTables: function () {
-			return [this._table00, this._table01, this._table10, this._table11];
+			return [this._viewTables.nw, this._viewTables.ne, this._viewTables.sw, this._viewTables.se];
 		},
 
 		// DOMTable abstraction **
@@ -10681,7 +10789,7 @@
 				tableWidth = wijgrid.element.outerWidth(true) + wijgrid.options.splitDistanceX,
 				outWidth = wijgrid.outerDiv.innerWidth();
 
-			if (this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._table01.element()), mode, wijgrid._autoHeight)) {
+			if (this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), mode, wijgrid._autoHeight)) {
 				tableWidth += this._verScrollBarSize;
 			}
 
@@ -10698,386 +10806,142 @@
 				: null;
 		},
 
+		// ** render
+
+		_preRender: function () {
+			var docFragment = document.createDocumentFragment(),
+				HTA = $.wijmo.wijgrid.htmlTableAccessor;
+
+			this._wijgrid.outerDiv.wrapInner("<div class=\"wijmo-wijgrid-fixedview\"><div class=\"wijmo-wijgrid-scroller\"><div class=\"wijmo-wijgrid-split-area-se wijmo-wijgrid-content-area\"></div></div></div>");
+			this._scroller = this._wijgrid.outerDiv.find(".wijmo-wijgrid-scroller");
+
+			this._scroller.after(this._splitAreas.nw = $("<div class=\"wijmo-wijgrid-split-area wijmo-wijgrid-split-area-nw\" style=\"overflow:hidden;position:absolute;z-index:4;top:0px;left:0px;\"></div>"));
+			this._scroller.after(this._splitAreas.ne = $("<div class=\"wijmo-wijgrid-split-area wijmo-wijgrid-split-area-ne\" style=\"overflow:hidden;position:absolute;z-index:4;top:0px;left:0px;\"></div>"));
+			this._scroller.after(this._splitAreas.sw = $("<div class=\"wijmo-wijgrid-split-area wijmo-wijgrid-split-area-sw\" style=\"overflow:hidden;position:absolute;z-index:4;top:0px;left:0px;\"></div>"));
+			this._splitAreas.se = this._scroller.find(".wijmo-wijgrid-split-area-se:first");
+
+			this._viewTables = { // skip offsets, ensure tbody + colgroup
+				nw: new HTA(docFragment.appendChild(document.createElement("table")), true, true, true),
+				ne: new HTA(docFragment.appendChild(document.createElement("table")), true, true, true),
+				sw: new HTA(docFragment.appendChild(document.createElement("table")), true, true, true),
+				se: new HTA(docFragment.appendChild(this._wijgrid.element[0]), true, true, true)
+			};
+		},
+
 		_postRender: function () {
-			var key;
+			var t00, t01, t10, t11,
+				HTA = $.wijmo.wijgrid.htmlTableAccessor;
 
-			for (key in this._viewTables) {
-				if (this._viewTables.hasOwnProperty(key)) {
-					$(this._viewTables[key])
-						.addClass("wijmo-wijgrid-table")
-						.attr("role", "grid")
-						.find("> tbody")
-							.addClass("ui-widget-content wijmo-wijgrid-data");
-				}
-			}
+			this._viewTables = { // rebuild with offsets
+				nw: new HTA(t00 = this._viewTables.nw.element()),
+				ne: new HTA(t01 = this._viewTables.ne.element()),
+				sw: new HTA(t10 = this._viewTables.sw.element()),
+				se: new HTA(t11 = this._viewTables.se.element())
+			};
 
-			this._table00 = new $.wijmo.wijgrid.htmlTableAccessor(this._viewTables.nw);
-			this._table01 = new $.wijmo.wijgrid.htmlTableAccessor(this._viewTables.ne);
-			this._table10 = new $.wijmo.wijgrid.htmlTableAccessor(this._viewTables.sw);
-			this._table11 = new $.wijmo.wijgrid.htmlTableAccessor(this._viewTables.se);
+			this._splitAreas.nw.empty().append(t00);
+			this._splitAreas.ne.empty().append(t01);
+			this._splitAreas.sw.empty().append(t10);
+			this._splitAreas.se.empty().append(t11);
 
-			this._rowsCount = Math.max(this._viewTables.nw.rows.length, this._viewTables.ne.rows.length) +
-				Math.max(this._viewTables.sw.rows.length, this._viewTables.se.rows.length);
-
-			// use separate instead of collapse to avoid a disalignment issue in chrome.
-			$.each([this._viewTables.nw, this._viewTables.sw, this._viewTables.ne, this._viewTables.se], function (index, element) {
-				$(element)
-					.attr({ "cellpadding": "0", "border": "0", "cellspacing": "0" })
-					.css("border-collapse", "separate");
+			$.each(this._viewTables, function (idx, hta) {
+				$(hta.element())
+					.addClass("wijmo-wijgrid-table")
+					.attr({
+						role: "grid",
+						border: "0",
+						cellpadding: "0",
+						cellspacing: "0"
+					})
+					.css("border-collapse", "separate") // use separate instead of collapse to avoid a disalignment issue in chrome.
+					.find("> tbody")
+						.addClass("ui-widget-content wijmo-wijgrid-data");
 			});
+
+			this._rowsCount = Math.max(t00.rows.length, t01.rows.length) + Math.max(t10.rows.length, t11.rows.length);
 
 			this._base();
 		},
 
-		_preRender: function () {
-			this._wijgrid.outerDiv.wrapInner("<div class=\"wijmo-wijgrid-fixedview\"><div class=\"wijmo-wijgrid-scroller\"><div class=\"wijmo-wijgrid-split-area-se wijmo-wijgrid-content-area\"></div></div></div>");
-			this._scroller = this._wijgrid.outerDiv.find(".wijmo-wijgrid-scroller");
-
-			this._scroller.after("<div class=\"wijmo-wijgrid-split-area wijmo-wijgrid-split-area-nw\" style=\"overflow:hidden;position:absolute;z-index:4;top:0px;left:0px;\"></div>");
-			this._scroller.after("<div class=\"wijmo-wijgrid-split-area wijmo-wijgrid-split-area-ne\" style=\"overflow:hidden;position:absolute;z-index:4;top:0px;left:0px;\"></div>");
-			this._scroller.after("<div class=\"wijmo-wijgrid-split-area wijmo-wijgrid-split-area-sw\" style=\"overflow:hidden;position:absolute;z-index:4;top:0px;left:0px;\"></div>");
+		_createCol: function (column, visibleIdx) {
+			return [
+				document.createElement("col"),
+				document.createElement("col")
+			];
 		},
 
-		_renderContent: function () {
-			var wijgrid = this._wijgrid,
-				visibleLeaves = wijgrid._field("visibleLeaves"),
-				docFragment = document.createDocumentFragment(),
-				columnHeadersTable = wijgrid._field("columnHeadersTable"),
-				staticDataRowIndex = wijgrid._getStaticIndex(true),
-				staticColumnIndex = wijgrid._getRealStaticColumnIndex(),
-				staticAllColumnIndex = staticColumnIndex === -1 ? -1 : visibleLeaves[staticColumnIndex].leavesIdx,
-				tHeads = {},
-				width, ri, height,
-				dataRow, dataRowLen,
-				leftDomRow, rightDomRow,
-				thX, ci, span, $domCell,
-				i, len, leaf,
-				correspondTables, key, colGroup, col, table,
-				data,
-				tBodies = {},
-				rowLen, cellLen, dataIndex, cellIndex, doBreak, $container, cellValue, dataValue,
-				nwArea, neArea, swArea, seArea,
-				cellAttr, cellStyle, rowInfo,
-				dataRowIndex = -1,
-				virtualDataItemIndexBase = 0,
-				$rt = $.wijmo.wijgrid.rowType,
-				$rs = $.wijmo.wijgrid.renderState,
-				isDataRow;
-
-			this._viewTables = {
-				nw: docFragment.appendChild(document.createElement("table")),
-				ne: docFragment.appendChild(document.createElement("table")),
-				sw: docFragment.appendChild(document.createElement("table")),
-				se: docFragment.appendChild(wijgrid.element[0])
-			};
-
-			// colgroup
-
-			// nw - sw
-			correspondTables = { t0: this._viewTables.nw, t1: this._viewTables.sw };
-			for (key in correspondTables) {
-				if (correspondTables.hasOwnProperty(key)) {
-					colGroup = document.createElement("colgroup");
-					for (i = 0; i <= staticColumnIndex; i++) {
-						col = document.createElement("col");
-						colGroup.appendChild(col);
-					}
-					table = correspondTables[key];
-					table.appendChild(colGroup);
-				}
+		_appendCol: function (domColArr, column, visibleIdx) {
+			if (visibleIdx <= this._staticColumnIndex) {
+				this._viewTables.nw.appendCol(domColArr[0]);
+				this._viewTables.sw.appendCol(domColArr[1]);
+			} else {
+				this._viewTables.ne.appendCol(domColArr[0]);
+				this._viewTables.se.appendCol(domColArr[1]);
 			}
-
-			// ne - se
-			correspondTables = { t0: this._viewTables.ne, t1: this._viewTables.se };
-			for (key in correspondTables) {
-				if (correspondTables.hasOwnProperty(key)) {
-					colGroup = document.createElement("colgroup");
-					for (i = staticColumnIndex + 1; i < visibleLeaves.length; i++) {
-						col = document.createElement("col");
-						colGroup.appendChild(col);
-					}
-					table = correspondTables[key];
-					table.appendChild(colGroup);
-				}
-			}
-			// end colgroup
-
-			// create header
-			if (columnHeadersTable && columnHeadersTable.length) {
-				tHeads.nw = this._viewTables.nw.createTHead();
-				tHeads.ne = this._viewTables.ne.createTHead();
-				/*tHeads.sw = this._viewTables.sw.createTHead(); // <-- user can fix the whole header only, not a random row.
-				tHeads.sw = this._viewTables.se.createTHead();*/
-
-				width = columnHeadersTable[0].length;
-
-				for (ri = 0, height = columnHeadersTable.length; ri < height; ri++) {
-					leftDomRow = null;
-					rightDomRow = null;
-
-					//if (ri <= staticRowIndex) {
-					// now header rows are always fixed by design, so we can create header cells inside the fixed areas (nw + ne) only.
-					//leftDomRow = tHeads.nw.insertRow(-1);
-					//rightDomRow = tHeads.ne.insertRow(-1);
-					leftDomRow = wijgrid._createRow(tHeads.nw, $rt.header, ri);
-					rightDomRow = wijgrid._createRow(tHeads.ne, $rt.header, ri);
-					/*} else {
-					leftDomRow = this._viewTables["sw"].tHead.insertRow(-1);
-					rightDomRow = this._viewTables["se"].tHead.insertRow(-1);
-					}*/
-
-					rowInfo = wijgrid._createRowInfo([leftDomRow, rightDomRow], $rt.header, $rs.rendering, -1, -1, -1, -1);
-
-					thX = 0;
-
-					for (ci = 0; ci < width; ci++) {
-						span = columnHeadersTable[ri][ci];
-
-						if (span.column && span.column.parentVis) {
-							span.column.thX = thX++;
-							span.column.thY = ri;
-
-							$domCell = $(wijgrid._createCell($rt.header, ri, span.column.dataIndex /*ci*/, span.column));
-
-							$container = $domCell.children("div");
-
-							if (ci <= staticAllColumnIndex) {
-								leftDomRow.appendChild($domCell[0]);
-							} else {
-								rightDomRow.appendChild($domCell[0]);
-							}
-
-							wijgrid.cellFormatter.format($container, span.column, span.column.headerText, rowInfo);
-							wijgrid._cellCreated($domCell, ci, span.column, rowInfo, $rs.rendering, { colSpan: span.colSpan, rowSpan: span.rowSpan });
-						} // end if
-					} // for ci
-
-					wijgrid._rowCreated(rowInfo);
-				} // for ri
-
-			} // end if
-			// create header end
-
-			// create filter -- now only the whole header can be fixed by design, so the tHeads can contain only "nw" or (and) "ne" keys.
-			if (wijgrid.options.showFilter) {
-				if (!tHeads.nw) {
-					tHeads.nw = this._viewTables.nw.createTHead();
-				}
-
-				if (!tHeads.ne) {
-					tHeads.ne = this._viewTables.ne.createTHead();
-				}
-
-				if (tHeads.nw) { // fixed columns area
-					leftDomRow = wijgrid._createRow(tHeads.nw, $rt.filter, -1);
-				}
-
-				if (tHeads.ne) { // unfixed columns area
-					rightDomRow = wijgrid._createRow(tHeads.ne, $rt.filter, -1);
-				}
-
-				rowInfo = wijgrid._createRowInfo([leftDomRow, rightDomRow], $rt.filter, $rs.rendering, -1, -1, -1, -1);
-
-				for (i = 0, len = visibleLeaves.length; i < len; i++) {
-					leaf = visibleLeaves[i];
-
-					$domCell = $(wijgrid._createCell($rt.filter, undefined, /*i*/ leaf.dataIndex, leaf));
-
-					if (i <= staticColumnIndex) {
-						leftDomRow.appendChild($domCell[0]);
-					} else {
-						rightDomRow.appendChild($domCell[0]);
-					}
-
-					wijgrid.cellFormatter.format($domCell, leaf, $.wijmo.wijgrid.filterHelper.getSingleValue(leaf.filterValue), rowInfo);
-					wijgrid._cellCreated($domCell, i, leaf, rowInfo, $rs.rendering);
-				}
-
-				wijgrid._rowCreated(rowInfo);
-			}
-			// create filter end
-
-			// create body **
-			data = wijgrid.dataTable;
-
-			tBodies = {
-				nw: $.wijmo.wijgrid.ensureTBody(this._viewTables.nw),
-				ne: $.wijmo.wijgrid.ensureTBody(this._viewTables.ne),
-				sw: $.wijmo.wijgrid.ensureTBody(this._viewTables.sw),
-				se: $.wijmo.wijgrid.ensureTBody(this._viewTables.se)
-			};
-
-			//staticDataRowIndex = staticRowIndex - (columnHeadersTable.length + (wijgrid.options.showFilter ? 1 : 0));
-
-			if (wijgrid._dataStore.dataMode() === $.wijmo.wijgrid.dataMode.dynamical) {
-				virtualDataItemIndexBase = wijgrid.options.pageIndex * wijgrid.options.pageSize;
-			}
-
-			// render rows
-			for (ri = 0, rowLen = data.length; ri < rowLen; ri++) {
-				dataRow = data[ri];
-				dataRowLen = dataRow.length;
-				isDataRow = (dataRow.rowType & $rt.data) !== 0;
-
-				leftDomRow = null;
-				rightDomRow = null;
-
-				if (ri <= staticDataRowIndex) {
-					leftDomRow = wijgrid._createRow(tBodies.nw, dataRow.rowType, dataRow.originalRowIndex);
-					rightDomRow = wijgrid._createRow(tBodies.ne, dataRow.rowType, dataRow.originalRowIndex);
-				} else {
-					leftDomRow = wijgrid._createRow(tBodies.sw, dataRow.rowType, dataRow.originalRowIndex);
-					rightDomRow = wijgrid._createRow(tBodies.se, dataRow.rowType, dataRow.originalRowIndex);
-				}
-
-				rowInfo = wijgrid._createRowInfo([leftDomRow, rightDomRow], dataRow.rowType, $rs.rendering,
-						ri,
-						isDataRow ? ++dataRowIndex : -1,
-						isDataRow ? dataRow.originalRowIndex : -1,
-						isDataRow ? virtualDataItemIndexBase + dataRow.originalRowIndex : -1);
-
-				// render cells
-				for (ci = 0, cellLen = visibleLeaves.length; ci < cellLen; ci++) {
-					leaf = visibleLeaves[ci];
-					dataIndex = leaf.dataIndex;
-
-					cellIndex = 0;
-					doBreak = false;
-
-					switch (dataRow.rowType) {
-						case $rt.data:
-						case $rt.data | $rt.dataAlt:
-							cellIndex = dataIndex; // use [leaf -> data] mapping
-
-							if (cellIndex >= 0 && (!dataRow[cellIndex] || (dataRow[cellIndex].visible === false))) {
-								continue; // spanned cell ?
-							}
-							break;
-
-						case $rt.emptyDataRow:
-						case $rt.groupHeader:
-						case $rt.groupFooter:
-							cellIndex = ci; // just iterate through all dataRow cells.
-
-							if (cellIndex >= dataRowLen) {
-								doBreak = true; // don't extend group headers\ footers with additional cells
-							}
-							break;
-					}
-
-					if (doBreak) {
-						break;
-					}
-
-					$domCell = $(wijgrid._createCell(dataRow.rowType, dataRow.originalRowIndex, cellIndex, leaf));
-
-					$container = $domCell.children("div");
-
-					if (ci <= staticColumnIndex) {
-						leftDomRow.appendChild($domCell[0]);
-					} else {
-						rightDomRow.appendChild($domCell[0]);
-					}
-
-					if ((dataRow.rowType & $rt.data) && leaf.dataParser) {
-						cellValue = null;
-
-						if (cellIndex >= 0) { // cellIndex is equal to leaf.dataIndex here
-							dataValue = dataRow[cellIndex].value;
-							cellValue = wijgrid._toStr(leaf, dataValue);
-
-						} else { // unbound column
-						}
-
-						wijgrid.cellFormatter.format($container, leaf, cellValue, rowInfo);
-					} else {
-						if (cellIndex >= 0) {
-							$container.html(dataRow[cellIndex].html); // use original html
-						}
-					}
-
-					cellAttr = (cellIndex >= 0) ? dataRow[cellIndex].__attr : null;
-					cellStyle = (cellIndex >= 0) ? dataRow[cellIndex].__style : null;
-
-					wijgrid._cellCreated($domCell, ci, leaf, rowInfo, $rs.rendering, cellAttr, cellStyle);
-				} // for ci
-
-				if (ri <= staticDataRowIndex) {
-					if (!leftDomRow.cells.length) {
-						tBodies.nw.removeChild(leftDomRow);
-						leftDomRow = null;
-					}
-
-					if (!rightDomRow.cells.length) {
-						tBodies.ne.removeChild(rightDomRow);
-						rightDomRow = null;
-					}
-
-					if (leftDomRow || rightDomRow) {
-						wijgrid._rowCreated(rowInfo, dataRow.__attr, dataRow.__style);
-					}
-				} else {
-					if (!leftDomRow.cells.length) {
-						tBodies.sw.removeChild(leftDomRow);
-						leftDomRow = null;
-					}
-
-					if (!rightDomRow.cells.length) {
-						tBodies.se.removeChild(rightDomRow);
-						rightDomRow = null;
-					}
-
-					if (leftDomRow || rightDomRow) {
-						wijgrid._rowCreated(rowInfo, dataRow.__attr, dataRow.__style);
-					}
-				}
-			} // for ri
-			// ** create body
-
-			// create footer **
-			if (wijgrid.options.showFooter) {
-				leftDomRow = wijgrid._createRow(this._viewTables.sw.createTFoot(), $rt.footer, -1);
-				rightDomRow = wijgrid._createRow(this._viewTables.se.createTFoot(), $rt.footer, -1);
-
-				rowInfo = wijgrid._createRowInfo([leftDomRow, rightDomRow], $rt.footer, $rs.rendering, -1, -1, -1, -1);
-
-				for (ci = 0, cellLen = visibleLeaves.length; ci < cellLen; ci++) {
-					leaf = visibleLeaves[ci];
-
-					$domCell = $(wijgrid._createCell($rt.footer, undefined, leaf.dataIndex /*ci*/, leaf));
-
-					$container = $domCell.children("div");
-
-					if (ci <= staticColumnIndex) {
-						leftDomRow.appendChild($domCell[0]);
-					} else {
-						rightDomRow.appendChild($domCell[0]);
-					}
-
-					wijgrid.cellFormatter.format($container, leaf, "", rowInfo);
-					wijgrid._cellCreated($domCell, ci, leaf, rowInfo, $rs.rendering);
-				}
-
-				wijgrid._rowCreated(rowInfo);
-			}
-			// ** create footer
-
-			nwArea = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-nw");
-			neArea = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-ne");
-			swArea = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-sw");
-			seArea = wijgrid.outerDiv.find(".wijmo-wijgrid-content-area");
-
-			nwArea[0].innerHTML = "";
-			neArea[0].innerHTML = "";
-			swArea[0].innerHTML = "";
-			seArea[0].innerHTML = "";
-
-			/* Note, empty() throws exception */
-			$(this._viewTables.nw).appendTo(nwArea);
-			$(this._viewTables.ne).appendTo(neArea);
-			$(this._viewTables.sw).appendTo(swArea);
-			$(this._viewTables.se).appendTo(seArea);
 		},
+
+		_createRow: function (rowType, sectionRowIndex, originalDataRowIndex) {
+			var $rt = $.wijmo.wijgrid.rowType,
+				leftRow, rightRow,
+				vt = this._viewTables;
+
+			switch (rowType) {
+				case $rt.header:
+				case $rt.filter:
+					leftRow = this._wijgrid._createRow(vt.nw.ensureTHead(), rowType, sectionRowIndex);
+					rightRow = this._wijgrid._createRow(vt.ne.ensureTHead(), rowType, sectionRowIndex);
+					break;
+
+				case $rt.footer:
+					leftRow = this._wijgrid._createRow(vt.sw.ensureTFoot(), rowType, sectionRowIndex);
+					rightRow = this._wijgrid._createRow(vt.se.ensureTFoot(), rowType, sectionRowIndex);
+					break;
+
+				default: // tbody
+					if (sectionRowIndex <= this._staticDataRowIndex) {
+						leftRow = this._wijgrid._createRow(vt.nw.ensureTBody(), rowType, originalDataRowIndex);
+						rightRow = this._wijgrid._createRow(vt.ne.ensureTBody(), rowType, originalDataRowIndex);
+					} else {
+						leftRow = this._wijgrid._createRow(vt.sw.ensureTBody(), rowType, originalDataRowIndex);
+						rightRow = this._wijgrid._createRow(vt.se.ensureTBody(), rowType, originalDataRowIndex);
+					}
+			}
+
+			return [leftRow, rightRow];
+		},
+
+		_rowRendered: function (rowInfo, rowAttr, rowStyle) {
+			var leftRow = rowInfo.$rows[0],
+				rightRow = rowInfo.$rows[1];
+
+			if (!leftRow.cells.length) {
+				leftRow.parentNode.removeChild(leftRow);
+				leftRow = null;
+			}
+
+			if (!rightRow.cells.length) {
+				rightRow.parentNode.removeChild(rightRow);
+				rightRow = null;
+			}
+
+			if (leftRow || rightRow) {
+				this._base(rowInfo, rowAttr, rowStyle);
+			}
+		},
+
+		_appendCell: function (rowInfo, cellIndex, $cell) {
+			var staticColIndex = (rowInfo.type !== $.wijmo.wijgrid.rowType.header)
+				? this._staticColumnIndex
+				: this._staticAllColumnIndex;
+
+			if (cellIndex <= staticColIndex) {
+				rowInfo.$rows[0].appendChild($cell[0]);
+			} else {
+				rowInfo.$rows[1].appendChild($cell[0]);
+			}
+		},
+
+		// render **
 
 		_getRowHeight: function (rowObj) {
 			if (rowObj[0] && rowObj[1]) {
@@ -11127,61 +10991,46 @@
 			/// The index of the column. Start with 0.
 			/// </param>
 
-			/*
-			var heightArray = [];
-			for (i = 0; i < rowLen; i++) {
-			heightArray.push(this._getRowHeight(this.getJoinedRows(i, 9)));
-			}
-
-			for (i = 0; i < 4; i++) {
-			tableParentArray[i].removeChild(tableArray[i]);
-			}
-
-			for (i = 0; i < rowLen; i++) {
-			this._setRowHeight(this.getJoinedRows(i, 9), heightArray[i]);
-			}
-
-			for (i = 0; i < 4; i++) {
-			tableParentArray[i].appendChild(tableArray[i]);
-			}
-			*/
-
 			var wijgrid = this._wijgrid,
 				fixedColIdx = wijgrid._getRealStaticColumnIndex(),
 				lastColIdx = wijgrid._field("visibleLeaves").length - 1,
 				fixedRowIdx, lastRowIdx,
 				tables, tableNE, tableNEParent, tableNW, tableNWParent,
 				tableSE, tableSEParent, tableSW, tableSWParent,
-				rowCount, i, j, leftRows, rightRows;
+				rowCount, i, j, leftRows, rightRows,
+				heightArray = [];
 
 			// setting row height only if grid is divided into leftern and rightern parts
 			if (fixedColIdx > -1 && fixedColIdx < lastColIdx) {
-				var heightArray = [];
+
 				fixedRowIdx = wijgrid._getRealStaticRowIndex();
 				lastRowIdx = this._rowsCount - 1;
 				tables = this._viewTables;
+
 				// getting the height of northern tables
 				if (fixedRowIdx > -1 && fixedRowIdx <= lastRowIdx) {
-					tableNE = tables.ne;
+					tableNE = tables.ne.element();
 					tableNEParent = tableNE.parentNode;
-					tableNW = tables.nw;
+					tableNW = tables.nw.element();
 					tableNWParent = tableNW.parentNode;
 					leftRows = tableNW.rows;
 					rightRows = tableNE.rows;
 					rowCount = leftRows.length;
+
 					for (i = 0; i < rowCount; i++) {
 						heightArray.push(this._getRowHeight([leftRows[i], rightRows[i]]));
 					}
 				}
 				// getting the height of southern tables
 				if (fixedRowIdx >= -1 && fixedRowIdx < lastRowIdx) {
-					tableSE = tables.se;
+					tableSE = tables.se.element();
 					tableSEParent = tableSE.parentNode;
-					tableSW = tables.sw;
+					tableSW = tables.sw.element();
 					tableSWParent = tableSW.parentNode;
 					leftRows = tableSW.rows;
 					rightRows = tableSE.rows;
 					rowCount = leftRows.length;
+
 					for (i = 0; i < rowCount; i++) {
 						heightArray.push(this._getRowHeight([leftRows[i], rightRows[i]]));
 					}
@@ -11232,76 +11081,13 @@
 
 		// ** private specific
 
-		/*
-		adjustCellsSizes: function () {
-		var accessor = new $.wijmo.wijgrid.rowAccessor(this, 9, 0),
-		rowLen = accessor.length(),
-		heights = [], // int[rowLen];
-		i, j, rowObj,
-		row0, len0, row0Span, row0h,
-		row1, len1, row1Span, row1h,
-		row;
-
-		for (i = 0; i < rowLen; i++) {
-		rowObj = this.getJoinedRows(i, 9); // = accessor[i];
-
-		row0 = rowObj[0];
-		len0 = (row0 !== null) ? row0.cells.length : 0;
-		row0Span = false;
-
-		for (j = 0; j < len0 && !row0Span; j++) {
-		row0Span = (row0.cells[j].rowSpan > 1);
-		}
-
-		row1 = rowObj[1];
-		len1 = (row1 !== null) ? row1.cells.length : 0;
-		row1Span = false;
-
-		if (!row0Span) {
-		for (j = 0; j < len1 && !row1Span; j++) {
-		row1Span = (row1.cells[j].rowSpan > 1);
-		}
-		}
-
-		row0h = (row0 !== null && len0 > 0) ? row0.offsetHeight : 0;
-		row1h = (row1 !== null && len1 > 0) ? row1.offsetHeight : 0;
-
-		heights[i] = (row0Span || row1Span) ? Math.min(row0h, row1h) : Math.max(row0h, row1h);
-		}
-
-		for (i = 0; i < rowLen; i++) {
-		row = this.getJoinedRows(i, 9); // = accessor[i];
-		accessor.iterateCells(row, this.setCellContentDivHeight, heights[i]);
-		}
-		},
-
-		adjustColumnSizes: function(topTable, bottomTable) {
-		if (topTable.rows.length > 0 && bottomTable.rows.length > 0) {
-		var topRowCells = topTable.rows[0].cells;
-		var bottomRowCells = bottomTable.rows[0].cells;
-
-		if (topRowCells.length == bottomRowCells.length) {
-		for (var i = 0; i < topRowCells.length; i++) {
-		topRowCells[i].style.width = bottomRowCells[i].style.width = Math.max(topRowCells[i].offsetWidth, bottomRowCells[i].offsetWidth);
-		}
-		}
-		}
-
-		topTable.style.width = bottomTable.style.width = Math.max(topTable.offsetWidth, bottomTable.offsetWidth) + "px";
-		//alert(topTable.style.width + "?w=" + Math.max(topTable.offsetWidth, bottomTable.offsetWidth));
-
-		topTable.style.tableLayout = "fixed";
-		bottomTable.style.tableLayout = "fixed";
-		},
-		*/
-
 		_onScroll: function (event, data) {
 			var element, key, property = {};
 			if (data.dir === "h") {
-				element = this._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-ne");
+				element = this._splitAreas.ne;
 				key = "scrollLeft";
 			} else {
-				element = this._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-sw");
+				element = this._splitAreas.sw;
 				key = "scrollTop";
 			}
 			if (data.animationOptions) {
@@ -11313,8 +11099,8 @@
 		},
 
 		_onScrolled: function () {
-			this._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-ne")[0].scrollLeft = parseInt((this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-templateouterwrapper").css("left") + "").replace("px", ""), 10) * -1;
-			this._wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-sw")[0].scrollTop = parseInt((this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-templateouterwrapper").css("top") + "").replace("px", ""), 10) * -1;
+			this._splitAreas.ne[0].scrollLeft = parseInt((this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-templateouterwrapper:first").css("left") + "").replace("px", ""), 10) * -1;
+			this._splitAreas.sw[0].scrollTop = parseInt((this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-templateouterwrapper:first").css("top") + "").replace("px", ""), 10) * -1;
 		},
 
 		_onMouseWheel: function (e, delta) {
@@ -11349,13 +11135,6 @@
 			}
 		},
 
-		/*
-		setCellContentDivHeight: function (cell, param) {
-		cell.style.height = param + "px";
-		return true;
-		},
-		*/
-
 		_testNeedVBar: function (outerDiv, gridElement, tableNE, mode, autoHeight) {
 			var excludeVBarWidth,
 				wijgrid = this._wijgrid,
@@ -11389,22 +11168,18 @@
 		_updateSplitAreaBounds: function (bSet) {
 			var wijgrid = this._wijgrid,
 				o = wijgrid.options,
-			//controlWidth = wijgrid.outerDiv.width(),
-				controlHeight, contentHeight, topHeight = 0, bottomHeight = 0,
-				areaNW = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-nw"),
-				areaNE = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-ne"),
-				areaSW = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-sw"),
-				areaSE = wijgrid.outerDiv.find(".wijmo-wijgrid-split-area-se");
+				controlHeight, contentHeight, topHeight = 0, bottomHeight = 0;
 
 			if (bSet === 0 || bSet === 2) {
-				areaNW.width(o.splitDistanceX);
-				areaSW.width(o.splitDistanceX);
-				areaSE.css("marginLeft", o.splitDistanceX);
-				areaNE.css("marginLeft", o.splitDistanceX);
+				this._splitAreas.nw.width(o.splitDistanceX);
+				this._splitAreas.sw.width(o.splitDistanceX);
+				this._splitAreas.se.css("marginLeft", o.splitDistanceX);
+				this._splitAreas.ne.css("marginLeft", o.splitDistanceX);
 			}
+
 			if (bSet === 1 || bSet === 2) {
 				this._scroller.css("height", "");
-				areaSE.css("marginTop", 0);
+				this._splitAreas.se.css("marginTop", 0);
 
 				controlHeight = wijgrid.outerDiv.height();
 
@@ -11417,8 +11192,8 @@
 					//this._noHeight = true;
 				}
 
-				areaNW.height(o.splitDistanceY);
-				areaNE.height(o.splitDistanceY);
+				this._splitAreas.nw.height(o.splitDistanceY);
+				this._splitAreas.ne.height(o.splitDistanceY);
 
 				if (wijgrid.$superPanelHeader !== null) {
 					topHeight = wijgrid.$superPanelHeader.outerHeight(true);
@@ -11429,20 +11204,19 @@
 				contentHeight = controlHeight - topHeight - bottomHeight;
 
 				if (wijgrid.$superPanelHeader !== null) {
-					$.each([areaNW, areaNE], function (index, el) {
-						el.css("top", topHeight + "px");
-					});
+					this._splitAreas.nw.css("top", topHeight + "px");
+					this._splitAreas.ne.css("top", topHeight + "px");
 				}
 
 				if (!wijgrid._autoHeight) {
-					areaSW.height(contentHeight - o.splitDistanceY);
+					this._splitAreas.sw.height(contentHeight - o.splitDistanceY);
 				}
 				else {
-					areaSW.height(contentHeight);
+					this._splitAreas.sw.height(contentHeight);
 				}
 
-				areaSW.css("top", o.splitDistanceY + topHeight);
-				areaSE.css("marginTop", o.splitDistanceY);
+				this._splitAreas.sw.css("top", o.splitDistanceY + topHeight);
+				this._splitAreas.se.css("marginTop", o.splitDistanceY);
 			}
 		}
 
@@ -13642,8 +13416,10 @@
 			}
 
 			function defFormatFilterCell(args) {
+				args.$container.addClass("ui-widget ui-state-default");
+
 				if ((args.column.dataIndex >= 0) && !args.column.isBand && args.column.showFilter) {
-					args.$container.html("<div class=\"wijmo-wijgrid-filter ui-widget ui-state-default ui-corner-all\"><input type=\"text\" class=\"wijmo-wijgrid-filter-input\" style=\"width:1px\" /><a class=\"wijmo-wijgrid-filter-trigger ui-corner-right ui-state-default\" href=\"#\"><span class=\"ui-icon ui-icon-triangle-1-s\"></span></a></div>");
+					args.$container.html("<div class=\"wijmo-wijgrid-filter ui-corner-all\"><input type=\"text\" class=\"wijmo-wijgrid-filter-input\" style=\"width:1px\" /><a class=\"wijmo-wijgrid-filter-trigger ui-corner-right ui-state-default\" href=\"#\"><span class=\"ui-icon ui-icon-triangle-1-s\"></span></a></div>");
 				} else {
 					args.$container.html("&nbsp;");
 				}
@@ -14031,10 +13807,11 @@
 				throw "invalid arguments";
 			}
 
-			this.format = function ($cell, cellIndex, column, rowInfo, state, cellAttr, cellStyle) {
+			this.format = function ($cell, column, rowInfo, state, cellAttr, cellStyle) {
 				var $rs = $.wijmo.wijgrid.renderState,
 					$rt = $.wijmo.wijgrid.rowType,
 					rowType = rowInfo.type,
+					cellIndex = column.visLeavesIdx,
 					args,
 					groupRowCellInfo = null;
 

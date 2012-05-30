@@ -1,7 +1,7 @@
 /*globals jQuery window */
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -478,8 +478,10 @@
 			if (o.loadCallback && $.isFunction(o.loadCallback)) {
 				self._trigger("loadCallback", null, self);
 			}
-			if (o.disabled) {
+			if (o.disabledState) {
+				var dis = o.disabled;
 				self.disable();
+				o.disabled = dis;
 			}
 			else if (o.auto) {
 				self.play();
@@ -534,7 +536,7 @@
 				i = citem.data("itemIndex");
 
 				for (i; i < self.currentIdx; i++) {
-				    list.children("li:first").appendTo(list);
+					list.children("li:first").appendTo(list);
 				}
 
 				if (o.preview) {
@@ -1042,14 +1044,14 @@
 			}
 
 			//Add support for jUICE!
-			if(thumbOpt) {
-				$.each(["mousedown", "mouseup","mouseover","mouseout","click"],function(i,n){
+			if (thumbOpt) {
+				$.each(["mousedown", "mouseup", "mouseover", "mouseout", "click"], function (i, n) {
 					var c = thumbOpt[n];
 					if (c && (typeof c === "string") && window[c]) {
 						thumbOpt[n] = window[c];
 					}
 				});
-			}			
+			}
 			//end
 			self.pager.bind("mouseover." + self.widgetName, function (event) {
 				self._pageingEvents(event, "mouseover", thumbOpt, isDot, function (li) {
@@ -1206,14 +1208,15 @@
 							}
 						}
 						else {
-							self[el].remove();
+							self[el].hide();
 						}
 						break;
 					case "loop":
 					case "orientation":
 					case "display":
+					case "preview":
 						if (value !== old) {
-							self.destroy();
+							self._destroy();
 							self._create();
 						}
 						break;
@@ -1223,6 +1226,15 @@
 						self._applyBtnClass();
 						if (o.showPager) {
 							self._createPager();
+						}
+						break;
+					case "showCaption":
+						if (value) {
+							self._createItems(isHorizontal); //re-create item with captions.
+						} else {
+							self.element
+							.find(".wijmo-wijcarousel-caption,.wijmo-wijcarousel-text")
+							.remove();
 						}
 						break;
 					case "buttonPosition":
@@ -1296,10 +1308,7 @@
 			}
 		},
 
-		destroy: function () {
-			/// <summary>
-			/// Destroys this widget.
-			/// </summary>
+		_destroy: function () {
 			var self = this;
 			self.container
 			.removeClass("wijmo-wijcarousel ui-widget")
@@ -1319,6 +1328,8 @@
 				item.removeData("itemIndex");
 			});
 
+			self.itemWidth = self.itemHeight = undefined;
+
 			self.element.find(ctrlSelector +
 			",.wijmo-wijcarousel-timerbar").remove();
 			if (self.pager) {
@@ -1330,6 +1341,13 @@
 				self.disabledDiv.remove();
 				self.disabledDiv = $();
 			}
+		},
+
+		destroy: function () {
+			/// <summary>
+			/// Destroys this widget.
+			/// </summary>
+			this._destroy();
 			$.Widget.prototype.destroy.apply(this);
 		},
 

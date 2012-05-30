@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -216,8 +216,10 @@
 					.after($(document.body).children("div:last")).hide();
 
 				//Add for support disabled option at 2011/7/8
-				if (o.disabled) {
+				if (o.disabledState) {
+					var dis = o.disabled;
 					self.disable();
+					o.disabled = dis;
 				}
 				//end for disabled option
 
@@ -279,8 +281,10 @@
 			}
 
 			//Add for support disabled option at 2011/7/8
-			if (o.disabled) {
+			if (o.disabledState) {
+				var dis = o.disabled;
 				self.disable();
+				o.disabled = dis;
 			}
 			//end for disabled option
 
@@ -437,7 +441,7 @@
 		_decreBtnMouseOver: function (e) {
 			var self = e.data, data, decreBtn;
 			
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -451,7 +455,7 @@
 		_increBtnMouseOver: function (e) {
 			var self = e.data, data, increBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -465,7 +469,7 @@
 		_decreBtnMouseOut: function (e) {
 			var self = e.data, data, decreBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -479,7 +483,7 @@
 		_increBtnMouseOut: function (e) {
 			var self = e.data, data, increBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -493,7 +497,7 @@
 		_decreBtnMouseDown: function (e) {
 			var self = e.data, data, decreBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -524,7 +528,7 @@
 
 		_documentMouseUp: function (e) {
 			var self = e.data.self, ele = e.data.ele;
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -542,7 +546,7 @@
 		_increBtnMouseDown: function (e) {
 			var self = e.data, data, increBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -573,7 +577,7 @@
 		_decreBtnMouseUp: function (e) {
 			var self = e.data, data, decreBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -589,7 +593,7 @@
 		_increBtnMouseUp: function (e) {
 			var self = e.data, data, increBtn;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 
@@ -613,7 +617,7 @@
 		_decreBtnClick: function (e) {
 			var self = e.data, data;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 			
@@ -637,7 +641,7 @@
 		_increBtnClick: function (e) {
 			var self = e.data, data;
 
-			if (self.options.disabled) {
+			if (self.options.disabledState) {
 				return;
 			}
 			//note: step1: slide the slider btn, the change event has fired;

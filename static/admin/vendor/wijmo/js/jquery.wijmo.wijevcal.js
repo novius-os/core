@@ -10,7 +10,7 @@ amplify*/
 
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -430,10 +430,78 @@ block comments:
 		options: {
 
 			///	<summary>
-			///	Culture name, e.g. "de-DE".
+			///	Culture name, e.g. "de-DE". 
+			///	Date and time formatting depends on the culture option.
 			///	</summary>
 			culture: "",
 
+			///	<summary>
+			///	Use the localization option in order to localize
+			///	text which not depends on culture option.
+			/// Default: {
+			///	buttonToday: "today",
+			///	buttonDayView: "Day",
+			///	buttonWeekView: "Week",
+			///	buttonMonthView: "Month",
+			///	buttonListView: "List",
+			///	buttonDelete: "Delete",
+			///	buttonOK: "OK",
+			///	buttonCancel: "Cancel",
+			///	labelAllDay: "all-day",
+			///	labelToday: "Today",
+			///	labelName: "name",
+			///	labelStarts: "starts",
+			///	labelEnds: "ends",
+			///	labelLocation: "location",
+			///	labelRepeat: "repeat",
+			///	labelCalendar: "calendar",
+			///	labelDescription: "description",
+			///	textNewEvent: "New event",
+			///	repeatNone: "None",
+			///	repeatDaily: "Every Day",
+			///	repeatWorkDays: "Work days",		
+			///	repeatWeekly: "Every Week",
+			///	repeatMonthly: "Every Month",
+			///	repeatYearly: "Every Year"
+			/// }
+			/// Type: Object.
+			/// Code example: $("#eventscalendar").wijevcal(
+			///					{ 
+			///						localization: {
+			///							buttonToday: "Go today",
+			///							buttonListView: "Agenda"
+			///						}
+			///					});
+			///	</summary>
+			localization: null,
+			/*
+			{
+			buttonToday: "today",
+			buttonDayView: "Day",
+			buttonWeekView: "Week",
+			buttonMonthView: "Month",
+			buttonListView: "List",
+			buttonDelete: "Delete",
+			buttonOK: "OK",
+			buttonCancel: "Cancel",
+			labelAllDay: "all-day",
+			labelToday: "Today",
+			labelName: "name",
+			labelStarts: "starts",
+			labelEnds: "ends",
+			labelLocation: "location",
+			labelRepeat: "repeat",
+			labelCalendar: "calendar",
+			labelDescription: "description",
+			textNewEvent: "New event",
+			repeatNone: "None",
+			repeatDaily: "Every Day",
+			repeatWorkDays: "Work days",		
+			repeatWeekly: "Every Week",
+			repeatMonthly: "Every Month",
+			repeatYearly: "Every Year"
+			},
+			*/
 			/// <summary>
 			/// The URL to the web service which will be used 
 			///	to store information about events.
@@ -496,12 +564,22 @@ block comments:
 			},
 
 			/// <summary>
-			/// The event objects array. This option is read-only.
-			///	qq: move this option to protected space
+			/// The event objects array.
 			/// Default: []
 			/// Type: Array.
 			/// Code example: $("#eventscalendar").wijevcal(
-			///						{ appointments: [{id: "appt1", 
+			///						{ eventsData: [{id: "appt1", 
+			///							start: new Date(2011, 4, 6, 17, 30), 
+			///							end: new Date(2011, 4, 6, 17, 35) }] });
+			/// </summary>
+			eventsData: [],
+			/// <summary>
+			/// The event objects array. This option is deprecated: 
+			///	please, use eventsData option, instead.
+			/// Default: []
+			/// Type: Array.
+			/// Code example: $("#eventscalendar").wijevcal(
+			///						{ eventsData: [{id: "appt1", 
 			///							start: new Date(2011, 4, 6, 17, 30), 
 			///							end: new Date(2011, 4, 6, 17, 35) }] });
 			/// </summary>
@@ -1029,6 +1107,33 @@ block comments:
 		///	</param>
 		beforeDeleteCalendar(e, args)
 
+		/// <summary>
+		/// Occurs when the eventsData option is changed.
+		/// Type: Function
+		/// Event type: wijevcaleventsdatachanged
+		/// Code example:
+		/// Supply a callback function to handle the eventsDataChanged event
+		///	as an option.
+		/// $("#eventscalendar").wijevcal(
+		///	   { 
+		///			eventsDataChanged: function (e, args) 
+		///			{
+		///				alert("eventsDataChanged called, events count is " + 
+		///					args.eventsData.length + ".");
+		///			}
+		///	});
+		/// Bind to the event by type: wijevcaleventsdatachanged.
+		/// $("#eventscalendar").bind( "wijevcaleventsdatachanged", 
+		///		function(e, args) {
+		///			...		
+		///		});
+		/// </summary>
+		/// <param name="e" type="Object">jQuery.Event object.</param>
+		/// <param name="args" type="Object">
+		///	args.args.eventsData - array of the event objects.
+		///	</param>
+		eventsDataChanged(e, args)
+
 		*/
 
 
@@ -1036,9 +1141,15 @@ block comments:
 		_setOption: function (key, value) {
 			var o = this.options;
 			switch (key) {
+				case "eventsData":
+					o.eventsData = value;
+					o.appointments = value; //qq:remove deprecated appointments option?
+					this._onEventsDataChanged();
+					break;
 				case "appointments":
-					o.appointments = value;
-					this._onAppointmentsChanged();
+					o.eventsData = value;
+					o.appointments = value; //qq:remove deprecated appointments option?
+					this._onEventsDataChanged();
 					break;
 				case "disabled":
 					if (o.disabled !== value) {
@@ -1201,13 +1312,20 @@ block comments:
 		},
 
 		///
-
+		localizeString: function (key, defaultValue) {
+			var o = this.options;
+			if (o.localization && o.localization[key]) {
+				return o.localization[key];
+			}
+			return defaultValue;
+			//("buttonToday", "today")
+		},
 		_create: function () {
 			// Add for parse date options for jUICE. D.H
-			if ($.isFunction(window["wijmoASPNetParseOptions"])) {
+			if ($.isFunction(window.wijmoASPNetParseOptions)) {
 				wijmoASPNetParseOptions(this.options);
 			}
-			
+
 			var navigationbar, toolsBar, o = this.options;
 			// fix problem with array options:
 			if (!o.colors) {
@@ -1232,21 +1350,22 @@ block comments:
 					"<input id=\"" + this._uidPref + "_daybtn\" name=\"viewselection\"" +
 						" type=\"radio\" class=\"wijmo-wijev-day\" />" +
 					"<label for=\"" + this._uidPref + "_daybtn\">" +
-						"Day</label>" +
+						this.localizeString("buttonDayView", "Day") +
+						"</label>" +
 					"<input id=\"" + this._uidPref + "_weekbtn\" name=\"viewselection\"" +
 						" type=\"radio\" class=\"wijmo-wijev-week\" />" +
 					"<label for=\"" + this._uidPref + "_weekbtn\">" +
-						"Week</label>" +
+						this.localizeString("buttonWeekView", "Week") + "</label>" +
 					"<input id=\"" + this._uidPref +
 						"_monthbtn\" name=\"viewselection\"" +
 						" type=\"radio\" class=\"wijmo-wijev-month\" />" +
 					"<label for=\"" + this._uidPref + "_monthbtn\">" +
-						"Month</label>" +
+						this.localizeString("buttonMonthView", "Month") + "</label>" +
 					"<input id=\"" + this._uidPref +
 						"_listbtn\" name=\"viewselection\"" +
 						" type=\"radio\" class=\"wijmo-wijev-list\" />" +
 					"<label for=\"" + this._uidPref + "_listbtn\">" +
-						"List</label>" +
+						this.localizeString("buttonListView", "List") + "</label>" +
 				"</span>" +
 			"</div>").appendTo(this.element);
 
@@ -1287,7 +1406,8 @@ block comments:
 
 			$("<div class=\"wijmo-wijev-navigationbar" +
 				" ui-widget-header ui-corner-bottom ui-helper-clearfix\">" +
-				"<a class=\"wijmo-wijev-today\">today</a>" +
+				"<a class=\"wijmo-wijev-today\">" +
+					this.localizeString("buttonToday", "today") + "</a>" +
 
 				"<div class=\"wijmo-wijev-datepager\">" +
 				"</div>" +
@@ -1308,7 +1428,7 @@ block comments:
 			toolsBar = this.element.find(".wijmo-wijev-headerbar .wijmo-wijev-tools");
 
 			navigationbar.find(".wijmo-wijev-today").button({
-				text: "today"
+				text: this.localizeString("buttonToday", "today")
 			}).click($.proxy(this._onTodayClick, this));
 
 			this.element.find(".wijmo-wijev-datepager").wijdatepager({
@@ -1529,7 +1649,7 @@ block comments:
 		},
 		_loadData: function () {
 			var o = this.options, self = this, i, count, cal, appt,
-					calendarsById, appointmentsById, query,
+					calendarsById, eventsDataById, query,
 					loadCalendarsCallback, loadEventsCallback, errorCallback;
 			//successCallback
 			this.showLoadingLabel();
@@ -1596,8 +1716,8 @@ block comments:
 
 
 
-			o.appointments = [];
-			appointmentsById = this._appointmentsById = {};
+			o.eventsData = [];
+			eventsDataById = this._eventsDataById = {};
 			loadEventsCallback = function (events) {
 				if (!events) {
 					return;
@@ -1622,7 +1742,7 @@ block comments:
 					appt = self._readEventData(events[i]);
 					self._storeEventWithSort(appt);
 				}
-				self._onAppointmentsChanged();
+				self._onEventsDataChanged();
 				self._trigger("initialized");
 				self.hideLoadingLabel();
 			};
@@ -1660,7 +1780,7 @@ block comments:
 						appt = self._readEventData(data.rows.item(i));
 						self._storeEventWithSort(appt);
 					}
-					self._onAppointmentsChanged();
+					self._onEventsDataChanged();
 					self._trigger("initialized");
 					self.hideLoadingLabel();
 				},
@@ -1822,43 +1942,54 @@ block comments:
 	"</div>" +
 
 "</li>" +
-"<li><label for=\"" + this._uidPref + "_alldaybtn\">all-day</label>" +
+"<li><label for=\"" + this._uidPref + "_alldaybtn\">" +
+			this.localizeString("labelAllDay", "all-day") + "</label>" +
 	"<input type=\"checkbox\" class=\"wijmo-wijev-allday\" id=\"" +
 											this._uidPref + "_alldaybtn\" />" +
 "</li>" +
-"<li><label>Starts</label>" +
+"<li><label>" + this.localizeString("labelStarts", "Starts") + "</label>" +
 	"<input type=\"text\" class=\"wijmo-wijev-start\" value=\"\">" +
 	"<input type=\"text\" class=\"wijmo-wijev-start-time\" value=\"\">" +
 "</li>" +
-"<li><label>Ends</label>" +
+"<li><label>" + this.localizeString("labelEnds", "Ends") + "</label>" +
 	"<input type=\"text\" class=\"wijmo-wijev-end\" value=\"\">" +
 	"<input type=\"text\" class=\"wijmo-wijev-end-time\" value=\"\">" +
 "</li>" +
 "</ul>" +
 
 "<ul class=\"wijmo-wijev-detailed-content ui-corner-all\">" +
-"<li><label>Location</label>" +
+"<li><label>" + this.localizeString("labelLocation", "Location") + "</label>" +
 	"<input type=\"text\" class=\"wijmo-wijev-location\" value=\"\"></li>" +
-"<li><label>Repeat</label>" +
+"<li><label>" + this.localizeString("labelRepeat", "Repeat") + "</label>" +
 	"<select class=\"wijmo-wijev-repeat\">" +
-		"<option value=\"none\">None</option>" +
-		"<option value=\"daily\">Every Day</option>" +
-		"<option value=\"workdays\">Work days</option>" +
-		"<option value=\"weekly\">Every Week</option>" +
-		"<option value=\"monthly\">Every Month</option>" +
-		"<option value=\"yearly\">Every Year</option>" +
+		"<option value=\"none\">" + this.localizeString("repeatNone", "None") +
+		"</option>" +
+		"<option value=\"daily\">" + this.localizeString("repeatDaily", "Every Day") +
+		"</option>" +
+		"<option value=\"workdays\">" + this.localizeString("repeatWorkDays", "Work days") +
+		"</option>" +
+		"<option value=\"weekly\">" + this.localizeString("repeatWeekly", "Every Week") +
+		"</option>" +
+		"<option value=\"monthly\">" + this.localizeString("repeatMonthly", "Every Month") +
+		"</option>" +
+		"<option value=\"yearly\">" + this.localizeString("repeatYearly", "Every Year") +
+		"</option>" +
 					/*"<option value=\"custom\">Custom...</option>" +*/
 	"</select></li>" +
-"<li><label>Calendar</label>" +
+"<li><label>" + this.localizeString("labelCalendar", "Calendar") + "</label>" +
 	"<select class=\"wijmo-wijev-calendar\"></select></li>" +
-"<li class=\"wijmo-wijev-description-item\"><label>Description</label>" +
+"<li class=\"wijmo-wijev-description-item\"><label>" +
+this.localizeString("labelDescription", "Description") + "</label>" +
 	"<textarea class=\"wijmo-wijev-description\" /></li>" +
 "</ul>" +
 
 "<div class=\"footer\">" +
-						"<a href=\"#\" class=\"wijmo-wijev-delete\">Delete</a>" +
-						"<a href=\"#\" class=\"wijmo-wijev-save\">OK</a>" +
-						"<a href=\"#\" class=\"wijmo-wijev-cancel\">Cancel</a>" +
+						"<a href=\"#\" class=\"wijmo-wijev-delete\">" +
+					this.localizeString("buttonDelete", "Delete") + "</a>" +
+						"<a href=\"#\" class=\"wijmo-wijev-save\">" +
+					this.localizeString("buttonOK", "OK") + "</a>" +
+						"<a href=\"#\" class=\"wijmo-wijev-cancel\">" +
+					this.localizeString("buttonCancel", "Cancel") + "</a>" +
 "</div>" +
 
 "<div class=\"wijmo-wijev-angle\"></div>" +
@@ -2865,14 +2996,14 @@ block comments:
 					return;
 				}
 				self._readUpdatedServerDataIfAny(result, o);
-				if (!self._appointmentsById[o.id]) {
+				if (!self._eventsDataById[o.id]) {
 					self._storeEventWithSort(o);
 					self.status("Event '" + o.subject + "' added.");
 				} else {
 					self.status("Event '" + o.subject + "' added.");
 				}
 				o.prevData = self._cloneObj(o);
-				self._onAppointmentsChanged();
+				self._onEventsDataChanged();
 				self.hideLoadingLabel();
 				if (successCallback) {
 					successCallback(result);
@@ -2925,8 +3056,8 @@ block comments:
 			// fix for
 			// [19618] [C1EventsCalendar] Request to provide sorting behavior 
 			// in C1EventsCalendar with all view types:
-			var apps = this.options.appointments, i, c;
-			this._appointmentsById[o.id] = o;
+			var apps = this.options.eventsData, i, c;
+			this._eventsDataById[o.id] = o;
 			for (i = 0, c = apps.length; i < c; i += 1) {
 				if (apps[i].start > o.start) {
 					apps.splice(i, 0, o);
@@ -3042,14 +3173,14 @@ block comments:
 					return;
 				}
 				self._readUpdatedServerDataIfAny(result, o);
-				if (!self._appointmentsById[o.id]) {
+				if (!self._eventsDataById[o.id]) {
 					self._storeEventWithSort(o);
 					self.status("Event '" + o.subject + "' added.");
 				} else {
 					self.status("Event '" + o.subject + "' updated.");
 				}
 				o.prevData = self._cloneObj(o);
-				self._onAppointmentsChanged();
+				self._onEventsDataChanged();
 
 				self.hideLoadingLabel();
 				if (successCallback) {
@@ -3232,11 +3363,12 @@ block comments:
 		/// <param name="end">The Date value which specifies 
 		/// the end date and time of the interval.</param>
 		getOccurrences: function (start, end) {
-			var o = this.options, appts = o.appointments, appt, occurrenceAppt, pattern,
+			var o = this.options, appts = o.eventsData, appt, occurrenceAppt, pattern,
 				i, j, icnt, jcnt, maxOccurrenceCount = 100, patternStart,
 				patternStartTime, patternEndTime, eventsArr = [];
 			for (i = 0, icnt = appts.length; i < icnt; i += 1) {
 				appt = appts[i];
+				this._eventsDataById[appt.id] = appt; //qq save recurring events as well
 				if (appt.recurrenceState === "master") {
 					pattern = appt.recurrencePattern;
 					// populate pattern:
@@ -3544,7 +3676,7 @@ block comments:
 			if (id.id) {
 				id = id.id;
 			}
-			var o = this._appointmentsById[id], i, appts, deleteEventCallback,
+			var o = this._eventsDataById[id], i, appts, deleteEventCallback,
 					deleteEventErrorCallback, self = this, k;
 			if (!this._trigger("beforeDeleteEvent", null,
 					{ data: o })) {
@@ -3565,20 +3697,20 @@ block comments:
 					deleteEventErrorCallback(result);
 					return;
 				}
-				if (self._appointmentsById[o.id]) {
-					appts = self.options.appointments;
+				if (self._eventsDataById[o.id]) {
+					appts = self.options.eventsData;
 					for (i = 0; i < appts.length; i = i + 1) {
 						if (appts[i].id === id) {
 							appts.splice(i, 1);
 						}
 					}
-					delete self._appointmentsById[o.id];
+					delete self._eventsDataById[o.id];
 					self.status("Event '" + o.subject + "' deleted.");
 				} else {
 					self.status("Event '" + o.subject + "' deleted.");
 				}
 				o.prevData = self._cloneObj(o);
-				self._onAppointmentsChanged();
+				self._onEventsDataChanged();
 				self.hideLoadingLabel();
 				if (successCallback) {
 					successCallback(result);
@@ -3894,9 +4026,8 @@ block comments:
 			if (targetCell && targetCell.hasClass("wijmo-wijev-daylabel")) {
 				targetCell = targetCell.parent(".wijmo-wijev-allday-cell");
 			}
-
 			if (!appt) {
-				appt = { subject: "New Event" };
+				appt = { subject: this.localizeString("textNewEvent", "New event") };
 
 				if (targetCell && targetCell.length > 0) {
 					this._editEventDialog._arrowTarget = targetCell;
@@ -4023,7 +4154,7 @@ block comments:
 								"<div class=\"wijmo-wijev-headercontainer\">" +
 									"<div class=\"wijmo-wijev-sizer\">" +
 									"<div class=\"wijmo-wijev-gmtlabel\">" +
-"all-day" +
+this.localizeString("labelAllDay", "all-day") +
 				/*GMT" +
 				(new Date().getTimezoneOffset() / 60) +*/
 									"</div>" +
@@ -4455,7 +4586,7 @@ block comments:
 					ev.subject +
 					"</div>" +
 					"<div class=\"wijmo-wijev-agenda-event-time\">" +
-						(this.isAllDayEvent(ev) ? "all-day" :
+						(this.isAllDayEvent(ev) ? this.localizeString("labelAllDay", "all-day") :
 				    this._formatString("{0:hh:mm tt} to {1:hh:mm tt}",
 									ev.start, ev.end)) +
 					"</div>" +
@@ -4473,10 +4604,12 @@ block comments:
 			timeInicator.css("top", (curTime / o.timeInterval) * o.timeIntervalHeight);
 		},
 		// <- end of day view
-		_onAppointmentsChanged: function () {
+		_onEventsDataChanged: function () {
 			this._clearViewsCache();
 			this._prepareEventsForView();
 			this._renderActiveView();
+			this._trigger("eventsDataChanged", null,
+					{ eventsData: this.options.eventsData });
 		},
 		_onCalendarsChanged: function () {
 			this._trigger("calendarsChanged", null,
@@ -4635,13 +4768,13 @@ block comments:
 
 		_resolveDayViewAppointmentConflicts: function (col) {
 
-			var appointments = $(col).find(".wijmo-wijev-appointment"),
+			var eventsData = $(col).find(".wijmo-wijev-appointment"),
 				intersections = [], arr1, i, j, appt1, appt2, count1, count2, v;
-			for (i = 0, count1 = appointments.length; i < count1; i += 1) {
-				appt1 = appointments[i];
+			for (i = 0, count1 = eventsData.length; i < count1; i += 1) {
+				appt1 = eventsData[i];
 				for (j = 0; j < count1; j += 1) {
 					if (j !== i) {
-						appt2 = appointments[j];
+						appt2 = eventsData[j];
 						if ((appt1.offsetTop) < (appt2.offsetTop + appt2.offsetHeight) &&
 						 (appt1.offsetTop + appt1.offsetHeight) > appt2.offsetTop
 						) {
@@ -4755,8 +4888,8 @@ block comments:
 				if (i !== -1) {
 					id = this._parseEventIdFromClass(id);
 				}
-				if (this._appointmentsById) {
-					return this._appointmentsById[id];
+				if (this._eventsDataById) {
+					return this._eventsDataById[id];
 				}
 			}
 			return null;
@@ -5132,7 +5265,7 @@ this._getEventMarkup(this.findEventById(this.__targetAppt[0].className), true)
 
 				if (isToday) {
 					s += "<span class=\"wijmo-wijev-todaylabel\">" +
-							"Today</span>";
+							this.localizeString("labelToday", "Today") + "</span>";
 				}
 
 				if (curRowInd === 0) {

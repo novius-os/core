@@ -2,7 +2,7 @@
 
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -253,7 +253,8 @@
 				north: "bottom", south: "top"
 			};
 			self.min = o.minValue;
-			self.max = o.maxValue;
+			//self.max = o.maxValue;
+			self.max = o.max = o.maxValue; //fixed bug when jui update to 1.8.18
 			element.addClass(wijpbCss);
 			$.ui.progressbar.prototype._create.apply(self, arguments);
 			self.label = $("<span>")

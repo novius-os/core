@@ -1,7 +1,7 @@
 /*globals jQuery,window,S,document */
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -143,7 +143,7 @@
 			///		captionOrientation: "vertical" 
 			///	} );
 			/// </summary>
-			captionOrientation: "horizontal",
+			// captionOrientation: "horizontal",
 			/// <summary>
 			/// Determines if the counter should be shown.
 			/// Default: true.
@@ -183,7 +183,15 @@
 			///	} );
 			/// </summary>
 			pagingPosition: {},
-			thumbnails: true,
+			///<summary>
+			/// Determines if the thumbnails should be shown.
+			/// Default: true.
+			/// Type: Boolean.
+			/// Code example: $("#element").wijgallery( { 
+			///		thumbnails: false 
+			///	} );
+			///</summary>
+			/// thumbnails: true,
 			/// <summary>
 			/// Determines the orientation of the thumbnails. 
 			/// Possible values are: "vertical" & "horizontal"
@@ -375,7 +383,7 @@
 		},
 
 		_setOption: function (key, value) {
-			var self = this, o = self.options, el, create, old;
+			var self = this, o = self.options, el, create, old, text;
 			if (key === "framePosition" ||
 				key === "thumbnailPosition" ||
 				key === "transitions" ||
@@ -386,39 +394,63 @@
 				old = o[key];
 				$.Widget.prototype._setOption.apply(self, arguments);
 				switch (key) {
-				case "disabled":
-					self._handleDisabledOption(value, self.element);
-					break;
-				case "thumbnailOrientation":
-					self.thumbs.wijgallery({
-						orientation: value
-					});
-					break;
-				case "autoPlay":
-					self.play();
-					break;
-				case "showPager":
-				case "showCounter":
-				case "showTimer":
-				case "showControls":
-					el = key.replace(/show/i, "").toLowerCase();
-					create = key.replace(/show/i, "_create");
-					if (value !== old) {
-						if (value === true) {
-							if (!self[el]) {
-								self[create]();
+					case "disabled":
+						self._handleDisabledOption(value, self.element);
+						break;
+					case "thumbnailOrientation":
+						self.thumbs[self.thumbWidgetName]({
+							orientation: value
+						});
+						break;
+					case "thumbsDisplay":
+						self.thumbs[self.thumbWidgetName]({
+							display: value
+						});
+						break;
+					case "autoPlay":
+						self[value ? "play" : "pause"]();
+						break;
+					case "showCounter":
+					case "showTimer":
+					case "showControls":
+						el = key.replace(/show/i, "").toLowerCase();
+						create = key.replace(/show/i, "_create");
+						if (value !== old) {
+							if (value === true) {
+								if (!self[el]) {
+									self[create]();
+								}
+								else if (self[el].jquery) {
+									self[el].show();
+								}
 							}
-							else if (self[el].jquery) {
-								self[el].show();
+							else {
+								self[el].hide();
 							}
 						}
-						else {
-							self[el].remove();
+						break;
+					case "showCaption":
+						if (value) {
+							self._createCaption(self.size);
+							text = self._loadCaption(self.images[self.currentIdx]);
+							text.show();
+						} else {
+							self.element
+							.find(".wijmo-wijgallery-caption,.wijmo-wijgallery-text")
+							.remove();
 						}
-					}
-					break;
-				default:
-					break;
+						break;
+					case "showPager":
+					case "thumbsLength":
+					case "thumbnailDirection":
+					case "showControlsOnHover":
+					case "mode":
+					case "data":
+						self._destroy();
+						self._create();
+						break;
+					default:
+						break;
 				}
 			}
 		},
@@ -551,6 +583,9 @@
 			if (o.showPager) {//remove this.
 				o.pagingPosition = true;
 				o.thumbnails = false;
+			}
+			else {
+				o.thumbnails = true;
 			}
 			if (o.data && o.data.length) {
 				self._createMarkupFromData();
@@ -837,6 +872,7 @@
 				}
 			}
 			text.hide();
+			return text;
 		},
 
 		_showCaption: function (img) {
@@ -1249,7 +1285,7 @@
 		_animate: function (index) {
 			var self = this, o = self.options, animate = o.transitions,
 			hori = o.thumbnailOrientation === "horizontal",
-			width, height, wrapper, half, data, forward, 
+			width, height, wrapper, half, data, forward,
 			effect = animate.animated, duration = animate.duration;
 
 			//if (!self.last.find("img").attr("src") && 
@@ -1441,7 +1477,7 @@
 			return this.count;
 		},
 
-		destroy: function () {
+		_destroy: function () {
 			var self = this;
 			self.frame.unwrap().remove();
 			if (self.options.thumbnails) {
@@ -1471,6 +1507,10 @@
 				self.disabledDiv.remove();
 				self.disabledDiv = null;
 			}
+		},
+
+		destroy: function () {
+			this._destroy();
 			$.Widget.prototype.destroy.apply(this);
 		},
 

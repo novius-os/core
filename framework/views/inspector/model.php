@@ -29,15 +29,20 @@ require([
 	                        inspector.noslistgrid('setSize', parent.width(), parent.height());
 						},
 						widgetReload : function() {
-
-                            inspector.wijgrid('doRefresh');
-							inspector.noslistgrid('option', 'pageSize', Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row));
+                            var size = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
+                            if (size != pageSize) {
+                                pageSize = size
+                                inspector.noslistgrid('option', 'pageSize', pageSize);
+                            } else {
+                                inspector.noslistgrid('ensureControl', true);
+                            }
 						}
 					}),
                 inspectorData = parent.data('inspector'),
                 table_heights = $nos.grid.getHeights(),
                 showFilter = inspectorData.grid.showFilter || false,
-				rendered = false;
+				rendered = false,
+                pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
 
 			if (inspectorData.reloadEvent) {
 				inspector.listenEvent('reload.' + inspectorData.reloadEvent, function() {
@@ -56,7 +61,7 @@ require([
                     scrollMode : 'auto',
                     allowPaging : true,
                     pageIndex : 0,
-                    pageSize: Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row),
+                    pageSize: pageSize,
                     allowColSizing : true,
                     allowColMoving : true,
                     columns : inspectorData.grid.columns,

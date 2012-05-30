@@ -33,6 +33,11 @@
     font-weight: normal;
     margin: 0 20px 0 0;
 }
+.wijmo-wijtree .wijmo-wijtree-list /*fix bug #21078 "The height of UL always equals 0"*/
+{
+    float: left; 
+    width: 100%; /*force the ul to a newline*/
+}
 
 .wijmo-wijtree-inner
 {

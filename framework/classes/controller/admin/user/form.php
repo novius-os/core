@@ -12,11 +12,11 @@ namespace Nos;
 
 class Controller_Admin_User_Form extends \Nos\Controller_Admin_Application {
 
-    public function before($response = null) {
-        if (\Request::active()->action == 'edit' &&\Request::active()->method_params[0] == \Session::user()->user_id) {
+    public function before() {
+        if (\Request::active()->action == 'edit' && ($user = \Session::user()) && \Request::active()->method_params[0] == $user->user_id) {
             $this->bypass = true;
         }
-        $ret = parent::before($response);
+        $ret = parent::before();
 
         return $ret;
     }
@@ -135,6 +135,8 @@ class Controller_Admin_User_Form extends \Nos\Controller_Admin_Application {
                 'label' => __('Last login: '),
                 'add' => false,
                 'widget' => 'Nos\Widget_Date_Select',
+                'dont_populate' => true,
+                'dont_save' => true,
                 'form' => array(
                     'readonly' => true,
                     'date_format' => 'eu_full',

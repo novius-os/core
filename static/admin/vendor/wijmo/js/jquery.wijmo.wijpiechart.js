@@ -1,7 +1,7 @@
 /*globals Raphael,jQuery, window*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -366,6 +366,52 @@
 		/** end of public methods */
 
 		/** private methods */
+		//add binding for pie chart
+		_bindData: function () {
+			var self = this,
+				o = self.options,
+				ds = o.dataSource,
+				data = o.data,
+				seriesList = [], 
+				dataLabel, dataValue, dataOffset;
+			
+			if (ds && data) {
+				dataLabel = data.label;
+				dataValue = data.value;
+				dataOffset = data.offset;
+				if (dataLabel && dataLabel.bind) {
+					dataLabel = self._getBindData(ds, dataLabel.bind);
+				}
+				if (dataValue && dataValue.bind) {
+					dataValue = self._getBindData(ds, dataValue.bind);
+				}
+				if (dataOffset && dataOffset.bind) {
+					dataOffset = self._getBindData(ds, dataOffset.bind);
+				}
+				if (dataLabel && $.isArray(dataLabel) && dataLabel.length && 
+						dataValue && $.isArray(dataValue) && dataValue.length) {
+					$.each(dataValue, function (idx, val) {
+						var label,
+							offset = 0;
+						if (idx >= 0 && idx < dataLabel.length) {
+							label = dataLabel[idx];
+						}
+						if (dataOffset && $.isArray(dataValue) && dataOffset.length &&
+								idx >= 0 && idx < dataOffset.length) {
+							offset = typeof dataOffset[idx] === 'undefined' ? 0 : dataOffset[idx];
+						}
+						seriesList.push({
+							data: val,
+							label: label,
+							offset: offset,
+							legendEntry: true
+						});
+					});
+					o.seriesList = seriesList;
+				}
+			}
+		},
+		
 		_getSeriesFromTR: function (theaders, sList, seriesList) {
 			var label = null, th = null, tds = null,
 				data = null, series = null;
