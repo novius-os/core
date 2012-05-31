@@ -26,6 +26,7 @@ define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTOR
     'Command'           => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'command.php',
     'Config'            => FUEL_EXTEND_PATH.'config.php',
     'Date'              => FUEL_EXTEND_PATH.'date.php',
+    'Event'             => FUEL_EXTEND_PATH.'event.php',
     'Fuel'              => FUEL_EXTEND_PATH.'fuel.php',
     'Finder'            => FUEL_EXTEND_PATH.'finder.php',
     'Fieldset'          => FUEL_EXTEND_PATH.'fieldset.php',
