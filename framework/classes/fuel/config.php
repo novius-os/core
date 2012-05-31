@@ -8,7 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-
+/**
+ * Extended Config class to allow callback on the loaded config
+ */
 class Config extends \Fuel\Core\Config {
 
     public static function load($file, $group = null, $reload = false, $overwrite = false) {
@@ -17,6 +19,11 @@ class Config extends \Fuel\Core\Config {
         if ($originFileName == 'db')  {
             $group = 'db';
         }
+		if (!$reload and is_array($file) and is_string($group))
+		{
+            Event::trigger_function('config|'.$group, array(&$file));
+		}
+
         return parent::load($file, $group, $reload, $overwrite);
     }
 
