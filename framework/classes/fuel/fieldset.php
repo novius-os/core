@@ -333,6 +333,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			$instance = null;
 		}
 
+        $options = \Arr::merge(array(
+            'save' => \Input::method() == 'POST',
+        ), $options);
+
 		$fieldset = \Fieldset::forge(uniqid(), array(
 			'inline_errors'  => true,
 			'auto_id'		 => true,
@@ -359,7 +363,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $fieldset->populate_with_instance($instance);
         }
 
-		if (\Input::method() == 'POST' && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
+		if ($options['save'] && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
 			$fieldset->repopulate();
 			if ($fieldset->validation()->run($fieldset->value())) {
 				$data = $fieldset->validated();
