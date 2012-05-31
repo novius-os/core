@@ -505,6 +505,9 @@ class Model extends \Orm\Model {
 		return $diff;
 	}
 
+    /**
+     * Clone nested objects manually, it's not native
+     */
     public function __clone() {
         parent::__clone();
         $wysiwygs = array();

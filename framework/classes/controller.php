@@ -33,7 +33,7 @@ class Controller extends \Fuel\Core\Controller {
     );
 
 
-    public function before($response = null) {
+    public function before() {
         if ( ! empty($this->template) and is_string($this->template))
         {
             // Load the template
@@ -49,7 +49,7 @@ class Controller extends \Fuel\Core\Controller {
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
         $this->trigger('before', $this, 'boolean');
 
-        return parent::before($response);
+        return parent::before();
     }
 
     public function after($response) {
@@ -505,7 +505,7 @@ class Controller extends \Fuel\Core\Controller {
         $lang = \Input::get('lang');
 
         if (empty($tree_config['id'])) {
-            $tree_config['id'] = \Config::getBDDName(join('::', $this->getLocation()));
+            $tree_config['id'] = \Config::getDbName(join('::', $this->getLocation()));
         }
 
         $tree_config = $this->build_tree($tree_config);

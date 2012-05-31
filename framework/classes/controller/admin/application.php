@@ -12,20 +12,22 @@ namespace Nos;
 
 class Controller_Admin_Application extends Controller_Admin_Auth {
 
-    public $template    = 'nos::admin/html';
-    public $bypass      = false;
+    public $template = 'nos::admin/html';
+    public $bypass   = false;
 
 
-    public function before($response = null) {
-        $ret = parent::before($response);
+    public function before() {
+        $ret = parent::before();
         $location = $this->getLocation();
         list($application, $file_name) = $location;
         if ($application == 'nos' && isset($location[2])) {
             $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native applications...
         }
 
-        if (!$this->bypass && $application != 'nos' && !Permission::check($application, 'access')) {
-            throw new \Exception('You don\'t have access to module '.$application.'!');
+        if (!$this->bypass) {
+            if ($application != 'nos' && !Permission::check($application, 'access')) {
+                throw new \Exception('You don\'t have access to application '.$application.'!');
+            }
         }
 
         //\Debug::dump($application, Permission::check($application, 'access'));

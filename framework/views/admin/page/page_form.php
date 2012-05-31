@@ -41,21 +41,12 @@ $fieldset->set_config('form_attributes', $form_attributes);
 ?>
 
 <?= $fieldset->open('admin/nos/page/page/form/'.($page->is_new() ? '' : '/'.$page->page_id)) ?>
-<?= View::forge('form/layout_standard', array(
-    'fieldset' => $fieldset,
-    // Used by the behaviours (publishable, etc.)
-    'object' => $page,
-    'medias' => array(),
-    'title' => 'page_title',
-    'id' => 'page_id',
 
-    'large' => true,
-
-    'save' => 'save',
-
-    'subtitle' => array('page_type', 'page_template'),
-
-    'content' => \View::forge('form/expander', array(
+<?php
+Event::register_function('config|nos::views/admin/page/page_form', 1, function(&$config) use ($fieldset, $page) {
+    $config['fieldset'] = $fieldset;
+    $config['object']   = $page;
+    $config['content'][] = \View::forge('form/expander', array(
         'title'    => __('Content'),
         // Wysiwyg are edge-to-edge with the border
         'nomargin' => true,
@@ -73,21 +64,19 @@ $fieldset->set_config('form_attributes', $form_attributes);
                 <p style="padding:1em;">We\'re sorry, internal links are not supported yet. We need a nice page selector before that.</p>
             </div>
             <div data-id="wysiwyg" style="display:none;"></div>',
-    ), false),
+    ), false);
 
-    'menu' => array_merge($page->page_parent_id == null ? array() : array(
-            __('Menu')               => array('page_parent_id', 'page_menu', 'page_menu_title'),
-        ), array(
-            __('URL (page address)') => array('page_virtual_name'),
-            __('SEO')                => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
-            __('Admin')              => array(
-                'header_class'  => 'faded',
-                'content_class' => 'faded',
-                'fields'        => array('page_cache_duration', 'page_lock'),
-            ),
-        )
-    ),
-), false) ?>
+    if ($page->page_parent_id == null) {
+        // Remove the menu section
+        array_shift($config['menu']);
+        //unset($config['menu'][__('Menu')]);
+    }
+});
+
+$config = Config::load('nos::views/admin/page/page_form', true);
+
+?>
+<?= View::forge('form/layout_standard', $config, false); ?>
 <?= $fieldset->close() ?>
 <script type="text/javascript">
 	require(['jquery-nos-ostabs'], function ($nos) {

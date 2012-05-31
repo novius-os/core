@@ -8,7 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-
+/**
+ * Extended Config class to allow callback on the loaded config
+ */
 class Config extends \Fuel\Core\Config {
 
     public static function load($file, $group = null, $reload = false, $overwrite = false) {
@@ -17,6 +19,11 @@ class Config extends \Fuel\Core\Config {
         if ($originFileName == 'db')  {
             $group = 'db';
         }
+		if (!$reload and is_array($file) and is_string($group))
+		{
+            Event::trigger_function('config|'.$group, array(&$file));
+		}
+
         return parent::load($file, $group, $reload, $overwrite);
     }
 
@@ -32,19 +39,6 @@ class Config extends \Fuel\Core\Config {
         return parent::save($file, $config);
 	}
 
-
-
-/*
-	public static function set($item, $value)
-	{
-		return \Arr::set(static::$items, $item, \Fuel::value($value));
-	}
-
-	public static function delete($item)
-	{
-		return \Arr::delete(static::$items, $item);
-	}
-*/
     public static function convertFileName($file, $from = 'load') {
         if (is_string($file) && mb_strpos($file, '::') !== false && mb_substr($file, 0, 4) == 'nos_') {
             list($application, $configuration_path) = explode('::', $file);
@@ -60,12 +54,12 @@ class Config extends \Fuel\Core\Config {
     public static function mergeWithUser($item, $config) {
         $user = Session::user();
 
-        Arr::set($config, 'configuration_id', static::getBDDName($item));
+        Arr::set($config, 'configuration_id', static::getDbName($item));
 
-        return \Arr::merge($config, \Arr::get($user->getConfiguration(), static::getBDDName($item), array()));
+        return \Arr::merge($config, \Arr::get($user->getConfiguration(), static::getDbName($item), array()));
     }
 
-    public static function getBDDName($item) {
+    public static function getDbName($item) {
         $item = str_replace('::', '/config/', $item);
         $item = str_replace('/', '.', $item);
         return $item;
