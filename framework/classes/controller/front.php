@@ -46,7 +46,7 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
-	    $this->base_href = \URI::base();
+	    $this->base_href = str_replace(array('http:', 'https:'), '', \URI::base());
 	    $this->url = mb_substr($_SERVER['REDIRECT_URL'], 1);
 	    $url = str_replace('.html', '', $this->url);
 
