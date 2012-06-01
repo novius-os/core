@@ -53,9 +53,10 @@ $large = !empty($large) && $large == true;
                     <tr>
                     <?php
                     if (!empty($medias)) {
-                        echo '<td>';
-                        foreach ((array) $medias as $name) {
-                            echo $fieldset->field($name)->build();
+                        $medias = (array) $medias;
+                        echo '<td style="width:'.(75 * count($medias)).'px;">';
+                        foreach ($medias as $name) {
+                            echo $fieldset->field($name)->set_template('{field}')->build();
                         }
                         echo '</td>';
                     }
@@ -125,18 +126,12 @@ $large = !empty($large) && $large == true;
             <?= $large ? '' : '<div class="unit col c1"></div>' ?>
             <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
                 <?php
-                if (is_array($content)) {
-                    foreach ($content as $c) {
-                        if (is_callable($c)) {
-                            echo $c();
-                        } else {
-                            echo $c;
-                        }
+                foreach ((array) $content as $c) {
+                    if (is_callable($c)) {
+                        echo $c();
+                    } else {
+                        echo $c;
                     }
-                } else if (is_callable($content)) {
-                    echo $content();
-                } else {
-                    echo $content;
                 }
                 ?>
             </div>

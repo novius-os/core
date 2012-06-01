@@ -104,8 +104,12 @@ class Controller_Front extends Controller {
 	        if ($_404) {
                 if (!\Event::trigger('front.404NotFound', array('url' => $this->pageUrl))) {
                     // If no redirection then we display 404
-                    $_SERVER['REDIRECT_URL'] = '/';
-                    return $this->router('index', $params);
+                    if (!empty($url)) {
+                        $_SERVER['REDIRECT_URL'] = '/';
+                        return $this->router('index', $params);
+                    } else {
+                        exit('No home page defined. Please check you created a page and it\'s published');
+                    }
                 }
 	        }
         }
@@ -184,14 +188,16 @@ class Controller_Front extends Controller {
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->page->page_id);
 
+        $this->page_title = $this->page->page_title;
+
+        $wysiwyg = array();
+
         // Scan all wysiwyg
         foreach ($this->template['layout'] as $wysiwyg_name => $layout) {
-            $content = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
 
-            $this->page_title = $this->page->page_title;
-
-            $this->_view->set('wysiwyg_'.$wysiwyg_name, $content, false);
+            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
         }
+        $this->_view->set('wysiwyg', $wysiwyg, false);
     }
 
     /**

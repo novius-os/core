@@ -7,16 +7,17 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-	$id = uniqid('temp_');
+    empty($attributes) and $attributes = array();
+    empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 ?>
-<div id="<?= $id ?>"><table class="nos-treegrid"></table></div>
+<div <?= array_to_attr($attributes); ?>><table class="nos-treegrid"></table></div>
 <script type="text/javascript">
 	require([
 		'jquery-nos-treegrid'
 	], function( $nos, table, undefined ) {
 		$nos(function() {
 			var params = <?= \Format::forge()->to_json($params) ?>,
-				container = $nos('#<?= $id ?>').removeAttr('id')
+				container = $nos('#<?= $attributes['id'] ?>')
 					.css({
                         height: params.height || '150px',
                         width: params.width || ''

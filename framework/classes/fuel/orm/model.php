@@ -263,6 +263,11 @@ class Model extends \Orm\Model {
         return Query::forge(get_called_class(), static::connection(), $options);
 	}
 
+    public static function  get_prefix() {
+
+        return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
+    }
+
 	/**
 	 * Returns the first non empty field. Will add field prefix when needed.
 	 *
@@ -270,14 +275,12 @@ class Model extends \Orm\Model {
 	 * @return mixed
 	 */
 	public function pick() {
-		static $prefix = null;
-		if (null == $prefix) {
-			$prefix = mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
-			$prefix_length = mb_strlen($prefix);
-		}
+
+        $prefix_length = mb_strlen(static::get_prefix());
+
 		foreach (func_get_args() as $property) {
 			//if (mb_substr($property, 0, $prefix_length) != $prefix) {
-				$property = $prefix.$property;
+				$property = static::get_prefix().$property;
 			//}
 			if (!empty($this->{$property})) {
 				return $this->{$property};
@@ -502,6 +505,9 @@ class Model extends \Orm\Model {
 		return $diff;
 	}
 
+    /**
+     * Clone nested objects manually, it's not native
+     */
     public function __clone() {
         parent::__clone();
         $wysiwygs = array();

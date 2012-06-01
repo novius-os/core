@@ -12,8 +12,8 @@ namespace Nos;
 
 class Controller_Admin_Application extends Controller_Admin_Auth {
 
-    public $template    = 'nos::admin/html';
-    public $bypass      = false;
+    public $template = 'nos::admin/html';
+    public $bypass   = false;
 
 
     public function before() {
@@ -24,8 +24,10 @@ class Controller_Admin_Application extends Controller_Admin_Auth {
             $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native applications...
         }
 
-        if (!$this->bypass && $application != 'nos' && !Permission::check($application, 'access')) {
-            throw new \Exception('You don\'t have access to module '.$application.'!');
+        if (!$this->bypass) {
+            if ($application != 'nos' && !Permission::check($application, 'access')) {
+                throw new \Exception('You don\'t have access to application '.$application.'!');
+            }
         }
 
         //\Debug::dump($application, Permission::check($application, 'access'));

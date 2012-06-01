@@ -505,7 +505,7 @@ class Controller extends \Fuel\Core\Controller {
         $lang = \Input::get('lang');
 
         if (empty($tree_config['id'])) {
-            $tree_config['id'] = \Config::getBDDName(join('::', $this->getLocation()));
+            $tree_config['id'] = \Config::getDbName(join('::', $this->getLocation()));
         }
 
         $tree_config = $this->build_tree($tree_config);

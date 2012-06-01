@@ -84,7 +84,7 @@ class Widget_Date_Select extends \Fieldset_Field {
             list($date, $time) = explode(' ', $value.' ');
 	        $date = explode('-', $date);
 	        if (count($date) >= 3) {
-                list($year, $month ,$day) = explode('-', $date);
+                list($year, $month ,$day) = $date;
 	        }
             return empty($value) or !empty($year) and !empty($month) and !empty($day) and checkdate((int) $month, (int) $day, (int) $year);
         }));
