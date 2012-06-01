@@ -46,7 +46,7 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
-	    $this->base_href = \URI::base();
+	    $this->base_href = str_replace(array('http:', 'https:'), '', \URI::base());
 	    $this->url = mb_substr($_SERVER['REDIRECT_URL'], 1);
 	    $url = str_replace('.html', '', $this->url);
 
@@ -76,12 +76,17 @@ class Controller_Front extends Controller {
 
 	        $_404 = true;
 	        foreach ($url_enhanced as $temp_url => $page_id) {
-		        if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-			        $_404 = false;
-			        $this->pageUrl = $temp_url != '/' ? mb_substr($temp_url, 0, -1).'.html' : '';
-			        $this->enhancerUrlPath = $temp_url != '/' ? $temp_url : '';
+                if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
+                    $_404 = false;
+                    if (!in_array($temp_url, array('', '/'))) {
+                        $this->pageUrl = mb_substr($temp_url, 0, -1).'.html';
+                        $this->enhancerUrlPath = $temp_url;
+                    } else {
+                        $this->pageUrl = '';
+                        $this->enhancerUrlPath = '';
+                    }
 			        $this->enhancerUrl = ltrim(str_replace(mb_substr($temp_url, 0, -1), '', $url), '/');
-			        try {
+                    try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
 				        $_404 = true;
