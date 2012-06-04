@@ -537,6 +537,7 @@ define('jquery-nos', [
                             url: contentUrl,
                             type: 'GET',
                             dataType: "html",
+                            data : options.ajaxData || {},
                             // Complete callback (responseText is used internally)
                             complete: function( jqXHR, status, responseText ) {
                                 // Store the response as specified by the jqXHR object
@@ -697,8 +698,7 @@ define('jquery-nos', [
                             window.parent.$nos(window.frameElement).tab('update', tab);
                         } else if (self.size() && !self.closest('.ui-dialog-content').size() && noviusos().length) {
                             var index = getIndex(self);
-                            noviusos().ostabs('update', index, tab)
-                                .xhr('saveUserConfig', 'tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
+                            noviusos().ostabs('update', index, tab);
                         }
                     })();
                     break;
@@ -706,9 +706,15 @@ define('jquery-nos', [
                 case 'init' :
                     (function() {
                         var configuration = args[0],
+                            saveTimeout = false,
                             fct = function() {
                                 if (noviusos().length) {
-                                    noviusos().xhr('saveUserConfig', 'tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
+                                    if (saveTimeout) {
+                                        clearTimeout(saveTimeout);
+                                    }
+                                    saveTimeout = setTimeout(function() {
+                                        noviusos().xhr('saveUserConfig', 'tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
+                                    }, 500);
                                 }
                             };
                         $noviusos = self;
@@ -717,7 +723,8 @@ define('jquery-nos', [
                             remove: fct,
                             select: fct,
                             show: fct,
-                            drag: fct
+                            drag: fct,
+                            update: fct
                         });
 
                         if (configuration['user_configuration']['tabs']) {

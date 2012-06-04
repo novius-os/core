@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize, wijmoASPNetParseOptions*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -158,6 +158,8 @@
 					return true;
 				} else if (typeof value === "undefined") {
 					return true;
+				} else if (typeof value === "number" && isNaN(value)) {
+					return true;
 				}
 				val = value;
 				return false;
@@ -175,6 +177,11 @@
 				return true;
 			} else if (typeof val === "undefined") {
 				return true;
+			} else if (typeof val === "number" && isNaN(val)) {
+				return true;
+			}
+			if (hole === null) {
+				return false;
 			}
 			if (typeof val !== "undefined") {
 				// for datetime, if use val === hole it returns false.
@@ -2975,8 +2982,9 @@
 				key === "seriesHoverStyles") {
 				//backup the styles. when drawed the charts, restore the styles.
 				self.styles = {
-					style: $.extend({ }, o.seriesStyles),
-					hoverStyles: $.extend({ }, o.seriesHoverStyles)
+					style: [].concat(o.seriesStyles.slice(0, o.seriesStyles.length)),
+					hoverStyles: [].concat(o.seriesHoverStyles.slice(0, 
+						o.seriesHoverStyles.length))
 				};
 				self._initStyles();
 			}
@@ -3045,8 +3053,9 @@
 			// the serverside will get the extended styles. when the add a series data,
 			// the extend style will wrong.
 			self.styles = {
-				style: $.extend({ }, o.seriesStyles),
-				hoverStyles: $.extend({ }, o.seriesHoverStyles)
+				style: [].concat(o.seriesStyles.slice(0, o.seriesStyles.length)),
+				hoverStyles: [].concat(o.seriesHoverStyles.slice(0, 
+					o.seriesHoverStyles.length))
 			};
 
 			// Extend seriesStyle
@@ -3192,12 +3201,13 @@
 
 			
 			$.each(seriesList, function (i, series) {
-				var data = series.data, dataX, dataY,
+				var data = series.data, dataX, dataY, dataY1,
 					ds = series.dataSource || dataSource;
 
 				if (ds && data) {
 					dataX = data.x;
 					dataY = data.y;
+					dataY1 = data.y1;
 					if (dataX && dataX.bind) {
 						data.x = self._getBindData(ds, dataX.bind);	
 					}
@@ -3211,6 +3221,9 @@
 					if (dataY && dataY.bind) {
 						data.y = self._getBindData(ds, dataY.bind);
 					}
+					if (dataY1 && dataY1.bind) {
+						data.y1 = self._getBindData(ds, dataY1.bind);
+					}
 				}
 			});
 			
@@ -3220,7 +3233,7 @@
 			if ($.isArray(dataSource)) {
 				var arr = [];
 				$.each(dataSource, function (i, data) {
-					if (data && data[bind]) {
+					if (data && data[bind] !== undefined) {
 						arr.push(data[bind]);
 					}
 				});
@@ -4049,7 +4062,7 @@
 					x = left + index * (iconWidth + maxWidth + legendMargin) +
 						(index + 1) * textMargin.left + index * textMargin.right,
 					y = top + offsetY + bBox.height / 2 + textMargin.top,
-					iconY = y - icon.wijGetBBox().height / 2, chtStyle;
+					iconY = y - icon.wijGetBBox().height / 2, chtStyle, legCover;
 
 				// icon.translate(x, y - icon.wijGetBBox().height / 2);
 				// icon.transform(Raphael.format("...T{0},{1}", x, y -
@@ -4077,6 +4090,21 @@
 				// y);
 				leg.transform(Raphael.format("...T{0},{1}", 
 				x + iconWidth + legendMargin + bBox.width / 2, y));
+				//It's hard to click the text in vml, so add a rect to cover it for clicking.
+				if (Raphael.vml) {
+					legCover = self.canvas.rect(x + iconWidth + legendMargin, 
+						y - bBox.height / 2, bBox.width, bBox.height).attr({
+							stroke: "none",
+							fill: "#000000",
+							opacity: 0.01
+						});
+					$.wijraphael.addClass($(legCover.node), 
+					"wijchart-legend-textCover wijchart-legend");
+					$(legCover.node).data("legendIndex", $(leg.node).data("legendIndex"));
+					$(legCover.node).data("index", $(leg.node).data("index"));
+					self.legendEles.push(legCover);
+				}
+				//end
 				leg.toFront();
 				//$(leg.node).data("index", seriesIdx);
 
@@ -4215,10 +4243,11 @@
 		},
 
 		_onBeforeTooltipShowing: function (tooltip) {
-			var target = tooltip.target;
+			var target = tooltip.target,
+				hintStyle = this.options.hint.style;
 
 			if (target) {
-				tooltip.options.style.stroke = tooltip.options.style.stroke ||
+				tooltip.options.style.stroke = hintStyle.stroke ||
 					target.attrs.stroke ||
 					target.attrs.fill;
 			}
@@ -5329,6 +5358,7 @@
 					vlGridLineStyle = {};
 
 				if (val < min || val > max) {
+					index++;
 					return true;
 				}
 
@@ -6733,6 +6763,8 @@
 						validValue = $.wijchart.getFirstValidListValue(valuesY);
 						if (self._isDate(validValue)) {
 							axisInfo.y[key].isTime = true;
+						} else if (typeof (validValue) === "undefined") {
+							return true;
 						} else if (typeof (validValue) !== "number") {
 							$.each(valuesY, function (idx, valueY) {
 								// valueLabels.push({
@@ -6826,7 +6858,7 @@
 				validValue;
 
 			if (!array.length) {
-				return;
+				return val;
 			}
 
 			validValue = $.wijchart.getFirstValidListValue(array);
@@ -6846,6 +6878,9 @@
 
 			for (i = 0; i < array.length; i++) {
 				if (array[i] === null || typeof array[i] === "undefined") {
+					continue;
+				}
+				if(typeof array[i] === "number" && isNaN(array[i])) {
 					continue;
 				}
 				if (array[i] < val.min) {

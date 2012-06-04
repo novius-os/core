@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, navigator*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -458,10 +458,11 @@
 		_onBeforeTooltipShowing: function (tooltip) {
 			var self = this,
 				o = tooltip.options,
+				hintStyle = self.options.hint.style,
 				target = tooltip.target;
 
 			if (target) {
-				o.style.stroke = o.style.stroke || 
+				o.style.stroke = hintStyle.stroke || 
 				target.getAttribute("stroke") ||
 				target.getAttribute("fill") || "#ffffff";
 				target.attrs = { stroke: o.style.stroke };
@@ -835,7 +836,7 @@
 						"class": "wijchart-canvas-object wijscatterchart"
 					});
 
-					dotData = $.extend(true, {
+					dotData = $.extend(false, {
 						dot: dot,
 						x: valuesX[j],
 						y: valuesY[j],

@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -656,6 +656,7 @@
 
 				self.hoverLine = lineSeries;
 				self.hoverPoint = null;
+				self.hoverVirtualPoint = null;
 			}
 		},
 
@@ -676,6 +677,7 @@
 				tooltip = self.tooltip,
 				hint = self.options.hint,
 				markers,
+				virtualMarkers,
 				idx = 0,
 				p, point, valueX, valueY,
 				s = null,
@@ -698,63 +700,91 @@
 					self.isNewLine = false;
 				}
 				markers = self.hoverLine.lineMarkers;
+				virtualMarkers = self.hoverLine.virtualMarkers;
 				idx = -1;
 				p = { x: 0, y: 0 };
-				$.each(markers, function (i, marker) {
-					if (marker.removed) {
-						return true;
-					}
-					var box = marker.wijGetBBox(),
-						pos = box.x + box.width / 2,
-						dis = Math.abs(pos - mousePos.left);
-					if (i === 0 || dis < distance) {
-						distance = dis;
-						idx = i;
-						p = {
-							x: pos,
-							y: box.y + box.height / 2
-						};
-					}
-				});
-				if (self.hoverPoint && self.hoverPoint.index === idx) {
-					return;
-				}
-				if (idx > -1) {
-					if (markers[idx].removed) {
+				if (markers && markers.length) {
+					$.each(markers, function (i, marker) {
+						if (marker.removed) {
+							return true;
+						}
+						var box = marker.wijGetBBox(),
+							pos = box.x + box.width / 2,
+							dis = Math.abs(pos - mousePos.left);
+						if (i === 0 || dis < distance) {
+							distance = dis;
+							idx = i;
+							p = {
+								x: pos,
+								y: box.y + box.height / 2
+							};
+						}
+					});
+					if (self.hoverPoint && self.hoverPoint.index === idx) {
 						return;
 					}
-					point = $(markers[idx].node).data("wijchartDataObj");
+					if (idx > -1) {
+						if (markers[idx].removed) {
+							return;
+						}
+						point = $(markers[idx].node).data("wijchartDataObj");
 
-					if (point) {
-						if (self.hoverPoint && !self.hoverPoint.isSymbol) {
-							if (!self.hoverPoint.removed) {
-								self.hoverPoint.marker
-									.wijAttr(self.hoverPoint.markerStyle);
-								self.hoverPoint.marker.transform("s1");
+						if (point) {
+							if (self.hoverPoint && !self.hoverPoint.isSymbol) {
+								if (!self.hoverPoint.removed) {
+									self.hoverPoint.marker
+										.wijAttr(self.hoverPoint.markerStyle);
+									self.hoverPoint.marker.transform("s1");
+								}
+							}
+							if (!point.isSymbol) {
+								if (!point.marker.removed) {
+									point.marker.wijAttr(point.markerHoverStyle);
+								}
 							}
 						}
-						if (!point.isSymbol) {
-							if (!point.marker.removed) {
-								point.marker.wijAttr(point.markerHoverStyle);
-							}
-						}
+
+						self.hoverPoint = point;
+						self.hoverVirtualPoint = virtualMarkers[idx];
 					}
-
-					self.hoverPoint = point;
+				} else {
+					$.each(virtualMarkers, function (i, marker) {
+						var dis = Math.abs(marker.x - mousePos.left);
+						if (i === 0 || dis < distance) {
+							distance = dis;
+							idx = i;
+							p = {
+								x: marker.x,
+								y: marker.y
+							};
+						}
+					});
+					if (self.hoverVirtualPoint && self.hoverVirtualPoint.index === idx) {
+						return;
+					}
+					if (idx > -1) {
+						self.hoverPoint = null;
+						self.hoverVirtualPoint = virtualMarkers[idx];
+					}
 				}
 				if (tooltip) {
-					dataObj = self.hoverPoint;
+					dataObj = self.hoverVirtualPoint;
 					valueX = dataObj.valX;
 					valueY = dataObj.valY;
+					//dataObj = self.hoverPoint;
+					//valueX = dataObj.valX;
+					//valueY = dataObj.valY;
 					if (isTitleFunc || isContentFunc) {
 						if (isTitleFunc) {
 							op.title = function () {
 								var obj = {
 									pointIndex: idx,
-									lineIndex: dataObj.lineSeries.index,
+									//lineIndex: dataObj.lineSeries.index,
+									lineIndex: self.hoverLine.index,
 									x: valueX,
 									y: valueY,
-									label: dataObj.lineSeries.label,
+									//label: dataObj.lineSeries.label,
+									label: self.hoverLine.label,
 									data: dataObj,
 									fmt: title
 								},
@@ -767,10 +797,12 @@
 							op.content = function () {
 								var obj = {
 									pointIndex: idx,
-									lineIndex: dataObj.lineSeries.index,
+									//lineIndex: dataObj.lineSeries.index,
+									lineIndex: self.hoverLine.index,
 									x: valueX,
 									y: valueY,
-									label: dataObj.lineSeries.label,
+									//label: dataObj.lineSeries.label,
+									label: self.hoverLine.label,
 									data: dataObj,
 									fmt: content
 								},
@@ -820,6 +852,7 @@
 			}
 			self.hoverLine = null;
 			self.hoverPoint = null;
+			self.hoverVirtualPoint = null;
 		},
 
 		_paintPlotArea: function () {
@@ -953,6 +986,9 @@
 			self.playHAnimation(duration, easing, animationSet, cBounds);
 		} else {
 			$.each(paths, function (idx, path) {
+				if (typeof path === "undefined" || path === null) {
+					return true;
+				}
 				if (fieldsAniPathAttr && fieldsAniPathAttr.length && 
 						seTrans.enabled) {
 					duration = seTrans.duration;
@@ -1152,7 +1188,8 @@
 				lineHoverStyle,
 				lineMarkerStyle,
 				lineMarkerHoverStyle,
-				lineSeriesStyle;
+				lineSeriesStyle,
+				virtualMarkers = [];
 
 			if (lineSeries.display === "exclude") {
 				return true;
@@ -1258,14 +1295,14 @@
 					lastYPoint, valX, valY, lineData.y[j], axis, fitType, isXTime, 
 					isYTime, j, lineMarkerStyle, lineMarkerHoverStyle, lineSeries, 
 					paintSymbol, showChartLabels, symbols, valuesX, valuesY, valsY, 
-					lineSeries.display, stacked);
+					lineSeries.display, stacked, virtualMarkers);
 			});
 			
 			self.renderPath(canvas, cBounds, lineSeries, paths, shadowPaths, linesStyle, 
 				lineHoverStyle, lineMarkerStyle, lineMarkerHoverStyle, markers, 
 				markersSet, animationSet, pathArr, aniPathsAttr, initAniPath, 
 				lineStyle, chartLabelStyle, aniMarkersAttr, aniLabelsAttr, 
-				defaultChartLabels, k, type, lastPathAttr, stacked);
+				defaultChartLabels, k, type, lastPathAttr, stacked, virtualMarkers);
 
 			seriesEles.push({markers: markers, path: paths[paths.length - 1],
 				shadowPath: shadowPaths[shadowPaths.length - 1],
@@ -1282,7 +1319,8 @@
 			shadowPaths, linesStyle, lineHoverStyle, lineMarkerStyle, 
 			lineMarkerHoverStyle, markers, markersSet, animationSet, pathArr, 
 			aniPathsAttr, initAniPath, lineStyle, chartLabelStyle, aniMarkersAttr, 
-			aniLabelsAttr, defaultChartLabels, pathIdx, type, lastPathAttr, stacked) {
+			aniLabelsAttr, defaultChartLabels, pathIdx, type, lastPathAttr, stacked,
+			virtualMarkers) {
 		var path,
 			fill,
 			opacity,
@@ -1492,6 +1530,7 @@
 		lineSeries.lineMarkers = markers;
 		lineSeries.lineStyle = lineStyle;
 		lineSeries.lineHoverStyle = lineHoverStyle;
+		lineSeries.virtualMarkers = virtualMarkers;
 		$.wijraphael.addClass($(path.node), "wijchart-canvas-object wijlinechart");
 		$(path.node).data("wijchartDataObj", lineSeries);
 	};
@@ -1503,7 +1542,7 @@
 			firstYPoint, lastYPoint, valX, valY, dataY, axis, fitType,
 			isXTime, isYTime, pointIdx, lineMarkerStyle, lineMarkerHoverStyle,
 			lineSeries, paintSymbol, showChartLabels, symbols, valuesX, valuesY,
-			valsY, display, stacked) {
+			valsY, display, stacked, virtualMarkers) {
 		var self = this,
 			width = cBounds.endX - cBounds.startX,
 			height = cBounds.endY - cBounds.startY,
@@ -1520,7 +1559,8 @@
 			Y,
 			initAniY,
 			markerData,
-			defaultChartLabel;
+			defaultChartLabel,
+			markerVisible = lineSeries.markers.visible;
 		if (isNaN(valX) || typeof valX === "string") {
 			val = pointIdx;
 		} else {
@@ -1565,31 +1605,38 @@
 			aniLabelsAttr.push($.extend(true, {}, defaultChartLabel.attr()));
 		}
 	
-		marker = self.renderMarker(canvas, symbols, paintSymbol, lineSeries.markers, 
-			pointIdx, X, Y, lineMarkerStyle);
-		dot = marker.dot;
-		
-		if (needAnimated) {
-			dot.straight = initAniY;
+		if (markerVisible) {
+			marker = self.renderMarker(canvas, symbols, paintSymbol, lineSeries.markers, 
+					pointIdx, X, Y, lineMarkerStyle);
+			dot = marker.dot;
+			
+			if (needAnimated) {
+				dot.straight = initAniY;
+			}
 		}
 		
 		markerData = {};
 		markerData.valX = valuesX[pointIdx];
 		markerData.valY = dataY;
-		markerData.marker = dot;
 		markerData.index = pointIdx;
 		markerData.type = "marker";
 		markerData.lineSeries = lineSeries;
 		markerData.x = X;
 		markerData.y = Y;
-		markerData.isSymbol = marker.isSymbol;
 		markerData.markerStyle = lineMarkerStyle;
 		markerData.markerHoverStyle = lineMarkerHoverStyle;
-		$(dot.node).data("wijchartDataObj", markerData);
-		markers.push(dot);
-	
-		aniMarkersAttr.push($.extend(true, {}, dot.attr()));
-		animationSet.push(dot);
+
+		if (markerVisible) {
+			markerData.marker = dot;
+			markerData.isSymbol = marker.isSymbol;
+			$(dot.node).data("wijchartDataObj", markerData);
+			markers.push(dot);
+		
+			aniMarkersAttr.push($.extend(true, {}, dot.attr()));
+			animationSet.push(dot);
+		}
+		
+		virtualMarkers.push(markerData);
 		
 		return pathArr;
 	};

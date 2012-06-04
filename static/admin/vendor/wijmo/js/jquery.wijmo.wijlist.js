@@ -1,7 +1,7 @@
 /*globals jQuery*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -361,13 +361,33 @@
 		},
 
 		_setOption: function (key, value) {
-			var self = this;
+			var self = this, selectedItem;
 
 			$.Widget.prototype._setOption.apply(self, arguments);
 
 			//Add for support disabled option at 2011/7/8
 			if (key === "disabled") {
 				self._handleDisabledOption(value, self.element);
+			} else if (key === "selectionMode") {
+				selectedItem = self.selectedItem;
+				if (selectedItem) {
+					selectedItem.selected = false;
+					if (selectedItem.element) {
+						selectedItem.element.removeClass(selectedActive);
+					}
+					self.selectedItem = undefined;
+				}
+				$.each(self.selectedItems, function (index, i) {
+					i.selected = false;
+					i.element.removeClass(selectedActive);
+				});
+				self.selectedItem = [];
+			} else if (key === "listItems") {
+				self.setItems(value);
+				self.renderList();
+				self.refreshSuperPanel();
+			} else if (key === "autoSize" || key === "maxItemsCount") {
+				self.refreshSuperPanel();
 			}
 			//end for disabled option
 		},
@@ -738,8 +758,10 @@
 				item.selected = true;
 				if (previous !== undefined && item !== previous) {
 					previous.selected = false;
-					previous.element.removeClass(selectedActive)
-					.removeAttr("aria-selected");
+					if (previous.element) {
+						previous.element.removeClass(selectedActive)
+						.removeAttr("aria-selected");
+					}
 				}
 				self.selectedItem = item;
 				selectedIndex = $.inArray(item, self.items);
@@ -985,6 +1007,18 @@
 				li.addClass(listItemCSSAlternate);
 			}
 			self._trigger("itemRendered", null, item);
+		},
+		
+		//update for juice
+		adjustOptions: function () {
+			var o = this.options, i;
+			if (o.data !== null) {
+				for (i = 0; i < o.listItems.length; i++) {
+					delete o.listItems[i].element;
+					delete o.listItems[i].list;
+				}
+			}
+			return o;
 		},
 
 		refreshSuperPanel: function () {

@@ -15,10 +15,10 @@ use Fuel\Core\Config;
 
 class Controller_Admin_Page_Inspector_Lang extends Controller_Inspector_Lang {
 
-	public function before($response = null) {
+	public function before() {
         Config::load('nos::admin/page', true);
 		$this->config = Arr::merge($this->config, Config::get('nos::admin.page.page.filters.lang'));
 
-		parent::before($response);
+		parent::before();
 	}
 }

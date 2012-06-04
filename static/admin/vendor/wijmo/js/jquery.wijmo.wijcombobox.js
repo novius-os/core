@@ -1,7 +1,7 @@
 /*globals jQuery,window,document*/
 /*
  *
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -414,12 +414,14 @@
 			/// Returns true if it succeeds; otherwise, returns false.
 			/// </returns>
 
-			var self = this;
+			var o = this.options, self = this;
 			if (self.element.is(":visible") || self._comboDiv ||
 			(self._select !== undefined && self._input.is(":visible"))) {
 				self._showTrigger();
-				if (self.options.disabled) {
+				if (o.disabledState) {
+					var dis = o.disabled;
 					self.disable();
+					o.disabled = dis;
 				}
 				return true;
 			}
@@ -433,7 +435,7 @@
 			o = self.options;
 			// self.element is an html input element.
 			input.bind("keydown.wijcombobox", function (event) {
-				if (o.disabled === true) {
+				if (o.disabledState === true) {
 					return;
 				}
 				code = event.keyCode;
@@ -829,6 +831,14 @@
 			self._oldWidth = ele.css("width");
 			if (self.options.isEditable === false) {
 				input.attr("readonly", "readonly");
+				//update for add issue: when iseditable is false
+				//click the all the combobox, the dropdown list will open
+				wrapperElement.bind("click",function () {
+					if (self.options.disabledState === true) {
+						return;
+					}
+					self._triggerClick();
+				});
 			}
 			comboElement.bind("mouseenter", function () {
 				self._addInputFocus(true, stateHover);
@@ -911,13 +921,13 @@
 					trigger = self._triggerArrow = $(triggerHTML);
 					comboElement.append(trigger);
 					trigger.bind("mouseover.triggerevent", self, function (e) {
-						if (o.disabled === true) {
+						if (o.disabledState === true) {
 							return;
 						}
 						var ct = $(e.currentTarget);
 						ct.addClass(stateHover);
 					}).bind("mousedown.triggerevent", self, function (e) {
-						if (o.disabled === true) {
+						if (o.disabledState === true) {
 							return;
 						}
 						var ct = $(e.currentTarget);
@@ -926,10 +936,11 @@
 						var ct = $(e.currentTarget);
 						ct.removeClass(stateActive);
 					}).bind("click.triggerevent", self, function () {
-						if (o.disabled === true) {
+						if (o.disabledState === true) {
 							return;
 						}
 						self._triggerClick();
+						
 					});
 				}
 				if (o.triggerPosition === "right") {
@@ -1042,9 +1053,18 @@
 		},
 
 		_setOption: function (key, value) {
-			var self = this, ele, input, items;
+			var self = this, ele, input, items, inputWrapper,
+			label = self._label, triggerPadding,
+			triggerWidth = 0,
+			o = self.options;
 			ele = self._comboElement;
 			input = self.element;
+			inputWrapper = input.parent();
+			
+			if (self._triggerArrow) {
+				triggerWidth = self._triggerArrow.outerWidth();
+			}
+			
 			$.Widget.prototype._setOption.apply(self, arguments);
 			if (key === "disabled") {
 				if (value) {
@@ -1055,6 +1075,7 @@
 						.addClass("wijmo-wijcombobox-disabled ui-state-disabled")
 						.attr("disabled", "disabled");
 					}
+					self._triggerArrow.unbind("click.triggerevent"); 
 					self.close();
 				}
 				else {
@@ -1065,14 +1086,67 @@
 						.removeClass("wijmo-wijcombobox-disabled ui-state-disabled")
 						.removeAttr("disabled");
 					}
+					
+					self._triggerArrow.bind("click.triggerevent", self, function () {
+						if (o.disabledState === true) {
+						return;
+						}
+						self._triggerClick();
+					}); 
 				}
-			}
-			else if (key === "isEditable") {
-				if (value) {
-					input.attr("readonly", "readonly");
+			} else if (key === "labelText"){
+				if (o.labelText !== null) {
+					label = self._label = $(labelHTML);
+					self._input.parent()
+					.append(label.html(o.labelText));
+					
+					if (self._triggerArrow !== undefined) {
+						triggerPadding = self._triggerArrow[0].offsetWidth;
+					}
+					if (o.triggerPosition === "right") {
+						if (label !== undefined) {
+							label.css("left", "");
+							label.css("right", triggerPadding);
+						}
+					}
+					else {
+						if (label !== undefined) {
+							label.css("right", "");
+							label.css("left", triggerPadding);
+						}
+					}
+					self.repaint();
 				}
 				else {
+					if (label !== undefined) {
+						label.remove();
+						self._label = undefined;
+					}
+				}
+			} else if (key === "showTrigger" ) {
+				self._showTrigger();
+				if (!o.showTrigger )  {
+					input.width(input.width() +  triggerWidth);
+				}
+			} else if (key === "triggerPosition") {
+				input.width(input.width() +  triggerWidth);
+				self._showTrigger();
+			}else if (key === "selectionMode") {
+				self.menu._setOption("selectionMode",value);
+			} else if (key === "isEditable") {
+				if (value) {
 					input.removeAttr("readonly");
+					//update for add issue: when iseditable is false
+					//click the all the combobox, the dropdown list will open
+					$(".wijmo-wijcombobox-wrapper", 
+							self._comboElement[0]).bind("click",function(){
+								self._triggerClick();
+							});
+				}
+				else {
+					input.attr("readonly", "readonly");
+					$(".wijmo-wijcombobox-wrapper", 
+							self._comboElement[0]).unbind("click");
 				}
 			}
 			//Add comments by RyanWu@20110119.
@@ -1317,7 +1391,7 @@
 
 		_change: function () {
 			// TODO: finish _change event.
-			var self = this, o, f, m, ele, t, itm;
+			var self = this, o, f, m, ele, t, itm, items;
 
 			o = self.options;
 			f = o.forceSelectionText;
@@ -1325,6 +1399,7 @@
 			ele = self._input;
 			t = ele.val();
 			itm = self.selectedItem;
+			items = self.selectedItems;
 
 			if (f) {
 				if (m === "single") {
@@ -1342,7 +1417,13 @@
 			//the text will restore in multiple mode
 			//Maybe it need to be adjusted.
 			if (m === "multiple") {
-				self._selectedItemsToInputVal(self.selectedItems);
+				//update for add issue: when iseditable is false
+				//click the all the combobox, the dropdown list will open
+				//self._selectedItemsToInputVal(self.selectedItems);
+				if (!self.selectedItems || self.selectedItems.length === 0){
+					items = [itm];
+				}
+				self._selectedItemsToInputVal(items);
 			}
 		},
 

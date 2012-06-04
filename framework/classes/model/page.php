@@ -227,10 +227,13 @@ class Model_Page extends \Nos\Orm\Model {
 					$url_enhanced = \Config::get("url_enhanced", array());
 					$url = str_replace('.html', '/', $this->page_virtual_url);
 					$url_enhanced[$url] = $this->page_id;
+                    if ($this->page_entrance) {
+                        $url_enhanced[''] = $this->page_id;
+                    }
+                    \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
+                    \Config::set('url_enhanced', $url_enhanced);
 
-					\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
-
-					\Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'page_enhanced');
+                    \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'page_enhanced');
 
 					$page_enhanced = \Config::get("page_enhanced", array());
 					$page_enhanced[$name][$this->page_id] = array(
@@ -239,7 +242,8 @@ class Model_Page extends \Nos\Orm\Model {
 					);
 
 					\Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
-					break 2;
+                    \Config::set('page_enhanced', $page_enhanced);
+                    break 2;
 				}
 			}
 		}
@@ -255,11 +259,12 @@ class Model_Page extends \Nos\Orm\Model {
 
 		$url_enhanced = \Config::get("url_enhanced", array());
 
-		foreach (array_keys($url_enhanced, $id) as $url => $id) {
+		foreach (array_keys($url_enhanced, $id) as $url) {
 			unset($url_enhanced[$url]);
 		}
 
 		\Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
+        \Config::set('url_enhanced', $url_enhanced);
 	}
 
 	static protected function _remove_page_enhanced($id) {
@@ -275,5 +280,6 @@ class Model_Page extends \Nos\Orm\Model {
 		}
 
 		\Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
-	}
+        \Config::set('page_enhanced', $page_enhanced);
+    }
 }

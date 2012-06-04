@@ -9,12 +9,15 @@
      */
 
 class Session extends \Fuel\Core\Session {
+
     static $user = null;
 
-
+    /**
+     * Returns the current logged user
+     * @return Nos\Model_User
+     */
     public static function user() {
         if (static::$user === null) {
-            static::$user = false;
             static::$user = static::get('logged_user', false);
         }
         return static::$user;

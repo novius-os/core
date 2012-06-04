@@ -1,7 +1,7 @@
 /*globals jQuery,window,document*/
 /*
  * 
- * Wijmo Library 2.0.8
+ * Wijmo Library 2.1.0
  * http://wijmo.com/
  * 
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -221,12 +221,12 @@
 					if (!self._volumnOn) {
 						currentVolumn = $volumeSlider.slider('value');
 						$volumeSlider.slider('value', 0);
-						$video.attr('volume', 0);
+						self._setVideoAttribute('volume', 0);
 						$volumeBtn.find("span").removeClass("ui-icon-volume-on")
 							.addClass("ui-icon-volume-off");
 					} else {
 						$volumeSlider.slider('value', currentVolumn);
-						$video.attr('volume', currentVolumn);
+						self._setVideoAttribute('volume', currentVolumn);
 						$volumeBtn.find("span").removeClass("ui-icon-volume-off")
 							.addClass("ui-icon-volume-on");
 					}
@@ -260,6 +260,11 @@
 				self._videoIsControls = true;
 			}
 			$video.removeAttr('controls');
+			
+			//update for juice 22288
+			if (self.options.disabled) {
+				self._handleDisabledOption(true, self.element);
+			}
 		},		
 		
 		_setOption: function (key, value) {
@@ -308,6 +313,7 @@
 				self.disabledDiv.appendTo("body");
 				if ($.browser.msie) {
 					$('.wijmo-wijvideo').unbind('mouseenter mouseleave');
+					$video.unbind("click."+ self.widgetName);
 				}
 			}
 			else {
@@ -320,6 +326,9 @@
 						},
 							function () {
 								$('.wijmo-wijvideo-controls').delay(300).fadeOut();
+						});
+						$video.bind("click." + self.widgetName, function () {
+							self._togglePlay();
 						});
 					}
 				}

@@ -19,6 +19,10 @@ class NotFoundException extends \Exception {}
 
 class Controller_Front extends Controller {
 
+    public $url;
+    public $pageUrl;
+    public $enhancerUrl;
+    public $enhancerUrlPath;
 
     public $template;
     public $is_preview = false;
@@ -42,7 +46,7 @@ class Controller_Front extends Controller {
     public function router($action, $params) {
 
 	    // Strip out leading / and trailing .html
-	    $this->base_href = \URI::base();
+	    $this->base_href = str_replace(array('http:', 'https:'), '', \URI::base());
 	    $this->url = mb_substr($_SERVER['REDIRECT_URL'], 1);
 	    $url = str_replace('.html', '', $this->url);
 
@@ -72,12 +76,17 @@ class Controller_Front extends Controller {
 
 	        $_404 = true;
 	        foreach ($url_enhanced as $temp_url => $page_id) {
-		        if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-			        $_404 = false;
-			        $this->pageUrl = $temp_url != '/' ? mb_substr($temp_url, 0, -1).'.html' : '';
-			        $this->enhancerUrlPath = $temp_url != '/' ? $temp_url : '';
+                if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
+                    $_404 = false;
+                    if (!in_array($temp_url, array('', '/'))) {
+                        $this->pageUrl = mb_substr($temp_url, 0, -1).'.html';
+                        $this->enhancerUrlPath = $temp_url;
+                    } else {
+                        $this->pageUrl = '';
+                        $this->enhancerUrlPath = '';
+                    }
 			        $this->enhancerUrl = ltrim(str_replace(mb_substr($temp_url, 0, -1), '', $url), '/');
-			        try {
+                    try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
 				        $_404 = true;
@@ -100,8 +109,12 @@ class Controller_Front extends Controller {
 	        if ($_404) {
                 if (!\Event::trigger('front.404NotFound', array('url' => $this->pageUrl))) {
                     // If no redirection then we display 404
-                    $_SERVER['REDIRECT_URL'] = '/';
-                    return $this->router('index', $params);
+                    if (!empty($url)) {
+                        $_SERVER['REDIRECT_URL'] = '/';
+                        return $this->router('index', $params);
+                    } else {
+                        exit('No home page defined. Please check you created a page and it\'s published');
+                    }
                 }
 	        }
         }
@@ -180,14 +193,16 @@ class Controller_Front extends Controller {
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->page->page_id);
 
+        $this->page_title = $this->page->page_title;
+
+        $wysiwyg = array();
+
         // Scan all wysiwyg
         foreach ($this->template['layout'] as $wysiwyg_name => $layout) {
-            $content = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
 
-            $this->page_title = $this->page->page_title;
-
-            $this->_view->set('wysiwyg_'.$wysiwyg_name, $content, false);
+            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
         }
+        $this->_view->set('wysiwyg', $wysiwyg, false);
     }
 
     /**

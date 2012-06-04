@@ -16,8 +16,8 @@ class Controller_Admin_Login extends Controller {
 
 	public $template = 'nos::admin/html';
 
-    public function before($response = null) {
-        parent::before($response);
+    public function before() {
+        parent::before();
 
         // If user is already logged in, proceed
 		if (\Nos\Auth::check()) {

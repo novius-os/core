@@ -156,6 +156,11 @@
 
 .wijmo-wijcarousel .wijmo-wijcarousel-current .wijmo-wijcarousel-mask
 {
+    display: none;
+}
+
+.wijmo-wijcarousel .wijmo-wijcarousel-current .wijmo-wijcarousel-mask
+{
 	opacity: 0;     
 	filter: alpha(opacity = 0);
 	cursor: default;

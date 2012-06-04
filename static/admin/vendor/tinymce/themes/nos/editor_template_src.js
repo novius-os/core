@@ -194,7 +194,13 @@
 			if (!s.font_size_style_values)
 				s.font_size_style_values = "8pt,10pt,12pt,14pt,18pt,24pt,36pt";
 
-			if (tinymce.is(s.theme_nos_font_sizes, 'string')) {
+            if (s.theme_nos_enhancers) {
+                each(s.theme_nos_enhancers, function(f, id) {
+                    s.theme_nos_enhancers[id].id = id;
+                });
+            }
+
+            if (tinymce.is(s.theme_nos_font_sizes, 'string')) {
 				s.font_size_style_values = tinymce.explode(s.font_size_style_values);
 				s.font_size_classes = tinymce.explode(s.font_size_classes || '');
 
@@ -537,7 +543,7 @@
 
                     p = DOM.getParent(n, 'A');
                     link = !!p;
-                    anchor = link && !!p.name;
+                    anchor = link && (p.name || (p.id && !p.href));
 
                     m.items['link'].setDisabled(anchor);
                     m.items['link'].setActive(link && !anchor);
@@ -1516,7 +1522,7 @@
             }
 
 			if (c = cm.get('anchor')) {
-				c.setActive(!co && !!p && p.name);
+                c.setActive(!co && !!p && (p.name || (p.id && !p.href)));
 			}
 
 			p = getParent('IMG');
@@ -1961,7 +1967,7 @@
             if (metadata.dialog.ajax || !edit) {
                 dialog = $(ed.formElement).nos().dialog($.extend({
                     title: metadata.title
-                }, edit ? $.extend({}, metadata.dialog, {ajax : edit.data('config')}) : metadata.dialog));
+                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
             } else {
                 // Open empty dialog
                 dialog = $(ed.formElement).nos().dialog($.extend({

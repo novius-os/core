@@ -27,8 +27,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
     protected $appdesk = array();
 
-    public function before($response = null) {
-        parent::before($response);
+    public function before() {
+        parent::before();
         if (!isset($this->config['appdesk'])) {
             list($application, $file_name) = $this->getLocation();
             $file_name = explode('/', $file_name);

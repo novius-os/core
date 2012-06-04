@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
 *
-* Wijmo Library 2.0.8
+* Wijmo Library 2.1.0
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -56,6 +56,13 @@
 					new Date(1900, 0, 1).getTime());
 
 			return time;
+		},
+		arrayClone: function (arr) {
+			var result = [];
+			$.each(arr, function (i, n) {
+				result.push($.extend(true, {}, n));
+			});
+			return result;
 		}
 	});
 
@@ -92,7 +99,7 @@
 			});
 		},
 
-		clearRaphaelCache: function () {			
+		clearRaphaelCache: function () {
 			Raphael.path2curve.cache = null;
 			Raphael.path2curve.count = null;
 			Raphael.parseTransformString.cache = null;
@@ -233,24 +240,24 @@
 			type = "circle";
 		}
 		switch (type) {
-		case "circle":
-			marker = self.circle(x, y, length);
-			break;
-		case "tri":
-			marker = self.tri(x, y, length);
-			break;
-		case "invertedTri":
-			marker = self.invertedTri(x, y, length);
-			break;
-		case "box":
-			marker = self.box(x, y, length);
-			break;
-		case "diamond":
-			marker = self.diamond(x, y, length);
-			break;
-		case "cross":
-			marker = self.cross(x, y, length);
-			break;
+			case "circle":
+				marker = self.circle(x, y, length);
+				break;
+			case "tri":
+				marker = self.tri(x, y, length);
+				break;
+			case "invertedTri":
+				marker = self.invertedTri(x, y, length);
+				break;
+			case "box":
+				marker = self.box(x, y, length);
+				break;
+			case "diamond":
+				marker = self.diamond(x, y, length);
+				break;
+			case "cross":
+				marker = self.cross(x, y, length);
+				break;
 		}
 		return marker;
 	};
@@ -420,21 +427,21 @@
 			bounds = txt.wijGetBBox();
 
 			switch (align) {
-			case "near":
-				offsetX = width - bounds.width / 2;
-				//offsetY += bounds.height / 2;
-				//top += bounds.height;
-				break;
-			case "center":
-				offsetX += width / 2;
-				//offsetY += bounds.height / 2;
-				//top += bounds.height;
-				break;
-			case "far":
-				offsetX += bounds.width / 2;
-				//offsetY += bounds.height / 2;
-				//top += bounds.height;
-				break;
+				case "near":
+					offsetX = width - bounds.width / 2;
+					//offsetY += bounds.height / 2;
+					//top += bounds.height;
+					break;
+				case "center":
+					offsetX += width / 2;
+					//offsetY += bounds.height / 2;
+					//top += bounds.height;
+					break;
+				case "far":
+					offsetX += bounds.width / 2;
+					//offsetY += bounds.height / 2;
+					//top += bounds.height;
+					break;
 			}
 			//add comments to fix tfs issue 19384
 			if (rotation) {
@@ -614,42 +621,42 @@
 		for (node = paper.bottom; node; node = node.next) {
 			if (node && node.type) {
 				switch (node.type) {
-				case "path":
-					for (idx = 0, len1 = node.attrs.path.length; idx < len1; idx++) {
-						group = node.attrs.path[idx];
+					case "path":
+						for (idx = 0, len1 = node.attrs.path.length; idx < len1; idx++) {
+							group = node.attrs.path[idx];
 
-						for (index = 0, len2 = group.length; index < len2; index++) {
-							value = group[index];
+							for (index = 0, len2 = group.length; index < len2; index++) {
+								value = group[index];
 
-							if (index < 1) {
-								path += value;
-							} else {
-								if (index === (len2 - 1)) {
+								if (index < 1) {
 									path += value;
 								} else {
-									path += value + ',';
+									if (index === (len2 - 1)) {
+										path += value;
+									} else {
+										path += value + ',';
+									}
 								}
 							}
 						}
-					}
 
-					if (path && path.length > 0) {
-						node.attrs.d = path.replace(/,/g, ' ');
-					}
-					break;
-				case "text":
-					if (!node.attrs["text-anchor"]) {
-						node.attrs["text-anchor"] = "middle";
-					}
-					break;
-				case "image":
-					trans = node.transformations;
-					node.attrs.transform = trans ? trans.join(' ') : '';
-					break;
-				case "ellipse":
-				case "rect":
-					svg += createSVGElement(node.type, node.attrs);
-					break;
+						if (path && path.length > 0) {
+							node.attrs.d = path.replace(/,/g, ' ');
+						}
+						break;
+					case "text":
+						if (!node.attrs["text-anchor"]) {
+							node.attrs["text-anchor"] = "middle";
+						}
+						break;
+					case "image":
+						trans = node.transformations;
+						node.attrs.transform = trans ? trans.join(' ') : '';
+						break;
+					case "ellipse":
+					case "rect":
+						svg += createSVGElement(node.type, node.attrs);
+						break;
 				}
 			}
 		}
@@ -797,44 +804,44 @@
 				this.shadow.attr(newName, value);
 			} else if (typeof (name) === "string") {
 				switch (name) {
-				case "clip-rect":
-				case "cx":
-				case "cy":
-				case "fill-opacity":
-				case "font":
-				case "font-family":
-				case "font-size":
-				case "font-weight":
-				case "height":
-				case "opacity":
-				case "path":
-				case "r":
-				case "rotation":
-				case "rx":
-				case "ry":
-				case "scale":
-				case "stroke-dasharray":
-				case "stroke-linecap":
-				case "stroke-linejoin":
-				case "stroke-miterlimit":
-				case "stroke-opacity":
-				case "stroke-width":
-				case "translation":
-				case "width":
-					this.shadow.attr(name, value);
-					break;
-				case "x":
-					this.shadow.attr(name, value);
-					//this.shadow.attr("translation", "1 0");
-					this.shadow.attr("transform", "...t1,0");
-					break;
-				case "y":
-					this.shadow.attr(name, value);
-					//this.shadow.attr("translation", "0 1");
-					this.shadow.attr("transform", "...t0,1");
-					break;
-				default:
-					break;
+					case "clip-rect":
+					case "cx":
+					case "cy":
+					case "fill-opacity":
+					case "font":
+					case "font-family":
+					case "font-size":
+					case "font-weight":
+					case "height":
+					case "opacity":
+					case "path":
+					case "r":
+					case "rotation":
+					case "rx":
+					case "ry":
+					case "scale":
+					case "stroke-dasharray":
+					case "stroke-linecap":
+					case "stroke-linejoin":
+					case "stroke-miterlimit":
+					case "stroke-opacity":
+					case "stroke-width":
+					case "translation":
+					case "width":
+						this.shadow.attr(name, value);
+						break;
+					case "x":
+						this.shadow.attr(name, value);
+						//this.shadow.attr("translation", "1 0");
+						this.shadow.attr("transform", "...t1,0");
+						break;
+					case "y":
+						this.shadow.attr(name, value);
+						//this.shadow.attr("translation", "0 1");
+						this.shadow.attr("transform", "...t0,1");
+						break;
+					default:
+						break;
 				}
 			}
 		}

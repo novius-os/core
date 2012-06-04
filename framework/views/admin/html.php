@@ -23,8 +23,8 @@
 		'jquery-validate' => 'static/novius-os/admin/vendor/jquery/jquery-validation/nos.validate',
 		'jquery-form' => 'static/novius-os/admin/vendor/jquery/jquery-form/jquery.form.min',
 		'jquery-ui' => 'static/novius-os/admin/vendor/jquery-ui/jquery-ui-1.8.20.custom.min',
-		'wijmo-open' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo-open.all.2.0.8.min',
-		'wijmo-complete' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo-complete.all.2.0.8.min',
+		'wijmo-open' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo-open.all.2.1.0.min',
+		'wijmo-complete' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo-complete.all.2.1.0.min',
 		'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
 		'wysiwyg' => 'static/novius-os/admin/vendor/tinymce/jquery.wysiwyg',
 		'link' => 'static/novius-os/admin/vendor/requirejs/link',
@@ -59,7 +59,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.css">
-<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.0.3.min.css">
+<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.1.0.min.css">
 <?php
 	if ($assets_minified) {
 ?>
