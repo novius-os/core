@@ -50,7 +50,7 @@ define('jquery-nos-ostabs',
         },
 
         tabId : 0,
-        stackOpening: [],
+        openRank : 0,
 
         _create: function() {
             var self = this,
@@ -277,13 +277,28 @@ define('jquery-nos-ostabs',
                     }
                 });
 
-
                 self.tabsWidth = self.uiOstabsSuperPanelContent.width();
                 self.labelWidth = o.labelMaxWidth;
                 self.uiOstabsTabs.width( self.tabsWidth );
             }
 
-            self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTray).add(self.uiOstabsTabs).find("li:has(a[href])");
+            var tabOpenRank = [];
+            self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTray).add(self.uiOstabsTabs).find("li:has(a[href])")
+                .each(function(i) {
+                    var $li = $(this),
+                        tab = $li.data( 'ui-ostab') || {};
+
+                    if (tab.openRank !== false) {
+                        tabOpenRank[tab.openRank] = $li;
+                    }
+                });
+            self.openRank = 1;
+            $.each(tabOpenRank, function(i, $li) {
+                if ($li) {
+                    var tab = $li.data( 'ui-ostab') || {};
+                    tab.openRank = self.openRank++;
+                }
+            });
 
             self.anchors = self.lis.map(function() {
                 return $( "a", this )[ 0 ];
@@ -515,7 +530,8 @@ define('jquery-nos-ostabs',
                 var el = this,
                     $li = $(el).closest( "li" ),
                     $hide = self.panels.filter( ":not(.nos-ostabs-hide)" ),
-                    $show = self.element.find( self._sanitizeSelector( el.hash ) );
+                    $show = self.element.find( self._sanitizeSelector( el.hash )),
+                    tab = $li.data( 'ui-ostab');
 
                 $li.addClass( "ui-state-open" );
                 self.uiOstabsNewTab.removeClass('ui-state-open');
@@ -543,7 +559,7 @@ define('jquery-nos-ostabs',
                         });
                     }
                     self.element.queue( "tabs", function() {
-                        self.stackOpening.push(el);
+                        tab.openRank = self.openRank++;
                         showTab( el, $show );
                     });
 
@@ -746,11 +762,15 @@ define('jquery-nos-ostabs',
                 labelDisplay: true,
                 iconClasses: 'ui-icon ui-icon-document',
                 iconUrl: '',
+                openRank: false,
                 iconSize: 16,
                 panelId: false,
                 actions : []
             }, tab);
 
+            if (tab.openRank !== false && tab.openRank >= self.openRank) {
+                self.openRank = tab.openRank + 1;
+            }
 
             var a = $( '<a href="' + tab.url + '"></a>' );
             if (tab.iframe) {
@@ -789,7 +809,9 @@ define('jquery-nos-ostabs',
             index = self._getIndex( index );
             var $li = self.lis.eq( index ),
                 $a = self.anchors.eq( index ),
-                $panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) );
+                $panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash )),
+                openIndex = 0,
+                openRank = 0;
 
             if ( index == 0 && !$li.hasClass( "nos-ostabs-selected" ) ) {
                 var linewtab = self.lis.filter( '.nos-ostabs-newtab' );
@@ -805,19 +827,17 @@ define('jquery-nos-ostabs',
 
             $li.removeClass( "ui-state-active ui-state-open" );
 
-            // Remove tab from stack opening
-            for (var i = 0; i < self.stackOpening.length; i++) {
-                if (self.stackOpening[i] === $a.get(0)) {
-                    self.stackOpening.splice(i, 1);
-                }
-            }
-
             // Open the last tab in stack opening or the 0 index
-            if (self.stackOpening.length) {
-                self.select( self.anchors.index( self.stackOpening[self.stackOpening.length - 1] ) );
-            } else {
-                self.select( 0 );
-            }
+            self.lis.each(function(i) {
+                var $litemp = $(this),
+                    tab = $litemp.data( 'ui-ostab') || {};
+
+                if ($litemp[0] != $li[0] && tab.openRank && tab.openRank > openRank) {
+                    openRank = tab.openRank;
+                    openIndex = i;
+                }
+            });
+            self.select( openIndex );
 
             if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
                 $( '> *', $panel ).not( '.nos-ostabs-actions' ).remove();
