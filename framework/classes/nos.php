@@ -97,7 +97,9 @@ class Nos {
         } catch (\Nos\NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
+            \Fuel::$profiling && \Debug::dump($e);
             return __('An unexpected exception occured.');
+
             $content = null;
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
             if (\Fuel::$profiling) throw $e;
