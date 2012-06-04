@@ -896,6 +896,8 @@ define('jquery-nos-ostabs',
                 self._actions($panel, index, tab.actions || []);
 
                 $newLi.remove();
+
+                self._trigger( "update", null, self._ui( $li[ 0 ], $panel[ 0 ] ) );
             }
 
             return self;
