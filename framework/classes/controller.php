@@ -12,7 +12,7 @@ namespace Nos;
 
 use Event;
 
-class Controller extends \Fuel\Core\Controller {
+class Controller extends \Fuel\Core\Controller_Hybrid {
     protected $config = array();
 
     /**
@@ -20,17 +20,6 @@ class Controller extends \Fuel\Core\Controller {
      */
     public $template = null;
     var $format = null;
-
-    protected $_supported_formats = array(
-        'xml' => 'application/xml',
-        'rawxml' => 'application/xml',
-        'json' => 'application/json',
-        'jsonp'=> 'text/javascript',
-        'serialized' => 'application/vnd.php.serialized',
-        'php' => 'text/plain',
-        'html' => 'text/html',
-        'csv' => 'application/csv'
-    );
 
 
     public function before() {
@@ -87,12 +76,33 @@ class Controller extends \Fuel\Core\Controller {
             $response = $this->response;
         }*/
 
-        if ( ! $response instanceof \Response)
+
+
+        if ( ! $response instanceof \Response && $this->response->body !== null)
 		{
-            $this->response->body = $response;
 			$response = $this->response;
 		}
 
+        // @todo; this is a quick fix to allow html loading via ajax by returning a view.
+        // -->
+        if ( \Input::is_ajax())
+        {
+            // If nothing was returned default to the template
+            if (empty($response))
+            {
+                $response = $this->template;
+            }
+
+            // If the response isn't a Response object, embed in the available one for BC
+            // @deprecated  can be removed when $this->response is removed
+            if ( ! $response instanceof Response)
+            {
+                $this->response->body = $response;
+                $response = $this->response;
+            }
+        }
+
+        // <--
 
         return parent::after($response);
     }
@@ -140,39 +150,6 @@ class Controller extends \Fuel\Core\Controller {
         return $config;
     }
 
-    /**
-     * Response
-     *
-     * Takes pure data and optionally a status code, then creates the response
-     *
-     * @param  mixed
-     * @param  int
-     */
-    protected function response($data = array(), $http_code = 200)
-    {
-        if ((is_array($data) and empty($data)) or ($data == ''))
-        {
-            $this->response->status = $this->no_data_status;
-            return;
-        }
-
-        $this->response->status = $http_code;
-
-        // If the format method exists, call and return the output in that format
-        if (method_exists('Format', 'to_'.$this->format))
-        {
-            // Set the correct format header
-            $this->response->set_header('Content-Type', $this->_supported_formats[$this->format]);
-
-            $this->response->body(\Format::forge($data)->{'to_'.$this->format}());
-        }
-
-        // Format not supported, output directly
-        else
-        {
-            $this->response->body((string) $data);
-        }
-    }
 
 
 

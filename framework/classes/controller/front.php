@@ -43,7 +43,7 @@ class Controller_Front extends Controller {
 
     public $page;
 
-    public function router($action, $params) {
+    public function router($action, array $params) {
 
 	    // Strip out leading / and trailing .html
 	    $this->base_href = str_replace(array('http:', 'https:'), '', \URI::base());
