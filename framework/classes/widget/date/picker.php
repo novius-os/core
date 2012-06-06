@@ -67,6 +67,7 @@ class Widget_Date_Picker extends \Fieldset_Field {
         $wrapper = '';
         if (!empty($this->options['wrapper'])) {
             $wrapper = '.wrap('.\Format::forge()->to_json($this->options['wrapper']).')';
+            unset($this->options['wrapper']);
         }
 		return <<<JS
 <script type="text/javascript">
