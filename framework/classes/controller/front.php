@@ -285,7 +285,8 @@ class Controller_Front extends Controller {
         foreach ($page_fields as $field) {
             $this->cache['page'][$field] = $this->page->{'page_'.$field};
         }
-        return parent::save_cache();
+        //return parent::save_cache();
+        return $this->cache; //@todo: to be reviewed
     }
 
     public function rebuild_cache($cache) {
@@ -295,6 +296,6 @@ class Controller_Front extends Controller {
         }
         $this->page->freeze();
         unset($cache['page']);
-        return parent::rebuild_cache($cache);
+        //return parent::rebuild_cache($cache); @todo: to be reviewed
     }
 }
