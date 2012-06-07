@@ -13,229 +13,225 @@ namespace Nos;
 use Fuel\Core\File;
 use Fuel\Core\View;
 
-class Controller_Admin_Tray_Plugins extends Controller_Admin_Application {
-	public $template = 'nos::admin/html';
+class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
+{
 
-    public function action_index() {
+    public function action_index()
+    {
+        $applications = Application::search_all();
+        $app_installed = array();
+        $app_others = array();
 
-        $LOCAL = APPPATH.'applications'.DS;
-
-        $plugins = array();
-        $plugins['local'] = File::read_dir($LOCAL, 1);
-
-        foreach ($plugins['local'] as $plugin => $foo) {
-			$plugin = trim($plugin, '/\\');
-            $metadata = @include $LOCAL.$plugin.DS.'config'.DS.'metadata.php';
-			unset($plugins['local'][$plugin]);
-            $plugins['local'][trim($plugin, '/\\')] = $metadata;
+        foreach ($applications as $app)
+        {
+            if ($app->is_installed())
+            {
+                $app_installed[$app->folder] = $app;
+            }
+            else
+            {
+                $app_others[$app->folder] = $app;
+            }
         }
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
+        $view = View::forge('admin/tray/app_manager');
+        $view->set(array(
+            'local'     => Application::forge('local'),
+            'installed' => $app_installed,
+            'others'    => $app_others,
+            'allow_upload' => \Config::get('allow_plugin_upload'),
+        ), false, false);
 
-		$app_installed = \Config::get('app_installed', array());
-		$app_others = array();
-
-		foreach ($plugins as $where => $list) {
-			foreach ($list as $plugin => $metadata) {
-				$plugin = trim($plugin, '/\\');
-				if (isset($app_installed[$plugin])) {
-					continue;
-				}
-				$app_others[$plugin] = $metadata;
-			}
-		}
-
-        // Get the differences between the metadata files
-		static::array_diff_key_assoc($app_installed, $plugins['local'], $diff);
-	    foreach ($app_installed as $app_name => &$metadata) {
-			$instance = new \Nos\Application($app_name);
-			if (!$instance->check_install()) {
-				$metadata['dirty'] = true;
-			}
-			if (isset($diff[$app_name])) {
-				$metadata['dirty'] = true;
-			}
-		}
-
-        $this->template->body = View::forge('admin/tray/plugins');
-
-        $this->template->body->set('installed', $app_installed);
-        $this->template->body->set('others', $app_others);
-        $this->template->body->set('allow_upload', \Config::get('allow_plugin_upload', false));
-
-        return $this->template;
+        return $view;
     }
 
-	public function action_add($app_name) {
-		$instance = new \Nos\Application($app_name);
-		if ($instance->install()) {
+    public function action_add($app_name)
+    {
+        \Module::load($app_name);
 
-			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
-			$app_installed = \Config::get('app_installed', array());
-            $metadata = @include APPPATH.'applications'.DS.$app_name.DS.'config'.DS.'metadata.php';
-			$app_installed[$app_name] = $metadata;
-			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
-		}
+        try
+        {
+            $application = Application::forge($app_name);
+            $application->install();
+        }
+        catch (\Exception $e)
+        {
+            $this->response(array(
+                'error' => $e->getMessage(),
+            ));
+            return;
+        }
+        $this->response(array(
+            'notify' => __('Installation successful'),
+            // The tab will be refreshed by the javaScript within the view
+        ));
+    }
 
-		\Response::redirect('admin/nos/tray/plugins');
-	}
+    public function action_remove($app_name)
+    {
+        try
+        {
+            $application = Application::forge($app_name);
+            if ($application->uninstall())
+            {
+                $app_installed = \Config::get('data::app_installed', array());
+                unset($app_installed[$app_name]);
+                \Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
+            }
+        }
+        catch (\Exception $e)
+        {
+            $this->response(array(
+                'error' => $e->getMessage(),
+            ));
+            return;
+        }
 
-	public function action_remove($app_name) {
-		$instance = new \Nos\Application($app_name);
+        $this->response(array(
+            'notify' => __('Uninstallation successful'),
+            // The tab will be refreshed by the javaScript within the view
+        ));
+    }
 
-		if ($instance->uninstall()) {
-			\Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
-			$app_installed = \Config::get('app_installed', array());
-			unset($app_installed[$app_name]);
-			\Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
-		}
+    public function action_upload()
+    {
+        if (\Config::get('allow_plugin_upload', false) == false)
+        {
+            Response::redirect('admin/nos/tray/appmanager');
+        }
 
-		\Response::redirect('admin/nos/tray/plugins');
-	}
+        if (empty($_FILES['zip']))
+        {
+            \Response::redirect('admin/nos/tray/appmanager');
+        }
 
-	public function action_upload() {
+        if (!is_uploaded_file($_FILES['zip']['tmp_name']))
+        {
+            \Session::forge()->set_flash('notification.plugins', array(
+                'title' => 'Upload error.',
+                'type' => 'error',
+            ));
+            \Response::redirect('admin/nos/tray/appmanager');
+        }
 
-		if (\Config::get('allow_plugin_upload', false) == false) {
-			Response::redirect('admin/nos/tray/plugins');
-		}
+        if ($_FILES['zip']['error'] != UPLOAD_ERR_OK)
+        {
+            \Session::forge()->set_flash('notification.plugins', array(
+                'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
+                'type' => 'error',
+            ));
+            \Response::redirect('admin/nos/tray/appmanager');
+        }
 
-		if (empty($_FILES['zip'])) {
-			\Response::redirect('admin/nos/tray/plugins');
-		}
+        $files = array();
+        $za = new \ZipArchive();
+        $zip_file = $_FILES['zip']['tmp_name'];
+        $za->open($zip_file);
+        for ($i = 0; $i < $za->numFiles; $i++)
+        {
+            $files[] = $za->getNameIndex($i);
+        }
 
-		if (!is_uploaded_file($_FILES['zip']['tmp_name'])) {
-			\Session::forge()->set_flash('notification.plugins', array(
-				'title' => 'Upload error.',
-				'type' => 'error',
-			));
-			\Response::redirect('admin/nos/tray/plugins');
-		}
+        $root_files = array();
+        foreach ($files as $k => $f)
+        {
+            if (mb_substr($f, -1) == '/' && substr_count($f, '/') <= 1)
+            {
+                $root_files[] = $f;
+            }
+        }
 
-		if ($_FILES['zip']['error'] != UPLOAD_ERR_OK) {
-			\Session::forge()->set_flash('notification.plugins', array(
-				'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
-				'type' => 'error',
-			));
-			\Response::redirect('admin/nos/tray/plugins');
-		}
+        $count = count($root_files);
+        if ($count == 0)
+        {
+            \Session::forge()->set_flash('notification.plugins', array(
+                'title' => $name.' already exists in you module directory.',
+                'type' => 'error',
+            ));
+            \Response::redirect('admin/nos/tray/appmanager');
+        }
+        $root = ($count == 1 ? $root_files[0] : '');
 
-		$files = array();
-		$za = new \ZipArchive();
-		$zip_file = $_FILES['zip']['tmp_name'];
-		$za->open($zip_file);
-		for ($i=0; $i<$za->numFiles;$i++) {
-			$files[] = $za->getNameIndex($i);
-		}
+        $metadata_file = $root.'config/metadata.php';
+        $metadata = \Fuel::load('zip://'.$zip_file.'#'.$metadata_file);
 
-		$root_files = array();
-		foreach ($files as $k => $f) {
-			if (mb_substr($f, -1) == '/' && substr_count($f, '/') <= 1) {
-				$root_files[] = $f;
-			}
-		}
+        if (empty($metadata['install_folder']))
+        {
+            \Session::forge()->set_flash('notification.plugins', array(
+                'title' => 'This is not a valid application archive.',
+                'type' => 'error',
+            ));
+            \Response::redirect('admin/nos/tray/appmanager');
+        }
 
-		$count = count($root_files);
-		if ($count == 0) {
-			\Session::forge()->set_flash('notification.plugins', array(
-				'title' => $name.' already exists in you module directory.',
-				'type' => 'error',
-			));
-			\Response::redirect('admin/nos/tray/plugins');
-		}
-		$root = ($count == 1 ? $root_files[0] : '');
+        $path = APPPATH.'applications'.DS.$metadata['install_folder'];
+        if (is_dir($path.$name))
+        {
+            \Session::forge()->set_flash('notification.plugins', array(
+                'title' => $metadata['install_folder'].' already exists in you module directory.',
+                'type' => 'error',
+            ));
+            \Response::redirect('admin/nos/tray/appmanager');
+        }
 
-		$metadata_file = $root.'config/metadata.php';
-		$metadata = \Fuel::load('zip://'.$zip_file.'#'.$metadata_file);
+        usort($files, function($a, $b)
+                {
+                    return mb_strlen($a) > mb_strlen($b);
+                });
 
-		if (empty($metadata['install_folder'])) {
-			\Session::forge()->set_flash('notification.plugins', array(
-				'title' => 'This is not a valid application archive.',
-				'type' => 'error',
-			));
-			\Response::redirect('admin/nos/tray/plugins');
-		}
+        // @todo better error handling ?
+        // @todo skip stupid files ?
+        // @todo appropriate chmod ?
+        try
+        {
+            $old = umask(0);
+            @mkdir($path, 0777);
+            umask($old);
 
-		$path = APPPATH.'applications'.DS.$metadata['install_folder'];
-		if (is_dir($path.$name)) {
-			\Session::forge()->set_flash('notification.plugins', array(
-				'title' => $metadata['install_folder'].' already exists in you module directory.',
-				'type' => 'error',
-			));
-			\Response::redirect('admin/nos/tray/plugins');
-		}
+            $root_length = mb_strlen($root);
 
-		usort($files, function($a, $b) {
-			return mb_strlen($a) > mb_strlen($b);
-		});
+            foreach ($files as $file)
+            {
+                $dest = $path.DS.mb_substr($file, $root_length);
+                if (mb_substr($file, -1) == '/')
+                {
+                    is_dir($dest) || @mkdir($dest, 0777);
+                }
+                else
+                {
+                    copy('zip://'.$zip_file.'#'.$file, $dest);
+                }
+            }
+        }
+        catch (\Exception $e)
+        {
+            \Fuel\Core\File::delete_dir($path, true, true);
+        }
+        \Response::redirect('admin/nos/tray/appmanager');
+    }
 
-		// @todo better error handling ?
-		// @todo skip stupid files ?
-		// @todo appropriate chmod ?
-		try {
-			$old = umask(0);
-			@mkdir($path, 0777);
-			umask($old);
+    public function after($response)
+    {
+        foreach (array(
+    'title' => 'Administration',
+    'base' => \Uri::base(false),
+    'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
+        ) as $var => $default)
+        {
+            if (empty($this->template->$var))
+            {
+                $this->template->$var = $default;
+            }
+        }
+        $ret = parent::after($response);
+        $this->template->set(array(
+            'css' => \Asset::render('css'),
+            'js' => \Asset::render('js'),
+                ), false, false);
 
-			$root_length = mb_strlen($root);
+        return $ret;
+    }
 
-			foreach ($files as $file) {
-				$dest = $path.DS.mb_substr($file, $root_length);
-				if (mb_substr($file, -1) == '/') {
-					is_dir($dest) || @mkdir($dest, 0777);
-				} else {
-					copy('zip://'.$zip_file.'#'.$file, $dest);
-				}
-			}
-		} catch (\Exception $e) {
-			\Fuel\Core\File::delete_dir($path, true, true);
-		}
-		\Response::redirect('admin/nos/tray/plugins');
-	}
-
-	/**
-	 * Computes the diff between 2 arrays, bith on keys and values.
-	 * @param type $arr1  First array to compare
-	 * @param type $arr2  Second array to compare
-	 * @param type $diff  Returns the diff between the 2 array
-	 */
-	protected static function array_diff_key_assoc($arr1, $arr2, &$diff = array()) {
-		foreach ($arr1 as $k => $v) {
-			if (!isset($arr2[$k])) {
-				$diff[$k] = array($v, null);
-			} else if (is_array($v)) {
-				unset($subdiff);
-				static::array_diff_key_assoc($v, $arr2[$k], $subdiff);
-				if (!empty($subdiff)) {
-					$diff[$k] = $subdiff;
-				}
-			} else if ($arr2[$k] !== $v) {
-				$diff[$k] = array($v, $arr2[$k]);
-			}
-		}
-		foreach ($arr2 as $k => $v) {
-			if (!isset($arr1[$k])) {
-				$diff[$k] = array(null, $v);
-			}
-		}
-	}
-
-
-	public function after($response) {
-		foreach (array(
-			         'title' => 'Administration',
-			         'base' => \Uri::base(false),
-			         'require'  => 'static/novius-os/admin/vendor/requirejs/require.js',
-		         ) as $var => $default) {
-			if (empty($this->template->$var)) {
-				$this->template->$var = $default;
-			}
-		}
-		$ret = parent::after($response);
-		$this->template->set(array(
-			'css' => \Asset::render('css'),
-			'js'  => \Asset::render('js'),
-		), false, false);
-
-		return $ret;
-	}
 }
+
+
