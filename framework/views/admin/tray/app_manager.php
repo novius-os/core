@@ -11,7 +11,7 @@
 ?>
 <style type="text/css">
 	.app_list {
-		width : 400px;
+		width : 500px;
 		margin: 1em 0 0;
 	}
 </style>
@@ -19,6 +19,19 @@
 <div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
 	<div class="unit col c1"></div>
 	<div class="unit col c10" id="line_first" style="position:relative;;">
+		<div class="line" style="overflow:visible;">
+			<h1 class="title"><?= Nos\I18n::get('Local configuration'); ?></h1>
+            <p>
+            <?php
+            if ($local->is_dirty()) {
+                echo 'Some modifications are not live - <a href="admin/nos/tray/appmanager/add/local">click to repair</a>';
+            } else {
+                echo 'No problem detected!';
+            }
+            ?>
+            </p>
+        </div>
+        <p>&nbsp;</p>
 		<div class="line" style="overflow:visible;">
 			<h1 class="title"><?= Nos\I18n::get('Applications'); ?></h1>
 
@@ -31,12 +44,14 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($installed as $app => $metadata) { ?>
+						<?php foreach ($installed as $app) {
+                            $metadata = $app->metadata;
+                            ?>
 						<tr>
-							<td><?= isset($metadata['name']) ? $metadata['name'] : $app ?></td>
+							<td><?= e($app->name) ?></td>
 							<td>
-								<a href="admin/nos/tray/plugins/remove/<?= $app ?>">remove</a>
-								<?= !empty($metadata['dirty']) ? '- [<a href="admin/nos/tray/plugins/add/'.$app.'">repair install</a>]' : '' ?>
+								<a href="admin/nos/tray/appmanager/remove/<?= $app->folder ?>">remove</a>
+								<?= $app->is_dirty() ? '- [<a href="admin/nos/tray/appmanager/add/'.$app->folder.'">repair install</a>]' : '' ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -59,10 +74,12 @@
 						</tr>
 					</thead>
 					<tbody>
-				<?php foreach ($others as $app => $metadata) { ?>
+				<?php foreach ($others as $app) {
+                    $metadata = $app->metadata;
+                    ?>
 						<tr>
-							<td><?= isset($metadata['name']) ? $metadata['name'] : $app ?> </td>
-							<td><a href="admin/nos/tray/plugins/add/<?= $app ?>">add</a></td>
+							<td><?= e($app->name) ?> </td>
+							<td><a href="admin/nos/tray/appmanager/add/<?= $app->folder ?>">add</a></td>
 						</tr>
 						<?php } ?>
 					</tbody>
@@ -79,7 +96,7 @@
 			<p>&nbsp;</p>
 			<h1 class="title"><?= Nos\I18n::get('Install from a .zip file') ?></h1>
 
-			<form method="post" action="/admin/nos/tray/plugins/upload" enctype="multipart/form-data">
+			<form method="post" action="/admin/nos/tray/appmanager/upload" enctype="multipart/form-data">
 				<input type="file" name="zip" />
 				<input type="submit" value="Upload the application" />
 			</form>
@@ -96,7 +113,7 @@
 			$nos(".app_list table").wijgrid({
 				columns: [
 					{  },
-					{ width: 100, ensurePxWidth: true }
+					{ width: 200, ensurePxWidth: true }
 				] });
 
 <?php

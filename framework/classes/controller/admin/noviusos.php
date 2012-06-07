@@ -68,7 +68,7 @@ class Controller_Admin_Noviusos extends Controller {
         if ($user->check_permission('nos_tray', 'access')) {
             array_unshift($trayTabs, array(
                 'iframe' => true,
-                'url' => 'admin/nos/tray/plugins',
+                'url' => 'admin/nos/tray/appmanager',
                 'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
                 'label' => __('Applications manager'),
                 'iconSize' => 24,
