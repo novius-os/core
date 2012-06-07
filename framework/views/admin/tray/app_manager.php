@@ -9,14 +9,16 @@
  */
 
 ?>
-<style type="text/css">
-	.app_list {
-		width : 500px;
-		margin: 1em 0 0;
-	}
-</style>
 
 <div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+
+    <style type="text/css">
+        .app_list {
+            width : 500px;
+            margin: 1em 0 0;
+        }
+    </style>
+
 	<div class="unit col c1"></div>
 	<div class="unit col c10" id="line_first" style="position:relative;;">
 		<div class="line" style="overflow:visible;">
@@ -104,26 +106,39 @@
 		</div>
 	</div>
 	<div class="unit lastUnit"></div>
+
+    <script type="text/javascript">
+        require(['jquery-nos'], function ($nos) {
+            $nos(function() {
+                var $container = $nos('#<?= $uniqid ?>');
+                $container.form();
+                $nos(".app_list table").wijgrid({
+                    columns: [
+                        {  },
+                        { width: 200, ensurePxWidth: true }
+                    ] });
+
+                $container.find('a').click(function(e) {
+                    e.preventDefault();
+                    $container.xhr({
+                        url: this.href,
+                        complete: function() {
+                            $container.load('admin/nos/tray/appmanager', function() {
+                                $container.find(':first').unwrap();
+                            });
+                        }
+                    });
+                })
+
+    <?php
+        $flash = \Session::get_flash('notification.plugins');
+        if (!empty($flash)) {
+    ?>
+                $nos.notify(<?= \Format::forge()->to_json($flash); ?>);
+    <?php
+        }
+    ?>
+            });
+        });
+    </script>
 </div>
-
-<script type="text/javascript">
-	require(['jquery-nos'], function ($nos) {
-		$nos(function() {
-			$nos('#<?= $uniqid ?>').form();
-			$nos(".app_list table").wijgrid({
-				columns: [
-					{  },
-					{ width: 200, ensurePxWidth: true }
-				] });
-
-<?php
-	$flash = \Session::get_flash('notification.plugins');
-	if (!empty($flash)) {
-?>
-			$nos.notify(<?= \Format::forge()->to_json($flash); ?>);
-<?php
-	}
-?>
-		});
-	});
-</script>

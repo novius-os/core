@@ -19,11 +19,22 @@ class Application
         \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
     }
 
+    /**
+     *
+     * @param string $name
+     * @param array $real_metadata Optional
+     * @return Application
+     */
     public static function forge($name, $real_metadata = array())
     {
         return new static($name, $real_metadata);
     }
 
+    /**
+     *
+     * @param string[] $repositories
+     * @return Application
+     */
     public static function search_all($repositories = array())
     {
         $repositories = array(

@@ -15,7 +15,6 @@ use Fuel\Core\View;
 
 class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
 {
-    public $template = 'nos::admin/html';
 
     public function action_index()
     {
@@ -35,39 +34,63 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             }
         }
 
-        $local = Application::forge('local');
+        $view = View::forge('admin/tray/app_manager');
+        $view->set(array(
+            'local'     => Application::forge('local'),
+            'installed' => $app_installed,
+            'others'    => $app_others,
+            'allow_upload' => \Config::get('allow_plugin_upload'),
+        ), false, false);
 
-        $this->template->body = View::forge('admin/tray/app_manager');
-
-        $this->template->body->set('local', $local, false);
-        $this->template->body->set('installed', $app_installed, false);
-        $this->template->body->set('others', $app_others, false);
-        $this->template->body->set('allow_upload', \Config::get('allow_plugin_upload', false));
-
-        return $this->template;
+        return $view;
     }
 
     public function action_add($app_name)
     {
         \Module::load($app_name);
-        $application = new \Nos\Application($app_name);
 
-        $application->install();
-        \Response::redirect('admin/nos/tray/appmanager');
+        try
+        {
+            $application = Application::forge($app_name);
+            $application->install();
+        }
+        catch (\Exception $e)
+        {
+            $this->response(array(
+                'error' => $e->getMessage(),
+            ));
+            return;
+        }
+        $this->response(array(
+            'notify' => __('Installation successful'),
+            // The tab will be refreshed by the javaScript within the view
+        ));
     }
 
     public function action_remove($app_name)
     {
-        $instance = new \Nos\Application($app_name);
-
-        if ($instance->uninstall())
+        try
         {
-            $app_installed = \Config::get('data::app_installed', array());
-            unset($app_installed[$app_name]);
-            \Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
+            $application = Application::forge($app_name);
+            if ($application->uninstall())
+            {
+                $app_installed = \Config::get('data::app_installed', array());
+                unset($app_installed[$app_name]);
+                \Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
+            }
+        }
+        catch (\Exception $e)
+        {
+            $this->response(array(
+                'error' => $e->getMessage(),
+            ));
+            return;
         }
 
-        \Response::redirect('admin/nos/tray/appmanager');
+        $this->response(array(
+            'notify' => __('Uninstallation successful'),
+            // The tab will be refreshed by the javaScript within the view
+        ));
     }
 
     public function action_upload()
