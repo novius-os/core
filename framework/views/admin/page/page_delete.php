@@ -12,6 +12,8 @@
     <input type="hidden" name="id" value="<?= $page->page_id ?>" />
     <p><?php
 
+    $page_title = $page->page_title;
+
     $page_langs = $page->find_lang('all');
     $lang_count = count($page_langs);
 
@@ -29,6 +31,9 @@
     foreach ($page_langs as $page) {
         $languages_list[] = \Arr::get($locales, $page->get_lang(), $page->get_lang());
     }
+?>
+    <p><?= Str::tr(__('You are about to delete the page <strong>":page_title"</strong>.'), array('page_title' => $page_title)) ?></p>
+<?php
 
     if ($children_count == 0 && $lang_count == 1) {
         ?>
