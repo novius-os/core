@@ -19,8 +19,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
      * @var string page template
      */
     public $template = null;
-    var $format = 'json';
-
+    public $format = 'json';
 
     public function before() {
         if ( ! empty($this->template) and is_string($this->template))
@@ -61,7 +60,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 }
             }
         }
-/*
+        /*
         // If nothing was returned default to the template
         if (empty($response))
         {
