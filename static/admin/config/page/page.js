@@ -45,7 +45,8 @@ define([
                                     method : 'POST',
                                     data : $dialog.find('form').serialize()
                                 });
-                            }
+                            },
+                            appDesk: appDesk
                         });
                     }
                 },

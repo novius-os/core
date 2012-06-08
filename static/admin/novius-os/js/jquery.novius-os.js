@@ -470,12 +470,13 @@ define('jquery-nos', [
                         var $form = $nos('<form class="fieldset standalone"></form>');
 
                         var $confirmationZone = $('<p></p>');
-                        var $confirmButton = $('<button type="submit" class="primary ui-state-error" data-icon="trash"></button>').append('Confirm the deletion');
-                        var $cancelButton = $('<a href="#"></a>').append('Cancel');
+                        var $confirmButton = $('<button type="submit" class="primary ui-state-error" data-icon="trash"></button>').append(params.appDesk.i18n('Confirm the deletion').label);
+                        var $cancelButton = $('<a href="#"></a>').append(params.appDesk.i18n('Cancel').label);
+                        var $or = $('<span></span>').text(' ' + params.appDesk.i18n('or').label + ' ');
                         var $verifications = $dialog.find('.verification');
 
                         $confirmButton.appendTo($confirmationZone);
-                        $confirmationZone.append('&nbsp;or&nbsp;');
+                        $or.appendTo($confirmationZone);
                         $cancelButton.appendTo($confirmationZone);
 
                         $confirmationZone.appendTo($dialog);
@@ -497,7 +498,7 @@ define('jquery-nos', [
                                 }
                                 $dialog.dialog('close');
                             } else {
-                                $nos.notify('Wrong confirmation', 'error');
+                                $nos.notify(params.appDesk.i18n('Wrong confirmation').label, 'error');
                             }
 
                         });
