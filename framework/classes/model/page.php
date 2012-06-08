@@ -181,6 +181,7 @@ class Model_Page extends \Nos\Orm\Model {
     }
 
 	public function _event_before_save() {
+        parent::_event_before_save();
 		$diff = $this->get_diff();
 
 		if (!empty($diff[0]['page_virtual_name'])) {
