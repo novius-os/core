@@ -29,6 +29,7 @@ define('jquery-nos-appdesk',
 			thumbnails : false,
 			defaultView : 'grid',
             locales : {},
+            hideLocales : false,
 			texts : {
                 allLanguages : 'All',
 				addDropDown : 'Select an action',
@@ -283,6 +284,11 @@ define('jquery-nos-appdesk',
         _uiLangsDropDown : function() {
             var self = this,
                 o = self.options;
+
+            if (o.hideLocales) {
+                self.uiLangsDropDownContainer.hide();
+                return self;
+            }
 
             if ($.isEmptyObject(o.locales)) {
                 return self;
@@ -1665,6 +1671,7 @@ define('jquery-nos-appdesk',
 
                 $.extend(true, appdesk.appdesk, {
                     locales : config.locales,
+                    hideLocales : config.hideLocales,
                     views : config.views,
                     name  : config.configuration_id,
                     selectedView : config.selectedView,
