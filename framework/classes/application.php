@@ -414,8 +414,8 @@ class Application
             }
         }
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
-        $app_installed = \Config::get('app_installed', array());
+        \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
+        $app_installed = \Config::get('data::app_installed', array());
 
         foreach ($app_installed as $app_name => $app)
         {
