@@ -11,6 +11,7 @@
 
 $locales = Config::get('locales', array());
 empty($tabInfos) and $tabInfos = array();
+empty($tabInfos['actions']) and $tabInfos['actions'] = array();
 empty($url_crud) or $tabInfos['url'] = $url_crud.($item === null ? '': '/'.$item->id).'?lang='.$lang;
 
 $labels     = array();
@@ -97,10 +98,12 @@ require(['jquery-nos'], function ($nos) {
 
         var tabInfos = <?= json_encode($tabInfos) ?>;
 
-        if (tabInfos.length > 0) {
+        // Object.keys() is not available in IE 8 or IE quirks
+        if (Object.keys(tabInfos).length > 0) {
             $container.onShow('bind', function() {
                 $container.tab('update', tabInfos);
             });
+            $container.onShow();
         }
     });
 });

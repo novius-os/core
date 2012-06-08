@@ -21,7 +21,7 @@
                 if ($locale == $selected_lang) {
                     $selected_index = $i;
                 }
-                echo '<li style="text-align: center;"><a href="'.$url_blank_slate.'?lang='.$locale.'">'.Nos\Helper::flag($locale).'</a></li>';
+                echo '<li style="text-align: center;"><a href="'.($locale == $selected_lang ? $url_form : $url_blank_slate).'?lang='.$locale.'">'.Nos\Helper::flag($locale).'</a></li>';
                 $i++;
             }
         } else {

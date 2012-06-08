@@ -66,6 +66,7 @@ class Controller_Admin_Page_Page extends Controller {
                 $parent_page = Model_Page::find('first', array(
                     'where' => array(
                         array('page_parent_id', 'IS', \Db::expr('NULL')),
+                        array('page_lang', $page->page_lang),
                     ),
                     'order_by' => array('page_id' => 'ASC'),
                 ));
