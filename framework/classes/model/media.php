@@ -163,6 +163,7 @@ class Model_Media extends \Nos\Orm\Model {
     }
 
 	public function _event_before_save() {
+        parent::_event_before_save();
 		$this->media_ext = pathinfo($this->media_file, PATHINFO_EXTENSION);
 		$is_image = @getimagesize(APPPATH.$this->get_private_path());
 		if ($is_image !== false) {
