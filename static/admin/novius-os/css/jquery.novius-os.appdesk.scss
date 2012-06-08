@@ -295,12 +295,15 @@
 	.buttontd {
 		cursor: pointer;
 		padding: 0;
-		border: 0;
+
+
 
 		.ui-state-default {
 			display: table-cell;
 			font-weight: normal;
 			text-align: center;
+            border-top: 0 !important;
+            border-right: 1px solid #A8A8A8;
 		}
 
 		.ui-icon-triangle-1-s {
