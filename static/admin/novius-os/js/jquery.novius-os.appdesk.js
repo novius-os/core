@@ -169,6 +169,17 @@ define('jquery-nos-appdesk',
 				}, o.thumbnails);
 			}
 
+            if (!$.isEmptyObject(o.locales)) {
+
+                if (o.selectedLang && o.selectedLang.length) {
+                    o.selectedLang = null;
+                }
+
+                if (o.selectedLang == null) {
+                    o.selectedLang = Object.keys(o.locales)[0];
+                }
+            }
+
 			self._css()
                 ._uiAdds()
 				._uiSplitters()
