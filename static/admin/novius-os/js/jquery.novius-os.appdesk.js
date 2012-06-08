@@ -1661,7 +1661,7 @@ define('jquery-nos-appdesk',
             }
 
             require(jsonFile, function () {
-                var appdesk = $nos.appdeskSetup();
+                var appdesk = $nos.appdeskSetup(config);
                 $.extend(true, appdesk.i18nMessages, config.i18n);
 
                 // Extending appdesk with each of the different json files
@@ -1730,7 +1730,7 @@ define('jquery-nos-appdesk',
             });
         },
 
-        appdeskSetup : function() {
+        appdeskSetup : function(config) {
             var self = {},
                 objectToArray = function(val, i) {
                     val['setupkey'] = i;
@@ -1772,6 +1772,10 @@ define('jquery-nos-appdesk',
                             object[key] = keyToOrderedArray(object, key);
                             for (var i = 0; i < object[key].length; i++) {
                                 if (object[key][i].lang) {
+                                    if (config.hideLocales) {
+                                        object[key].splice(i, 1);
+                                        continue;
+                                    }
                                     object[key][i] = {
                                         headerText : 'Languages',
                                         dataKey    : 'lang',
