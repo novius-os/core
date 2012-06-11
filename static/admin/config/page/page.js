@@ -26,7 +26,8 @@ define([
                     action : function(item, ui) {
                         $nos(ui).tab({
                             url : 'admin/nos/page/page/crud/' + item.id,
-                            label : item.title
+                            label : item.title,
+                            iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                         });
                     }
                 },
@@ -63,7 +64,8 @@ define([
                         action : function(ui, appdesk) {
                             $nos(ui).tab('add', {
                                 url: 'admin/nos/page/page/crud?lang=' + appdesk.lang,
-                                title: appDesk.i18n('Add a page')._()
+                                label: appDesk.i18n('Add a page')._(),
+                                iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                             });
                         }
                     }/*,
