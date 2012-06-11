@@ -22,7 +22,7 @@
 		'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.7.2.min',
 		'jquery-validate' => 'static/novius-os/admin/vendor/jquery/jquery-validation/nos.validate',
 		'jquery-form' => 'static/novius-os/admin/vendor/jquery/jquery-form/jquery.form.min',
-		'jquery-ui' => 'static/novius-os/admin/vendor/jquery-ui/jquery-ui-1.8.20.custom.min',
+		'jquery-ui' => 'static/novius-os/admin/vendor/jquery-ui/jquery-ui-1.8.21.custom.min',
 		'wijmo-open' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo-open.all.2.1.0.min',
 		'wijmo-complete' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo-complete.all.2.1.0.min',
 		'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
