@@ -294,7 +294,7 @@ define('jquery-nos', [
                             ajax: true,
                             title: 'Choose a media file'
                         });
-                        $dialog.bind('select.media', function(e, item) {
+                        $dialog.bind('select_media', function(e, item) {
                             $input.inputFileThumb({
                                 file: item.thumbnail
                             });
