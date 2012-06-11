@@ -163,6 +163,7 @@ class Application
         $this->addPermission();
 
         $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
+        \Config::load($this->folder.'::metadata', true);
         $new_metadata = \Config::get($this->folder.'::metadata');
 
         // Check if the installation is compatible with other applications
@@ -194,7 +195,7 @@ class Application
     public function uninstall()
     {
         $old_metadata = \Config::get('data::app_installed.'.$this->folder);
-        $new_metadata = \Config::get($this->folder.'::metadata');
+        $new_metadata = array();
 
         // Check if the installation is compatible with other applications
         $config = $this->prepare_config($old_metadata, $new_metadata);
