@@ -468,8 +468,6 @@ define('jquery-nos', [
         },
 
         confirmationDialog: function(params) {
-            var self = this;
-
             if (!params) {
                 params = {};
             }
@@ -477,13 +475,13 @@ define('jquery-nos', [
                 ajax : true,
                 width: 500,
                 height: 'auto',
-                class: 'nos-confirmation-dialog',
+                'class': 'nos-confirmation-dialog',
                 dialogRendered: function($dialog) {
                     require(['jquery-nos'], function($nos) {
                         var $form = $nos('<form class="fieldset standalone"></form>');
 
                         var $confirmationZone = $('<p></p>');
-                        var $confirmButton = $('<button type="submit" class="primary ui-state-error" data-icon="trash"></button>').append(params.appDesk.i18n('Confirm the deletion').label);
+                        var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(params.appDesk.i18n('Confirm the deletion').label);
                         var $cancelButton = $('<a href="#"></a>').append(params.appDesk.i18n('Cancel').label);
                         var $or = $('<span></span>').text(' ' + params.appDesk.i18n('or').label + ' ');
                         var $verifications = $dialog.find('.verification');
@@ -499,7 +497,6 @@ define('jquery-nos', [
 
                             var allVerificationPassed = true;
                             $verifications.each(function() {
-                                var $this = $(this);
                                 if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
                                     allVerificationPassed = false;
                                     return false;
