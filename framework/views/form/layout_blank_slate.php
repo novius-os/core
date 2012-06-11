@@ -16,8 +16,14 @@ empty($url_crud) or $tabInfos['url'] = $url_crud.($item === null ? '': '/'.$item
 
 $labels     = array();
 $items_lang = array();
+$common = $item::find($common_id);
 
-if ($item !== null) {
+if (empty($common)) {
+    $common_id = null;
+}
+
+
+if (!empty($common)) {
     $possible = $item->get_possible_lang();
     $main_lang = $item->find_main_lang();
     $common_id = $main_lang ? $main_lang->id : false;
@@ -33,7 +39,7 @@ if ($item !== null) {
 <div id="<?= $uniqid = uniqid($lang.'_') ?>" class="" style="padding:0;">
     <div class="blank_slate">
         <?php
-        if ($item !== null) {
+        if (!empty($common_id)) {
             ?>
             <p><?= strtr(__('This {item} has not been added in {lang} yet.'), array(
                 '{item}' => null === $item_text ? '' : $item_text,
@@ -57,7 +63,7 @@ if ($item !== null) {
                 </form>
             </li>
             <?php
-            if ($item !== null) {
+            if (!empty($common_id)) {
                 ?>
                 <li>
                     <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span>
