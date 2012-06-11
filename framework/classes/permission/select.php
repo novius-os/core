@@ -24,7 +24,7 @@ class Permission_Select extends Permission_Driver {
 	}
 
 	public function check($role, $key) {
-		static::_load_permissions();
+		static::_load_permissions($role);
 		return isset(static::$data[$role->role_id][$this->application]) && in_array($key, (array) static::$data[$role->role_id][$this->application]);
 	}
 
@@ -64,18 +64,14 @@ class Permission_Select extends Permission_Driver {
         }
 	}
 
-	protected static function _load_permissions() {
-		if (!empty(static::$data)) {
+	protected static function _load_permissions($role) {
+		if (!empty(static::$data[$role->role_id])) {
 			return;
 		}
 
-        $role_ids = array();
-        foreach (Model_User_Role::find('all') as $g) {
-            $role_ids[] = $g->role_id;
-        }
         $data = Model_User_Permission::find('all', array(
             'where' => array(
-                array('perm_role_id', 'IN', $role_ids),
+                array('perm_role_id', $role->role_id),
             ),
         ));
 

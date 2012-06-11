@@ -36,12 +36,17 @@ define([
                     primary : true,
                     icon : 'trash',
                     action : function(item, ui) {
-                        $nos(ui).dialog({
+                        $nos(ui).confirmationDialog({
                             contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
-                            ajax : true,
                             title: appDesk.i18n('Delete a page')._(),
-                            width: 500,
-                            height: 250
+                            confirmed: function($dialog) {
+                                $dialog.xhr({
+                                    url : 'admin/nos/page/page/delete_page_confirm',
+                                    method : 'POST',
+                                    data : $dialog.find('form').serialize()
+                                });
+                            },
+                            appDesk: appDesk
                         });
                     }
                 },

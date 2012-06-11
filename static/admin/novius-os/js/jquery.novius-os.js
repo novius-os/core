@@ -454,6 +454,70 @@ define('jquery-nos', [
             return this;
         },
 
+        confirmationDialog: function(params) {
+            var self = this;
+
+            if (!params) {
+                params = {};
+            }
+            params = $.extend({
+                ajax : true,
+                width: 500,
+                height: 'auto',
+                class: 'nos-confirmation-dialog',
+                dialogRendered: function($dialog) {
+                    require(['jquery-nos'], function($nos) {
+                        var $form = $nos('<form class="fieldset standalone"></form>');
+
+                        var $confirmationZone = $('<p></p>');
+                        var $confirmButton = $('<button type="submit" class="primary ui-state-error" data-icon="trash"></button>').append(params.appDesk.i18n('Confirm the deletion').label);
+                        var $cancelButton = $('<a href="#"></a>').append(params.appDesk.i18n('Cancel').label);
+                        var $or = $('<span></span>').text(' ' + params.appDesk.i18n('or').label + ' ');
+                        var $verifications = $dialog.find('.verification');
+
+                        $confirmButton.appendTo($confirmationZone);
+                        $or.appendTo($confirmationZone);
+                        $cancelButton.appendTo($confirmationZone);
+
+                        $confirmationZone.appendTo($dialog);
+
+                        $confirmButton.click(function(e) {
+                            e.preventDefault();
+
+                            var allVerificationPassed = true;
+                            $verifications.each(function() {
+                                var $this = $(this);
+                                if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
+                                    allVerificationPassed = false;
+                                    return false;
+                                }
+                            });
+                            if (allVerificationPassed) {
+                                if ($.isFunction(params['confirmed'])) {
+                                    params['confirmed']($dialog);
+                                }
+                                $dialog.dialog('close');
+                            } else {
+                                $nos.notify(params.appDesk.i18n('Wrong confirmation').label, 'error');
+                            }
+
+                        });
+
+                        $cancelButton.click(function(e) {
+                            e.preventDefault();
+                            $dialog.dialog('close');
+                        });
+
+                        $dialog.wrapInner($form);
+
+                        $dialog.parent().form();
+                    });
+                }
+            }, params);
+
+            this.dialog(params);
+        },
+
         dialog : function() {
             var args = Array.prototype.slice.call(arguments),
                 method = 'open';
@@ -491,6 +555,7 @@ define('jquery-nos', [
                         $dialog = $nos('<div></div>').addClass('nos-dispatcher')
                             .appendTo($container);
 
+
                     $.extend(options, {
                             close : function(e, ui) {
                                 dialogEvent.close($dialog);
@@ -523,6 +588,10 @@ define('jquery-nos', [
 
                     if (options['content'] !== undefined) {
                         $dialog.append(options.content);
+                    }
+
+                    if (options['class'] !== undefined) {
+                        $dialog.addClass(options['class']);
                     }
 
                     var proceed = true;
@@ -559,6 +628,7 @@ define('jquery-nos', [
                                     if (proceed) {
                                         $dialog.wijdialog('open')
                                             .html( responseText );
+                                        $.isFunction(options['dialogRendered']) && options['dialogRendered']($dialog);
                                     } else {
                                         $dialog.empty()
                                             .wijdialog('destroy')
