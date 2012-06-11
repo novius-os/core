@@ -61,7 +61,7 @@ $large = !empty($large) && $large == true;
                         echo '</td>';
                     }
                     ?>
-                        <td>
+                        <td class="table-field">
                     <?php
                     if (!empty($title)) {
                         $title = (array) $title;
