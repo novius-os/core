@@ -100,10 +100,16 @@ class Finder extends Fuel\Core\Finder {
 			}
 		}
 
+		$ext = pathinfo($file_no_ns, PATHINFO_EXTENSION);
+		if (!$ext)
+		{
+			$file_no_ns .= '.php';
+		}
+
 		foreach ($search as $path) {
 			// We now only have absolute paths, search through them
-			if (is_file($path.$file_no_ns.$ext)) {
-				$found[] = $path.$file_no_ns.$ext;
+			if (is_file($path.$file_no_ns)) {
+				$found[] = $path.$file_no_ns;
 			}
 		}
 
@@ -114,7 +120,7 @@ class Finder extends Fuel\Core\Finder {
 				if (!is_dir($search[0])) {
 					File::create_dir(dirname($search[0]), basename($search[0]));
 				}
-				return $search[0].$file_no_ns.$ext;
+				return $search[0].$file_no_ns;
 			} else if (!$is_namespaced) {
 				$found = parent::locate($directory, $file, $ext, $multiple, $cache);
 			}
