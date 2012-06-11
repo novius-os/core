@@ -154,6 +154,22 @@ class Model extends \Orm\Model {
 
 
 
+    public function get_possible_lang() {
+        $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
+        $tree         = static::behaviours('Nos\Orm_Behaviour_Tree');
+
+        if (!$translatable || !$tree) {
+            return array_keys(\Config::get('locales'));
+        }
+
+        // Return langs from parent if available
+        $parent = $this->find_parent();
+        if (!empty($parent)) {
+            return $parent->get_all_lang();
+        }
+        return array_keys(\Config::get('locales'));
+    }
+
 	/**
 	 * @see \Orm\Model::__construct()
 	 */
