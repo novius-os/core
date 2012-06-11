@@ -94,14 +94,14 @@ class Model extends \Orm\Model {
 		if ( !$init)
 		{
 			static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviours());
-            if (empty(static::$_observers_cached[$class]['\Orm\Observer_Self'])) {
-                static::$_observers_cached[$class]['\Orm\Observer_Self'] = array();
+            if (empty(static::$_observers_cached[$class]['Orm\Observer_Self'])) {
+                static::$_observers_cached[$class]['Orm\Observer_Self'] = array();
             }
-            if (empty(static::$_observers_cached[$class]['\Orm\Observer_Self']['events'])) {
-                static::$_observers_cached[$class]['\Orm\Observer_Self']['events'] = array();
+            if (empty(static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
+                static::$_observers_cached[$class]['Orm\Observer_Self']['events'] = array();
             }
-            if (!in_array('before_save', static::$_observers_cached[$class]['\Orm\Observer_Self']['events'])) {
-                static::$_observers_cached[$class]['\Orm\Observer_Self']['events'][] = 'before_save';
+            if (!in_array('before_save', static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
+                static::$_observers_cached[$class]['Orm\Observer_Self']['events'][] = 'before_save';
             }
 		}
 
