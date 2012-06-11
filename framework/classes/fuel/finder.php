@@ -100,10 +100,10 @@ class Finder extends Fuel\Core\Finder {
 			}
 		}
 
-		$ext = pathinfo($file_no_ns, PATHINFO_EXTENSION);
-		if (!$ext)
+		$file_ext = pathinfo($file_no_ns, PATHINFO_EXTENSION);
+		if (!$file_ext)
 		{
-			$file_no_ns .= '.php';
+			$file_no_ns .= $ext;
 		}
 
 		foreach ($search as $path) {
