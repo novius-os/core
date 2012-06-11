@@ -202,6 +202,19 @@ define('jquery-nos', [
                             $nos.notify(json.error, 'error');
                         }
                     }
+                    if (json.internal_server_error) {
+                        var ise = json.internal_server_error;
+                        var str = "An internal server error has been detected.\n\n";
+                        str +=  ise.type + ' [ ' + ise.severity + ' ]: ' + ise.message + "\n";
+                        str += ise.filepath + " @ line " + ise.error_line + "\n\n";
+                        str += "Backtrace:\n";
+                        for (var i = 0; i < ise.backtrace.length; i++) {
+                            str += (i + 1) + ': ' + ise.backtrace[i].file + ' @ line ' + ise.backtrace[i].line + "\n";
+                        }
+                        if (console) {
+                            console.error(str);
+                        }
+                    }
                     if (json.notify) {
                         if ($.isArray(json.notify)) {
                             $.each(json.notify, function() {
