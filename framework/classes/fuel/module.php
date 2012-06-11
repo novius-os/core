@@ -19,17 +19,15 @@ class Module extends Fuel\Core\Module
 			$path = static::$modules[$module];
 
 			// Load the config (namespace + dependencies)
-			Config::load("$module::config", true);
-			$config = Config::get("$module::config", array());
+			$metadata = Config::get("app_installed.$module.metadata", array());
 
-			if (!empty($config['namespace'])) {
+			if (!empty($metadata['namespace'])) {
 				Autoloader::add_namespaces(array(
-					$config['namespace'] => $path.'classes'.DS,
+					$metadata['namespace'] => $path.'classes'.DS,
 				), true);
 				// Allow autoloading from bootstrap to alias classes from this namespace
-				Fuel::$namespace_aliases[Inflector::words_to_upper($module)] = $config['namespace'];
+				Fuel::$namespace_aliases[Inflector::words_to_upper($module)] = $metadata['namespace'];
 			}
-			Config::load("applications/$module", "$module::config");
 
 			// Load the bootstrap if it exists
 			if ($module !== 'nos' && is_file($path.'bootstrap.php')) {
