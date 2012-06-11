@@ -43,6 +43,7 @@ class Model_User extends \Nos\Orm\Model {
     }
 
     public function _event_before_save() {
+        parent::_event_before_save();
 		// Don't hash twice
         if ($this->is_changed('user_password')) {
             $ph = new \PasswordHash(8, false);

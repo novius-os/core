@@ -19,7 +19,7 @@ class Module extends Fuel\Core\Module
 			$path = static::$modules[$module];
 
 			// Load the config (namespace + dependencies)
-			$metadata = Config::get("app_installed.$module.metadata", array());
+			$metadata = Config::get("data::app_installed.$module.metadata", array());
 
 			if (!empty($metadata['namespace'])) {
 				Autoloader::add_namespaces(array(

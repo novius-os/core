@@ -7,7 +7,7 @@
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
- * 
+ *
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/license
@@ -337,7 +337,7 @@
 			///
 			/// Note: during conversion wijgrid extracts the first item value and makes it data field value, the second item (list of values) is removed:
 			///  [ { col0: 1, col1: "a" } ]
-			/// 
+			///
 			/// If DOM table is used as a datasource then attributes belonging to the cells in tBody section of the original table will be read and applied to the new cells.
 			///
 			/// rowSpan and colSpan attributes are not allowed.
@@ -454,7 +454,7 @@
 			splitDistanceY: 50,*/
 
 			/// <summary>
-			/// Indicates the index of columns that will always be shown on the left when the grid view scrolled horizontally. 
+			/// Indicates the index of columns that will always be shown on the left when the grid view scrolled horizontally.
 			/// Note, that all columns before the static column will be automatically marked as static, too.
 			/// It can only take effect when scrollMode is not "none".
 			/// It will be considered as -1 when grouping or row merging is enabled.
@@ -2672,7 +2672,7 @@
 				$fe.unbind("keypress." + this.widgetName);
 
 				$.each(view.subTables(), function () {
-					var domTable = this.element(); // item (this) is a htmlTableAccessor instance 
+					var domTable = this.element(); // item (this) is a htmlTableAccessor instance
 
 					if (domTable) {
 						if (domTable.tHead) {
@@ -2689,7 +2689,7 @@
 					// detach "onGroupExpandCollapseIconClick" event
 					$.each(view.getJoinedTables(true, 0), function (index, item) {
 						if (item && typeof (item) !== "number") {
-							$(item.element()) // item (this) is a htmlTableAccessor instance 
+							$(item.element()) // item (this) is a htmlTableAccessor instance
 								.find("> tbody")
 								.find("> tr.wijmo-wijgrid-groupheaderrow > td .wijmo-wijgrid-grouptogglebtn")
 								.unbind("." + self.widgetName);
@@ -4207,7 +4207,7 @@
 			/// <summary>
 			/// Causes the grid to calculate aggregate values on the column and place them in the column footer cell or group header and footer rows.
 			/// If the <see cref="showFooter"/> option is disabled or grid does not contain any groups, setting the "aggregate" option has no effect.
-			/// 
+			///
 			/// Possible values are: "none", "count", "sum", "average", "min", "max", "std", "stdPop", "var", "varPop" and "custom".
 			///
 			/// "none": no aggregate is calculated or displayed.
@@ -4245,7 +4245,7 @@
 			/// "datetime": if using built-in parser only date-time values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
 			/// "currency": if using built-in parser only numeric and currency values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
 			/// "boolean": if using built-in parser only "true" and "false" (case-insensitive) values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
-			/// 
+			///
 			/// Default: "string".
 			/// Type: String.
 			/// Code example: $("#element").wijgrid({ columns: [{ dataType: "string" }] });
@@ -4254,7 +4254,7 @@
 
 			/// <summary>
 			/// Data converter that is able to translate values from a string representation to column data type and back.
-			/// 
+			///
 			/// The dataParser is an object which must contains the following methods:
 			///   parseDOM(value, culture, format, nullString): converts given DOM element into the typed value.
 			///   parse(value, culture, format, nullString): converts the value into typed value.
@@ -4305,7 +4305,7 @@
 
 			/// <summary>
 			/// An operations set for filtering. Must be either one of the embedded operators or custom filter operator.
-			/// Operator names are case insensitive. 
+			/// Operator names are case insensitive.
 			///
 			/// Embedded filter operators include:
 			///   "NoFilter": no filter.
@@ -4326,7 +4326,7 @@
 			///
 			/// Full option value is:
 			///   [filterOperartor1, ..., filterOperatorN]
-			/// 
+			///
 			/// where each filter item is an object of the following kind:
 			///   { name: <operatorName>, condition: "or"|"and" }
 			///
@@ -4500,7 +4500,7 @@
 			/// "none": no row merging.
 			/// "free": allows row with identical text to merge.
 			/// "restricted": keeps rows with identical text from merging if rows in the previous column are merged.
-			/// 
+			///
 			/// Default: "none".
 			/// Type: String.
 			/// Code example: $("#element").wijgrid({ columns: [{ rowMerge: "none" }] });
@@ -4522,7 +4522,7 @@
 			/// "none": no sorting.
 			/// "ascending": sort from smallest to largest.
 			/// "descending": sort from largest to smallest.
-			/// 
+			///
 			/// Default: "none".
 			/// Type: String.
 			/// Code example: $("#element").wijgrid({ columns: [{ sortDirection: "none" }] });
@@ -5049,7 +5049,7 @@
 			/// "none": no sorting.
 			/// "ascending": sort from smallest to largest.
 			/// "descending": sort from largest to smallest.
-			/// 
+			///
 			/// Default: "none".
 			/// Type: String.
 			/// Code example: $("#element").wijgrid({ columns: [{ sortDirection: "none" }] });
@@ -5239,7 +5239,7 @@
 				//band can't be dropped into group area
 				return !(wijField instanceof $.wijmo.c1groupedfield);
 			}
- 
+
 			return false;
 		}
 	});
@@ -5812,7 +5812,7 @@
 
 				if (_dataMode() === $.wijmo.wijgrid.dataMode.dynamical) { // always load data
 					userData.data = _prepareRequest();
-					if (_dataSource.proxy) { // remote 
+					if (_dataSource.proxy) { // remote
 						_dataSource.proxy.options.data = $.extend(_dataSource.proxy.options.data, userData.data);
 					}
 
@@ -6247,7 +6247,7 @@
 				return dataRes;
 			}
 
-			// sortRequest: array of { dataKey, sortDirection } 
+			// sortRequest: array of { dataKey, sortDirection }
 			function _applySort(data, sortRequest) {
 				if (sortRequest.length) {
 
@@ -6540,7 +6540,7 @@
 				} else {
 					childRanges = groupHelper.getChildGroupRanges(leaves, groupRange.cr, groupRange.owner.level);
 
-					if (childRanges.length && (dataStart !== childRanges[0].cr.r1)) { // 
+					if (childRanges.length && (dataStart !== childRanges[0].cr.r1)) { //
 						// a space between parent groupHeader and first child range - show single rows (groupSingleRow = false)
 						for (i = dataStart; i < childRanges[0].cr.r1; i++) {
 							_toggleRowVisibility(rowAccessor.item(i), true);
@@ -8489,9 +8489,9 @@
 							if (this._verifySingleOp(filterOperator[i], filterValue[i], dataType, cache)) {
 								fop.push({
 									name: filterOperator[i].name || filterOperator[i],
-									condition: filterOperator[i].condition || "or" 
+									condition: filterOperator[i].condition || "or"
 								});
-								
+
 								fval.push(filterValue ? filterValue[i] : undefined);
 							}
 						}
@@ -8503,7 +8503,7 @@
 							};
 						}
 					} else {
-						if (this._verifySingleOp(filterOperator, filterValue, dataType, cache)) { 
+						if (this._verifySingleOp(filterOperator, filterValue, dataType, cache)) {
 							return { // compatibility with old model
 								filterOperator: filterOperator,
 								filterValue: filterValue
@@ -8524,7 +8524,7 @@
 					filterOperator = (filterOperator || "").toLowerCase();
 
 					if (filterOperator !== "nofilter" && (fop = cache.getByName(filterOperator))) {
-					
+
 						if ($.inArray(dataType || "string", fop.applicableTo) >= 0) {
 							if (fop.arity === 1 || (fop.arity > 1 && this.getSingleValue(filterValue) !== undefined)) {
 								return true;
@@ -8716,7 +8716,7 @@
 				return (domCol && colGroup.appendChild(domCol)) || colGroup.appendChild(document.createElement("col"));
 			};
 
-			// ** initialization 
+			// ** initialization
 
 			if (ensureColgroup) { // important: colGroup must preceed tBody in a table
 				this.ensureColGroup();
@@ -8814,7 +8814,7 @@
 			/// </summary>
 			/// <returns type="object">
 			/// Information about associated row.
-			/// 
+			///
 			/// The return value has the following properties:
 			/// $rows: jQuery object that represents associated rows.
 			/// data: associated data.
@@ -9000,7 +9000,7 @@
 		var _topLeft = topLeft._clone(),
 			_bottomRight = bottomRight._clone();
 
-		// public 
+		// public
 
 		this.bottomRight = function () {
 			/// <summary>
@@ -9332,7 +9332,11 @@
 
 		// ** rendering
 		_postRender: function () {
-			this.ensureDisabledState();
+            // Novius OS Fixed : this 2 lines was remove in v2.0.8 but whitout treeGrid drag & drop fail
+            // disable or enable DOM selection
+            this.toggleDOMSelection(this._wijgrid.options.selectionMode === "none");
+
+            this.ensureDisabledState();
 		},
 
 		_preRender: function () {
@@ -9399,7 +9403,7 @@
 				virtualDataItemIndexBase = this._wijgrid.options.pageIndex * this._wijgrid.options.pageSize;
 			}
 
-			// render rows 
+			// render rows
 			for (i = 0, len = data.length; i < len; i++) {
 				dataRow = data[i];
 				isDataRow = (dataRow.rowType & $rt.data) !== 0;
@@ -11278,7 +11282,7 @@
 			/// Usage:
 			/// 1. addColumns(0)
 			/// 2. addColumns(0, 2)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
 			/// does not allow multiple selection the previous selection will be removed.
 			///
@@ -11301,7 +11305,7 @@
 			/// Usage:
 			/// 1. addRange(cellRange)
 			/// 2. addRange(x0, y0, x1, y1)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
 			/// does not allow multiple selection the previous selection will be removed.
 			///
@@ -11342,7 +11346,7 @@
 			/// Usage:
 			/// 1. addRows(0)
 			/// 2. addRows(0, 2)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
 			/// does not allow multiple selection the previous selection will be removed.
 			///
@@ -11365,7 +11369,7 @@
 			/// Usage:
 			/// 1. removeRange(cellRange)
 			/// 2. removeRange(x0, y0, x1, y1)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid.
 			///
 			/// Code example: selectionObj.removeRange(0, 0, 1, 1);
@@ -11405,7 +11409,7 @@
 			/// Usage:
 			/// 1. removeColumns(0)
 			/// 2. removeColumns(0, 2)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid.
 			///
 			/// Code example: selectionObj.removeColumns(0);
@@ -11427,7 +11431,7 @@
 			/// Usage:
 			/// 1. removeRows(0)
 			/// 2. removeRows(0, 2)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid.
 			///
 			/// Code example: selectionObj.removeRows(0);
@@ -11450,7 +11454,7 @@
 			/// Usage:
 			/// 1. addRows(0)
 			/// 2. addRows(0, 2)
-			/// 
+			///
 			/// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
 			/// does not allow multiple selection the previous selection will be removed.
 			///
@@ -12266,7 +12270,7 @@
 						break;
 					}
 
-					if (pnt.x < bounds.left) { // -1 
+					if (pnt.x < bounds.left) { // -1
 						right = median - 1;
 					}
 					else
@@ -12414,7 +12418,7 @@
 		this.getCell = function (rowObj, globCellIndex) {
 			/// <summary>
 			/// Gets a cell by its global index in a row's array passed in rowObj.
-			/// 
+			///
 			/// example:
 			/// Suppose rows is an array containing the following data:
 			/// [ ["a", "b"], ["c", "d", "e"] ]
@@ -13285,7 +13289,7 @@
 						}
 					}
 				}
-				
+
 				return null;
 			}
 

@@ -26,7 +26,8 @@ define([
                     action : function(item, ui) {
                         $nos(ui).tab({
                             url : 'admin/nos/page/page/crud/' + item.id,
-                            label : item.title
+                            label : item.title,
+                            iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                         });
                     }
                 },
@@ -36,12 +37,17 @@ define([
                     primary : true,
                     icon : 'trash',
                     action : function(item, ui) {
-                        $nos(ui).dialog({
+                        $nos(ui).confirmationDialog({
                             contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
-                            ajax : true,
                             title: appDesk.i18n('Delete a page')._(),
-                            width: 500,
-                            height: 250
+                            confirmed: function($dialog) {
+                                $dialog.xhr({
+                                    url : 'admin/nos/page/page/delete_page_confirm',
+                                    method : 'POST',
+                                    data : $dialog.find('form').serialize()
+                                });
+                            },
+                            appDesk: appDesk
                         });
                     }
                 },
@@ -63,7 +69,8 @@ define([
                         action : function(ui, appdesk) {
                             $nos(ui).tab('add', {
                                 url: 'admin/nos/page/page/crud?lang=' + appdesk.lang,
-                                title: appDesk.i18n('Add a page')._()
+                                label: appDesk.i18n('Add a page')._(),
+                                iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                             });
                         }
                     }/*,

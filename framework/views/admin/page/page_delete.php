@@ -8,9 +8,10 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
     <input type="hidden" name="id" value="<?= $page->page_id ?>" />
     <p><?php
+
+    $page_title = $page->page_title;
 
     $page_langs = $page->find_lang('all');
     $lang_count = count($page_langs);
@@ -29,6 +30,9 @@
     foreach ($page_langs as $page) {
         $languages_list[] = \Arr::get($locales, $page->get_lang(), $page->get_lang());
     }
+?>
+    <p><?= Str::tr(__('You are about to delete the page <strong>":page_title"</strong>.'), array('page_title' => $page_title)) ?></p>
+<?php
 
     if ($children_count == 0 && $lang_count == 1) {
         ?>
@@ -53,7 +57,6 @@
                 }
                 ?>
             </select>
-            <p>&nbsp;</p>
 <?php
         }
         if ($children_count > 0) {
@@ -66,56 +69,9 @@
             )) ?></p>
             <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
             <p><?= strtr(__('Yes, I want to delete the page and all of its {count} sub-pages.'), array(
-                '{count}' => '<input data-id="verification1" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
+                '{count}' => '<input class="verification" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
             )); ?></p>
-            <p>&nbsp;</p>
 <?php
         }
     }
 ?></p>
-    <p>
-        <button type="submit" class="primary ui-state-error" data-icon="trash" data-id="confirmation"><?= __('Confirm the deletion') ?></button>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
-    </p>
-</div>
-
-<script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-    $nos(function() {
-        var $container     = $nos('#<?= $uniqid ?>').form();
-        var $verification1 = $container.find('input[data-id=verification1]');
-        var $verification2 = $container.find('input[data-id=verification2]');
-        var $confirmation  = $container.find('button[data-id=confirmation]');
-
-        // Create a form so we can retrieve its data with jQuery.serialize()
-        $container.wrapInner('<form></form>');
-        $confirmation.click(function(e) {
-            e.preventDefault();
-            if ($verification1.length && $verification1.val() != $verification1.data('verification')) {
-                $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
-                return;
-            }
-            if ($verification2.length && $verification2.val() != $verification2.data('verification')) {
-                $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
-                return;
-            }
-
-	        $container.xhr({
-                url : 'admin/nos/page/page/delete_page_confirm',
-                method : 'POST',
-                data : $container.find('form').serialize(),
-                success : function(json) {
-	                $container.dialog('close');
-                }
-            });
-        });
-
-        $container.find('a[data-id=cancel]').click(function(e) {
-            e.preventDefault();
-	        $container.dialog('close');
-        });
-
-    });
-});
-</script>

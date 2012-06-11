@@ -46,11 +46,11 @@
 				</tr>
 				<tr>
 					<th><label><?= __('Height:') ?> </label></th>
-					<td><input type="text" name="height" data-id="height" readonly /></td>
+					<td><input type="text" name="height" data-id="height" size="5" readonly /></td>
 				</tr>
 				<tr>
 					<th><label><?= __('Style:') ?> </label></th>
-					<td><input type="text" name="style" data-id="style" size="50" /></td>
+					<td><input type="text" name="style" data-id="style" /></td>
 				</tr>
 				<tr>
 					<th></th>
@@ -64,9 +64,9 @@
 require(['jquery-nos'], function($nos) {
 	$nos(function() {
 
-		var id = '<?= $uniqid ?>',
-			newimg = !'<?= $edit ?>',
-			$container = $nos('#' + id)
+		var id = '<?= $uniqid ?>';
+		var newimg = !'<?= $edit ?>';
+        var $container = $nos('#' + id)
 				.find('> form')
 				.submit(function(e) {
 					$container.find('button[data-id=save]').triggerHandler('click');
@@ -107,39 +107,40 @@ require(['jquery-nos'], function($nos) {
 				.css({
 					width : '18%'
 				})
-				.end(),
-			$dialog = $container.closest('.ui-dialog-content')
-				.bind('select.media', function(e, data) {
+				.end();
+		var $dialog = $container.closest('.ui-dialog-content')
+				.bind('select_media', function(e, data) {
 					tinymce_image_select(data);
-				}),
-			$library = $container.find('div:eq(0)')
+				});
+		var $library = $container.find('div:eq(0)')
 				.css({
 					width : '100%',
 					padding: 0,
 					margin: 0
-				}),
-			$thumb = $container.find('img')
+				});
+        var $thumb = $container.find('img')
 				.hide()
 				.parent()
 				.css('vertical-align', 'top')
-				.end(),
-			base_url = '<?= \Uri::base(true) ?>',
-			$height = $container.find('input[data-id=height]'),
-			$width = $container.find('input[data-id=width]')
+				.end();
+		var base_url = '<?= \Uri::base(true) ?>';
+		var $height = $container.find('input[data-id=height]');
+		var $width = $container.find('input[data-id=width]')
 				.bind('change keyup', function() {
 					if ($proportional.is(':checked') && media && media.width && media.height) {
-						$height.val(Math.round($width.val() * media.height / media.width));
+                        var width = $width.val();
+						$height.val(width == '' ? '' : Math.round(width * media.height / media.width));
 					}
-				}),
-			$title = $container.find('input[data-id=title]')
+				});
+		var $title = $container.find('input[data-id=title]')
 				.bind('change keyup', function() {
 					if ($same_title_alt.is(':checked')) {
 						$alt.val($title.val());
 					}
-				}),
-			$alt = $container.find('input[data-id=alt]'),
-			$style = $container.find('input[data-id=style]'),
-			$proportional = $container.find('input[data-id=proportional]')
+				});
+		var $alt = $container.find('input[data-id=alt]');
+		var $style = $container.find('input[data-id=style]');
+		var $proportional = $container.find('input[data-id=proportional]')
 				.change(function() {
 					if ($proportional.is(':checked')) {
 						$height.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
@@ -147,21 +148,25 @@ require(['jquery-nos'], function($nos) {
 					} else {
 						$height.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
 					}
-				}),
-			$same_title_alt = $container.find('input[data-id=same_title_alt]')
+				});
+		var $same_title_alt = $container.find('input[data-id=same_title_alt]')
 				.change(function() {
 					if ($same_title_alt.is(':checked')) {
 						$alt.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
 					} else {
 						$alt.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
 					}
-				}),
-			media = null,
-			tinymce_image_select = function(media_json, image_dom) {
+				});
+		var media = null;
+		var tinymce_image_select = function(media_json, image_dom) {
 					media = media_json;
 
-					$thumb.attr('src', media.thumbnail.replace(/64/g, '128'))
-						.show();
+                    if (media && media.thumbnail) {
+                        $thumb.attr('src', media.thumbnail.replace(/64/g, '128'))
+                            .show();
+                    }
+
+                    log(media_json);
 
 					if (image_dom == null)
 					{
@@ -190,12 +195,9 @@ require(['jquery-nos'], function($nos) {
 					{
 						$same_title_alt.prop('checked', false).removeAttr('checked').change();
 					}
-				},
-			ed = $dialog.data('tinymce'),
-			e = ed.selection.getNode();
-
-		$proportional.triggerHandler('change');
-		$same_title_alt.triggerHandler('change');
+				};
+		var ed = $dialog.data('tinymce');
+		var e = ed.selection.getNode();
 
 		// Editing the current image
 		if (e.nodeName == 'IMG') {
@@ -233,6 +235,9 @@ require(['jquery-nos'], function($nos) {
 			.addClass('box-sizing-border')
 			.end()
 			.form();
+
+		$proportional.triggerHandler('change');
+		$same_title_alt.triggerHandler('change');
 
 
 		if (!newimg) {

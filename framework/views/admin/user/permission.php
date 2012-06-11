@@ -9,14 +9,15 @@
  */
 
 ?>
-<div class="nos-fixed-header ui-widget-content" style="z-index:100;right:20px;">
-    <?= render('form/action_or_cancel') ?>
-</div>
 
 <div class="permissions fill-parent" id="<?= $uniqid = uniqid('id_') ?>" style="overflow:auto;">
 
 <form action="admin/nos/user/form/save_permissions" method="POST">
-  <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
+
+    <div class="nos-fixed-header ui-widget-content" style="z-index:100;right:20px;">
+        <?= render('form/action_or_cancel') ?>
+    </div>
+    <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
 
 	<div class="applications">
 	    <div class="application all">
@@ -50,7 +51,7 @@ foreach ($apps as $app => $perms) {
 		<div class="infos" title="<?= strtr(__('Application provided by {provider_name}'), array(
                 '{provider_name}' => $apps[$app]['provider']['name'],
             )) ?>">
-			<?= $apps[$app]['name'] ?>
+			<?= !empty($apps[$app]['name']) ? $apps[$app]['name'] : $app ?>
 		</div>
     </div>
 

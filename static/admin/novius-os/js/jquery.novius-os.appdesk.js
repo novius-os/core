@@ -29,6 +29,7 @@ define('jquery-nos-appdesk',
 			thumbnails : false,
 			defaultView : 'grid',
             locales : {},
+            hideLocales : false,
 			texts : {
                 allLanguages : 'All',
 				addDropDown : 'Select an action',
@@ -169,6 +170,17 @@ define('jquery-nos-appdesk',
 				}, o.thumbnails);
 			}
 
+            if (!$.isEmptyObject(o.locales)) {
+
+                if (o.selectedLang && o.selectedLang.length) {
+                    o.selectedLang = null;
+                }
+
+                if (o.selectedLang == null) {
+                    o.selectedLang = Object.keys(o.locales)[0];
+                }
+            }
+
 			self._css()
                 ._uiAdds()
 				._uiSplitters()
@@ -272,6 +284,11 @@ define('jquery-nos-appdesk',
         _uiLangsDropDown : function() {
             var self = this,
                 o = self.options;
+
+            if (o.hideLocales) {
+                self.uiLangsDropDownContainer.hide();
+                return self;
+            }
 
             if ($.isEmptyObject(o.locales)) {
                 return self;
@@ -1644,7 +1661,7 @@ define('jquery-nos-appdesk',
             }
 
             require(jsonFile, function () {
-                var appdesk = $nos.appdeskSetup();
+                var appdesk = $nos.appdeskSetup(config);
                 $.extend(true, appdesk.i18nMessages, config.i18n);
 
                 // Extending appdesk with each of the different json files
@@ -1654,6 +1671,7 @@ define('jquery-nos-appdesk',
 
                 $.extend(true, appdesk.appdesk, {
                     locales : config.locales,
+                    hideLocales : config.hideLocales,
                     views : config.views,
                     name  : config.configuration_id,
                     selectedView : config.selectedView,
@@ -1712,7 +1730,7 @@ define('jquery-nos-appdesk',
             });
         },
 
-        appdeskSetup : function() {
+        appdeskSetup : function(config) {
             var self = {},
                 objectToArray = function(val, i) {
                     val['setupkey'] = i;
@@ -1754,6 +1772,10 @@ define('jquery-nos-appdesk',
                             object[key] = keyToOrderedArray(object, key);
                             for (var i = 0; i < object[key].length; i++) {
                                 if (object[key][i].lang) {
+                                    if (config.hideLocales) {
+                                        object[key].splice(i, 1);
+                                        continue;
+                                    }
                                     object[key][i] = {
                                         headerText : 'Languages',
                                         dataKey    : 'lang',

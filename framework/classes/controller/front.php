@@ -43,14 +43,12 @@ class Controller_Front extends Controller {
 
     public $page;
 
-    public function router($action, $params) {
+    public function router($action, array $params) {
 
 	    // Strip out leading / and trailing .html
-	    $this->base_href = \URI::base();
+	    $this->base_href = str_replace(array('http:', 'https:'), '', \URI::base());
 	    $this->url = mb_substr($_SERVER['REDIRECT_URL'], 1);
 	    $url = str_replace('.html', '', $this->url);
-
-        //print_r($_SERVER['REDIRECT_URL']);
 
         $this->is_preview = \Input::get('_preview', false);
 
@@ -76,12 +74,17 @@ class Controller_Front extends Controller {
 
 	        $_404 = true;
 	        foreach ($url_enhanced as $temp_url => $page_id) {
-		        if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-			        $_404 = false;
-			        $this->pageUrl = $temp_url != '/' ? mb_substr($temp_url, 0, -1).'.html' : '';
-			        $this->enhancerUrlPath = $temp_url != '/' ? $temp_url : '';
+                if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
+                    $_404 = false;
+                    if (!in_array($temp_url, array('', '/'))) {
+                        $this->pageUrl = mb_substr($temp_url, 0, -1).'.html';
+                        $this->enhancerUrlPath = $temp_url;
+                    } else {
+                        $this->pageUrl = '';
+                        $this->enhancerUrlPath = '';
+                    }
 			        $this->enhancerUrl = ltrim(str_replace(mb_substr($temp_url, 0, -1), '', $url), '/');
-			        try {
+                    try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
 				        $_404 = true;
@@ -97,6 +100,7 @@ class Controller_Front extends Controller {
 		            echo $this->_view->render();
 			        $cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
 			        $content = $cache->execute();
+
 			        break;
 		        }
 	        }
@@ -113,49 +117,63 @@ class Controller_Front extends Controller {
                 }
 	        }
         }
+
 		$this->_handle_head($content);
 
 		foreach(\Event::trigger('front.display', null, 'array') as $c) {
 			is_callable($c) && call_user_func_array($c, array(&$content));
 		}
+
 		return $content;
     }
 
     protected function _handle_head(&$content) {
+
 	    $replaces  = array(
 		    'base_href'         => array(
-			    'pattern' => '/<base [^>]*\/?>/iu',
+			    'pattern' => '/<base [^>]*\/?>/iU',
 			    'replace' => '<base href="content" />',
 		    ),
 		    'page_title'        => array(
-			    'pattern' => '/<title>[^<]*<\/title>/iu',
+			    'pattern' => '/<title>[^<]*<\/title>/iU',
 			    'replace' => '<title>content</title>',
 		    ),
 		    'meta_description'  => array(
-			    'pattern' => '/<meta [^>]*name=\"?description[^>]*\"? *\/?>/iu',
+			    'pattern' => '/<meta [^>]*name=\"?description[^>]*\"? *\/?>/iU',
 			    'replace' => '<meta name="description" content="content">',
 		    ),
 		    'meta_keywords'     => array(
-			    'pattern' => '/<meta [^>]*name=\"?keywords[^>]*\"? *\/?>/iu',
+			    'pattern' => '/<meta [^>]*name=\"?keywords[^>]*\"? *\/?>/iU',
 			    'replace' => '<meta name="keywords" content="content">',
 		    ),
 		    'meta_robots'       => array(
-			    'pattern' => '/<meta [^>]*name=\"?robots[^>]*\"? *\/?>/iu',
+			    'pattern' => '/<meta [^>]*name=\"?robots[^>]*\"? *\/?>/iU',
 			    'replace' => '<meta name="robots" content="content">',
 		    ),
 	    );
+
+
 	    $begin_head = '';
 	    foreach ($replaces as $prop => $replace) {
 		    if (!empty($this->{$prop})) {
-			    $content = preg_replace($replace['pattern'], str_replace('content', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']), $content, -1, $count);
+			    $content = preg_replace(
+                    $replace['pattern'],
+                    str_replace('content', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']),
+                    $content,
+                    -1,
+                    $count
+                );
 			    if (!$count) {
 				    $begin_head .= "\n".preg_replace('/content/iu', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']);
 			    }
 		    }
 	    }
+
+
 	    if ($begin_head) {
-		    $content = preg_replace('/<head>/ui', '<head>'.$begin_head."\n", $content);
+		    $content = preg_replace('/<head>/Ui', '<head>'.$begin_head."\n", $content);
 	    }
+
 
 	    $head = array();
 
@@ -197,6 +215,7 @@ class Controller_Front extends Controller {
 
             $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->page->wysiwygs->{$wysiwyg_name}, $this);
         }
+
         $this->_view->set('wysiwyg', $wysiwyg, false);
     }
 
@@ -266,7 +285,8 @@ class Controller_Front extends Controller {
         foreach ($page_fields as $field) {
             $this->cache['page'][$field] = $this->page->{'page_'.$field};
         }
-        return parent::save_cache();
+        //return parent::save_cache();
+        return $this->cache; //@todo: to be reviewed
     }
 
     public function rebuild_cache($cache) {
@@ -276,6 +296,6 @@ class Controller_Front extends Controller {
         }
         $this->page->freeze();
         unset($cache['page']);
-        return parent::rebuild_cache($cache);
+        //return parent::rebuild_cache($cache); @todo: to be reviewed
     }
 }

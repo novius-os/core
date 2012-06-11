@@ -48,31 +48,35 @@ class Controller_Admin_Noviusos extends Controller {
 	{
 		$view = \View::forge('admin/noviusos');
 
-        $user = \Session::get('logged_user', false);
+        $user = \Session::user();
+
+        $trayTabs = array(
+            array(
+                'url' => 'admin/nos/tray/help',
+                'iconClasses' => 'nos-icon24 nos-icon24-help',
+                'label' => __('Help'),
+                'iconSize' => 24,
+            ),
+            array(
+                'url' => 'admin/nos/tray/account',
+                'iconClasses' => 'nos-icon24 nos-icon24-account',
+                'label' => __('Account'),
+                'iconSize' => 24,
+            ),
+        );
+
+        if ($user->check_permission('nos_tray', 'access')) {
+            array_unshift($trayTabs, array(
+                'url' => 'admin/nos/tray/appmanager',
+                'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
+                'label' => __('Applications manager'),
+                'iconSize' => 24,
+            ));
+        }
 
 		$ostabs = array(
 			'initTabs' => array(),
-			'trayTabs' => array(
-				array(
-                    'iframe' => true,
-					'url' => 'admin/nos/tray/plugins',
-					'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
-					'label' => __('Applications manager'),
-					'iconSize' => 24,
-				),
-				array(
-					'url' => 'admin/nos/tray/help',
-					'iconClasses' => 'nos-icon24 nos-icon24-help',
-					'label' => __('Help'),
-					'iconSize' => 24,
-				),
-				array(
-					'url' => 'admin/nos/tray/account',
-					'iconClasses' => 'nos-icon24 nos-icon24-account',
-					'label' => __('Account'),
-					'iconSize' => 24,
-				),
-			),
+			'trayTabs' => $trayTabs,
 			'appsTab' => array(
 				'panelId' => 'noviusospanel',
 				'url' => 'admin/nos/noviusos/appstab',
