@@ -91,17 +91,21 @@ class Model extends \Orm\Model {
 
 		parent::observers($specific, $default);
 
-		if ( !$init)
+		if (!$init)
 		{
 			static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviours());
+            // Add Observer_Self, always
             if (empty(static::$_observers_cached[$class]['Orm\Observer_Self'])) {
-                static::$_observers_cached[$class]['Orm\Observer_Self'] = array();
+                static::$_observers_cached[$class]['Orm\Observer_Self'] = array(
+                    'events' => array(),
+                );
             }
-            if (empty(static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
-                static::$_observers_cached[$class]['Orm\Observer_Self']['events'] = array();
-            }
-            if (!in_array('before_save', static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
-                static::$_observers_cached[$class]['Orm\Observer_Self']['events'][] = 'before_save';
+            // If events is empty, don't populate it, because empty === ALL observers will be called.
+            // If we add only 'before_save', the other observers won't called anymore
+            if (!empty(static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
+                if (!in_array('before_save', static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
+                    static::$_observers_cached[$class]['Orm\Observer_Self']['events'][] = 'before_save';
+                }
             }
 		}
 
