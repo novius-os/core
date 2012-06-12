@@ -12,6 +12,11 @@ class ModuleNotFoundException extends \FuelException { }
 
 class Module extends Fuel\Core\Module
 {
+    public static function _init() {
+
+        \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
+    }
+
 	public static function load($module, $path = null)
 	{
 		$loaded = parent::load($module, $path);
@@ -19,7 +24,7 @@ class Module extends Fuel\Core\Module
 			$path = static::$modules[$module];
 
 			// Load the config (namespace + dependencies)
-			$metadata = Config::get("data::app_installed.$module.metadata", array());
+			$metadata = Config::get("data::app_installed.$module", array());
 
 			if (!empty($metadata['namespace'])) {
 				Autoloader::add_namespaces(array(
