@@ -19,8 +19,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
      * @var string page template
      */
     public $template = null;
-    var $format = null;
-
+    public $format = 'json';
 
     public function before() {
         if ( ! empty($this->template) and is_string($this->template))
@@ -61,7 +60,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 }
             }
         }
-/*
+        /*
         // If nothing was returned default to the template
         if (empty($response))
         {
@@ -78,14 +77,11 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
 
 
 
-        if ( ! $response instanceof \Response && $this->response->body !== null)
-		{
-			$response = $this->response;
-		}
+
 
         // @todo; this is a quick fix to allow html loading via ajax by returning a view.
         // -->
-        if ( \Input::is_ajax())
+        if ( \Input::is_ajax() && $this->response !== null)
         {
             // If nothing was returned default to the template
             if (empty($response))
@@ -93,14 +89,23 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 $response = $this->template;
             }
 
+
             // If the response isn't a Response object, embed in the available one for BC
             // @deprecated  can be removed when $this->response is removed
-            if ( ! $response instanceof Response)
+            if ( ! $response instanceof Response && $this->response->body == null)
             {
                 $this->response->body = $response;
                 $response = $this->response;
             }
         }
+
+        if ( ! $response instanceof \Response && $this->response->body !== null)
+        {
+            $response = $this->response;
+        }
+
+
+
 
         // <--
 

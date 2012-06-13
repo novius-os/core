@@ -7,6 +7,20 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+if (\Input::is_ajax()) {
+    \Response::json(array(
+        'error' => 'An internal server error has been detected.',
+        'internal_server_error' => array(
+            'type' => $type,
+            'severity' => $severity,
+            'message' => $message,
+            'filepath' => $filepath,
+            'error_line' => $error_line,
+            'backtrace' => $backtrace
+        ),
+    ));
+}
 ?>
 
 <!--

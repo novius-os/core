@@ -18,8 +18,6 @@ class Controller_Admin_User_Permission_Basic extends Controller {
 
         $role = Model_User_Role::find($role_id);
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
-        $apps = \Config::get('app_installed', array());
         \Config::load("$app::permissions", true);
         $permissions = \Config::get("$app::permissions", array());
 

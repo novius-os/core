@@ -10,45 +10,52 @@
 
 namespace Nos;
 
-class Controller_Admin_Noviusos extends Controller {
+class Controller_Admin_Noviusos extends Controller
+{
+    public $template = 'nos::admin/html';
 
-	public $template = 'nos::admin/html';
+    public function before()
+    {
+        parent::before();
 
-	public function before() {
-		parent::before();
+        if (!\Nos\Auth::check())
+        {
+            \Response::redirect('/admin/nos/login'.($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
+            exit();
+        }
 
-		if (!\Nos\Auth::check()) {
-			\Response::redirect('/admin/nos/login' . ($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
-			exit();
-		}
+        $this->auto_render = false;
+    }
 
-		$this->auto_render = false;
-	}
+    public function after($response)
+    {
+        foreach (array(
+    'title' => 'Administration',
+    'base' => \Uri::base(false),
+    'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
+        ) as $var => $default)
+        {
+            if (empty($this->template->$var))
+            {
+                $this->template->$var = $default;
+            }
+        }
+        $ret = parent::after($response);
+        $this->template->set(array(
+            'css' => \Asset::render('css'),
+            'js' => \Asset::render('js'),
+                ), false, false);
 
-	public function after($response) {
-		foreach (array(
-			         'title' => 'Administration',
-			         'base' => \Uri::base(false),
-			         'require'  => 'static/novius-os/admin/vendor/requirejs/require.js',
-		         ) as $var => $default) {
-			if (empty($this->template->$var)) {
-				$this->template->$var = $default;
-			}
-		}
-		$ret = parent::after($response);
-		$this->template->set(array(
-			'css' => \Asset::render('css'),
-			'js'  => \Asset::render('js'),
-		), false, false);
+        return $ret;
+    }
 
-		return $ret;
-	}
-
-	public function action_index()
-	{
-		$view = \View::forge('admin/noviusos');
+    public function action_index()
+    {
+        $view = \View::forge('admin/noviusos');
 
         $user = \Session::user();
+        $user_configuration = unserialize($user->user_configuration);
+        $deep_linking_url = \Input::get('tab', null);
 
         $trayTabs = array(
             array(
@@ -64,62 +71,106 @@ class Controller_Admin_Noviusos extends Controller {
                 'iconSize' => 24,
             ),
         );
-
-        if ($user->check_permission('nos_tray', 'access')) {
+        if ($user->check_permission('nos_tray', 'access'))
+        {
             array_unshift($trayTabs, array(
-                'iframe' => true,
-                'url' => 'admin/nos/tray/plugins',
+                'url' => 'admin/nos/tray/appmanager',
                 'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
                 'label' => __('Applications manager'),
                 'iconSize' => 24,
             ));
         }
+        $count_trayTabs = count($trayTabs);
 
-		$ostabs = array(
-			'initTabs' => array(),
-			'trayTabs' => $trayTabs,
-			'appsTab' => array(
-				'panelId' => 'noviusospanel',
-				'url' => 'admin/nos/noviusos/appstab',
-				'iconClasses' => 'nos-icon32',
-				'iconSize' => 32,
-				'label' => 'Novius OS',
-			),
-			'newTab' => array(
-				'panelId' => 'noviusospanel',
-				'url' => 'admin/nos/noviusos/appstab',
-				'iconClasses' => 'nos-icon16 nos-icon16-add',
-				'iconSize' => 16,
-			),
-            'user_configuration' => unserialize($user->user_configuration),
-		);
 
-		$view->set('ostabs', \Format::forge($ostabs)->to_json(), false);
-		$this->template->body = $view;
-		return $this->template;
-	}
+        if (!empty($deep_linking_url))
+        {
+            if (!is_array($user_configuration['tabs']['tabs'])) {
+                $user_configuration['tabs']['tabs']  = array();
+            }
+            $openRank = null;
+            foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
+            {
+                if ($tab['url'] == $deep_linking_url)
+                {
+                    $openRank = $tab['openRank'];
+                    $tab['openRank'] = 0;
+                    $user_configuration['tabs']['selected'] = $i + $count_trayTabs + 1;
+                }
+            }
+            unset($tab);
 
-	public function action_appstab()
-	{
-		\Config::load(APPPATH.'data'.DS.'config'.DS.'launchers.php', 'launchers');
-		$launchers = \Config::get('launchers', array());
+            // Tab was not found found, add it
+            if ($openRank === null)
+            {
+                $user_configuration['tabs']['selected'] = count($user_configuration['tabs']) + $count_trayTabs;
+                $openRank = 1;
+                $user_configuration['tabs']['tabs'][] = array(
+                    'url' => $deep_linking_url,
+                    'openRank' => 1,
+                );
+            }
+
+            // Rank from every tab goes up
+            foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
+            {
+                if ($tab['openRank'] < $openRank)
+                {
+                    $tab['openRank']++;
+                }
+            }
+            unset($tab);
+        }
+
+        $ostabs = array(
+            'initTabs' => array(),
+            'trayTabs' => $trayTabs,
+            'appsTab' => array(
+                'panelId' => 'noviusospanel',
+                'url' => 'admin/nos/noviusos/appstab',
+                'iconClasses' => 'nos-icon32',
+                'iconSize' => 32,
+                'label' => 'Novius OS',
+            ),
+            'newTab' => array(
+                'panelId' => 'noviusospanel',
+                'url' => 'admin/nos/noviusos/appstab',
+                'iconClasses' => 'nos-icon16 nos-icon16-add',
+                'iconSize' => 16,
+            ),
+            'user_configuration' => $user_configuration,
+        );
+
+        $view->set('ostabs', \Format::forge($ostabs)->to_json(), false);
+        $this->template->body = $view;
+        return $this->template;
+    }
+
+    public function action_appstab()
+    {
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'launchers.php', 'launchers');
+        $launchers = \Config::get('launchers', array());
 
         \Config::load('nos::admin/launchers_default', true);
         $launchers_default = \Config::get('nos::admin/launchers_default', array());
-		$launchers = array_merge($launchers, $launchers_default);
+        $launchers = array_merge($launchers, $launchers_default);
         $launchers = \Config::mergeWithUser('misc.apps', $launchers);
 
         $apps = array();
-        foreach ($launchers as $key => $app) {
-            if (!empty($app['url']) && !empty($app['icon64'])) { // do we have to display the application?
+        foreach ($launchers as $key => $app)
+        {
+            if (!empty($app['url']) && !empty($app['icon64']))
+            { // do we have to display the application?
                 //\Debug::dump($app['application'], Permission::check($app['application'], 'access'));
-                if (!isset($app['application']) || Permission::check($app['application'], 'access')) { // do we have the rights to access the application?
+                if (!isset($app['application']) || Permission::check($app['application'], 'access'))
+                { // do we have the rights to access the application?
                     $app['key'] = $key;
                     $apps[] = $app;
                 }
             }
         }
-        if (count($apps) > 0) {
+        if (count($apps) > 0)
+        {
             $apps = \Arr::sort($apps, 'order', 'asc');
         }
 
@@ -129,21 +180,23 @@ class Controller_Admin_Noviusos extends Controller {
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background');
         $background = $background_id ? Model_Media::find($background_id) : false;
 
-		$view = \View::forge('admin/appstab', array(
-			'apps'          => $apps,
-		));
+        $view = \View::forge('admin/appstab', array(
+                    'apps' => $apps,
+                ));
         $view->set('background', $background, false);
-		return $view;
-	}
+        return $view;
+    }
 
-    public function action_save_user_configuration() {
-        $key            = \Input::post('key');
-        $new_config     = \Input::post('configuration');
+    public function action_save_user_configuration()
+    {
+        $key = \Input::post('key');
+        $new_config = \Input::post('configuration');
 
-        if (!$new_config) {
+        if (!$new_config)
+        {
             $new_config = array();
         }
-        $new_config  = $this->convertFromPost($new_config);
+        $new_config = $this->convertFromPost($new_config);
 
 
         $json = array(
@@ -151,10 +204,14 @@ class Controller_Admin_Noviusos extends Controller {
         );
 
         $user = \Session::get('logged_user', false);
-        if ($user) {
-            if (!$user->user_configuration) {
+        if ($user)
+        {
+            if (!$user->user_configuration)
+            {
                 $user_configuration = array();
-            } else {
+            }
+            else
+            {
                 $user_configuration = unserialize($user->user_configuration);
             }
             $configuration = &$user_configuration;
@@ -169,12 +226,18 @@ class Controller_Admin_Noviusos extends Controller {
         \Response::json($json);
     }
 
-    protected function convertFromPost($arr) {
-        if (is_array($arr)) {
-            foreach ($arr as $key => $value) {
-                if (is_array($value)) {
+    protected function convertFromPost($arr)
+    {
+        if (is_array($arr))
+        {
+            foreach ($arr as $key => $value)
+            {
+                if (is_array($value))
+                {
                     $arr[$key] = $this->convertFromPost($arr[$key]);
-                } else {
+                }
+                else
+                {
                     $arr[$key] = $arr[$key] == 'true' ? true : ($arr[$key] == 'false' ? false : $arr[$key]);
                     $arr[$key] = is_numeric($arr[$key]) ? floatval($arr[$key]) : $arr[$key];
                 }
@@ -182,4 +245,7 @@ class Controller_Admin_Noviusos extends Controller {
         }
         return $arr;
     }
+
 }
+
+

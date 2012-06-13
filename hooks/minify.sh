@@ -16,7 +16,7 @@ re="static/admin/novius-os/js/"
 if [[ $files =~ $re ]]
 then
   ./hooks/minify-nos-js.sh
-  git add static/admin/novius-os/js/*
+  git add static/admin/bundle/nos.min.js
 fi
 
 re="static/admin/vendor/tinymce/themes/nos/editor_template_src.js"
@@ -24,4 +24,26 @@ if [[ $files =~ $re ]]
 then
   ./hooks/minify-nos-tiny.sh
   git add static/admin/vendor/tinymce/themes/nos/editor_template.js
+fi
+
+re1="static/admin/vendor/jquery/*"
+re2="static/admin/vendor/jquery-ui/*"
+re3="static/admin/vendor/wijmo/*"
+re4="static/admin/vendor/log.js"
+if [[ $files =~ $re1 ]]
+then
+  ./hooks/minify-vendor-js.sh
+  git add static/admin/bundle/vendor.min.js
+elif [[ $files =~ $re2 ]]
+then
+  ./hooks/minify-vendor-js.sh
+  git add static/admin/bundle/vendor.min.js
+elif [[ $files =~ $re3 ]]
+then
+  ./hooks/minify-vendor-js.sh
+  git add static/admin/bundle/vendor.min.js
+elif [[ $files =~ $re4 ]]
+then
+  ./hooks/minify-vendor-js.sh
+  git add static/admin/bundle/vendor.min.js
 fi

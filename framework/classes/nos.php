@@ -57,12 +57,16 @@ class Nos {
         } catch (\Nos\NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
-            \Fuel::$profiling && \Debug::dump($e);
-            return __('An unexpected exception occured.');
-
-            $content = null;
+            if (\Fuel::$env == \Fuel::DEVELOPMENT) {
+                \Debug::dump('Error in enhancer "'.$where.'"');
+                $old_continue_on = \Config::get('errors.continue_on', array());
+                $continue_on = $old_continue_on;
+                $continue_on[] = $e->getCode();
+                \Config::set('errors.continue_on', $continue_on);
+                \Error::show_php_error($e);
+                \Config::set('errors.continue_on', $old_continue_on);
+            }
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
-            if (\Fuel::$profiling) throw $e;
         }
         $content = ob_get_clean();
         return $content;

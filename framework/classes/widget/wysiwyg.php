@@ -46,7 +46,7 @@ class Widget_Wysiwyg extends \Fieldset_Field {
 	public function js_init() {
 	    // we have to find why it's called two times...
         $id = $this->get_attribute('id');
-        return '<script type="text/javascript">require(["wysiwyg"], function() {var $t = $("textarea#'.$id.'.not_initialized"); $t.removeClass("not_initialized"); $t.wysiwyg($t.data("wysiwyg-options"));});</script>';
+        return '<script type="text/javascript">require(["jquery-nos-wysiwyg"], function() {var $t = $("textarea#'.$id.'.not_initialized"); $t.removeClass("not_initialized"); $t.wysiwyg($t.data("wysiwyg-options"));});</script>';
 	}
 
 }

@@ -13,15 +13,15 @@
 <div id="<?= $uniqid_tabs = uniqid('tabs_') ?>" class="nos-tabs line ui-widget fill-parent" style="clear:both; margin:0;display:none;">
     <ul class="nos-tabs-lang-header">
         <?php
-        $locales = Config::get('locales', array());
         $selected_index = 0;
         $i = 0;
-        if ($item === null) {
-            foreach ($locales as $locale => $text) {
+        $possible = $item->get_possible_lang();
+        if ($item->is_new()) {
+            foreach ($possible as $locale) {
                 if ($locale == $selected_lang) {
                     $selected_index = $i;
                 }
-                echo '<li style="text-align: center;"><a href="'.$url_blank_slate.'?lang='.$locale.'">'.Nos\Helper::flag($locale).'</a></li>';
+                echo '<li style="text-align: center;"><a href="'.($locale == $selected_lang ? $url_form : $url_blank_slate).'?lang='.$locale.'">'.Nos\Helper::flag($locale).'</a></li>';
                 $i++;
             }
         } else {
@@ -42,7 +42,8 @@
 <script type="text/javascript">
 require([
     'jquery-nos',
-    'static/novius-os/admin/config/page/form.js'
+    'static/novius-os/admin/config/page/form.js',
+    'wijmo.wijtabs'
 ], function($nos, callback_fn) {
 
     $nos(function() {

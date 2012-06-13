@@ -31,81 +31,77 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 // Boot the app
 require_once NOSPATH.'bootstrap.php';
 
+$redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), 1);
 
+$is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
 
-$resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $_SERVER['REDIRECT_URL'], $m);
+if ($is_media) {
 
+    $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $redirect_url, $m);
 
-if ($resized) {
-    list(,$path, $max_width, $max_height, $verification, $extension) = $m;
-    $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
-    $media_url = str_replace("/$max_width-$max_height", '', $media_url);
-} else {
-	$redirect_url = Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL'));
-    $media_url    = str_replace('/media/', '', $redirect_url);
-}
-
-$media = false;
-$res = \DB::select()->from(\Nos\Model_Media::table())->where(array(
-    array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
-))->execute()->as_array();
-
-if ($res) {
-    $media = \Nos\Model_Media::forge(reset($res));
-    $media->freeze();
-}
-
-//$media = Nos\Model_Media::find('all', array(
-//    'where' => array(
-//        array(DB::expr('CONCAT(media_path, media_file)'), '=', $media_url),
-//    ),
-//));
-
-//$media  = current($media);
-
-if (false === $media) {
-    $send_file = false;
-} else {
-    if ($resized) {
-        $source = APPPATH.$media->get_private_path();
-        $dest   = DOCROOT.$m[0];
-        $dir    = dirname($dest);
-        if (!is_dir($dir)) {
-            if (!@mkdir($dir, 0755, true)) {
-                exit("Can't create dir ".$dir);
-            }
-        }
-        try {
-            \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
-            $send_file = $dest;
-        } catch(\Exception $e) {
-            $send_file = false;
-        }
+    if ($is_resized) {
+        list(,$path, $max_width, $max_height, $verification, $extension) = $m;
+        $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
+        $media_url = str_replace("/$max_width-$max_height", '', $media_url);
     } else {
-        $source = APPPATH.$media->get_private_path();
-        $target = DOCROOT.$media->get_public_path();
-        $dir    = dirname($target);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+        $media_url    = str_replace('media/', '', $redirect_url);
+    }
+
+    $media = false;
+    $res = \DB::select()->from(\Nos\Model_Media::table())->where(array(
+        array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
+    ))->execute()->as_array();
+
+    if (!empty($res)) {
+        $media = \Nos\Model_Media::forge(reset($res));
+    }
+
+    if (false === $media) {
+        $send_file = false;
+    } else {
+        if ($is_resized) {
+            $source = APPPATH.$media->get_private_path();
+            $dest   = DOCROOT.$m[0];
+            $dir    = dirname($dest);
+            if (!is_dir($dir)) {
+                if (!@mkdir($dir, 0755, true)) {
+                    exit("Can't create dir ".$dir);
+                }
+            }
+            try {
+                \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
+                $send_file = $dest;
+            } catch(\Exception $e) {
+                $send_file = false;
+            }
+        } else {
+            $source = APPPATH.$media->get_private_path();
+            $target = DOCROOT.$media->get_public_path();
+            $dir    = dirname($target);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            @symlink($source, $target);
+            $send_file = $source;
         }
-        @symlink($source, $target);
-        $send_file = $source;
+    }
+
+    if (false !== $send_file && is_file($send_file)) {
+        //Nos\Tools_File::$use_xsendfile = false;
+
+        // This is a 404 error handler, so force status 200
+        header('HTTP/1.0 200 Ok');
+        header('HTTP/1.1 200 Ok');
+
+        Nos\Tools_File::send($send_file);
     }
 }
 
-if (false !== $send_file && is_file($send_file)) {
-	//Nos\Tools_File::$use_xsendfile = false;
-
-    // This is a 404 error handler, so force status 200
-    header('HTTP/1.0 200 Ok');
-    header('HTTP/1.1 200 Ok');
-
-    Nos\Tools_File::send($send_file);
-}
-
 // real 404
-$response = Request::forge('nos/front/index', false)->execute()->response();
-$response->send(true);
+if (!$is_media) {
+    $response = Request::forge('nos/front/index', false)->execute()->response();
+    $response->send(true);
+}
 
 header('HTTP/1.0 404 Ok');
 header('HTTP/1.1 404 Ok');

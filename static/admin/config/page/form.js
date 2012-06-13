@@ -8,7 +8,7 @@
  */
 
 define([
-	'wysiwyg',
+	'jquery-nos-wysiwyg',
 	'jquery-nos'
 ], function(a, $nos) {
     "use strict";
@@ -91,7 +91,7 @@ define([
             })
         });
 
-        var $template_unit = $container.find('select[name=page_template]').closest('div.unit');
+        var $template_unit = $container.find('select[name=page_template]').closest('td');
         $container.find('select[name=page_type]').change(function() {
             var val = $nos(this).val();
             var $wysiwyg = $container.find('[data-id=wysiwyg]');

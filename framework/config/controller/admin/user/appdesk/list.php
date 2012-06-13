@@ -21,6 +21,7 @@ return array(
 		'user_name',
 		'user_email',
 	),
+    'hideLocales' => true,
     'selectedView' => 'default',
     'views' => array(
         'default' => array(

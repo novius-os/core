@@ -26,7 +26,7 @@ return array(
                         return $page->get_href();
                     },
                     'previewUrl' => function($page) {
-                        return $page->get_href(array('absolute' => true)).'?_preview=1';
+                        return $page->get_preview_href(array('absolute' => true));;
                     },
                     'actions' => array(
                         'delete' => function($page) {
@@ -90,7 +90,7 @@ return array(
             return $page->get_href();
         },
         'previewUrl' => function($page) {
-            return $page->get_href(array('absolute' => true)).'?_preview=1';
+            return $page->get_preview_href(array('absolute' => true));
         },
         'actions' => array(
             'delete' => function($page) {
