@@ -6,316 +6,309 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-
 define('jquery-nos-preview',
-[
-    'jquery',
-    'log',
-    'order!jquery-ui',
-    'order!wijmo-open',
-    'order!wijmo-complete',
-    'order!jquery-nos'
-], function( $, a, b, c, d, $nos ) {
-    "use strict";
-        var undefined = void(0);
-	$.widget( "nos.preview", {
-		options: {
-            meta : {},
-            actions : [],
-			data : null,
-			dataParser : null,
-			texts : {
-				headerDefault : 'Preview',
-				selectItem : 'No item selected'
-			}
-		},
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'wijmo.wijsuperpanel'],
+    function($, $nos) {
+        "use strict";
+            var undefined = void(0);
+        $.widget( "nos.preview", {
+            options: {
+                meta : {},
+                actions : [],
+                data : null,
+                dataParser : null,
+                texts : {
+                    headerDefault : 'Preview',
+                    selectItem : 'No item selected'
+                }
+            },
 
-		data : null,
+            data : null,
 
-		_create: function() {
-			var self = this,
-				o = self.options;
+            _create: function() {
+                var self = this,
+                    o = self.options;
 
-			self.element.addClass('nos-preview ui-widget ui-widget-content wijmo-wijgrid')
-                .parents('.nos-appdesk')
-                .bind('selectionChanged.appdesk', function(e, data) {
-                    if ($.isPlainObject(data)) {
-                        self.select(data);
-                    } else {
-                        self.unselect();
-                    }
-                });
-		},
+                self.element.addClass('nos-preview ui-widget ui-widget-content wijmo-wijgrid')
+                    .parents('.nos-appdesk')
+                    .bind('selectionChanged.appdesk', function(e, data) {
+                        if ($.isPlainObject(data)) {
+                            self.select(data);
+                        } else {
+                            self.unselect();
+                        }
+                    });
+            },
 
-		_init: function() {
-			var self = this,
-				o = self.options;
+            _init: function() {
+                var self = this,
+                    o = self.options;
 
-			self.data = self.data || o.data;
+                self.data = self.data || o.data;
 
-			if ($.isPlainObject(self.data)) {
-				self.select(self.data);
-			} else {
-				self.unselect();
-			}
-		},
+                if ($.isPlainObject(self.data)) {
+                    self.select(self.data);
+                } else {
+                    self.unselect();
+                }
+            },
 
-		_uiHeader : function(title) {
-			var self = this,
-				o = self.options;
+            _uiHeader : function(title) {
+                var self = this,
+                    o = self.options;
 
-			var table = $('<table cellspacing="0" cellpadding="0" border="0"><thead></thead></table>')
-					.addClass('nos-preview-header wijmo-wijsuperpanel-header wijmo-wijgrid-root wijmo-wijgrid-table')
-					.css({
-						borderCollapse : 'separate',
-						'-moz-user-select' : '-moz-none'
-					})
-					.appendTo(self.element);
+                var table = $('<table cellspacing="0" cellpadding="0" border="0"><thead></thead></table>')
+                        .addClass('nos-preview-header wijmo-wijsuperpanel-header wijmo-wijgrid-root wijmo-wijgrid-table')
+                        .css({
+                            borderCollapse : 'separate',
+                            '-moz-user-select' : '-moz-none'
+                        })
+                        .appendTo(self.element);
 
-			var tr = $('<tr></tr>').addClass('wijmo-wijgrid-headerrow')
-				.appendTo(table);
+                var tr = $('<tr></tr>').addClass('wijmo-wijgrid-headerrow')
+                    .appendTo(table);
 
-			$('<th><div><span></span></div></th>').addClass('wijgridth ui-widget wijmo-c1basefield ui-state-default wijmo-c1field')
-				.appendTo(tr)
-				.find('div')
-				.addClass('wijmo-wijgrid-innercell')
-				.find('span')
-				.addClass('wijmo-wijgrid-headertext')
-				.text(title);
+                $('<th><div><span></span></div></th>').addClass('wijgridth ui-widget wijmo-c1basefield ui-state-default wijmo-c1field')
+                    .appendTo(tr)
+                    .find('div')
+                    .addClass('wijmo-wijgrid-innercell')
+                    .find('span')
+                    .addClass('wijmo-wijgrid-headertext')
+                    .text(title);
 
-			return self;
-		},
+                return self;
+            },
 
-		_uiFooter : function() {
-			var self = this,
-				o = self.options;
+            _uiFooter : function() {
+                var self = this,
+                    o = self.options;
 
-			if (o.actions.length > 0) {
+                if (o.actions.length > 0) {
 
-				self.uiFooter = $('<div></div>')
-					.addClass('nos-preview-footer')
-					.appendTo(self.uiContainer);
+                    self.uiFooter = $('<div></div>')
+                        .addClass('nos-preview-footer')
+                        .appendTo(self.uiContainer);
 
-                $.each(o.actions, function() {
-                    var action = this;
-                    var iconClass = false;
-                    if (action.iconClasses) {
-                        iconClass = action.iconClasses;
-                    } else if (action.icon) {
-                        iconClass = 'nos-icon16 ui-icon ui-icon-' + action.icon;
-                    }
-                    var text;
-                    if (action.primary) {
-                        text = (iconClass ? '<span class="ui-button-icon-primary ' + iconClass +' wijmo-wijmenu-icon-left"></span>' : '');
-                        text += '<span class="ui-button-text">' + action.label + '</span>';
-                        $('<button></button>')
-                            .addClass('ui-button ui-button-text' + (action.icon ? '-icon-primary' : '') + ' ui-widget ui-state-default ui-corner-all')
-                            .css({
-                                marginBottom : '5px'
-                            })
-                            .appendTo(self.uiFooter)
-                            .html(text)
-                            .hover(function() {
-                                $(this).addClass('ui-state-hover');
-                            }, function() {
-                                $(this).removeClass('ui-state-hover');
-                            })
-                            .click(function(e) {
-                                e.preventDefault();
-                                e.stopImmediatePropagation();
-                                action.action.apply(this, [self.data, $(this)]);
-                            })
-                    } else {
-                        text = (iconClass ? '<span class="' + iconClass +'"></span> ' : '');
-                        text += '<span class="ui-button-text">' + action.label + '</span>';
-                        $('<a href="#"></a>')
-                            .css({
-                                display : 'inline-block',
-                                marginBottom : '5px'
-                            })
-                            .appendTo(self.uiFooter)
-                            .html(text)
-                            .click(function(e) {
-                                e.preventDefault();
-                                e.stopImmediatePropagation();
-                                action.action.apply(this, [self.data, $(this)]);
-                            })
-                    }
-                });
-
-			}
-
-			return self;
-		},
-
-		_uiThumbnail : function(data) {
-			var self = this,
-				o = self.options,
-				thumbnail = data.thumbnail.replace(/64-64/g, '256-256') || data.thumbnailAlternate;
-
-			if (thumbnail) {
-				self._loadImg(data, thumbnail);
-			}
-
-			return self;
-		},
-
-		_loadImg : function(item, thumbnail) {
-			var self = this,
-				o = self.options;
-
-			$('<img />')
-				.error(function() {
-					$(this).remove();
-					if (thumbnail === item.thumbnail && item.thumbnailAlternate) {
-						self._loadImg(item, item.thumbnailAlternate);
-					}
-				})
-				.load(function() {
-					var img = $(this),
-						height = img.height();
-
-					var div = $('<div></div>')
-						.addClass('nos-preview-thumb')
-						.css({
-							backgroundImage :'url("' + img.attr('src') +'")',
-							height : (height <= 100 ? height : 100) + 'px'
-						})
-						.prependTo(self.uiContainer);
-
-                        var action = null;
-                        $.each(o.actions, function() {
-                            if (this.name == o.actionThumbnail) {
-                                action = this;
-                            }
-                        });
-
-                        if (action !== null) {
-                            div
-                                .attr({
-                                    title : action.label
-                                })
+                    $.each(o.actions, function() {
+                        var action = this;
+                        var iconClass = false;
+                        if (action.iconClasses) {
+                            iconClass = action.iconClasses;
+                        } else if (action.icon) {
+                            iconClass = 'nos-icon16 ui-icon ui-icon-' + action.icon;
+                        }
+                        var text;
+                        if (action.primary) {
+                            text = (iconClass ? '<span class="ui-button-icon-primary ' + iconClass +' wijmo-wijmenu-icon-left"></span>' : '');
+                            text += '<span class="ui-button-text">' + action.label + '</span>';
+                            $('<button></button>')
+                                .addClass('ui-button ui-button-text' + (action.icon ? '-icon-primary' : '') + ' ui-widget ui-state-default ui-corner-all')
                                 .css({
-                                    cursor : 'pointer'
+                                    marginBottom : '5px'
+                                })
+                                .appendTo(self.uiFooter)
+                                .html(text)
+                                .hover(function() {
+                                    $(this).addClass('ui-state-hover');
+                                }, function() {
+                                    $(this).removeClass('ui-state-hover');
                                 })
                                 .click(function(e) {
                                     e.preventDefault();
                                     e.stopImmediatePropagation();
-                                    action.action.apply(this, [self.data]);
-                                });
+                                    action.action.apply(this, [self.data, $(this)]);
+                                })
+                        } else {
+                            text = (iconClass ? '<span class="' + iconClass +'"></span> ' : '');
+                            text += '<span class="ui-button-text">' + action.label + '</span>';
+                            $('<a href="#"></a>')
+                                .css({
+                                    display : 'inline-block',
+                                    marginBottom : '5px'
+                                })
+                                .appendTo(self.uiFooter)
+                                .html(text)
+                                .click(function(e) {
+                                    e.preventDefault();
+                                    e.stopImmediatePropagation();
+                                    action.action.apply(this, [self.data, $(this)]);
+                                })
                         }
-					img.remove();
-				})
-				.css({
-					position : 'absolute',
-					visibility : 'hidden'
-				})
-				.attr('src', thumbnail)
-				.appendTo('body');
+                    });
 
-			return self;
-		},
+                }
 
-		_uiMetaData : function(data) {
-			var self = this,
-				o = self.options,
-                i = 0;
+                return self;
+            },
 
-			var table = $('<table cellspacing="0" cellpadding="0" border="0"><tbody></tbody></table>')
-					.addClass('nos-preview-metadata wijmo-wijgrid-root wijmo-wijgrid-table')
-					.css({
-						borderCollapse : 'separate',
-						'-moz-user-select' : '-moz-none'
-					})
-					.appendTo(self.uiContainer)
-					.find('tbody')
-					.addClass('ui-widget-content wijmo-wijgrid-data');
+            _uiThumbnail : function(data) {
+                var self = this,
+                    o = self.options,
+                    thumbnail = data.thumbnail.replace(/64-64/g, '256-256') || data.thumbnailAlternate;
 
-			$.each(o.meta, function(key, meta) {
-				var tr = $('<tr></tr>').addClass('wijmo-wijgrid-row ui-widget-content wijmo-wijgrid-datarow' + (i%2 ? ' wijmo-wijgrid-alternatingrow' : ''))
-					.appendTo(table);
+                if (thumbnail) {
+                    self._loadImg(data, thumbnail);
+                }
 
-				$('<th><div></div></th>').addClass('wijgridtd wijdata-type-string')
-					.appendTo(tr)
-					.find('div')
-					.addClass('wijmo-wijgrid-innercell')
-					.text(meta.label || '');
+                return self;
+            },
 
-				$('<td><div></div></td>').addClass('wijgridtd wijdata-type-string')
-					.appendTo(tr)
-					.find('div')
-					.addClass('wijmo-wijgrid-innercell')
-					.text(data[key] || '');
-                i++;
-			});
+            _loadImg : function(item, thumbnail) {
+                var self = this,
+                    o = self.options;
 
-			return self;
-		},
+                $('<img />')
+                    .error(function() {
+                        $(this).remove();
+                        if (thumbnail === item.thumbnail && item.thumbnailAlternate) {
+                            self._loadImg(item, item.thumbnailAlternate);
+                        }
+                    })
+                    .load(function() {
+                        var img = $(this),
+                            height = img.height();
 
-		unselect : function() {
-			var self = this,
-				o = self.options;
+                        var div = $('<div></div>')
+                            .addClass('nos-preview-thumb')
+                            .css({
+                                backgroundImage :'url("' + img.attr('src') +'")',
+                                height : (height <= 100 ? height : 100) + 'px'
+                            })
+                            .prependTo(self.uiContainer);
 
-			self.element.wijsuperpanel('destroy')
-				.empty();
+                            var action = null;
+                            $.each(o.actions, function() {
+                                if (this.name == o.actionThumbnail) {
+                                    action = this;
+                                }
+                            });
 
-			self._uiHeader(o.texts.headerDefault);
+                            if (action !== null) {
+                                div
+                                    .attr({
+                                        title : action.label
+                                    })
+                                    .css({
+                                        cursor : 'pointer'
+                                    })
+                                    .click(function(e) {
+                                        e.preventDefault();
+                                        e.stopImmediatePropagation();
+                                        action.action.apply(this, [self.data]);
+                                    });
+                            }
+                        img.remove();
+                    })
+                    .css({
+                        position : 'absolute',
+                        visibility : 'hidden'
+                    })
+                    .attr('src', thumbnail)
+                    .appendTo('body');
 
-			self.uiContainer = $('<div></div>')
-				.addClass('nos-preview-noitem')
-				.text(o.texts.selectItem)
-				.appendTo(self.element);
+                return self;
+            },
 
-			self.element.wijsuperpanel({
-					showRounder : false
-				});
+            _uiMetaData : function(data) {
+                var self = this,
+                    o = self.options,
+                    i = 0;
 
-			return self;
-		},
+                var table = $('<table cellspacing="0" cellpadding="0" border="0"><tbody></tbody></table>')
+                        .addClass('nos-preview-metadata wijmo-wijgrid-root wijmo-wijgrid-table')
+                        .css({
+                            borderCollapse : 'separate',
+                            '-moz-user-select' : '-moz-none'
+                        })
+                        .appendTo(self.uiContainer)
+                        .find('tbody')
+                        .addClass('ui-widget-content wijmo-wijgrid-data');
 
-		select : function(data) {
-			var self = this,
-				o = self.options;
+                $.each(o.meta, function(key, meta) {
+                    var tr = $('<tr></tr>').addClass('wijmo-wijgrid-row ui-widget-content wijmo-wijgrid-datarow' + (i%2 ? ' wijmo-wijgrid-alternatingrow' : ''))
+                        .appendTo(table);
 
-			if (data === undefined) {
-				return self.data;
-			} else {
-				self.data = data;
+                    $('<th><div></div></th>').addClass('wijgridtd wijdata-type-string')
+                        .appendTo(tr)
+                        .find('div')
+                        .addClass('wijmo-wijgrid-innercell')
+                        .text(meta.label || '');
 
-				if ($.isFunction(o.dataParser)) {
-					data = o.dataParser(data);
-				}
+                    $('<td><div></div></td>').addClass('wijgridtd wijdata-type-string')
+                        .appendTo(tr)
+                        .find('div')
+                        .addClass('wijmo-wijgrid-innercell')
+                        .text(data[key] || '');
+                    i++;
+                });
 
-				self.element.wijsuperpanel('destroy')
-					.empty()
-					.css('height', '100%');
+                return self;
+            },
 
-				self._uiHeader(data.title);
+            unselect : function() {
+                var self = this,
+                    o = self.options;
 
-				self.uiContainer = $('<div></div>')
-					.addClass('nos-preview-container')
-					.appendTo(self.element);
+                self.element.wijsuperpanel('destroy')
+                    .empty();
 
-				self._uiThumbnail(data)
-					._uiMetaData(data.meta)
-					._uiFooter();
+                self._uiHeader(o.texts.headerDefault);
 
-				self.element.wijsuperpanel({
-						showRounder : false,
-						autoRefresh : true
-					});
-			}
+                self.uiContainer = $('<div></div>')
+                    .addClass('nos-preview-noitem')
+                    .text(o.texts.selectItem)
+                    .appendTo(self.element);
 
-			return self;
-		},
+                self.element.wijsuperpanel({
+                        showRounder : false
+                    });
 
-		resize : function() {
-			var self = this;
+                return self;
+            },
 
-			self._init();
+            select : function(data) {
+                var self = this,
+                    o = self.options;
 
-			return self;
-		}
-	});
-	return $nos;
-});
+                if (data === undefined) {
+                    return self.data;
+                } else {
+                    self.data = data;
+
+                    if ($.isFunction(o.dataParser)) {
+                        data = o.dataParser(data);
+                    }
+
+                    self.element.wijsuperpanel('destroy')
+                        .empty()
+                        .css('height', '100%');
+
+                    self._uiHeader(data.title);
+
+                    self.uiContainer = $('<div></div>')
+                        .addClass('nos-preview-container')
+                        .appendTo(self.element);
+
+                    self._uiThumbnail(data)
+                        ._uiMetaData(data.meta)
+                        ._uiFooter();
+
+                    self.element.wijsuperpanel({
+                            showRounder : false,
+                            autoRefresh : true
+                        });
+                }
+
+                return self;
+            },
+
+            resize : function() {
+                var self = this;
+
+                self._init();
+
+                return self;
+            }
+        });
+        return $nos;
+    });

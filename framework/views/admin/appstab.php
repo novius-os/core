@@ -9,26 +9,6 @@
  */
 
 ?>
-<div id="switcher"></div>
-<script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-	$nos(function() {
-		//$('#switcher').themeswitcher();
-        var apps = $nos('#apps').sortable({
-            update: function() {
-                var orders = {};
-                $nos('.app').each(function(i) {
-                    orders[$nos(this).data('launcher').key] = {order: i};
-                });
-                $nos(apps).xhr('saveUserConfig', 'misc.apps', orders);
-            }
-        });
-		<?php if ($background) { ?>
-		$nos('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
-		<?php } ?>
-	});
-});
-</script>
 <div align="center">
 <form data-ui="ajaxForm" id="search">
 	<span id="magnifier"></span>
@@ -38,16 +18,31 @@ require(['jquery-nos'], function($nos) {
 <?= render('admin/apps', array('apps' => $apps)) ?>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-	$nos('a.app').click(function(e) {
-		e.preventDefault();
-        var $launcher = $nos(this),
-	        tab = $launcher.data('launcher');
-		$launcher.tab($nos.extend({
-			app: true,
-			iconSize: 32,
-			labelDisplay: false
-		}, tab));
-	});
-});
+    require(['jquery-nos', 'jquery-ui.sortable'], function($nos) {
+        $nos(function() {
+            //$('#switcher').themeswitcher();
+            var apps = $nos('#apps').sortable({
+                update: function() {
+                    var orders = {};
+                    $nos('.app').each(function(i) {
+                        orders[$nos(this).data('launcher').key] = {order: i};
+                    });
+                    $nos(apps).xhr('saveUserConfig', 'misc.apps', orders);
+                }
+            });
+        <?php if ($background) { ?>
+            $nos('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
+            <?php } ?>
+        });
+        $nos('a.app').click(function(e) {
+            e.preventDefault();
+            var $launcher = $nos(this),
+                tab = $launcher.data('launcher');
+            $launcher.tab($nos.extend({
+                app: true,
+                iconSize: 32,
+                labelDisplay: false
+            }, tab));
+        });
+    });
 </script>

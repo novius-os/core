@@ -12,7 +12,7 @@
 <input type="text" name="<?= htmlspecialchars($name) ?>" value="<?= $value ?>" />
 <script type="text/javascript">
 require([
-		'jquery-nos'
+		'jquery-nos', 'jquery-ui.datepicker'
 	], function( $nos, undefined ) {
 		$nos(function() {
 			$nos('input[name=<?= $name ?>]').datepicker({

@@ -42,7 +42,8 @@
 <script type="text/javascript">
 require([
     'jquery-nos',
-    'static/novius-os/admin/config/page/form.js'
+    'static/novius-os/admin/config/page/form.js',
+    'wijmo.wijtabs'
 ], function($nos, callback_fn) {
 
     $nos(function() {

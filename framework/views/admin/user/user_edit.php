@@ -54,8 +54,8 @@ foreach ($fieldset->field() as $field) {
 
 <script type="text/javascript">
     require([
-	    'order!jquery-nos',
-	    'order!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
+	    'jquery-nos',
+	    'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
 	    'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
     ], function($nos) {
         $nos(function() {

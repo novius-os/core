@@ -33,7 +33,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery-nos'], function($nos) {
+    require(['jquery-nos', 'wijmo.wijtabs'], function($nos) {
 		$nos(function() {
             var $container = $nos('#<?= $uniqid ?>');
 			$container.form();
