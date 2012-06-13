@@ -69,8 +69,7 @@ $fieldset->set_config('form_attributes', $form_attributes);
 <script type="text/javascript">
 require([
     'jquery-nos',
-    'order!jquery-form',
-	'order!static/novius-os/admin/config/media/seo_compliant'
+	'static/novius-os/admin/config/media/seo_compliant'
 ],
 function($nos) {
     $nos(function() {

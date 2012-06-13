@@ -57,7 +57,7 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'order!jquery-form', 'order!static/novius-os/admin/config/media/seo_compliant'], function($nos) {
+require(['jquery-nos', 'static/novius-os/admin/config/media/seo_compliant'], function($nos) {
     $nos(function() {
         var $container = $nos('#<?= $uniqid ?>').form();
 
