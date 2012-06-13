@@ -9,7 +9,7 @@ re="static/admin/novius-os/css/"
 if [[ $files =~ $re ]]
 then
   ./hooks/minify-nos-css.sh
-  git add static/admin/bundle/nos.min.css
+  git add static/admin/novius-os/css/nos.min.css
 fi
 
 re="static/admin/novius-os/js/"
