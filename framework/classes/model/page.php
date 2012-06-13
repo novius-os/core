@@ -165,14 +165,6 @@ class Model_Page extends \Nos\Orm\Model {
         return $this->get_href($params).($this->page_type == self::TYPE_EXTERNAL_LINK ? '' : '?_preview=1');
     }
 
-    public function get_possible_lang() {
-        $parent = $this->find_parent();
-        if (!empty($parent)) {
-            return $parent->get_all_lang();
-        }
-        return array_keys(\Config::get('locales'));
-    }
-
     public function _event_after_change_parent() {
 
         $parent = $this->find_parent();

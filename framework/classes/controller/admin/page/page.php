@@ -10,20 +10,20 @@
 
 namespace Nos;
 
-class Controller_Admin_Page_Page extends Controller {
+class Controller_Admin_Page_Page extends Controller_Admin_Application {
 
     public function action_crud($id = null) {
-        $page = $id === null ? null : Model_Page::find($id);
+        $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
 	    return \View::forge('nos::form/layout_languages', array(
 		    'item' => $page,
-		    'selected_lang' => \Input::get('lang', $page === null ? null : $page->get_lang()),
+		    'selected_lang' => \Input::get('lang', $page->is_new() ? null : $page->get_lang()),
 		    'url_blank_slate' => 'admin/nos/page/page/blank_slate',
 		    'url_form' => 'admin/nos/page/page/form',
 	    ), false);
     }
 
     public function action_blank_slate($id = null) {
-        $page = $id === null ? null : Model_Page::find($id);
+        $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
         $lang = \Input::get('lang', '');
         return \View::forge('nos::form/layout_blank_slate', array(
             'item'      => $page,
@@ -56,7 +56,7 @@ class Controller_Admin_Page_Page extends Controller {
                  $page_from = Model_Page::find($create_from_id);
                  $page      = clone $page_from;
             }
-            $page->page_lang = \Input::get('lang');
+            $page->page_lang = \Input::get('lang', key(\Config::get('locales')));
             if (!empty($page->page_lang_common_id)) {
                 $page_main = Model_Page::find($page->page_lang_common_id);
                 $parent_page = $page_main->find_parent();
@@ -66,11 +66,12 @@ class Controller_Admin_Page_Page extends Controller {
                 $parent_page = Model_Page::find('first', array(
                     'where' => array(
                         array('page_parent_id', 'IS', \Db::expr('NULL')),
+                        array('page_lang', $page->page_lang),
                     ),
                     'order_by' => array('page_id' => 'ASC'),
                 ));
             }
-            if (!empty($page->page_lang) && !empty($page_parent)) {
+            if (!empty($page->page_lang) && !empty($parent_page)) {
                 $parent_page = $parent_page->find_lang($page->page_lang);
             }
             // Root page

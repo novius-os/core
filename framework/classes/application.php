@@ -163,6 +163,7 @@ class Application
         $this->addPermission();
 
         $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
+        \Config::load($this->folder.'::metadata', true);
         $new_metadata = \Config::get($this->folder.'::metadata');
 
         // Check if the installation is compatible with other applications
@@ -194,7 +195,7 @@ class Application
     public function uninstall()
     {
         $old_metadata = \Config::get('data::app_installed.'.$this->folder);
-        $new_metadata = \Config::get($this->folder.'::metadata');
+        $new_metadata = array();
 
         // Check if the installation is compatible with other applications
         $config = $this->prepare_config($old_metadata, $new_metadata);
@@ -414,8 +415,8 @@ class Application
             }
         }
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
-        $app_installed = \Config::get('app_installed', array());
+        \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
+        $app_installed = \Config::get('data::app_installed', array());
 
         foreach ($app_installed as $app_name => $app)
         {

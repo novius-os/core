@@ -94,6 +94,7 @@ define('jquery-nos',
 
             };
 
+
         $nos.extend({
             dispatchEvent : function(event) {
                 if (window.parent != window && window.parent.$nos) {
@@ -196,20 +197,33 @@ define('jquery-nos',
                             } else {
                                 $nos.notify(json.error, 'error');
                             }
+                    }
+                    if (json.internal_server_error) {
+                        var ise = json.internal_server_error;
+                        var str = "An internal server error has been detected.\n\n";
+                        str +=  ise.type + ' [ ' + ise.severity + ' ]: ' + ise.message + "\n";
+                        str += ise.filepath + " @ line " + ise.error_line + "\n\n";
+                        str += "Backtrace:\n";
+                        for (var i = 0; i < ise.backtrace.length; i++) {
+                            str += (i + 1) + ': ' + ise.backtrace[i].file + ' @ line ' + ise.backtrace[i].line + "\n";
                         }
-                        if (json.notify) {
-                            if ($.isArray(json.notify)) {
-                                $.each(json.notify, function() {
-                                    $nos.notify(this);
-                                });
-                            } else {
-                                $nos.notify(json.notify);
-                            }
+                        if (console) {
+                            console.error(str);
                         }
-                        // Call user callback
-                        if ($.isFunction(json.user_success)) {
-                            json.user_success.apply(this, args);
+                    }
+                    if (json.notify) {
+                        if ($.isArray(json.notify)) {
+                            $.each(json.notify, function() {
+                                $nos.notify(this);
+                            });
+                        } else {
+                            $nos.notify(json.notify);
                         }
+                    }
+                    // Call user callback
+                    if ($.isFunction(json.user_success)) {
+                        json.user_success.apply(this, args);
+                    }
 
                         var dialog = this.closest('.ui-dialog-content').size();
                         if (dialog) {
@@ -289,7 +303,7 @@ define('jquery-nos',
                                 ajax: true,
                                 title: 'Choose a media file'
                             });
-                            $dialog.bind('select.media', function(e, item) {
+                            $dialog.bind('select_media', function(e, item) {
                                 $input.inputFileThumb({
                                     file: item.thumbnail
                                 });
@@ -357,26 +371,30 @@ define('jquery-nos',
                         if (!$context.is('form')) {
                             $context = $context.find('form');
                         }
-                        $context.validate($.extend({}, params, {
-                            errorClass : 'ui-state-error',
-                            success : true,
-                            ignore: 'input[type=hidden]'
-                        }));
+                        require(['jquery-validate'], function() {
+                            $context.validate($.extend({}, params, {
+                                errorClass : 'ui-state-error',
+                                success : true,
+                                ignore: 'input[type=hidden]'
+                            }));
+                        });
                         break;
 
                     case 'ajax' :
                         if (!$context.is('form')) {
                             $context = $context.find('form');
                         }
-                        $context.ajaxForm({
-                            dataType: 'json',
-                            success: function(json) {
-                                $context.xhr('success', json)
-                                    .triggerHandler('ajax_success', [json]);
-                            },
-                            error: function() {
-                                $nos.notify('An error occured', 'error');
-                            }
+                        require(['jquery-form'], function() {
+                            $context.ajaxForm({
+                                dataType: 'json',
+                                success: function(json) {
+                                    $context.xhr('success', json)
+                                        .triggerHandler('ajax_success', [json]);
+                                },
+                                error: function() {
+                                    $nos.notify('An error occured', 'error');
+                                }
+                            });
                         });
                         break;
                 }
@@ -460,7 +478,7 @@ define('jquery-nos',
                         var $form = $nos('<form class="fieldset standalone"></form>');
 
                         var $confirmationZone = $('<p></p>');
-                        var $confirmButton = $('<button type="submit" class="primary ui-state-error" data-icon="trash"></button>').append(params.appDesk.i18n('Confirm the deletion').label);
+                        var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(params.appDesk.i18n('Confirm the deletion').label);
                         var $cancelButton = $('<a href="#"></a>').append(params.appDesk.i18n('Cancel').label);
                         var $or = $('<span></span>').text(' ' + params.appDesk.i18n('or').label + ' ');
                         var $verifications = $dialog.find('.verification');
@@ -476,7 +494,6 @@ define('jquery-nos',
 
                             var allVerificationPassed = true;
                             $verifications.each(function() {
-                                var $this = $(this);
                                 if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
                                     allVerificationPassed = false;
                                     return false;

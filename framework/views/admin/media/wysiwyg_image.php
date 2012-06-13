@@ -109,11 +109,8 @@ require(['jquery-nos', 'wijmo.wijtabs'], function($nos) {
 				})
 				.end();
 		var $dialog = $container.closest('.ui-dialog-content')
-				.bind('select.media', function(e, data) {
-                    // @todo this function is called when selecting text in an input
-                    // but the "data" arg is null then (which cause a bug in the tinymce_image_select function())
-                    // temporary workaround: only invoke the callback if we have data...
-					data && tinymce_image_select(data);
+				.bind('select_media', function(e, data) {
+					tinymce_image_select(data);
 				});
 		var $library = $container.find('div:eq(0)')
 				.css({
