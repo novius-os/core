@@ -96,7 +96,11 @@ spl_autoload_register(function($class) {
 
 // Initialize the framework with the config file.
 $config_novius = include(NOSPATH.'config/config.php');
-$routes_novius = include(NOSPATH.'config/routes.php');
+
+$routes_novius = @include(NOSPATH.'config/routes.config.php');
+if ($routes_novius === false) {
+    $routes_novius = include(NOSPATH.'config/routes.php');
+}
 $config_app    = include(APPPATH.'config/config.php');
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
