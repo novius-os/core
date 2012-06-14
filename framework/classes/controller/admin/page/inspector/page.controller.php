@@ -13,6 +13,35 @@ namespace Nos;
 use Fuel\Core\Arr;
 use Fuel\Core\Config;
 
-class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltree {
+class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltree
+{
 
+    protected function tree(array $tree_config)
+    {
+        $id = \Input::get('id', null);
+        // ID == 0 means we're retrieving the root itself, it's not a real item
+        if ($id == 0) {
+            $_GET['id'] = null;
+        }
+        $json = parent::tree($tree_config);
+
+        // If we're requesting the root
+        if ($id === null)
+        {
+            $json['total'] = 0;
+            $json['items'] = array(
+                array(
+                    '_id' => '0',
+                    '_model' => 'Nos\Model_Page',
+                    //'actions' => array(),
+                    'id' => '0',
+                    //'lang' => '',
+                    //'publication_status' => '',
+                    'title' => __('Root'),
+                    'treeChilds' => $json['items'],
+                ),
+            );
+        }
+        return $json;
+    }
 }

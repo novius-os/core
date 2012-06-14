@@ -12,6 +12,11 @@ class ModuleNotFoundException extends \FuelException { }
 
 class Module extends Fuel\Core\Module
 {
+    public static function _init() {
+
+        \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
+    }
+
 	public static function load($module, $path = null)
 	{
 		$loaded = parent::load($module, $path);
@@ -19,8 +24,7 @@ class Module extends Fuel\Core\Module
 			$path = static::$modules[$module];
 
 			// Load the config (namespace + dependencies)
-			Config::load("$module::metadata", true);
-			$metadata = Config::get("$module::metadata", array());
+			$metadata = Config::get("data::app_installed.$module", array());
 
 			if (!empty($metadata['namespace'])) {
 				Autoloader::add_namespaces(array(
@@ -29,7 +33,6 @@ class Module extends Fuel\Core\Module
 				// Allow autoloading from bootstrap to alias classes from this namespace
 				Fuel::$namespace_aliases[Inflector::words_to_upper($module)] = $metadata['namespace'];
 			}
-			Config::load("applications/$module", "$module::config");
 
 			// Load the bootstrap if it exists
 			if ($module !== 'nos' && is_file($path.'bootstrap.php')) {

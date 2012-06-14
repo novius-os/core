@@ -13,7 +13,7 @@
 <div id="<?= $id ?>" style="display:none;"><?= str_replace(array('xxxbeginxxx', 'xxxendxxx'), array($date_begin, $date_end), $label_custom) ?></div>
 <script type="text/javascript">
 require([
-		'jquery-nos-listgrid'
+		'jquery-nos-listgrid', 'jquery-ui.datepicker'
 	], function( $nos, undefined ) {
 		$nos(function() {
 			var label_custom = $nos('#<?= $id ?>').removeAttr('id')

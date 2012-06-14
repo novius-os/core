@@ -42,8 +42,9 @@ class Controller_Admin_User_Form extends \Nos\Controller_Admin_Application {
         \Config::load('nos::admin/native_apps', 'natives_apps');
         $natives_apps = \Config::get('natives_apps', array());
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'app_installed');
-        $apps = \Config::get('app_installed', array());
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
+        $apps = \Config::get('data::app_installed', array());
+        unset($apps['local']);
 
         $apps = array_merge($natives_apps, $apps);
 

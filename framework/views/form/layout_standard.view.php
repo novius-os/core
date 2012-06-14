@@ -61,7 +61,7 @@ $large = !empty($large) && $large == true;
                         echo '</td>';
                     }
                     ?>
-                        <td>
+                        <td class="table-field">
                     <?php
                     if (!empty($title)) {
                         $title = (array) $title;
@@ -126,7 +126,10 @@ $large = !empty($large) && $large == true;
             <?= $large ? '' : '<div class="unit col c1"></div>' ?>
             <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
                 <?php
-                foreach ((array) $content as $c) {
+                if (!is_array($content)) {
+                    $content = array($content);
+                }
+                foreach ($content as $c) {
                     if (is_callable($c)) {
                         echo $c();
                     } else {

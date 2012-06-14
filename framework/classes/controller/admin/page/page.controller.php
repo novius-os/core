@@ -10,20 +10,20 @@
 
 namespace Nos;
 
-class Controller_Admin_Page_Page extends Controller {
+class Controller_Admin_Page_Page extends Controller_Admin_Application {
 
     public function action_crud($id = null) {
-        $page = $id === null ? null : Model_Page::find($id);
+        $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
 	    return \View::forge('nos::form/layout_languages', array(
 		    'item' => $page,
-		    'selected_lang' => \Input::get('lang', $page === null ? null : $page->get_lang()),
+		    'selected_lang' => \Input::get('lang', $page->is_new() ? null : $page->get_lang()),
 		    'url_blank_slate' => 'admin/nos/page/page/blank_slate',
 		    'url_form' => 'admin/nos/page/page/form',
 	    ), false);
     }
 
     public function action_blank_slate($id = null) {
-        $page = $id === null ? null : Model_Page::find($id);
+        $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
         $lang = \Input::get('lang', '');
         return \View::forge('nos::form/layout_blank_slate', array(
             'item'      => $page,
@@ -47,40 +47,49 @@ class Controller_Admin_Page_Page extends Controller {
         if ($id !== null) {
             $page = Model_Page::find($id);
         } else {
-            // Create a new page
+            // Create a new page from another one
             $create_from_id = \Input::get('create_from_id', 0);
-            if (empty($create_from_id)) {
-                $page = Model_Page::forge();
-                $page->page_lang_common_id = \Input::get('common_id');
-            } else {
+            if (!empty($create_from_id)) {
                  $page_from = Model_Page::find($create_from_id);
-                 $page      = clone $page_from;
             }
-            $page->page_lang = \Input::get('lang');
-            if (!empty($page->page_lang_common_id)) {
-                $page_main = Model_Page::find($page->page_lang_common_id);
-                $parent_page = $page_main->find_parent();
-            }
-            // Parent page is the root
-            if (empty($parent_page)) {
-                $parent_page = Model_Page::find('first', array(
-                    'where' => array(
-                        array('page_parent_id', 'IS', \Db::expr('NULL')),
-                    ),
-                    'order_by' => array('page_id' => 'ASC'),
-                ));
-            }
-            if (!empty($page->page_lang) && !empty($page_parent)) {
-                $parent_page = $parent_page->find_lang($page->page_lang);
-            }
-            // Root page
-            if (empty($parent_page) || (!empty($page_main) && $page_main->page_parent_id == null)) {
-                $page->page_parent_id = null;
-                $page->page_home     = 1;
-                $page->page_entrance = 1;
+
+            if (empty($page_from)) {
+                $page = Model_Page::forge();
+                $page->page_lang_common_id = \Input::get('common_id', null);
             } else {
-                $page->page_parent_id = $parent_page->page_id;
+                $page = clone $page_from;
             }
+            $page->page_lang = \Input::get('lang', key(\Config::get('locales')));
+
+            // New page: no parent
+            // Translation: we have a common_id and can determine the parent
+            if (!empty($page->page_lang_common_id)) {
+                $page_lang_common = Model_Page::find($page->page_lang_common_id);
+                $page_parent = $page_lang_common->find_parent();
+
+                // Fetch in the appropriate lang
+                if (!empty($page_parent)) {
+                    $page_parent = $page_parent->find_lang($page->page_lang);
+                }
+
+                // Set manually, because set_parent doesn't handle new items
+                if (!empty($page_parent)) {
+                    $page->page_parent_id = $page_parent->page_id;
+                }
+            }
+
+            $page_parent = Model_Page::find($page->page_parent_id);
+
+            // The first page we create is a homepage
+            $lang_has_home = (int) (bool) Model_Page::count(array(
+                'where' => array(
+                    array('page_home', '=', 0),
+                    array('page_lang', $page->page_lang),
+                ),
+            ));
+            // $lang_has_home is either 0 or 1 with the double cast
+            $page->page_home     = 1 - $lang_has_home;
+            $page->page_entrance = 1 - $lang_has_home;
 
             // Tweak the form for creation
             $fields = \Arr::merge($fields, array(
@@ -122,10 +131,15 @@ class Controller_Admin_Page_Page extends Controller {
 
 		$fieldset = \Fieldset::build_from_config($fields, $page, array(
             'before_save' => function($page, $data) {
-                $parent = $page->find_parent();
+
+                // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
+                // https://github.com/fuel/orm/issues/171
+                //$parent = $page->find_parent();
+
+                // Instead, retrieve the object manually
+                $parent = Model_Page::find($page->page_parent_id);
+
                 // Event 'after_change_parent' will set the appropriate lang
-                //\Debug::dump($parent->id, $parent->get_lang(), $page->get_lang());
-                //\Debug::dump($parent->find_lang('en_GB')->id);
                 $page->set_parent($parent);
                 $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
@@ -145,7 +159,6 @@ class Controller_Admin_Page_Page extends Controller {
             }
         ));
 		$fieldset->js_validation();
-        //$fieldset->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,

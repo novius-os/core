@@ -13,8 +13,8 @@
 <div <?= array_to_attr($attributes); ?>><table class="nos-treegrid"></table></div>
 <script type="text/javascript">
 	require([
-		'jquery-nos-treegrid'
-	], function( $nos, table, undefined ) {
+		'jquery', 'jquery-nos-treegrid'
+	], function( $, $nos ) {
 		$nos(function() {
 			var params = <?= \Format::forge()->to_json($params) ?>,
 				container = $nos('#<?= $attributes['id'] ?>')
@@ -56,7 +56,8 @@
 								}
 							},
 							rowStyleFormatter : function(args) {
-								if (args.type == $nos.wijmo.wijgrid.rowType.header) {
+                                console.log($nos.wijmo);
+								if (args.type == $.wijmo.wijgrid.rowType.header) {
 									args.$rows.hide();
 								}
 							},

@@ -54,6 +54,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         if (!empty($bool)) {
             return (bool) $object->get($bool);
         }
+        return false;
         // @todo publication start / end
 	}
 

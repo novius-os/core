@@ -26,6 +26,7 @@ class Widget_Date_Picker extends \Fieldset_Field {
 		'gotoCurrent'       => true,
 		'firstDay'          => 1,
 		'showAnim'          => 'slideDown',
+        'wrapper'           => '', //'<div class="datepicker-wrapper"></div>',
 	);
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset) {
@@ -63,14 +64,20 @@ class Widget_Date_Picker extends \Fieldset_Field {
 
 	public function js_init() {
 		$id = $this->get_attribute('id');
+        $wrapper = '';
+        if (!empty($this->options['wrapper'])) {
+            $wrapper = '.wrap('.\Format::forge()->to_json($this->options['wrapper']).')';
+            unset($this->options['wrapper']);
+        }
 		return <<<JS
 <script type="text/javascript">
 	require([
-		'jquery-nos'
-	], function( \$nos, undefined ) {
+		'jquery-nos',
+		'jquery-ui.datepicker'
+	], function( \$nos ) {
 		\$nos(function() {
 			var \$input = \$nos('input#$id');
-			\$input.datepicker(\$input.data('datepicker-options'));
+			\$input{$wrapper}.datepicker(\$input.data('datepicker-options'));
 		});
 	});
 </script>

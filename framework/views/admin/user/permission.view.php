@@ -51,7 +51,7 @@ foreach ($apps as $app => $perms) {
 		<div class="infos" title="<?= strtr(__('Application provided by {provider_name}'), array(
                 '{provider_name}' => $apps[$app]['provider']['name'],
             )) ?>">
-			<?= $apps[$app]['name'] ?>
+			<?= !empty($apps[$app]['name']) ? $apps[$app]['name'] : $app ?>
 		</div>
     </div>
 

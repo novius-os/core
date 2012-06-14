@@ -44,6 +44,9 @@ class Finder extends Fuel\Core\Finder {
                 if ($directory == $suffixed_directory) {
                     $dots = explode('.', $file);
                     array_splice($dots, count($dots) - ($dots[count($dots) - 1] == 'php' ? 1 : 0), 0, array($suffix));
+                    if ($dots[count($dots) - 1] != 'php') {
+                        $dots[] = 'php';
+                    }
                     $finalName = implode('.', $dots);
 
                     $ret = $this->locate($directory, $finalName, $ext, $multiple, $cache, true);
@@ -117,10 +120,16 @@ class Finder extends Fuel\Core\Finder {
 			}
 		}
 
+		$file_ext = pathinfo($file_no_ns, PATHINFO_EXTENSION);
+		if (!$file_ext)
+		{
+			$file_no_ns .= $ext;
+		}
+
 		foreach ($search as $path) {
 			// We now only have absolute paths, search through them
-			if (is_file($path.$file_no_ns.$ext)) {
-				$found[] = $path.$file_no_ns.$ext;
+			if (is_file($path.$file_no_ns)) {
+				$found[] = $path.$file_no_ns;
 			}
 		}
 
@@ -131,7 +140,7 @@ class Finder extends Fuel\Core\Finder {
 				if (!is_dir($search[0])) {
 					File::create_dir(dirname($search[0]), basename($search[0]));
 				}
-				return $search[0].$file_no_ns.$ext;
+				return $search[0].$file_no_ns;
 			} else if (!$is_namespaced) {
 				$found = parent::locate($directory, $file, $ext, $multiple, $cache);
 			}

@@ -61,7 +61,7 @@ class Model extends \Orm\Model {
 			'cascade_delete' => false,
 			'conditions'     => array(
 				'where' => array(
-					array('wysiwyg_join_table', '=', DB::expr(static::$_table_name) ),
+					array('wysiwyg_join_table', '=', static::$_table_name),
 				),
 			),
 		);
@@ -74,7 +74,7 @@ class Model extends \Orm\Model {
 			'cascade_delete' => false,
 			'conditions'     => array(
 				'where' => array(
-					array('medil_from_table', '=', DB::expr(static::$_table_name) ),
+					array('medil_from_table', '=', static::$_table_name),
 				),
 			),
 		);
@@ -91,17 +91,21 @@ class Model extends \Orm\Model {
 
 		parent::observers($specific, $default);
 
-		if ( !$init)
+		if (!$init)
 		{
 			static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviours());
-            if (empty(static::$_observers_cached[$class]['\Orm\Observer_Self'])) {
-                static::$_observers_cached[$class]['\Orm\Observer_Self'] = array();
+            // Add Observer_Self, always
+            if (empty(static::$_observers_cached[$class]['Orm\Observer_Self'])) {
+                static::$_observers_cached[$class]['Orm\Observer_Self'] = array(
+                    'events' => array(),
+                );
             }
-            if (empty(static::$_observers_cached[$class]['\Orm\Observer_Self']['events'])) {
-                static::$_observers_cached[$class]['\Orm\Observer_Self']['events'] = array();
-            }
-            if (!in_array('before_save', static::$_observers_cached[$class]['\Orm\Observer_Self']['events'])) {
-                static::$_observers_cached[$class]['\Orm\Observer_Self']['events'][] = 'before_save';
+            // If events is empty, don't populate it, because empty === ALL observers will be called.
+            // If we add only 'before_save', the other observers won't called anymore
+            if (!empty(static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
+                if (!in_array('before_save', static::$_observers_cached[$class]['Orm\Observer_Self']['events'])) {
+                    static::$_observers_cached[$class]['Orm\Observer_Self']['events'][] = 'before_save';
+                }
             }
 		}
 
@@ -153,6 +157,22 @@ class Model extends \Orm\Model {
 	}
 
 
+
+    public function get_possible_lang() {
+        $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
+        $tree         = static::behaviours('Nos\Orm_Behaviour_Tree');
+
+        if (!$translatable || !$tree) {
+            return array_keys(\Config::get('locales'));
+        }
+
+        // Return langs from parent if available
+        $parent = $this->find_parent();
+        if (!empty($parent)) {
+            return $parent->get_all_lang();
+        }
+        return array_keys(\Config::get('locales'));
+    }
 
 	/**
 	 * @see \Orm\Model::__construct()
