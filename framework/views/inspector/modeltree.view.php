@@ -16,7 +16,7 @@ require([
 		'jquery-nos-treegrid'
 	], function( $nos, table, undefined ) {
 		$nos(function() {
-			var inspector = $nos('#<?= $attributes['id'] ?>')
+			var inspector = $nos('#<?= $attributes['id'] ?>'),
 				connector = inspector.closest('.nos-inspector, body')
 					.on('langChange', function() {
 						if (inspectorData.langChange) {

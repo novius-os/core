@@ -24,7 +24,8 @@ class Widget_Page_Selector extends \Nos\Widget_Selector {
         return $this->template(static::widget(array(
             'input_name' => $this->name,
             'selected' => array(
-                'id' => $this->value,
+                // Converts null to 0
+                'id' => (string) (int) $this->value,
             ),
             'treeOptions' => array(
                 'lang' => \Arr::get($this->widget_options, 'lang', null),

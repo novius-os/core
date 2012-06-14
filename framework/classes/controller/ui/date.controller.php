@@ -12,7 +12,7 @@ namespace Nos;
 
 use Fuel\Core\Input;
 
-use Fuel\Core\View;
+use View;
 
 use Date;
 

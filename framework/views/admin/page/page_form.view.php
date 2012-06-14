@@ -65,12 +65,6 @@ Event::register_function('config|nos::views/admin/page/page_form', 1, function(&
             </div>
             <div data-id="wysiwyg" style="display:none;"></div>',
     ), false);
-
-    if ($page->page_parent_id == null) {
-        // Remove the menu section
-        array_shift($config['menu']);
-        //unset($config['menu'][__('Menu')]);
-    }
 });
 
 $config = Config::load('nos::views/admin/page/page_form', true);
@@ -84,7 +78,7 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 			var tabInfos = {
 				label : <?= json_encode(empty($page) || $page->is_new() ? __('Add a page') : $page->page_title) ?>,
 				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
-				url : 'admin/nos/page/page/crud<?= empty($page) ? '' : '/'.$page->page_id ?>'
+				url : 'admin/nos/page/page/crud<?= empty($page) ? '' : '/'.$page->page_id ?>?lang=<?= $lang ?>'
 			};
 <?php
 	if (!empty($page) && !$page->is_new()) {
