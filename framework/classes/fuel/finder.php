@@ -10,6 +10,8 @@
 
 class Finder extends Fuel\Core\Finder {
 
+    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view');
+
 	public static function instance()
 	{
 		if ( ! static::$instance)
@@ -35,8 +37,23 @@ class Finder extends Fuel\Core\Finder {
 	 * @param   bool    $cache      true
 	 * @return  string | array
 	 */
-	public function locate($directory, $file, $ext = '.php', $multiple = false, $cache = true)
-	{
+	public function locate($directory, $file, $ext = '.php', $multiple = false, $cache = true, $alternative = false)
+    {
+        if ($alternative == false) {
+            foreach (static::$_suffixed_directories as $suffixed_directory => $suffix) {
+                if ($directory == $suffixed_directory) {
+                    $dots = explode('.', $file);
+                    array_splice($dots, count($dots) - ($dots[count($dots) - 1] == 'php' ? 1 : 0), 0, array($suffix));
+                    $finalName = implode('.', $dots);
+
+                    $ret = $this->locate($directory, $finalName, $ext, $multiple, $cache, true);
+                    if (count($ret) > 0 && $ret !== false) {
+                        return $ret;
+                    }
+                }
+            }
+        }
+
 		list($section,) = explode('/', $directory,  2);
 
 		// Do we need to override the default behaviour?

@@ -13,7 +13,7 @@ namespace Nos;
 use Fuel\Core\Cache;
 use Fuel\Core\Config;
 use Fuel\Core\Request;
-use Fuel\Core\View;
+use View;
 
 class NotFoundException extends \Exception {}
 

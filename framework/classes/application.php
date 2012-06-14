@@ -345,7 +345,7 @@ class Application
         $data_path = APPPATH.'data'.DS.'config'.DS;
         foreach ($config as $file => $content)
         {
-            \Config::save($data_path.$file.'.php', $content);
+            \Config::save($data_path.$file.'.config.php', $content);
             \Config::set('data::'.$file, $content);
         }
     }
@@ -435,7 +435,7 @@ class Application
         }
 
         \Config::set('app_dependencies', $dependencies);
-        \Config::save(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', $dependencies);
+        \Config::save(APPPATH.'data'.DS.'config'.DS.'app_dependencies.config.php', $dependencies);
     }
 
     public function addPermission()

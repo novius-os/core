@@ -11,7 +11,7 @@
 namespace Nos;
 
 use Fuel\Core\File;
-use Fuel\Core\View;
+use View;
 
 class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
 {
@@ -76,7 +76,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             {
                 $app_installed = \Config::get('data::app_installed', array());
                 unset($app_installed[$app_name]);
-                \Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.php', $app_installed);
+                \Config::save(APPPATH.'data'.DS.'config'.DS.'app_installed.config.php', $app_installed);
             }
         }
         catch (\Exception $e)
