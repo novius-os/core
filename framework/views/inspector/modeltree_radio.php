@@ -56,7 +56,6 @@
 								}
 							},
 							rowStyleFormatter : function(args) {
-                                console.log($nos.wijmo);
 								if (args.type == $.wijmo.wijgrid.rowType.header) {
 									args.$rows.hide();
 								}
