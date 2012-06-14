@@ -371,7 +371,7 @@ define('jquery-nos',
                         if (!$context.is('form')) {
                             $context = $context.find('form');
                         }
-                        require(['jquery-validate'], function() {
+                        require(['jquery-nos-validate'], function() {
                             $context.validate($.extend({}, params, {
                                 errorClass : 'ui-state-error',
                                 success : true,
