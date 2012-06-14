@@ -56,7 +56,7 @@ class Widget_Time_Picker extends \Fieldset_Field {
 <script type="text/javascript">
 	require([
 		'jquery-nos',
-		'jquery'
+		'jquery',
 		'jquery-ui.datetimepicker'
 	], function( \$nos, \$ ) {
 		\$nos(function() {
