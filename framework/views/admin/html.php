@@ -66,6 +66,7 @@
             'wijmo.wijgrid' => 'static/novius-os/admin/bundle/vendor.min',
             'wijmo.wijlightbox' => 'static/novius-os/admin/bundle/vendor.min',
             'wijmo.wijtooltip' => 'static/novius-os/admin/bundle/vendor.min',
+            'wijmo.wijwizard' => 'static/novius-os/admin/vendor/wijmo/js/jquery.wijmo.wijwizard',
 
             'jquery-nos-validate' => 'static/novius-os/admin/bundle/nos.min',
             'jquery-nos-wysiwyg' => 'static/novius-os/admin/bundle/nos.min',
@@ -127,6 +128,7 @@
             'wijmo.wijgrid' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.draggable', 'jquery-ui.droppable', 'wijmo.wijinputdate', 'wijmo.wijinputmask', 'wijmo.wijinputnumber', 'wijmo.wijutil', 'wijmo.wijdatasource', 'jquery.globalize'),
             'wijmo.wijlightbox' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'jquery-ui.effects.core', 'jquery.cookie', 'wijmo.wijutil'),
             'wijmo.wijtooltip' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position'),
+            'wijmo.wijwizard' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget','jquery-ui.position', 'jquery-ui.effects.core', 'jquery.cookie', 'wijmo.wijutil', 'wijmo.wijsuperpanel'),
         ),
         'deps' => array('jquery', 'jquery-nos'),
     );
