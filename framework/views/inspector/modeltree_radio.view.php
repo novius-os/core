@@ -66,7 +66,7 @@
 
 								if (data && rendered) {
 									params.selected.id = data._id;
-									row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true).trigger('selectionChanged', data);
+									row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true).triggerHandler('click');
 								}
 							},
 							rendering : function() {
@@ -99,6 +99,14 @@
 								name : params.input_name,
 								value : args.row.data._id
 							})
+                            .click(function() {
+                                // Save the selected in params in cas of a refresh tree event
+                                params.selected = {
+                                    id : args.row.data._id,
+                                    model : args.row.data._model
+                                };
+                                $nos(this).trigger('selectionChanged', args.row.data);
+                            })
 							.appendTo(args.$container);
 
 						return true;
