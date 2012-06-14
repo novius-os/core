@@ -7,10 +7,14 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-wysiwyg',
-    ['jquery', 'tinymce'],
-    function($) {
+    [
+        'jquery-nos',
+        'jquery',
+        'tinymce'
+    ],
+    function($nos, $) {
         var inc = 1;
-        $.fn.wysiwyg = function(options) {
+        $nos.fn.wysiwyg = function(options) {
             var self = $(this);
             options = options || {};
             $.ajax({
@@ -31,5 +35,5 @@ define('jquery-nos-wysiwyg',
                 }
             });
         };
-        return $;
+        return $nos;
     });

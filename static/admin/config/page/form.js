@@ -10,7 +10,7 @@
 define([
 	'jquery-nos-wysiwyg',
 	'jquery-nos'
-], function(a, $nos) {
+], function($nos) {
     "use strict";
     return function() {
 
