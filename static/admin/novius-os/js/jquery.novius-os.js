@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos',
-    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijtextbox', 'wijmo.wijcheckbox', 'wijmo.wijdropdown', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
+    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijtextbox', 'wijmo.wijcheckbox', 'wijmo.wijradio', 'wijmo.wijdropdown', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
     function($) {
         "use strict";
         var undefined = void(0),
@@ -346,12 +346,15 @@ define('jquery-nos',
                                 }
                                 $(this).button(options);
                             });
-                        $context.find("select").filter(':not(.notransform)').nos().onShow('one', function() {
+                        $context.find("select").filter(':not(.notransform)').onShow('one', function() {
                                 $(this).wijdropdown();
                             });
-                        $context.find(":input[type=checkbox]").nos().onShow('one', function() {
-                            $(this).wijcheckbox();
-                        });
+                        $context.find(":input[type=checkbox]").onShow('one', function() {
+                                $(this).wijcheckbox();
+                            });
+                        $context.find(":input[type=radio]").filter(':not(.notransform)').onShow('one', function() {
+                                $(this).wijradio();
+                            });
                         $context.find('.expander').each(function() {
                                 var $this = $(this);
                                 $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
@@ -359,7 +362,7 @@ define('jquery-nos',
                         $context.find('.accordion').wijaccordion({
                                 header: "h3",
                                 selectedIndexChanged : function(e, args) {
-                                    $(e.target).find('.ui-accordion-content').eq(args.newIndex).nos().onShow();
+                                    $nos(e.target).find('.ui-accordion-content').eq(args.newIndex).onShow();
                                 }
                             });
                             // @todo Check usefulness of this
