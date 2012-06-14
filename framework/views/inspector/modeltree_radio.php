@@ -34,8 +34,6 @@
 				rendered = false,
 				init = function() {
 					if (params.reloadEvent) {
-                        console.log(container);
-                        console.log($nos.fn);
 						container.listenEvent('reload.' + params.reloadEvent, function() {
 							table.nostreegrid('reload');
 						});
