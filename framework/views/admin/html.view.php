@@ -213,7 +213,7 @@
             'wijmo.wijvideo' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijtooltip'),
             'wijmo.wijwizard' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget','jquery-ui.position', 'jquery-ui.effects.core', 'jquery.cookie', 'wijmo.wijutil', 'wijmo.wijsuperpanel'),
         ),
-        'deps' => array('jquery', 'jquery-nos'),
+        'deps' => array('jquery', 'jquery-nos', 'log'),
     );
 
 	if (!$assets_minified) {
