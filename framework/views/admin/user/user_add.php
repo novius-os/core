@@ -70,8 +70,7 @@ foreach ($fieldset->field() as $field) {
 <script type="text/javascript">
     require([
 	    'jquery-nos',
-	    'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
-	    'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
+        'jquery.passwordstrength'
     ], function($nos) {
         $nos(function() {
             var $container = $nos('#<?= $uniqid ?>');
