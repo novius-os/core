@@ -11,7 +11,7 @@
 namespace Nos;
 
 use Fuel\Core\File;
-use Fuel\Core\View;
+use View;
 
 class Controller_Admin_Tray_Account extends \Controller {
 
