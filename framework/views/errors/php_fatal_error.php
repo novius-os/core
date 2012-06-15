@@ -9,6 +9,14 @@
  */
 
 if (\Input::is_ajax()) {
+
+    foreach ($backtrace as &$trace) {
+        $trace = array_diff_key($trace, array(
+            'file' => true,
+            'line' => true,
+        ));
+    }
+
     \Response::json(array(
         'error' => 'An internal server error has been detected.',
         'internal_server_error' => array(
