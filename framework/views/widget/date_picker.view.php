@@ -10,12 +10,14 @@
 ?>
 <script type="text/javascript">
     require(
-        ['jquery-nos'],
-        function ($nos) {
+        [
+            'jquery-nos',
+            'jquery-ui.datepicker'
+        ],
+        function($nos) {
             $nos(function() {
-                $nos(':input#<?= $id ?>').each(function() {
-                    $nos(this).media($(this).data('media-options'));
-                });
+                var $input = $nos('input#<?= $id ?>');
+                $input<?= $wrapper ?>.datepicker($input.data('datepicker-options'));
             });
         });
 </script>

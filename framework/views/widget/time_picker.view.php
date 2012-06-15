@@ -12,12 +12,13 @@
     require(
         [
             'jquery-nos',
-            'jquery-ui.datepicker'
+            'jquery',
+            'jquery-ui.datetimepicker'
         ],
-        function($nos) {
+        function($nos, $) {
             $nos(function() {
                 var $input = $nos('input#<?= $id ?>');
-                $input<?= $wrapper ?>.datepicker($input.data('datepicker-options'));
+                $input.timepicker($input.data('timepicker-options'));
             });
         });
 </script>

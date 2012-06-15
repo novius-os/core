@@ -10,12 +10,12 @@
 ?>
 <script type="text/javascript">
     require(
-        ['jquery-nos'],
-        function ($nos) {
+        ['jquery-nos-wysiwyg'],
+        function($nos) {
             $nos(function() {
-                $nos(':input#<?= $id ?>').each(function() {
-                    $nos(this).media($(this).data('media-options'));
-                });
+                var $t = $nos("textarea#<?= $id ?>.not_initialized");
+                $t.removeClass('not_initialized')
+                    .wysiwyg($t.data('wysiwyg-options'));
             });
         });
 </script>

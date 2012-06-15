@@ -1,8 +1,21 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: felix
- * Date: 15/06/12
- * Time: 16:18
- * To change this template use File | Settings | File Templates.
+ * NOVIUS OS - Web OS for digital communication
+ *
+ * @copyright  2011 Novius
+ * @license    GNU Affero General Public License v3 or (at your option) any later version
+ *             http://www.gnu.org/licenses/agpl-3.0.html
+ * @link http://www.novius-os.org
  */
+?>
+<script type="text/javascript">
+    require(
+        ['jquery-nos'],
+        function ($nos) {
+            $nos(function() {
+                $nos(':input#<?= $id ?>').each(function() {
+                    $nos(this).media($(this).data('media-options'));
+                });
+            });
+        });
+</script>
