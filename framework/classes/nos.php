@@ -86,7 +86,7 @@ class Nos {
 	    static::_parse_internals($content);
 
 		$content = strtr($content, array(
-			'nos://anchor/' => static::main_controller()->url,
+			'nos://anchor/' => static::main_controller()->getUrl(),
 		));
 
 		foreach(\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {

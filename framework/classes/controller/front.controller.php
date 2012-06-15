@@ -264,23 +264,23 @@ class Controller_Front extends Controller {
 
     protected function _handle_head(&$content) {
         $replaces  = array(
-            'base_href'         => array(
+            '_base_href'         => array(
                 'pattern' => '/<base [^>]*\/?>/iU',
                 'replace' => '<base href="replace" />',
             ),
-            'page_title'        => array(
+            '_title'        => array(
                 'pattern' => '/<title>[^<]*<\/title>/iU',
                 'replace' => '<title>replace</title>',
             ),
-            'meta_description'  => array(
+            '_meta_description'  => array(
                 'pattern' => '/<meta [^>]*name=\"?description[^>]*\"? *\/?>/iU',
                 'replace' => '<meta name="description" content="replace">',
             ),
-            'meta_keywords'     => array(
+            '_meta_keywords'     => array(
                 'pattern' => '/<meta [^>]*name=\"?keywords[^>]*\"? *\/?>/iU',
                 'replace' => '<meta name="keywords" content="replace">',
             ),
-            'meta_robots'       => array(
+            '_meta_robots'       => array(
                 'pattern' => '/<meta [^>]*name=\"?robots[^>]*\"? *\/?>/iU',
                 'replace' => '<meta name="robots" content="replace">',
             ),
@@ -355,11 +355,11 @@ class Controller_Front extends Controller {
 
         // Scan all wysiwyg
         foreach ($this->_template['layout'] as $wysiwyg_name => $layout) {
-
             $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->_page->wysiwygs->{$wysiwyg_name}, $this);
         }
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
+        $this->_view->set('title', $this->_title, false);
     }
 
     /**
