@@ -63,25 +63,15 @@ class Widget_Date_Picker extends \Fieldset_Field {
     }
 
 	public function js_init() {
-		$id = $this->get_attribute('id');
         $wrapper = '';
         if (!empty($this->options['wrapper'])) {
             $wrapper = '.wrap('.\Format::forge()->to_json($this->options['wrapper']).')';
             unset($this->options['wrapper']);
         }
-		return <<<JS
-<script type="text/javascript">
-	require([
-		'jquery-nos',
-		'jquery-ui.datepicker'
-	], function( \$nos ) {
-		\$nos(function() {
-			var \$input = \$nos('input#$id');
-			\$input{$wrapper}.datepicker(\$input.data('datepicker-options'));
-		});
-	});
-</script>
-JS;
+        return \View::forge('widget/date_picker', array(
+            'wrapper' => $wrapper,
+            'id' => $this->get_attribute('id'),
+        ));
 	}
 
 }

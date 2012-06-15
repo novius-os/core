@@ -51,21 +51,9 @@ class Widget_Time_Picker extends \Fieldset_Field {
     }
 
 	public function js_init() {
-		$id = $this->get_attribute('id');
-		return <<<JS
-<script type="text/javascript">
-	require([
-		'jquery-nos',
-		'jquery',
-		'jquery-ui.datetimepicker'
-	], function( \$nos, \$ ) {
-		\$nos(function() {
-			var \$input = \$nos('input#$id');
-			\$input.timepicker(\$input.data('timepicker-options'));
-		});
-	});
-</script>
-JS;
+        return \View::forge('widget/time_picker', array(
+            'id' => $this->get_attribute('id'),
+        ));
 	}
 
 }

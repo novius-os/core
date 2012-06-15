@@ -58,17 +58,8 @@ class Widget_Media extends \Fieldset_Field {
     }
 
 	public function js_init() {
-		$id = $this->get_attribute('id');
-		return <<<JS
-<script type="text/javascript">
-require(['jquery-nos'], function (\$nos) {
-	\$nos(function() {
-		\$nos(':input#$id').each(function() {
-			\$nos(this).media($(this).data('media-options'));
-		});
-	});
-});
-</script>
-JS;
+		return \View::forge('widget/media', array(
+            'id' => $this->get_attribute('id'),
+        ));
 	}
 }
