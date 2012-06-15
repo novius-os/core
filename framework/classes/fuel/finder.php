@@ -107,6 +107,11 @@ class Finder extends Fuel\Core\Finder {
 		if ($context == 'config.save') {
 			$search = array($local_config_path);
 		} else {
+
+			if ($active_module == 'nos' && $directory == 'views') {
+				$search[] = $local_config_path.'novius-os'.DS;
+			}
+
 			// -8 = strip the classes directory
 			if (!empty($namespace_path)) {
 				$search[] = $namespace_path.$directory.DS;
@@ -126,11 +131,23 @@ class Finder extends Fuel\Core\Finder {
 			$file_no_ns .= $ext;
 		}
 
+        $files_to_search = array();
+        foreach (static::$_suffixed_directories as $suffixed_directory => $suffix) {
+            if ($directory == $suffixed_directory) {
+                $dots = explode('.', $file_no_ns);
+                array_splice($dots, count($dots) - 1, 0, array($suffix));
+                $files_to_search[] = implode('.', $dots);
+            }
+        }
+        $files_to_search[] = $file_no_ns;
+
 		foreach ($search as $path) {
 			// We now only have absolute paths, search through them
-			if (is_file($path.$file_no_ns)) {
-				$found[] = $path.$file_no_ns;
-			}
+            foreach ($files_to_search as $file_search) {
+                if (is_file($path.$file_search)) {
+                    $found[] = $path.$file_search;
+                }
+            }
 		}
 
 		// Fallback for standard search
