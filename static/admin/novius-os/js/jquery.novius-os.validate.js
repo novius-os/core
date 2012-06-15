@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-validate',
-    ['jquery', 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate.min'],
+    ['jquery', 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate.min', 'wijmo.wijtooltip'],
     function($) {
         // This replaces the showLabel function
         var showLabel = function (element, message) {
@@ -60,7 +60,7 @@ define('jquery-nos-validate',
 
 
                 var wijtooltip = label.data('wijtooltip');
-                wijtooltip._tooltip.addClass('nos-tooltip-error')
+                wijtooltip._tooltip.addClass('nos-tooltip-error');
 
                 var tooltip = wijtooltip._tooltip;
 
@@ -123,7 +123,7 @@ define('jquery-nos-validate',
                 label.remove();
             }
             this.toShow = this.toShow.add(label);
-        }
+        };
 
         $.extend($.validator.prototype, {
             showLabel: showLabel,
