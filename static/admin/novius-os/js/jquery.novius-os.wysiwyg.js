@@ -7,10 +7,14 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-wysiwyg',
-    ['jquery', 'tinymce'],
-    function($) {
-        var inc = 1;
-        $.fn.wysiwyg = function(options) {
+    [
+        'module',
+        'jquery-nos',
+        'jquery',
+        'tinymce'
+    ],
+    function(module, $nos, $) {
+        $nos.fn.wysiwyg = function(options) {
             var self = $(this);
             options = options || {};
             $.ajax({
@@ -20,7 +24,7 @@ define('jquery-nos-wysiwyg',
                 success: function(enhancers) {
                     options = $.extend({
                         // Location of TinyMCE script
-                        script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce' + (assets_minified ? '' : '_src') + '.js',
+                        script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce' + (module.config().minified ? '' : '_src') + '.js',
                         theme      : 'nos',
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
                         theme_nos_enhancers : enhancers
@@ -31,5 +35,5 @@ define('jquery-nos-wysiwyg',
                 }
             });
         };
-        return $;
+        return $nos;
     });

@@ -13,7 +13,7 @@
     require(['jquery-nos-ostabs'], function ($nos) {
         $nos(function () {
 	        $nos('#<?= $uniqid = uniqid('id_'); ?>').tab('update', {
-                label : <?= \Format::forge()->to_json('Add a user') ?>,
+                label : <?= \Format::forge()->to_json(isset($user) ? $user->fullname() : 'Add a user') ?>,
                 iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
             });
         });
@@ -39,49 +39,43 @@ foreach ($fieldset->field() as $field) {
 }
 ?>
 
-<div class="page line ui-widget" id="<?= $uniqid ?>">
-    <?= $fieldset->open('admin/nos/user/form/add'); ?>
-    <?= View::forge('form/layout_standard', array(
-        'fieldset' => $fieldset,
-        'medias' => null,
-        'title' => array('user_firstname', 'user_name'),
-        'id' => 'user_id',
-
-        'published' => null,
-        'save' => 'save',
-
-        'subtitle' => array(),
-
-        'content' => array(
-            \View::forge('form/expander', array(
-                'title'   => 'Details',
-                'nomargin' => false,
-                'content' => \View::forge('form/fields', array(
-                    'fieldset' => $fieldset,
-                    'fields' => array('user_email', 'user_password', 'password_confirmation'),
-                ), false)
-            ), false),
-        ),
-    ), false); ?>
-    <?= $fieldset->close(); ?>
+<div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
+    <ul style="width: 15%;">
+        <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
+        <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
+    </ul>
+    <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
+        <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
+    </div>
+    <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
+       <?= $permissions ?>
+    </div>
 </div>
-
 
 <script type="text/javascript">
     require([
 	    'jquery-nos',
-	    'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
-	    'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'
+        'jquery.passwordstrength'
     ], function($nos) {
         $nos(function() {
             var $container = $nos('#<?= $uniqid ?>');
-            var $password = $container.find('input[name=user_password]');
+            $container.css('display', 'block').onShow();
+            $container.wijtabs({
+                alignment: 'left'
+            });
 
-            <?php $formatter = \Format::forge(); ?>
+            $container.find('> div').addClass('fill-parent').css({
+                left: '15%',
+                width : '85%'
+            });
+
+            var $password = $container.find('input[name=password_reset]');
+
             // Password strength
             var strength_id = '<?= $uniqid ?>_strength';
             var $strength = $nos('<span id="' + strength_id + '"></span>');
             $password.after($strength);
+            <?php $formatter = \Format::forge(); ?>
             $password.password_strength({
                 container : '#' + strength_id,
                 texts : {

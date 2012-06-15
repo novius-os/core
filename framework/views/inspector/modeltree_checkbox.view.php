@@ -66,17 +66,7 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 									data = row ? row.data : false;
 
 								if (data && rendered) {
-									var checkbox = row.$rows.find(':checkbox[value=' + row.data._id + ']'),
-										checked = checkbox.is(':checked');
-									if (checked) {
-										delete params.selected[row.data._model + '|' + row.data._id];
-									} else {
-										params.selected[row.data._model + '|' + row.data._id] = {
-											id : row.data._id,
-											model : row.data._model
-										};
-									}
-									checkbox.prop('checked', !checked).trigger('selectionChanged', data);
+									checkbox.prop('checked', !checked).triggerHandler('click');
 								}
 							},
 							rendering : function() {
@@ -110,7 +100,21 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 								name : params.input_name + '[]',
 								value : args.row.data._id
 							})
-							.appendTo(args.$container);
+                            .click(function() {
+                                // Save the selected in params in cas of a refresh tree event
+                                var checkbox = $nos(this),
+                                    checked = checkbox.is(':checked');
+                                if (checked) {
+                                    params.selected[row.data._model + '|' + row.data._id] = {
+                                        id : row.data._id,
+                                        model : row.data._model
+                                    };
+                                } else {
+                                    params.selected[row.data._model + '|' + row.data._id] && delete params.selected[row.data._model + '|' + row.data._id];
+                                }
+                                checkbox.trigger('selectionChanged', args.row.data);
+                            })
+                            .appendTo(args.$container);
 
 						return true;
 					}

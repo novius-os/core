@@ -12,7 +12,7 @@ namespace Nos;
 
 use Fuel\Core\Request;
 
-use Fuel\Core\View;
+use View;
 
 use Fuel\Core\Config;
 

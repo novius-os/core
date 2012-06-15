@@ -8,9 +8,12 @@
  * @link http://www.novius-os.org
  */
 
+
+define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
+
 // Load in the Autoloader
-require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
-class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
+require FUEL_EXTEND_PATH.'autoloader.php';
+//class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
 
 // Bootstrap the framework DO NOT edit this
 require_once COREPATH.'bootstrap.php';
@@ -18,7 +21,7 @@ if (!MBSTRING) {
     require_once NOSPATH.'mb_string.php';
 }
 
-define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
+
 \Autoloader::add_classes(array(
     // Add classes you want to override here
     // Example: 'View' => APPPATH.'classes/view.php',
@@ -93,7 +96,12 @@ spl_autoload_register(function($class) {
 
 // Initialize the framework with the config file.
 $config_novius = include(NOSPATH.'config/config.php');
-$routes_novius = include(NOSPATH.'config/routes.php');
+
+$routes_novius = @include(NOSPATH.'config/routes.config.php');
+if ($routes_novius === false) {
+    $routes_novius = include(NOSPATH.'config/routes.php');
+}
+
 $config_app    = include(APPPATH.'config/config.php');
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));

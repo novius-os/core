@@ -56,9 +56,9 @@ class Widget_Time_Picker extends \Fieldset_Field {
 <script type="text/javascript">
 	require([
 		'jquery-nos',
-        'static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon',
-        'link!static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon.css',
-	], function( \$nos ) {
+		'jquery',
+		'jquery-ui.datetimepicker'
+	], function( \$nos, \$ ) {
 		\$nos(function() {
 			var \$input = \$nos('input#$id');
 			\$input.timepicker(\$input.data('timepicker-options'));
