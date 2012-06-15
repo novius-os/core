@@ -84,15 +84,16 @@ define('jquery-nos-appdesk',
                 self.uiHeaderBar = $('<div></div>').addClass('nos-appdesk-headerbar')
                     .appendTo(self.element);
 
-                self.uiAdds = $('<div></div>').addClass('nos-appdesk-adds')
+                self.uiHeaderBarLeft = $('<div></div>').addClass('nos-appdesk-headerbar-left')
                     .appendTo(self.uiHeaderBar);
-                self.uiAddsButton = $('<button type="button"></button>').addClass('primary').appendTo(self.uiAdds);
+                self.uiAddsButton = $('<button type="button"></button>').addClass('primary').appendTo(self.uiHeaderBarLeft);
 
-                self.uiViewsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownviews')
+                self.uiHeaderBarRight = $('<div></div>').addClass('nos-appdesk-headerbar-right')
                     .appendTo(self.uiHeaderBar);
-
                 self.uiLangsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownlang')
-                    .appendTo(self.uiHeaderBar);
+                    .appendTo(self.uiHeaderBarRight);
+                self.uiViewsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownviews')
+                    .appendTo(self.uiHeaderBarRight);
 
                 self.uiSplitterVertical = $('<div></div>').addClass('nos-appdesk-splitter-v')
                     .appendTo(self.element);
@@ -216,7 +217,7 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 if (!$.isArray(o.adds) || !o.adds.length) {
-                    self.uiAdds.hide();
+                    self.uiHeaderBarLeft.hide();
                     return self;
                 }
 
@@ -249,7 +250,7 @@ define('jquery-nos-appdesk',
                     $('<a href="#"></a>')
                         .addClass('nos-appdesk-action-secondary')
                         .text(this.label)
-                        .appendTo(self.uiAdds)
+                        .appendTo(self.uiHeaderBarLeft)
                         .click(function(e) {
                             e.preventDefault();
                             e.stopImmediatePropagation();

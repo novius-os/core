@@ -30,19 +30,24 @@
     height : 100%;
 
 	.nos-appdesk-headerbar {
-		margin : 0px 10px 0;
+		margin : 5px 10px;
 
-		.nos-appdesk-adds {
-			float : left;
+		.nos-appdesk-headerbar-left {
+            display : inline-block;
             margin-top: 5px;
 		}
         .nos-appdesk-action-secondary {
             display : inline-block;
             margin: 0 1em;
         }
+        .nos-appdesk-headerbar-right {
+            float: right;
+            margin-top: 5px;
+        }
 		.nos-appdesk-dropdownviews, .nos-appdesk-dropdownlang {
-			float : right;
-            margin-top: 10px;
+            display : inline-block;
+            vertical-align: middle;
+            margin-top: 5px;
             margin-left: 10px;
 		}
 	}
@@ -50,7 +55,7 @@
 	.nos-appdesk-splitter-v {
 		@include box-sizing(border-box);
 		position : absolute;
-        top : 45px;
+        top : 54px;
 		left : 0;
 		right : 0;
 		bottom : 0;
