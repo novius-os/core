@@ -214,6 +214,11 @@
             'wijmo.wijwizard' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget','jquery-ui.position', 'jquery-ui.effects.core', 'jquery.cookie', 'wijmo.wijutil', 'wijmo.wijsuperpanel'),
         ),
         'deps' => array('jquery', 'jquery-nos', 'log'),
+        'config' => array(
+            'jquery-nos-wysiwyg' => array(
+                'minified' => $assets_minified,
+            ),
+        ),
     );
 
 	if (!$assets_minified) {
@@ -362,15 +367,6 @@
 <?= $css ?>
 <script src="<?= $require ?>" type="text/javascript"></script>
 <script type="text/javascript">
-	var assets_minified = <?= \Format::forge($assets_minified)->to_json() ?>;
-    require.onError = function (err) {
-        console.log(err);
-        if (err.requireType === 'timeout') {
-            console.log('modules: ' + err.requireModules);
-        }
-
-        throw err;
-    };
     require.config(<?= \Format::forge($config)->to_json() ?>);
 </script>
 <?= $js ?>
