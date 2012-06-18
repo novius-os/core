@@ -47,7 +47,7 @@ class Widget_Wysiwyg extends \Fieldset_Field {
 	    // we have to find why it's called two times...
         return \View::forge('widget/wysiwyg', array(
             'id' => $this->get_attribute('id'),
-        ));
+        ), false);
 	}
 
 }

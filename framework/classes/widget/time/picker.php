@@ -53,7 +53,7 @@ class Widget_Time_Picker extends \Fieldset_Field {
 	public function js_init() {
         return \View::forge('widget/time_picker', array(
             'id' => $this->get_attribute('id'),
-        ));
+        ), false);
 	}
 
 }

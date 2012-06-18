@@ -60,6 +60,6 @@ class Widget_Media extends \Fieldset_Field {
 	public function js_init() {
 		return \View::forge('widget/media', array(
             'id' => $this->get_attribute('id'),
-        ));
+        ), false);
 	}
 }

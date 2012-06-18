@@ -11,7 +11,7 @@
 if (\Input::is_ajax()) {
 
     foreach ($backtrace as &$trace) {
-        $trace = array_diff_key($trace, array(
+        $trace = array_intersect_key($trace, array(
             'file' => true,
             'line' => true,
         ));
