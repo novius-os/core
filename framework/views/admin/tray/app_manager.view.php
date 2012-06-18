@@ -108,7 +108,7 @@
 	<div class="unit lastUnit"></div>
 
     <script type="text/javascript">
-        require(['jquery-nos'], function ($nos) {
+        require(['jquery-nos', 'wijmo.wijgrid'], function ($nos) {
             $nos(function() {
                 var $container = $nos('#<?= $uniqid ?>');
                 $container.form();
