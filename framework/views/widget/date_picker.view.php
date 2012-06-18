@@ -17,7 +17,7 @@
         function($nos) {
             $nos(function() {
                 var $input = $nos('input#<?= $id ?>');
-                $input<?= $wrapper ?>.datepicker($input.data('datepicker-options'));
+                $input<?= !empty($wrapper) ? '.wrap('.\Format::forge()->to_json($wrapper).')' : '' ?>.datepicker($input.data('datepicker-options'));
             });
         });
 </script>
