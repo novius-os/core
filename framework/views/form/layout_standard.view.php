@@ -173,6 +173,9 @@ $large = !empty($large) && $large == true;
                             if (!isset($options['fields'])) {
                                 $options = array('fields' => $options);
                             }
+                            if (!isset($options['field_template'])) {
+                                $options['field_template'] = '<p>{field}</p>';
+                            }
                             ?>
                             <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $title ?></a></h3>
                             <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
@@ -182,9 +185,9 @@ $large = !empty($large) && $large == true;
                                         if ($field instanceof \View) {
                                             echo $field;
                                         } else if ($field == '_id') {
-                                            echo '<p>ID : '.$_id.'</p>';
+                                            echo strtr($options['field_template'], array('{field}' => 'ID : '.$_id));
                                         } else {
-                                            echo '<p>'.$fieldset->field($field)->build().'</p>';
+                                            echo strtr($options['field_template'], array('{field}' => $fieldset->field($field)->build()));
                                         }
                                     } catch (\Exception $e) {
                                         throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
