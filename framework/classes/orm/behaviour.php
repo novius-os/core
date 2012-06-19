@@ -12,8 +12,16 @@ namespace Nos;
 
 abstract class Orm_Behaviour extends \Orm\Observer
 {
+    protected $_class = null;
+    protected $_properties = array();
 
-	public static function behaviour($instance, $method, $args)
+    public function __construct($class)
+    {
+        $this->_class = $class;
+        $this->_properties = call_user_func($class . '::observers', get_class($this));
+    }
+
+    public static function behaviour($instance, $method, $args)
 	{
 		$model_class = is_object($instance) ? get_class($instance) : $instance;
 		if (method_exists(static::instance($model_class), $method))
