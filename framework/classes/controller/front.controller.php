@@ -393,6 +393,7 @@ class Controller_Front extends Controller {
         // Get the first page
         reset($pages);
         $this->_page = current($pages);
+        \Nos\I18n::setLocale($this->_page->get_lang());
     }
 
     protected function _find_template() {

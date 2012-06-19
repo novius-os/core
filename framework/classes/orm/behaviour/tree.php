@@ -12,7 +12,6 @@ namespace Nos;
 
 class Orm_Behaviour_Tree extends Orm_Behaviour
 {
-	protected $_class = null;
     protected $_parent_relation = null;
     protected $_children_relation = null;
 
@@ -24,8 +23,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
 	public function __construct($class)
 	{
-		$this->_class = $class;
-		$this->_properties = call_user_func($class . '::observers', get_class($this));
+        parent::__construct($class);
         $this->_parent_relation = call_user_func($class . '::relations', $this->_properties['parent_relation']);
         $this->_children_relation = call_user_func($class . '::relations', $this->_properties['children_relation']);
 

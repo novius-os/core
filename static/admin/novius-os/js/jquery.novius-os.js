@@ -469,6 +469,21 @@ define('jquery-nos',
             confirmationDialog: function(params) {
                 var self = this;
 
+                var i18n = {
+                    'confirm_deletion': 'Confirm the deletion',
+                    'or': 'or',
+                    'cancel': 'Cancel',
+                    'wrong_confirmation': 'Wrong confirmation'
+                };
+                if (params.i18n) {
+                    i18n = params.i18n;
+                } else if (params.appDesk) {
+                    i18n['confirm_deletion'] = params.appDesk.i18n('Confirm the deletion').label;
+                    i18n['or'] = params.appDesk.i18n('or').label;
+                    i18n['cancel'] = params.appDesk.i18n('Cancel').label;
+                    i18n['wrong_confirmation'] = params.appDesk.i18n('Wrong confirmation').label;
+                }
+
                 if (!params) {
                     params = {};
                 }
@@ -481,9 +496,9 @@ define('jquery-nos',
                         var $form = $nos('<form class="fieldset standalone"></form>');
 
                         var $confirmationZone = $('<p></p>');
-                        var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(params.appDesk.i18n('Confirm the deletion').label);
-                        var $cancelButton = $('<a href="#"></a>').append(params.appDesk.i18n('Cancel').label);
-                        var $or = $('<span></span>').text(' ' + params.appDesk.i18n('or').label + ' ');
+                        var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(i18n['confirm_deletion']);
+                        var $cancelButton = $('<a href="#"></a>').append(i18n['cancel']);
+                        var $or = $('<span></span>').text(' ' + i18n['or'] + ' ');
                         var $verifications = $dialog.find('.verification');
 
                         $confirmButton.appendTo($confirmationZone);
@@ -508,7 +523,7 @@ define('jquery-nos',
                                 }
                                 $dialog.dialog('close');
                             } else {
-                                $nos.notify(params.appDesk.i18n('Wrong confirmation').label, 'error');
+                                $nos.notify(i18n['wrong_confirmation'], 'error');
                             }
 
                         });
@@ -604,7 +619,7 @@ define('jquery-nos',
                         }
 
                         var proceed = true;
-                        if (options.ajax) {
+                        if (options.ajax && options.contentUrl) {
                             var contentUrl = options.contentUrl;
                             delete options.contentUrl;
                             options.autoOpen = false;
@@ -649,6 +664,7 @@ define('jquery-nos',
                             });
                         } else {
                             $dialog.wijdialog(options);
+                            $.isFunction(options['dialogRendered']) && options['dialogRendered']($dialog);
                         }
                         if (proceed && $.isFunction(options.onLoad)) {
                             options.onLoad();
