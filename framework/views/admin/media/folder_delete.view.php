@@ -18,8 +18,8 @@
     } else {
         ?>
         <p><?= strtr(__(
-                $media_count == 1 ? 'There are <strong>one media</strong> in this folder.'
-                                  : 'There is <strong>{count} medias</strong> in this folder.'
+                $media_count == 1 ? 'There is <strong>one media</strong> in this folder.'
+                                  : 'There are <strong>{count} medias</strong> in this folder.'
         ), array(
             '{count}' => $media_count,
         )) ?></p>
