@@ -12,8 +12,6 @@ namespace Nos;
 
 class Orm_Behaviour_Translatable extends Orm_Behaviour
 {
-    protected $_class = null;
-
     /**
      * lang_property
      * common_id_property
@@ -22,12 +20,6 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * default_lang
      */
     protected $_properties = array();
-
-    public function __construct($class)
-    {
-        $this->_class = $class;
-        $this->_properties = call_user_func($class . '::observers', get_class($this));
-    }
 
     /**
      * Fill in the lang_common_id and lang properties when creating the object

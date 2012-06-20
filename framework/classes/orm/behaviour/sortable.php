@@ -12,18 +12,10 @@ namespace Nos;
 
 class Orm_Behaviour_Sortable extends Orm_Behaviour
 {
-	protected $_class = null;
-
 	/**
 	 * sort_property
 	 */
 	protected $_properties = array();
-
-	public function __construct($class)
-	{
-		$this->_class = $class;
-		$this->_properties = call_user_func($class . '::observers', get_class($this));
-	}
 
 	public function before_query(&$options) {
 		if (array_key_exists('order_by', $options)) {

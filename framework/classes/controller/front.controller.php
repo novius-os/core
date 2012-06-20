@@ -105,13 +105,16 @@ class Controller_Front extends Controller {
 	        }
 
 	        if ($_404) {
-                if (!\Event::trigger('front.404NotFound', array('url' => $this->_page_url))) {
+                $event_404 = \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
+                $event_404 = array_filter($event_404);
+                if (empty($event_404)) {
                     // If no redirection then we display 404
                     if (!empty($url)) {
                         $_SERVER['REDIRECT_URL'] = '/';
                         return $this->router('index', $params);
                     } else {
-                        exit('No home page defined. Please check you created a page and it\'s published');
+                        echo \View::forge('nos::errors/blank_slate_front');
+                        exit();
                     }
                 }
 	        }
@@ -390,6 +393,7 @@ class Controller_Front extends Controller {
         // Get the first page
         reset($pages);
         $this->_page = current($pages);
+        \Nos\I18n::setLocale($this->_page->get_lang());
     }
 
     protected function _find_template() {

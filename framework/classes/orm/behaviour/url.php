@@ -12,20 +12,12 @@ namespace Nos;
 
 class Orm_Behaviour_Url extends Orm_Behaviour
 {
-	protected $_class = null;
-
 	/**
 	 * publication_bool_property
 	 * publication_start_property
 	 * publication_end_property
 	 */
 	protected $_properties = array();
-
-	public function __construct($class)
-	{
-		$this->_class = $class;
-		$this->_properties = call_user_func($class . '::observers', get_class($this));
-	}
 
 	public function first_url($object) {
 		return static::_possible_url($object, true);
