@@ -37,7 +37,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
         $this->trigger('before', $this, 'boolean');
 
-        return parent::before();
+        parent::before();
     }
 
     public function after($response) {
