@@ -12,20 +12,12 @@ namespace Nos;
 
 class Orm_Behaviour_Publishable extends Orm_Behaviour
 {
-	protected $_class = null;
-
 	/**
 	 * publication_bool_property
 	 * publication_start_property
 	 * publication_end_property
 	 */
 	protected $_properties = array();
-
-	public function __construct($class)
-	{
-		$this->_class = $class;
-		$this->_properties = call_user_func($class . '::observers', get_class($this));
-	}
 
     public static function dataset(&$dataset) {
         $dataset['publication_status'] = array(__CLASS__, 'publication_status');

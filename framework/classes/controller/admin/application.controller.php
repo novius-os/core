@@ -17,21 +17,18 @@ class Controller_Admin_Application extends Controller_Admin_Auth {
 
 
     public function before() {
-        $ret = parent::before();
-        $location = $this->getLocation();
-        list($application, $file_name) = $location;
-        if ($application == 'nos' && isset($location[2])) {
-            $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native applications...
-        }
+        parent::before();
 
         if (!$this->bypass) {
+            $location = $this->getLocation();
+            list($application, $file_name) = $location;
+            if ($application == 'nos' && isset($location[2])) {
+                $application = 'nos_'.$location[2]; // this hack should be temporary until we figure out how to correctly implement native applications...
+            }
             if ($application != 'nos' && !Permission::check($application, 'access')) {
                 throw new \Exception('You don\'t have access to application '.$application.'!');
             }
         }
-
-        //\Debug::dump($application, Permission::check($application, 'access'));
-        return $ret;
     }
 
 

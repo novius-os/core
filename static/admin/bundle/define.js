@@ -54,6 +54,7 @@ define('wijmo.wijaccordion');
 define('wijmo.wijdialog');
 define('wijmo.wijpager');
 define('wijmo.wijtextbox');
+define('wijmo.wijradio');
 define('wijmo.wijgrid');
 define('wijmo.wijlightbox');
 define('wijmo.wijtooltip');

@@ -19,6 +19,8 @@ class I18n
 
     private static $_locale;
 
+    private static $_encoding;
+
     private static $_locale_stack = array();
 
     private static $_loaded_files = array();
@@ -44,6 +46,16 @@ class I18n
             $country = mb_strtoupper($language);
         }
         static::$_locale = $language.'_'.$country;
+        if (!empty($encoding)) {
+            static::$_encoding = $encoding;
+        }
+        setlocale(LC_ALL, array(
+                static::$_locale.'.'.static::$_encoding.'@'.$variant,
+                static::$_locale.'.'.static::$_encoding,
+                static::$_locale.'@'.$variant,
+                static::$_locale,
+            )
+        );
     }
 
     public static function restoreLocale()
