@@ -10,22 +10,9 @@
 
 namespace Nos;
 
-class Controller_Admin_Noviusos extends Controller
+class Controller_Admin_Noviusos extends Controller_Admin_Auth
 {
     public $template = 'nos::admin/html';
-
-    public function before()
-    {
-        parent::before();
-
-        if (!\Nos\Auth::check())
-        {
-            \Response::redirect('/admin/nos/login'.($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
-            exit();
-        }
-
-        $this->auto_render = false;
-    }
 
     public function after($response)
     {

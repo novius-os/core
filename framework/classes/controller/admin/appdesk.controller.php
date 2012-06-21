@@ -42,10 +42,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
     }
 
     public function action_index($view = null) {
-        if (!\Nos\Auth::check()) {
-            \Response::redirect('/admin/nos/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
-            exit();
-        }
 
         if (empty($view)) {
             $view = \Input::get('view', $this->appdesk['selectedView']);
@@ -68,13 +64,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
     public function action_json()
     {
-
-        if (!\Nos\Auth::check()) {
-            \Response::json(403, array(
-                'login_page' => \Uri::base(false).'admin/nos/login',
-            ));
-        }
-
         $config = $this->appdesk;
         $where = function($query) use ($config) {
             foreach ($config['inputs'] as $input => $condition) {
@@ -170,12 +159,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
     public function action_tree_json()
     {
-        if (!\Nos\Auth::check()) {
-            \Response::json(403, array(
-                'login_page' => \Uri::base(false).'admin/nos/login',
-            ));
-        }
-
         $tree_config = $this->appdesk['tree'];
         $tree_config['id'] =  $this->appdesk['configuration_id'];
 
