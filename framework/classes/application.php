@@ -214,71 +214,50 @@ class Application
     {
         // Load current data
         $data_path = APPPATH.'data'.DS.'config'.DS;
-        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced') as $config_file)
+        $config = array();
+        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced') as $section)
         {
-            \Config::load($data_path.$config_file.'.php', 'data::'.$config_file);
-            ${$config_file} = \Config::get('data::'.$config_file, true);
+            \Config::load($data_path.$section.'.php', 'data::'.$section);
+            $config[$section] = \Config::get('data::'.$section, true);
         }
 
-        if (!isset($new_metadata['templates']))
+        foreach (array('templates', 'enhancers', 'launchers') as $section)
         {
-            $new_metadata['templates'] = array();
-        }
-        if (!isset($new_metadata['launchers']))
-        {
-            $new_metadata['launchers'] = array();
-        }
-        if (!isset($new_metadata['enhancers']))
-        {
-            $new_metadata['enhancers'] = array();
-        }
-        if (!isset($old_metadata['templates']))
-        {
-            $old_metadata['templates'] = array();
-        }
-        if (!isset($old_metadata['launchers']))
-        {
-            $old_metadata['launchers'] = array();
-        }
-        if (!isset($old_metadata['enhancers']))
-        {
-            $old_metadata['enhancers'] = array();
-        }
+            if (!isset($new_metadata[$section]))
+            {
+                $new_metadata[$section] = array();
+            }
+            if (!isset($old_metadata[$section]))
+            {
+                $old_metadata[$section] = array();
+            }
+            $removed[$section] = array();
 
-        $removed_templates = array();
-        $removed_launchers = array();
-        $removed_enhancers = array();
-
-        if (empty($old_metadata))
-        {
-            // Add
-            $added_templates = $new_metadata['templates'];
-            $added_launchers = $new_metadata['launchers'];
-            $added_enhancers = $new_metadata['enhancers'];
-        }
-        else
-        {
-            // Repair
-            $added_templates   = array_diff_key($new_metadata['templates'], $old_metadata['templates']);
-            $removed_templates = array_diff_key($old_metadata['templates'], $new_metadata['templates']);
-            $added_launchers   = array_diff_key($new_metadata['launchers'], $old_metadata['launchers']);
-            $removed_launchers = array_diff_key($old_metadata['launchers'], $new_metadata['launchers']);
-            $added_enhancers   = array_diff_key($new_metadata['enhancers'], $old_metadata['enhancers']);
-            $removed_enhancers = array_diff_key($old_metadata['enhancers'], $new_metadata['enhancers']);
+            if (empty($old_metadata))
+            {
+                // Add
+                $added[$section] = $new_metadata[$section];
+            }
+            else
+            {
+                // Repair
+                $added[$section]   = array_diff_key($new_metadata[$section], $old_metadata[$section]);
+                $removed[$section] = array_diff_key($old_metadata[$section], $new_metadata[$section]);
+            }
         }
 
         // Check duplicate templates
-        if (!empty($added_templates)) {
-            $duplicates = array_intersect_key($templates, $added_templates);
+        if (!empty($added['templates'])) {
+            $duplicates = array_intersect_key($templates, $added['templates']);
             if (count($duplicates) > 0)
             {
                 throw new \Exception(count($duplicates).' templates from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
             }
         }
 
-        if (!empty($removed_templates)) {
+        if (!empty($removed['templates'])) {
             // Check template usage in the page
-            $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed_templates)))));
+            $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
             if (count($pages) > 0)
             {
                 throw new \Exception(count($pages).' pages use a template from this application.');
@@ -286,8 +265,8 @@ class Application
         }
 
         // Check duplicate launchers
-        if (!empty($added_launchers)) {
-            $duplicates = array_intersect_key($launchers, $added_launchers);
+        if (!empty($added['launchers'])) {
+            $duplicates = array_intersect_key($launchers, $added['launchers']);
             if (count($duplicates) > 0)
             {
                 throw new \Exception(count($duplicates).' launchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
@@ -295,8 +274,8 @@ class Application
         }
 
         // Check duplicate enhancers
-        if (!empty($added_enhancers)) {
-            $duplicates = array_intersect_key($enhancers, $added_enhancers);
+        if (!empty($added['enhancers'])) {
+            $duplicates = array_intersect_key($enhancers, $added['enhancers']);
             if (count($duplicates) > 0)
             {
                 throw new \Exception(count($duplicates).' enhancers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
@@ -304,19 +283,22 @@ class Application
         }
 
         // Update actual configuration
-        // TEMPLATES
-        $templates = array_merge($templates, $added_templates);
-        $templates = array_diff_key($templates, $removed_templates);
+        foreach (array('templates', 'enhancers', 'launchers') as $section)
+        {
 
-        // LAUNCHERS
-        $launchers = array_merge($launchers, $added_launchers);
-        $launchers = array_diff_key($launchers, $removed_launchers);
+            // Update
+            $updated = array_intersect_key($new_metadata[$section], $old_metadata[$section]);
+            foreach ($updated as $k => $v)
+            {
+                $config[$section][$k] = $v;
+            }
 
-        // ENHANCERS
-        $enhancers = array_merge($enhancers, $added_enhancers);
-        $enhancers = array_diff_key($enhancers, $removed_enhancers);
+            $config[$section] = array_merge($config[$section], $added[$section]);
+            $config[$section] = array_diff_key($config[$section], $removed[$section]);
+        }
 
-        foreach ($added_enhancers as $key => $enhancer)
+        // More treatment for enhancers
+        foreach ($added['enhancers'] as $key => $enhancer)
         {
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
@@ -324,7 +306,7 @@ class Application
             }
         }
 
-        foreach ($removed_enhancers as $key => $enhancer)
+        foreach ($removed['enhancers'] as $key => $enhancer)
         {
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
@@ -333,12 +315,7 @@ class Application
             }
         }
 
-        return array(
-            'templates' => $templates,
-            'enhancers' => $enhancers,
-            'launchers' => $launchers,
-            'models_url_enhanced' => $models_url_enhanced,
-        );
+        return $config;
     }
 
     protected function save_config($config)
