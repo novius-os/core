@@ -557,7 +557,7 @@ define('jquery-nos-ostabs',
                         $( 'title' ).text( $li.find( '.nos-ostabs-label' ).text() );
                         var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
                         if ('replaceState' in window.history) {
-                            window.history.replaceState(tab, '', document.location.pathname + '?tab=' + url);
+                            window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
                         } else {
                             document.location.hash = 'tab=' + url;
                         }
@@ -896,7 +896,7 @@ define('jquery-nos-ostabs',
                         $( 'title' ).text( tab.label );
                         var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
                         if ('replaceState' in window.history) {
-                            window.history.replaceState(tab, '', document.location.pathname + '?tab=' + url);
+                            window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
                         } else {
                             document.location.hash = 'tab=' + url;
                         }
