@@ -21,9 +21,14 @@ class Controller_Admin_Login extends Controller {
 
         // If user is already logged in, proceed
 		if (\Nos\Auth::check()) {
-			\Response::redirect(urldecode(\Input::get('redirect', '/admin/')));
-			exit();
+			$this->redirect();
 		}
+    }
+
+    protected function redirect() {
+
+        \Response::redirect(urldecode(\Input::get('redirect', '/admin/')));
+        exit();
     }
 
     public function action_index() {
@@ -68,8 +73,7 @@ class Controller_Admin_Login extends Controller {
 
 		if (\Nos\Auth::login($_POST['email'], $_POST['password'])) {
 			\Event::trigger('user_login');
-			\Response::redirect(urldecode(\Input::get('redirect', '/admin/')));
-			exit();
+			$this->redirect();
 		}
 		return 'Access denied';
 	}
