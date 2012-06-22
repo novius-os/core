@@ -25,11 +25,6 @@ class Controller_Inspector_Model extends Controller_Admin_Application {
 
     public function action_list()
     {
-		if (!\Nos\Auth::check()) {
-			\Response::redirect('/admin/nos/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
-			exit();
-		}
-
         $view = View::forge('inspector/model');
 
         return $view;
@@ -37,12 +32,6 @@ class Controller_Inspector_Model extends Controller_Admin_Application {
 
     public function action_json()
     {
-		if (!\Nos\Auth::check()) {
-			\Response::json(403, array(
-				'login_page' => \Uri::base(false).'admin/nos/login',
-			));
-		}
-
 	    $config = $this->config;
 	    $where = function($query) use ($config) {
 		    Filter::apply($query, $config);

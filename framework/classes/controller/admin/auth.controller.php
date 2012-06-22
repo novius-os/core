@@ -10,6 +10,28 @@
 
 namespace Nos;
 
-class Controller_Admin_Auth extends Controller {
+class Controller_Admin_Auth extends Controller
+{
 
+    public function before()
+    {
+        parent::before();
+
+        if (!\Nos\Auth::check())
+        {
+            if (\Input::is_ajax())
+            {
+                $this->response(array(
+                    'login_page' => \Uri::base(false).'admin/nos/login',
+                ), 403);
+            }
+            else
+            {
+                \Response::redirect('/admin/nos/login?'.http_build_query(array(
+                    'redirect' => $_SERVER['REDIRECT_URL'].'?tab='.\Input::get('tab', ''),
+                ), '', '&'));
+                exit();
+            }
+        }
+    }
 }

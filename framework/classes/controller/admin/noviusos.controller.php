@@ -10,29 +10,16 @@
 
 namespace Nos;
 
-class Controller_Admin_Noviusos extends Controller
+class Controller_Admin_Noviusos extends Controller_Admin_Auth
 {
     public $template = 'nos::admin/html';
-
-    public function before()
-    {
-        parent::before();
-
-        if (!\Nos\Auth::check())
-        {
-            \Response::redirect('/admin/nos/login'.($_SERVER['REDIRECT_URL'] ? '?redirect='.urlencode($_SERVER['REDIRECT_URL']) : ''));
-            exit();
-        }
-
-        $this->auto_render = false;
-    }
 
     public function after($response)
     {
         foreach (array(
-    'title' => 'Administration',
-    'base' => \Uri::base(false),
-    'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
+            'title' => 'Administration',
+            'base' => \Uri::base(false),
+            'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
         ) as $var => $default)
         {
             if (empty($this->template->$var))
@@ -44,7 +31,7 @@ class Controller_Admin_Noviusos extends Controller
         $this->template->set(array(
             'css' => \Asset::render('css'),
             'js' => \Asset::render('js'),
-                ), false, false);
+        ), false, false);
 
         return $ret;
     }
@@ -57,6 +44,13 @@ class Controller_Admin_Noviusos extends Controller
         $user_configuration = unserialize($user->user_configuration);
         $deep_linking_url = \Input::get('tab', null);
 
+        $osTabs = array(
+            'panelId' => 'noviusospanel',
+            'url' => 'admin/nos/noviusos/appstab',
+            'iconClasses' => 'nos-icon32',
+            'iconSize' => 32,
+            'label' => 'Novius OS',
+        );
         $trayTabs = array(
             array(
                 'url' => 'admin/nos/tray/help',
@@ -85,53 +79,71 @@ class Controller_Admin_Noviusos extends Controller
 
         if (!empty($deep_linking_url))
         {
-            if (!is_array($user_configuration['tabs']['tabs'])) {
+            if (!isset($user_configuration['tabs'])) {
+                $user_configuration['tabs']  = array();
+            }
+            if (!isset($user_configuration['tabs']['tabs'])) {
                 $user_configuration['tabs']['tabs']  = array();
             }
             $openRank = null;
-            foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
+            $found = false;
+
+            // Native = OS + tray
+            $nativeTabs = $trayTabs;
+            array_unshift($nativeTabs, $osTabs);
+
+            // Search native tabs
+            foreach ($nativeTabs as $i => $tab)
             {
                 if ($tab['url'] == $deep_linking_url)
                 {
-                    $openRank = $tab['openRank'];
-                    $tab['openRank'] = 0;
-                    $user_configuration['tabs']['selected'] = $i + $count_trayTabs + 1;
+                    $user_configuration['tabs']['selected'] = $i;
+                    $found = true;
                 }
             }
-            unset($tab);
+
+            // Search user tabs
+            if (!$found)
+            {
+                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
+                {
+                    if ($tab['url'] == $deep_linking_url)
+                    {
+                        $openRank = $tab['openRank'];
+                        $tab['openRank'] = 0;
+                        $user_configuration['tabs']['selected'] = $i + $count_trayTabs + 1;
+                        $found = true;
+                    }
+                }
+                unset($tab);
+            }
 
             // Tab was not found found, add it
-            if ($openRank === null)
+            if (!$found)
             {
-                $user_configuration['tabs']['selected'] = count($user_configuration['tabs']) + $count_trayTabs;
+                $user_configuration['tabs']['selected'] = count($user_configuration['tabs']['tabs']) + 1 + $count_trayTabs;
                 $openRank = 1;
                 $user_configuration['tabs']['tabs'][] = array(
                     'url' => $deep_linking_url,
                     'openRank' => 1,
                 );
-            }
 
-            // Rank from every tab goes up
-            foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
-            {
-                if ($tab['openRank'] < $openRank)
+                // Rank from every tab goes up
+                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
                 {
-                    $tab['openRank']++;
+                    if ($tab['openRank'] < $openRank)
+                    {
+                        $tab['openRank']++;
+                    }
                 }
+                unset($tab);
             }
-            unset($tab);
         }
 
         $ostabs = array(
             'initTabs' => array(),
             'trayTabs' => $trayTabs,
-            'appsTab' => array(
-                'panelId' => 'noviusospanel',
-                'url' => 'admin/nos/noviusos/appstab',
-                'iconClasses' => 'nos-icon32',
-                'iconSize' => 32,
-                'label' => 'Novius OS',
-            ),
+            'appsTab' => $osTabs,
             'newTab' => array(
                 'panelId' => 'noviusospanel',
                 'url' => 'admin/nos/noviusos/appstab',
