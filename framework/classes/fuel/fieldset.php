@@ -264,7 +264,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
 			} else {
-                if ($attributes['type'] == 'checkbox') {
+                if (\Arr::get($attributes, 'type', '') == 'checkbox') {
                     unset($attributes['empty']);
                 }
 				$field = $this->add($p, $label, $attributes);
