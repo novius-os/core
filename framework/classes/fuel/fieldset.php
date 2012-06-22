@@ -173,11 +173,14 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 * @param   array|object  input for initial population of fields, this is deprecated - you should use populate() instea
 	 * @return  Fieldset  this, to allow chaining
 	 */
-	public function repopulate($repopulate = false) {
+	public function repopulate() {
 
 		$input = mb_strtolower($this->form()->get_attribute('method', 'post')) == 'get' ? \Input::get() : \Input::post();
 
 		foreach ($this->fields as $f) {
+            if ($f->type == 'checkbox' && !isset($input[$f->name])) {
+                $f->set_attribute('checked', null);
+            }
 
 			// Don't repopulate the CSRF field
 			if ($f->name === \Config::get('security.csrf_token_key', 'fuel_csrf_token'))
@@ -191,7 +194,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			}
 		}
 
-		return parent::populate($input, $repopulate);
+        parent::repopulate(); //return parent::populate($input);
 	}
 
 	/**
@@ -206,8 +209,14 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $values = array();
             foreach ($this->fields as $f)
 			{
-                $values[$f->name] = $f->value;
+
+                if ($f->type == 'checkbox' && $f->get_attribute('checked') == null) {
+                    $values[$f->name] = null;
+                } else {
+                    $values[$f->name] = $f->value;
+                }
             }
+
 			return $values;
 		}
 		return $this->field($name)->value;
@@ -255,6 +264,9 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
 			} else {
+                if (\Arr::get($attributes, 'type', '') == 'checkbox') {
+                    unset($attributes['empty']);
+                }
 				$field = $this->add($p, $label, $attributes);
 			}
 			if ( ! empty($settings['validation']))
@@ -349,11 +361,17 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		if (!empty($options['form_name'])) {
 			$fieldset->form_name($options['form_name']);
 		}
+
         if (isset($instance)) {
             // Let behaviours do their job (publication for example)
             $instance->form_fieldset_fields($config);
         }
+
+
+
 		$fieldset->add_widgets($config, $options);
+
+
 
 		if (!empty($options['extend']) && is_callable($options['extend'])) {
 			call_user_func($options['extend'], $fieldset);
@@ -363,15 +381,18 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $fieldset->populate_with_instance($instance);
         }
 
+        $options['fieldset'] = $fieldset;
+
 		if ($options['save'] && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
-			$fieldset->repopulate();
+            $fieldset->repopulate();
 			if ($fieldset->validation()->run($fieldset->value())) {
 				$data = $fieldset->validated();
 				if (!empty($options['complete']) && is_callable($options['complete'])) {
-					call_user_func($options['complete'], $data);
+                    $json = call_user_func($options['complete'], $data, $model, $config, $options);
 				} else {
-                    \Response::json(self::defaultComplete($data, $model, $config, $options));
+                    $json = self::defaultComplete($data, $model, $config, $options);
                 }
+                \Response::json($json);
 			} else {
 				 \Response::json(array(
 					'error' => (string) current($fieldset->error()),
@@ -450,7 +471,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
     }
 
     public static function defaultComplete($data, $object, $fields, $options) {
-
+        if (isset($options['fieldset'])) {
+            $fieldset = $options['fieldset'];
+        } else {
+            $fieldset = false;
+        }
 		if (!is_object($object)) {
 			return;
 		}
@@ -490,16 +515,21 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
 					call_user_func($config['before_save'], $object, $data);
 				} else {
-					if ($type == 'checkox' && empty($data[$name])) {
-						$object->$name = null;
+					if ($type == 'checkbox' && empty($data[$name])) {
+						$object->$name = \Arr::get($config, 'form.empty', null);
+
 					} else if (isset($data[$name]) && !in_array($name, $pk)) {
 						$object->$name = $data[$name];
 					}
 				}
 			}
 
+
+
+
             // Let behaviours do their job (publication for example)
-            $object->form_processing_behaviours($data, $json_response);
+            //$object->form_processing_behaviours($data, $json_response);
+
 
             if (!empty($options['before_save']) && is_callable($options['before_save']))
             {

@@ -555,6 +555,13 @@ define('jquery-nos-ostabs',
                         });
 
                         $( 'title' ).text( $li.find( '.nos-ostabs-label' ).text() );
+                        var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
+                        if ('replaceState' in window.history) {
+                            window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
+                        } else {
+                            document.location.hash = 'tab=' + url;
+                        }
+
 
                         self._load( self.anchors.index( this ) );
                     } else {
@@ -887,6 +894,12 @@ define('jquery-nos-ostabs',
                 } else {
                     if ( self.options.selected == index ) {
                         $( 'title' ).text( tab.label );
+                        var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
+                        if ('replaceState' in window.history) {
+                            window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
+                        } else {
+                            document.location.hash = 'tab=' + url;
+                        }
                     }
 
                     var $newLi = self._add(tab),

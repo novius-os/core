@@ -148,6 +148,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
                 }
             },
             'success' => function() use ($page, $is_new) {
+
                 $json = array(
                     'notify' => $is_new ? __('Page sucessfully added.') : __('Page successfully saved.'),
                     'dispatchEvent' => 'reload.nos_page',

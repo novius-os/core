@@ -21,11 +21,6 @@ class Controller_Inspector_Modeltree extends Controller_Admin_Application {
 
 	public function action_list($view = null, $view_data = array())
     {
-		if (!\Nos\Auth::check()) {
-			\Response::redirect('/admin/nos/login?redirect='.urlencode($_SERVER['REDIRECT_URL']));
-			exit();
-		}
-
         if (empty($view)) {
             $view = 'inspector/modeltree';
         }
@@ -39,12 +34,6 @@ class Controller_Inspector_Modeltree extends Controller_Admin_Application {
 
     public function action_json()
     {
-		if (!\Nos\Auth::check()) {
-			\Response::json(403, array(
-				'login_page' => \Uri::base(false).'admin/nos/login',
-			));
-		}
-
 	    $json = $this->tree($this->config);
 
 	    if (\Fuel::$env === \Fuel::DEVELOPMENT) {

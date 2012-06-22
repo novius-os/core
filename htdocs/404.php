@@ -13,10 +13,6 @@
  * Set error reporting and display errors settings.  You will want to change these when in production.
  */
 
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
@@ -35,60 +31,77 @@ $redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('RE
 
 $is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
 
-if ($is_media) {
+if ($is_media)
+{
 
     $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $redirect_url, $m);
 
-    if ($is_resized) {
-        list(,$path, $max_width, $max_height, $verification, $extension) = $m;
+    if ($is_resized)
+    {
+        list(, $path, $max_width, $max_height, $verification, $extension) = $m;
         $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
         $media_url = str_replace("/$max_width-$max_height", '', $media_url);
-    } else {
-        $media_url    = str_replace('media/', '', $redirect_url);
+    }
+    else
+    {
+        $media_url = str_replace('media/', '', $redirect_url);
     }
 
     $media = false;
     $res = \DB::select()->from(\Nos\Model_Media::table())->where(array(
-        array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
-    ))->execute()->as_array();
+                array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
+            ))->execute()->as_array();
 
-    if (!empty($res)) {
+    if (!empty($res))
+    {
         $media = \Nos\Model_Media::forge(reset($res));
     }
 
-    if (false === $media) {
+    if (false === $media)
+    {
         $send_file = false;
-    } else {
-        if ($is_resized) {
+    }
+    else
+    {
+        if ($is_resized)
+        {
             $source = APPPATH.$media->get_private_path();
-            $dest   = DOCROOT.$m[0];
-            $dir    = dirname($dest);
-            if (!is_dir($dir)) {
-                if (!@mkdir($dir, 0755, true)) {
+            $dest = DOCROOT.$m[0];
+            $dir = dirname($dest);
+            if (!is_dir($dir))
+            {
+                if (!@mkdir($dir, 0755, true))
+                {
                     exit("Can't create dir ".$dir);
                 }
             }
-            try {
+            try
+            {
                 \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
                 $send_file = $dest;
-            } catch(\Exception $e) {
+            }
+            catch (\Exception $e)
+            {
                 $send_file = false;
             }
-        } else {
+        }
+        else
+        {
             $source = APPPATH.$media->get_private_path();
             $target = DOCROOT.$media->get_public_path();
-            $dir    = dirname($target);
-            if (!is_dir($dir)) {
+            $dir = dirname($target);
+            if (!is_dir($dir))
+            {
                 mkdir($dir, 0755, true);
             }
-            @symlink($source, $target);
+            symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
             $send_file = $source;
         }
     }
 
-    if (false !== $send_file && is_file($send_file)) {
+    if (false !== $send_file && is_file($send_file))
+    {
         //Nos\Tools_File::$use_xsendfile = false;
-
         // This is a 404 error handler, so force status 200
         header('HTTP/1.0 200 Ok');
         header('HTTP/1.1 200 Ok');
@@ -98,7 +111,8 @@ if ($is_media) {
 }
 
 // real 404
-if (!$is_media) {
+if (!$is_media)
+{
     $response = Request::forge('nos/front/index', false)->execute()->response();
     $response->send(true);
 }

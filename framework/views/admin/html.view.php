@@ -343,6 +343,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <title><?= $title ?></title>
 <meta name="robots" content="noindex,nofollow">
+
+<script type="text/javascript">
+var hash = document.location.hash.substr(1);
+if (hash.substr(0, 4) == 'tab=') {
+    document.location.hash = '';
+    document.location.href = document.location.pathname + '?tab=' + hash.substr(4);
+}
+</script>
+
 <link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.css">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.1.0.min.css">
