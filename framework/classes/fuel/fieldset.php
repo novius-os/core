@@ -264,6 +264,9 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
 			} else {
+                if ($attributes['type'] == 'checkbox') {
+                    unset($attributes['empty']);
+                }
 				$field = $this->add($p, $label, $attributes);
 			}
 			if ( ! empty($settings['validation']))
@@ -513,7 +516,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 					call_user_func($config['before_save'], $object, $data);
 				} else {
 					if ($type == 'checkbox' && empty($data[$name])) {
-						$object->$name = null;
+						$object->$name = \Arr::get($config, 'form.empty', null);
 
 					} else if (isset($data[$name]) && !in_array($name, $pk)) {
 						$object->$name = $data[$name];

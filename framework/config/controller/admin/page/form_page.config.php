@@ -75,6 +75,7 @@ return array(
         'form' => array(
             'type' => 'checkbox',
             'value' => '1',
+            'empty' => '0',
         ),
     ),
     'page_menu' => array(
@@ -82,6 +83,7 @@ return array(
         'form' => array(
             'type' => 'checkbox',
             'value' => '1',
+            'empty' => '0',
         ),
     ),
     'page_menu_title' => array(
