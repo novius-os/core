@@ -61,9 +61,7 @@ class Widget_Date_Picker extends \Fieldset_Field
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id'), $this->options));
         $datepicker_options = $this->options['datepicker'];
-        $attributes['data-datepicker-options'] = htmlspecialchars(\Format::forge()->to_json($datepicker_options));
-
-        $this->set_attribute('data-datepicker-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+        $this->set_attribute('data-datepicker-options', htmlspecialchars(\Format::forge()->to_json($datepicker_options)));
         return (string) parent::build();
     }
 
@@ -82,9 +80,9 @@ class Widget_Date_Picker extends \Fieldset_Field
             $widget['id'] = uniqid('datepicker_');
         }
 
-        if (empty($attributes['size']))
+        if (empty($widget['size']))
         {
-            $attributes['size'] = 9;
+            $widget['size'] = 9;
         }
 
         // Default options of the widget
