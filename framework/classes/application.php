@@ -248,7 +248,7 @@ class Application
 
         // Check duplicate templates
         if (!empty($added['templates'])) {
-            $duplicates = array_intersect_key($templates, $added['templates']);
+            $duplicates = array_intersect_key($config['templates'], $added['templates']);
             if (count($duplicates) > 0)
             {
                 throw new \Exception(count($duplicates).' templates from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
@@ -266,7 +266,7 @@ class Application
 
         // Check duplicate launchers
         if (!empty($added['launchers'])) {
-            $duplicates = array_intersect_key($launchers, $added['launchers']);
+            $duplicates = array_intersect_key($config['launchers'], $added['launchers']);
             if (count($duplicates) > 0)
             {
                 throw new \Exception(count($duplicates).' launchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
@@ -275,7 +275,7 @@ class Application
 
         // Check duplicate enhancers
         if (!empty($added['enhancers'])) {
-            $duplicates = array_intersect_key($enhancers, $added['enhancers']);
+            $duplicates = array_intersect_key($config['enhancers'], $added['enhancers']);
             if (count($duplicates) > 0)
             {
                 throw new \Exception(count($duplicates).' enhancers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
@@ -302,7 +302,7 @@ class Application
         {
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
-                $models_url_enhanced[$model][] = $key;
+                $config['models_url_enhanced'][$model][] = $key;
             }
         }
 
@@ -310,8 +310,8 @@ class Application
         {
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
-                $remove = array_search($key, $models_url_enhanced[$model]);
-                unset($models_url_enhanced[$model][$remove]);
+                $remove = array_search($key, $config['models_url_enhanced'][$model]);
+                unset($config['models_url_enhanced'][$model][$remove]);
             }
         }
 

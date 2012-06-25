@@ -13,8 +13,8 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 <div <?= array_to_attr($attributes); ?>><table class="nos-treegrid"></table></div>
 <script type="text/javascript">
 	require([
-		'jquery-nos-treegrid'
-	], function( $nos, table, undefined ) {
+		'jquery', 'jquery-nos-treegrid'
+	], function( $, $nos, table, undefined ) {
 		$nos(function() {
 			var params = <?= \Format::forge()->to_json($params) ?>,
 				container = $nos('#<?= $attributes['id'] ?>')
@@ -57,16 +57,8 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 								}
 							},
 							rowStyleFormatter : function(args) {
-								if (args.type == $nos.wijmo.wijgrid.rowType.header) {
+								if (args.type == $.wijmo.wijgrid.rowType.header) {
 									args.$rows.hide();
-								}
-							},
-							currentCellChanged : function(e) {
-								var row = $nos(e.target).nostreegrid("currentCell").row(),
-									data = row ? row.data : false;
-
-								if (data && rendered) {
-									checkbox.prop('checked', !checked).triggerHandler('click');
 								}
 							},
 							rendering : function() {
@@ -105,12 +97,12 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                                 var checkbox = $nos(this),
                                     checked = checkbox.is(':checked');
                                 if (checked) {
-                                    params.selected[row.data._model + '|' + row.data._id] = {
-                                        id : row.data._id,
-                                        model : row.data._model
+                                    params.selected[args.row.data._model + '|' + args.row.data._id] = {
+                                        id : args.row.data._id,
+                                        model : args.row.data._model
                                     };
                                 } else {
-                                    params.selected[row.data._model + '|' + row.data._id] && delete params.selected[row.data._model + '|' + row.data._id];
+                                    params.selected[args.row.data._model + '|' + args.row.data._id] && delete params.selected[args.row.data._model + '|' + args.row.data._id];
                                 }
                                 checkbox.trigger('selectionChanged', args.row.data);
                             })
