@@ -132,17 +132,11 @@ define('jquery-nos',
                         'link!static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
                         'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify'
                     ], function() {
-                        var o = {
-                            pnotify_history : false,
-                            pnotify_addclass : 'nos-notification'
-                        };
-                        $.each( options, function(key, val) {
-                            if ( key.substr( 0, 8 ) !== 'pnotify_' ) {
-                                key = 'pnotify_' + key;
-                            }
-                            o[key] = val;
-                        } );
-                        return $.pnotify( o );
+                        return $.pnotify( $.extend({
+                            styling: "jqueryui",
+                            history : false,
+                            addclass : 'nos-notification'
+                        }, options) );
                     });
                 }
                 return false;
