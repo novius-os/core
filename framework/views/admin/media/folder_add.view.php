@@ -87,7 +87,7 @@ require(['jquery-nos', 'static/novius-os/admin/config/media/seo_compliant'], fun
 
         $container.find('form').bind('ajax_success', function() {
 	        $nos(this).dialog('close');
-        })
+        });
 
         $container.find('a[data-id=cancel]').click(function(e) {
             e.preventDefault();

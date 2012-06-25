@@ -14,7 +14,7 @@ require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
 class Autoloader extends Fuel\Core\Autoloader {
     static $suffixed = array(
         'model' => 'model',
-        'controller' => 'controller'
+        'controller' => 'ctrl'
     );
 
 

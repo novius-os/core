@@ -1,5 +1,5 @@
 /*
- * jQuery Pines Notify (pnotify) Plugin 1.1.1
+ * jQuery Pines Notify (pnotify) Plugin 1.2.0
  *
  * http://pinesframework.org/pnotify/
  * Copyright (c) 2009-2012 Hunter Perrin
@@ -11,9 +11,49 @@
  */
 
 (function($) {
-	var history_handle_top, timer;
-	var body = $("body");
-	var jwindow = $(window);
+	var history_handle_top,
+		timer,
+		body,
+		jwindow = $(window),
+		styling = {
+			jqueryui: {
+				container: "ui-widget ui-widget-content ui-corner-all",
+				notice: "ui-state-highlight",
+				// (The actual jQUI notice icon looks terrible.)
+				notice_icon: "ui-icon ui-icon-info",
+				info: "",
+				info_icon: "ui-icon ui-icon-info",
+				success: "ui-state-default",
+				success_icon: "ui-icon ui-icon-circle-check",
+				error: "ui-state-error",
+				error_icon: "ui-icon ui-icon-alert",
+				closer: "ui-icon ui-icon-close",
+				pin_up: "ui-icon ui-icon-pin-w",
+				pin_down: "ui-icon ui-icon-pin-s",
+				hi_menu: "ui-state-default ui-corner-bottom",
+				hi_btn: "ui-state-default ui-corner-all",
+				hi_btnhov: "ui-state-hover",
+				hi_hnd: "ui-icon ui-icon-grip-dotted-horizontal"
+			},
+			bootstrap: {
+				container: "alert",
+				notice: "",
+				notice_icon: "icon-exclamation-sign",
+				info: "alert-info",
+				info_icon: "icon-info-sign",
+				success: "alert-success",
+				success_icon: "icon-ok-sign",
+				error: "alert-error",
+				error_icon: "icon-warning-sign",
+				closer: "icon-remove",
+				pin_up: "icon-pause",
+				pin_down: "icon-play",
+				hi_menu: "well",
+				hi_btn: "btn",
+				hi_btnhov: "",
+				hi_hnd: "icon-chevron-down"
+			}
+		};
 	// Set global variables.
 	var do_when_ready = function(){
 		body = $("body");
@@ -25,7 +65,7 @@
 			timer = setTimeout($.pnotify_position_all, 10);
 		});
 	};
-	if (body.length)
+	if (document.body)
 		do_when_ready();
 	else
 		$(do_when_ready);
@@ -52,7 +92,7 @@
 				return;
 			// Reset the next position data.
 			$.each(notices_data, function(){
-				var s = this.opts.pnotify_stack;
+				var s = this.opts.stack;
 				if (!s) return;
 				s.nextpos1 = s.firstpos1;
 				s.nextpos2 = s.firstpos2;
@@ -66,18 +106,23 @@
 		pnotify: function(options) {
 			// Stores what is currently being animated (in or out).
 			var animating;
-			
+
 			// Build main options.
 			var opts;
 			if (typeof options != "object") {
 				opts = $.extend({}, $.pnotify.defaults);
-				opts.pnotify_text = options;
+				opts.text = options;
 			} else {
 				opts = $.extend({}, $.pnotify.defaults, options);
 			}
+			// Translate old pnotify_ style options.
+			for (var i in opts) {
+				if (typeof i == "string" && i.match(/^pnotify_/))
+					opts[i.replace(/^pnotify_/, "")] = opts[i];
+			}
 
-			if (opts.pnotify_before_init) {
-				if (opts.pnotify_before_init(opts) === false)
+			if (opts.before_init) {
+				if (opts.before_init(opts) === false)
 					return null;
 			}
 
@@ -106,183 +151,197 @@
 				nonblock_last_elem = jelement_below;
 			};
 
+			// Get our styling object.
+			var styles = styling[opts.styling];
+
 			// Create our widget.
 			// Stop animation, reset the removal timer, and show the close
 			// button when the user mouses over.
 			var pnotify = $("<div />", {
-				"class": "ui-pnotify "+opts.pnotify_addclass,
+				"class": "ui-pnotify "+opts.addclass,
 				"css": {"display": "none"},
 				"mouseenter": function(e){
-					if (opts.pnotify_nonblock) e.stopPropagation();
-					if (opts.pnotify_mouse_reset && animating == "out") {
+					if (opts.nonblock) e.stopPropagation();
+					if (opts.mouse_reset && animating == "out") {
 						// If it's animating out, animate back in really quickly.
 						pnotify.stop(true);
 						animating = "in";
-						pnotify.css("height", "auto").animate({"width": opts.pnotify_width, "opacity": opts.pnotify_nonblock ? opts.pnotify_nonblock_opacity : opts.pnotify_opacity}, "fast");
+						pnotify.css("height", "auto").animate({"width": opts.width, "opacity": opts.nonblock ? opts.nonblock_opacity : opts.opacity}, "fast");
 					}
-					if (opts.pnotify_nonblock) {
+					if (opts.nonblock) {
 						// If it's non-blocking, animate to the other opacity.
-						pnotify.animate({"opacity": opts.pnotify_nonblock_opacity}, "fast");
+						pnotify.animate({"opacity": opts.nonblock_opacity}, "fast");
 					}
 					// Stop the close timer.
-					if (opts.pnotify_hide && opts.pnotify_mouse_reset) pnotify.pnotify_cancel_remove();
+					if (opts.hide && opts.mouse_reset) pnotify.pnotify_cancel_remove();
 					// Show the buttons.
-					if (opts.pnotify_sticker && !opts.pnotify_nonblock) pnotify.sticker.trigger("pnotify_icon").show();
-					if (opts.pnotify_closer && !opts.pnotify_nonblock) pnotify.closer.show();
+					if (opts.sticker && !opts.nonblock) pnotify.sticker.trigger("pnotify_icon").css("visibility", "visible");
+					if (opts.closer && !opts.nonblock) pnotify.closer.css("visibility", "visible");
 				},
 				"mouseleave": function(e){
-					if (opts.pnotify_nonblock) e.stopPropagation();
+					if (opts.nonblock) e.stopPropagation();
 					nonblock_last_elem = null;
 					pnotify.css("cursor", "auto");
 					// Animate back to the normal opacity.
-					if (opts.pnotify_nonblock && animating != "out")
-						pnotify.animate({"opacity": opts.pnotify_opacity}, "fast");
+					if (opts.nonblock && animating != "out")
+						pnotify.animate({"opacity": opts.opacity}, "fast");
 					// Start the close timer.
-					if (opts.pnotify_hide && opts.pnotify_mouse_reset) pnotify.pnotify_queue_remove();
+					if (opts.hide && opts.mouse_reset) pnotify.pnotify_queue_remove();
 					// Hide the buttons.
-					if (opts.pnotify_sticker_hover)
-						pnotify.sticker.hide();
-					if (opts.pnotify_closer_hover)
-						pnotify.closer.hide();
+					if (opts.sticker_hover)
+						pnotify.sticker.css("visibility", "hidden");
+					if (opts.closer_hover)
+						pnotify.closer.css("visibility", "hidden");
 					$.pnotify_position_all();
 				},
 				"mouseover": function(e){
-					if (opts.pnotify_nonblock) e.stopPropagation();
+					if (opts.nonblock) e.stopPropagation();
 				},
 				"mouseout": function(e){
-					if (opts.pnotify_nonblock) e.stopPropagation();
+					if (opts.nonblock) e.stopPropagation();
 				},
 				"mousemove": function(e){
-					if (opts.pnotify_nonblock) {
+					if (opts.nonblock) {
 						e.stopPropagation();
 						nonblock_pass(e, "onmousemove");
 					}
 				},
 				"mousedown": function(e){
-					if (opts.pnotify_nonblock) {
+					if (opts.nonblock) {
 						e.stopPropagation();
 						e.preventDefault();
 						nonblock_pass(e, "onmousedown");
 					}
 				},
 				"mouseup": function(e){
-					if (opts.pnotify_nonblock) {
+					if (opts.nonblock) {
 						e.stopPropagation();
 						e.preventDefault();
 						nonblock_pass(e, "onmouseup");
 					}
 				},
 				"click": function(e){
-					if (opts.pnotify_nonblock) {
+					if (opts.nonblock) {
 						e.stopPropagation();
 						nonblock_pass(e, "onclick");
 					}
 				},
 				"dblclick": function(e){
-					if (opts.pnotify_nonblock) {
+					if (opts.nonblock) {
 						e.stopPropagation();
 						nonblock_pass(e, "ondblclick");
 					}
 				}
 			});
 			pnotify.opts = opts;
-			// Create a drop shadow.
-			if (opts.pnotify_shadow && !$.browser.msie) {
-				pnotify.shadow_container = $("<div />", {"class": "ui-widget-shadow ui-pnotify-shadow"}).prependTo(pnotify);
-				if (opts.pnotify_cornerclass != "")
-					pnotify.shadow_container.addClass(opts.pnotify_cornerclass);
-			}
 			// Create a container for the notice contents.
-			pnotify.container = $("<div />", {"class": "ui-widget ui-widget-content ui-pnotify-container "+(opts.pnotify_type == "error" ? "ui-state-error" : (opts.pnotify_type == "info" ? "" : "ui-state-highlight"))})
+			pnotify.container = $("<div />", {"class": styles.container+" ui-pnotify-container "+(opts.type == "error" ? styles.error : (opts.type == "info" ? styles.info : (opts.type == "success" ? styles.success : styles.notice)))})
 			.appendTo(pnotify);
-			if (opts.pnotify_cornerclass != "")
-				pnotify.container.addClass(opts.pnotify_cornerclass);
+			if (opts.cornerclass != "")
+				pnotify.container.removeClass("ui-corner-all").addClass(opts.cornerclass);
+			// Create a drop shadow.
+			if (opts.shadow)
+				pnotify.container.addClass("ui-pnotify-shadow");
 
 			// The current version of Pines Notify.
-			pnotify.pnotify_version = "1.1.1";
+			pnotify.pnotify_version = "1.2.0";
 
 			// This function is for updating the notice.
 			pnotify.pnotify = function(options) {
 				// Update the notice.
 				var old_opts = opts;
 				if (typeof options == "string")
-					opts.pnotify_text = options;
+					opts.text = options;
 				else
 					opts = $.extend({}, opts, options);
+				// Translate old pnotify_ style options.
+				for (var i in opts) {
+					if (typeof i == "string" && i.match(/^pnotify_/))
+						opts[i.replace(/^pnotify_/, "")] = opts[i];
+				}
 				pnotify.opts = opts;
+				// Update the corner class.
+				if (opts.cornerclass != old_opts.cornerclass)
+					pnotify.container.removeClass("ui-corner-all").addClass(opts.cornerclass);
 				// Update the shadow.
-				if (opts.pnotify_shadow != old_opts.pnotify_shadow) {
-					// Don't show a shadow in IE, because it's very buggy. No kidding... try it if you don't believe me.
-					if (opts.pnotify_shadow && !$.browser.msie)
-						pnotify.shadow_container = $("<div />", {"class": "ui-widget-shadow ui-pnotify-shadow"}).prependTo(pnotify);
+				if (opts.shadow != old_opts.shadow) {
+					if (opts.shadow)
+						pnotify.container.addClass("ui-pnotify-shadow");
 					else
-						pnotify.children(".ui-pnotify-shadow").remove();
+						pnotify.container.removeClass("ui-pnotify-shadow");
 				}
 				// Update the additional classes.
-				if (opts.pnotify_addclass === false)
-					pnotify.removeClass(old_opts.pnotify_addclass);
-				else if (opts.pnotify_addclass !== old_opts.pnotify_addclass)
-					pnotify.removeClass(old_opts.pnotify_addclass).addClass(opts.pnotify_addclass);
+				if (opts.addclass === false)
+					pnotify.removeClass(old_opts.addclass);
+				else if (opts.addclass !== old_opts.addclass)
+					pnotify.removeClass(old_opts.addclass).addClass(opts.addclass);
 				// Update the title.
-				if (opts.pnotify_title === false)
-					pnotify.title_container.hide("fast");
-				else if (opts.pnotify_title !== old_opts.pnotify_title) {
-					if (opts.pnotify_title_escape)
-						pnotify.title_container.text(opts.pnotify_title).show(200);
+				if (opts.title === false)
+					pnotify.title_container.slideUp("fast");
+				else if (opts.title !== old_opts.title) {
+					if (opts.title_escape)
+						pnotify.title_container.text(opts.title).slideDown(200);
 					else
-						pnotify.title_container.html(opts.pnotify_title).show(200);
+						pnotify.title_container.html(opts.title).slideDown(200);
 				}
 				// Update the text.
-				if (opts.pnotify_text === false) {
-					pnotify.text_container.hide("fast");
-				} else if (opts.pnotify_text !== old_opts.pnotify_text) {
-					if (opts.pnotify_text_escape)
-						pnotify.text_container.text(opts.pnotify_text).show(200);
+				if (opts.text === false) {
+					pnotify.text_container.slideUp("fast");
+				} else if (opts.text !== old_opts.text) {
+					if (opts.text_escape)
+						pnotify.text_container.text(opts.text).slideDown(200);
 					else
-						pnotify.text_container.html(opts.pnotify_insert_brs ? String(opts.pnotify_text).replace(/\n/g, "<br />") : opts.pnotify_text).show(200);
+						pnotify.text_container.html(opts.insert_brs ? String(opts.text).replace(/\n/g, "<br />") : opts.text).slideDown(200);
 				}
-				pnotify.pnotify_history = opts.pnotify_history;
-				pnotify.pnotify_hide = opts.pnotify_hide;
+				// Update values for history menu access.
+				pnotify.pnotify_history = opts.history;
+				pnotify.pnotify_hide = opts.hide;
 				// Change the notice type.
-				if (opts.pnotify_type != old_opts.pnotify_type)
-					pnotify.container.removeClass("ui-state-error ui-state-highlight").addClass(opts.pnotify_type == "error" ? "ui-state-error" : (opts.pnotify_type == "info" ? "" : "ui-state-highlight"));
-				if ((opts.pnotify_notice_icon != old_opts.pnotify_notice_icon && opts.pnotify_type == "notice") ||
-					(opts.pnotify_info_icon != old_opts.pnotify_info_icon && opts.pnotify_type == "info") ||
-					(opts.pnotify_error_icon != old_opts.pnotify_error_icon && opts.pnotify_type == "error") ||
-					(opts.pnotify_type != old_opts.pnotify_type)) {
+				if (opts.type != old_opts.type)
+					pnotify.container.removeClass(styles.error+" "+styles.notice+" "+styles.success+" "+styles.info).addClass(opts.type == "error" ? styles.error : (opts.type == "info" ? styles.info : (opts.type == "success" ? styles.success : styles.notice)));
+				if (opts.icon !== old_opts.icon || (opts.icon === true && opts.type != old_opts.type)) {
 					// Remove any old icon.
 					pnotify.container.find("div.ui-pnotify-icon").remove();
-					if ((opts.pnotify_error_icon && opts.pnotify_type == "error") || (opts.pnotify_info_icon && opts.pnotify_type == "info") || (opts.pnotify_notice_icon)) {
+					if (opts.icon !== false) {
 						// Build the new icon.
 						$("<div />", {"class": "ui-pnotify-icon"})
-						.append($("<span />", {"class": opts.pnotify_type == "error" ? opts.pnotify_error_icon : (opts.pnotify_type == "info" ? opts.pnotify_info_icon : opts.pnotify_notice_icon)}))
+						.append($("<span />", {"class": opts.icon === true ? (opts.type == "error" ? styles.error_icon : (opts.type == "info" ? styles.info_icon : (opts.type == "success" ? styles.success_icon : styles.notice_icon))) : opts.icon}))
 						.prependTo(pnotify.container);
 					}
 				}
 				// Update the width.
-				if (opts.pnotify_width !== old_opts.pnotify_width)
-					pnotify.animate({width: opts.pnotify_width});
+				if (opts.width !== old_opts.width)
+					pnotify.animate({width: opts.width});
 				// Update the minimum height.
-				if (opts.pnotify_min_height !== old_opts.pnotify_min_height)
-					pnotify.container.animate({minHeight: opts.pnotify_min_height});
+				if (opts.min_height !== old_opts.min_height)
+					pnotify.container.animate({minHeight: opts.min_height});
 				// Update the opacity.
-				if (opts.pnotify_opacity !== old_opts.pnotify_opacity)
-					pnotify.fadeTo(opts.pnotify_animate_speed, opts.pnotify_opacity);
+				if (opts.opacity !== old_opts.opacity)
+					pnotify.fadeTo(opts.animate_speed, opts.opacity);
+				// Update the sticker and closer buttons.
+				if (!opts.closer || opts.nonblock)
+					pnotify.closer.css("display", "none");
+				else
+					pnotify.closer.css("display", "block");
+				if (!opts.sticker || opts.nonblock)
+					pnotify.sticker.css("display", "none");
+				else
+					pnotify.sticker.css("display", "block");
 				// Update the sticker icon.
 				pnotify.sticker.trigger("pnotify_icon");
 				// Update the hover status of the buttons.
-				if (opts.pnotify_sticker_hover)
-					pnotify.sticker.hide();
-				else if (!opts.pnotify_nonblock)
-					pnotify.sticker.show();
-				if (opts.pnotify_closer_hover)
-					pnotify.closer.hide();
-				else if (!opts.pnotify_nonblock)
-					pnotify.closer.show();
+				if (opts.sticker_hover)
+					pnotify.sticker.css("visibility", "hidden");
+				else if (!opts.nonblock)
+					pnotify.sticker.css("visibility", "visible");
+				if (opts.closer_hover)
+					pnotify.closer.css("visibility", "hidden");
+				else if (!opts.nonblock)
+					pnotify.closer.css("visibility", "visible");
 				// Update the timed hiding.
-				if (!opts.pnotify_hide)
+				if (!opts.hide)
 					pnotify.pnotify_cancel_remove();
-				else if (!old_opts.pnotify_hide)
+				else if (!old_opts.hide)
 					pnotify.pnotify_queue_remove();
 				pnotify.pnotify_queue_position();
 				return pnotify;
@@ -292,7 +351,7 @@
 			// position even if it's not visible.
 			pnotify.pnotify_position = function(dont_skip_hidden){
 				// Get the notice's stack.
-				var s = pnotify.opts.pnotify_stack;
+				var s = pnotify.opts.stack;
 				if (!s) return;
 				if (!s.nextpos1)
 					s.nextpos1 = s.firstpos1;
@@ -300,8 +359,9 @@
 					s.nextpos2 = s.firstpos2;
 				if (!s.addpos2)
 					s.addpos2 = 0;
+				var hidden = pnotify.css("display") == "none";
 				// Skip this notice if it's not shown.
-				if (pnotify.css("display") != "none" || dont_skip_hidden) {
+				if (!hidden || dont_skip_hidden) {
 					var curpos1, curpos2;
 					// Store what will need to be animated.
 					var animate = {};
@@ -325,7 +385,7 @@
 					if (isNaN(curpos1))
 						curpos1 = 0;
 					// Remember the first pos1, so the first visible notice goes there.
-					if (typeof s.firstpos1 == "undefined") {
+					if (typeof s.firstpos1 == "undefined" && !hidden) {
 						s.firstpos1 = curpos1;
 						s.nextpos1 = s.firstpos1;
 					}
@@ -349,7 +409,7 @@
 					if (isNaN(curpos2))
 						curpos2 = 0;
 					// Remember the first pos2, so the first visible notice goes there.
-					if (typeof s.firstpos2 == "undefined") {
+					if (typeof s.firstpos2 == "undefined" && !hidden) {
 						s.firstpos2 = curpos2;
 						s.nextpos2 = s.firstpos2;
 					}
@@ -360,7 +420,7 @@
 						(s.dir1 == "right" && s.nextpos1 + pnotify.width() > jwindow.width()) ) {
 						// If it is, it needs to go back to the first pos1, and over on pos2.
 						s.nextpos1 = s.firstpos1;
-						s.nextpos2 += s.addpos2 + (typeof s.spacing2 == "undefined" ? 10 : s.spacing2);
+						s.nextpos2 += s.addpos2 + (typeof s.spacing2 == "undefined" ? 25 : s.spacing2);
 						s.addpos2 = 0;
 					}
 					// Animate if we're moving on dir2.
@@ -422,11 +482,11 @@
 					switch (s.dir1) {
 						case "down":
 						case "up":
-							s.nextpos1 += pnotify.height() + (typeof s.spacing1 == "undefined" ? 10 : s.spacing1);
+							s.nextpos1 += pnotify.height() + (typeof s.spacing1 == "undefined" ? 25 : s.spacing1);
 							break;
 						case "left":
 						case "right":
-							s.nextpos1 += pnotify.width() + (typeof s.spacing1 == "undefined" ? 10 : s.spacing1);
+							s.nextpos1 += pnotify.width() + (typeof s.spacing1 == "undefined" ? 25 : s.spacing1);
 							break;
 					}
 				}
@@ -448,30 +508,30 @@
 				if (!pnotify.parent().length)
 					pnotify.appendTo(body);
 				// Run callback.
-				if (opts.pnotify_before_open) {
-					if (opts.pnotify_before_open(pnotify) === false)
+				if (opts.before_open) {
+					if (opts.before_open(pnotify) === false)
 						return;
 				}
 				// Try to put it in the right position.
-				if (opts.pnotify_stack.push != "top")
+				if (opts.stack.push != "top")
 					pnotify.pnotify_position(true);
 				// First show it, then set its opacity, then hide it.
-				if (opts.pnotify_animation == "fade" || opts.pnotify_animation.effect_in == "fade") {
+				if (opts.animation == "fade" || opts.animation.effect_in == "fade") {
 					// If it's fading in, it should start at 0.
 					pnotify.show().fadeTo(0, 0).hide();
 				} else {
 					// Or else it should be set to the opacity.
-					if (opts.pnotify_opacity != 1)
-						pnotify.show().fadeTo(0, opts.pnotify_opacity).hide();
+					if (opts.opacity != 1)
+						pnotify.show().fadeTo(0, opts.opacity).hide();
 				}
 				pnotify.animate_in(function(){
-					if (opts.pnotify_after_open)
-						opts.pnotify_after_open(pnotify);
+					if (opts.after_open)
+						opts.after_open(pnotify);
 
 					pnotify.pnotify_queue_position();
 
 					// Now set it to hide.
-					if (opts.pnotify_hide)
+					if (opts.hide)
 						pnotify.pnotify_queue_remove();
 				});
 			};
@@ -483,18 +543,18 @@
 					pnotify.timer = null;
 				}
 				// Run callback.
-				if (opts.pnotify_before_close) {
-					if (opts.pnotify_before_close(pnotify) === false)
+				if (opts.before_close) {
+					if (opts.before_close(pnotify) === false)
 						return;
 				}
 				pnotify.animate_out(function(){
-					if (opts.pnotify_after_close) {
-						if (opts.pnotify_after_close(pnotify) === false)
+					if (opts.after_close) {
+						if (opts.after_close(pnotify) === false)
 							return;
 					}
 					pnotify.pnotify_queue_position();
 					// If we're supposed to remove the notice from the DOM, do it.
-					if (opts.pnotify_remove)
+					if (opts.remove)
 						pnotify.detach();
 				});
 			};
@@ -504,23 +564,23 @@
 				// Declare that the notice is animating in. (Or has completed animating in.)
 				animating = "in";
 				var animation;
-				if (typeof opts.pnotify_animation.effect_in != "undefined")
-					animation = opts.pnotify_animation.effect_in;
+				if (typeof opts.animation.effect_in != "undefined")
+					animation = opts.animation.effect_in;
 				else
-					animation = opts.pnotify_animation;
+					animation = opts.animation;
 				if (animation == "none") {
 					pnotify.show();
 					callback();
 				} else if (animation == "show")
-					pnotify.show(opts.pnotify_animate_speed, callback);
+					pnotify.show(opts.animate_speed, callback);
 				else if (animation == "fade")
-					pnotify.show().fadeTo(opts.pnotify_animate_speed, opts.pnotify_opacity, callback);
+					pnotify.show().fadeTo(opts.animate_speed, opts.opacity, callback);
 				else if (animation == "slide")
-					pnotify.slideDown(opts.pnotify_animate_speed, callback);
+					pnotify.slideDown(opts.animate_speed, callback);
 				else if (typeof animation == "function")
 					animation("in", callback, pnotify);
 				else
-					pnotify.show(animation, (typeof opts.pnotify_animation.options_in == "object" ? opts.pnotify_animation.options_in : {}), opts.pnotify_animate_speed, callback);
+					pnotify.show(animation, (typeof opts.animation.options_in == "object" ? opts.animation.options_in : {}), opts.animate_speed, callback);
 			};
 
 			// Animate the notice out.
@@ -528,23 +588,23 @@
 				// Declare that the notice is animating out. (Or has completed animating out.)
 				animating = "out";
 				var animation;
-				if (typeof opts.pnotify_animation.effect_out != "undefined")
-					animation = opts.pnotify_animation.effect_out;
+				if (typeof opts.animation.effect_out != "undefined")
+					animation = opts.animation.effect_out;
 				else
-					animation = opts.pnotify_animation;
+					animation = opts.animation;
 				if (animation == "none") {
 					pnotify.hide();
 					callback();
 				} else if (animation == "show")
-					pnotify.hide(opts.pnotify_animate_speed, callback);
+					pnotify.hide(opts.animate_speed, callback);
 				else if (animation == "fade")
-					pnotify.fadeOut(opts.pnotify_animate_speed, callback);
+					pnotify.fadeOut(opts.animate_speed, callback);
 				else if (animation == "slide")
-					pnotify.slideUp(opts.pnotify_animate_speed, callback);
+					pnotify.slideUp(opts.animate_speed, callback);
 				else if (typeof animation == "function")
 					animation("out", callback, pnotify);
 				else
-					pnotify.hide(animation, (typeof opts.pnotify_animation.options_out == "object" ? opts.pnotify_animation.options_out : {}), opts.pnotify_animate_speed, callback);
+					pnotify.hide(animation, (typeof opts.animation.options_out == "object" ? opts.animation.options_out : {}), opts.animate_speed, callback);
 			};
 
 			// Cancel any pending removal timer.
@@ -559,29 +619,31 @@
 				pnotify.pnotify_cancel_remove();
 				pnotify.timer = window.setTimeout(function(){
 					pnotify.pnotify_remove();
-				}, (isNaN(opts.pnotify_delay) ? 0 : opts.pnotify_delay));
+				}, (isNaN(opts.delay) ? 0 : opts.delay));
 			};
 
 			// Provide a button to close the notice.
 			pnotify.closer = $("<div />", {
 				"class": "ui-pnotify-closer",
-				"css": {"cursor": "pointer", "display": opts.pnotify_closer_hover ? "none" : "block"},
+				"css": {"cursor": "pointer", "visibility": opts.closer_hover ? "hidden" : "visible"},
 				"click": function(){
 					pnotify.pnotify_remove();
-					pnotify.sticker.hide();
-					pnotify.closer.hide();
+					pnotify.sticker.css("visibility", "hidden");
+					pnotify.closer.css("visibility", "hidden");
 				}
 			})
-			.append($("<span />", {"class": "ui-icon ui-icon-close"}))
+			.append($("<span />", {"class": styles.closer}))
 			.appendTo(pnotify.container);
+			if (!opts.closer || opts.nonblock)
+				pnotify.closer.css("display", "none");
 
 			// Provide a button to stick the notice.
 			pnotify.sticker = $("<div />", {
 				"class": "ui-pnotify-sticker",
-				"css": {"cursor": "pointer", "display": opts.pnotify_sticker_hover ? "none" : "block"},
+				"css": {"cursor": "pointer", "visibility": opts.sticker_hover ? "hidden" : "visible"},
 				"click": function(){
-					opts.pnotify_hide = !opts.pnotify_hide;
-					if (opts.pnotify_hide)
+					opts.hide = !opts.hide;
+					if (opts.hide)
 						pnotify.pnotify_queue_remove();
 					else
 						pnotify.pnotify_cancel_remove();
@@ -589,91 +651,93 @@
 				}
 			})
 			.bind("pnotify_icon", function(){
-				$(this).children().removeClass("ui-icon-pin-w ui-icon-pin-s").addClass(opts.pnotify_hide ? "ui-icon-pin-w" : "ui-icon-pin-s");
+				$(this).children().removeClass(styles.pin_up+" "+styles.pin_down).addClass(opts.hide ? styles.pin_up : styles.pin_down);
 			})
-			.append($("<span />", {"class": "ui-icon ui-icon-pin-w"}))
+			.append($("<span />", {"class": styles.pin_up}))
 			.appendTo(pnotify.container);
+			if (!opts.sticker || opts.nonblock)
+				pnotify.sticker.css("display", "none");
 
 			// Add the appropriate icon.
-			if ((opts.pnotify_error_icon && opts.pnotify_type == "error") || (opts.pnotify_info_icon && opts.pnotify_type == "info") || (opts.pnotify_notice_icon)) {
+			if (opts.icon !== false) {
 				$("<div />", {"class": "ui-pnotify-icon"})
-				.append($("<span />", {"class": opts.pnotify_type == "error" ? opts.pnotify_error_icon : (opts.pnotify_type == "info" ? opts.pnotify_info_icon : opts.pnotify_notice_icon)}))
-				.appendTo(pnotify.container);
+				.append($("<span />", {"class": opts.icon === true ? (opts.type == "error" ? styles.error_icon : (opts.type == "info" ? styles.info_icon : (opts.type == "success" ? styles.success_icon : styles.notice_icon))) : opts.icon}))
+				.prependTo(pnotify.container);
 			}
 
 			// Add a title.
-			pnotify.title_container = $("<div />", {
+			pnotify.title_container = $("<h4 />", {
 				"class": "ui-pnotify-title"
 			})
 			.appendTo(pnotify.container);
-			if (opts.pnotify_title === false)
+			if (opts.title === false)
 				pnotify.title_container.hide();
-			else if (opts.pnotify_title_escape)
-				pnotify.title_container.text(opts.pnotify_title);
+			else if (opts.title_escape)
+				pnotify.title_container.text(opts.title);
 			else
-				pnotify.title_container.html(opts.pnotify_title);
+				pnotify.title_container.html(opts.title);
 
 			// Add text.
 			pnotify.text_container = $("<div />", {
 				"class": "ui-pnotify-text"
 			})
 			.appendTo(pnotify.container);
-			if (opts.pnotify_text === false)
+			if (opts.text === false)
 				pnotify.text_container.hide();
-			else if (opts.pnotify_text_escape)
-				pnotify.text_container.text(opts.pnotify_text);
+			else if (opts.text_escape)
+				pnotify.text_container.text(opts.text);
 			else
-				pnotify.text_container.html(opts.pnotify_insert_brs ? String(opts.pnotify_text).replace(/\n/g, "<br />") : opts.pnotify_text);
+				pnotify.text_container.html(opts.insert_brs ? String(opts.text).replace(/\n/g, "<br />") : opts.text);
 
 			// Set width and min height.
-			if (typeof opts.pnotify_width == "string")
-				pnotify.css("width", opts.pnotify_width);
-			if (typeof opts.pnotify_min_height == "string")
-				pnotify.container.css("min-height", opts.pnotify_min_height);
+			if (typeof opts.width == "string")
+				pnotify.css("width", opts.width);
+			if (typeof opts.min_height == "string")
+				pnotify.container.css("min-height", opts.min_height);
 
 			// The history variable controls whether the notice gets redisplayed
 			// by the history pull down.
-			pnotify.pnotify_history = opts.pnotify_history;
+			pnotify.pnotify_history = opts.history;
 			// The hide variable controls whether the history pull down should
 			// queue a removal timer.
-			pnotify.pnotify_hide = opts.pnotify_hide;
+			pnotify.pnotify_hide = opts.hide;
 
 			// Add the notice to the notice array.
 			var notices_data = jwindow.data("pnotify");
 			if (notices_data == null || typeof notices_data != "object")
 				notices_data = [];
-			if (opts.pnotify_stack.push == "top")
+			if (opts.stack.push == "top")
 				notices_data = $.merge([pnotify], notices_data);
 			else
 				notices_data = $.merge(notices_data, [pnotify]);
 			jwindow.data("pnotify", notices_data);
 			// Now position all the notices if they are to push to the top.
-			if (opts.pnotify_stack.push == "top")
+			if (opts.stack.push == "top")
 				pnotify.pnotify_queue_position(1);
 
 			// Run callback.
-			if (opts.pnotify_after_init)
-				opts.pnotify_after_init(pnotify);
+			if (opts.after_init)
+				opts.after_init(pnotify);
 
-			if (opts.pnotify_history) {
+			if (opts.history) {
 				// If there isn't a history pull down, create one.
 				var history_menu = jwindow.data("pnotify_history");
 				if (typeof history_menu == "undefined") {
 					history_menu = $("<div />", {
-						"class": "ui-pnotify-history-container ui-state-default ui-corner-bottom",
+						"class": "ui-pnotify-history-container "+styles.hi_menu,
 						"mouseleave": function(){
 							history_menu.animate({top: "-"+history_handle_top+"px"}, {duration: 100, queue: false});
 						}
 					})
 					.append($("<div />", {"class": "ui-pnotify-history-header", "text": "Redisplay"}))
 					.append($("<button />", {
-							"class": "ui-pnotify-history-all ui-state-default ui-corner-all",
+							"class": "ui-pnotify-history-all "+styles.hi_btn,
 							"text": "All",
 							"mouseenter": function(){
-								$(this).addClass("ui-state-hover");
+								$(this).addClass(styles.hi_btnhov);
 							},
 							"mouseleave": function(){
-								$(this).removeClass("ui-state-hover");
+								$(this).removeClass(styles.hi_btnhov);
 							},
 							"click": function(){
 								// Display all notices. (Disregarding non-history notices.)
@@ -690,13 +754,13 @@
 							}
 					}))
 					.append($("<button />", {
-							"class": "ui-pnotify-history-last ui-state-default ui-corner-all",
+							"class": "ui-pnotify-history-last "+styles.hi_btn,
 							"text": "Last",
 							"mouseenter": function(){
-								$(this).addClass("ui-state-hover");
+								$(this).addClass(styles.hi_btnhov);
 							},
 							"mouseleave": function(){
-								$(this).removeClass("ui-state-hover");
+								$(this).removeClass(styles.hi_btnhov);
 							},
 							"click": function(){
 								// Look up the last history notice, and display it.
@@ -722,7 +786,7 @@
 
 					// Make a handle so the user can pull down the history tab.
 					var handle = $("<span />", {
-						"class": "ui-pnotify-history-pulldown ui-icon ui-icon-grip-dotted-horizontal",
+						"class": "ui-pnotify-history-pulldown "+styles.hi_hnd,
 						"mouseenter": function(){
 							history_menu.animate({top: "0"}, {duration: 100, queue: false});
 						}
@@ -739,7 +803,7 @@
 			}
 
 			// Mark the stack so it won't animate the new notice.
-			opts.pnotify_stack.animation = false;
+			opts.stack.animation = false;
 
 			// Display the notice.
 			pnotify.pnotify_display();
@@ -749,10 +813,10 @@
 	});
 
 	// Some useful regexes.
-	var re_on = /^on/;
-	var re_mouse_events = /^(dbl)?click$|^mouse(move|down|up|over|out|enter|leave)$|^contextmenu$/;
-	var re_ui_events = /^(focus|blur|select|change|reset)$|^key(press|down|up)$/;
-	var re_html_events = /^(scroll|resize|(un)?load|abort|error)$/;
+	var re_on = /^on/,
+		re_mouse_events = /^(dbl)?click$|^mouse(move|down|up|over|out|enter|leave)$|^contextmenu$/,
+		re_ui_events = /^(focus|blur|select|change|reset)$|^key(press|down|up)$/,
+		re_html_events = /^(scroll|resize|(un)?load|abort|error)$/;
 	// Fire a DOM event.
 	var dom_event = function(e, orig_e){
 		var event_object;
@@ -789,62 +853,60 @@
 
 	$.pnotify.defaults = {
 		// The notice's title.
-		pnotify_title: false,
+		title: false,
 		// Whether to escape the content of the title. (Not allow HTML.)
-		pnotify_title_escape: false,
+		title_escape: false,
 		// The notice's text.
-		pnotify_text: false,
+		text: false,
 		// Whether to escape the content of the text. (Not allow HTML.)
-		pnotify_text_escape: false,
+		text_escape: false,
+		// What styling classes to use. (Can be either jqueryui or bootstrap.)
+		styling: "bootstrap",
 		// Additional classes to be added to the notice. (For custom styling.)
-		pnotify_addclass: "",
+		addclass: "",
 		// Class to be added to the notice for corner styling.
-		pnotify_cornerclass: "ui-corner-all",
+		cornerclass: "",
 		// Create a non-blocking notice. It lets the user click elements underneath it.
-		pnotify_nonblock: false,
+		nonblock: false,
 		// The opacity of the notice (if it's non-blocking) when the mouse is over it.
-		pnotify_nonblock_opacity: .2,
+		nonblock_opacity: .2,
 		// Display a pull down menu to redisplay previous notices, and place the notice in the history.
-		pnotify_history: true,
+		history: true,
 		// Width of the notice.
-		pnotify_width: "300px",
+		width: "300px",
 		// Minimum height of the notice. It will expand to fit content.
-		pnotify_min_height: "16px",
-		// Type of the notice. "notice", "info", or "error".
-		pnotify_type: "notice",
-		// The icon class to use if type is notice. (The actual jQUI notice icon looks terrible.)
-		pnotify_notice_icon: "ui-icon ui-icon-info",
-		// The icon class to use if type is info.
-		pnotify_info_icon: "ui-icon ui-icon-info",
-		// The icon class to use if type is error.
-		pnotify_error_icon: "ui-icon ui-icon-alert",
+		min_height: "16px",
+		// Type of the notice. "notice", "info", "success", or "error".
+		type: "notice",
+		// Set icon to true to use the default icon for the selected style/type, false for no icon, or a string for your own icon class.
+		icon: true,
 		// The animation to use when displaying and hiding the notice. "none", "show", "fade", and "slide" are built in to jQuery. Others require jQuery UI. Use an object with effect_in and effect_out to use different effects.
-		pnotify_animation: "fade",
+		animation: "fade",
 		// Speed at which the notice animates in and out. "slow", "def" or "normal", "fast" or number of milliseconds.
-		pnotify_animate_speed: "slow",
+		animate_speed: "slow",
 		// Opacity of the notice.
-		pnotify_opacity: 1,
+		opacity: 1,
 		// Display a drop shadow.
-		pnotify_shadow: false,
+		shadow: true,
 		// Provide a button for the user to manually close the notice.
-		pnotify_closer: true,
+		closer: true,
 		// Only show the closer button on hover.
-		pnotify_closer_hover: true,
+		closer_hover: true,
 		// Provide a button for the user to manually stick the notice.
-		pnotify_sticker: true,
+		sticker: true,
 		// Only show the sticker button on hover.
-		pnotify_sticker_hover: true,
+		sticker_hover: true,
 		// After a delay, remove the notice.
-		pnotify_hide: true,
+		hide: true,
 		// Delay in milliseconds before the notice is removed.
-		pnotify_delay: 8000,
+		delay: 8000,
 		// Reset the hide timer if the mouse moves over the notice.
-		pnotify_mouse_reset: true,
+		mouse_reset: true,
 		// Remove the notice's elements from the DOM after it is removed.
-		pnotify_remove: true,
+		remove: true,
 		// Change new lines to br tags.
-		pnotify_insert_brs: true,
+		insert_brs: true,
 		// The stack on which the notices will be placed. Also controls the direction the notices stack.
-		pnotify_stack: {"dir1": "down", "dir2": "left", "push": "bottom", "spacing1": 10, "spacing2": 10}
+		stack: {"dir1": "down", "dir2": "left", "push": "bottom", "spacing1": 25, "spacing2": 25}
 	};
 })(jQuery);
