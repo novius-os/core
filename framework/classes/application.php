@@ -215,10 +215,10 @@ class Application
         // Load current data
         $data_path = APPPATH.'data'.DS.'config'.DS;
         $config = array();
-        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced') as $section)
+        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced', 'app_dependencies') as $section)
         {
             \Config::load($data_path.$section.'.php', 'data::'.$section);
-            $config[$section] = \Config::get('data::'.$section, true);
+            $config[$section] = \Config::get('data::'.$section, array());
         }
 
         foreach (array('templates', 'enhancers', 'launchers') as $section)
@@ -247,7 +247,8 @@ class Application
         }
 
         // Check duplicate templates
-        if (!empty($added['templates'])) {
+        if (!empty($added['templates']))
+        {
             $duplicates = array_intersect_key($config['templates'], $added['templates']);
             if (count($duplicates) > 0)
             {
@@ -255,7 +256,8 @@ class Application
             }
         }
 
-        if (!empty($removed['templates'])) {
+        if (!empty($removed['templates']))
+        {
             // Check template usage in the page
             $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
             if (count($pages) > 0)
@@ -265,7 +267,8 @@ class Application
         }
 
         // Check duplicate launchers
-        if (!empty($added['launchers'])) {
+        if (!empty($added['launchers']))
+        {
             $duplicates = array_intersect_key($config['launchers'], $added['launchers']);
             if (count($duplicates) > 0)
             {
@@ -274,7 +277,8 @@ class Application
         }
 
         // Check duplicate enhancers
-        if (!empty($added['enhancers'])) {
+        if (!empty($added['enhancers']))
+        {
             $duplicates = array_intersect_key($config['enhancers'], $added['enhancers']);
             if (count($duplicates) > 0)
             {
@@ -285,7 +289,6 @@ class Application
         // Update actual configuration
         foreach (array('templates', 'enhancers', 'launchers') as $section)
         {
-
             // Update
             $updated = array_intersect_key($new_metadata[$section], $old_metadata[$section]);
             foreach ($updated as $k => $v)
@@ -310,8 +313,35 @@ class Application
         {
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
-                $remove = array_search($key, $config['models_url_enhanced'][$model]);
-                unset($config['models_url_enhanced'][$model][$remove]);
+                foreach (array_keys($config['models_url_enhanced'][$model], $key) as $remove)
+                {
+                    unset($config['models_url_enhanced'][$model][$remove]);
+                }
+            }
+        }
+
+        $old_dependency = \Arr::get($old_metadata, 'extends', '');
+        $new_dependency = \Arr::get($new_metadata, 'extends', '');
+
+        if ($old_dependency != $new_dependency)
+        {
+            // Add new dependency
+            if ($new_dependency != '')
+            {
+                if (empty($config['app_dependencies'][$new_dependency]))
+                {
+                    $config['app_dependencies'][$new_dependency] = array();
+                }
+                $config['app_dependencies'][$new_dependency][] = $this->folder;
+            }
+
+            // Remove old dependency
+            if (!empty($config['app_dependencies'][$old_dependency]))
+            {
+                foreach (array_keys($config['app_dependencies'][$old_dependency], $this->folder) as $key)
+                {
+                    unset($config['app_dependencies'][$old_dependency][$key]);
+                }
             }
         }
 
