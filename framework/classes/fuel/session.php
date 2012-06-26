@@ -18,9 +18,13 @@ class Session extends \Fuel\Core\Session {
      */
     public static function user() {
         if (static::$user === null) {
-            static::$user = static::get('logged_user', false);
+            \Nos\Auth::check();
         }
         return static::$user;
+    }
+
+    public static function setUser($user) {
+        static::$user = $user;
     }
 
 

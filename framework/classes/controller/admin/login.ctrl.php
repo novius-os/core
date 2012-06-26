@@ -71,7 +71,7 @@ class Controller_Admin_Login extends Controller {
 
 	protected function post_login() {
 
-		if (\Nos\Auth::login($_POST['email'], $_POST['password'])) {
+		if (\Nos\Auth::login($_POST['email'], $_POST['password'], \Input::post('remember_me', false) ? true : false)) {
 			\Event::trigger('user_login');
 			$this->redirect();
 		}
