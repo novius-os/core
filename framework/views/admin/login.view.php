@@ -36,6 +36,13 @@ require(['jquery-nos'], function($nos) {
     <form method="POST" action="">
         <p><input type="email" name="email" id="email" value="<?= \Input::post('email', ''); ?>" placeholder="Email" /></p>
         <p><input type="password" name="password" placeholder="Password" /></p>
+        <p>
+            <label style="font-size: 13px;" for="remember_me">
+                <?= __('Remember me') ?>
+            </label>
+
+            <input type="checkbox" id="remember_me" name="remember_me" value="1" />
+        </p>
         <p><input type="submit" value="Dive in"></p>
     </form>
 </div>
