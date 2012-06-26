@@ -711,7 +711,7 @@ define('jquery-nos',
                             return false;
                         },
                     self = this;
-                if (args.length > 0 && $.inArray(args[0], ['open', 'close', 'add', 'update', 'init']) !== -1) {
+                if (args.length > 0 && $.inArray(args[0], ['open', 'close', 'add', 'update', 'init', 'current']) !== -1) {
                     method = args.shift();
                 }
 
@@ -795,6 +795,19 @@ define('jquery-nos',
                                 var index = getIndex(self);
                                 noviusos().ostabs('update', index, tab);
                             }
+                        })();
+                        break;
+
+                    case 'current' :
+                        return (function() {
+                            if (window.parent != window && window.parent.$nos) {
+                                return window.parent.$nos(window.frameElement).tab('current');
+                            } else {
+                                if (noviusos().length) {
+                                    return noviusos().ostabs('current');
+                                }
+                            }
+                            return null;
                         })();
                         break;
 
