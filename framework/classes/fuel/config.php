@@ -77,6 +77,22 @@ class Config extends \Fuel\Core\Config {
         return array($application, $file);
     }
 
+    public static function loadConfiguration($app_name, $file_name) {
+        \Config::load($app_name.'::'.$file_name, true);
+        $config = \Config::get($app_name.'::'.$file_name);
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+        $dependencies = \Config::get('data::app_dependencies', array());
+
+        if (!empty($dependencies[$app_name])) {
+            foreach ($dependencies[$app_name] as $dependency) {
+                \Config::load($dependency.'::'.$file_name, true);
+                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
+            }
+        }
+        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+        return $config;
+    }
+
     public static function getDbName($item) {
         $item = str_replace('::', '/config/', $item);
         $item = str_replace('/', '.', $item);

@@ -38,7 +38,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
             list($application, $file_name) = explode('::', $this->config['appdesk']);
         }
 
-        $this->appdesk = \Config::mergeWithUser($application.'::'.$file_name, static::loadConfiguration($application, $file_name));
+        $this->appdesk = \Config::mergeWithUser($application.'::'.$file_name, \Config::loadConfiguration($application, $file_name));
     }
 
     public function action_index($view = null) {
