@@ -338,7 +338,7 @@ class Controller_Front extends Controller {
             }
         }
         if (count($footer)) {
-            $content = str_ireplace('</body>', implode("\n", $footer).'</head>', $content);
+            $content = str_ireplace('</body>', implode("\n", $footer), $content);
         }
     }
 
