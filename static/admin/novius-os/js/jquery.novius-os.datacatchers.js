@@ -46,6 +46,7 @@ define('jquery-nos-datacatchers',
                     o = self.options;
 
                 self.uiHeaderIcon.click(function() {
+                    self.element.removeClass('nos-datacatchers-form');
                     self.element.toggleClass('nos-datacatchers-open');
                 });
 
@@ -81,6 +82,7 @@ define('jquery-nos-datacatchers',
                 self.uiCustomize.button()
                     .click(function() {
                         self.element.addClass('nos-datacatchers-form');
+                        $nos(self.uiForm).onShow('show');
                     });
 
                 $nos(self.uiForm).form();

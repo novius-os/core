@@ -14,13 +14,15 @@ class Controller_Admin_Catcher extends Controller_Admin_Application {
 
     public $bypass   = true;
 
-    public function action_form($model, $id)
+    public function action_form($item)
     {
-        $item = $model::find($id);
+        $model = get_class($item);
+        $id = $item->{\Arr::get($item->primary_key(), 0)};
         $data_catchers = $model::data_catchers();
         $default_nuggets = $item->get_default_nuggets();
 
         return \View::forge('nos::admin/data_catcher/panel', array(
+            'item' => $item,
             'model_name' => $model,
             'model_id' => $id,
             'default_nuggets' => $default_nuggets,

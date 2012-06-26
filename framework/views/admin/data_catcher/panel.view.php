@@ -17,6 +17,12 @@
         $fields[] = \Nos\Orm_Behaviour_Sharable::TYPE_TITLE;
         $fieldset->add(\Nos\Orm_Behaviour_Sharable::TYPE_TITLE, __('Name:'), array('value' => $default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_TITLE]));
     }
+    if (isset($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL])) {
+        $fields[] = \Nos\Orm_Behaviour_Sharable::TYPE_URL;
+        $options = $item->get_urls();
+        $options = array_combine($options, $options);
+        $fieldset->add(\Nos\Orm_Behaviour_Sharable::TYPE_URL, __('Url:'), array('tag' => 'select', 'options' => array($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL] => $default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL]), 'value' => $default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL]));
+    }
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme">
     <h2><?= __('Share') ?></h2>
