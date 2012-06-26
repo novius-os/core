@@ -9,6 +9,8 @@
 @import "compass/reset";
 @import "compass/css3/box-shadow";
 @import "compass/css3/text-shadow";
+@import "compass/css3/images";
+$support-for-original-webkit-gradients: true;
 
 
 /* +-++-++-++-++-++-+
@@ -35,6 +37,23 @@ a:hover {
 	color   : #036;
 }
 
+.nos-dark-theme {
+    background: #222222;
+    color: #fff;
+
+    a {
+        color: #fff;
+    }
+
+    &.ui-widget-content, .ui-widget-content {
+        background: #222222;
+        color: #fff;
+    }
+    .ui-widget-content a {
+        color: #fff;
+    }
+}
+
 .nos-icon16 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 16px; height: 16px; line-height: 16px; vertical-align: middle; }
 .nos-icon24 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 24px; height: 24px; line-height: 24px; vertical-align: middle; }
 .nos-icon32 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 32px; height: 32px; line-height: 32px; vertical-align: middle; }
@@ -46,11 +65,13 @@ a:hover {
 .nos-icon16-root { background-image: url(../img/16/root.png); }
 .nos-icon16-media { background-image: url(../img/16/media.png) !important; }
 .nos-icon16-root { background-image: url(../img/16/root.png) !important; }
+.nos-icon16-share { background-image: url(../img/16/share.png) !important; }
 
 .nos-icon24-noviusstore { background-image: url(../img/24/tabs-store.png); }
 .nos-icon24-settings { background-image: url(../img/24/tabs-settings.png); }
 .nos-icon24-account { background-image: url(../img/24/tabs-account.png); }
 .nos-icon24-help { background-image: url(../img/24/tabs-help.png); }
+.nos-icon24-share { background-image: url(../img/24/share.png) !important; }
 
 .nos-icon32-language { background-image: url(../img/32/language.png); }
 .nos-icon32-page { background-image: url(../img/32/page.png); }

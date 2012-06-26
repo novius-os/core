@@ -137,7 +137,7 @@ define('jquery-nos-ostabs',
                     self.element.addClass( "nos-ostabs ui-widget ui-widget-content" );
 
                     self.uiOstabsHeader = $( '<div></div>' )
-                        .addClass( 'ui-widget-header' )
+                        .addClass( 'nos-ostabs-header' )
                         .appendTo( self.element );
 
                     self.uiOstabsSuperPanel = $( '<div></div>' )

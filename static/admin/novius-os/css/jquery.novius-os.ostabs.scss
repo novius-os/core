@@ -29,7 +29,7 @@ body {
 	bottom : 0px;
 	border : 0px;
 
-	> .ui-widget-header {
+	> .nos-ostabs-header {
 		background-position : 50% 75%;
 		border : 0;
 		height : 46px;
@@ -275,7 +275,7 @@ body {
 .nos-ostabs {
     background : none;
 
-	> .ui-widget-header {
+	> .nos-ostabs-header {
 		position : relative;
 		z-index : 1;
 		@include background(linear-gradient(#222222, #111111));
