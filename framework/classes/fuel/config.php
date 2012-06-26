@@ -66,13 +66,11 @@ class Config extends \Fuel\Core\Config {
         $file = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
         if ($application !== 'nos') {
-            \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
-            $apps = Config::get('data::app_installed', array());
-            foreach ($apps as $app => $metadata) {
-                if (!empty($metadata['namespace']) && $namespace === $metadata['namespace']) {
-                    $application = $app;
-                    break;
-                }
+            \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+            $namespaces = Config::get('data::app_namespaces', null);
+            if ($app = array_search($namespace, $namespaces))
+            {
+                $application = $app;
             }
         }
 
