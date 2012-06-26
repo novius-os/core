@@ -131,21 +131,32 @@ class Model extends \Orm\Model {
 		if ( ! array_key_exists($class, static::$_behaviours_cached))
 		{
 			$behaviours = array();
-			if (property_exists($class, '_behaviours'))
-			{
-				foreach (static::$_behaviours as $beha_k => $beha_v)
-				{
-					if (is_int($beha_k))
-					{
-						$behaviours[$beha_v] = array();
-					}
-					else
-					{
-						$behaviours[$beha_k] = $beha_v;
-					}
-				}
-			}
-			static::$_behaviours_cached[$class] = $behaviours;
+            $_behaviours = array();
+
+            if (property_exists($class, '_behaviours'))
+            {
+                $_behaviours = static::$_behaviours;
+            }
+
+            list($application, $file_name) = \Config::configFile(get_called_class());
+            $config = \Config::loadConfiguration($application, $file_name);
+            if (!empty($config) && !empty($config['behaviours'])) {
+                $_behaviours = \Arr::merge($_behaviours, $config['behaviours']);
+            }
+
+            foreach ($_behaviours as $beha_k => $beha_v)
+            {
+                if (is_int($beha_k))
+                {
+                    $behaviours[$beha_v] = array();
+                }
+                else
+                {
+                    $behaviours[$beha_k] = $beha_v;
+                }
+            }
+
+            static::$_behaviours_cached[$class] = $behaviours;
 		}
 
 		if ($specific)

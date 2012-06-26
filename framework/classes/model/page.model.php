@@ -78,9 +78,6 @@ class Model_Page extends \Nos\Orm\Model {
 		'Nos\Orm_Behaviour_Publishable' => array(
 			'publication_bool_property' => 'page_published',
 		),
-        'Nos\Orm_Behaviour_Sharable' => array(
-            \Nos\Orm_Behaviour_Sharable::TYPE_TITLE => 'page_title',
-        ),
 	);
 
 	protected $_data_events = array();
