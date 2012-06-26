@@ -142,8 +142,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
     protected static function loadConfiguration($module_name, $file_name) {
         \Config::load($module_name.'::'.$file_name, true);
         $config = \Config::get($module_name.'::'.$file_name);
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', true);
-        $dependencies = \Config::get(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', array());
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+        $dependencies = \Config::get('data::app_dependencies', array());
 
         if (!empty($dependencies[$module_name])) {
             foreach ($dependencies[$module_name] as $dependency) {

@@ -40,11 +40,11 @@ class Module extends Fuel\Core\Module
 			}
 
 			// Load dependent applications
-			Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', true);
-			$dependencies = Config::get('app_dependencies', array());
+			Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+			$dependencies = Config::get('data::app_dependencies', array());
 			if (!empty($dependencies[$module])) {
-				foreach ($dependencies[$module] as $module) {
-					static::load($module);
+				foreach ($dependencies[$module] as $dependence) {
+					static::load($dependence);
 				}
 			}
 		}
