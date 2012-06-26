@@ -30,7 +30,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
     public function before() {
         parent::before();
         if (!isset($this->config['appdesk'])) {
-            list($application, $file_name) = $this->getLocation();
+            list($application, $file_name) = \Config::configFile(get_called_class());
             $file_name = explode('/', $file_name);
             array_splice($file_name, count($file_name) - 1, 0, array('appdesk'));
             $file_name = implode('/', $file_name);

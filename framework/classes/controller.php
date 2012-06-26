@@ -113,30 +113,14 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
     }
 
     protected function trigger($event, $data = '', $return_type = 'string') {
-        list($application, $file_name) = $this->getLocation();
+        list($application, $file_name) = \Config::configFile(get_called_class());
         $file_name = str_replace('/', '_', $file_name);
         return \Event::trigger($application.'.'.$file_name.'.'.$event, $data, $return_type);
     }
 
     protected static function getConfiguration() {
-        list($application, $file_name) = self::getLocation();
+        list($application, $file_name) = \Config::configFile(get_called_class());
         return static::loadConfiguration($application, $file_name);
-    }
-
-    protected static function getLocation() {
-        // @todo use get_called_class() instead
-        $controller = explode('\\', \Request::active()->controller);
-        $module_name = mb_strtolower($controller[0]);
-        $file_name   = mb_strtolower(str_replace('_', DS, $controller[1]));
-        $location = array($module_name, $file_name);
-        if ($module_name == 'nos') {
-            $submodule = explode('_', $controller[1]);
-            if ($submodule[0] == 'Controller' && $submodule[1] == 'Admin' && count($submodule) > 2) {
-                $location[] = mb_strtolower($submodule[2]);
-            }
-        }
-
-        return $location;
     }
 
     protected static function loadConfiguration($module_name, $file_name) {
@@ -487,7 +471,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         $lang = \Input::get('lang');
 
         if (empty($tree_config['id'])) {
-            $tree_config['id'] = \Config::getDbName(join('::', $this->getLocation()));
+            $tree_config['id'] = \Config::getDbName(join('::', \Config::configFile(get_called_class())));
         }
 
         $tree_config = $this->build_tree($tree_config);
