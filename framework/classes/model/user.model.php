@@ -42,12 +42,22 @@ class Model_User extends \Nos\Orm\Model {
         return $ph->CheckPassword($password, $this->user_password);
     }
 
+    public function generate_md5() {
+        $this->user_md5 = md5(uniqid(rand(), true));
+    }
+
     public function _event_before_save() {
         parent::_event_before_save();
 		// Don't hash twice
         if ($this->is_changed('user_password')) {
             $ph = new \PasswordHash(8, false);
             $this->user_password = $ph->HashPassword($this->user_password);
+        }
+        if (empty($this->user_md5) || $this->is_changed('user_password') || $this->is_new()) {
+            $this->generate_md5();
+            if ($this->user_id == \Session::user()->user_id) {
+                \Nos\Auth::set_user_md5($this->user_md5);
+            }
         }
     }
 

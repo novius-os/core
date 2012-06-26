@@ -526,9 +526,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 
 
-
             // Let behaviours do their job (publication for example)
-            //$object->form_processing_behaviours($data, $json_response);
+            $object->form_processing_behaviours($data, $json_response);
 
 
             if (!empty($options['before_save']) && is_callable($options['before_save']))

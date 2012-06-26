@@ -16,7 +16,7 @@ use View;
 class Controller_Admin_Tray_Account extends \Controller {
 
     public function action_index() {
-		$user = \Session::get('logged_user');
+		$user = \Session::user();
 		$fieldset_infos    = Controller_Admin_User_Form::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
         $fieldset_display  = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
@@ -28,7 +28,7 @@ class Controller_Admin_Tray_Account extends \Controller {
 	}
 
 	public function action_disconnect() {
-		\Session::destroy();
+        Auth::disconnect();
 		\Response::redirect('/admin/nos/login/reset');
 		exit();
 	}

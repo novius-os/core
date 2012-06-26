@@ -72,9 +72,20 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 										if ($nos.isPlainObject(selected) && selected.id) {
 											container.find(':checkbox[value=' + selected.id + ']').prop('checked', true);
 											table.data('nostreegrid');
+                                            if(selected.disable_check){
+                                                container.find(':checkbox[value=' + selected.id + ']').attr('disabled', selected.disable_check);
+                                            }
 										}
 									});
 								}
+                                if ($nos.isPlainObject(params.disabled)) {
+                                    $nos.each(params.disabled, function(i, disabled) {
+                                        if ($nos.isPlainObject(disabled) && disabled.id) {
+                                            container.find(':checkbox[value=' + disabled.id + ']').attr('disabled', true);
+                                            table.data('nostreegrid');
+                                        }
+                                    });
+                                }
 							},
 							columns: params.columns
 						});

@@ -188,7 +188,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         //\Debug::dump($apps);
 
-        $user = \Session::get('logged_user', false);
+        $user = \Session::user();
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background');
         $background = $background_id ? Model_Media::find($background_id) : false;
 
@@ -215,7 +215,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             'success' => true,
         );
 
-        $user = \Session::get('logged_user', false);
+        $user = \Session::user();
         if ($user)
         {
             if (!$user->user_configuration)
@@ -231,7 +231,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
             $user->user_configuration = serialize($user_configuration);
             $user->save();
-            \Session::set('logged_user', $user);
+            \Session::setUser($user);
         }
 
 
