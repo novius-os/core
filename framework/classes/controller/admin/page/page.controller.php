@@ -148,7 +148,6 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
                 }
             },
             'success' => function() use ($page, $is_new) {
-
                 $json = array(
                     'notify' => $is_new ? __('Page sucessfully added.') : __('Page successfully saved.'),
                     'dispatchEvent' => 'reload.nos_page',
@@ -161,11 +160,23 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
         ));
 		$fieldset->js_validation();
 
-        return \View::forge('nos::admin/page/page_form', array(
+
+        // If we pass $page, we've got a mega bug that we don't understand !!!
+        // you can try, if you solve it you're a CHAMPION !
+        $catcher = (string) \Request::forge('nos/admin/catcher/form')->execute(
+            array(
+                get_class($page),
+                $page->page_id,
+            )
+        );
+
+        $view = (string) \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
             'lang'     => $page->page_lang
 		), false);
+
+        return $catcher.$view;
     }
 
     protected static function  _get_page_with_permission($page_id, $permission) {

@@ -215,13 +215,13 @@ class Application
         // Load current data
         $data_path = APPPATH.'data'.DS.'config'.DS;
         $config = array();
-        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced') as $section)
+        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced', 'data_catchers') as $section)
         {
             \Config::load($data_path.$section.'.php', 'data::'.$section);
             $config[$section] = \Config::get('data::'.$section, true);
         }
 
-        foreach (array('templates', 'enhancers', 'launchers') as $section)
+        foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section)
         {
             if (!isset($new_metadata[$section]))
             {
@@ -282,8 +282,17 @@ class Application
             }
         }
 
+        // Check duplicate data catchers
+        if (!empty($added['data_catchers'])) {
+            $duplicates = array_intersect_key($config['data_catchers'], $added['data_catchers']);
+            if (count($duplicates) > 0)
+            {
+                throw new \Exception(count($duplicates).' data catchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
+            }
+        }
+
         // Update actual configuration
-        foreach (array('templates', 'enhancers', 'launchers') as $section)
+        foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section)
         {
 
             // Update

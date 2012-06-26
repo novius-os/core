@@ -120,6 +120,7 @@
             'jquery-nos-treegrid' => 'static/novius-os/admin/bundle/nos.min',
             'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
             'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
+            'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
         ),
         'shim' => array(
             'jquery.bgiframe' => array('jquery'),
@@ -327,7 +328,7 @@
             'jquery-nos-treegrid' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.treegrid',
             'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.thumbnailsgrid',
             'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
-            'jquery-nos-timepicker' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.timepicker',
+            'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
         ));
 	}
 ?>
@@ -370,6 +371,7 @@ if (hash.substr(0, 4) == 'tab=') {
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/jquery.novius-os.treegrid.css">
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/jquery.novius-os.thumbnailsgrid.css">
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/jquery.novius-os.preview.css">
+<link rel="stylesheet" href="static/novius-os/admin/novius-os/css/jquery.novius-os.datacatchers.css">
 <?php
 	}
 ?>
