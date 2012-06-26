@@ -160,18 +160,18 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
         ));
 		$fieldset->js_validation();
 
+        $return = '';
+        if ($page::behaviours('Nos\Orm_Behaviour_Sharable')) {
+            $return .= (string) \Request::forge('nos/admin/catcher/form')->execute(array($page));
+        }
 
-        // If we pass $page, we've got a mega bug that we don't understand !!!
-        // you can try, if you solve it you're a CHAMPION !
-        $catcher = (string) \Request::forge('nos/admin/catcher/form')->execute(array($page));
-
-        $view = (string) \View::forge('nos::admin/page/page_form', array(
+        $return .= (string) \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
             'lang'     => $page->page_lang
 		), false);
 
-        return $catcher.$view;
+        return $return;
     }
 
     protected static function  _get_page_with_permission($page_id, $permission) {
