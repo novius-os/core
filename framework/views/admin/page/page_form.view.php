@@ -76,22 +76,29 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 	require(['jquery-nos-ostabs'], function ($nos) {
 		$nos(function () {
 			var tabInfos = {
-				label : <?= json_encode(empty($page) || $page->is_new() ? __('Add a page') : $page->page_title) ?>,
+				label : <?= json_encode($page->is_new() ? __('Add a page') : $page->page_title) ?>,
 				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
-				url : 'admin/nos/page/page/crud<?= empty($page) ? '' : '/'.$page->page_id ?>?lang=<?= $lang ?>'
+				url : 'admin/nos/page/page/crud<?= $page->is_new() ? '' : '/'.$page->page_id ?>?lang=<?= $lang ?>'
 			};
+
+            tabInfos.actions = [];
 <?php
+    echo \View::forge('nos::form/actions_languages', array(
+        'item' => $page,
+        'url_crud' => $url_crud,
+        'var' => 'tabInfos.actions',
+    ), false);
+
+
 	if (!empty($page) && !$page->is_new()) {
 ?>
-			tabInfos.actions = [
-				{
-					label : <?= json_encode(__('Visualise')) ?>,
-					click : function() {
-						window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
-					},
-					iconClasses : 'nos-icon16 nos-icon16-eye'
-				}
-			];
+			tabInfos.actions.push({
+                label : <?= json_encode(__('Visualise')) ?>,
+                click : function() {
+                    window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
+                },
+                iconClasses : 'nos-icon16 nos-icon16-eye'
+            });
 <?php
 	}
 ?>

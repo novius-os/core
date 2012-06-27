@@ -12,19 +12,41 @@ namespace Nos;
 
 class Controller_Admin_Page_Page extends Controller_Admin_Application {
 
-    public function action_crud($id = null) {
+    public function action_crud($id = null)
+    {
+        // crud               : add a new item
+        // crud/ID            : edit an existing item
+        // crud/ID?lang=fr_FR : translate an  existing item (can be forbidden if the parent doesn't exists in that language)
+
         $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
-	    return \View::forge('nos::form/layout_languages', array(
-		    'item' => $page,
-		    'selected_lang' => \Input::get('lang', $page->is_new() ? null : $page->get_lang()),
-		    'url_blank_slate' => 'admin/nos/page/page/blank_slate',
-		    'url_form' => 'admin/nos/page/page/form',
-	    ), false);
+        $selected_lang = \Input::get('lang', $page->is_new() ? null : $page->get_lang());
+
+        if ($page->is_new())
+        {
+            return $this->action_form($id);
+        }
+        else
+        {
+            $all_langs = $page->get_all_lang();
+
+            if (in_array($selected_lang, $all_langs))
+            {
+                return $this->action_form($id);
+            }
+            else
+            {
+                $_GET['common_id'] = $id;
+                return $this->action_blank_slate($id, $selected_lang);
+            }
+        }
     }
 
-    public function action_blank_slate($id = null) {
+    public function action_blank_slate($id = null, $lang = null) {
         $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
-        $lang = \Input::get('lang', '');
+        if (empty($lang))
+        {
+            $lang = \Input::get('lang', key(\Config::get('locales')));
+        }
         return \View::forge('nos::form/layout_blank_slate', array(
             'item'      => $page,
             'lang'      => $lang,
@@ -164,6 +186,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
         return \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
+            'url_crud'  => 'admin/nos/page/page/crud',
             'lang'     => $page->page_lang
 		), false);
     }

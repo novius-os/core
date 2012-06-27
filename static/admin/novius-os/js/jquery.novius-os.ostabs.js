@@ -644,6 +644,7 @@ define('jquery-nos-ostabs',
                         .appendTo( reload );
                 }
 
+                other_actions = other_actions.reverse();
                 $.each(other_actions, function() {
                     var action = this;
 
@@ -660,7 +661,11 @@ define('jquery-nos-ostabs',
                         .text( action.label || '' )
                         .appendTo( $el );
                     if ( action.iconUrl ) {
-                        icon.css( 'background-image', 'url("' + action.iconUrl + '") !important' );
+                        icon.css({
+                            'background-image' : 'url("' + action.iconUrl + '")',
+                            'background-position' : 'center center',
+                            'padding-left': '4px'
+                        });
                     } else {
                         icon.addClass( action.iconClasses );
                     }
