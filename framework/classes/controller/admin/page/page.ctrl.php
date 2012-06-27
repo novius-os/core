@@ -83,7 +83,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
             // The first page we create is a homepage
             $lang_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
-                    array('page_home', '=', 0),
+                    array('page_home', '=', 1),
                     array('page_lang', $page->page_lang),
                 ),
             ));
