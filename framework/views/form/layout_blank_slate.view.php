@@ -54,19 +54,19 @@ if (!empty($common)) {
         <p>&nbsp;</p>
         <ul style="margin-left:1em;">
             <li>
-                <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span>
+                <span style="display:inline-block; width:2em;"></span>
                 <form action="<?= $url_form ?>" style="display:inline-block;">
                     <?= Form::hidden('lang',      $lang) ?>
                     <?= Form::hidden('common_id', $common_id) ?>
-                    <?= $item !== null ? __('Start from scratch ') : strtr(__('Start in {lang}'), array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang))) ?>
-                    <button type="submit" class="primary" data-icon="plus"><?= __('Add') ?></button>
+                    <button type="submit" class="primary" data-icon="plus"><?=__('Start from scratch ') ?></button>
                 </form>
+                <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Blank form)') ?></p>
             </li>
             <?php
             if (!empty($common_id)) {
                 ?>
                 <li>
-                    <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span>
+                    <span class="faded" style="display:inline-block; width:2em;"><?= __('OR') ?></span>
                     <form action="<?= $url_form ?>" style="display:inline-block;">
                         <?= Form::hidden('lang',      $lang) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
@@ -78,12 +78,13 @@ if (!empty($common)) {
                             $selected_lang = Form::select('create_from_id', null, $labels);
                         }
 
-                        echo strtr(__('Start with the content from the {lang} version'), array(
+                        echo strtr(__('{translate} the {lang} version'), array(
+                            '{translate}' => '<button type="submit" class="primary" data-icon="plus">'.__('Translate').'</button>',
                             '{lang}' => $selected_lang,
                         ));
                         ?>
-                        <button type="submit" class="primary" data-icon="plus"><?= __('Add') ?></button>
                     </form>
+                    <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Form filled with the content from the original version)') ?></p>
                 </li>
                 <?php
             }
@@ -103,6 +104,13 @@ require(['jquery-nos'], function ($nos) {
         });
 
         var tabInfos = <?= json_encode($tabInfos) ?>;
+        <?php
+        echo \View::forge('nos::form/actions_languages', array(
+            'item' => $item,
+            'url_crud' => $url_crud,
+            'var' => 'tabInfos.actions',
+        ), false);
+        ?>
 
         // Object.keys() is not available in IE 8 or IE quirks
         if (Object.keys(tabInfos).length > 0) {
