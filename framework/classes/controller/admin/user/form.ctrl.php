@@ -38,15 +38,17 @@ class Controller_Admin_User_Form extends \Nos\Controller_Admin_Application {
         }
         $role = reset($user->roles);
 
+        $apps = array();
 
         \Config::load('nos::admin/native_apps', 'natives_apps');
-        $natives_apps = \Config::get('natives_apps', array());
-
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
-        $apps = \Config::get('data::app_installed', array());
+        $applications = array_merge(\Config::get('data::app_installed', array()), \Config::get('natives_apps', array()));
+        foreach ($applications as $app => $params) {
+            if (isset($params['permission'])) {
+                $apps[$app] = array_merge($params, $params['permission']);
+            }
+        }
         unset($apps['local']);
-
-        $apps = array_merge($natives_apps, $apps);
 
         return \View::forge('nos::admin/user/user_edit', array(
             'user'   => $user,
