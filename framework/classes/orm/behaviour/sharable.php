@@ -16,51 +16,27 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
     const TYPE_TITLE = 1;
     const TYPE_URL = 2;
-    const TYPE_DESCRIPTION = 3;
-    const TYPE_HTML = 4;
-    const TYPE_IMAGE = 5;
-    const TYPE_VIDEO = 6;
-    const TYPE_DOCUMENT = 7;
-    const TYPE_DATE = 8;
-    const TYPE_KEYWORDS = 9;
+    const TYPE_TEXT = 3;
+    const TYPE_IMAGE = 4;
+    const TYPE_VIDEO = 5;
+    const TYPE_DOCUMENT = 6;
+    const TYPE_DATE = 7;
+    const TYPE_COLLECTION = 8;
 
     public function get_default_nuggets($object) {
         $default_nuggets = $object->get_default_nuggets_model();
         $nuggets = $default_nuggets->content_data;
         foreach ($this->_properties as $type => $params) {
             if (!isset($nuggets[$type])) {
-                if ($type === static::TYPE_URL) {
-                    if (is_array($params) && isset($params['url'])) {
-                        $params = $params['url'];
-                    }
-                }
-                if (is_string($params)) {
-                    $nuggets[$type] = $object->{$params};
+                if (is_string($params['value'])) {
+                    $nuggets[$type] = $object->{$params['value']};
                 } else if (is_callable($params)) {
-                    $nuggets[$type] = $params($object);
+                    $nuggets[$type] = $params['value']($object);
                 }
             }
         }
 
         return $nuggets;
-    }
-
-    public function get_urls($object) {
-        if (isset($this->_properties[static::TYPE_URL])) {
-            $params = $this->_properties[static::TYPE_URL];
-            if (is_array($params) && isset($params['urls']) && is_callable($params['urls'])) {
-                return $params['urls']($object);
-            }
-            if (is_array($params) && isset($params['url'])) {
-                $params = $params['url'];
-            }
-            if (is_string($params)) {
-                return array($object->{$params});
-            } else if (is_callable($params)) {
-                return array($params($object));
-            }
-        }
-        return array();
     }
 
     public function get_default_nuggets_model($object) {
@@ -81,8 +57,12 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $default_nuggets;
     }
 
-    public function get_sharable_types() {
-        return array_keys($this->_properties);
+    public function get_sharable_property($object, $property, $default = null) {
+        $value = \Arr::get($this->_properties, $property, null);
+        if ($value === null) {
+            return $default;
+        }
+        return is_callable($value) ? $value($object) : $value;
     }
 
     public function data_catchers() {

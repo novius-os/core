@@ -41,7 +41,7 @@ class Controller_Admin_Catcher extends Controller_Admin_Application {
             $nugget = $item->get_default_nuggets_model();
 
             $data = array();
-            foreach ($model::get_sharable_types() as $type) {
+            foreach ($model::get_sharable_types() as $type => $params) {
                 $data[$type] = \Input::post($type);
                 if (empty($data[$type])) {
                     unset($data[$type]);
