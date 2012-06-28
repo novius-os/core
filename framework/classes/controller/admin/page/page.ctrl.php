@@ -10,55 +10,11 @@
 
 namespace Nos;
 
-class Controller_Admin_Page_Page extends Controller_Admin_Application {
+class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
-    public function action_crud($id = null)
+    protected function crud_item($id)
     {
-        // crud               : add a new item
-        // crud/ID            : edit an existing item
-        // crud/ID?lang=fr_FR : translate an  existing item (can be forbidden if the parent doesn't exists in that language)
-
-        $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
-        $selected_lang = \Input::get('lang', $page->is_new() ? null : $page->get_lang());
-
-        if ($page->is_new())
-        {
-            return $this->action_form($id);
-        }
-        else
-        {
-            $all_langs = $page->get_all_lang();
-
-            if (in_array($selected_lang, $all_langs))
-            {
-                return $this->action_form($id);
-            }
-            else
-            {
-                $_GET['common_id'] = $id;
-                return $this->action_blank_slate($id, $selected_lang);
-            }
-        }
-    }
-
-    public function action_blank_slate($id = null, $lang = null) {
-        $page = $id === null ? Model_Page::forge() : Model_Page::find($id);
-        if (empty($lang))
-        {
-            $lang = \Input::get('lang', key(\Config::get('locales')));
-        }
-        return \View::forge('nos::form/layout_blank_slate', array(
-            'item'      => $page,
-            'lang'      => $lang,
-            'common_id' => \Input::get('common_id', ''),
-            'item_text' => __('page'),
-            'url_form'  => 'admin/nos/page/page/form',
-            'url_crud'  => 'admin/nos/page/page/crud',
-            'tabInfos' => array(
-                'label'   =>  __('Add a page'),
-                'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
-            ),
-        ), false);
+        return $id === null ? Model_Page::forge() : Model_Page::find($id);
     }
 
     public function action_form($id = null) {
@@ -186,8 +142,8 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
         return \View::forge('nos::admin/page/page_form', array(
 			'page'     => $page,
 			'fieldset' => $fieldset,
-            'url_crud'  => 'admin/nos/page/page/crud',
-            'lang'     => $page->page_lang
+            'lang'     => $page->page_lang,
+            'tabInfos' => $this->get_tabInfos($page)
 		), false);
     }
 

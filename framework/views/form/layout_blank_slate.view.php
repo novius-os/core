@@ -103,22 +103,12 @@ require(['jquery-nos'], function ($nos) {
             $container.load($form.get(0).action, $form.serialize());
         });
 
-        var tabInfos = <?= json_encode($tabInfos) ?>;
-        <?php
-        echo \View::forge('nos::form/actions_languages', array(
-            'item' => $item,
-            'url_crud' => $url_crud,
-            'var' => 'tabInfos.actions',
-        ), false);
-        ?>
+        var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
 
-        // Object.keys() is not available in IE 8 or IE quirks
-        if (Object.keys(tabInfos).length > 0) {
-            $container.onShow('bind', function() {
-                $container.tab('update', tabInfos);
-            });
-            $container.onShow();
-        }
+        $container.onShow('bind', function() {
+            $container.tab('update', tabInfos);
+        });
+        $container.onShow();
     });
 });
 </script>

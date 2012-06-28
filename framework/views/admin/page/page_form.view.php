@@ -73,40 +73,14 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 <?= View::forge('form/layout_standard', $config, false); ?>
 <?= $fieldset->close() ?>
 <script type="text/javascript">
-	require(['jquery-nos-ostabs'], function ($nos) {
+	require(['jquery-nos'], function ($nos) {
 		$nos(function () {
-			var tabInfos = {
-				label : <?= json_encode($page->is_new() ? __('Add a page') : $page->page_title) ?>,
-				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
-				url : 'admin/nos/page/page/crud<?= $page->is_new() ? '' : '/'.$page->page_id ?>?lang=<?= $lang ?>'
-			};
+			var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
 
-            tabInfos.actions = [];
-<?php
-    echo \View::forge('nos::form/actions_languages', array(
-        'item' => $page,
-        'url_crud' => $url_crud,
-        'var' => 'tabInfos.actions',
-    ), false);
-
-
-	if (!empty($page) && !$page->is_new()) {
-?>
-			tabInfos.actions.push({
-                label : <?= json_encode(__('Visualise')) ?>,
-                click : function() {
-                    window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
-                },
-                iconClasses : 'nos-icon16 nos-icon16-eye'
-            });
-<?php
-	}
-?>
-			var $el = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
-            $el.addClass('fill-parent');
-            $el.css('overflow', 'auto');
-			$el.onShow('bind', function() {
-				$el.tab('update', tabInfos);
+			var $container = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
+            $container.addClass('fill-parent').css('overflow', 'auto');
+			$container.onShow('bind', function() {
+				$container.tab('update', tabInfos);
 			});
 		});
 	});
