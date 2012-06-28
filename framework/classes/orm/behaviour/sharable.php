@@ -56,7 +56,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return is_callable($value) ? $value($object) : $value;
     }
 
-    public function data_catchers() {
+    public function data_catchers($object) {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'data_catchers.php', 'data_catchers');
         $data_catchers = \Config::get("data_catchers", array());
         $catchers = array();
@@ -77,6 +77,23 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             }
             $catchers[$id] = $config;
         }
+
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
+        foreach ($object->wysiwygs as $wysiwyg) {
+            \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers) {
+                $params = \Config::get('enhancers.'.$enhancer, false);
+                if ($params !== false) {
+                    if (isset($params['data_catchers_added']) && is_array($params['data_catchers_added'])) {
+                        foreach ($params['data_catchers_added'] as $catcher) {
+                            if (isset($data_catchers[$catcher])) {
+                                $catchers[$catcher] = $data_catchers[$catcher];
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         return $catchers;
     }
 }

@@ -102,35 +102,35 @@ class Nos {
 
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
-		preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
-        foreach ($matches[2] as $match_id => $fct_id) {
-
-            $function_content = static::__parse_enhancers($fct_id, $matches[3][$match_id], $controller);
-			$content = str_replace($matches[0][$match_id], $function_content, $content);
-		}
-
-		preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u', $content, $matches);
-        foreach ($matches[3] as $match_id => $fct_id) {
-            $function_content = static::__parse_enhancers($fct_id, $matches[2][$match_id], $controller);
-			$content = str_replace($matches[0][$match_id], $function_content, $content);
-		}
+        static::parse_enhancers($content, function ($enhancer, $config, $tag) use (&$content, $controller) {
+            $function_content = static::_get_enhancer_content($enhancer, $config, $controller);
+            $content = str_replace($tag, $function_content, $content);
+        });
 	}
 
-    protected static function __parse_enhancers($fct_id, $args, $controller) {
+    public static function parse_enhancers($content, $closure) {
+        preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
+        foreach ($matches[2] as $match_id => $enhancer) {
+            $closure($enhancer, $matches[3][$match_id], $matches[0][$match_id]);
+        }
+
+        preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u', $content, $matches);
+        foreach ($matches[3] as $match_id => $enhancer) {
+            $closure($enhancer, $matches[2][$match_id], $matches[0][$match_id]);
+        }
+    }
+
+    protected static function _get_enhancer_content($enhancer, $args, $controller) {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
         )), true);
 
-        // Check if the function exists
-        $name   = $fct_id;
-
-        $config = \Config::get("enhancers.$name", false);
+        $config = \Config::get("enhancers.$enhancer", false);
 
         $found  = $config !== false;
 
         false && \Fuel::$profiling && \Profiler::console(array(
-            'function_id'   => $fct_id,
-            'function_name' => $name,
+            'enhancer' => $enhancer,
             'controller'    => get_class($controller),
         ));
 
@@ -139,11 +139,11 @@ class Nos {
                 'args'        => array($args),
             ));
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
-                $function_content = 'Enhancer '.$name.' ('.$config['enhancer'].') returned empty content.';
+                $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
             }
         } else {
-            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$name.' not found in '.get_class($controller).'.' : '';
-            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$name.' not found in '.get_class($controller).'.');
+            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found in '.get_class($controller).'.' : '';
+            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found in '.get_class($controller).'.');
         }
         return $function_content;
     }

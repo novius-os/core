@@ -18,7 +18,7 @@ class Controller_Admin_Catcher extends Controller_Admin_Application {
     {
         $model = get_class($item);
         $id = $item->{\Arr::get($item->primary_key(), 0)};
-        $data_catchers = $model::data_catchers();
+        $data_catchers = $item->data_catchers();
         $default_nuggets = $item->get_default_nuggets();
 
         return \View::forge('nos::admin/data_catcher/panel', array(
