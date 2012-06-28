@@ -55,7 +55,8 @@ foreach ($fieldset->field() as $field) {
 <script type="text/javascript">
     require([
 	    'jquery-nos',
-        'jquery.passwordstrength'
+        'jquery.passwordstrength',
+        'wijmo.wijtabs'
     ], function($nos) {
         $nos(function() {
             var $container = $nos('#<?= $uniqid ?>');

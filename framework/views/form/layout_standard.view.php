@@ -36,12 +36,25 @@ $large = !empty($large) && $large == true;
 ?>
 
 <div id="<?= $uniqid_fixed ?>" class="nos-fixed-header ui-widget-content" style="z-index:100;">
-    <p><?= $fieldset->field($save)->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
-    <?php
-        echo \View::forge('form/publishable', array(
+<?php
+    if (!isset($fixed_layer)) {
+        $fixed_layer = \View::forge('form/layout_fixed_layer');
+    }
+
+    $fixed_layer->set('save',
+        \View::forge('form/layout_save', array(
+            'save_field' => $fieldset->field($save)
+        ), false)
+    , false);
+
+    $fixed_layer->set('publishable',
+        \View::forge('form/publishable', array(
             'object' => !empty($object) ? $object : null,
-        ), false);
-    ?>
+        ), false)
+    , false);
+
+    echo $fixed_layer;
+?>
 </div>
 
 <div id="<?= $uniqid ?>" class="nos-fixed-content fill-parent" style="display:none;">
