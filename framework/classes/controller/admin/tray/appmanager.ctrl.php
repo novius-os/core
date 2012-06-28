@@ -36,6 +36,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
 
         $view = View::forge('admin/tray/app_manager');
         $view->set(array(
+            'nos'     => Application::forge('nos'),
             'local'     => Application::forge('local'),
             'installed' => $app_installed,
             'others'    => $app_others,

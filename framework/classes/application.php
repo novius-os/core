@@ -120,7 +120,7 @@ class Application
      */
     public function is_dirty()
     {
-        return ($this->folder != 'local' && !$this->check_install()) || !$this->check_metadata();
+        return ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install()) || !$this->check_metadata();
     }
 
     protected function check_install()
@@ -170,7 +170,7 @@ class Application
         $config = $this->prepare_config($old_metadata, $new_metadata);
 
         // If symlinks are created, save the config
-        if ($this->folder != 'local' && !$this->check_install())
+        if ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install())
         {
             $this->unsymlink('static') && $this->unsymlink('htdocs');
             $this->symlink('static') && $this->symlink('htdocs');

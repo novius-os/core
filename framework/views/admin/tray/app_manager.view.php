@@ -21,7 +21,20 @@
 
 	<div class="unit col c1"></div>
 	<div class="unit col c10" id="line_first" style="position:relative;;">
-		<div class="line" style="overflow:visible;">
+        <div class="line" style="overflow:visible;">
+            <h1 class="title"><?= Nos\I18n::get('Core configuration'); ?></h1>
+            <p>
+                <?php
+                if ($nos->is_dirty()) {
+                    echo 'Some modifications are not live - <a href="admin/nos/tray/appmanager/add/nos">click to repair</a>';
+                } else {
+                    echo 'No problem detected!';
+                }
+                ?>
+            </p>
+        </div>
+        <p>&nbsp;</p>
+        <div class="line" style="overflow:visible;">
 			<h1 class="title"><?= Nos\I18n::get('Local configuration'); ?></h1>
             <p>
             <?php

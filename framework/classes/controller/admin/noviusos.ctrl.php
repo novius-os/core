@@ -162,14 +162,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
     {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'launchers.php', 'launchers');
         $launchers = \Config::get('launchers', array());
-
-        \Config::load('nos::admin/native_apps', true);
-        $native_apps = \Config::get('nos::admin/native_apps', array());
-        foreach ($native_apps as $params) {
-            if (isset($params['launchers'])) {
-                $launchers = array_merge($launchers, $params['launchers']);
-            }
-        }
         $launchers = \Config::mergeWithUser('misc.apps', $launchers);
 
         $apps = array();
