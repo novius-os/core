@@ -110,7 +110,7 @@ abstract class Controller_Admin_Crud extends Controller_Admin_Application
                 $actions[$locale] = array(
                     'label' => strtr(__('Add in {lang}'), array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                     'action' => array(
-                        'openTab' => $this->config['main_url'].'/crud?lang='.$locale,
+                        'openTab' => $this->config['base_url'].'/crud?lang='.$locale,
                     ),
                     'iconUrl' => \Nos\Helper::flag_url($locale),
                 );
