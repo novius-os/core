@@ -281,10 +281,6 @@ define('jquery-nos-appdesk',
                     return self;
                 }
 
-                if ($.isEmptyObject(o.locales)) {
-                    return self;
-                }
-
                 if (o.selectedLang && o.selectedLang.length) {
                     o.selectedLang = null;
                 }
@@ -1660,9 +1656,12 @@ define('jquery-nos-appdesk',
                         $.extend(true, appdesk, arguments[i](appdesk));
                     }
 
+                    // If the property is set explicitely, use it, else display only if there's more than 1 lang
+                    var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.locales).length <= 1);
+
                     $.extend(true, appdesk.appdesk, {
                         locales : config.locales,
-                        hideLocales : config.hideLocales,
+                        hideLocales : hideLocales,
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
@@ -1722,6 +1721,8 @@ define('jquery-nos-appdesk',
             },
 
             appdeskSetup : function(config) {
+                var configToUse = $.extend({}, true, config);
+
                 var self = {},
                     objectToArray = function(val, i) {
                         val['setupkey'] = i;
@@ -1737,8 +1738,8 @@ define('jquery-nos-appdesk',
                                 if (object[key][keys[i]] != null) {
                                     object[key][keys[i]]['setupkey'] = keys[i];
                                     ordered.push(object[key][keys[i]]);
-                                    }
                                 }
+                            }
                             return ordered;
                         } else {
                             return $.map(object[key], objectToArray);
@@ -1763,7 +1764,7 @@ define('jquery-nos-appdesk',
                                 object[key] = keyToOrderedArray(object, key);
                                 for (var i = 0; i < object[key].length; i++) {
                                     if (object[key][i].lang) {
-                                        if (config.hideLocales) {
+                                        if (configToUse.hideLocales) {
                                             object[key].splice(i, 1);
                                             continue;
                                         }
@@ -1910,6 +1911,9 @@ define('jquery-nos-appdesk',
                                     }
                                 });
                             }
+
+                            //
+                            configToUse = params.appdesk;
 
                             // Translate clone object
                             recursive(params);
