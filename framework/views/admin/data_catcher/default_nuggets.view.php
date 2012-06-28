@@ -7,13 +7,13 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-    if (isset($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_TITLE])) {
+    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_TITLE])) {
         echo '<label>', htmlspecialchars(__('Name:')) ,'</label>';
-        echo '<div>', htmlspecialchars($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_TITLE]) ,'</div>';
+        echo '<div>', htmlspecialchars($default_nuggets[\Nos\DataCatcher::TYPE_TITLE]) ,'</div>';
     }
-    if (isset($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL])) {
+    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_URL])) {
         echo '<label>', htmlspecialchars(__('Url:')) ,'</label>';
-        echo '<div>', htmlspecialchars($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL]) ,'</div>';
+        echo '<div>', htmlspecialchars($default_nuggets[\Nos\DataCatcher::TYPE_URL]) ,'</div>';
     }
 ?>
 <button><?= htmlspecialchars(__('Customize')) ?></button>

@@ -13,14 +13,14 @@
     $fieldset->add('model_id', '', array('value' => $model_id, 'type' => 'hidden'));
     $fieldset->add('model_name', '', array('value' => $model_name, 'type' => 'hidden'));
     $fields = array();
-    if (isset($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_TITLE])) {
-        $fields[] = \Nos\Orm_Behaviour_Sharable::TYPE_TITLE;
-        $fieldset->add(\Nos\Orm_Behaviour_Sharable::TYPE_TITLE, __('Name:'), array('value' => $default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_TITLE]));
+    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_TITLE])) {
+        $fields[] = \Nos\DataCatcher::TYPE_TITLE;
+        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => $default_nuggets[\Nos\DataCatcher::TYPE_TITLE]));
     }
-    if (isset($default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL])) {
-        $fields[] = \Nos\Orm_Behaviour_Sharable::TYPE_URL;
-        $options = $item->get_sharable_property(\Nos\Orm_Behaviour_Sharable::TYPE_URL.'.options');
-        $fieldset->add(\Nos\Orm_Behaviour_Sharable::TYPE_URL, __('Url:'), array('tag' => 'select', 'options' => $options, 'value' => $default_nuggets[\Nos\Orm_Behaviour_Sharable::TYPE_URL]));
+    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_URL])) {
+        $fields[] = \Nos\DataCatcher::TYPE_URL;
+        $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.options');
+        $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array('tag' => 'select', 'options' => $options, 'value' => $default_nuggets[\Nos\DataCatcher::TYPE_URL]));
     }
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme">

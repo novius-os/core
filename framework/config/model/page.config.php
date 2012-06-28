@@ -2,11 +2,11 @@
 return array(
     'behaviours' => array (
         'Nos\Orm_Behaviour_Sharable' => array(
-            \Nos\Orm_Behaviour_Sharable::TYPE_TITLE => array(
+            \Nos\DataCatcher::TYPE_TITLE => array(
                 'value' => 'page_title',
                 'useTitle' => __('Title'),
             ),
-            \Nos\Orm_Behaviour_Sharable::TYPE_URL => array(
+            \Nos\DataCatcher::TYPE_URL => array(
                 'value' => function($page) {
                     return $page->get_href(array('absolute' => true));
                 },

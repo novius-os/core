@@ -14,15 +14,6 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 {
 	protected $_properties = array();
 
-    const TYPE_TITLE = 1;
-    const TYPE_URL = 2;
-    const TYPE_TEXT = 3;
-    const TYPE_IMAGE = 4;
-    const TYPE_VIDEO = 5;
-    const TYPE_DOCUMENT = 6;
-    const TYPE_DATE = 7;
-    const TYPE_COLLECTION = 8;
-
     public function get_default_nuggets($object) {
         $default_nuggets = $object->get_default_nuggets_model();
         $nuggets = $default_nuggets->content_data;
@@ -70,7 +61,10 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         $data_catchers = \Config::get("data_catchers", array());
         $catchers = array();
         foreach ($data_catchers as $id => $config) {
-            if (isset($config['specified_models']) && $config['specified_models']) {
+            if (isset($config['specified_models']) &&
+                ((is_bool($config['specified_models']) && $config['specified_models'] === true) ||
+                (is_array($config['specified_models']) && !in_array($this->_class, $config['specified_models'])))
+            ) {
                 continue;
             }
             if (!is_array($config['required_data'])) {
