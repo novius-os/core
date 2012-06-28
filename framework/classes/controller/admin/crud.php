@@ -74,7 +74,7 @@ abstract class Controller_Admin_Crud extends Controller_Admin_Application
         $tabInfos = array_merge(
             $this->config['tabInfos'],
             array(
-                'url' => $this->config['base_url'].'/crud'.($item === null ? '': '/'.$item->id),
+                'url' => $this->config['base_url'].'/crud'.($item->is_new() ? '?lang='.$item->get_lang() : '/'.$item->id),
                 'actions' => array_values($this->get_actions_lang($item)),
             )
         );
@@ -82,15 +82,18 @@ abstract class Controller_Admin_Crud extends Controller_Admin_Application
         {
             $tabInfos['label'] = $tabInfos['label']($item);
         }
-        foreach ($this->config['actions'] as $actionClosure)
+        if (!$item->is_new())
         {
-            $action = $actionClosure($item);
-            if ($faded)
+            foreach ($this->config['actions'] as $actionClosure)
             {
-                unset($action['action']);
-                $action['faded'] = true;
+                $action = $actionClosure($item);
+                if ($faded)
+                {
+                    unset($action['action']);
+                    $action['faded'] = true;
+                }
+                $tabInfos['actions'][] = $action;
             }
-            $tabInfos['actions'][] = $action;
         }
 
         return $tabInfos;
