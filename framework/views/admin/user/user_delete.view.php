@@ -20,29 +20,31 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-    $nos(function() {
-        var $container    = $nos('#<?= $uniqid ?>').form();
+require(
+    ['jquery-nos'],
+    function($) {
+        $(function() {
+            var $container    = $('#<?= $uniqid ?>').nosFormUI();
 
-	    $container.find('button[data-id=confirmation]').click(function(e) {
-            e.preventDefault();
-		    $container.xhr({
-                url : 'admin/nos/user/user/delete_user_confirm',
-                method : 'POST',
-                data : {
-                    id : <?= $user->user_id ?>
-                },
-                success : function(json) {
-	                $container.dialog('close');
-                }
+            $container.find('button[data-id=confirmation]').click(function(e) {
+                e.preventDefault();
+                $container.nosAjax({
+                    url : 'admin/nos/user/user/delete_user_confirm',
+                    method : 'POST',
+                    data : {
+                        id : <?= $user->user_id ?>
+                    },
+                    success : function(json) {
+                        $container.nosDialog('close');
+                    }
+                });
             });
-        });
 
-        $container.find('a[data-id=cancel]').click(function(e) {
-            e.preventDefault();
-	        $container.dialog('close');
-        });
+            $container.find('a[data-id=cancel]').click(function(e) {
+                e.preventDefault();
+                $container.nosDialog('close');
+            });
 
+        });
     });
-});
 </script>

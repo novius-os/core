@@ -12,113 +12,113 @@
 ?>
 <div <?= array_to_attr($attributes); ?>><table class="nos-treegrid"></table></div>
 <script type="text/javascript">
-	require([
-		'jquery', 'jquery-nos-treegrid'
-	], function( $, $nos ) {
-		$nos(function() {
-			var params = <?= \Format::forge()->to_json($params) ?>,
-				container = $nos('#<?= $attributes['id'] ?>')
-					.css({
-                        height: params.height || '150px',
-                        width: params.width || ''
-                    }),
-				table = container.find('table'),
-				connector = container.closest('.nos-inspector, body')
-					.on('langChange', function() {
-						if (params.langChange) {
-							table.nostreegrid('option', 'treeOptions', {
-								lang : connector.data('nosLang') || ''
-							});
-						}
-					}),
-				rendered = false,
-				init = function() {
-					if (params.reloadEvent) {
-						container.listenEvent('reload.' + params.reloadEvent, function() {
-							table.nostreegrid('reload');
-						});
-					}
+	require(
+        ['jquery', 'jquery-nos-treegrid'],
+        function( $ ) {
+            $(function() {
+                var params = <?= \Format::forge()->to_json($params) ?>,
+                    container = $('#<?= $attributes['id'] ?>')
+                        .css({
+                            height: params.height || '150px',
+                            width: params.width || ''
+                        }),
+                    table = container.find('table'),
+                    connector = container.closest('.nos-inspector, body')
+                        .on('langChange', function() {
+                            if (params.langChange) {
+                                table.nostreegrid('option', 'treeOptions', {
+                                    lang : connector.data('nosLang') || ''
+                                });
+                            }
+                        }),
+                    rendered = false,
+                    init = function() {
+                        if (params.reloadEvent) {
+                            container.nosListenEvent('reload.' + params.reloadEvent, function() {
+                                table.nostreegrid('reload');
+                            });
+                        }
 
-					table.nostreegrid({
-							sortable : false,
-							movable : false,
-							treeUrl : params.treeUrl,
-							treeColumnIndex : 1,
-							treeOptions : $nos.extend(true, {
-								lang : connector.data('nosLang') || ''
-							}, params.treeOptions || {}),
-							preOpen : params.selected || {},
-							columnsAutogenerationMode : 'none',
-							scrollMode : 'auto',
-							cellStyleFormatter: function(args) {
-								if (args.$cell.is('td')) {
-									args.$cell.removeClass("ui-state-highlight");
-								}
-							},
-							rowStyleFormatter : function(args) {
-								if (args.type == $.wijmo.wijgrid.rowType.header) {
-									args.$rows.hide();
-								}
-							},
-							currentCellChanged : function(e) {
-								var row = $nos(e.target).nostreegrid("currentCell").row(),
-									data = row ? row.data : false;
+                        table.nostreegrid({
+                                sortable : false,
+                                movable : false,
+                                treeUrl : params.treeUrl,
+                                treeColumnIndex : 1,
+                                treeOptions : $.extend(true, {
+                                    lang : connector.data('nosLang') || ''
+                                }, params.treeOptions || {}),
+                                preOpen : params.selected || {},
+                                columnsAutogenerationMode : 'none',
+                                scrollMode : 'auto',
+                                cellStyleFormatter: function(args) {
+                                    if (args.$cell.is('td')) {
+                                        args.$cell.removeClass("ui-state-highlight");
+                                    }
+                                },
+                                rowStyleFormatter : function(args) {
+                                    if (args.type == $.wijmo.wijgrid.rowType.header) {
+                                        args.$rows.hide();
+                                    }
+                                },
+                                currentCellChanged : function(e) {
+                                    var row = $(e.target).nostreegrid("currentCell").row(),
+                                        data = row ? row.data : false;
 
-								if (data && rendered) {
-									params.selected.id = data._id;
-									row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true).triggerHandler('click');
-								}
-							},
-							rendering : function() {
-								rendered = false;
-							},
-							rendered : function() {
-								rendered = true;
-								table.css("height", "auto");
-								if ($nos.isPlainObject(params.selected) && params.selected.id) {
-									var radio = container.find(':radio[value=' + params.selected.id + ']')
-										.prop('checked', true),
-										nostreegrid = table.data('nostreegrid');
+                                    if (data && rendered) {
+                                        params.selected.id = data._id;
+                                        row.$rows.find(':radio[value=' + params.selected.id + ']').prop('checked', true).triggerHandler('click');
+                                    }
+                                },
+                                rendering : function() {
+                                    rendered = false;
+                                },
+                                rendered : function() {
+                                    rendered = true;
+                                    table.css("height", "auto");
+                                    if ($.isPlainObject(params.selected) && params.selected.id) {
+                                        var radio = container.find(':radio[value=' + params.selected.id + ']')
+                                            .prop('checked', true),
+                                            nostreegrid = table.data('nostreegrid');
 
-									nostreegrid._view()._getSuperPanel().scrollChildIntoView(radio);
-								}
-							},
-							columns: params.columns
-						});
-				};
+                                        nostreegrid._view()._getSuperPanel().scrollChildIntoView(radio);
+                                    }
+                                },
+                                columns: params.columns
+                            });
+                    };
 
-			params.columns.unshift({
-				allowMoving : false,
-				allowSizing : false,
-				width : 35,
-				ensurePxWidth : true,
-				cellFormatter : function(args) {
-					if ($nos.isPlainObject(args.row.data)) {
+                params.columns.unshift({
+                    allowMoving : false,
+                    allowSizing : false,
+                    width : 35,
+                    ensurePxWidth : true,
+                    cellFormatter : function(args) {
+                        if ($.isPlainObject(args.row.data)) {
 
-						$nos('<input type="radio" />').attr({
-								name : params.input_name,
-								value : args.row.data._id
-							})
-                            .click(function() {
-                                // Save the selected in params in cas of a refresh tree event
-                                params.selected = {
-                                    id : args.row.data._id,
-                                    model : args.row.data._model
-                                };
-                                $nos(this).trigger('selectionChanged', args.row.data);
-                            })
-							.appendTo(args.$container);
+                            $('<input type="radio" />').attr({
+                                    name : params.input_name,
+                                    value : args.row.data._id
+                                })
+                                .click(function() {
+                                    // Save the selected in params in cas of a refresh tree event
+                                    params.selected = {
+                                        id : args.row.data._id,
+                                        model : args.row.data._model
+                                    };
+                                    $(this).trigger('selectionChanged', args.row.data);
+                                })
+                                .appendTo(args.$container);
 
-						return true;
-					}
-				}
-			});
-
-            table.css({
-                    height : '100%',
-                    width : '100%'
+                            return true;
+                        }
+                    }
                 });
-			table.nos().onShow('one', init);
-		});
-	});
+
+                table.css({
+                        height : '100%',
+                        width : '100%'
+                    });
+                table.nosOnShow('one', init);
+            });
+        });
 </script>

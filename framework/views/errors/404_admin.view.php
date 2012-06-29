@@ -24,13 +24,15 @@ if ($css) {
 if ($js) {
 ?>
 <script type="text/javascript">
-require(['jquery-nos-ostabs'], function($nos) {
-	$nos(function() {
-		$nos('#wrapper').tab('update', {
-			label : 'Not implemented yet'
-		});
-	});
-});
+require(
+    ['jquery-nos-ostabs'],
+    function($) {
+        $(function() {
+            $('#wrapper').nosTabs('update', {
+                label : 'Not implemented yet'
+            });
+        });
+    });
 </script>
 <?
 }

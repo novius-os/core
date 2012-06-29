@@ -9,14 +9,16 @@
  */
 ?>
 <script type="text/javascript">
-require(['jquery-nos-ostabs'], function ($nos) {
-	$nos(function () {
-		$nos('#<?= $uniqid = uniqid('id_') ?>').tab('update', {
-			label : <?= json_encode(__('Add a media')) ?>,
-			iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
-		});
-	});
-});
+require(
+    ['jquery-nos-ostabs'],
+    function ($) {
+        $(function () {
+            $('#<?= $uniqid = uniqid('id_') ?>').nosTabs('update', {
+                label : <?= json_encode(__('Add a media')) ?>,
+                iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
+            });
+        });
+    });
 </script>
 
 <?php
@@ -61,67 +63,68 @@ $fieldset->set_config('form_attributes', $form_attributes);
         </div>
     </div>
     <div class="unit col c3 lastUnit">
-        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a></p>
+        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$nos(this).nosTabs('close');return false;"><?= __('Cancel') ?></a></p>
     </div>
 	<?= $fieldset->close(); ?>
 </div>
 
 <script type="text/javascript">
-require([
-    'jquery-nos',
-	'static/novius-os/admin/config/media/seo_compliant'
-],
-function($nos) {
-    $nos(function() {
-        var $container = $nos('#<?= $uniqid ?>')
-	            .form()
-		        .find('form')
-		        .bind('ajax_success', function() {
-			        $nos(this).dialog('close');
-		        })
-	            .end();
-        var    $file = $container.find(':file[name=media]')
-	            .change(function() {
-		            var path = $file.val();
+require(
+    [
+        'jquery-nos',
+        'static/novius-os/admin/config/media/seo_compliant'
+    ],
+    function($) {
+        $(function() {
+            var $container = $('#<?= $uniqid ?>')
+                    .nosFormUI()
+                    .find('form')
+                    .bind('ajax_success', function() {
+                        $(this).nosDialog('close');
+                    })
+                    .end(),
+                $file = $container.find(':file[name=media]')
+                    .change(function() {
+                        var path = $file.val();
 
-		            // Get the filename only
-		            // Remove the dirname
-		            path = path.replace(/^.*[\/\\]/g, '');
-		            // Remove the extension
-		            path = path.split('.');
-		            if (path.length > 1) {
-			            path.pop();
-		            }
-		            path = path.join('.');
+                        // Get the filename only
+                        // Remove the dirname
+                        path = path.replace(/^.*[\/\\]/g, '');
+                        // Remove the extension
+                        path = path.split('.');
+                        if (path.length > 1) {
+                            path.pop();
+                        }
+                        path = path.join('.');
 
-		            // Format a bit the title
-		            // Cleanup
-		            path = path.replace(/[^a-z0-9A-Z]/g, ' ').replace(/\s+/g, ' ');
-		            // Ucwords
-		            path = path.replace(/^([a-z])|\s+([a-z])/g, function ($1) {
-			            return $1.toUpperCase();
-		            });
-		            $title.val(path).triggerHandler('change');
-	            }),
-	        // Same title and description (alt)
-			$title = $container.find('input[name=media_title]')
-				.bind('change keyup', function() {
-					if ($same_title.is(':checked')) {
-						$slug.val($nos.seoCompliant($title.val()));
-					}
-				}),
-			$slug = $container.find('input[name=slug]'),
-			$same_title = $container.find('input[data-id=same_title]')
-				.change(function() {
-					if ($nos(this).is(':checked')) {
-						$slug.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-						$title.triggerHandler('change');
-					} else {
-						$slug.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-					}
-				});
+                        // Format a bit the title
+                        // Cleanup
+                        path = path.replace(/[^a-z0-9A-Z]/g, ' ').replace(/\s+/g, ' ');
+                        // Ucwords
+                        path = path.replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+                            return $1.toUpperCase();
+                        });
+                        $title.val(path).triggerHandler('change');
+                    }),
+                // Same title and description (alt)
+                $title = $container.find('input[name=media_title]')
+                    .bind('change keyup', function() {
+                        if ($same_title.is(':checked')) {
+                            $slug.val($.seoCompliant($title.val()));
+                        }
+                    }),
+                $slug = $container.find('input[name=slug]'),
+                $same_title = $container.find('input[data-id=same_title]')
+                    .change(function() {
+                        if ($(this).is(':checked')) {
+                            $slug.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                            $title.triggerHandler('change');
+                        } else {
+                            $slug.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                        }
+                    });
 
-	    $same_title.triggerHandler('change');
+            $same_title.triggerHandler('change');
+        });
     });
-});
 </script>

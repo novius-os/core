@@ -108,37 +108,40 @@
 	<div class="unit lastUnit"></div>
 
     <script type="text/javascript">
-        require(['jquery-nos', 'wijmo.wijgrid'], function ($nos) {
-            $nos(function() {
-                var $container = $nos('#<?= $uniqid ?>');
-                $container.form();
-                $nos(".app_list table").wijgrid({
-                    columns: [
-                        {  },
-                        { width: 200, ensurePxWidth: true }
-                    ] });
+        require(
+            ['jquery-nos', 'wijmo.wijgrid'],
+            function ($) {
+                $(function() {
+                    var $container = $('#<?= $uniqid ?>');
+                    $container.nosFormUI();
+                    $(".app_list table").wijgrid({
+                        columns: [
+                            {  },
+                            { width: 200, ensurePxWidth: true }
+                        ] });
 
-                $container.find('a').click(function(e) {
-                    e.preventDefault();
-                    $container.xhr({
-                        url: this.href,
-                        complete: function() {
-                            $container.load('admin/nos/tray/appmanager', function() {
-                                $container.find(':first').unwrap();
-                            });
-                        }
-                    });
-                })
+                    $container.find('a').click(function(e) {
+                        e.preventDefault();
+                        $container.nosAjax({
+                            url: this.href,
+                            complete: function() {
+                                $container.load('admin/nos/tray/appmanager', function() {
+                                    $container.find(':first').unwrap();
+                                });
+                                $.nosDispatchEvent('reload.appstab');
+                            }
+                        });
+                    })
 
-    <?php
-        $flash = \Session::get_flash('notification.plugins');
-        if (!empty($flash)) {
-    ?>
-                $nos.notify(<?= \Format::forge()->to_json($flash); ?>);
-    <?php
-        }
-    ?>
+<?php
+    $flash = \Session::get_flash('notification.plugins');
+    if (!empty($flash)) {
+?>
+                    $.nosNotify(<?= \Format::forge()->to_json($flash); ?>);
+<?php
+    }
+?>
+                });
             });
-        });
     </script>
 </div>

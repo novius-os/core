@@ -5,4 +5,4 @@ if ($save_field) {
     throw new \Exception('The save field is not present or incorrectly configured.');
 }
 ?>
-&nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$(this).nos().tab('close');return false;"><?= __('Cancel') ?></a>
+&nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$nos(this).nosTabs('close');return false;"><?= __('Cancel') ?></a>

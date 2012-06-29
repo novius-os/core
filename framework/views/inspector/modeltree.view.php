@@ -12,11 +12,11 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 ?>
 <table <?= array_to_attr($attributes); ?>></table>
 <script type="text/javascript">
-require([
-		'jquery-nos-treegrid'
-	], function( $nos, table, undefined ) {
-		$nos(function() {
-			var inspector = $nos('#<?= $attributes['id'] ?>'),
+require(
+    ['jquery-nos-treegrid'],
+    function($) {
+		$(function() {
+			var inspector = $('#<?= $attributes['id'] ?>'),
 				connector = inspector.closest('.nos-inspector, body')
 					.on('langChange', function() {
 						if (inspectorData.langChange) {
@@ -38,7 +38,7 @@ require([
 				rendered = false;
 
 			if (inspectorData.reloadEvent) {
-				inspector.listenEvent('reload.' + inspectorData.reloadEvent, function() {
+				inspector.nosListenEvent('reload.' + inspectorData.reloadEvent, function() {
 					parent.trigger('widgetReload');
 				});
 			}
@@ -47,7 +47,7 @@ require([
                     height : '100%',
                     width : '100%'
                 })
-                .nostreegrid($nos.extend({
+                .nostreegrid($.extend({
 		            treeOptions : {
 			            lang : connector.data('nosLang') || ''
 		            },
@@ -56,7 +56,7 @@ require([
                     allowColSizing : true,
                     allowColMoving : true,
                     currentCellChanged : function(e) {
-                        var row = $nos(e.target).nostreegrid("currentCell").row(),
+                        var row = $(e.target).nostreegrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

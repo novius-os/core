@@ -73,8 +73,10 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 <?= View::forge('form/layout_standard', $config, false); ?>
 <?= $fieldset->close() ?>
 <script type="text/javascript">
-	require(['jquery-nos-ostabs'], function ($nos) {
-		$nos(function () {
+require(
+    ['jquery-nos-ostabs', 'static/novius-os/admin/config/page/form.js'],
+    function ($, callback_fn) {
+		$(function () {
 			var tabInfos = {
 				label : <?= json_encode(empty($page) || $page->is_new() ? __('Add a page') : $page->page_title) ?>,
 				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
@@ -95,17 +97,14 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 <?php
 	}
 ?>
-			var $el = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
+			var $el = $('#<?= $fieldset->form()->get_attribute('id') ?>');
             $el.addClass('fill-parent');
             $el.css('overflow', 'auto');
-			$el.onShow('bind', function() {
-				$el.tab('update', tabInfos);
+			$el.nosOnShow('bind', function() {
+				$el.nosTabs('update', tabInfos);
 			});
-		});
-	});
-	require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
-		$nos(function () {
-			callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
-		});
+
+            callback_fn.call($('#<?= $fieldset->form()->get_attribute('id') ?>'));
+        });
 	});
 </script>

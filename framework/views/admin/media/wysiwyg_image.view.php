@@ -61,193 +61,195 @@
 	</form>
 </div>
 <script type="text/javascript">
-require(['jquery-nos', 'wijmo.wijtabs'], function($nos) {
-	$nos(function() {
+require(
+    ['jquery-nos', 'wijmo.wijtabs'],
+    function($) {
+        $(function() {
 
-		var id = '<?= $uniqid ?>';
-		var newimg = !'<?= $edit ?>';
-        var $container = $nos('#' + id)
-				.find('> form')
-				.submit(function(e) {
-					$container.find('button[data-id=save]').triggerHandler('click');
-					e.stopPropagation();
-					e.preventDefault();
-				})
-				.end()
-				.find('a[data-id=close]')
-				.click(function(e) {
-					e.preventDefault();
-					$container.dialog('close');
-				})
-				.end()
-				.find('button[data-id=save]')
-				.click(function(e) {
-					var img = $nos('<img />');
+            var id = '<?= $uniqid ?>';
+            var newimg = !'<?= $edit ?>';
+            var $container = $('#' + id)
+                    .find('> form')
+                    .submit(function(e) {
+                        $container.find('button[data-id=save]').triggerHandler('click');
+                        e.stopPropagation();
+                        e.preventDefault();
+                    })
+                    .end()
+                    .find('a[data-id=close]')
+                    .click(function(e) {
+                        e.preventDefault();
+                        $container.nosDialog('close');
+                    })
+                    .end()
+                    .find('button[data-id=save]')
+                    .click(function(e) {
+                        var img = $('<img />');
 
-					if (!media || !media.id) {
-						alert(<?= \Format::forge()->to_json(__('Please choose an image first')) ?>);
-						return;
-					}
+                        if (!media || !media.id) {
+                            alert(<?= \Format::forge()->to_json(__('Please choose an image first')) ?>);
+                            return;
+                        }
 
-					img.attr('height', $height.val());
-					img.attr('width',  $width.val());
-					img.attr('title',  $title.val());
-					img.attr('alt',    $alt.val());
-					img.attr('style',  $style.val());
+                        img.attr('height', $height.val());
+                        img.attr('width',  $width.val());
+                        img.attr('title',  $title.val());
+                        img.attr('alt',    $alt.val());
+                        img.attr('style',  $style.val());
 
-					img.attr('data-media', JSON.stringify(media));
-					img.attr('src', base_url + media.path);
+                        img.attr('data-media', JSON.stringify(media));
+                        img.attr('src', base_url + media.path);
 
-					$dialog.trigger('insert.media', img);
-					e.stopPropagation();
-					e.preventDefault();
-				})
-				.end()
-				.find('> ul')
-				.css({
-					width : '18%'
-				})
-				.end();
-		var $dialog = $container.closest('.ui-dialog-content')
-				.bind('select_media', function(e, data) {
-					tinymce_image_select(data);
-				});
-		var $library = $container.find('div:eq(0)')
-				.css({
-					width : '100%',
-					padding: 0,
-					margin: 0
-				});
-        var $thumb = $container.find('img')
-				.hide()
-				.parent()
-				.css('vertical-align', 'top')
-				.end();
-		var base_url = '<?= \Uri::base(true) ?>';
-		var $height = $container.find('input[data-id=height]');
-		var $width = $container.find('input[data-id=width]')
-				.bind('change keyup', function() {
-					if ($proportional.is(':checked') && media && media.width && media.height) {
-                        var width = $width.val();
-						$height.val(width == '' ? '' : Math.round(width * media.height / media.width));
-					}
-				});
-		var $title = $container.find('input[data-id=title]')
-				.bind('change keyup', function() {
-					if ($same_title_alt.is(':checked')) {
-						$alt.val($title.val());
-					}
-				});
-		var $alt = $container.find('input[data-id=alt]');
-		var $style = $container.find('input[data-id=style]');
-		var $proportional = $container.find('input[data-id=proportional]')
-				.change(function() {
-					if ($proportional.is(':checked')) {
-						$height.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-						$width.triggerHandler('change');
-					} else {
-						$height.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-					}
-				});
-		var $same_title_alt = $container.find('input[data-id=same_title_alt]')
-				.change(function() {
-					if ($same_title_alt.is(':checked')) {
-						$alt.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-					} else {
-						$alt.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-					}
-				});
-		var media = null;
-		var tinymce_image_select = function(media_json, image_dom) {
-					media = media_json;
+                        $dialog.trigger('insert.media', img);
+                        e.stopPropagation();
+                        e.preventDefault();
+                    })
+                    .end()
+                    .find('> ul')
+                    .css({
+                        width : '18%'
+                    })
+                    .end();
+            var $dialog = $container.closest('.ui-dialog-content')
+                    .bind('select_media', function(e, data) {
+                        tinymce_image_select(data);
+                    });
+            var $library = $container.find('div:eq(0)')
+                    .css({
+                        width : '100%',
+                        padding: 0,
+                        margin: 0
+                    });
+            var $thumb = $container.find('img')
+                    .hide()
+                    .parent()
+                    .css('vertical-align', 'top')
+                    .end();
+            var base_url = '<?= \Uri::base(true) ?>';
+            var $height = $container.find('input[data-id=height]');
+            var $width = $container.find('input[data-id=width]')
+                    .bind('change keyup', function() {
+                        if ($proportional.is(':checked') && media && media.width && media.height) {
+                            var width = $width.val();
+                            $height.val(width == '' ? '' : Math.round(width * media.height / media.width));
+                        }
+                    });
+            var $title = $container.find('input[data-id=title]')
+                    .bind('change keyup', function() {
+                        if ($same_title_alt.is(':checked')) {
+                            $alt.val($title.val());
+                        }
+                    });
+            var $alt = $container.find('input[data-id=alt]');
+            var $style = $container.find('input[data-id=style]');
+            var $proportional = $container.find('input[data-id=proportional]')
+                    .change(function() {
+                        if ($proportional.is(':checked')) {
+                            $height.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                            $width.triggerHandler('change');
+                        } else {
+                            $height.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                        }
+                    });
+            var $same_title_alt = $container.find('input[data-id=same_title_alt]')
+                    .change(function() {
+                        if ($same_title_alt.is(':checked')) {
+                            $alt.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                        } else {
+                            $alt.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                        }
+                    });
+            var media = null;
+            var tinymce_image_select = function(media_json, image_dom) {
+                        media = media_json;
 
-                    if (media && media.thumbnail) {
-                        $thumb.attr('src', media.thumbnail.replace(/64/g, '128'))
-                            .show();
-                    }
+                        if (media && media.thumbnail) {
+                            $thumb.attr('src', media.thumbnail.replace(/64/g, '128'))
+                                .show();
+                        }
 
-                    log(media_json);
+                        log(media_json);
 
-					if (image_dom == null)
-					{
-						$height.val(media_json.height);
-						$width.val(media_json.width);
-						$title.val(media_json.title);
-						$alt.val(media_json.title);
-						$style.val('');
+                        if (image_dom == null)
+                        {
+                            $height.val(media_json.height);
+                            $width.val(media_json.width);
+                            $title.val(media_json.title);
+                            $alt.val(media_json.title);
+                            $style.val('');
 
-						$container.wijtabs('enableTab', 1)
-							.wijtabs('select', 1);
-						return;
-					}
+                            $container.wijtabs('enableTab', 1)
+                                .wijtabs('select', 1);
+                            return;
+                        }
 
-					$height.val(image_dom.attr('height'));
-					$width.val(image_dom.attr('width'));
-					$title.val(image_dom.attr('title'));
-					$alt.val(image_dom.attr('alt'));
-					$style.val(image_dom.attr('style'));
+                        $height.val(image_dom.attr('height'));
+                        $width.val(image_dom.attr('width'));
+                        $title.val(image_dom.attr('title'));
+                        $alt.val(image_dom.attr('alt'));
+                        $style.val(image_dom.attr('style'));
 
-					if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {
-						$proportional.prop('checked', false).removeAttr('checked', true).change();
-					}
+                        if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {
+                            $proportional.prop('checked', false).removeAttr('checked', true).change();
+                        }
 
-					if ($title.val() != $alt.val())
-					{
-						$same_title_alt.prop('checked', false).removeAttr('checked').change();
-					}
-				};
-		var ed = $dialog.data('tinymce');
-		var e = ed.selection.getNode();
+                        if ($title.val() != $alt.val())
+                        {
+                            $same_title_alt.prop('checked', false).removeAttr('checked').change();
+                        }
+                    };
+            var ed = $dialog.data('tinymce');
+            var e = ed.selection.getNode();
 
-		// Editing the current image
-		if (e.nodeName == 'IMG') {
-			var $img = $nos(e),
-				media_id = $img.data('media-id');
+            // Editing the current image
+            if (e.nodeName == 'IMG') {
+                var $img = $(e),
+                    media_id = $img.data('media-id');
 
-			// No data available yet, we need to fetch them
-			if (media_id) {
-				$nos.ajax({
-					method: 'GET',
-					url: base_url + 'admin/nos/media/info/media/' + media_id,
-					dataType: 'json',
-					success: function(item) {
-						tinymce_image_select(item, $img);
-					}
-				})
-			} else {
-				tinymce_image_select($img.data('media'), $img);
-			}
-		}
-
-		$container.wijtabs({
-				alignment: 'left',
-				load: function(e, ui) {
-					var margin = $nos(ui.panel).outerHeight(true) - $nos(ui.panel).innerHeight();
-					$nos(ui.panel).height($dialog.height() - margin);
-				},
-				disabledIndexes: newimg ? [1] : [],
-                show: function(e, ui) {
-                    $nos(ui.panel).onShow();
+                // No data available yet, we need to fetch them
+                if (media_id) {
+                    $.ajax({
+                        method: 'GET',
+                        url: base_url + 'admin/nos/media/info/media/' + media_id,
+                        dataType: 'json',
+                        success: function(item) {
+                            tinymce_image_select(item, $img);
+                        }
+                    })
+                } else {
+                    tinymce_image_select($img.data('media'), $img);
                 }
-			})
-			.find('.wijmo-wijtabs-content')
-			.css('width', '81%')
-			.addClass('box-sizing-border')
-			.end()
-			.form();
+            }
 
-		$proportional.triggerHandler('change');
-		$same_title_alt.triggerHandler('change');
+            $container.wijtabs({
+                    alignment: 'left',
+                    load: function(e, ui) {
+                        var margin = $(ui.panel).outerHeight(true) - $(ui.panel).innerHeight();
+                        $(ui.panel).height($dialog.height() - margin);
+                    },
+                    disabledIndexes: newimg ? [1] : [],
+                    show: function(e, ui) {
+                        $(ui.panel).nosOnShow();
+                    }
+                })
+                .find('.wijmo-wijtabs-content')
+                .css('width', '81%')
+                .addClass('box-sizing-border')
+                .end()
+                .nosFormUI();
+
+            $proportional.triggerHandler('change');
+            $same_title_alt.triggerHandler('change');
 
 
-		if (!newimg) {
-			$container.wijtabs('select', 1)
-				.bind('wijtabsshow', function() {
-					$library.html(<?= \Format::forge()->to_json($appdeskview) ?>);
-				});
-		} else {
-			$library.html(<?= \Format::forge()->to_json($appdeskview) ?>);
-		}
-	});
-});
+            if (!newimg) {
+                $container.wijtabs('select', 1)
+                    .bind('wijtabsshow', function() {
+                        $library.html(<?= \Format::forge()->to_json($appdeskview) ?>);
+                    });
+            } else {
+                $library.html(<?= \Format::forge()->to_json($appdeskview) ?>);
+            }
+        });
+    });
 </script>

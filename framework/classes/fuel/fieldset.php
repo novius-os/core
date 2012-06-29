@@ -100,7 +100,6 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 }
             }
         }
-		$js_rules = \Format::forge()->to_json($json);
 
         $append = array();
         foreach ($this->append as $a) {
@@ -111,7 +110,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
             }
         }
         $form_attributes = $this->get_config('form_attributes', array());
-        $append[] = '<script type="text/javascript">require(["jquery-nos"], function($nos) {$nos("#'.$form_attributes['id'].'").form("validate", '.$js_rules.').form("ajax");});</script>';
+        $append[] = (string) \View::forge('form/fieldset_js', array(
+            'id' => $form_attributes['id'],
+            'rules' => \Format::forge()->to_json($json),
+        ), false);
         return implode('', $append);
     }
 

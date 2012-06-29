@@ -40,29 +40,30 @@
     </ul>
 </div>
 <script type="text/javascript">
-require([
-    'jquery-nos',
-    'static/novius-os/admin/config/page/form.js',
-    'wijmo.wijtabs'
-], function($nos, callback_fn) {
-
-    $nos(function() {
-        var $tabs = $nos('#<?= $uniqid_tabs ?>');
-        $tabs.onShow('one', function() {
-            $tabs.find('div.page_lang').onShow('one', callback_fn).bind('blank_slate', callback_fn);
-            $tabs.wijtabs({
-                alignment: 'left',
-                ajax: true,
-                cache: true,
-                panelTemplate: '<div class="fill-parent" style="padding:0;"></div>',
-                show: function(e, ui) {
-                    $nos(ui.panel).onShow();
-                }
+require(
+    [
+        'jquery-nos',
+        'static/novius-os/admin/config/page/form.js',
+        'wijmo.wijtabs'
+    ],
+    function($, callback_fn) {
+        $(function() {
+            var $tabs = $('#<?= $uniqid_tabs ?>');
+            $tabs.nosOnShow('one', function() {
+                $tabs.find('div.page_lang').nosOnShow('one', callback_fn).bind('blank_slate', callback_fn);
+                $tabs.wijtabs({
+                    alignment: 'left',
+                    ajax: true,
+                    cache: true,
+                    panelTemplate: '<div class="fill-parent" style="padding:0;"></div>',
+                    show: function(e, ui) {
+                        $(ui.panel).nosOnShow();
+                    }
+                });
+                $tabs.wijtabs('select', <?= $selected_index ?>);
+                $tabs.find('> div').addClass('fill-parent').addClass('nos-tabs-lang-content');
             });
-            $tabs.wijtabs('select', <?= $selected_index ?>);
-	        $tabs.find('> div').addClass('fill-parent').addClass('nos-tabs-lang-content');
+            $tabs.nosOnShow();
         });
-        $tabs.onShow();
     });
-});
 </script>
