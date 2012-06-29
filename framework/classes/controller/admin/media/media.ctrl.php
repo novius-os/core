@@ -170,7 +170,11 @@ class Controller_Admin_Media_Media extends Controller {
 			$body = array(
 				'notify' => 'File successfully added.',
 				'closeDialog' => true,
-				'dispatchEvent' => 'reload.nos_media',
+                'dispatchEvent' => array(
+                    'name' => get_class($media),
+                    'action' => 'insert',
+                    'id' => $media->media_id,
+                ),
                 'replaceTab' => 'admin/nos/media/media/edit/'.$media->media_id,
 			);
         } catch (\Exception $e) {
@@ -270,7 +274,11 @@ class Controller_Admin_Media_Media extends Controller {
 
 			$body = array(
 				'notify' => 'File successfully saved.',
-				'dispatchEvent' => 'reload.nos_media',
+                'dispatchEvent' => array(
+                    'name' => get_class($media),
+                    'action' => 'update',
+                    'id' => $media->media_id,
+                ),
 			);
         } catch (\Exception $e) {
 			$body = array(

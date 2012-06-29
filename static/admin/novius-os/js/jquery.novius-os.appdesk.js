@@ -1705,8 +1705,27 @@ define('jquery-nos-appdesk',
                     });
 
                     if (params.reloadEvent) {
-                        dispatcher.on('reload.' + params.reloadEvent, function() {
-                            div.appdesk('gridReload');
+                        if (!$.isArray(params.reloadEvent)) {
+                            params.reloadEvent = [params.reloadEvent];
+                        }
+                        $.each(params.reloadEvent, function(i, reloadEvent) {
+                            if ($.type(reloadEvent) === 'string') {
+                                // Reload the grid if a action on a same language's item occurs
+                                // Or if a update or a insert on a other language's item occurs
+                                dispatcher.nosListenEvent({
+                                    name : params.reloadEvent
+                                }, function(json) {
+                                    if (!json.lang || !dispatcher.data('nosLang') || json.lang === dispatcher.data('nosLang')) {
+                                        div.appdesk('gridReload');
+                                    } else if (json.action === 'delete' || json.action === 'insert') {
+                                        div.appdesk('gridReload');
+                                    }
+                                });
+                            } else {
+                                dispatcher.nosListenEvent(reloadEvent, function() {
+                                    div.appdesk('gridReload');
+                                });
+                            }
                         });
                     }
 

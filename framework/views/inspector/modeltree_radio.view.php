@@ -34,9 +34,14 @@
                     rendered = false,
                     init = function() {
                         if (params.reloadEvent) {
-                            container.nosListenEvent('reload.' + params.reloadEvent, function() {
-                                table.nostreegrid('reload');
-                            });
+                            container.nosListenEvent({
+                                    name : params.reloadEvent
+                                }, function(json) {
+                                    if (!json.lang || !connector.data('nosLang') || json.lang === connector.data('nosLang')) {
+                                        table.nostreegrid('reload');
+                                    }
+                                });
+
                         }
 
                         table.nostreegrid({

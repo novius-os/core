@@ -151,7 +151,13 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
 
                 $json = array(
                     'notify' => $is_new ? __('Page sucessfully added.') : __('Page successfully saved.'),
-                    'dispatchEvent' => 'reload.nos_page',
+                    'dispatchEvent' => array(
+                        'name' => get_class($page),
+                        'action' => $is_new ? 'insert' : 'update',
+                        'id' => $page->page_id,
+                        'lang_common_id' => $page->page_lang_common_id,
+                        'lang' => $page->page_lang,
+                    ),
                 );
                 if ($is_new) {
                     $json['replaceTab'] = 'admin/nos/page/page/crud/'.$page->page_id;
@@ -236,7 +242,13 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
 
 			$body = array(
 				'notify' => 'Page successfully deleted.',
-                'dispatchEvent' => 'reload.nos_page',
+                'dispatchEvent' => array(
+                    'name' => get_class($page),
+                    'action' => 'delete',
+                    'id' => $page->page_id,
+                    'lang_common_id' => $page->page_lang_common_id,
+                    'lang' => $page->page_lang,
+                ),
 			);
 
         } catch (\Exception $e) {

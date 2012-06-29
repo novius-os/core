@@ -101,19 +101,11 @@ define('jquery-nos',
                     return window.parent.$nos.nosDispatchEvent(event);
                 }
 
-                var $noviusos = noviusos();
-                if (!$.isArray(event)) {
-                    event = [event];
-                }
-                $.each(event, function() {
-                    var e = this;
-                    if ( !(e instanceof jQuery.Event) ) {
-                        e = $.Event(e);
-                    }
+                var $noviusos = noviusos(),
+                    e = $.Event('noviusos', {noviusos : event});
 
-                    $noviusos.ostabs('dispatchEvent', e);
-                    dialogEvent.dispatchEvent(e);
-                });
+                $noviusos.ostabs('dispatchEvent', e);
+                dialogEvent.dispatchEvent(e);
                 return $;
             },
 
@@ -228,13 +220,13 @@ define('jquery-nos',
                     }
                 }
                 if (json.dispatchEvent) {
-                    if ($.isArray(json.dispatchEvent)) {
-                        $.each(json.dispatchEvent, function(i, event) {
-                            $.nosDispatchEvent(event);
-                        });
-                    } else {
-                        $.nosDispatchEvent(json.dispatchEvent);
+                    var events = json.dispatchEvent;
+                    if (!$.isArray(events)) {
+                        events = [events];
                     }
+                    $.each(events, function(i, event) {
+                        $.nosDispatchEvent(event);
+                    });
                 }
 
                 return this;
@@ -669,10 +661,22 @@ define('jquery-nos',
                 return this;
             },
 
-            nosListenEvent : function(event, callback) {
+            nosListenEvent : function(json_match, callback) {
                 var self = this;
 
-                this.closest('.nos-dispatcher, body').on(event, callback);
+                this.closest('.nos-dispatcher, body').on('noviusos', function(e) {
+                    var match = true;
+                    e.noviusos = e.noviusos || {};
+                    $.each(json_match, function(key, value) {
+                        if (e.noviusos[key] !== value) {
+                            match = false;
+                            return false;
+                        }
+                    });
+                    if (match) {
+                        callback(e.noviusos);
+                    }
+                });
 
                 return self;
             },

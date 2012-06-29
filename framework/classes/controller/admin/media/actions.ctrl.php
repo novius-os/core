@@ -65,7 +65,11 @@ class Controller_Admin_Media_Actions extends Controller {
 
 			$body = array(
 				'notify' => 'File successfully deleted.',
-                'dispatchEvent' => 'reload.nos_media',
+                'dispatchEvent' => array(
+                    'name' => get_class($media),
+                    'action' => 'delete',
+                    'id' => $media->media_id,
+                ),
 			);
         } catch (\Exception $e) {
             // Easy debug
@@ -185,7 +189,11 @@ class Controller_Admin_Media_Actions extends Controller {
             \DB::commit_transaction();
             $body = array(
                 'notify' => 'Folder successfully deleted.',
-				'dispatchEvent' => array('reload.nos_media', 'reload.nos_media_folder'),
+                'dispatchEvent' => array(
+                    'name' => get_class($folder),
+                    'action' => 'delete',
+                    'id' => $folder->medif_id,
+                ),
             );
         } catch (\Exception $e) {
             \DB::rollback_transaction();

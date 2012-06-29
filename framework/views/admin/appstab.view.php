@@ -38,7 +38,7 @@ require(
     ['jquery-nos', 'jquery-ui.sortable'],
     function($) {
         $(function() {
-            var $panel = $('#<?= $id ?>').nosListenEvent('reload.appstab', function() {
+            var $panel = $('#<?= $id ?>').nosListenEvent({name : 'Nos\\Application'} ,function(json) {
                         $.ajax({
                             url: '/admin/nos/noviusos/appstab',
                             success: function(data) {

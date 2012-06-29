@@ -38,9 +38,13 @@ require(
 				rendered = false;
 
 			if (inspectorData.reloadEvent) {
-				inspector.nosListenEvent('reload.' + inspectorData.reloadEvent, function() {
-					parent.trigger('widgetReload');
-				});
+                inspector.nosListenEvent({
+                        name : inspectorData.reloadEvent
+                    }, function(json) {
+                        if (!json.lang || !connector.data('nosLang') || json.lang === connector.data('nosLang')) {
+                            parent.trigger('widgetReload');
+                        }
+                    });
 			}
 
             inspector.css({

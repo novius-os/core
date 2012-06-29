@@ -59,7 +59,11 @@ class Controller_Admin_User_User extends Controller {
 
 			$body = array(
 				'notify' => 'User permanently deleted.',
-                'dispatchEvent' => 'reload.nos_user',
+                'dispatchEvent' => array(
+                    'name' => get_class($user),
+                    'action' => 'delete',
+                    'id' => $user->user_id,
+                ),
 			);
         } catch (\Exception $e) {
             // Easy debug

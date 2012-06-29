@@ -95,7 +95,13 @@ define(
                     label : appDesk.i18n('Media center'),
                     iconUrl : 'static/novius-os/admin/novius-os/img/32/media.png'
                 },
-                reloadEvent : 'nos_media',
+                reloadEvent : [
+                    'Nos\\Model_Media',
+                    {
+                        name : 'Nos\\Model_Media_Folder',
+                        action : 'delete'
+                    }
+                ],
                 appdesk : {
                     splittersVertical : 300,
                     adds : {
@@ -162,7 +168,7 @@ define(
                             label : appDesk.i18n('Folders'),
                             url : 'admin/nos/media/inspector/folder/list',
                             inputName : 'folder_id',
-                            reloadEvent : 'nos_media_folder',
+                            reloadEvent : 'Nos\\Model_Media_Folder',
                             treeGrid : {
                                 treeUrl : 'admin/nos/media/inspector/folder/json',
                                 sortable : false,
@@ -267,7 +273,7 @@ define(
                         },
                         preview : {
                             vertical : true,
-                            reloadEvent : 'nos_media',
+                            reloadEvent : 'Nos\\Model_Media',
                             label : appDesk.i18n('Preview'),
                             preview : true,
                             options : {

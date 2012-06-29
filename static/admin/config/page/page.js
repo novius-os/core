@@ -61,7 +61,7 @@ define(
                         }
                     }
                 },
-                reloadEvent : 'nos_page',
+                reloadEvent : 'Nos\\Model_Page',
                 appdesk : {
                     adds: {
                         page : {
@@ -110,7 +110,7 @@ define(
                     defaultView : 'treeGrid',
                     inspectors : {
                         roots : {
-                            reloadEvent : 'nos_page_roots',
+                            reloadEvent : 'Nos\\Model_Page_Root',
                             vertical : true,
                             hide : true,
                             label : appDesk.i18n('Roots'),

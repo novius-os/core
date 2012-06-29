@@ -10,10 +10,12 @@
 ?>
 
 <script type="text/javascript">
-    require(
-        ["jquery-nos"],
-        function($) {
-            $("# <?= $id ?>").nosFormValidate(<?= $rules ?>)
+require(
+    ["jquery-nos"],
+    function($) {
+        $(function() {
+            $("#<?= $id ?>").nosFormValidate(<?= $rules ?>)
                 .nosFormAjax();
         });
+    });
 </script>
