@@ -303,6 +303,10 @@ class Application
         // More treatment for enhancers
         foreach ($added['enhancers'] as $key => $enhancer)
         {
+            if (empty($enhancer['models_url_enhanced']))
+            {
+                continue;
+            }
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
                 $config['models_url_enhanced'][$model][] = $key;
@@ -311,6 +315,10 @@ class Application
 
         foreach ($removed['enhancers'] as $key => $enhancer)
         {
+            if (empty($enhancer['models_url_enhanced']))
+            {
+                continue;
+            }
             foreach ($enhancer['models_url_enhanced'] as $model)
             {
                 foreach (array_keys($config['models_url_enhanced'][$model], $key) as $remove)
