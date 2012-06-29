@@ -1713,7 +1713,7 @@ define('jquery-nos-appdesk',
                                 // Reload the grid if a action on a same language's item occurs
                                 // Or if a update or a insert on a other language's item occurs
                                 dispatcher.nosListenEvent({
-                                    name : params.reloadEvent
+                                    name : reloadEvent
                                 }, function(json) {
                                     if (!json.lang || !dispatcher.data('nosLang') || json.lang === dispatcher.data('nosLang')) {
                                         div.appdesk('gridReload');
@@ -1722,6 +1722,7 @@ define('jquery-nos-appdesk',
                                     }
                                 });
                             } else {
+                                log('autre', reloadEvent);
                                 dispatcher.nosListenEvent(reloadEvent, function() {
                                     div.appdesk('gridReload');
                                 });

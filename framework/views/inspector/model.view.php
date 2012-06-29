@@ -46,7 +46,7 @@ require(
 
 			if (inspectorData.reloadEvent) {
                 inspector.nosListenEvent({
-                        target : inspectorData.reloadEvent
+                        name : inspectorData.reloadEvent
                     }, function(json) {
                         if (!json.lang || !connector.data('nosLang') || json.lang === connector.data('nosLang')) {
                             parent.trigger('widgetReload');

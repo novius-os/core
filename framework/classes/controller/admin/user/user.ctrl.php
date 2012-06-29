@@ -54,16 +54,19 @@ class Controller_Admin_User_User extends Controller {
 
             $user = static::_get_user_with_permission($user_id, 'delete');
 
+            // Recover infos before delete, if not id is null
+            $dispatchEvent = array(
+                'name' => get_class($user),
+                'action' => 'delete',
+                'id' => $user->user_id,
+            );
+
             // Delete database & relations (link)
             $user->delete();
 
 			$body = array(
 				'notify' => 'User permanently deleted.',
-                'dispatchEvent' => array(
-                    'name' => get_class($user),
-                    'action' => 'delete',
-                    'id' => $user->user_id,
-                ),
+                'dispatchEvent' => $dispatchEvent,
 			);
         } catch (\Exception $e) {
             // Easy debug
