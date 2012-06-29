@@ -1902,7 +1902,7 @@
         _nosEnhancer : function(ui, metadata, edit) {
             var ed = tinyMCE.activeEditor;
 
-			// Keep reference to the wijdialog node, so we can close the popup manually
+			// Keep reference to the wijnosDialog node, so we can close the popup manually
 			var dialog = null;
 			var self   = this;
 
@@ -1965,12 +1965,12 @@
 
 			// Open the dialog popup (it returns the node inserted in the body)
             if (metadata.dialog.ajax || !edit) {
-                dialog = $(ed.formElement).nos().dialog($.extend({
+                dialog = $nos(ed.formElement).nosDialog($.extend({
                     title: metadata.title
                 }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
             } else {
                 // Open empty dialog
-                dialog = $(ed.formElement).nos().dialog($.extend({
+                dialog = $nos(ed.formElement).nosDialog($.extend({
                     title: metadata.title
                 }, $.extend({}, metadata.dialog, {contentUrl : null})));
 
@@ -2010,7 +2010,7 @@
 
             dialog.bind('save.enhancer', function(e, json) {
                 save(json);
-                dialog.dialog('close');
+                dialog.nosDialog('close');
             });
         },
 
@@ -2024,7 +2024,7 @@
             var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
 
 			var dialog = null;
-            dialog = $(ed.formElement).nos().dialog({
+            dialog = $nos(ed.formElement).nosDialog({
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
 				ajax: true,
@@ -2034,7 +2034,7 @@
 			});
             dialog.bind('insert.media', function(e, img) {
                 // Cleanup
-                dialog.dialog('close');
+                dialog.nosDialog('close');
 
                 var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
                 if (editCurrentImage) {

@@ -30,11 +30,11 @@
     height : 100%;
 
 	.nos-appdesk-headerbar {
-		margin : 5px 10px;
+		margin : 0 10px;/* Don't put a top margin, or scrollbar will appear */
 
 		.nos-appdesk-headerbar-left {
             display : inline-block;
-            margin-top: 5px;
+            line-height : 54px; /* Vertical align = middle */
 		}
         .nos-appdesk-action-secondary {
             display : inline-block;
@@ -42,13 +42,12 @@
         }
         .nos-appdesk-headerbar-right {
             float: right;
-            margin-top: 5px;
+            line-height : 54px; /* Vertical align = middle */
         }
 		.nos-appdesk-dropdownviews, .nos-appdesk-dropdownlang {
             display : inline-block;
-            vertical-align: middle;
-            margin-top: 5px;
             margin-left: 10px;
+            line-height : 1em;
 		}
 	}
 

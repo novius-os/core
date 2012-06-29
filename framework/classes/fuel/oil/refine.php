@@ -10,11 +10,11 @@
 
 class Refine extends Oil\Refine
 {
+
+
     public static function run($task, $args)
     {
-
-
-        $task = mb_strtolower($task);
+        $task = strtolower($task);
 
         // Make sure something is set
         if (empty($task) or $task === 'help')
@@ -36,7 +36,7 @@ class Refine extends Oil\Refine
         {
             try
             {
-	            \Module::load($module);
+                \Module::load($module);
                 $path = \Module::exists($module);
                 \Finder::instance()->add_path($path);
             }
@@ -45,8 +45,6 @@ class Refine extends Oil\Refine
                 throw new Exception(sprintf('Module "%s" does not exist.', $module));
             }
         }
-
-
 
         // Just call and run() or did they have a specific method in mind?
         list($task, $method) = array_pad(explode(':', $task), 2, 'run');
@@ -77,15 +75,15 @@ class Refine extends Oil\Refine
             return;
         }
 
-
-
         require_once $file;
 
-        $task = ucfirst($task);
+        $originalTask = $task;
+        $task = '\\Nos\\Tasks\\'.ucfirst($task);
+        if (!class_exists($task)) {
+            $task = '\\Fuel\\Tasks\\'.ucfirst($originalTask);
+        }
 
         $new_task = new $task;
-
-
 
         // The help option hs been called, so call help instead
         if (\Cli::option('help') && is_callable(array($new_task, 'help')))
@@ -100,4 +98,5 @@ class Refine extends Oil\Refine
             \Cli::write($return);
         }
     }
+
 }

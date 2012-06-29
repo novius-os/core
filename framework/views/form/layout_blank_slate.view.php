@@ -93,24 +93,26 @@ if (!empty($common)) {
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function ($nos) {
-    $nos(function () {
-        var $container = $nos('#<?= $uniqid ?>').form();
-        $container.find('form').submit(function(e) {
-            e.preventDefault();
-            var $form = $(this);
-            $container.load($form.get(0).action, $form.serialize());
-        });
-
-        var tabInfos = <?= json_encode($tabInfos) ?>;
-
-        // Object.keys() is not available in IE 8 or IE quirks
-        if (Object.keys(tabInfos).length > 0) {
-            $container.onShow('bind', function() {
-                $container.tab('update', tabInfos);
+require(
+    ['jquery-nos'],
+    function ($) {
+        $(function () {
+            var $container = $('#<?= $uniqid ?>').nosFormUI();
+            $container.find('form').submit(function(e) {
+                e.preventDefault();
+                var $form = $(this);
+                $container.load($form.get(0).action, $form.serialize());
             });
-            $container.onShow();
-        }
+
+            var tabInfos = <?= json_encode($tabInfos) ?>;
+
+            // Object.keys() is not available in IE 8 or IE quirks
+            if (Object.keys(tabInfos).length > 0) {
+                $container.nosOnShow('bind', function() {
+                    $container.nosTabs('update', tabInfos);
+                });
+                $container.nosOnShow();
+            }
+        });
     });
-});
 </script>

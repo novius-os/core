@@ -69,9 +69,11 @@
 <?= $fieldset->close() ?>
 </div>
 <script type="text/javascript">
-require(['jquery-nos-datacatchers'], function($nos) {
-    $nos(function() {
-        $nos("#<?= $id ?>").datacatchers();
+require(
+    ['jquery-nos-datacatchers'],
+    function($) {
+        $(function() {
+            $("#<?= $id ?>").datacatchers();
+        });
     });
-});
 </script>

@@ -12,9 +12,11 @@
 ?>
 <div id="<?= $id ?>"></div>
 <script type="text/javascript">
-require(['jquery-nos-appdesk'], function($nos) {
-    $nos(function() {
-        $nos.appdeskAdd("<?= $id ?>", <?= $appdesk ?>);
+require(
+    ['jquery-nos-appdesk'],
+    function($) {
+        $(function() {
+            $.appdeskAdd("<?= $id ?>", <?= $appdesk ?>);
+        });
     });
-});
 </script>

@@ -9,7 +9,7 @@
 
 define('jquery-nos-datacatchers',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-ui.button', 'wijmo.wijaccordion'],
-    function($, $nos) {
+    function($) {
         "use strict";
         var undefined = void(0);
         $.widget( "nos.datacatchers", {
@@ -63,8 +63,8 @@ define('jquery-nos-datacatchers',
                             }
                         })
                         .click(function() {
-                            var current = $nos($button).tab('current');
-                            $nos($button).tab('add', {
+                            var current = $($button).nosTabs('current');
+                            $($button).nosTabs('add', {
                                 iconClasses: params.iconClasses || null,
                                 iconUrl: params.iconUrl || null,
                                 url : params.url,
@@ -82,10 +82,10 @@ define('jquery-nos-datacatchers',
                 self.uiCustomize.button()
                     .click(function() {
                         self.element.addClass('nos-datacatchers-form');
-                        $nos(self.uiForm).onShow('show');
+                        $(self.uiForm).nosOnShow('show');
                     });
 
-                $nos(self.uiForm).form();
+                $(self.uiForm).nosFormUI();
 
                 self.uiForm.bind('ajax_success', function(e, json) {
                     self.uiDefaultNuggets.html(json.default_nuggets);
@@ -99,5 +99,5 @@ define('jquery-nos-datacatchers',
             }
         });
 
-        return $nos;
+        return $;
     });

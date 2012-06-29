@@ -8,7 +8,7 @@
  */
 define('jquery-nos-thumbnailsgrid',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'wijmo.wijsuperpanel', 'wijmo.wijpager'],
-    function( $, $nos ) {
+    function( $ ) {
         "use strict";
         var undefined = void(0);
         $.widget( "nos.thumbnailsgrid", {
@@ -132,7 +132,7 @@ define('jquery-nos-thumbnailsgrid',
                                         notify.text = notify.text.replace('log-in again', "<a href=\"" + json.login_page + "\">log-in again</a>");
                                     }
                                 } catch (e) {}
-                                $nos.notify(notify);
+                                $.nosNotify(notify);
                             }
                             self.uiOverlay.hide();
                             log(jqXHR, textStatus, errorThrown);
@@ -276,7 +276,7 @@ define('jquery-nos-thumbnailsgrid',
 
                 self._itemThumbnail(imgContainer, item, index);
 
-                var buttons = $nos.appdeskActions(o.actions, noParseData);
+                var buttons = $.appdeskActions(o.actions, noParseData);
 
                 buttons.appendTo(container);
 
@@ -410,5 +410,5 @@ define('jquery-nos-thumbnailsgrid',
                 return this._data;
             }
         });
-        return $nos;
+        return $;
     });

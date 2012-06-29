@@ -8,7 +8,7 @@
  */
 define('jquery-nos-ostabs',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel'],
-    function( $, $nos ) {
+    function( $ ) {
         "use strict";
         var undefined = void(0);
         $.widget( "nos.ostabs", {
@@ -161,9 +161,8 @@ define('jquery-nos-ostabs',
                             .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
                             .prependTo( self.uiOstabsHeader );
                         self._add( o.appsTab, self.uiOstabsAppsTab )
-                        .addClass( 'nos-ostabs-appstab' )
-                        .removeClass( 'ui-state-default' );
-                        self.uiOstabsAppsTab.find('> li > a:first').click(function() {$nos().refreshNosPanel();})
+                            .addClass( 'nos-ostabs-appstab' )
+                            .removeClass( 'ui-state-default' );
                     } else {
                         self.uiOstabsAppsTab = $( '<ul></ul>' );
                     }
@@ -1111,5 +1110,5 @@ define('jquery-nos-ostabs',
                 };
             }
         });
-        return $nos;
+        return $;
     });

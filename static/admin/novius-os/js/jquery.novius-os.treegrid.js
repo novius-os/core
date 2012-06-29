@@ -8,7 +8,7 @@
  */
 define('jquery-nos-treegrid',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-listgrid', 'wijmo.wijgrid', 'wijmo.wijdatasource'],
-    function( $, $nos ) {
+    function( $ ) {
         "use strict";
         var undefined = void(0);
         $.widget( "nos.nostreegrid", $.nos.noslistgrid, {
@@ -484,7 +484,7 @@ define('jquery-nos-treegrid',
                             }
                         }
                         if (data.error) {
-                            $nos.notify(data.error, 'error');
+                            $.nosNotify(data.error, 'error');
                         }
                     },
                     error : function(jqXHR, textStatus, errorThrown) {
@@ -550,5 +550,5 @@ define('jquery-nos-treegrid',
                 return self;
             }
         });
-        return $nos;
+        return $;
     });

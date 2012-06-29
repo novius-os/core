@@ -8,41 +8,66 @@
  * @link http://www.novius-os.org
  */
 
+    $id = uniqid('temp_');
 ?>
-<div align="center">
-<form data-ui="ajaxForm" id="search">
-	<span id="magnifier"></span>
-	<input type="search" name="search" placeholder="<?= __('Search') ?>" data-button-go="false" />
-</form>
+<div id="<?= $id ?>">
+    <div align="center">
+    <form data-ui="ajaxForm" id="search">
+        <span id="magnifier"></span>
+        <input type="search" name="search" placeholder="<?= __('Search') ?>" data-button-go="false" />
+    </form>
+    </div>
+    <div id="apps">
+<?php
+    foreach ($apps as $app) {
+?>
+        <a class="app" href="<?= $app['url'] ?>" data-launcher="<?= htmlspecialchars(\Format::forge($app)->to_json()) ?>">
+            <span class="icon">
+                <img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />
+                <img width="64" src="<?= $app['icon64'] ?>" />
+            </span>
+            <span class="text"><?= $app['name'] ?></span>
+        </a>
+<?php
+    }
+?>
+    </div>
 </div>
-<?= render('admin/apps', array('apps' => $apps)) ?>
-
 <script type="text/javascript">
-    require(['jquery-nos', 'jquery-ui.sortable'], function($nos) {
-        $nos(function() {
-            //$('#switcher').themeswitcher();
-            var apps = $nos('#apps').sortable({
-                update: function() {
-                    var orders = {};
-                    $nos('.app').each(function(i) {
-                        orders[$nos(this).data('launcher').key] = {order: i};
+require(
+    ['jquery-nos', 'jquery-ui.sortable'],
+    function($) {
+        $(function() {
+            var $panel = $('#<?= $id ?>').nosListenEvent({name : 'Nos\\Application'} ,function(json) {
+                        $.ajax({
+                            url: '/admin/nos/noviusos/appstab',
+                            success: function(data) {
+                                $panel.parent().empty().append(data);
+                            }
+                        });
+                    }),
+                apps = $panel.find('#apps').sortable({
+                        update: function() {
+                            var orders = {};
+                            $('.app').each(function(i) {
+                                orders[$(this).data('launcher').key] = {order: i};
+                            });
+                            $(apps).nosSaveUserConfig('misc.apps', orders);
+                        }
                     });
-                    $nos(apps).xhr('saveUserConfig', 'misc.apps', orders);
-                }
+<?php if ($background) { ?>
+            $('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
+<?php } ?>
+            $panel.find('a.app').click(function(e) {
+                e.preventDefault();
+                var $launcher = $(this),
+                    tab = $launcher.data('launcher');
+                $launcher.nosTabs($.extend({
+                    app: true,
+                    iconSize: 32,
+                    labelDisplay: false
+                }, tab));
             });
-        <?php if ($background) { ?>
-            $nos('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
-            <?php } ?>
-        });
-        $nos('a.app').click(function(e) {
-            e.preventDefault();
-            var $launcher = $nos(this),
-                tab = $launcher.data('launcher');
-            $launcher.tab($nos.extend({
-                app: true,
-                iconSize: 32,
-                labelDisplay: false
-            }, tab));
         });
     });
 </script>

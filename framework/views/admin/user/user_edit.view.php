@@ -10,9 +10,11 @@
 
 ?>
 <script type="text/javascript">
-    require(['jquery-nos-ostabs'], function ($nos) {
-        $nos(function () {
-	        $nos('#<?= $uniqid = uniqid('id_'); ?>').tab('update', {
+require(
+    ['jquery-nos-ostabs'],
+    function ($) {
+        $(function () {
+	        $('#<?= $uniqid = uniqid('id_'); ?>').nosTabs('update', {
                 label : <?= \Format::forge()->to_json(isset($user) ? $user->fullname() : 'Add a user') ?>,
                 iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
             });
@@ -57,10 +59,10 @@ foreach ($fieldset->field() as $field) {
 	    'jquery-nos',
         'jquery.passwordstrength',
         'wijmo.wijtabs'
-    ], function($nos) {
-        $nos(function() {
-            var $container = $nos('#<?= $uniqid ?>');
-            $container.css('display', 'block').onShow();
+    ], function($) {
+        $(function() {
+            var $container = $('#<?= $uniqid ?>');
+            $container.css('display', 'block').nosOnShow();
             $container.wijtabs({
                 alignment: 'left'
             });
@@ -74,7 +76,7 @@ foreach ($fieldset->field() as $field) {
 
             // Password strength
             var strength_id = '<?= $uniqid ?>_strength';
-            var $strength = $nos('<span id="' + strength_id + '"></span>');
+            var $strength = $('<span id="' + strength_id + '"></span>');
             $password.after($strength);
             <?php $formatter = \Format::forge(); ?>
             $password.password_strength({
