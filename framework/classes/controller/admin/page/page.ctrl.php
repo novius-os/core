@@ -107,7 +107,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
         $is_new = $page->is_new();
 
-		$fieldset = \Fieldset::build_from_config($fields, $page, array(
+        $fieldset = \Fieldset::build_from_config($fields, $page, array(
             'before_save' => function($page, $data) {
 
                 // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
@@ -143,14 +143,14 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                 return $json;
             }
         ));
-		$fieldset->js_validation();
+        $fieldset->js_validation();
 
         return \View::forge('nos::admin/page/page_form', array(
-			'page'     => $page,
-			'fieldset' => $fieldset,
+            'page'     => $page,
+            'fieldset' => $fieldset,
             'lang'     => $page->page_lang,
             'tabInfos' => $this->get_tabInfos($page)
-		), false);
+        ), false);
     }
 
     protected static function  _get_page_with_permission($page_id, $permission) {
@@ -167,7 +167,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         return $page;
     }
 
-	public function action_delete_page($page_id = null) {
+    public function action_delete_page($page_id = null) {
         try {
             $page = static::_get_page_with_permission($page_id, 'delete');
             return \View::forge('nos::admin/page/page_delete', array(
@@ -178,14 +178,14 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
             if (\Fuel::$env == \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
                 throw $e;
             }
-			$body = array(
-				'error' => $e->getMessage(),
-			);
+            $body = array(
+                'error' => $e->getMessage(),
+            );
             \Response::json($body);
-		}
+        }
     }
 
-	public function action_delete_page_confirm() {
+    public function action_delete_page_confirm() {
         try {
             $page_id = \Input::post('id');
             // Allow GET for easier dev
@@ -196,22 +196,36 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
             $page = static::_get_page_with_permission($page_id, 'delete');
 
             // Recover infos before delete, if not id is null
-            $dispatchEvent = array(
-                'name' => get_class($page),
-                'action' => 'delete',
-                'id' => $page->page_id,
-                'lang_common_id' => $page->page_lang_common_id,
-                'lang' => $page->page_lang,
-            );
+            $dispatchEvent = array();
 
             // Delete all languages by default
             $lang = \Input::post('lang', 'all');
 
             // Delete children for all languages
             if ($lang == 'all') {
+                foreach ($page->find_lang('all') as $page_lang)
+                {
+                    $dispatchEvent[] = array(
+                        'name' => get_class($page),
+                        'action' => 'delete',
+                        'id' => $page_lang->page_id,
+                        'lang_common_id' => $page_lang->page_lang_common_id,
+                        'lang' => $page_lang->page_lang,
+                    );
+                    foreach ($page_lang->get_ids_children(false) as $page_id)
+                    {
+                        $dispatchEvent[] = array(
+                            'name' => get_class($page),
+                            'action' => 'delete',
+                            'id' => $page_id,
+                        );
+                    }
+                }
+
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 // Optimised operation for deleting all languages
                 $page->delete_all_lang();
+
             } else {
                 // Search for the appropriate page
                 if ($lang != 'all' && $page->get_lang() != $lang) {
@@ -224,25 +238,41 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                     )));
                 }
 
+                $dispatchEvent[] = array(
+                    'name' => get_class($page),
+                    'action' => 'delete',
+                    'id' => $page->page_id,
+                    'lang_common_id' => $page->page_lang_common_id,
+                    'lang' => $page->page_lang,
+                );
+
+                foreach ($page->get_ids_children(false) as $page_id) {
+                    $dispatchEvent[] = array(
+                        'name' => get_class($page),
+                        'action' => 'delete',
+                        'id' => $page_id,
+                    );
+                }
+
                 // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 $page->delete();
             }
 
-			$body = array(
-				'notify' => 'Page successfully deleted.',
+            $body = array(
+                'notify' => 'Page successfully deleted.',
                 'dispatchEvent' => $dispatchEvent,
-			);
+            );
 
         } catch (\Exception $e) {
             // Easy debug
             if (\Fuel::$env == \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
                 throw $e;
             }
-			$body = array(
-				'error' => $e->getMessage(),
-			);
-		}
+            $body = array(
+                'error' => $e->getMessage(),
+            );
+        }
 
         \Response::json($body);
     }

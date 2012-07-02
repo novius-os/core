@@ -72,6 +72,13 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 ?>
 <?= View::forge('form/layout_standard', $config, false); ?>
 <?= $fieldset->close() ?>
+
+<div id="<?= $uniqid_close = uniqid('close_') ?>" style="display:none;">
+    <p><?= __('This item has been deleted.') ?></p>
+    <p>&nbsp;</p>
+    <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
+</div>
+
 <script type="text/javascript">
     require(['jquery-nos'], function ($) {
         $(function () {
@@ -82,6 +89,30 @@ $config = Config::load('nos::views/admin/page/page_form', true);
             $container.nosOnShow('bind', function() {
                 $container.nosTabs('update', tabInfos);
             });
+            <?php
+            if  (!$page->is_new())
+            {
+                ?>
+                $container.nosListenEvent({
+                    name: 'Nos\\Model_Page',
+                    action: 'delete',
+                    id: '<?= $page->page_id ?>'
+                }, function() {
+                    var $close = $('#<?= $uniqid_close ?>');
+                    $close.show().nosFormUI();
+                    $container.nosDialog({
+                        title: <?= Format::forge()->to_json(__('Bye bye')) ?>,
+                        content: $close,
+                        width: 300,
+                        height: 130,
+                        close: function() {
+                            $container.nosTabs('close');
+                        }
+                    });
+                });
+                <?php
+            }
+            ?>
         });
     });
     require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($, callback_fn) {
