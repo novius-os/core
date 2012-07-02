@@ -44,6 +44,7 @@ define(
                         }
                     }
                 },
+                reloadEvent : 'Nos\\Model_User',
                 appdesk : {
                     adds : {
                         user : {
