@@ -40,12 +40,12 @@ abstract class Controller_Admin_Crud extends Controller_Admin_Application
             else
             {
                 $_GET['common_id'] = $id;
-                return $this->action_blank_slate($id, $selected_lang);
+                return $this->blank_slate($id, $selected_lang);
             }
         }
     }
 
-    public function action_blank_slate($id, $selected_lang)
+    public function blank_slate($id, $selected_lang)
     {
         $item = $this->crud_item($id);
         if (empty($lang))

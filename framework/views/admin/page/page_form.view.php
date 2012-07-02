@@ -73,20 +73,20 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 <?= View::forge('form/layout_standard', $config, false); ?>
 <?= $fieldset->close() ?>
 <script type="text/javascript">
-	require(['jquery-nos'], function ($nos) {
-		$nos(function () {
-			var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
+    require(['jquery-nos'], function ($nos) {
+        $nos(function () {
+            var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
 
-			var $container = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
+            var $container = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
             $container.addClass('fill-parent').css('overflow', 'auto');
-			$container.onShow('bind', function() {
-				$container.tab('update', tabInfos);
-			});
-		});
-	});
-	require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
-		$nos(function () {
-			callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
-		});
-	});
+            $container.onShow('bind', function() {
+                $container.tab('update', tabInfos);
+            });
+        });
+    });
+    require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
+        $nos(function () {
+            callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
+        });
+    });
 </script>
