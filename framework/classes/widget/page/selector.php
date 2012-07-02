@@ -43,7 +43,7 @@ class Widget_Page_Selector extends \Nos\Widget_Selector {
     public static function widget($options = array()) {
         $options = \Arr::merge(array(
             'treeUrl' => 'admin/nos/page/inspector/page/json',
-            'reloadEvent' => 'nos_page',
+            'reloadEvent' => 'Nos\\Model_Page',
             'input_name' => null,
             'selected' => array(
                 'id' => null,

@@ -39,19 +39,19 @@
             'wijmo.wijtabs',
             'jquery.passwordstrength'
         ],
-        function($nos) {
-            $nos(function() {
-                var $container = $nos('#<?= $uniqid ?>');
-                $container.form();
-                $nos('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
+        function($) {
+            $(function() {
+                var $container = $('#<?= $uniqid ?>');
+                $container.nosFormUI();
+                $('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
                     if (json.wallpaper_url) {
-                        $nos('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
+                        $('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
                     } else {
-                        $nos('#noviusospanel').css('background-image', '');
+                        $('#noviusospanel').css('background-image', '');
                     }
                 });
-                var $tabs = $nos('#<?= $uniqid ?> .tabs');
-                $tabs.css('display', 'block').onShow();
+                var $tabs = $('#<?= $uniqid ?> .tabs');
+                $tabs.css('display', 'block').nosOnShow();
                 $tabs.wijtabs({
                     alignment: 'left'
                 });
@@ -64,7 +64,7 @@
 
                 // Password strength
                 var strength_id = '<?= $uniqid ?>_strength';
-                var $strength = $nos('<span id="' + strength_id + '"></span>');
+                var $strength = $('<span id="' + strength_id + '"></span>');
                 $password.after($strength);
                 <?php $formatter = \Format::forge(); ?>
                 $password.password_strength({

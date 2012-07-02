@@ -10,22 +10,23 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos'], function($nos) {
+require(
+    ['jquery-nos'],
+    function($) {
+        $(function() {
+            var $header  = $("#<?= $uniqid_fixed = uniqid('fixed_') ?>");
+            var $content = $("#<?= $uniqid = uniqid('id_') ?>");
 
-	$nos(function() {
-        var $header  = $nos("#<?= $uniqid_fixed = uniqid('fixed_') ?>");
-        var $content = $nos("#<?= $uniqid = uniqid('id_') ?>");
-
-        $header.onShow('one', function() {
-            $header.form();
+            $header.nosOnShow('one', function() {
+                $header.nosFormUI();
+            });
+            $content.nosOnShow('one', function() {
+                $content.nosFormUI();
+            });
+            $header.nosOnShow();
+            $content.nosOnShow();
         });
-        $content.onShow('one', function() {
-            $content.form();
-        });
-        $header.onShow();
-        $content.onShow();
-	});
-});
+    });
 </script>
 
 <?php

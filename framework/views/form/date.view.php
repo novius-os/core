@@ -11,11 +11,11 @@
 ?>
 <input type="text" name="<?= htmlspecialchars($name) ?>" value="<?= $value ?>" />
 <script type="text/javascript">
-require([
-		'jquery-nos', 'jquery-ui.datepicker'
-	], function( $nos, undefined ) {
-		$nos(function() {
-			$nos('input[name=<?= $name ?>]').datepicker({
+require(
+    ['jquery-nos', 'jquery-ui.datepicker'],
+    function( $, undefined ) {
+		$(function() {
+			$('input[name=<?= $name ?>]').datepicker({
 				showOn : 'both',
 				buttonImage: 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
 				buttonImageOnly : true,

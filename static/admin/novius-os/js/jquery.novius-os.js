@@ -11,11 +11,11 @@ define('jquery-nos',
     function($) {
         "use strict";
         var undefined = void(0),
-            $nos = window.$nos = $.sub(),
+            $nos = window.$nos = $,
             $noviusos = undefined,
             noviusos = function() {
                     if ($noviusos === undefined) {
-                        $noviusos = $nos('.nos-ostabs');
+                        $noviusos = $('.nos-ostabs');
                     }
                     return $noviusos;
                 },
@@ -95,31 +95,23 @@ define('jquery-nos',
             };
 
 
-        $nos.extend({
-            dispatchEvent : function(event) {
+        $.extend({
+            nosDispatchEvent : function(event) {
                 if (window.parent != window && window.parent.$nos) {
-                    return window.parent.$nos.dispatchEvent(event);
+                    return window.parent.$nos.nosDispatchEvent(event);
                 }
 
-                var $noviusos = noviusos();
-                if (!$.isArray(event)) {
-                    event = [event];
-                }
-                $.each(event, function() {
-                    var e = this;
-                    if ( !(e instanceof jQuery.Event) ) {
-                        e = $.Event(e);
-                    }
+                var $noviusos = noviusos(),
+                    e = $.Event('noviusos', {noviusos : event});
 
-                    $noviusos.ostabs('dispatchEvent', e);
-                    dialogEvent.dispatchEvent(e);
-                });
-                return $nos;
+                $noviusos.ostabs('dispatchEvent', e);
+                dialogEvent.dispatchEvent(e);
+                return $;
             },
 
-            notify : function( options, type ) {
+            nosNotify : function( options, type ) {
                 if (window.parent != window && window.parent.$nos) {
-                    return window.parent.$nos.notify( options, type );
+                    return window.parent.$nos.nosNotify( options, type );
                 }
                 if ( !$.isPlainObject( options ) ) {
                     options = {title : options};
@@ -143,138 +135,129 @@ define('jquery-nos',
             }
         });
 
-        $nos.fn.extend({
-            xhr : function() {
-                var args = Array.prototype.slice.call(arguments),
-                    method = 'request';
-                if (args.length > 0 && $.inArray(args[0], ['request', 'success', 'error', 'saveUserConfig']) !== -1) {
-                    method = args.shift();
+        $.fn.extend({
+            nosAjax : function(params) {
+                var options = $.extend({
+                        dataType : 'json',
+                        type     : 'POST',
+                        data     : {}
+                    }, params || {}),
+                    old_success = options.success,
+                    old_error = options.error,
+                    self = this;
+
+                // Internal callbacks for JSON dataType
+                if (options.dataType == 'json') {
+                    options.success = function(json) {
+                        if ($.isFunction(old_success)) {
+                            json.user_success = old_success;
+                        }
+                        self.nosAjaxSuccess(json);
+                    };
+
+                    options.error = function(json) {
+                        self.nosAjaxError(json);
+                        if ($.isFunction(old_error)) {
+                            old_error.apply(this, args);
+                        }
+                    };
                 }
-                switch (method) {
-                    case 'request' :
-                        var options = $.extend({
-                                    dataType : 'json',
-                                    type     : 'POST',
-                                    data     : {}
-                                }, args[0] || {}),
-                            old_success = options.success,
-                            old_error = options.error,
-                            self = this;
 
-                        // Internal callbacks for JSON dataType
-                        if (options.dataType == 'json') {
-                            options.success = function(json) {
-                                if ($.isFunction(old_success)) {
-                                    json.user_success = old_success;
-                                }
-                                self.xhr('success', json);
-                            };
+                return $.ajax(options);
+            },
 
-                            options.error = function(json) {
-                                self.xhr('error', json);
-                                if ($.isFunction(old_error)) {
-                                    old_error.apply(this, args);
-                                }
-                            };
-                        }
-
-                        return $.ajax(options);
-                        break;
-
-                    case 'success' :
-                        var json = args[0];
-                        if (json.error) {
-                            if ($.isArray(json.error)) {
-                                $.each(json.error, function() {
-                                    $nos.notify(this, 'error');
-                                });
-                            } else {
-                                $nos.notify(json.error, 'error');
-                            }
-                    }
-                    if (json.internal_server_error) {
-                        var ise = json.internal_server_error;
-                        var str = "An internal server error has been detected.\n\n";
-                        str +=  ise.type + ' [ ' + ise.severity + ' ]: ' + ise.message + "\n";
-                        str += ise.filepath + " @ line " + ise.error_line + "\n\n";
-                        str += "Backtrace:\n";
-                        for (var i = 0; i < ise.backtrace.length; i++) {
-                            str += (i + 1) + ': ' + ise.backtrace[i].file + ' @ line ' + ise.backtrace[i].line + "\n";
-                        }
-                        if (console) {
-                            console.error(str);
-                        }
-                    }
-                    if (json.notify) {
-                        if ($.isArray(json.notify)) {
-                            $.each(json.notify, function() {
-                                $nos.notify(this);
-                            });
-                        } else {
-                            $nos.notify(json.notify);
-                        }
-                    }
-                    // Call user callback
-                    if ($.isFunction(json.user_success)) {
-                        json.user_success.apply(this, args);
-                    }
-
-                        var dialog = this.closest('.ui-dialog-content').size();
-                        if (dialog) {
-                            if (json.closeTab) {
-                                this.tab('close');
-                            }
-                        } else {
-                            if (json.redirect) {
-                                document.location.href = json.redirect;
-                            }
-                            if (json.replaceTab) {
-                                this.tab('update', {
-                                    url : json.replaceTab,
-                                    reload : true
-                                });
-                            }
-                        }
-                        if (json.dispatchEvent) {
-                            if ($.isArray(json.dispatchEvent)) {
-                                $.each(json.dispatchEvent, function(i, event) {
-                                    $nos.dispatchEvent(event);
-                                });
-                            } else {
-                                $nos.dispatchEvent(json.dispatchEvent);
-                            }
-                        }
-                        break;
-
-                    case 'error' :
-                        var x = args[0],
-                            e = args[1];
-                        // http://www.maheshchari.com/jquery-ajax-error-handling/
-                        if (x.status != 0) {
-                            $nos.notify('Connection error!', 'error');
-                        } else if (e == 'parsererror') {
-                            $nos.notify('Request seemed a success, but we could not read the answer.');
-                        } else if (e == 'timeout') {
-                            $nos.notify('Time out (server is busy?). Please try again.');
-                        }
-                        break;
-
-                    case 'saveUserConfig' :
-                        var key = args[0],
-                            configuration = args[1];
-                        this.xhr({
-                            url: '/admin/nos/noviusos/save_user_configuration',
-                            data: {
-                                key: key,
-                                configuration: configuration
-                            }
+            nosAjaxSuccess : function(json) {
+                if (json.error) {
+                    if ($.isArray(json.error)) {
+                        $.each(json.error, function() {
+                            $.nosNotify(this, 'error');
                         });
-                        break;
+                    } else {
+                        $.nosNotify(json.error, 'error');
+                    }
                 }
+                if (json.internal_server_error) {
+                    var ise = json.internal_server_error;
+                    var str = "An internal server error has been detected.\n\n";
+                    str +=  ise.type + ' [ ' + ise.severity + ' ]: ' + ise.message + "\n";
+                    str += ise.filepath + " @ line " + ise.error_line + "\n\n";
+                    str += "Backtrace:\n";
+                    for (var i = 0; i < ise.backtrace.length; i++) {
+                        str += (i + 1) + ': ' + ise.backtrace[i].file + ' @ line ' + ise.backtrace[i].line + "\n";
+                    }
+                    if (console) {
+                        console.error(str);
+                    }
+                }
+                if (json.notify) {
+                    if ($.isArray(json.notify)) {
+                        $.each(json.notify, function() {
+                            $.nosNotify(this);
+                        });
+                    } else {
+                        $.nosNotify(json.notify);
+                    }
+                }
+                // Call user callback
+                if ($.isFunction(json.user_success)) {
+                    json.user_success.apply(this, args);
+                }
+
+                var dialog = this.closest('.ui-dialog-content').size();
+                if (dialog) {
+                    if (json.closeTab) {
+                        this.nosTabs('close');
+                    }
+                } else {
+                    if (json.redirect) {
+                        document.location.href = json.redirect;
+                    }
+                    if (json.replaceTab) {
+                        this.nosTabs('update', {
+                            url : json.replaceTab,
+                            reload : true
+                        });
+                    }
+                }
+                if (json.dispatchEvent) {
+                    var events = json.dispatchEvent;
+                    if (!$.isArray(events)) {
+                        events = [events];
+                    }
+                    $.each(events, function(i, event) {
+                        $.nosDispatchEvent(event);
+                    });
+                }
+
                 return this;
             },
 
-            media : function(data) {
+            nosAjaxError : function(x, e) {
+                // http://www.maheshchari.com/jquery-ajax-error-handling/
+                if (x.status != 0) {
+                    $.nosNotify('Connection error!', 'error');
+                } else if (e == 'parsererror') {
+                    $.nosNotify('Request seemed a success, but we could not read the answer.');
+                } else if (e == 'timeout') {
+                    $.nosNotify('Time out (server is busy?). Please try again.');
+                }
+
+                return this;
+            },
+
+            nosSaveUserConfig : function(key, configuration) {
+                this.nosAjax({
+                    url: '/admin/nos/noviusos/save_user_configuration',
+                    data: {
+                        key: key,
+                        configuration: configuration
+                    }
+                });
+
+                return this;
+            },
+
+            nosMedia : function(data) {
 
                 data = data || {};
                 var contentUrls = {
@@ -291,7 +274,7 @@ define('jquery-nos',
                     choose: function() {
                         // Open the dialog to choose the file
                         if ($dialog === null) {
-                            $dialog = $input.dialog({
+                            $dialog = $input.nosDialog({
                                 destroyOnClose : false,
                                 contentUrl: contentUrls[data.mode],
                                 ajax: true,
@@ -302,10 +285,10 @@ define('jquery-nos',
                                     file: item.thumbnail
                                 });
                                 $input.val(item.id);
-                                $dialog.dialog('close');
+                                $dialog.nosDialog('close');
                             });
                         } else {
-                            $dialog.dialog('open');
+                            $dialog.nosDialog('open');
                         }
                     }
                 }, data.inputFileThumb || {});
@@ -318,87 +301,90 @@ define('jquery-nos',
                         $input.inputFileThumb(options);
                     });
                 });
-            },
 
-            form : function() {
-                var args = Array.prototype.slice.call(arguments),
-                    method = 'ui',
-                    $context = this;
-                if (args.length > 0 && $.inArray(args[0], ['ui', 'validate', 'ajax']) !== -1) {
-                    method = args.shift();
-                }
-                switch (method) {
-                    case 'ui' :
-                        $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
-                        $context.find(":input[type='submit'],button").each(function() {
-                                var options = {};
-                                var icon = $(this).data('icon');
-                                if (icon) {
-                                    options.icons = {
-                                        primary: 'ui-icon-' + icon
-                                    }
-                                }
-                                $(this).button(options);
-                            });
-                        $context.find("select").filter(':not(.notransform)').onShow('one', function() {
-                                $(this).wijdropdown();
-                            });
-                        $context.find(":input[type=checkbox]").onShow('one', function() {
-                                $(this).wijcheckbox();
-                            });
-                        $context.find(":input[type=radio]").filter(':not(.notransform)').onShow('one', function() {
-                                $(this).wijradio();
-                            });
-                        $context.find('.expander').each(function() {
-                                var $this = $(this);
-                                $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
-                            });
-                        $context.find('.accordion').wijaccordion({
-                                header: "h3",
-                                selectedIndexChanged : function(e, args) {
-                                    $nos(e.target).find('.ui-accordion-content').eq(args.newIndex).onShow();
-                                }
-                            });
-                            // @todo Check usefulness of this
-                            //.find('.ui-accordion-content:first').onShow();
-                        break;
-
-                    case 'validate' :
-                        var params = args[0] || {};
-                        if (!$context.is('form')) {
-                            $context = $context.find('form');
-                        }
-                        require(['jquery-nos-validate'], function() {
-                            $context.validate($.extend({}, params, {
-                                errorClass : 'ui-state-error',
-                                success : true,
-                                ignore: 'input[type=hidden]'
-                            }));
-                        });
-                        break;
-
-                    case 'ajax' :
-                        if (!$context.is('form')) {
-                            $context = $context.find('form');
-                        }
-                        require(['jquery-form'], function() {
-                            $context.ajaxForm({
-                                dataType: 'json',
-                                success: function(json) {
-                                    $context.xhr('success', json)
-                                        .triggerHandler('ajax_success', [json]);
-                                },
-                                error: function() {
-                                    $nos.notify('An error occured', 'error');
-                                }
-                            });
-                        });
-                        break;
-                }
                 return this;
             },
 
-            onShow : function() {
+            nosFormUI : function() {
+                var $context = this;
+
+                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
+                $context.find(":input[type='submit'],button").each(function() {
+                    var options = {};
+                    var icon = $(this).data('icon');
+                    if (icon) {
+                        options.icons = {
+                            primary: 'ui-icon-' + icon
+                        }
+                    }
+                    $(this).button(options);
+                });
+                $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
+                    $(this).wijdropdown();
+                });
+                $context.find(":input[type=checkbox]").nosOnShow('one', function() {
+                    $(this).wijcheckbox();
+                });
+                $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
+                    $(this).wijradio();
+                });
+                $context.find('.expander').each(function() {
+                    var $this = $(this);
+                    $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
+                });
+                $context.find('.accordion').wijaccordion({
+                    header: "h3",
+                    selectedIndexChanged : function(e, args) {
+                        $(e.target).find('.ui-accordion-content').eq(args.newIndex).nosOnShow();
+                    }
+                });
+                // @todo Check usefulness of this
+                //.find('.ui-accordion-content:first').nosOnShow();
+
+                return $context;
+            },
+
+            nosFormValidate : function(params) {
+                var $context = this;
+
+                params = params || {};
+                if (!$context.is('form')) {
+                    $context = $context.find('form');
+                }
+                require(['jquery-nos-validate'], function() {
+                    $context.validate($.extend({}, params, {
+                        errorClass : 'ui-state-error',
+                        success : true,
+                        ignore: 'input[type=hidden]'
+                    }));
+                });
+
+                return this;
+            },
+
+            nosFormAjax : function() {
+                var $context = this;
+
+                if (!$context.is('form')) {
+                    $context = $context.find('form');
+                }
+                require(['jquery-form'], function() {
+                    $context.ajaxForm({
+                        dataType: 'json',
+                        success: function(json) {
+                            $context.nosAjaxSuccess(json)
+                                .triggerHandler('ajax_success', [json]);
+                        },
+                        error: function() {
+                            $.nosNotify('An error occured', 'error');
+                        }
+                    });
+                });
+
+                return this;
+            },
+
+            nosOnShow : function() {
                 var args = Array.prototype.slice.call(arguments),
                     method = 'show';
                 if (args.length > 0 && $.inArray(args[0], ['one', 'bind', 'show']) !== -1) {
@@ -412,7 +398,7 @@ define('jquery-nos',
                             return;
                         }
                         this.each(function() {
-                            var $el = $nos(this),
+                            var $el = $(this),
                                 nb_bind = $el.data('nos-on-show') || 0;
 
                             $el.addClass('nos-on-show')
@@ -420,19 +406,19 @@ define('jquery-nos',
                                 [method]('nos-on-show', callback);
 
                             if ($el.is(':visible')) {
-                                $el.onShow();
+                                $el.nosOnShow();
                             }
                         });
                         break;
 
                     case 'show' :
                         // If the element has the class .nos-on-show, we display it and trigger the nos-on-show events
-                        // If the element does not have the class .nos-on-show, we search for children and triggers the onShow()
+                        // If the element does not have the class .nos-on-show, we search for children and triggers the nosOnShow()
                         // Either ways, if the element is hidden, we do nothing, it'll be triggered by a parent when it's shown
 
                         // Show the element
                         this.not('.nos-on-show-exec').addClass('nos-on-show-exec').each(function() {
-                            var $el = $nos(this),
+                            var $el = $(this),
                                 nb_bind = $el.data('nos-on-show') || 0;
 
                             if ($el.is('.nos-on-show')) {
@@ -453,14 +439,14 @@ define('jquery-nos',
                             }
 
                             // Cascade on the children
-                            $el.find('.nos-on-show').not('.nos-on-show-exec').onShow();
+                            $el.find('.nos-on-show').not('.nos-on-show-exec').nosOnShow();
                         }).removeClass('nos-on-show-exec');
                         break;
                 }
                 return this;
             },
 
-            confirmationDialog: function(params) {
+            nosConfirmationDialog: function(params) {
                 var self = this;
 
                 var i18n = {
@@ -487,7 +473,7 @@ define('jquery-nos',
                     height: 'auto',
                     'class': 'nos-confirmation-dialog',
                     dialogRendered: function($dialog) {
-                        var $form = $nos('<form class="fieldset standalone"></form>');
+                        var $form = $('<form class="fieldset standalone"></form>');
 
                         var $confirmationZone = $('<p></p>');
                         var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(i18n['confirm_deletion']);
@@ -515,28 +501,28 @@ define('jquery-nos',
                                 if ($.isFunction(params['confirmed'])) {
                                     params['confirmed']($dialog);
                                 }
-                                $dialog.dialog('close');
+                                $dialog.nosDialog('close');
                             } else {
-                                $nos.notify(i18n['wrong_confirmation'], 'error');
+                                $.nosNotify(i18n['wrong_confirmation'], 'error');
                             }
 
                         });
 
                         $cancelButton.click(function(e) {
                             e.preventDefault();
-                            $dialog.dialog('close');
+                            $dialog.nosDialog('close');
                         });
 
                         $dialog.wrapInner($form);
 
-                        $dialog.parent().form();
+                        $dialog.parent().nosFormUI();
                     }
                 }, params);
 
-                self.dialog(params);
+                self.nosDialog(params);
             },
 
-            dialog : function() {
+            nosDialog : function() {
                 var args = Array.prototype.slice.call(arguments),
                     method = 'open';
                 if (args.length > 0 && $.inArray(args[0], ['open', 'close']) !== -1) {
@@ -570,7 +556,7 @@ define('jquery-nos',
                             },
                             $container = this.closest('.nos-dispatcher, body'),
                             self = this,
-                            $dialog = $nos('<div></div>').addClass('nos-dispatcher')
+                            $dialog = $('<div></div>').addClass('nos-dispatcher')
                                 .appendTo($container);
 
 
@@ -651,7 +637,7 @@ define('jquery-nos',
                                             $dialog.empty()
                                                 .wijdialog('destroy')
                                                 .remove();
-                                            self.xhr('success', json);
+                                            self.nosAjaxSuccess(json);
                                         }
                                     }
                                 }
@@ -675,23 +661,27 @@ define('jquery-nos',
                 return this;
             },
 
-            listenEvent : function(event, callback) {
-                this.closest('.nos-dispatcher, body').on(event, callback);
-            },
+            nosListenEvent : function(json_match, callback) {
+                var self = this;
 
-            refreshNosPanel : function () { //@todo : see where it can be moved
-                $.ajax({
-                    url: '/admin/nos/noviusos/appstab',
-                    success: function(data) {
-                        var $panelContent = $('#noviusospanel > .nos-ostabs-panel-content');
-                        if ($panelContent.length) {
-                            $panelContent.html(data);
+                this.closest('.nos-dispatcher, body').on('noviusos', function(e) {
+                    var match = true;
+                    e.noviusos = e.noviusos || {};
+                    $.each(json_match, function(key, value) {
+                        if (e.noviusos[key] !== value) {
+                            match = false;
+                            return false;
                         }
+                    });
+                    if (match) {
+                        callback(e.noviusos);
                     }
                 });
+
+                return self;
             },
 
-            tab : function() {
+            nosTabs : function() {
                 var args = Array.prototype.slice.call(arguments),
                     method = 'open',
                     getIndex = function(context) {
@@ -716,13 +706,13 @@ define('jquery-nos',
                                 dialogOptions = args[1] || {},
                                 dialog = self.closest('.ui-dialog-content').size();
                             if (dialog) {
-                                self.dialog($.extend({
+                                self.nosDialog($.extend({
                                     contentUrl: tab.url,
                                     ajax : !tab.iframe,
                                     title: tab.label
                                 }, dialogOptions));
                             } else if (window.parent != window && window.parent.$nos) {
-                                window.parent.$nos(window.frameElement).tab('open', tab, dialogOptions);
+                                window.parent.$nos(window.frameElement).nosTabs('open', tab, dialogOptions);
                             } else if (noviusos().length) {
                                 var tabs = noviusos().ostabs('tabs'),
                                     sel = false;
@@ -735,7 +725,7 @@ define('jquery-nos',
                                 if (sel !== false) {
                                     return noviusos().ostabs('select', sel + 4); // Add 4 because appstab and tray are before and not return by tabs
                                 } else {
-                                    self.tab('add', tab);
+                                    self.nosTabs('add', tab);
                                 }
                             } else if (tab.url) {
                                 window.open(tab.url);
@@ -748,7 +738,7 @@ define('jquery-nos',
                             var tab = args[0],
                                 place = args[1] || 'end';
                             if (window.parent != window && window.parent.$nos) {
-                                window.parent.$nos(window.frameElement).tab('add', tab, place);
+                                window.parent.$nos(window.frameElement).nosTabs('add', tab, place);
                             } else {
                                 var index;
                                 if ($.inArray(place, ['before', 'after']) !== -1) {
@@ -768,9 +758,9 @@ define('jquery-nos',
                         (function() {
                             var $dialog = self.closest(':wijmo-wijdialog');
                             if ($dialog.size()) {
-                                self.dialog('close');
+                                self.nosDialog('close');
                             } else if (window.parent != window && window.parent.$nos) {
-                                window.parent.$nos(window.frameElement).tab('close');
+                                window.parent.$nos(window.frameElement).nosTabs('close');
                             } else {
                                 var index = getIndex(self);
                                 if (noviusos().length) {
@@ -784,7 +774,7 @@ define('jquery-nos',
                         (function() {
                             var tab = args[0];
                             if (window.parent != window && window.parent.$nos) {
-                                window.parent.$nos(window.frameElement).tab('update', tab);
+                                window.parent.$nos(window.frameElement).nosTabs('update', tab);
                             } else if (self.size() && !self.closest('.ui-dialog-content').size() && noviusos().length) {
                                 var index = getIndex(self);
                                 noviusos().ostabs('update', index, tab);
@@ -802,7 +792,7 @@ define('jquery-nos',
                                             clearTimeout(saveTimeout);
                                         }
                                         saveTimeout = setTimeout(function() {
-                                            noviusos().xhr('saveUserConfig', 'tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
+                                            noviusos().nosSaveUserConfig('tabs', {selected: noviusos().ostabs('option', 'selected'), tabs: noviusos().ostabs('tabs')});
                                         }, 500);
                                     }
                                 };
@@ -831,9 +821,5 @@ define('jquery-nos',
             }
         });
 
-        $.fn.nos = function() {
-            return $nos(this);
-        };
-
-        return $nos;
+        return $;
     });

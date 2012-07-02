@@ -10,9 +10,11 @@
 
 ?>
 <script type="text/javascript">
-    require(['jquery-nos-ostabs'], function ($nos) {
-        $nos(function () {
-	        $nos('#<?= $uniqid = uniqid('id_'); ?>').tab('update', {
+require(
+    ['jquery-nos-ostabs'],
+    function ($) {
+        $(function () {
+	        $('#<?= $uniqid = uniqid('id_'); ?>').nosTabs('update', {
                 label : <?= \Format::forge()->to_json('Add a user') ?>,
                 iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
             });
@@ -71,15 +73,15 @@ foreach ($fieldset->field() as $field) {
     require([
 	    'jquery-nos',
         'jquery.passwordstrength'
-    ], function($nos) {
-        $nos(function() {
-            var $container = $nos('#<?= $uniqid ?>');
+    ], function($) {
+        $(function() {
+            var $container = $('#<?= $uniqid ?>');
             var $password = $container.find('input[name=user_password]');
 
             <?php $formatter = \Format::forge(); ?>
             // Password strength
             var strength_id = '<?= $uniqid ?>_strength';
-            var $strength = $nos('<span id="' + strength_id + '"></span>');
+            var $strength = $('<span id="' + strength_id + '"></span>');
             $password.after($strength);
             $password.password_strength({
                 container : '#' + strength_id,

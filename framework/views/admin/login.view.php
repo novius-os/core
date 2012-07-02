@@ -9,20 +9,22 @@
  */
 ?>
 <script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-    $nos(function() {
-	    $nos('#login').form();
-        <?php if (!empty($error)) { ?>
-        $nos.notify(<?= json_encode(array(
-            'title' => $error,
-            'type' => 'error',
-            'addclass' => 'nos-login-error',
-        )) ?>);
-        <?php } ?>
-        var $email = $nos('#email');
-        $email.select();
+require(
+    ['jquery-nos'],
+    function($) {
+        $(function() {
+            $('#login').nosFormUI();
+            <?php if (!empty($error)) { ?>
+            $.nosNotify(<?= json_encode(array(
+                'title' => $error,
+                'type' => 'error',
+                'addclass' => 'nos-login-error',
+            )) ?>);
+            <?php } ?>
+            var $email = $('#email');
+            $email.select();
+        });
     });
-});
 </script>
 <style type="text/css">
 .nos-login-error {

@@ -129,7 +129,13 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
                 $json = array(
                     'notify' => $is_new ? __('Page sucessfully added.') : __('Page successfully saved.'),
-                    'dispatchEvent' => 'reload.nos_page',
+                    'dispatchEvent' => array(
+                        'name' => get_class($page),
+                        'action' => $is_new ? 'insert' : 'update',
+                        'id' => $page->page_id,
+                        'lang_common_id' => $page->page_lang_common_id,
+                        'lang' => $page->page_lang,
+                    ),
                 );
                 if ($is_new) {
                     $json['replaceTab'] = 'admin/nos/page/page/crud/'.$page->page_id;
@@ -188,6 +194,16 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
             }
 
             $page = static::_get_page_with_permission($page_id, 'delete');
+
+            // Recover infos before delete, if not id is null
+            $dispatchEvent = array(
+                'name' => get_class($page),
+                'action' => 'delete',
+                'id' => $page->page_id,
+                'lang_common_id' => $page->page_lang_common_id,
+                'lang' => $page->page_lang,
+            );
+
             // Delete all languages by default
             $lang = \Input::post('lang', 'all');
 
@@ -215,7 +231,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
 			$body = array(
 				'notify' => 'Page successfully deleted.',
-                'dispatchEvent' => 'reload.nos_page',
+                'dispatchEvent' => $dispatchEvent,
 			);
 
         } catch (\Exception $e) {

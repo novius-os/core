@@ -79,14 +79,16 @@ if (\Input::is_ajax()) {
 ?>
 	<script type="text/javascript">
 	function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']){var disp = elem.style['display'];}else if (elem.currentStyle){var disp = elem.currentStyle['display'];}else if (window.getComputedStyle){var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;}
-	require(['jquery-nos-ostabs'], function($nos) {
-		$nos(function() {
-			$nos('#wrapper').tab('update', {
-				label : 'Error - We\'re working on it'
-				//iconUrl : 'static/novius-os/admin/novius-os/img/icons/exclamation--frame.png'
-			});
-		});
-	});
+	require(
+        ['jquery-nos-ostabs'],
+        function($) {
+            $(function() {
+                $('#wrapper').nosTabs('update', {
+                    label : 'Error - We\'re working on it'
+                    //iconUrl : 'static/novius-os/admin/novius-os/img/icons/exclamation--frame.png'
+                });
+            });
+        });
 	</script>
 <?
 		$js = ob_get_contents();

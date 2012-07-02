@@ -8,17 +8,14 @@
  * @link http://www.novius-os.org
  */
 ?>
+
 <script type="text/javascript">
-    require(
-        [
-            'jquery-nos',
-            'jquery',
-            'jquery-ui.datetimepicker'
-        ],
-        function($) {
-            $(function() {
-                var $input = $('input#<?= $id ?>');
-                $input.timepicker($input.data('timepicker-options'));
-            });
+require(
+    ["jquery-nos"],
+    function($) {
+        $(function() {
+            $("#<?= $id ?>").nosFormValidate(<?= $rules ?>)
+                .nosFormAjax();
         });
+    });
 </script>

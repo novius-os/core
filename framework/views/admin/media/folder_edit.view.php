@@ -53,37 +53,39 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos', 'static/novius-os/admin/config/media/seo_compliant'], function($nos) {
-    $nos(function() {
-        var $container = $nos('#<?= $uniqid ?>').form();
+require(
+    ['jquery-nos', 'static/novius-os/admin/config/media/seo_compliant'],
+    function($) {
+        $(function() {
+            var $container = $('#<?= $uniqid ?>').nosFormUI();
 
-		var $title      = $container.find('input[name=medif_title]');
-		var $seo_title  = $container.find('input[name=medif_path]');
-		var $same_title = $container.find('input[data-id=same_title]');
+            var $title      = $container.find('input[name=medif_title]');
+            var $seo_title  = $container.find('input[name=medif_path]');
+            var $same_title = $container.find('input[data-id=same_title]');
 
-		// Same title and description (alt)
-		$title.bind('change keyup', function() {
-			if ($same_title.is(':checked')) {
-				$seo_title.val($nos.seoCompliant($title.val()));
-			}
-		});
-		$same_title.change(function() {
-			if ($nos(this).is(':checked')) {
-				$seo_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-                $title.triggerHandler('change');
-			} else {
-				$seo_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-			}
-		}).triggerHandler('change');
+            // Same title and description (alt)
+            $title.bind('change keyup', function() {
+                if ($same_title.is(':checked')) {
+                    $seo_title.val($.seoCompliant($title.val()));
+                }
+            });
+            $same_title.change(function() {
+                if ($(this).is(':checked')) {
+                    $seo_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                    $title.triggerHandler('change');
+                } else {
+                    $seo_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                }
+            }).triggerHandler('change');
 
-	    $container.find('form').bind('ajax_success', function() {
-		    $nos(this).dialog('close');
-	    })
+            $container.find('form').bind('ajax_success', function() {
+                $(this).nosDialog('close');
+            })
 
-        $container.find('a[data-id=cancel]').click(function(e) {
-            e.preventDefault();
-            $nos(this).tab('close');
+            $container.find('a[data-id=cancel]').click(function(e) {
+                e.preventDefault();
+                $(this).nosTabs('close');
+            });
         });
     });
-});
 </script>

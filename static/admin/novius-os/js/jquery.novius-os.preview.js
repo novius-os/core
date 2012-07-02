@@ -8,7 +8,7 @@
  */
 define('jquery-nos-preview',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'wijmo.wijsuperpanel'],
-    function($, $nos) {
+    function($) {
         "use strict";
             var undefined = void(0);
         $.widget( "nos.preview", {
@@ -310,5 +310,5 @@ define('jquery-nos-preview',
                 return self;
             }
         });
-        return $nos;
+        return $;
     });

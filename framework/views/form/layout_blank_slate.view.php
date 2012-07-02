@@ -109,23 +109,22 @@ $common_id = $main_lang ? $main_lang->id : false;
         ?>
         </div>
     </div>
-
     <script type="text/javascript">
-        require(['jquery-nos'], function ($nos) {
-            $nos(function () {
-                var $container = $nos('#<?= $uniqid ?>').form();
-                $container.find('form').submit(function(e) {
-                    e.preventDefault();
-                    var $form = $(this);
-                    $container.load($form.get(0).action, $form.serialize());
-                });
-
-                var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
-
-            $container.onShow('bind', function() {
-                $container.tab('update', tabInfos);
+    require(['jquery-nos'], function ($) {
+        $(function () {
+            var $container = $('#<?= $uniqid ?>').nosFormUI();
+            $container.find('form').submit(function(e) {
+                e.preventDefault();
+                var $form = $(this);
+                $container.load($form.get(0).action, $form.serialize());
             });
-            $container.onShow();
+
+            var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
+
+            $container.nosOnShow('bind', function() {
+                $container.nosTabs('update', tabInfos);
+            });
+            $container.nosOnShow();
         });
     });
-</script>
+    </script>
