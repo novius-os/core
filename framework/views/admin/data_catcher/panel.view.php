@@ -50,7 +50,7 @@
         <div class="nos-datacatchers-default-nuggets"><?= $default_nuggets_view ?></div>
     </div>
 <?
-    echo $fieldset->open('admin/nos/catcher/save');
+    echo $fieldset->open('admin/nos/datacatcher/save');
     echo $fieldset->build_hidden_fields();
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
@@ -73,7 +73,10 @@ require(
     ['jquery-nos-datacatchers'],
     function($) {
         $(function() {
-            $("#<?= $id ?>").datacatchers();
+            $("#<?= $id ?>").datacatchers(<?= \Format::forge(array(
+                'model_id' => $model_id,
+                'model_name' => $model_name,
+            ))->to_json() ?>);
         });
     });
 </script>

@@ -48,12 +48,16 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $default_nuggets;
     }
 
-    public function get_sharable_property($object, $property, $default = null) {
-        $value = \Arr::get($this->_properties, $property, null);
-        if ($value === null) {
-            return $default;
+    public function get_sharable_property($object, $property = null, $default = null) {
+        if (empty($property)) {
+            return $this->_properties;
+        } else {
+            $value = \Arr::get($this->_properties, $property, null);
+            if ($value === null) {
+                return $default;
+            }
+            return is_callable($value) ? $value($object) : $value;
         }
-        return is_callable($value) ? $value($object) : $value;
     }
 
     public function data_catchers($object) {

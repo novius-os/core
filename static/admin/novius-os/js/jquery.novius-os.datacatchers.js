@@ -14,6 +14,8 @@ define('jquery-nos-datacatchers',
         var undefined = void(0);
         $.widget( "nos.datacatchers", {
             options: {
+                model_id : '',
+                model_name : ''
             },
 
             _create: function() {
@@ -34,9 +36,8 @@ define('jquery-nos-datacatchers',
                     .addClass('nos-datacatchers-accordion');
 
                 self.uiDefaultNuggets = self.element.find('.nos-datacatchers-default-nuggets');
-                self.uiCustomize = self.uiDefaultNuggets.find('button');
-                self.uiForm = self.element.find('form');
 
+                self.uiForm = self.element.find('form');
                 self.uiSave = self.uiForm.find('.nos-datacatchers-buttons button');
                 self.uiCancel = self.uiForm.find('.nos-datacatchers-buttons a');
             },
@@ -79,16 +80,13 @@ define('jquery-nos-datacatchers',
                     }
                 });
 
-                self.uiCustomize.button()
-                    .click(function() {
-                        self.element.addClass('nos-datacatchers-form');
-                        $(self.uiForm).nosOnShow('show');
-                    });
-
                 $(self.uiForm).nosFormUI();
+
+                self._defaultNuggets();
 
                 self.uiForm.bind('ajax_success', function(e, json) {
                     self.uiDefaultNuggets.html(json.default_nuggets);
+                    self._defaultNuggets();
                     self.uiCancel.triggerHandler('click');
                 });
 
@@ -96,6 +94,38 @@ define('jquery-nos-datacatchers',
                         e.preventDefault();
                         self.element.removeClass('nos-datacatchers-form');
                     });
+
+                self.element.nosListenEvent({
+                        name : o.model_name,
+                        id : o.model_id,
+                        action : 'update'
+                    }, function() {
+                        $.ajax({
+                            url : 'admin/nos/datacatcher/form',
+                            data : {
+                                model_name : o.model_name,
+                                model_id : o.model_id
+                            },
+                            success : function(data) {
+                                self.element.replaceWith(data);
+
+                            }
+                        })
+                    });
+            },
+
+            _defaultNuggets : function() {
+                var self = this,
+                    o = self.options;
+
+                self.uiDefaultNuggets.find('button')
+                    .button()
+                    .click(function() {
+                        self.element.addClass('nos-datacatchers-form');
+                        $(self.uiForm).nosOnShow('show');
+                    });
+
+                return self;
             }
         });
 

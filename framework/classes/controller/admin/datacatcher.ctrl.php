@@ -10,14 +10,20 @@
 
 namespace Nos;
 
-class Controller_Admin_Catcher extends Controller_Admin_Application {
+class Controller_Admin_DataCatcher extends Controller_Admin_Application {
 
     public $bypass   = true;
 
-    public function action_form($item)
+    public function action_form($item = null)
     {
-        $model = get_class($item);
-        $id = $item->{\Arr::get($item->primary_key(), 0)};
+        if (empty($item)) {
+            $id = \Input::get('model_id');
+            $model = \Input::get('model_name');
+            $item = $model::find($id);
+        } else {
+            $model = get_class($item);
+            $id = $item->{\Arr::get($item->primary_key(), 0)};
+        }
         $data_catchers = $item->data_catchers();
         $default_nuggets = $item->get_default_nuggets();
 
@@ -41,7 +47,7 @@ class Controller_Admin_Catcher extends Controller_Admin_Application {
             $nugget = $item->get_default_nuggets_model();
 
             $data = array();
-            foreach ($model::get_sharable_types() as $type => $params) {
+            foreach ($item->get_sharable_property() as $type => $params) {
                 $data[$type] = \Input::post($type);
                 if (empty($data[$type])) {
                     unset($data[$type]);

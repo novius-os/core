@@ -168,7 +168,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Application {
 
         $return = '';
         if ($page::behaviours('Nos\Orm_Behaviour_Sharable')) {
-            $return .= (string) \Request::forge('nos/admin/catcher/form')->execute(array($page));
+            $return .= (string) \Request::forge('nos/admin/datacatcher/form')->execute(array($page));
         }
 
         $return .= (string) \View::forge('nos::admin/page/page_form', array(
