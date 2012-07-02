@@ -268,49 +268,67 @@ class Controller_Front extends Controller {
     protected function _handle_head(&$content) {
         $replaces  = array(
             '_base_href'         => array(
-                'pattern' => '/<base [^>]*\/?>/iU',
+                'pattern' => '<base [^>]*\/?>',
                 'replace' => '<base href="replace" />',
             ),
             '_title'        => array(
-                'pattern' => '/<title>[^<]*<\/title>/iU',
+                'pattern' => '<title>[^<]*<\/title>',
                 'replace' => '<title>replace</title>',
             ),
             '_meta_description'  => array(
-                'pattern' => '/<meta [^>]*name=\"?description[^>]*\"? *\/?>/iU',
+                'pattern' => '<meta [^>]*name=\"?description[^>]*\"? *\/?>',
                 'replace' => '<meta name="description" content="replace">',
             ),
             '_meta_keywords'     => array(
-                'pattern' => '/<meta [^>]*name=\"?keywords[^>]*\"? *\/?>/iU',
+                'pattern' => '<meta [^>]*name=\"?keywords[^>]*\"? *\/?>',
                 'replace' => '<meta name="keywords" content="replace">',
             ),
             '_meta_robots'       => array(
-                'pattern' => '/<meta [^>]*name=\"?robots[^>]*\"? *\/?>/iU',
+                'pattern' => '<meta [^>]*name=\"?robots[^>]*\"? *\/?>',
                 'replace' => '<meta name="robots" content="replace">',
             ),
         );
-        $begin_head = '';
-        foreach ($replaces as $prop => $replace) {
-            if (!empty($this->{$prop})) {
+
+        $replace_fct = function($pattern, $replace) use (&$content) {
+            $content_old = $content;
+            $content = preg_replace(
+                '/'.$pattern.'/iUu',
+                $replace,
+                $content,
+                -1,
+                $count
+            );
+            // if $content content none utf8 characters, preg_replace return empty string
+            if (empty($content) && !empty($content_old)) {
                 $content = preg_replace(
-                    $replace['pattern'],
-                    str_replace('replace', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']),
-                    $content,
+                    '/'.$pattern.'/iU',
+                    $replace,
+                    $content_old,
                     -1,
                     $count
                 );
+            }
+            return $count;
+        };
+
+        $begin_head = '';
+        foreach ($replaces as $prop => $replace) {
+            if (!empty($this->{$prop})) {
+                $count = $replace_fct($replace['pattern'], str_replace('replace', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']));
                 if (!$count) {
                     $begin_head .= "\n".str_replace('replace', htmlspecialchars($this->{$prop}, ENT_COMPAT, 'UTF-8', false), $replace['replace']);
                 }
             }
         }
         if ($begin_head) {
-            $content = preg_replace('/<head>/Ui', '<head>'.$begin_head."\n", $content);
+            $replace_fct('<head>', '<head>'.$begin_head."\n");
         }
 
         $head = array();
         foreach ($this->_metas as $metas) {
             $head[] = $metas;
         }
+        $this->_css = array_unique($this->_css);
         foreach ($this->_css as $css) {
             if (is_array($css) && isset($css['inline']) && $css['inline'] && isset($css['css'])) {
                 $head[] = '<style type="text/css">'.$css['css'].'</style>';
@@ -318,6 +336,7 @@ class Controller_Front extends Controller {
                 $head[] = '<link href="'.(is_string($css) ? $css : $css['css']).'" rel="stylesheet" type="text/css">';
             }
         }
+        $this->_js_header = array_unique($this->_js_header);
         foreach ($this->_js_header as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $head[] = '<script type="text/javascript">'.$js['js'].'</script>';
@@ -326,10 +345,12 @@ class Controller_Front extends Controller {
             }
         }
         if (count($head)) {
-            $content = str_ireplace('</head>', implode("\n", $head).'</head>', $content);
+            $replace_fct('</head>', implode("\n", $head)."\n</head>");
         }
 
         $footer = array();
+        $this->_js_footer = array_unique($this->_js_footer);
+        $this->_js_footer = array_diff($this->_js_footer, $this->_js_header);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
@@ -338,7 +359,7 @@ class Controller_Front extends Controller {
             }
         }
         if (count($footer)) {
-            $content = str_ireplace('</body>', implode("\n", $footer).'</head>', $content);
+            $replace_fct('</body>', implode("\n", $footer)."\n</body>");
         }
     }
 

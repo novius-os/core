@@ -158,7 +158,7 @@ define('jquery-nos',
                     options.error = function(json) {
                         self.nosAjaxError(json);
                         if ($.isFunction(old_error)) {
-                            old_error.apply(this, args);
+                            old_error.call(this, params);
                         }
                     };
                 }
@@ -200,7 +200,7 @@ define('jquery-nos',
                 }
                 // Call user callback
                 if ($.isFunction(json.user_success)) {
-                    json.user_success.apply(this, args);
+                    json.user_success.call(this, json);
                 }
 
                 var dialog = this.closest('.ui-dialog-content').size();
