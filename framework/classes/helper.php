@@ -10,31 +10,44 @@
 
 namespace Nos;
 
-class Helper {
-
+class Helper
+{
     static $locales = array();
 
-    public static function _init() {
+    public static function _init()
+    {
 
         \Config::load('locales', true);
         static::$locales = \Config::get('locales', array());
     }
 
-	public static function flag($locale) {
+    public static function flag_url($locale)
+    {
         // Convert lang_LOCALE to locale
         list($lang, $country) = explode('_', $locale.'_');
-        if (!empty($country)) {
+        if (!empty($country))
+        {
             $lang = mb_strtolower($country);
         }
-        switch($lang) {
+        switch ($lang)
+        {
             case 'en':
                 $lang = 'gb';
                 break;
         }
-        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$lang.'.png" title="'.\Arr::get(static::$locales, $locale, $locale).'" /> ';
-	}
+        return 'static/novius-os/admin/novius-os/img/flags/'.$lang.'.png';
+    }
 
-    public static function flag_empty() {
+    public static function flag($locale)
+    {
+        return '<img src="'.static::flag_url($locale).'" title="'.\Arr::get(static::$locales, $locale, $locale).'" /> ';
+    }
+
+    public static function flag_empty()
+    {
         return '<span style="display:inline-block; width:16px;"></span> ';
     }
+
 }
+
+
