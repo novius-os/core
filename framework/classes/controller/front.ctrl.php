@@ -44,9 +44,10 @@ class Controller_Front extends Controller {
 
     public function router($action, array $params) {
 
-	    // Strip out leading / and trailing .html
-	    $this->_base_href = str_replace(array('http:', 'https:'), '', \URI::base());
-	    $this->_url = mb_substr($_SERVER['REDIRECT_URL'], 1);
+	    $this->_base_href = \URI::base();
+
+        // Strip out leading / and trailing .html
+        $this->_url = mb_substr($_SERVER['REDIRECT_URL'], 1);
 	    $url = str_replace('.html', '', $this->_url);
 
         $this->_is_preview = \Input::get('_preview', false);
