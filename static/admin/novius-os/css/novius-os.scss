@@ -46,9 +46,14 @@ a:hover {
     }
 
     &.ui-widget-content, .ui-widget-content {
-        background: #222222;
+        background: rgba(0, 0, 0, 0.9);
         color: #fff;
+
+        .ui-widget-content {
+            background: transparent;
+        }
     }
+
     .ui-widget-content a {
         color: #fff;
     }
