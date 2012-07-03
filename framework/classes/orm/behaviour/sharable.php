@@ -21,7 +21,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             if (!isset($nuggets[$type])) {
                 if (is_string($params['value'])) {
                     $nuggets[$type] = $object->{$params['value']};
-                } else if (is_callable($params)) {
+                } else if (is_callable($params['value'])) {
                     $nuggets[$type] = $params['value']($object);
                 }
             }

@@ -38,12 +38,14 @@ class Orm_Behaviour_Url extends Orm_Behaviour
 					$function = $enhancers[$enhancer]['get_url_model'];
 					foreach ($page_enhanced[$enhancer] as $page_id => $params) {
 						if ($page = Model_Page::find($page_id)) {
-							if ($url = call_user_func($function, $object, array('urlPath' => mb_substr($page->get_href(), 0, -5).'/', 'enhancer_config' => $params))) {
+                            $urlPath = mb_substr($page->get_href(), 0, -5).'/';
+							if ($url = call_user_func($function, $object, array('urlPath' => $urlPath, 'enhancer_config' => $params))) {
 								if ($url && $first) {
 									return $url;
 								}
 								$urls[] = array(
 									'url' => $url,
+                                    'itemUrl' => str_replace($urlPath, '', $url),
 									'page_id' => $page_id,
 								);
 							}

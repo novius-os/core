@@ -14,7 +14,7 @@ return array(
                     return array($page->get_href(array('absolute' => true)));
                 },
                 'useTitle' => __('Url'),
-            )
+            ),
         ),
     ),
 );

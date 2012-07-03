@@ -43,14 +43,35 @@ class Controller_Admin_DataCatcher extends Controller_Admin_Application {
         try {
             $id = \Input::post('model_id');
             $model = \Input::post('model_name');
+
+            // Load the application if we need it
+            $namespace = \Inflector::get_namespace($model);
+            \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+            $namespaces = \Config::get('data::app_namespaces');
+            $application = array_search(substr($namespace, 0, -1), $namespaces);
+            if (false !== $application)
+            {
+                \Module::load($application);
+            }
+
             $item = $model::find($id);
             $nugget = $item->get_default_nuggets_model();
 
             $data = array();
-            foreach ($item->get_sharable_property() as $type => $params) {
-                $data[$type] = \Input::post($type);
-                if (empty($data[$type])) {
+            foreach ($item->get_sharable_property() as $type => $params)
+            {
+                $use_default = \Input::post('default.'.$type, false);
+                if (!empty($use_default))
+                {
                     unset($data[$type]);
+                }
+                else
+                {
+                    $data[$type] = \Input::post($type);
+                    if (empty($data[$type]))
+                    {
+                        unset($data[$type]);
+                    }
                 }
             }
             $nugget->content_data = $data;
