@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
 *
-* Wijmo Library 2.1.0
+* Wijmo Library 2.1.4
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -381,6 +381,10 @@
 			bounds = null,
 			center = null,
 			textBounds = [];
+		
+		if (typeof text === "undefined") {
+			text = "";
+		}
 
 		function splitString(text, width, textStyle) {
 			var tempText = null,
@@ -681,7 +685,7 @@
 
 	Raphael.st.wijRemove = function () {
 		$.each(this, function (idx, obj) {
-			if (obj.wijRemove) {
+			if (obj.wijRemove && !obj.removed) {
 				obj.wijRemove();
 			}
 		});

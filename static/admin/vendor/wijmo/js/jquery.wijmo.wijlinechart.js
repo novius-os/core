@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
  *
- * Wijmo Library 2.1.0
+ * Wijmo Library 2.1.4
  * http://wijmo.com/
  *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
@@ -886,6 +886,7 @@
 					self.axisInfo.y[0].isTime,
 				//isYTime: self.axisInfo.y.isTime,
 				disabled: o.disabled,
+				culture: self._getCulture(),
 				hint: o.hint,
 				aniPathsAttr: self.aniPathsAttr,
 				chartLabelEles: self.chartLabelEles,
@@ -936,10 +937,11 @@
 			aniPathsAttr = [],
 			chartEles,
 			fields = element.data("fields") || {},
-			seriesEles = [];
+			seriesEles = [],
+			culture = options.culture;
 			
 		self.render(options, aniPathsAttr, fieldsAniPathAttr, paths, 
-			shadowPaths, markersSet, animationSet, symbols, linesStyle, seriesEles);
+			shadowPaths, markersSet, animationSet, symbols, linesStyle, seriesEles, culture);
 			
 		if (ani.enabled || seTrans.enabled) {
 			self.playAnimation(ani, seTrans, animationSet, cBounds, 
@@ -983,7 +985,7 @@
 				duration = seTrans.duration;
 				easing = seTrans.easing;
 			}
-			self.playHAnimation(duration, easing, animationSet, cBounds);
+			self.playHAnimation(duration, easing, animationSet, cBounds, paths);
 		} else {
 			$.each(paths, function (idx, path) {
 				if (typeof path === "undefined" || path === null) {
@@ -1107,7 +1109,12 @@
 	};
 	
 	$.wijchart._line.prototype.playHAnimation = function (duration, easing, 
-			animationSet, cBounds) {
+			animationSet, cBounds, paths) {
+		$.each(paths, function (idx, path) {
+			if (path.tracker) {
+				path.tracker.hide();
+			}
+		});
 		var width = cBounds.endX - cBounds.startX + 20,
 			height = cBounds.endY - cBounds.startY + 20;
 		animationSet.wijAttr("clip-rect", (cBounds.startX - 10) +
@@ -1115,6 +1122,9 @@
 		animationSet.wijAnimate({"clip-rect": (cBounds.startX - 10) +
 				" " + (cBounds.startY - 10) + " " + width + " " + height},
 				duration, easing, function () {
+				if (this.tracker) {
+					this.tracker.show();
+				}
 				if (Raphael.vml) {
 					//delete clip-rect's div in vml
 					var attrs = null, 
@@ -1145,7 +1155,7 @@
 	
 	$.wijchart._line.prototype.render = function (options, aniPathsAttr, 
 			fieldsAniPathAttr, paths, shadowPaths, markersSet, animationSet, 
-			symbols, linesStyle, seriesEles) {
+			symbols, linesStyle, seriesEles, culture) {
 		var self = this,
 			cBounds = options.bounds,
 			canvas = options.canvas,
@@ -1295,7 +1305,7 @@
 					lastYPoint, valX, valY, lineData.y[j], axis, fitType, isXTime, 
 					isYTime, j, lineMarkerStyle, lineMarkerHoverStyle, lineSeries, 
 					paintSymbol, showChartLabels, symbols, valuesX, valuesY, valsY, 
-					lineSeries.display, stacked, virtualMarkers);
+					lineSeries.display, stacked, virtualMarkers, culture);
 			});
 			
 			self.renderPath(canvas, cBounds, lineSeries, paths, shadowPaths, linesStyle, 
@@ -1542,7 +1552,7 @@
 			firstYPoint, lastYPoint, valX, valY, dataY, axis, fitType,
 			isXTime, isYTime, pointIdx, lineMarkerStyle, lineMarkerHoverStyle,
 			lineSeries, paintSymbol, showChartLabels, symbols, valuesX, valuesY,
-			valsY, display, stacked, virtualMarkers) {
+			valsY, display, stacked, virtualMarkers, culture) {
 		var self = this,
 			width = cBounds.endX - cBounds.startX,
 			height = cBounds.endY - cBounds.startY,
@@ -1599,7 +1609,7 @@
 
 		if (showChartLabels) {
 			defaultChartLabel = self.renderChartLabel(canvas, isYTime, valY, 
-				chartLabelFormatString, X, Y);
+				chartLabelFormatString, X, Y, culture);
 			chartLabelEles.push(defaultChartLabel);
 			defaultChartLabels.push(defaultChartLabel);
 			aniLabelsAttr.push($.extend(true, {}, defaultChartLabel.attr()));
@@ -1727,7 +1737,7 @@
 	};
 	
 	$.wijchart._line.prototype.renderChartLabel = function (canvas, isYTime, valY, 
-			chartLabelFormatString, X, Y) {
+			chartLabelFormatString, X, Y, culture) {
 		var labelText,
 			defaultChartLabel,
 			dclBox;
@@ -1739,7 +1749,7 @@
 
 		if (chartLabelFormatString && chartLabelFormatString.length) {
 			//labelText = $.format(labelText, o.chartLabelFormatString);
-			labelText = Globalize.format(labelText, chartLabelFormatString);
+			labelText = Globalize.format(labelText, chartLabelFormatString, culture);
 		}
 		defaultChartLabel = canvas.text(X, Y, labelText);
 		$.wijraphael.addClass($(defaultChartLabel.node), "wijlinechart-label");

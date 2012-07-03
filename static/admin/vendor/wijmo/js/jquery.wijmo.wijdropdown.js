@@ -1,17 +1,17 @@
 /*globals jQuery,document,window*/
 /*
 *
-* Wijmo Library 2.1.0
+* Wijmo Library 2.1.4
 * http://wijmo.com/
 *
 * Copyright(c) ComponentOne, LLC.  All rights reserved.
-* 
+*
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
 * http://www.wijmo.com/license
 *
 * * Wijmo Dropdown widget.
-* 
+*
 * Depends:
 *	jquery.js
 *	jquery.ui.js
@@ -62,8 +62,7 @@
 		_createSelect: function () {
 			var self = this,
 				ele = self.element,
-            	// @todo : Fixed Novius OS
-				width = ele.outerWidth(),
+                width = ele.outerWidth(), // @todo : Fixed Novius OS
 				eleWidth = width,
 			//height = ele.height(),
 				selectWrap = ele.wrap("<div></div>").parent()
@@ -115,10 +114,13 @@
 			self._listContainer = listContainer;
 			self._list = list;
 			self._value = ele.val();
+			//self._selectedIndex = ele.find("option:selected").index();
+			self._selectedIndex = $('option',ele)
+									.index(ele.find("option:selected")),
 			self._selectWrap = selectWrap;
 			self._labelWrap = labelWrap;
 			self._container = container;
-			
+
 			//update for fixed tooltip can't take effect
 			container.attr("title",ele.attr("title"));
 			ele.removeAttr("title");
@@ -127,7 +129,7 @@
 		_buildList: function (list, listContainer, eleWidth) {
 			var self = this,
 				ele = self.element, height;
-			
+
 			listContainer.show();
 
 			ele.children().each(function (i, n) {
@@ -151,12 +153,12 @@
 					list.append(group);
 				}
 			});
-			
-			//update for fixing height setting is incorrect when 
+
+			//update for fixing height setting is incorrect when
 			//execute refresh at 2011/11/30
 			listContainer.height("");
 			//end for height setting
-			
+
 			height = listContainer.height();
 			height = list.outerHeight() < height ? list.outerHeight() : height;
 
@@ -164,11 +166,11 @@
 				height: height,
 				width: eleWidth
 			});
-			
+
 			//update for fixing can't show all dropdown items by wuhao at 2012/2/24
 			list.setOutWidth(list.parent().parent().innerWidth() - 18);
 			//end for issue
-			
+
 			if (listContainer.data("wijsuperpanel")) {
 				listContainer.wijsuperpanel("paintPanel");
 				self.superpanel = listContainer.data("wijsuperpanel");
@@ -179,7 +181,7 @@
 			if ($.fn.bgiframe) {
 				self.superpanel.element.bgiframe();
 			}
-			
+
 			//update for fixing can't show all dropdown items by wuhao at 2012/2/24
 			//list.setOutWidth(list.parent().parent().innerWidth());
 			if (!self.superpanel.vNeedScrollBar) {
@@ -187,7 +189,7 @@
 				self.superpanel.refresh();
 			}
 			//end for issue
-			
+
 			listContainer.hide();
 		},
 
@@ -283,11 +285,12 @@
 						listContainer.parent().css("z-index", "");
 					}
 					listContainer.hide();
-					self.oldVal = ele.val();
-					ele.val(self._value);
-					if (self.oldVal !== self._value) {
-						ele.trigger("change");
-					}
+					self._setValueToEle();
+					//self.oldVal = ele.val();
+					//ele.val(self._value);
+					//if (self.oldVal !== self._value) {
+					//	ele.trigger("change");
+					//}
 				}
 				ele.click();
 			});
@@ -462,6 +465,9 @@
 			if (self._activeItem) {
 				self._label.text(self._activeItem.text());
 				self._value = self._activeItem.data("value");
+				//self._selectedIndex = self._activeItem.index();
+				self._selectedIndex = $('li.wijmo-dropdown-item',listContainer)
+											.index(self._activeItem);
 
 				if (self.superpanel.vNeedScrollBar) {
 					top = self._activeItem.offset().top;
@@ -478,24 +484,42 @@
 				}
 			}
 		},
-		
+
 		_setValueToEle: function () {
-			var self = this, ele = self.element;
-			
-			self.oldVal = ele.val();
-			ele.val(self._value);
-			if (self.oldVal !== self._value) {
+			var self = this, ele = self.element,
+				oldSelectedItem = ele.find("option[selected]"),
+				//oldSelectedIndex = oldSelectedItem.index(),
+				oldSelectedIndex = $('option',ele).index(oldSelectedItem),
+				selectedIndex = self._selectedIndex;
+
+			//self.oldVal = ele.val();
+			//ele.val(self._value);
+			if (oldSelectedIndex !== selectedIndex) {
+				oldSelectedItem.removeAttr('selected');
+				ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
+
 				ele.trigger("change");
 			}
+			//if (self.oldVal !== self._value) {
+			//	ele.trigger("change");
+			//}
 		},
 
 		_initActiveItem: function () {
 			var self = this;
 			if (self._value !== undefined) {
-				self._list.find("li.wijmo-dropdown-item").each(function () {
-					if ($(this).data("value") === self._value) {
+				if (self._selectedIndex === -1) {
+					self._activate(self._list.find("li.wijmo-dropdown-item").eq(0));
+					return;
+				}
+				self._list.find("li.wijmo-dropdown-item").each(function (idx) {
+					if (idx === self._selectedIndex) {
 						self._activate($(this));
+						return false;
 					}
+					//if ($(this).data("value") === self._value) {
+					//	self._activate($(this));
+					//}
 				});
 			}
 		},
@@ -533,7 +557,7 @@
 
 		refresh: function () {
 			/// Use the refresh method to set the drop-down element's style.
-			var self = this, containerWidth;
+			var self = this, ele = self.element, containerWidth;
 
 			if (self.needInit) {
 				if (self.element.is(":visible")) {
@@ -548,14 +572,13 @@
 				if (!self._list) {
 					return;
 				}
-				
+
 				self._listContainer.show();
 				//update for fixing width settings is wrong when
 				//execute refresh method at 2011/11/30
 				//containerWidth = self._listContainer.width();
 				self._selectWrap.removeClass("ui-helper-hidden");
-				// @todo : Fixed Novius OS
-				containerWidth = self.element.outerWidth();
+				containerWidth = self.element.outerWidth(); // @todo : Fixed Novius OS
 				containerWidth += parseInt(self._label.css("padding-left")
 				.replace(/px/, ""), 10);
 				containerWidth += parseInt(self._label.css("padding-right")
@@ -564,10 +587,13 @@
 				self._container.width(containerWidth);
 				self._selectWrap.addClass("ui-helper-hidden");
 				//end for fixing width settings at 2011/11/30
-				
+
 				self._list.empty();
 				self._buildList(self._list, self._listContainer, containerWidth);
 				self._value = self.element.val();
+				//self._selectedIndex = ele.find("option :selected").index();
+				self._selectedIndex = $('option',ele)
+									.index(ele.find("option:selected")),
 				self._initActiveItem();
 				if (self._activeItem) {
 					self._label.text(self._activeItem.text());
@@ -636,11 +662,11 @@
 		},
 
 		destroy: function () {
-			
+
 			//update for fixed tooltip can't take effect
 			this.element.attr("title", this._container.attr("title"));
-			
-			/// Remove the functionality completely. 
+
+			/// Remove the functionality completely.
 			/// This will return the element back to its pre-init state.
 			this.element.closest(".wijmo-wijdropdown")
 			.find(">div.wijmo-dropdown-trigger,>div.wijmo-dropdown," +
