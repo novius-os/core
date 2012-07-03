@@ -35,13 +35,6 @@ class Model_Page extends \Nos\Orm\Model {
 			'cascade_save'   => false,
 			'cascade_delete' => false,
 		),
-		'racine' => array(
-			'key_from'       => 'page_root_id',
-			'model_to'       => '\Nos\Model_Page_Root',
-			'key_to'         => 'root_id',
-			'cascade_save'   => false,
-			'cascade_delete' => false,
-		),
 	);
 
 	protected static $_observers = array('Orm\\Observer_Self');
