@@ -17,7 +17,6 @@ class Controller_Front_Application extends Controller {
     public $main_controller;
 
     public $cache;
-    public $cache_cleanup;
 
     public $default_config = array();
 

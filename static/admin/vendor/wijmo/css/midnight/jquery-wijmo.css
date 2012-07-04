@@ -33,28 +33,16 @@
     font-size: 100%;
     list-style: none;
 }
-.ui-helper-clearfix:after
-{
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+	content: "";
+	display: table;
 }
-.ui-helper-clearfix
-{
-    display: inline-block;
+.ui-helper-clearfix:after {
+	clear: both;
 }
-/* required comment for clearfix to work in Opera \*/
-* html .ui-helper-clearfix
-{
-    height: 1%;
+.ui-helper-clearfix {
+	zoom: 1;
 }
-.ui-helper-clearfix
-{
-    display: block;
-}
-/* end clearfix */
 .ui-helper-zfix
 {
     width: 100%;
@@ -120,7 +108,7 @@
 .ui-widget
 {
     font-family: Georgia, "Times New Roman" , Times, serif;
-    font-size: 1.2em;
+    font-size: 100%;
 }
 .ui-widget .ui-widget
 {

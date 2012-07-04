@@ -61,7 +61,7 @@ class Widget_Page_Selector extends \Nos\Widget_Selector {
             'width' => null,
         ), $options);
 
-        return (string) \Request::forge('nos/admin/page/inspector/page/list')->execute(
+        return (string) \Request::forge('nos/admin/page/inspector/page/appdesk')->execute(
             array(
                 'inspector/modeltree_radio',
                 array(
