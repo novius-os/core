@@ -115,11 +115,13 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                 //$parent = $page->find_parent();
 
                 // Instead, retrieve the object manually
-                $parent = Model_Page::find($page->page_parent_id);
-
-                // Event 'after_change_parent' will set the appropriate lang
-                $page->set_parent($parent);
-                $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
+                if (is_null($page->page_parent_id)) {
+                    $page->page_level = 1;
+                } else {
+                    $parent = Model_Page::find($page->page_parent_id);
+                    $page->set_parent($parent);
+                    $page->page_level = $parent->page_level + 1;
+                }
 
                 foreach (\Input::post('wysiwyg', array()) as $key => $text) {
                     $page->wysiwygs->$key = $text;
@@ -196,7 +198,13 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
             $page = static::_get_page_with_permission($page_id, 'delete');
 
             // Recover infos before delete, if not id is null
-            $dispatchEvent = array();
+            $dispatchEvent = array(
+                'name' => get_class($page),
+                'action' => 'delete',
+                'id' => array(),
+                'lang_common_id' => array($page->page_lang_common_id),
+                'lang' => array(),
+            );
 
             // Delete all languages by default
             $lang = \Input::post('lang', 'all');
@@ -205,26 +213,17 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
             if ($lang == 'all') {
                 foreach ($page->find_lang('all') as $page_lang)
                 {
-                    $dispatchEvent[] = array(
-                        'name' => get_class($page),
-                        'action' => 'delete',
-                        'id' => $page_lang->page_id,
-                        'lang_common_id' => $page_lang->page_lang_common_id,
-                        'lang' => $page_lang->page_lang,
-                    );
+                    $dispatchEvent['id'][] = $page_lang->page_id;
+                    $dispatchEvent['lang'][] = $page_lang->page_lang;
                     foreach ($page_lang->get_ids_children(false) as $page_id)
                     {
-                        $dispatchEvent[] = array(
-                            'name' => get_class($page),
-                            'action' => 'delete',
-                            'id' => $page_id,
-                        );
+                        $dispatchEvent['id'][] = $page_id;
                     }
                 }
 
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 // Optimised operation for deleting all languages
-                $page->delete_all_lang();
+                //$page->delete_all_lang();
 
             } else {
                 // Search for the appropriate page
@@ -238,25 +237,15 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                     )));
                 }
 
-                $dispatchEvent[] = array(
-                    'name' => get_class($page),
-                    'action' => 'delete',
-                    'id' => $page->page_id,
-                    'lang_common_id' => $page->page_lang_common_id,
-                    'lang' => $page->page_lang,
-                );
-
+                $dispatchEvent['id'][] = $page->page_id;
+                $dispatchEvent['lang'][] = $page->page_lang;
                 foreach ($page->get_ids_children(false) as $page_id) {
-                    $dispatchEvent[] = array(
-                        'name' => get_class($page),
-                        'action' => 'delete',
-                        'id' => $page_id,
-                    );
+                    $dispatchEvent['id'][] = $page_id;
                 }
 
                 // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                $page->delete();
+                //$page->delete();
             }
 
             $body = array(

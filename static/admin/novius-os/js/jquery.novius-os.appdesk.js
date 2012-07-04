@@ -1707,25 +1707,28 @@ define('jquery-nos-appdesk',
                         if (!$.isArray(params.reloadEvent)) {
                             params.reloadEvent = [params.reloadEvent];
                         }
+                        var match = [];
                         $.each(params.reloadEvent, function(i, reloadEvent) {
                             if ($.type(reloadEvent) === 'string') {
                                 // Reload the grid if a action on a same language's item occurs
                                 // Or if a update or a insert on a other language's item occurs
-                                dispatcher.nosListenEvent({
-                                    name : reloadEvent
-                                }, function(json) {
-                                    if (!json.lang || !dispatcher.data('nosLang') || json.lang === dispatcher.data('nosLang')) {
-                                        div.appdesk('gridReload');
-                                    } else if (json.action === 'delete' || json.action === 'insert') {
-                                        div.appdesk('gridReload');
-                                    }
+                                if (dispatcher.data('nosLang')) {
+                                    match.push({
+                                            name : reloadEvent,
+                                            lang : dispatcher.data('nosLang')
+                                        });
+                                }
+                                match.push({
+                                    name : reloadEvent,
+                                    action : ['delete', 'insert']
                                 });
                             } else {
-                                dispatcher.nosListenEvent(reloadEvent, function() {
-                                    div.appdesk('gridReload');
-                                });
+                                match.push(reloadEvent);
                             }
                         });
+                        dispatcher.nosListenEvent(match, function() {
+                                div.appdesk('gridReload');
+                            });
                     }
 
                     div.bind('reloadView', function(e, newConfig) {

@@ -663,17 +663,38 @@ define('jquery-nos',
 
             nosListenEvent : function(json_match, callback) {
                 var self = this;
+                json_match = $.isArray(json_match) ? json_match : [json_match];
 
                 this.closest('.nos-dispatcher, body').on('noviusos', function(e) {
-                    var match = true;
+                    var matched = false;
                     e.noviusos = e.noviusos || {};
-                    $.each(json_match, function(key, value) {
-                        if (e.noviusos[key] !== value) {
-                            match = false;
+
+                    // Check if one of match_obj matched with event
+                    $.each(json_match, function(i, match_obj) {
+                        var matched_obj = true;
+                        $.each(match_obj, function(key, value) {
+                            if (!$.isArray(e.noviusos[key]) && !$.isArray(value)) {
+                                matched_obj = e.noviusos[key] === value;
+                            } else if ($.isArray(e.noviusos[key]) && !$.isArray(value)) {
+                                matched_obj = $.inArray(value, e.noviusos[key]) !== -1;
+                            } else if (!$.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                matched_obj = $.inArray(e.noviusos[key], value) !== -1;
+                            } else if ($.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                var matched_temp = false;
+                                $.each(value, function(i, val) {
+                                    matched_temp = $.inArray(val, e.noviusos[key]) !== -1;
+                                    return !matched_temp;
+                                });
+                                matched_obj = matched_temp;
+                            }
+                            return matched_obj;
+                        });
+                        if (matched_obj) {
+                            matched = true;
                             return false;
                         }
                     });
-                    if (match) {
+                    if (matched) {
                         callback(e.noviusos);
                     }
                 });
