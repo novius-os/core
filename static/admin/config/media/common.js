@@ -129,7 +129,7 @@ define(
                     },
                     grid : {
                         id : 'nos_media_grid',
-                        proxyUrl : 'admin/nos/media/list/json',
+                        proxyUrl : 'admin/nos/media/appdesk/json',
                         columns : {
                             extension : {
                                 headerText : appDesk.i18n('Ext.'),
