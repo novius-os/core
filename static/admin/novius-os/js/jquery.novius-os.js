@@ -261,8 +261,8 @@ define('jquery-nos',
 
                 data = data || {};
                 var contentUrls = {
-                        'all'   : '/admin/nos/media/list',
-                        'image' : '/admin/nos/media/list?view=image_pick'
+                        'all'   : '/admin/nos/media/appdesk',
+                        'image' : '/admin/nos/media/appdesk?view=image_pick'
                     },
                     $input = this;
 

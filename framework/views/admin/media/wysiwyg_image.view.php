@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-	$appdeskview = (string) Request::forge('nos/admin/media/list/index')->execute(array('image_pick'))->response();
+	$appdeskview = (string) Request::forge('nos/admin/media/appdesk/index')->execute(array('image_pick'))->response();
 	$uniqid = uniqid('tabs_');
 	$id_library = $uniqid.'_library';
 	$id_properties = $uniqid.'_properties';

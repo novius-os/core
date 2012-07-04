@@ -58,7 +58,7 @@ define(
                         }
                     },
                     grid : {
-                        proxyUrl : 'admin/nos/user/list/json',
+                        proxyUrl : 'admin/nos/user/appdesk/json',
                         columns : {
                             user : {
                                 headerText : appDesk.i18n('Name'),
