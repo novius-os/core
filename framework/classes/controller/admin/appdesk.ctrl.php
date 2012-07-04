@@ -80,7 +80,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
             } else if (is_array($condition)) {
                 $query->and_where_open();
                 foreach ($condition as $field) {
-                    $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                    if (is_callable($field)) {
+                        $query = $field($value, $query);
+                    }
+                    else
+                    {
+                        $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                    }
                 }
                 $query->and_where_close();
             } else {
