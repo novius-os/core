@@ -3,10 +3,10 @@
 .wijmo-wijcombobox
 {
     position: relative;
+    display: inline-block;
 }
 .wijmo-wijcombobox-wrapper
 {
-    float: left;
 }
 /* wijcombobox textbox
  ----------------------------------*/
@@ -39,7 +39,7 @@
     position: absolute;
     top: 0px;
     font-size: 0px;
-    width: 20px;
+    width: 22px;
     cursor: pointer;
 }
 /* dropdown list

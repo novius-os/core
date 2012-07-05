@@ -56,6 +56,13 @@ class Controller_Admin_Media_Actions extends Controller {
 
             $media = static::_get_media_with_permission($media_id, 'delete');
 
+            // Recover infos before delete, if not id is null
+            $dispatchEvent = array(
+                'name' => get_class($media),
+                'action' => 'delete',
+                'id' => $media->media_id,
+            );
+
             // Delete database & relations (link)
             $media->delete();
             // Delete file from the hard drive
@@ -65,7 +72,7 @@ class Controller_Admin_Media_Actions extends Controller {
 
 			$body = array(
 				'notify' => 'File successfully deleted.',
-                'dispatchEvent' => 'reload.nos_media',
+                'dispatchEvent' => $dispatchEvent,
 			);
         } catch (\Exception $e) {
             // Easy debug
@@ -129,6 +136,13 @@ class Controller_Admin_Media_Actions extends Controller {
             }
             $folder = static::_get_folder_with_permission($folder_id, 'delete');
 
+            // Recover infos before delete, if not id is null
+            $dispatchEvent = array(
+                'name' => get_class($folder),
+                'action' => 'delete',
+                'id' => $folder->medif_id,
+            );
+
             $count_medias = $folder->count_media();
             // Basic check to prevent false supression
             if (!is_dir($folder->path()) && $count_medias > 0) {
@@ -185,7 +199,7 @@ class Controller_Admin_Media_Actions extends Controller {
             \DB::commit_transaction();
             $body = array(
                 'notify' => 'Folder successfully deleted.',
-				'dispatchEvent' => array('reload.nos_media', 'reload.nos_media_folder'),
+                'dispatchEvent' => $dispatchEvent,
             );
         } catch (\Exception $e) {
             \DB::rollback_transaction();

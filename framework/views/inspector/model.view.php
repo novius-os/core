@@ -12,11 +12,11 @@
 ?>
 <table id="<?= $id ?>"></table>
 <script type="text/javascript">
-require([
-		'jquery-nos-listgrid'
-	], function( $nos, undefined ) {
-		$nos(function() {
-			var inspector = $nos('#<?= $id ?>').removeAttr('id'),
+require(
+    ['jquery-nos-listgrid'],
+    function( $, undefined ) {
+		$(function() {
+			var inspector = $('#<?= $id ?>').removeAttr('id'),
 				connector = inspector.closest('.nos-inspector, body')
 					.on('langChange', function() {
 						if (inspectorData.langChange) {
@@ -39,15 +39,21 @@ require([
 						}
 					}),
                 inspectorData = parent.data('inspector'),
-                table_heights = $nos.grid.getHeights(),
+                table_heights = $.grid.getHeights(),
                 showFilter = inspectorData.grid.showFilter || false,
 				rendered = false,
                 pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
 
 			if (inspectorData.reloadEvent) {
-				inspector.listenEvent('reload.' + inspectorData.reloadEvent, function() {
-					parent.trigger('widgetReload');
-				});
+                var match = {
+                        name : inspectorData.reloadEvent
+                    };
+                if (connector.data('nosLang')) {
+                    match['lang'] = connector.data('nosLang');
+                }
+                inspector.nosListenEvent(match, function() {
+                        parent.trigger('widgetReload');
+                    });
 			}
 
             inspector.css({
@@ -90,7 +96,7 @@ require([
                         }
                     }),
                     currentCellChanged: function (e) {
-                        var row = $nos(e.target).noslistgrid("currentCell").row(),
+                        var row = $(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

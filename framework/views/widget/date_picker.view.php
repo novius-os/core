@@ -14,9 +14,9 @@
             'jquery-nos',
             'jquery-ui.datepicker'
         ],
-        function($nos) {
-            $nos(function() {
-                var $input = $nos('input#<?= $id ?>');
+        function($) {
+            $(function() {
+                var $input = $('input#<?= $id ?>');
                 $input<?= !empty($wrapper) ? '.wrap('.\Format::forge()->to_json($wrapper).')' : '' ?>.datepicker($input.data('datepicker-options'));
             });
         });

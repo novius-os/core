@@ -8,15 +8,10 @@
  * @link http://www.novius-os.org
  */
 
-?>
-<script type="text/javascript">
-require(
-    ['jquery-nos'],
-    function($) {
-        var top = window;
-        while (top.parent != top) {
-            top = top.parent;
-        }
-        top.location = 'admin/nos/login';
-    });
-</script>
+namespace Nos;
+
+use Fuel\Core\Config;
+
+class Controller_Admin_User_Appdesk extends Controller_Admin_Appdesk {
+
+}

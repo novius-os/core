@@ -38,35 +38,37 @@
 </div>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-    $nos(function() {
-        var $container    = $nos('#<?= $uniqid ?>').form();
-        var $verification = $container.find('input[data-id=verification]');
-        var $confirmation = $container.find('button[data-id=confirmation]');
+require(
+    ['jquery-nos'],
+    function($) {
+        $(function() {
+            var $container    = $('#<?= $uniqid ?>').nosFormUI();
+            var $verification = $container.find('input[data-id=verification]');
+            var $confirmation = $container.find('button[data-id=confirmation]');
 
-        $confirmation.click(function(e) {
-            e.preventDefault();
-            if ($verification.length && $verification.val() != $verification.data('verification')) {
-                $nos.notify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
-                return;
-            }
-	        $container.xhr({
-                url : 'admin/nos/media/actions/delete_media_confirm',
-                method : 'POST',
-                data : {
-                    id : <?= $media->media_id ?>
-                },
-                success : function(json) {
-	                $container.dialog('close');
+            $confirmation.click(function(e) {
+                e.preventDefault();
+                if ($verification.length && $verification.val() != $verification.data('verification')) {
+                    $.nosNotify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
+                    return;
                 }
+                $container.nosAjax({
+                    url : 'admin/nos/media/actions/delete_media_confirm',
+                    method : 'POST',
+                    data : {
+                        id : <?= $media->media_id ?>
+                    },
+                    success : function(json) {
+                        $container.nosDialog('close');
+                    }
+                });
             });
-        });
 
-        $container.find('a[data-id=cancel]').click(function(e) {
-            e.preventDefault();
-	        $container.dialog('close');
-        });
+            $container.find('a[data-id=cancel]').click(function(e) {
+                e.preventDefault();
+                $container.nosDialog('close');
+            });
 
+        });
     });
-});
 </script>

@@ -124,7 +124,6 @@ class FrontCache {
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
-		\Nos\Nos::main_controller()->expires = \Date::forge($expires)->format("%H:%M:%S");;
     }
 
     public function save($duration = -1, $controller = null) {
@@ -153,24 +152,6 @@ class FrontCache {
         }
         if (!$this->store()) {
             trigger_error('Cache could not be written! (path = '.$this->_path.')', E_USER_WARNING);
-        } else {
-            /*
-            if (!empty($controller->cache_cleanup)) {
-                $cache_cleanup = $controller->cache_cleanup;
-                if (!is_array($cache_cleanup)) {
-                    $cache_cleanup = array($cache_cleanup);
-                }
-                foreach ($cache_cleanup as $cc) {
-                    $path_cache1 = \Config::get('cache_dir').$cc;
-                    $path_cache2 = substr($this->_path, 0, -4);
-                    !is_dir($path_cache1) && mkdir($path_cache1, 0755, true);
-                    !is_dir($path_cache2) && mkdir($path_cache2, 0755, true);
-                    $uniqid = uniqid();
-                    symlink($path_cache1, $path_cache2.'/'.$uniqid);
-                    symlink($path_cache2, $path_cache1.'/'.$uniqid);
-                }
-            }
-            //*/
         }
         //flock($this->_lock_fp, LOCK_UN);
     }

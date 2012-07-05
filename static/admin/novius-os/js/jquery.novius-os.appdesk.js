@@ -9,7 +9,7 @@
 
 define('jquery-nos-appdesk',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-thumbnailsgrid', 'jquery-nos-listgrid', 'jquery-nos-treegrid', 'jquery-nos-preview', 'jquery-ui.button', 'wijmo.wijdropdown', 'wijmo.wijtabs', 'wijmo.wijsuperpanel', 'wijmo.wijsplitter', 'wijmo.wijgrid', 'wijmo.wijmenu'],
-    function($, $nos) {
+    function($) {
         "use strict";
         var undefined = void(0);
         $.widget( "nos.appdesk", {
@@ -238,7 +238,7 @@ define('jquery-nos-appdesk',
                                 lang: o.selectedLang
                             });
                         } else {
-                            $nos(this).tab('add', {
+                            $(this).nosTabs('add', {
                                 iframe : true,
                                 url : first.url,
                                 label : first.label
@@ -259,7 +259,7 @@ define('jquery-nos-appdesk',
                                     lang: o.selectedLang
                                 });
                             } else {
-                                $nos(this).tab('add', {
+                                $(this).nosTabs('add', {
                                     iframe : true,
                                     url : add.url,
                                     label : add.label
@@ -278,10 +278,6 @@ define('jquery-nos-appdesk',
 
                 if (o.hideLocales) {
                     self.uiLangsDropDownContainer.hide();
-                    return self;
-                }
-
-                if ($.isEmptyObject(o.locales)) {
                     return self;
                 }
 
@@ -316,11 +312,11 @@ define('jquery-nos-appdesk',
                 self.uiLangsDropDownContainer.buttonset();
 
                 self.uiLangsDropDownContainer.find('input[name=' + uniqid + ']').change(function() {
-                    var select = $nos(this);
+                    var select = $(this);
 
                     o.selectedLang = select.val();
 
-                    select.xhr('saveUserConfig', o.name + '.selectedLang', o.selectedLang);
+                    select.nosSaveUserConfig(o.name + '.selectedLang', o.selectedLang);
 
                     self.gridReload();
                     self.dispatcher.data('nosLang', o.selectedLang)
@@ -376,11 +372,11 @@ define('jquery-nos-appdesk',
                 self.uiViewsDropDown.wijdropdown();
 
                 self.uiViewsDropDown.change(function() {
-                    var $dropdown = $nos(this);
+                    var $dropdown = $(this);
 
                     if ($dropdown.val() == 'edit_custom') {
                         var $el = self._uiCustomViewDialog();
-                        self.uiCustomViewDialog = $nos(self.uiViewsDropDown).dialog({
+                        self.uiCustomViewDialog = $(self.uiViewsDropDown).nosDialog({
                             title: o.texts.settings,
                             contentUrl: null,
                             content: $el,
@@ -429,7 +425,7 @@ define('jquery-nos-appdesk',
                                                 label : o.texts.cancel,
                                                 icons : {primary : 'ui-icon-gear'}
                                             }).click( function() {
-                                                self.uiCustomViewDialog.dialog('close');
+                                                self.uiCustomViewDialog.nosDialog('close');
                                             })
                                     ).append(
                                         $('<button />').button({
@@ -437,7 +433,7 @@ define('jquery-nos-appdesk',
                                                 icons : {primary : 'ui-icon-gear'}
                                             }).click( function() {
                                                 self._uiCustomViewDialogSave();
-                                                self.uiCustomViewDialog.dialog('close');
+                                                self.uiCustomViewDialog.nosDialog('close');
                                             })
                                     )
                                 );
@@ -448,9 +444,9 @@ define('jquery-nos-appdesk',
                         $dropdown.find('option').attr('selected', '');
                         $dropdown.find('option[value=custom]').attr('selected', 'selected');
                         $dropdown.wijdropdown("refresh");
-                        $dropdown.xhr('saveUserConfig', o.name + '.selectedView', $(this).val());
+                        $dropdown.nosSaveUserConfig(o.name + '.selectedView', $(this).val());
                     } else {
-                        $dropdown.xhr('saveUserConfig', o.name + '.selectedView', $(this).val());
+                        $dropdown.nosSaveUserConfig(o.name + '.selectedView', $(this).val());
                         self.element.trigger('reloadView', {selectedView: $(this).val()});
                     }
                 });
@@ -779,7 +775,7 @@ define('jquery-nos-appdesk',
 
                 custom.appdesk.grid = self._getGridConfiguration(o.grid);
 
-                self.element.nos().xhr('saveUserConfig', o.name, {selectedView: 'custom', custom: custom});
+                self.element.nosSaveUserConfig(o.name, {selectedView: 'custom', custom: custom});
                 return custom;
             },
 
@@ -1157,7 +1153,7 @@ define('jquery-nos-appdesk',
                     position = self.uiGrid.offset(),
                     positionContainer = self.element.offset(),
                     height = self.element.height() - position.top + positionContainer.top,
-                    heights = $nos.grid.getHeights();
+                    heights = $.grid.getHeights();
 
                 self.uiGrid.css({
                         height : height,
@@ -1548,7 +1544,7 @@ define('jquery-nos-appdesk',
                     } else {
                         self.uiGrid.noslistgrid('setSize', null, height);
                         if (reload) {
-                            var heights = $nos.grid.getHeights();
+                            var heights = $.grid.getHeights();
                             self.uiGrid.noslistgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
                         }
                     }
@@ -1632,7 +1628,7 @@ define('jquery-nos-appdesk',
 
         });
 
-        $nos.extend({
+        $.extend({
             appdeskAdd: function(id, config) {
                 var self = this;
                 var onCustom = false;
@@ -1652,7 +1648,7 @@ define('jquery-nos-appdesk',
                 }
 
                 require(jsonFile, function () {
-                    var appdesk = $nos.appdeskSetup(config);
+                    var appdesk = $.appdeskSetup(config);
                     $.extend(true, appdesk.i18nMessages, config.i18n);
 
                     // Extending appdesk with each of the different json files
@@ -1660,9 +1656,12 @@ define('jquery-nos-appdesk',
                         $.extend(true, appdesk, arguments[i](appdesk));
                     }
 
+                    // If the property is set explicitely, use it, else display only if there's more than 1 lang
+                    var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.locales).length <= 1);
+
                     $.extend(true, appdesk.appdesk, {
                         locales : config.locales,
-                        hideLocales : config.hideLocales,
+                        hideLocales : hideLocales,
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
@@ -1681,7 +1680,7 @@ define('jquery-nos-appdesk',
 
                     if ($.isPlainObject(params.tab) && !$.isEmptyObject(params.tab)) {
                         try {
-                            $nos(div).tab('update', params.tab);
+                            $(div).nosTabs('update', params.tab);
                         } catch (e) {
                             log('Could not update current tab. Maybe your config file should not try to update it.');
                         }
@@ -1705,9 +1704,31 @@ define('jquery-nos-appdesk',
                     });
 
                     if (params.reloadEvent) {
-                        dispatcher.on('reload.' + params.reloadEvent, function() {
-                            div.appdesk('gridReload');
+                        if (!$.isArray(params.reloadEvent)) {
+                            params.reloadEvent = [params.reloadEvent];
+                        }
+                        var match = [];
+                        $.each(params.reloadEvent, function(i, reloadEvent) {
+                            if ($.type(reloadEvent) === 'string') {
+                                // Reload the grid if a action on a same language's item occurs
+                                // Or if a update or a insert on a other language's item occurs
+                                if (dispatcher.data('nosLang')) {
+                                    match.push({
+                                            name : reloadEvent,
+                                            lang : dispatcher.data('nosLang')
+                                        });
+                                }
+                                match.push({
+                                    name : reloadEvent,
+                                    action : ['delete', 'insert']
+                                });
+                            } else {
+                                match.push(reloadEvent);
+                            }
                         });
+                        dispatcher.nosListenEvent(match, function() {
+                                div.appdesk('gridReload');
+                            });
                     }
 
                     div.bind('reloadView', function(e, newConfig) {
@@ -1722,6 +1743,8 @@ define('jquery-nos-appdesk',
             },
 
             appdeskSetup : function(config) {
+                var configToUse = $.extend({}, true, config);
+
                 var self = {},
                     objectToArray = function(val, i) {
                         val['setupkey'] = i;
@@ -1737,8 +1760,8 @@ define('jquery-nos-appdesk',
                                 if (object[key][keys[i]] != null) {
                                     object[key][keys[i]]['setupkey'] = keys[i];
                                     ordered.push(object[key][keys[i]]);
-                                    }
                                 }
+                            }
                             return ordered;
                         } else {
                             return $.map(object[key], objectToArray);
@@ -1763,7 +1786,7 @@ define('jquery-nos-appdesk',
                                 object[key] = keyToOrderedArray(object, key);
                                 for (var i = 0; i < object[key].length; i++) {
                                     if (object[key][i].lang) {
-                                        if (config.hideLocales) {
+                                        if (configToUse.hideLocales) {
                                             object[key].splice(i, 1);
                                             continue;
                                         }
@@ -1789,7 +1812,7 @@ define('jquery-nos-appdesk',
                                         if (showOnlyArrow) {
                                             width = 20;
                                         } else {
-                                            width = $nos.grid.getActionWidth(actions);
+                                            width = $.grid.getActionWidth(actions);
 
                                             if (actions.length > 1) {
                                                 // Reserve space for the dropdown actions menu
@@ -1805,7 +1828,7 @@ define('jquery-nos-appdesk',
                                             cellFormatter : function(args) {
                                                 if ($.isPlainObject(args.row.data)) {
 
-                                                    var buttons = $nos.appdeskActions(actions, args.row.data, {
+                                                    var buttons = $.appdeskActions(actions, args.row.data, {
                                                         showOnlyArrow : showOnlyArrow
                                                     });
 
@@ -1866,7 +1889,7 @@ define('jquery-nos-appdesk',
                                     texts : this.i18nMessages,
                                     splitters : {},
                                     slidersChange : function(e, rapport) {
-                                        //$nos.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
+                                        //$.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
                                     }
                                 }
                             }, this);
@@ -1910,6 +1933,9 @@ define('jquery-nos-appdesk',
                                     }
                                 });
                             }
+
+                            //
+                            configToUse = params.appdesk;
 
                             // Translate clone object
                             recursive(params);
@@ -2038,7 +2064,7 @@ define('jquery-nos-appdesk',
                     // Don't select the line when clicking the "more actions" arrow dropdown
                     dropDown.appendTo(container.find('tr')).click(function(e) {
 
-                        $.each($nos.appdeskActionsList, function() {
+                        $.each($.appdeskActionsList, function() {
                             $(this).wijmenu('hideAllMenus');
                         });
 
@@ -2096,7 +2122,7 @@ define('jquery-nos-appdesk',
                                 }
                             });
 
-                            $nos.appdeskActionsList.push(ul);
+                            $.appdeskActionsList.push(ul);
 
                             this.created = true;
 
@@ -2160,7 +2186,7 @@ define('jquery-nos-appdesk',
                                     cellFormatter : function(args) {
                                         if ($.isPlainObject(args.row.data)) {
 
-                                            var buttons = $nos.appdeskActions(actions, []);
+                                            var buttons = $.appdeskActions(actions, []);
 
                                             buttons.appendTo(args.$container);
                                             args.$container.parent().addClass('buttontd');
@@ -2193,5 +2219,5 @@ define('jquery-nos-appdesk',
             }
         });
 
-        return $nos;
+        return $;
     });

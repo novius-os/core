@@ -153,7 +153,11 @@ class Controller_Admin_Media_Folder extends Controller {
 			$body = array(
 				'notify' => 'Sub-folder successfully created.',
 				'closeDialog' => true,
-				'dispatchEvent' => 'reload.nos_media_folder',
+                'dispatchEvent' => array(
+                    'name' => get_class($folder),
+                    'action' => 'insert',
+                    'id' => $folder->medif_id,
+                ),
 			);
 		} catch (\Exception $e) {
 			$body = array(
@@ -222,7 +226,11 @@ class Controller_Admin_Media_Folder extends Controller {
 			$body = array(
 				'notify' => 'Folder successfully edited.',
 				'closeDialog' => true,
-				'dispatchEvent' => array('reload.nos_media', 'reload.nos_media_folder'),
+                'dispatchEvent' => array(
+                    'name' => get_class($folder),
+                    'action' => 'update',
+                    'id' => $folder->medif_id,
+                ),
 			);
 
         } catch (\Exception $e) {

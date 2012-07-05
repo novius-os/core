@@ -7,11 +7,15 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+?>
 
-namespace Nos;
-
-use Fuel\Core\Config;
-
-class Controller_Admin_User_List extends Controller_Admin_Appdesk {
-
-}
+<script type="text/javascript">
+require(
+    ["jquery-nos"],
+    function($) {
+        $(function() {
+            $("#<?= $id ?>").nosFormValidate(<?= $rules ?>)
+                .nosFormAjax();
+        });
+    });
+</script>
