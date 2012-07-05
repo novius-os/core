@@ -62,8 +62,6 @@ class Model extends \Orm\Model {
 
         if (!$init)
         {
-            Event::trigger(get_called_class().'.properties', get_called_class());
-
             parent::properties();
 
             $config = static::_config();
