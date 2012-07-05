@@ -223,7 +223,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 // Optimised operation for deleting all languages
-                //$page->delete_all_lang();
+                $page->delete_all_lang();
 
             } else {
                 // Search for the appropriate page
@@ -245,7 +245,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
                 // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                //$page->delete();
+                $page->delete();
             }
 
             $body = array(
