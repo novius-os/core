@@ -699,6 +699,7 @@ define('jquery-nos-ostabs',
                         width += $( this ).outerWidth( true );
                     });
                 self.uiOstabsTabs.width( width );
+                log(self.uiOstabsTabs, width);
 
                 var nbLabel = self.uiOstabsTabs.find( '.nos-ostabs-label:visible' ).length,
                     add;
@@ -710,7 +711,7 @@ define('jquery-nos-ostabs',
                         self.uiOstabsTabs.width( width );
                         self.labelWidth = self.labelWidth - add;
                         $( 'head .tabswidth' ).remove();
-                        $( '<style type="text/css" class="tabswidth">.nos-ostabs .ui-widget-header .nos-ostabs-label {width : ' + self.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
+                        $( '<style type="text/css" class="tabswidth">.nos-ostabs .nos-ostabs-header .nos-ostabs-label {width : ' + self.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
                     }
                 } else {
                     do {
@@ -721,7 +722,7 @@ define('jquery-nos-ostabs',
                             self.uiOstabsTabs.width( width );
                             self.labelWidth = self.labelWidth + add;
                             $( 'head .tabswidth' ).remove();
-                            $( '<style type="text/css" class="tabswidth">.nos-ostabs .ui-widget-header .nos-ostabs-label {width : ' + self.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
+                            $( '<style type="text/css" class="tabswidth">.nos-ostabs .nos-ostabs-header .nos-ostabs-label {width : ' + self.labelWidth + 'px !important;}</style>' ).appendTo( 'head' );
                         }
                     } while ( self.tabsWidth > (width + nbLabel * 10) && self.labelWidth < o.labelMaxWidth );
                 }
