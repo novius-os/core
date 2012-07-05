@@ -151,6 +151,41 @@ class Str extends \Fuel\Core\Str
         $text   = preg_replace('#([_\.0-9a-z-]+@([0-9a-z][0-9a-z-]+\.)+[a-z]{2,3})#iu', '<a href="mailto:\\1">\\1</a>', $text);
         return $text;
     }
+
+    public static function bbToHtml($text) {
+        $text = stripslashes($text);
+        $text = nl2br(htmlentities($text));
+        $input = array(
+            '#\[b\](.*)\[/b\]#Usi',
+            '#\[i\](.*)\[/i\]#Usi',
+            '#\[u\](.*)\[/u\]#Usi',
+            '#\[s\](.*)\[/s\]#Usi',
+            '#\[img\](.*)\[/img\]#Usi',
+            '#\[url\](.*)\[/url\]#Usi',
+            '#\[url=(.*)\](.*)\[/url\]#Usi',
+            '#\[left\](.*)\[/left\]#Usi',
+            '#\[center\](.*)\[/center\]#Usi',
+            '#\[right\](.*)\[/right\]#Usi'
+        );
+        $output = array(
+            '<strong>$1</strong>',
+            '<em>$1</em>',
+            '<span style="text-decoration:underline;">$1</span>',
+            '<span style="text-decoration:line-through;">$1</span>',
+            '<img src="$1" alt="Image" />',
+            '<a href="$1">$1</a>',
+            '<a href="$1">$2</a>',
+            '<div style="text-align:left;">$1</div>',
+            '<div style="text-align:center;">$1</div>',
+            '<div style="text-align:right;">$1</div>'
+        );
+        $count = count($input)-1;
+        for($i=0;$i<=$count;$i++)
+        {
+            $text = preg_replace($input[$i],$output[$i],$text);
+        }
+        return $text;
+    }
 }
 
 
