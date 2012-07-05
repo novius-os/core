@@ -12,19 +12,19 @@ return array(
     'launchers' => array(
         'nos_page' => array(
             'name' => 'Page',
-            'url' => 'admin/nos/page/list/index',
+            'url' => 'admin/nos/page/appdesk/index',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
         ),
         'nos_media' => array(
             'name' => 'Media centre',
-            'url' => 'admin/nos/media/list/index',
+            'url' => 'admin/nos/media/appdesk/index',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/media.png',
         ),
         'nos_user' => array(
             'name' => 'Users',
-            'url' => 'admin/nos/user/list/index',
+            'url' => 'admin/nos/user/appdesk/index',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
         ),
