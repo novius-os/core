@@ -239,9 +239,9 @@ class Model extends \Orm\Model {
             if ($application !== 'nos') {
                 \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
                 $apps = \Config::get('data::app_installed', array());
-                foreach ($apps as $app)
+                foreach ($apps as $app => $conf)
                 {
-                    if (!empty($app['namespace']) && $app['namespace'] === $namespace)
+                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace)
                     {
                         $application = $app;
                     }
