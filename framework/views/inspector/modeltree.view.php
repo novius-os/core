@@ -38,12 +38,14 @@ require(
 				rendered = false;
 
 			if (inspectorData.reloadEvent) {
-                inspector.nosListenEvent({
+                var match = {
                         name : inspectorData.reloadEvent
-                    }, function(json) {
-                        if (!json.lang || !connector.data('nosLang') || json.lang === connector.data('nosLang')) {
-                            parent.trigger('widgetReload');
-                        }
+                    };
+                if (connector.data('nosLang')) {
+                    match['lang'] = connector.data('nosLang');
+                }
+                inspector.nosListenEvent(match, function() {
+                        parent.trigger('widgetReload');
                     });
 			}
 

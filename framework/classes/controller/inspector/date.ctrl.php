@@ -161,8 +161,13 @@ class Controller_Inspector_Date extends Controller_Admin_Application {
 		$view->set('content', \Format::forge($content)->to_json(), false);
 		$view->set('label_custom', $this->config['label_custom_inputs']);
 
-		$view->set('date_begin', Request::forge('nos/ui/date/index/'.$this->config['input_begin'])->execute(), false);
-		$view->set('date_end', Request::forge('nos/ui/date/index/'.$this->config['input_end'])->execute(), false);
+
+		$view->set('date_begin', \Nos\Widget_Date_Picker::widget(array(
+            'name' => $this->config['input_begin'],
+        )), false);
+		$view->set('date_end', \Nos\Widget_Date_Picker::widget(array(
+            'name' => $this->config['input_end'],
+        )), false);
 
 		return $view;
 	}

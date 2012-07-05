@@ -80,7 +80,7 @@ define(
                         }*/
                     },
                     grid : {
-                        proxyUrl : 'admin/nos/page/list/json',
+                        proxyUrl : 'admin/nos/page/appdesk/json',
                         columns : {
                             title : {
                                 headerText : appDesk.i18n('Title'),
@@ -105,7 +105,7 @@ define(
                         }
                     },
                     treeGrid : {
-                        proxyUrl : 'admin/nos/page/list/tree_json'
+                        proxyUrl : 'admin/nos/page/appdesk/tree_json'
                     },
                     defaultView : 'treeGrid',
                     inspectors : {

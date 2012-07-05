@@ -74,6 +74,15 @@ $large = !empty($large) && $large == true;
                         }
                         echo '</td>';
                     }
+
+                    if (!empty($object))
+                    {
+                        $translatable = $object->behaviours('Nos\Orm_Behaviour_Translatable');
+                        if ($translatable)
+                        {
+                            echo '<td style="width:16px;">'.\Nos\Helper::flag($object->get_lang()).'</td>';
+                        }
+                    }
                     ?>
                         <td class="table-field">
                     <?php

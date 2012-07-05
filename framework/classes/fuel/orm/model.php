@@ -29,57 +29,109 @@ class Model extends \Orm\Model {
 	public $medias;
 	public $wysiwygs;
 
-	/**
+    /**
+     *  @see \Orm\Model::table()
+     */
+    public static function table()
+    {
+        $class = get_called_class();
+        $init = array_key_exists($class, static::$_table_names_cached);
+
+        if ( ! $init)
+        {
+            $config = static::_config();
+            if (!empty($config) && !empty($config['table_name'])) {
+                static::$_table_names_cached[$class] = $config['table_name'];
+            }
+            else
+            {
+                parent::table();
+            }
+        }
+
+        return static::$_table_names_cached[$class];
+    }
+
+    /**
 	 *  @see \Orm\Model::properties()
 	 */
 	public static function properties() {
-		Event::trigger(get_called_class().'.properties', get_called_class());
-		return call_user_func_array('parent::properties', func_get_args());
+
+        $class = get_called_class();
+        $init = array_key_exists($class, static::$_properties_cached);
+
+        if (!$init)
+        {
+            Event::trigger(get_called_class().'.properties', get_called_class());
+
+            parent::properties();
+
+            $config = static::_config();
+            if (!empty($config) && !empty($config['properties'])) {
+                static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+            }
+        }
+
+		return static::$_properties_cached[$class];
 	}
 
 	/**
 	 * @see \Orm\Model::relations()
 	 */
-	public static function relations($specific = false) {
+	public static function relations($specific = false)
+    {
+        $class = get_called_class();
 
-        /*
-        $relations = \Event::trigger(get_called_class().'.relations', '', array());
-        foreach ($relations as $relation) {
-            foreach ($relation as $type => $rels) {
-                foreach ($rels as $name => $props) {
-                    static::${'_'.$type}[$name] = $props;
+        if ( ! array_key_exists($class, static::$_relations_cached))
+        {
+            static::$_has_many['linked_wysiwygs'] = array(
+                'key_from' => static::$_primary_key[0],
+                'model_to' => 'Nos\Model_Wysiwyg',
+                'key_to' => 'wysiwyg_foreign_id',
+                'cascade_save' => true,
+                'cascade_delete' => false,
+                'conditions'     => array(
+                    'where' => array(
+                        array('wysiwyg_join_table', '=', static::$_table_name),
+                    ),
+                ),
+            );
+
+            static::$_has_many['linked_medias'] = array(
+                'key_from' => static::$_primary_key[0],
+                'model_to' => 'Nos\Model_Media_Link',
+                'key_to' => 'medil_foreign_id',
+                'cascade_save' => true,
+                'cascade_delete' => false,
+                'conditions'     => array(
+                    'where' => array(
+                        array('medil_from_table', '=', static::$_table_name),
+                    ),
+                ),
+            );
+
+            $config = static::_config();
+            if (!empty($config))
+            {
+                foreach (static::$_valid_relations as $rel_name => $rel_class)
+                {
+                    if (!empty($config[$rel_name]))
+                    {
+                        if (property_exists($class, '_'.$rel_name))
+                        {
+                            static::${'_'.$rel_name} = \Arr::merge(static::${'_'.$rel_name}, $config[$rel_name]);
+                        }
+                        else
+                        {
+                            static::${'_'.$rel_name} = $config[$rel_name];
+                        }
+                    }
                 }
             }
         }
-        */
 
-        static::$_has_many['linked_wysiwygs'] = array(
-			'key_from' => static::$_primary_key[0],
-			'model_to' => 'Nos\Model_Wysiwyg',
-			'key_to' => 'wysiwyg_foreign_id',
-			'cascade_save' => true,
-			'cascade_delete' => false,
-			'conditions'     => array(
-				'where' => array(
-					array('wysiwyg_join_table', '=', static::$_table_name),
-				),
-			),
-		);
-
-        static::$_has_many['linked_medias'] = array(
-			'key_from' => static::$_primary_key[0],
-			'model_to' => 'Nos\Model_Media_Link',
-			'key_to' => 'medil_foreign_id',
-			'cascade_save' => true,
-			'cascade_delete' => false,
-			'conditions'     => array(
-				'where' => array(
-					array('medil_from_table', '=', static::$_table_name),
-				),
-			),
-		);
-		return parent::relations($specific);
-	}
+        return parent::relations($specific);
+    }
 
 	/**
 	 * @see \Orm\Model::observers()
@@ -93,7 +145,12 @@ class Model extends \Orm\Model {
 
 		if (!$init)
 		{
-			static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviours());
+            $config = static::_config();
+            if (!empty($config) && !empty($config['observers'])) {
+                static::$_observers_cached[$class] = \Arr::merge(static::$_observers_cached[$class], $config['observers']);
+            }
+
+            static::$_observers_cached[$class] = array_merge(static::$_observers_cached[$class], static::behaviours());
             // Add Observer_Self, always
             if (empty(static::$_observers_cached[$class]['Orm\Observer_Self'])) {
                 static::$_observers_cached[$class]['Orm\Observer_Self'] = array(
@@ -130,7 +187,7 @@ class Model extends \Orm\Model {
 
 		if ( ! array_key_exists($class, static::$_behaviours_cached))
 		{
-			$behaviours = array();
+            $behaviours = array();
             $_behaviours = array();
 
             if (property_exists($class, '_behaviours'))
@@ -138,8 +195,7 @@ class Model extends \Orm\Model {
                 $_behaviours = static::$_behaviours;
             }
 
-            list($application, $file_name) = \Config::configFile(get_called_class());
-            $config = \Config::loadConfiguration($application, $file_name);
+            $config = static::_config();
             if (!empty($config) && !empty($config['behaviours'])) {
                 $_behaviours = \Arr::merge($_behaviours, $config['behaviours']);
             }
@@ -157,7 +213,7 @@ class Model extends \Orm\Model {
             }
 
             static::$_behaviours_cached[$class] = $behaviours;
-		}
+        }
 
 		if ($specific)
 		{
@@ -168,6 +224,18 @@ class Model extends \Orm\Model {
 	}
 
 
+    protected static $_configs = array();
+
+    protected static function _config()
+    {
+        $class = get_called_class();
+        if (!isset(static::$_configs[$class]))
+        {
+            list($application, $file_name) = \Config::configFile($class);
+            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
+        }
+        return static::$_configs[$class];
+    }
 
     public function get_possible_lang() {
         $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');

@@ -1,16 +1,16 @@
-/* 
- * 
+/*
+ *
  * Wijmo Aristo Theme
  * http://wijmo.com/
- * 
+ *
  * Copyright(c) ComponentOne, LLC.  All rights reserved.
- * 
+ *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://www.wijmo.com/license
- * 
+ *
  * Based on the Aristo theme concept created by 280 North and Pinvoke (https://github.com/280north/aristo).
- * 
+ *
 */
 
 /* Layout helpers
@@ -36,28 +36,16 @@
     font-size: 100%;
     list-style: none;
 }
-.ui-helper-clearfix:after
-{
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+	content: "";
+	display: table;
 }
-.ui-helper-clearfix
-{
-    display: inline-block;
+.ui-helper-clearfix:after {
+	clear: both;
 }
-/* required comment for clearfix to work in Opera \*/
-* html .ui-helper-clearfix
-{
-    height: 1%;
+.ui-helper-clearfix {
+	zoom: 1;
 }
-.ui-helper-clearfix
-{
-    display: block;
-}
-/* end clearfix */
 .ui-helper-zfix
 {
     width: 100%;
@@ -126,7 +114,7 @@
 .ui-widget
 {
     font-family: Arial,sans-serif;
-    font-size: 1.1em;
+    font-size: 100%;
 }
 .ui-widget .ui-widget
 {
@@ -1742,7 +1730,7 @@ button.ui-button::-moz-focus-inner
 }
 .ui-slider .ui-slider-handle
 {
-    
+
     background: #83b0ca url(images/ui-bg_highlight-soft_100_83b0ca_1x100.png) repeat-x top;
     border-color: #8ab0c6;
     /*
@@ -1862,7 +1850,7 @@ button.ui-button::-moz-focus-inner
 {
     width: 17em;
     padding: .2em .2em 0;
-	display:none; /* @todo : Fixed Novius OS */
+    display:none; /* @todo : Fixed Novius OS */
 }
 .ui-datepicker .ui-datepicker-header
 {
@@ -1997,10 +1985,10 @@ button.ui-button::-moz-focus-inner
 
 .wijmo-wijcalendar-preview-wrapper .wijmo-wijcalendar table.ui-datepicker-calendar
 {
-    width: 85.8%;   
+    width: 85.8%;
 }
 
-.wijmo-wijcalendar .wijmo-wijcalendar-nextpreview-button 
+.wijmo-wijcalendar .wijmo-wijcalendar-nextpreview-button
 {
 
 }
@@ -2553,7 +2541,7 @@ margin-left:10px;
 border:solid 1px #587e93;
 }
 
-.wijmo-wijmenu-child .wijmo-wijmenu-link.ui-state-focus 
+.wijmo-wijmenu-child .wijmo-wijmenu-link.ui-state-focus
 {
     background: #7389a5;
     color: #fff;
