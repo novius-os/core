@@ -293,7 +293,7 @@ class Controller_Front extends Controller {
         $replace_fct = function($pattern, $replace) use (&$content) {
             $content_old = $content;
             $content = preg_replace(
-                '/'.$pattern.'/iUu',
+                '`'.$pattern.'`iUu',
                 $replace,
                 $content,
                 -1,
@@ -302,7 +302,7 @@ class Controller_Front extends Controller {
             // if $content content none utf8 characters, preg_replace return empty string
             if (empty($content) && !empty($content_old)) {
                 $content = preg_replace(
-                    '/'.$pattern.'/iU',
+                    '`'.$pattern.'`iU',
                     $replace,
                     $content_old,
                     -1,
