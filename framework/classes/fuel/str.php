@@ -154,18 +154,18 @@ class Str extends \Fuel\Core\Str
 
     public static function bbToHtml($text) {
         $text = stripslashes($text);
-        $text = nl2br(htmlentities($text));
+        $text = nl2br($text); //htmlentities
         $input = array(
-            '#\[b\](.*)\[/b\]#Usi',
-            '#\[i\](.*)\[/i\]#Usi',
-            '#\[u\](.*)\[/u\]#Usi',
-            '#\[s\](.*)\[/s\]#Usi',
-            '#\[img\](.*)\[/img\]#Usi',
-            '#\[url\](.*)\[/url\]#Usi',
-            '#\[url=(.*)\](.*)\[/url\]#Usi',
-            '#\[left\](.*)\[/left\]#Usi',
-            '#\[center\](.*)\[/center\]#Usi',
-            '#\[right\](.*)\[/right\]#Usi'
+            '#\[b\](.*)\[/b\]#Usiu',
+            '#\[i\](.*)\[/i\]#Usiu',
+            '#\[u\](.*)\[/u\]#Usiu',
+            '#\[s\](.*)\[/s\]#Usiu',
+            '#\[img\](.*)\[/img\]#Usiu',
+            '#\[url\](.*)\[/url\]#Usiu',
+            '#\[url=(.*)\](.*)\[/url\]#Usiu',
+            '#\[left\](.*)\[/left\]#Usiu',
+            '#\[center\](.*)\[/center\]#Usiu',
+            '#\[right\](.*)\[/right\]#Usiu'
         );
         $output = array(
             '<strong>$1</strong>',
