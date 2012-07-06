@@ -1277,7 +1277,10 @@ define('jquery-nos-appdesk',
                     o = self.options,
                     position = self.uiTreeGrid.offset(),
                     positionContainer = self.element.offset(),
-                    height = self.element.height() - position.top + positionContainer.top;
+                    height = self.element.height() - position.top + positionContainer.top,
+                    grid = $.extend(true, {}, o.grid);
+
+                delete grid.columns;
 
                 self.uiTreeGrid.css({
                         height : height,
@@ -1293,6 +1296,7 @@ define('jquery-nos-appdesk',
                         scrollMode : 'auto',
                         allowColSizing : true,
                         allowColMoving : true,
+                        columns : o.treeGrid.columns || o.grid.columns,
                         sorting: function(e, args) {
                             $.each(o.grid.columns, function() {
                                 var column = this;
@@ -1353,7 +1357,7 @@ define('jquery-nos-appdesk',
                         loaded: function() {
                             self.uiSplitterHorizontalBottom.find('.wijmo-wijgrid-footer').prepend(self.uiPaginationLabel);
                         }
-                    }, o.grid));
+                    }, grid));
 
                 return self;
             },
@@ -1707,25 +1711,28 @@ define('jquery-nos-appdesk',
                         if (!$.isArray(params.reloadEvent)) {
                             params.reloadEvent = [params.reloadEvent];
                         }
+                        var match = [];
                         $.each(params.reloadEvent, function(i, reloadEvent) {
                             if ($.type(reloadEvent) === 'string') {
                                 // Reload the grid if a action on a same language's item occurs
                                 // Or if a update or a insert on a other language's item occurs
-                                dispatcher.nosListenEvent({
-                                    name : reloadEvent
-                                }, function(json) {
-                                    if (!json.lang || !dispatcher.data('nosLang') || json.lang === dispatcher.data('nosLang')) {
-                                        div.appdesk('gridReload');
-                                    } else if (json.action === 'delete' || json.action === 'insert') {
-                                        div.appdesk('gridReload');
-                                    }
+                                if (dispatcher.data('nosLang')) {
+                                    match.push({
+                                            name : reloadEvent,
+                                            lang : dispatcher.data('nosLang')
+                                        });
+                                }
+                                match.push({
+                                    name : reloadEvent,
+                                    action : ['delete', 'insert']
                                 });
                             } else {
-                                dispatcher.nosListenEvent(reloadEvent, function() {
-                                    div.appdesk('gridReload');
-                                });
+                                match.push(reloadEvent);
                             }
                         });
+                        dispatcher.nosListenEvent(match, function() {
+                                div.appdesk('gridReload');
+                            });
                     }
 
                     div.bind('reloadView', function(e, newConfig) {
@@ -1910,6 +1917,13 @@ define('jquery-nos-appdesk',
                                     $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
                                         if ($.type(val) == 'string') {
                                             params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
+                                        }
+                                    });
+                                }
+                                if (params.appdesk.treeGrid && params.appdesk.treeGrid.columns && params.appdesk.treeGrid.columns.actions && params.appdesk.treeGrid.columns.actions.actions) {
+                                    $.each(params.appdesk.treeGrid.columns.actions.actions, function(i, val) {
+                                        if ($.type(val) == 'string') {
+                                            params.appdesk.treeGrid.columns.actions.actions[i] = gridActions[val];
                                         }
                                     });
                                 }

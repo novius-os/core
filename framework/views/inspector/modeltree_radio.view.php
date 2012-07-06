@@ -34,12 +34,14 @@
                     rendered = false,
                     init = function() {
                         if (params.reloadEvent) {
-                            container.nosListenEvent({
+                            var match = {
                                     name : params.reloadEvent
-                                }, function(json) {
-                                    if (!json.lang || !connector.data('nosLang') || json.lang === connector.data('nosLang')) {
-                                        table.nostreegrid('reload');
-                                    }
+                                };
+                            if (connector.data('nosLang')) {
+                                match['lang'] = connector.data('nosLang');
+                            }
+                            container.nosListenEvent(match, function(json) {
+                                    table.nostreegrid('reload');
                                 });
 
                         }
