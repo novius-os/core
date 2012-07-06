@@ -72,40 +72,52 @@ $config = Config::load('nos::views/admin/page/page_form', true);
 ?>
 <?= View::forge('form/layout_standard', $config, false); ?>
 <?= $fieldset->close() ?>
+
+<div id="<?= $uniqid_close = uniqid('close_') ?>" style="display:none;">
+    <p><?= __('This item has been deleted.') ?></p>
+    <p>&nbsp;</p>
+    <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
+</div>
+
 <script type="text/javascript">
-	require(['jquery-nos-ostabs'], function ($nos) {
-		$nos(function () {
-			var tabInfos = {
-				label : <?= json_encode(empty($page) || $page->is_new() ? __('Add a page') : $page->page_title) ?>,
-				iconUrl : 'static/novius-os/admin/novius-os/img/16/page.png',
-				url : 'admin/nos/page/page/crud<?= empty($page) ? '' : '/'.$page->page_id ?>?lang=<?= $lang ?>'
-			};
-<?php
-	if (!empty($page) && !$page->is_new()) {
-?>
-			tabInfos.actions = [
-				{
-					label : <?= json_encode(__('Visualise')) ?>,
-					click : function() {
-						window.open(<?= json_encode($page->get_href()) ?> + '?_preview=1');
-					},
-					iconClasses : 'nos-icon16 nos-icon16-eye'
-				}
-			];
-<?php
-	}
-?>
-			var $el = $nos('#<?= $fieldset->form()->get_attribute('id') ?>');
-            $el.addClass('fill-parent');
-            $el.css('overflow', 'auto');
-			$el.onShow('bind', function() {
-				$el.tab('update', tabInfos);
-			});
-		});
-	});
-	require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($nos, callback_fn) {
-		$nos(function () {
-			callback_fn.call($nos('#<?= $fieldset->form()->get_attribute('id') ?>'));
-		});
-	});
+    require(['jquery-nos'], function ($) {
+        $(function () {
+            var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
+
+            var $container = $('#<?= $fieldset->form()->get_attribute('id') ?>');
+            $container.addClass('fill-parent').css('overflow', 'auto');
+            $container.nosOnShow('bind', function() {
+                $container.nosTabs('update', tabInfos);
+            });
+            <?php
+            if  (!$page->is_new())
+            {
+                ?>
+                $container.nosListenEvent({
+                    name: 'Nos\\Model_Page',
+                    action: 'delete',
+                    id: '<?= $page->page_id ?>'
+                }, function() {
+                    var $close = $('#<?= $uniqid_close ?>');
+                    $close.show().nosFormUI();
+                    $container.nosDialog({
+                        title: <?= Format::forge()->to_json(__('Bye bye')) ?>,
+                        content: $close,
+                        width: 300,
+                        height: 130,
+                        close: function() {
+                            $container.nosTabs('close');
+                        }
+                    });
+                });
+                <?php
+            }
+            ?>
+        });
+    });
+    require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($, callback_fn) {
+        $(function () {
+            callback_fn.call($('#<?= $fieldset->form()->get_attribute('id') ?>'));
+        });
+    });
 </script>

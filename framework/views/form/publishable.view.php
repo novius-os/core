@@ -29,50 +29,52 @@ if (empty($publishable)) {
 </p>
 
 <script type="text/javascript">
-require(['jquery-nos'], function($nos) {
-    <?php
+require(
+    ['jquery-nos'],
+    function($) {
+<?php
     $formatter = \Format::forge();
-    ?>
-    var labels = {
-        'undefined' : {
-            0 : <?= $formatter->to_json('Will not be published') ?>,
-            1 : <?= $formatter->to_json('Will be published') ?>
-        },
-        'no' : {
-            0 : <?= $formatter->to_json('Not published') ?>,
-            1 : <?= $formatter->to_json('Will be published') ?>
-        },
-        'yes' : {
-            0 : <?= $formatter->to_json('Will be unpublished') ?>,
-            1 : <?= $formatter->to_json('Published') ?>
-        }
-    };
-
-    var initial_status = '<?= empty($object) || $object->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>';
-
-    $nos(function() {
-        var $buttonset = $nos('#<?= $buttonset ?>');
-        var $label     = $nos('#<?= $label ?>');
-
-        $buttonset.buttonset({
-            text : false,
-            icons : {
-                primary:'ui-icon-locked'
+?>
+        var labels = {
+            'undefined' : {
+                0 : <?= $formatter->to_json('Will not be published') ?>,
+                1 : <?= $formatter->to_json('Will be published') ?>
+            },
+            'no' : {
+                0 : <?= $formatter->to_json('Not published') ?>,
+                1 : <?= $formatter->to_json('Will be published') ?>
+            },
+            'yes' : {
+                0 : <?= $formatter->to_json('Will be unpublished') ?>,
+                1 : <?= $formatter->to_json('Published') ?>
             }
-        });
-        $buttonset.find(':radio').change(function() {
-            $label.text(labels[initial_status][$nos(this).val()]);
-        })
-        $buttonset.find(':checked').triggerHandler('change');
+        };
 
-        $buttonset.closest('form').bind('ajax_success', function(e, json) {
-            if (json.publication_initial_status == null) {
-                log('Potential error: publication_initial_status in JSON response.');
-                return;
-            }
-            initial_status = json.publication_initial_status == 1 ? 'yes' : 'no';
+        var initial_status = '<?= empty($object) || $object->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>';
+
+        $(function() {
+            var $buttonset = $('#<?= $buttonset ?>');
+            var $label     = $('#<?= $label ?>');
+
+            $buttonset.buttonset({
+                text : false,
+                icons : {
+                    primary:'ui-icon-locked'
+                }
+            });
+            $buttonset.find(':radio').change(function() {
+                $label.text(labels[initial_status][$(this).val()]);
+            })
             $buttonset.find(':checked').triggerHandler('change');
+
+            $buttonset.closest('form').bind('ajax_success', function(e, json) {
+                if (json.publication_initial_status == null) {
+                    log('Potential error: publication_initial_status in JSON response.');
+                    return;
+                }
+                initial_status = json.publication_initial_status == 1 ? 'yes' : 'no';
+                $buttonset.find(':checked').triggerHandler('change');
+            });
         });
     });
-});
 </script>

@@ -8,7 +8,7 @@
  */
 define('jquery-nos-loadspinner',
     ['jquery', 'jquery-nos', 'jquery-ui.widget'],
-    function( $, $nos ) {
+    function( $ ) {
         $.widget ('nos.loadspinner', {
             options : {
                 diameter : 40, // The diameter of the loader.
@@ -381,5 +381,5 @@ define('jquery-nos-loadspinner',
                 return this;
             }
         });
-        return $nos;
+        return $;
     });

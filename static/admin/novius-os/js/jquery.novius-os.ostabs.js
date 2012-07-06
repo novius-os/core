@@ -8,7 +8,7 @@
  */
 define('jquery-nos-ostabs',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel'],
-    function( $, $nos ) {
+    function( $ ) {
         "use strict";
         var undefined = void(0);
         $.widget( "nos.ostabs", {
@@ -161,9 +161,8 @@ define('jquery-nos-ostabs',
                             .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
                             .prependTo( self.uiOstabsHeader );
                         self._add( o.appsTab, self.uiOstabsAppsTab )
-                        .addClass( 'nos-ostabs-appstab' )
-                        .removeClass( 'ui-state-default' );
-                        self.uiOstabsAppsTab.find('> li > a:first').click(function() {$nos().refreshNosPanel();})
+                            .addClass( 'nos-ostabs-appstab' )
+                            .removeClass( 'ui-state-default' );
                     } else {
                         self.uiOstabsAppsTab = $( '<ul></ul>' );
                     }
@@ -644,23 +643,43 @@ define('jquery-nos-ostabs',
                         .appendTo( reload );
                 }
 
-                $.each(other_actions, function() {
+                // slice() = clone()
+                var reversed_actions = other_actions.slice(0).reverse();
+                $.each(reversed_actions, function() {
                     var action = this;
 
                     var $el = $( '<a href="#"></a>' )
                         .addClass( 'nos-ostabs-action' )
                         .click(function(e) {
                             e.preventDefault();
-                            if ($.isFunction(action.click)) {
-                                action.click(e, {ui : $el, action : action});
+                            if (action.action) {
+                                if ($.isFunction(action.action.click)) {
+                                    action.action.click(e, {ui : $el, action : action});
+                                }
+                                if (action.action.openTab) {
+                                    $(this).nosTabs('open', {
+                                        url : action.action.openTab
+                                    });
+                                }
+                                if (action.action.openWindow) {
+                                    window.open(action.action.openWindow);
+                                }
                             }
                         })
                         .appendTo( links );
+
+                    if (action.faded) {
+                       $el.addClass('faded');
+                    }
                     var icon = $( '<span></span>' ).addClass( 'ui-icon' )
                         .text( action.label || '' )
                         .appendTo( $el );
                     if ( action.iconUrl ) {
-                        icon.css( 'background-image', 'url("' + action.iconUrl + '") !important' );
+                        icon.css({
+                            'background-image' : 'url("' + action.iconUrl + '")',
+                            'background-position' : 'center center',
+                            'padding-left': '6px'
+                        });
                     } else {
                         icon.addClass( action.iconClasses );
                     }
@@ -1111,5 +1130,5 @@ define('jquery-nos-ostabs',
                 };
             }
         });
-        return $nos;
+        return $;
     });

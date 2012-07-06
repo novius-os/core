@@ -10,17 +10,18 @@
 
 ?>
 <script type="text/javascript">
-require(['jquery-nos', 'jquery-nos-ostabs'], function ($nos) {
-	$nos(function () {
-		$nos('#<?= $uniqid = uniqid('id_') ?>')
-			.tab('update', {
-				label : 'Add a new user',
-				iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
-			})
-			.form();
-	});
-
-});
+require(
+    ['jquery-nos', 'jquery-nos-ostabs'],
+    function ($) {
+        $(function () {
+            $('#<?= $uniqid = uniqid('id_') ?>')
+                .nosTabs('update', {
+                    label : 'Add a new user',
+                    iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
+                })
+                .nosFormUI();
+        });
+    });
 </script>
 
 <div id ="<?= $uniqid ?>" class="page">

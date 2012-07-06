@@ -46,7 +46,7 @@ class Widget_Media_Folder extends \Nos\Widget_Selector {
     public static function widget($options = array()) {
         $options = \Arr::merge(array(
             'treeUrl' => 'admin/nos/media/inspector/folder/json',
-            'reloadEvent' => 'nos_media_folder',
+            'reloadEvent' => 'Nos\\Model_Media_Folder',
             'input_name' => null,
             'selected' => array(
                 'id' => null,

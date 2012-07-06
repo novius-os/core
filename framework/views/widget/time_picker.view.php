@@ -15,9 +15,9 @@
             'jquery',
             'jquery-ui.datetimepicker'
         ],
-        function($nos, $) {
-            $nos(function() {
-                var $input = $nos('input#<?= $id ?>');
+        function($) {
+            $(function() {
+                var $input = $('input#<?= $id ?>');
                 $input.timepicker($input.data('timepicker-options'));
             });
         });

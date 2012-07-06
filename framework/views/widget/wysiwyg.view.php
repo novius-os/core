@@ -11,9 +11,9 @@
 <script type="text/javascript">
     require(
         ['jquery-nos-wysiwyg'],
-        function($nos) {
-            $nos(function() {
-                var $t = $nos("textarea#<?= $id ?>.not_initialized");
+        function($) {
+            $(function() {
+                var $t = $("textarea#<?= $id ?>.not_initialized");
                 $t.removeClass('not_initialized')
                     .wysiwyg($t.data('wysiwyg-options'));
             });

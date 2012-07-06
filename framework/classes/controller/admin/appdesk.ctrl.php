@@ -31,9 +31,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
         parent::before();
         if (!isset($this->config['appdesk'])) {
             list($application, $file_name) = $this->getLocation();
-            $file_name = explode('/', $file_name);
-            array_splice($file_name, count($file_name) - 1, 0, array('appdesk'));
-            $file_name = implode('/', $file_name);
         } else {
             list($application, $file_name) = explode('::', $this->config['appdesk']);
         }
@@ -75,16 +72,18 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
             $value = Input::get('inspectors.search');
             $condition = $config['search_text'];
-            if (is_callable($condition)) {
-                $query = $condition($value, $query);
-            } else if (is_array($condition)) {
+            if (!empty($value)) {
                 $query->and_where_open();
-                foreach ($condition as $field) {
-                    $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                foreach ((array)$condition as $field) {
+                    if (is_callable($field)) {
+                        $query = $field($value, $query);
+                    }
+                    else
+                    {
+                        $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                    }
                 }
                 $query->and_where_close();
-            } else {
-                $query->where(array($condition, 'LIKE', '%'.$value.'%'));
             }
 
             Filter::apply($query, $config);
@@ -93,7 +92,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
         };
 
         $return = $this->items(array_merge($this->appdesk['query'], array(
-            'callback' => array($where),
+            'callback' => array_merge(\Arr::get($this->appdesk['query'], 'callback', array()), array($where)),
             'dataset' => $this->appdesk['dataset'],
             'lang' => Input::get('lang', null),
             'limit' => intval(Input::get('limit', \Arr::get($this->appdesk['query'], 'limit'))),
@@ -120,41 +119,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
         }
 
         \Response::json($json);
-    }
-
-    protected function searchtext_condition($menu, $target, $search)
-    {
-        if ($target) {
-            if ($menu['target'] == $target) {
-                if (isset($menu['column'])) {
-                    return array(array($menu['column'], 'like', '%'.$search.'%'));
-                } else if (isset($menu['submenu']) && is_array($menu['submenu'])) {
-                    $wheres = array();
-                    foreach ($menu['submenu'] as $smenu) {
-                        $wheres = array_merge($wheres, $this->searchtext_condition($smenu, false, $search));
-                    }
-                    return $wheres;
-                }
-            } else if (isset($menu['submenu']) && is_array($menu['submenu'])) {
-                foreach ($menu['submenu'] as $smenu) {
-                    $where = $this->searchtext_condition($smenu, $target, $search);
-                    if (count($where)) {
-                        return $where;
-                    }
-                }
-            }
-        } else {
-            if (isset($menu['column'])) {
-                return array(array($menu['column'], 'like', '%'.$search.'%'));
-            } else if (isset($menu['submenu']) && is_array($menu['submenu'])) {
-                $wheres = array();
-                foreach ($menu['submenu'] as $smenu) {
-                    $wheres = array_merge($wheres, $this->searchtext_condition($smenu, false, $search));
-                }
-                return $wheres;
-            }
-        }
-        return array();
     }
 
     public function action_tree_json()

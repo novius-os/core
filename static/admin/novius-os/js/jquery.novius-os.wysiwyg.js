@@ -13,8 +13,8 @@ define('jquery-nos-wysiwyg',
         'jquery',
         'tinymce'
     ],
-    function(module, $nos, $) {
-        $nos.fn.wysiwyg = function(options) {
+    function(module, $) {
+        $.fn.wysiwyg = function(options) {
             var self = $(this);
             options = options || {};
             $.ajax({
@@ -35,5 +35,5 @@ define('jquery-nos-wysiwyg',
                 }
             });
         };
-        return $nos;
+        return $;
     });

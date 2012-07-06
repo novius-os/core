@@ -11,10 +11,10 @@
 <script type="text/javascript">
     require(
         ['jquery-nos'],
-        function ($nos) {
-            $nos(function() {
-                $nos(':input#<?= $id ?>').each(function() {
-                    $nos(this).media($(this).data('media-options'));
+        function ($) {
+            $(function() {
+                $(':input#<?= $id ?>').each(function() {
+                    $(this).nosMedia($(this).data('media-options'));
                 });
             });
         });

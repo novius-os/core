@@ -11,11 +11,11 @@
 ?>
 <table id="<?= $id ?>"></table>
 <script type="text/javascript">
-require([
-		'jquery-nos-listgrid'
-	], function( $nos, table, undefined ) {
-		$nos(function() {
-			var inspector = $nos('#<?= $id ?>').removeAttr('id'),
+require(
+    ['jquery-nos-listgrid'],
+    function( $ ) {
+		$(function() {
+			var inspector = $('#<?= $id ?>').removeAttr('id'),
 				parent = inspector.parent()
 					.bind({
 						widgetResize: function() {
@@ -39,7 +39,7 @@ require([
                     columns : inspectorData.grid.columns,
                     data: <?= $data ?>,
                     currentCellChanged: function (e) {
-                        var row = $nos(e.target).noslistgrid("currentCell").row(),
+                        var row = $(e.target).noslistgrid("currentCell").row(),
                             data = row ? row.data : false;
 
                         if (data && rendered) {

@@ -26,7 +26,7 @@
             <p>
             <?php
             if ($local->is_dirty()) {
-                echo 'Some modifications are not live - <a href="admin/nos/tray/appmanager/add/local">click to repair</a>';
+                echo 'Some modifications are not live - <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'remove'))->to_json()).'" onclick="return false;">click to repair</a>';
             } else {
                 echo 'No problem detected!';
             }
@@ -52,8 +52,8 @@
 						<tr>
 							<td><?= e($app->name) ?></td>
 							<td>
-								<a href="admin/nos/tray/appmanager/remove/<?= $app->folder ?>">remove</a>
-								<?= $app->is_dirty() ? '- [<a href="admin/nos/tray/appmanager/add/'.$app->folder.'">repair install</a>]' : '' ?>
+								<a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;">remove</a>
+								<?= $app->is_dirty() ? '- [<a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'repair'))->to_json()).'" onclick="return false;">repair install</a>]' : '' ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -81,7 +81,7 @@
                     ?>
 						<tr>
 							<td><?= e($app->name) ?> </td>
-							<td><a href="admin/nos/tray/appmanager/add/<?= $app->folder ?>">add</a></td>
+							<td><a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;">add</a></td>
 						</tr>
 						<?php } ?>
 					</tbody>
@@ -108,37 +108,46 @@
 	<div class="unit lastUnit"></div>
 
     <script type="text/javascript">
-        require(['jquery-nos', 'wijmo.wijgrid'], function ($nos) {
-            $nos(function() {
-                var $container = $nos('#<?= $uniqid ?>');
-                $container.form();
-                $nos(".app_list table").wijgrid({
-                    columns: [
-                        {  },
-                        { width: 200, ensurePxWidth: true }
-                    ] });
+        require(
+            ['jquery-nos', 'wijmo.wijgrid'],
+            function ($) {
+                $(function() {
+                    var $container = $('#<?= $uniqid ?>');
+                    $container.nosFormUI();
+                    $(".app_list table").wijgrid({
+                        columns: [
+                            {  },
+                            { width: 200, ensurePxWidth: true }
+                        ] });
 
-                $container.find('a').click(function(e) {
-                    e.preventDefault();
-                    $container.xhr({
-                        url: this.href,
-                        complete: function() {
-                            $container.load('admin/nos/tray/appmanager', function() {
-                                $container.find(':first').unwrap();
-                            });
-                        }
-                    });
-                })
+                    $container.find('a').click(function(e) {
+                        e.preventDefault();
+                        var data = $(this).data('app');
 
-    <?php
-        $flash = \Session::get_flash('notification.plugins');
-        if (!empty($flash)) {
-    ?>
-                $nos.notify(<?= \Format::forge()->to_json($flash); ?>);
-    <?php
-        }
-    ?>
+                        $container.nosAjax({
+                            url: 'admin/nos/tray/appmanager/' + (data.action === 'remove' ? 'remove' : 'add') + '/' + data.name,
+                            complete: function() {
+                                $container.load('admin/nos/tray/appmanager', function() {
+                                    $container.find(':first').unwrap();
+                                });
+                                $.nosDispatchEvent({
+                                    name : 'Nos\\Application',
+                                    action : data.action,
+                                    id : data.name
+                                });
+                            }
+                        });
+                    })
+
+<?php
+    $flash = \Session::get_flash('notification.plugins');
+    if (!empty($flash)) {
+?>
+                    $.nosNotify(<?= \Format::forge()->to_json($flash); ?>);
+<?php
+    }
+?>
+                });
             });
-        });
     </script>
 </div>
