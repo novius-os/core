@@ -28,7 +28,7 @@ class Controller_Admin_Auth extends Controller
             else
             {
                 \Response::redirect('/admin/nos/login?'.http_build_query(array(
-                    'redirect' => $_SERVER['REDIRECT_URL'].'?tab='.\Input::get('tab', ''),
+                    'redirect' => \Input::server('REDIRECT_SCRIPT_URL', \Input::server('REDIRECT_URL', '/admin/')).'?tab='.\Input::get('tab', ''),
                 ), '', '&'));
                 exit();
             }
