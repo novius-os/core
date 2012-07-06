@@ -72,16 +72,18 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
             $value = Input::get('inspectors.search');
             $condition = $config['search_text'];
-            if (is_callable($condition)) {
-                $query = $condition($value, $query);
-            } else if (is_array($condition)) {
+            if (!empty($value)) {
                 $query->and_where_open();
-                foreach ($condition as $field) {
-                    $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                foreach ((array)$condition as $field) {
+                    if (is_callable($field)) {
+                        $query = $field($value, $query);
+                    }
+                    else
+                    {
+                        $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
+                    }
                 }
                 $query->and_where_close();
-            } else {
-                $query->where(array($condition, 'LIKE', '%'.$value.'%'));
             }
 
             Filter::apply($query, $config);
@@ -90,7 +92,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
         };
 
         $return = $this->items(array_merge($this->appdesk['query'], array(
-            'callback' => array($where),
+            'callback' => array_merge(\Arr::get($this->appdesk['query'], 'callback', array()), array($where)),
             'dataset' => $this->appdesk['dataset'],
             'lang' => Input::get('lang', null),
             'limit' => intval(Input::get('limit', \Arr::get($this->appdesk['query'], 'limit'))),

@@ -1277,7 +1277,10 @@ define('jquery-nos-appdesk',
                     o = self.options,
                     position = self.uiTreeGrid.offset(),
                     positionContainer = self.element.offset(),
-                    height = self.element.height() - position.top + positionContainer.top;
+                    height = self.element.height() - position.top + positionContainer.top,
+                    grid = $.extend(true, {}, o.grid);
+
+                delete grid.columns;
 
                 self.uiTreeGrid.css({
                         height : height,
@@ -1293,6 +1296,7 @@ define('jquery-nos-appdesk',
                         scrollMode : 'auto',
                         allowColSizing : true,
                         allowColMoving : true,
+                        columns : o.treeGrid.columns || o.grid.columns,
                         sorting: function(e, args) {
                             $.each(o.grid.columns, function() {
                                 var column = this;
@@ -1353,7 +1357,7 @@ define('jquery-nos-appdesk',
                         loaded: function() {
                             self.uiSplitterHorizontalBottom.find('.wijmo-wijgrid-footer').prepend(self.uiPaginationLabel);
                         }
-                    }, o.grid));
+                    }, grid));
 
                 return self;
             },
@@ -1913,6 +1917,13 @@ define('jquery-nos-appdesk',
                                     $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
                                         if ($.type(val) == 'string') {
                                             params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
+                                        }
+                                    });
+                                }
+                                if (params.appdesk.treeGrid && params.appdesk.treeGrid.columns && params.appdesk.treeGrid.columns.actions && params.appdesk.treeGrid.columns.actions.actions) {
+                                    $.each(params.appdesk.treeGrid.columns.actions.actions, function(i, val) {
+                                        if ($.type(val) == 'string') {
+                                            params.appdesk.treeGrid.columns.actions.actions[i] = gridActions[val];
                                         }
                                     });
                                 }

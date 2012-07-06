@@ -116,6 +116,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
                 // Instead, retrieve the object manually
                 if (!$page->page_parent_id) {
+                    $page->page_parent_id = null;
                     $page->page_level = 1;
                 } else {
                     \Log::error($page->page_parent_id);
