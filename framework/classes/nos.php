@@ -41,19 +41,9 @@ class Nos {
         try {
             $request = \Request::forge($where);
 
-
             $response = $request->execute($args['args']);
 
-
-            $cache_cleanup = $request->controller_instance->cache_cleanup;
-
-            if (!empty($cache_cleanup)) {
-                \Fuel::$profiling && \Profiler::console($cache_cleanup);
-                static::main_controller()->cache_cleanup[] = $cache_cleanup;
-            }
             echo $response;
-            //echo $response->response();
-            //$content = $response->response();
         } catch (\Nos\NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
