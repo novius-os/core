@@ -62,8 +62,6 @@ class Model extends \Orm\Model {
 
         if (!$init)
         {
-            Event::trigger(get_called_class().'.properties', get_called_class());
-
             parent::properties();
 
             $config = static::_config();
@@ -231,8 +229,35 @@ class Model extends \Orm\Model {
         $class = get_called_class();
         if (!isset(static::$_configs[$class]))
         {
-            list($application, $file_name) = \Config::configFile($class);
-            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
+            $namespace = trim(\Inflector::get_namespace($class), '\\');
+
+            $application = mb_strtolower($namespace);
+            $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
+
+            if ($application !== 'nos') {
+                \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
+                $apps = \Config::get('data::app_installed', array());
+                foreach ($apps as $app => $conf)
+                {
+                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace)
+                    {
+                        $application = $app;
+                    }
+                }
+            }
+
+            \Config::load($application.'::'.$file_name, true);
+            $config = \Config::get($application.'::'.$file_name);
+            \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+            $dependencies = \Config::get('data::app_dependencies', array());
+
+            if (!empty($dependencies[$application])) {
+                foreach ($dependencies[$application] as $dependency) {
+                    \Config::load($dependency.'::'.$file_name, true);
+                    $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
+                }
+            }
+            static::$_configs[$class] = \Arr::recursive_filter($config, function($var) { return $var !== null; });
         }
         return static::$_configs[$class];
     }

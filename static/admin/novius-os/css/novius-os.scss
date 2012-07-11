@@ -23,7 +23,7 @@ strong {
 body, select, input, textarea {
 	color       : #444; /* 444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
 	font-family : franklin gothic medium, arial, verdana, helvetica, sans-serif; /* Set your base font here, to apply evenly */
-	font-size: 12px;
+	font-size: 13px;
 }
 
 /* Headers (h1, h2, etc) have no default font-size or margin; define those yourself */
@@ -238,7 +238,7 @@ input.ui-state-disabled {
 input.ui-widget.primary, button.ui-widget.primary {
 	border-width : 2px;
 	border-style : outset;
-	font-size    : 1.1em;
+	font-size    : 1.2em;
 
     .ui-button-text {
         line-height  : 1.9em;
@@ -545,4 +545,10 @@ table.title-fields {
 
 .ui-tabs-left .wijmo-wijtabs-content {
     width: 84%;
+}
+
+.ui-pnotify-title {
+    font-size: 1.2em;
+    line-height: 1;
+    font-weight: bold;
 }

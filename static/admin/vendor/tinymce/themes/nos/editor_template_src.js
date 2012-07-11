@@ -319,7 +319,8 @@
 				}, 1);
 			});
 
-			ed.onSaveContent.add(function(ed, o) {
+            // Previously "onSaveContent". But it seems useless...
+			ed.onPostProcess.add(function(ed, o) {
 				var content = $(o.content);
 
 				content.find('img').filter(function() {
