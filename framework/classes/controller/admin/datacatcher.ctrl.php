@@ -74,6 +74,14 @@ class Controller_Admin_DataCatcher extends Controller_Admin_Application {
                     }
                 }
             }
+            if (!\Input::post('default.'.$type, false) && \Input::post(\Nos\DataCatcher::TYPE_IMAGE, 0) == 0)
+            {
+                $data[\Nos\DataCatcher::TYPE_IMAGE] = \Input::post('custom_image', 0);
+                if (empty($data[\Nos\DataCatcher::TYPE_IMAGE]))
+                {
+                    unset($data[\Nos\DataCatcher::TYPE_IMAGE]);
+                }
+            }
             $nugget->content_data = $data;
             $nugget->save();
 

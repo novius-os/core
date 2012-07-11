@@ -14,10 +14,10 @@
     left: -300px;
     bottom: 20px;
     width : 300px;
-    z-index: 5000;
+    z-index: 1000;
     border-top: 0;
     border-left: 0;
-    @include transition( all 0.5s linear);
+    //@include transition( all 0.5s linear);
 
     &.nos-datacatchers-open {
         left: 0px;
@@ -71,6 +71,54 @@
     .nos-datacatchers-buttons {
         text-align: right;
         margin: 2em;
+    }
+
+    .nos-datacatchers-nugget-image {
+        display: inline-block;
+        color: black;
+        text-align: center;
+        border-radius: 4px;
+        padding: 5px;
+        margin: 0;
+        width: 80px;
+        height: 105px;
+        vertical-align: top;
+        position: relative;
+        cursor: pointer;
+        border: 1px solid transparent;
+
+        &:not(.ui-state-hover):not(.ui-state-active) {
+            background: white;
+        }
+
+        label {
+            line-height: 80px; /* Centers text */
+        }
+        img {
+            vertical-align: middle; /* Centers image */
+            cursor: pointer;
+        }
+
+        .wijmo-wijradio {
+            padding-right: 5px;
+            position : absolute;
+            bottom: 5px;
+            width: 80px;
+        }
+
+        .wijmo-wijradio-box {
+            float: none;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .ui-inputfilethumb {
+            line-height: 1em;
+        }
+
+        .ui-inputfilethumb-hover {
+            background: #fff;
+        }
     }
 
     form {

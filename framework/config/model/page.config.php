@@ -15,6 +15,15 @@ return array(
                 },
                 'useTitle' => __('Url'),
             ),
+            \Nos\DataCatcher::TYPE_IMAGE => array(
+                'value' => function($page) {
+                    $possible = $page->possible_medias();
+                    return Arr::get(array_keys($possible), 0, null);
+                },
+                'possibles' => function($page) {
+                    return $page->possible_medias();
+                },
+            ),
         ),
     ),
 );

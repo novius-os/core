@@ -100,4 +100,21 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
         return $catchers;
     }
+
+    public function possible_medias($object)
+    {
+        $medias = array();
+        foreach ($object->medias as $media)
+        {
+            $medias[$media->media_id] = $media;
+        }
+        foreach ($object->wysiwygs as $wysiwyg)
+        {
+            \Nos\Nos::parse_medias($wysiwyg, function($media) use (&$medias) {
+                $medias[$media->media_id] = $media;
+            });
+        }
+
+        return $medias;
+    }
 }

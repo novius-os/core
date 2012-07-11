@@ -15,5 +15,9 @@
         echo '<label>', htmlspecialchars(__('Url:')) ,'</label>';
         echo '<div>', htmlspecialchars($default_nuggets[\Nos\DataCatcher::TYPE_URL]) ,'</div>';
     }
+    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
+        echo '<label>', htmlspecialchars(__('Image:')) ,'</label>';
+        echo '<div>', Nos\Model_Media::find($default_nuggets[\Nos\DataCatcher::TYPE_IMAGE])->get_img_tag(array('max_width' => '200', 'max_height' => '300')) ,'</div>';
+    }
 ?>
 <button><?= htmlspecialchars(__('Customize')) ?></button>

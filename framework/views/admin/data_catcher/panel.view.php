@@ -19,11 +19,19 @@
     }
     if (isset($default_nuggets[\Nos\DataCatcher::TYPE_URL])) {
         $fields[] = \Nos\DataCatcher::TYPE_URL;
-        $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.options');
+        $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.possibles');
         $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array(
-            'tag' => 'select',
-            'options' => $options,
+            'type' => 'select',
             'value' => $default_nuggets[\Nos\DataCatcher::TYPE_URL]
+        ));
+    }
+    if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $default_nuggets)) {
+        $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
+        $possible = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.possible'));
+        $value = $default_nuggets[\Nos\DataCatcher::TYPE_IMAGE];
+        $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
+            'type' => 'radio',
+            'value' => isset($possible[$value]) ? $value : 0,
         ));
     }
 ?>
@@ -70,12 +78,37 @@
             // Actually, field_name is an number
             $field_name = $field->name;
             $id = uniqid('for_');
-            $label = strtr(__('Use default ({what})'), array(
-                '{what}' => $item->get_sharable_property($field_name.'.useTitle')
+            $useTitle = $item->get_sharable_property($field_name.'.useTitle');
+            $label = strtr(__('Use default {what}'), array(
+                '{what}' => empty($useTitle) ? '' : '('.$useTitle.')',
             ));
             $nugget_silo = $item->get_default_nuggets_model()->content_data;
             $checked = isset($nugget_silo[$field_name]) ? '' : 'checked';
             $template = str_replace('{field}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label><div class="nos-datacatchers-nugget-value" style="display:none;">{field}</div>', $template);
+
+            // Image field displays a bit differently: radio button with several options
+            if ($field->name == \Nos\DataCatcher::TYPE_IMAGE)
+            {
+                $field->set_template('{field}');
+                $possibles = $item->get_sharable_property($field_name.'.possibles');
+                foreach ($possibles as $media_id => $idk) {
+                    $media = \Nos\Model_Media::find($media_id);
+                    $field->set_options(array(
+                        $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
+                    ));
+                }
+                $value = isset($nugget_silo[$field_name]) ? $nugget_silo[$field_name] : 0;
+                $field->set_options(array(
+                    0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(array(
+                        'name' => 'custom_image',
+                        'value' => isset($possibles[$value]) ? 0 : $value,
+                    )).'</div>',
+                ));
+                $template = strtr($template, array(
+                    '{label}' => '{group_label}',
+                    '{field}' => '{fields} <div class="nos-datacatchers-nugget-image"> {label} <br /> {field} </div> {fields}',
+                ));
+            }
             $field->set_template($template);
             echo $field->build();
         },
@@ -111,6 +144,15 @@ require(
                         $(this).closest('td').find('.nos-datacatchers-nugget-value').show().nosOnShow();
                     }
                 }).triggerHandler('change');
+            });
+
+            $container.find('.nos-datacatchers-nugget-image').hover(function() {
+                $(this).addClass('ui-state-hover');
+            }, function() {
+                $(this).removeClass('ui-state-hover');
+            }).click(function() {
+                $(this).find('input').prop('checked', true).wijradio('refresh');
+                $(this).addClass('ui-state-active').siblings().removeClass('ui-state-active');
             });
         });
     });
