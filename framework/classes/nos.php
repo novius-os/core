@@ -42,7 +42,7 @@ class Nos {
             $request = \Request::forge($where);
 
 
-	        $response = $request->execute($args['args']);
+            $response = $request->execute($args['args']);
 
 
             $cache_cleanup = $request->controller_instance->cache_cleanup;
@@ -81,22 +81,22 @@ class Nos {
      */
     public static function parse_wysiwyg($content, $controller) {
 
-		static::_parse_enhancers($content, $controller);
-	    static::_parse_medias($content);
-	    static::_parse_internals($content);
+        static::_parse_enhancers($content, $controller);
+        static::_parse_medias($content);
+        static::_parse_internals($content);
 
-		$content = strtr($content, array(
-			'nos://anchor/' => static::main_controller()->getUrl(),
-		));
+        $content = strtr($content, array(
+            'nos://anchor/' => static::main_controller()->getUrl(),
+        ));
 
-		foreach(\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
-			is_callable($c) && call_user_func_array($c, array(&$content));
-		}
+        foreach(\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
+            is_callable($c) && call_user_func_array($c, array(&$content));
+        }
 
-		return $content;
+        return $content;
     }
 
-	protected static function _parse_enhancers(&$content, $controller) {
+    protected static function _parse_enhancers(&$content, $controller) {
         // Fetch the available functions
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
@@ -106,7 +106,7 @@ class Nos {
             $function_content = static::_get_enhancer_content($enhancer, $config, $controller);
             $content = str_replace($tag, $function_content, $content);
         });
-	}
+    }
 
     public static function parse_enhancers($content, $closure) {
         preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
@@ -148,44 +148,56 @@ class Nos {
         return $function_content;
     }
 
-	protected static function _parse_medias(&$content) {
+    protected static function _parse_medias(&$content) {
 
-		// Replace media URL
-		preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`u', $content, $matches);
-		if (!empty($matches[0])) {
-			$media_ids = array();
-			foreach ($matches[1] as $match_id => $media_id)
-			{
-				$media_ids[] = $media_id;
-			}
-			$medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
-			foreach ($matches[1] as $match_id => $media_id)
-			{
-				if (!empty($matches[3][$match_id])) {
-					$media_url = $medias[$media_id]->get_public_path_resized($matches[2][$match_id], $matches[3][$match_id]);
-				} else {
-					$media_url = $medias[$media_id]->get_public_path();
-				}
-				$content = str_replace($matches[0][$match_id], $media_url, $content);
-			}
-		}
-	}
+        static::parse_medias($content, function($media, $width, $height, $tag) use (&$content)
+        {
+            if (!empty($height))
+            {
+                $media_url = $media->get_public_path_resized($width, $height);
+            }
+            else
+            {
+                $media_url = $media->get_public_path();
+            }
 
-	protected static function _parse_internals(&$content) {
+            $content = str_replace($tag, $media_url, $content);
+        });
+    }
 
-		// Replace internal links
-		preg_match_all('`nos://page/(\d+)`u', $content, $matches);
-		if (!empty($matches[0])) {
-			$page_ids = array();
-			foreach ($matches[1] as $match_id => $page_id)
-			{
-				$page_ids[] = $page_id;
-			}
-			$pages = Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
-			foreach ($matches[1] as $match_id => $page_id)
-			{
-				$content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);
-			}
-		}
-	}
+    public static function parse_medias(&$content, $closure) {
+
+        // Replace media URL
+        preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`u', $content, $matches);
+        if (!empty($matches[0])) {
+            $media_ids = array();
+            foreach ($matches[1] as $match_id => $media_id)
+            {
+                $media_ids[] = $media_id;
+            }
+            $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+            foreach ($matches[1] as $match_id => $media_id)
+            {
+                $closure($medias[$media_id], \Arr::get($matches[2], $match_id, null), \Arr::get($matches[3], $match_id, null), $matches[0][$match_id]);
+            }
+        }
+    }
+
+    protected static function _parse_internals(&$content) {
+
+        // Replace internal links
+        preg_match_all('`nos://page/(\d+)`u', $content, $matches);
+        if (!empty($matches[0])) {
+            $page_ids = array();
+            foreach ($matches[1] as $match_id => $page_id)
+            {
+                $page_ids[] = $page_id;
+            }
+            $pages = Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+            foreach ($matches[1] as $match_id => $page_id)
+            {
+                $content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);
+            }
+        }
+    }
 }
