@@ -103,7 +103,7 @@ class Controller_Front extends Controller {
 
 			        break;
 		        }
-	        }
+            }
 
 	        if ($_404) {
                 $event_404 = \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
@@ -178,8 +178,15 @@ class Controller_Front extends Controller {
      * @param $title
      * @return Controller_Front
      */
-    public function setTitle($title) {
-        $this->_title = $title;
+    public function setTitle($title, $template = null) {
+        if (!$template) {
+            $template = \Config::get('title_template', null);
+            if (!$template) {
+                $template = ':title';
+            }
+        }
+
+        $this->_title = \Str::tr($template, array('title' => $title));
         return $this;
     }
 
@@ -293,7 +300,7 @@ class Controller_Front extends Controller {
         $replace_fct = function($pattern, $replace) use (&$content) {
             $content_old = $content;
             $content = preg_replace(
-                '/'.$pattern.'/iUu',
+                '`'.$pattern.'`iUu',
                 $replace,
                 $content,
                 -1,
@@ -302,7 +309,7 @@ class Controller_Front extends Controller {
             // if $content content none utf8 characters, preg_replace return empty string
             if (empty($content) && !empty($content_old)) {
                 $content = preg_replace(
-                    '/'.$pattern.'/iU',
+                    '`'.$pattern.'`iU',
                     $replace,
                     $content_old,
                     -1,
@@ -374,7 +381,7 @@ class Controller_Front extends Controller {
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
-        $this->_title = $this->_page->page_title;
+        $this->setTitle($this->_page->page_title);
 
         $wysiwyg = array();
 
