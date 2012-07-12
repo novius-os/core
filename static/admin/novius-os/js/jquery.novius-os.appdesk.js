@@ -1734,7 +1734,6 @@ define('jquery-nos-appdesk',
                                 match.push(reloadEvent);
                             }
                         });
-                        log(match);
                         dispatcher.nosListenEvent(match, function() {
                                 div.appdesk('gridReload');
                             });
