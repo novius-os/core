@@ -34,7 +34,7 @@ define(
                     'delete' : {
                         label : appDesk.i18n('Delete'),
                         name : 'delete',
-                        primary : true,
+                        primary : false,
                         icon : 'trash',
                         action : function(item, ui) {
                             $(ui).nosConfirmationDialog({
@@ -58,6 +58,21 @@ define(
                         iconClasses : 'nos-icon16 nos-icon16-eye',
                         action : function(item) {
                             window.open(item.previewUrl);
+                        }
+                    },
+                    'set_homepage' : {
+                        label : appDesk.i18n('Set as homepage'),
+                        name : 'set_homepage',
+                        primary : false,
+                        icon : 'home',
+                        action : function(item, ui) {
+                            $(ui).nosAjax({
+                                url : 'admin/nos/page/page/set_homepage',
+                                method : 'POST',
+                                data : {
+                                    id : item.id
+                                }
+                            });
                         }
                     }
                 },
@@ -84,8 +99,21 @@ define(
                         columns : {
                             title : {
                                 headerText : appDesk.i18n('Title'),
-                                dataKey : 'title',
-                                sortDirection : 'ascending'
+                                //dataKey : 'title',
+                                sortDirection : 'ascending',
+                                cellFormatter : function(args) {
+                                    if ($.isPlainObject(args.row.data)) {
+                                        var text = "";
+                                        if (args.row.data.is_home) {
+                                            text += ' <span class="ui-icon ui-icon-home" style="float:left;"></span> ';
+                                        }
+                                        text += args.row.data.title;
+
+                                        args.$container.html(text);
+
+                                        return true;
+                                    }
+                                }
                             },
                             lang : {
                                 lang : true
@@ -100,7 +128,7 @@ define(
                                 dataKey : 'publication_status'
                             },
                             actions : {
-                                actions : ['edit', 'delete', 'visualise']
+                                actions : ['edit', 'visualise', 'delete', 'set_homepage']
                             }
                         }
                     },

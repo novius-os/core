@@ -12,6 +12,28 @@ use Nos\I18n;
 
 I18n::load('page', 'nos_page');
 
+$dataset = array(
+    'id' => 'page_id',
+    'title' => 'page_title',
+    'url' => function($page) {
+        return $page->get_href();
+    },
+    'previewUrl' => function($page) {
+        return $page->get_preview_href(array('absolute' => true));;
+    },
+    'is_home' => function($page) {
+        return (bool) (int) $page->page_home;
+    },
+    'actions' => array(
+        'delete' => function($page) {
+            return $page->page_lock != $page::LOCK_DELETION;
+        },
+        'set_homepage' => function($page) {
+            return !$page->page_home;
+        },
+    ),
+);
+
 return array(
 	'tree' => array(
 		'models' => array(
@@ -19,21 +41,7 @@ return array(
 				'model' => 'Nos\Model_Page',
 				'order_by' => 'page_sort',
 				'childs' => array('Nos\Model_Page'),
-				'dataset' => array(
-					'id' => 'page_id',
-					'title' => 'page_title',
-					'url' => function($page) {
-                        return $page->get_href();
-                    },
-                    'previewUrl' => function($page) {
-                        return $page->get_preview_href(array('absolute' => true));;
-                    },
-                    'actions' => array(
-                        'delete' => function($page) {
-                            return $page->page_lock != $page::LOCK_DELETION;
-                        }
-                    ),
-				),
+				'dataset' => $dataset,
 			),
 		),
 		'roots' => array(
@@ -91,21 +99,7 @@ return array(
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
     ),
-	'dataset' => array(
-		'id' => 'page_id',
-		'title' => 'page_title',
-        'url' => function($page) {
-            return $page->get_href();
-        },
-        'previewUrl' => function($page) {
-            return $page->get_preview_href(array('absolute' => true));
-        },
-        'actions' => array(
-            'delete' => function($page) {
-                return $page->page_lock != Nos\Model_Page::LOCK_DELETION;
-            }
-        ),
-	),
+	'dataset' => $dataset,
 	'inputs' => array(
 		'root_id' => function($value, $query) {
 			if ($value) {
