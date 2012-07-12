@@ -14,4 +14,32 @@ use Fuel\Core\Config;
 
 class Controller_Admin_Media_Appdesk extends Controller_Admin_Appdesk {
 
+    public function action_info($id)
+    {
+        $media = Model_Media::find($id);
+
+        if (!empty($media)) {
+            $dataset = \Arr::get($this->appdesk, 'dataset');
+            $media->import_dataset_behaviours($dataset);
+            unset($dataset['actions']);
+            $item = array();
+            foreach ($dataset as $key => $data)
+            {
+                // Array with a 'value' key
+                if (is_array($data) and !empty($data['value'])) {
+                    $data = $data['value'];
+                }
+
+                if (is_callable($data)) {
+                    $item[$key] = call_user_func($data, $media);
+                } else {
+                    $item[$key] = $media->get($data);
+                }
+            }
+        } else {
+            $item = null;
+        }
+
+        \Response::json($item);
+    }
 }
