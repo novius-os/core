@@ -1721,11 +1721,15 @@ define('jquery-nos-appdesk',
                                             name : reloadEvent,
                                             lang : dispatcher.data('nosLang')
                                         });
+                                    match.push({
+                                            name : reloadEvent,
+                                            action : ['delete', 'insert']
+                                        });
+                                } else {
+                                    match.push({
+                                        name : reloadEvent
+                                    });
                                 }
-                                match.push({
-                                    name : reloadEvent,
-                                    action : ['delete', 'insert']
-                                });
                             } else {
                                 match.push(reloadEvent);
                             }

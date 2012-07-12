@@ -56,19 +56,6 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                 }
             }
 
-            $page_parent = Model_Page::find($page->page_parent_id);
-
-            // The first page we create is a homepage
-            $lang_has_home = (int) (bool) Model_Page::count(array(
-                'where' => array(
-                    array('page_home', '=', 1),
-                    array('page_lang', $page->page_lang),
-                ),
-            ));
-            // $lang_has_home is either 0 or 1 with the double cast
-            $page->page_home     = 1 - $lang_has_home;
-            $page->page_entrance = 1 - $lang_has_home;
-
             // Tweak the form for creation
             $fields = \Arr::merge($fields, array(
                 'page_lang' => array(
@@ -110,20 +97,28 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         $fieldset = \Fieldset::build_from_config($fields, $page, array(
             'before_save' => function($page, $data) {
 
+                // The first page we create is a homepage
+                $lang_has_home = (int) (bool) Model_Page::count(array(
+                    'where' => array(
+                        array('page_home', '=', 1),
+                        array('page_lang', $page->page_lang),
+                    ),
+                ));
+                // $lang_has_home is either 0 or 1 with the double cast
+                $page->page_home     = 1 - $lang_has_home;
+                $page->page_entrance = 1 - $lang_has_home;
+
                 // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
                 // https://github.com/fuel/orm/issues/171
                 //$parent = $page->find_parent();
 
                 // Instead, retrieve the object manually
-                if (!$page->page_parent_id) {
-                    $page->page_parent_id = null;
-                    $page->page_level = 1;
-                } else {
-                    \Log::error($page->page_parent_id);
-                    $parent = Model_Page::find($page->page_parent_id);
-                    $page->set_parent($parent);
-                    $page->page_level = $parent->page_level + 1;
-                }
+                // Model::find(null) returns an Orm\Query. We don't want that.
+                $parent = empty($page->page_parent_id) ? null : Model_Page::find($page->page_parent_id);
+
+                // Event 'after_change_parent' will set the appropriate lang
+                $page->set_parent($parent);
+                $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
                 foreach (\Input::post('wysiwyg', array()) as $key => $text) {
                     $page->wysiwygs->$key = $text;
@@ -258,6 +253,67 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
             $body = array(
                 'notify' => 'Page successfully deleted.',
+                'dispatchEvent' => $dispatchEvent,
+            );
+
+        } catch (\Exception $e) {
+            // Easy debug
+            if (\Fuel::$env == \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
+                throw $e;
+            }
+            $body = array(
+                'error' => $e->getMessage(),
+            );
+        }
+
+        \Response::json($body);
+    }
+
+
+    public function action_set_homepage() {
+        try {
+            $page_id = \Input::post('id');
+            // Allow GET for easier dev
+            if (empty($page_id) && \Fuel::$env == \Fuel::DEVELOPMENT) {
+                $page_id = \Input::get('id');
+            }
+
+            $page = static::_get_page_with_permission($page_id, 'homepage');
+
+            $langs = $page->get_all_lang();
+            $pages_lang = $page->find_lang('all');
+            $pages_old = Model_Page::find('all', array(
+                'where' => array(
+                    array('page_home', '=', 1),
+                    array('page_lang', 'IN', $langs),
+                    array('page_id', 'NOT IN', array_keys($pages_lang)),
+                ),
+            ));
+
+            foreach ($pages_lang as $page_lang)
+            {
+                $page_lang->page_home = 1;
+                $page_lang->page_entrance = 1;
+                $page_lang->save();
+            }
+
+            foreach ($pages_old as $page_old)
+            {
+                $page_old->page_home = 0;
+                $page_old->page_entrance = 0;
+                $page_old->save();
+            }
+
+            $dispatchEvent = array(
+                'name' => get_class($page),
+                'action' => 'update',
+                'id' => array_merge(array_keys($pages_lang), array_keys($pages_old)),
+                'lang_common_id' => array($page->page_lang_common_id),
+                'lang' => $langs,
+            );
+
+            $body = array(
+                'notify' => 'Homepage successfully changed.',
                 'dispatchEvent' => $dispatchEvent,
             );
 
