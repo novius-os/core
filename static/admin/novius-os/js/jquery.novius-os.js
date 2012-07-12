@@ -299,6 +299,7 @@ define('jquery-nos',
                 ], function() {
                     $(function() {
                         $input.inputFileThumb(options);
+                        $input.prependTo($input.parents('.ui-widget-content'));
                     });
                 });
 
@@ -530,7 +531,9 @@ define('jquery-nos',
                 }
                 switch (method) {
                     case 'open' :
-                        if (this.is('.ui-dialog')) {
+                        if (this.is('.ui-dialog-content')) {
+                            // If we call open, then we had options.destroyOnClose = false
+                            this.closest('.ui-dialog').show().appendTo('body');
                             this.wijdialog('open');
                             return this;
                         }
@@ -583,9 +586,6 @@ define('jquery-nos',
                                     dialogEvent.open($dialog);
                                     if ($.isFunction(oldCallbacks.open)) {
                                         oldCallbacks.open.apply($dialog, arguments);
-                                    }
-                                    if (!options.destroyOnClose) {
-                                        $dialog.closest('.ui-dialog').appendTo('body');
                                     }
                                 }
                             });
