@@ -102,6 +102,11 @@
                     0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(array(
                         'name' => 'custom_image',
                         'value' => isset($possibles[$value]) ? 0 : $value,
+                        'widget_options' => array(
+                            'inputFileThumb' => array(
+                                'title' => __('Pick a custom image'),
+                            ),
+                        ),
                     )).'</div>',
                 ));
                 $template = strtr($template, array(
