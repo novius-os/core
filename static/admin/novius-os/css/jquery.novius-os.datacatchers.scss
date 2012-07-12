@@ -17,6 +17,8 @@
     z-index: 1000;
     border-top: 0;
     border-left: 0;
+    // deactivated, because it needs to be synchronised with JavaScript callback
+    // (nosOnShow shall execute after the transition)
     //@include transition( all 0.5s linear);
 
     &.nos-datacatchers-open {

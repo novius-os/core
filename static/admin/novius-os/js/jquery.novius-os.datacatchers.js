@@ -122,6 +122,7 @@ define('jquery-nos-datacatchers',
                     .button()
                     .click(function() {
                         self.element.addClass('nos-datacatchers-form');
+                        // Care: this needs to be triggered after the CSS transition (if any).
                         $(self.uiForm).nosOnShow('show');
                     });
 
