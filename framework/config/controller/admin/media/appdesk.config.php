@@ -40,6 +40,15 @@ return array(
                 'static/novius-os/admin/config/media/media.js',
                 'static/novius-os/admin/config/media/image_pick.js'
             ),
+        ),
+        'media_pick' => array(
+            'name' => __('Media'),
+            'virtual' => true,
+            'json' => array(
+                'static/novius-os/admin/config/media/common.js',
+                'static/novius-os/admin/config/media/media.js',
+                'static/novius-os/admin/config/media/media_pick.js'
+            ),
         )
     ),
     'i18n' => array(

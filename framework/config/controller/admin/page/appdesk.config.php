@@ -54,7 +54,15 @@ return array(
         'default' => array(
             'name' => __('Default view'),
             'json' => array('static/novius-os/admin/config/page/page.js'),
-        )
+        ),
+        'link_pick' => array(
+            'name' => __('Link'),
+            'virtual' => true,
+            'json' => array(
+                'static/novius-os/admin/config/page/page.js',
+                'static/novius-os/admin/config/page/link_pick.js'
+            ),
+        ),
     ),
     'i18n' => array(
         'Pages' => __('Pages'),

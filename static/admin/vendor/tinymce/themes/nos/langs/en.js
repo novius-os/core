@@ -92,5 +92,7 @@ tinyMCE.addI18n('en.nos',{
     toolbar_toggle_label_close: "Less toolbars",
     toolbar_toggle_label_open: "More toolbars",
     image_edit: 'Edit an image',
-    image_insert: 'Insert an image'
+    image_insert: 'Insert an image',
+    link_edit: 'Edit a link',
+    link_insert: 'Insert a link'
 });

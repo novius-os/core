@@ -10,7 +10,13 @@ class Controller_Admin_Wysiwyg extends \Controller {
 		return $view;
 	}
 
-	public function action_enhancers() {
+    public function action_link($edit = false) {
+        $view = \View::forge('nos::admin/page/wysiwyg_link');
+        $view->set('edit', $edit, false);
+        return $view;
+    }
+
+    public function action_enhancers() {
 
 		$urlEnhancers = \Input::get('urlEnhancers', false);
 

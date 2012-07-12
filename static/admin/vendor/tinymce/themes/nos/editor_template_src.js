@@ -509,7 +509,7 @@
                 title : 'nos.link_title',
                 label : 'nos.link_label',
                 onclick: function(){
-                    t.editor.execCommand('mceLink', true, '');
+                    t.editor.execCommand('nosLink', true, '');
                 },
                 'class' : 'mce_link'
             }, tinymce.ui.NosSplitButton);
@@ -524,7 +524,7 @@
                     title : 'nos.link_title',
                     icon : 'link',
                     onclick: function(){
-                        t.editor.execCommand('mceLink', true, '');
+                        t.editor.execCommand('nosLink', true, '');
                     },
                     id : 'link'
                 });
@@ -1517,7 +1517,7 @@
 
 			p = getParent('A');
             if (c = cm.get('linkcontrols')) {
-                c.setDisabled(co);
+                c.setDisabled(!p && co);
                 c.setActive(!!p);
             }
 
@@ -2014,7 +2014,60 @@
             });
         },
 
-		_nosImage : function(ui, val) {
+        _nosLink : function(ui, val) {
+            var ed = this.editor,
+                e = ed.dom.getParent(ed.selection.getNode(), 'A');
+
+            var dialog = null;
+            dialog = $nos(ed.formElement).nosDialog({
+                contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
+                title: e ? ed.getLang('nos.link_edit') : ed.getLang('nos.link_insert'),
+                ajax: true,
+                open : function(event) {
+                    $(event.target).data('tinymce', ed);
+                }
+            });
+            dialog.bind('insert.link', function(event, link) {
+                // Cleanup
+                dialog.nosDialog('close');
+
+                if (e == null) {
+                    ed.getDoc().execCommand("unlink", false, null);
+                    ed.execCommand("mceInsertLink", false, "#mce_temp_url#", {skip_undo : 1});
+
+                    tinymce.each(ed.dom.select("a"), function(n) {
+                        if (ed.dom.getAttrib(n, 'href') == '#mce_temp_url#') {
+                            e = n;
+
+                            ed.dom.setAttribs(e, {
+                                href : link.href,
+                                title : link.title,
+                                target : link.target
+                            });
+                        }
+                    });
+                } else {
+                    ed.dom.setAttribs(e, {
+                        href : link.href,
+                        title : link.title,
+                        target : link.target
+                    });
+                }
+
+                // Don't move caret if selection was image
+                if (e.childNodes.length != 1 || e.firstChild.nodeName != 'IMG') {
+                    ed.focus();
+                    ed.selection.select(e);
+                    ed.selection.collapse(0);
+                    ed.windowManager.bookmark = ed.selection.getBookmark(1);
+                }
+
+                ed.execCommand("mceEndUndoLevel");
+            });
+
+        },
+
+        _nosImage : function(ui, val) {
 			var ed = this.editor;
 
 			// Internal image object like a flash placeholder

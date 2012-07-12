@@ -71,7 +71,7 @@ class Nos {
      */
     public static function parse_wysiwyg($content, $controller) {
 
-		static::_parse_enhancers($content, $controller);
+        static::_parse_enhancers($content, $controller);
 	    static::_parse_medias($content);
 	    static::_parse_internals($content);
 

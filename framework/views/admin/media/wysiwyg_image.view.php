@@ -33,28 +33,28 @@
 			<table class="fieldset">
 				<tr>
 					<td rowspan="6"><img /></td>
-					<th><label><?= __('Title:') ?> </label></th>
-					<td><input type="text" name="title" data-id="title" size="30" /></td>
+					<th><label for="<?= $uniqid ?>_title"><?= __('Title:') ?> </label></th>
+					<td><input type="text" name="title" data-id="title" size="30" id="<?= $uniqid ?>_title" /></td>
 				</tr>
 				<tr>
-					<th><label><?= __('Description:') ?> </label></th>
-					<td><input type="text" name="alt" data-id="alt" size="30" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= strtr(__('Use {field}'), array('{field}' => __('title'))) ?></label></td>
+					<th><label for="<?= $uniqid ?>_alt"><?= __('Description:') ?> </label></th>
+					<td><input type="text" name="alt" data-id="alt" size="30" id="<?= $uniqid ?>_alt" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= strtr(__('Use {field}'), array('{field}' => __('title'))) ?></label></td>
 				</tr>
 				<tr>
-					<th><label><?= __('Width:') ?> </label></th>
-					<td><input type="text" name="width" data-id="width" size="5" /> &nbsp; <label><input type="checkbox" data-id="proportional" checked> &nbsp;<?= __('Keep proportions') ?></label></td>
+					<th><label for="<?= $uniqid ?>_width"><?= __('Width:') ?> </label></th>
+					<td><input type="text" name="width" data-id="width" size="5" id="<?= $uniqid ?>_width" /> &nbsp; <label><input type="checkbox" data-id="proportional" checked> &nbsp;<?= __('Keep proportions') ?></label></td>
 				</tr>
 				<tr>
-					<th><label><?= __('Height:') ?> </label></th>
-					<td><input type="text" name="height" data-id="height" size="5" readonly /></td>
+					<th><label for="<?= $uniqid ?>_height"><?= __('Height:') ?> </label></th>
+					<td><input type="text" name="height" data-id="height" size="5" readonly id="<?= $uniqid ?>_height" /></td>
 				</tr>
 				<tr>
-					<th><label><?= __('Style:') ?> </label></th>
-					<td><input type="text" name="style" data-id="style" /></td>
+					<th><label for="<?= $uniqid ?>_style"><?= __('Style:') ?> </label></th>
+					<td><input type="text" name="style" data-id="style" id="<?= $uniqid ?>_style" /></td>
 				</tr>
 				<tr>
 					<th></th>
-					<td> <button type="submit" class="primary" data-icon="check" data-id="save"><?= __('Insert this image') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
+					<td> <button type="submit" class="primary" data-icon="check" data-id="save"><?= $edit ? __('Update this image') : __('Insert this image') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
 				</tr>
 			</table>
 		</div>
@@ -87,7 +87,7 @@ require(
                         var img = $('<img />');
 
                         if (!media || !media.id) {
-                            alert(<?= \Format::forge()->to_json(__('Please choose an image first')) ?>);
+                            $.nosNotify(<?= \Format::forge()->to_json(__('Please choose an image first')) ?>, 'error');
                             return;
                         }
 
@@ -168,8 +168,6 @@ require(
                                 .show();
                         }
 
-                        log(media_json);
-
                         if (image_dom == null)
                         {
                             $height.val(media_json.height);
@@ -210,12 +208,12 @@ require(
                 if (media_id) {
                     $.ajax({
                         method: 'GET',
-                        url: base_url + 'admin/nos/media/info/media/' + media_id,
+                        url: base_url + 'admin/nos/media/appdesk/info/' + media_id,
                         dataType: 'json',
                         success: function(item) {
                             tinymce_image_select(item, $img);
                         }
-                    })
+                    });
                 } else {
                     tinymce_image_select($img.data('media'), $img);
                 }
