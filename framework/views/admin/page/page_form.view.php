@@ -40,7 +40,7 @@ $fieldset->set_config('form_attributes', $form_attributes);
 
 ?>
 
-<?= $fieldset->open('admin/nos/page/page/form/'.($page->is_new() ? '' : '/'.$page->page_id)) ?>
+<?= $fieldset->open('admin/nos/page/page/form/'.($page->is_new() ? '' : '/'.$page->page_id).'?lang='.$page->get_lang()) ?>
 
 <?php
 Event::register_function('config|nos::views/admin/page/page_form', 1, function(&$config) use ($fieldset, $page) {
