@@ -20,22 +20,10 @@ class Controller_Admin_DataCatcher extends Controller_Admin_Application {
             $id = \Input::get('model_id');
             $model = \Input::get('model_name');
             $item = $model::find($id);
-        } else {
-            $model = get_class($item);
-            $id = $item->{\Arr::get($item->primary_key(), 0)};
         }
-        $data_catchers = $item->data_catchers();
-        $default_nuggets = $item->get_default_nuggets();
 
         return \View::forge('nos::admin/data_catcher/panel', array(
             'item' => $item,
-            'model_name' => $model,
-            'model_id' => $id,
-            'default_nuggets' => $default_nuggets,
-            'default_nuggets_view' => \View::forge('nos::admin/data_catcher/default_nuggets', array(
-                'default_nuggets' => $default_nuggets,
-            ), false),
-            'data_catchers' => $data_catchers,
         ), false);
     }
 
@@ -55,7 +43,7 @@ class Controller_Admin_DataCatcher extends Controller_Admin_Application {
             }
 
             $item = $model::find($id);
-            $nugget = $item->get_default_nuggets_model();
+            $nugget = $item->get_catcher_nuggets(\Nos\Model_Content_Nuggets::DEFAULT_CATCHER);
 
             $data = array();
             foreach ($item->get_sharable_property() as $type => $params)

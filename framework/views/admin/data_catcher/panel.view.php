@@ -9,31 +9,11 @@
  */
     $id = uniqid('temp_');
 
-    $fieldset = \Fieldset::forge();
-    $fieldset->add('model_id', '', array('value' => $model_id, 'type' => 'hidden'));
-    $fieldset->add('model_name', '', array('value' => $model_name, 'type' => 'hidden'));
-    $fields = array();
-    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_TITLE])) {
-        $fields[] = \Nos\DataCatcher::TYPE_TITLE;
-        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => $default_nuggets[\Nos\DataCatcher::TYPE_TITLE]));
-    }
-    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_URL])) {
-        $fields[] = \Nos\DataCatcher::TYPE_URL;
-        $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.possibles');
-        $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array(
-            'type' => 'select',
-            'value' => $default_nuggets[\Nos\DataCatcher::TYPE_URL]
-        ));
-    }
-    if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $default_nuggets)) {
-        $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
-        $possible = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.possible'));
-        $value = $default_nuggets[\Nos\DataCatcher::TYPE_IMAGE];
-        $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
-            'type' => 'radio',
-            'value' => isset($possible[$value]) ? $value : 0,
-        ));
-    }
+    $model_name = get_class($item);
+    $model_id   = $item->id;
+
+    $data_catchers = $item->data_catchers();
+    $default_nuggets = $item->get_default_nuggets();
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme">
     <h2><?= __('Share') ?></h2>
@@ -54,81 +34,44 @@
             $auto = true;
         }
 
+        $data_catcher['url'] .= '?'.http_build_query(array(
+            'model' => $model_name,
+            'id'    => $model_id,
+         ), '', '&');
+
         echo '<button class="catcher" data-params="', htmlspecialchars(\Format::forge($data_catcher)->to_json()) ,'">', htmlspecialchars($data_catcher['title']),'</button>';
     }
 ?>
         </div>
         <h3><?= __('What will be shared') ?></h3>
-        <div class="nos-datacatchers-default-nuggets"><?= $default_nuggets_view ?></div>
+        <div class="nos-datacatchers-default-nuggets">
+            <?php
+            echo \View::forge('nos::admin/data_catcher/default_nuggets', array(
+                'nugget' => $item->get_default_nuggets(),
+            ), false);
+            ?>
+        </div>
     </div>
-<?php
-    echo $fieldset->open('admin/nos/datacatcher/save');
-    $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-    echo $fieldset->build_hidden_fields();
-    echo \View::forge('form/fields', array(
-        'fieldset' => $fieldset,
-        'fields' => $fields,
-        'callback' => function($field) use ($item)
-        {
-            $template = $field->template;
-            if (empty($template))
-            {
-                $template = $field->fieldset->form()->get_config('field_template');
-            }
-            // Actually, field_name is an number
-            $field_name = $field->name;
-            $id = uniqid('for_');
-            $useTitle = $item->get_sharable_property($field_name.'.useTitle');
-            $label = strtr(__('Use default {what}'), array(
-                '{what}' => empty($useTitle) ? '' : '('.$useTitle.')',
-            ));
-            $nugget_silo = $item->get_default_nuggets_model()->content_data;
-            $checked = isset($nugget_silo[$field_name]) ? '' : 'checked';
-            $template = str_replace('{field}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label><div class="nos-datacatchers-nugget-value" style="display:none;">{field}</div>', $template);
 
-            // Image field displays a bit differently: radio button with several options
-            if ($field->name == \Nos\DataCatcher::TYPE_IMAGE)
-            {
-                $field->set_template('{field}');
-                $possibles = $item->get_sharable_property($field_name.'.possibles');
-                foreach ($possibles as $media_id => $idk) {
-                    $media = \Nos\Model_Media::find($media_id);
-                    $field->set_options(array(
-                        $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
-                    ));
-                }
-                $value = isset($nugget_silo[$field_name]) ? $nugget_silo[$field_name] : 0;
-                $field->set_options(array(
-                    0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(array(
-                        'name' => 'custom_image',
-                        'value' => isset($possibles[$value]) ? 0 : $value,
-                        'widget_options' => array(
-                            'inputFileThumb' => array(
-                                'title' => __('Pick a custom image'),
-                            ),
-                        ),
-                    )).'</div>',
-                ));
-                $template = strtr($template, array(
-                    '{label}' => '{group_label}',
-                    '{field}' => '{fields} <div class="nos-datacatchers-nugget-image"> {label} <br /> {field} </div> {fields}',
-                ));
-            }
-            $field->set_template($template);
-            echo $field->build();
-        },
-    ), false);
-?>
-    <div class="nos-datacatchers-buttons">
-        <button type="submit" data-icon="check" class="primary">
-            <?= __('Save') ?>
-        </button>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" onclick="return false;">
-            <?= __('Cancel') ?>
-        </a>
-    </div>
-<?= $fieldset->close() ?>
+    <form method="POST" action="admin/nos/datacatcher/save">
+        <input type="hidden" name="model_id" value="<?= $model_id ?>" />
+        <input type="hidden" name="model_name" value="<?= $model_name ?>" />
+        <?php
+        echo \View::forge('nos::admin/data_catcher/form', array(
+            'item' => $item,
+            'nugget' => $item->get_default_nuggets(),
+        ));
+        ?>
+        <div class="nos-datacatchers-buttons">
+            <button type="submit" data-icon="check" class="primary">
+                <?= __('Save') ?>
+            </button>
+            &nbsp; <?= __('or') ?> &nbsp;
+            <a href="#" onclick="return false;">
+                <?= __('Cancel') ?>
+            </a>
+        </div>
+    </form>
 </div>
 <script type="text/javascript">
 require(

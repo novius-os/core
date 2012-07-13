@@ -7,17 +7,18 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_TITLE])) {
+
+    if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE])) {
         echo '<label>', htmlspecialchars(__('Name:')) ,'</label>';
-        echo '<div>', htmlspecialchars($default_nuggets[\Nos\DataCatcher::TYPE_TITLE]) ,'</div>';
+        echo '<div>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TITLE]) ,'</div>';
     }
-    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_URL])) {
+    if (isset($nugget[\Nos\DataCatcher::TYPE_URL])) {
         echo '<label>', htmlspecialchars(__('Url:')) ,'</label>';
-        echo '<div>', htmlspecialchars($default_nuggets[\Nos\DataCatcher::TYPE_URL]) ,'</div>';
+        echo '<div>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_URL]) ,'</div>';
     }
-    if (isset($default_nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
+    if (isset($nugget[\Nos\DataCatcher::TYPE_IMAGE])) {
         echo '<label>', htmlspecialchars(__('Image:')) ,'</label>';
-        echo '<div>', Nos\Model_Media::find($default_nuggets[\Nos\DataCatcher::TYPE_IMAGE])->get_img_tag(array('max_width' => '200', 'max_height' => '300')) ,'</div>';
+        echo '<div>', Nos\Model_Media::find($nugget[\Nos\DataCatcher::TYPE_IMAGE])->get_img_tag(array('max_width' => '200', 'max_height' => '300')) ,'</div>';
     }
 ?>
 <button><?= htmlspecialchars(__('Customize')) ?></button>

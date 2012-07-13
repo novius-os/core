@@ -64,6 +64,7 @@ define('jquery-nos-datacatchers',
                             }
                         })
                         .click(function() {
+                            log(params);
                             var current = $($button).nosTabs('current');
                             $($button).nosTabs('add', {
                                 iconClasses: params.iconClasses || null,
