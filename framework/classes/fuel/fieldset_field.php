@@ -61,4 +61,8 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
         }
         return parent::build();
     }
+
+    public function before_save($object, $data) {
+        return true;
+    }
 }

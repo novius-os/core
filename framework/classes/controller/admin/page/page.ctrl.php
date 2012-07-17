@@ -17,7 +17,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         return $id === null ? Model_Page::forge() : Model_Page::find($id);
     }
 
-    public function action_form($id = null) {
+    public function action_form($id) {
 
         $fields = \Config::load('nos::controller/admin/page/form_page', true);
 

@@ -392,7 +392,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				if (!empty($options['complete']) && is_callable($options['complete'])) {
                     $json = call_user_func($options['complete'], $data, $model, $config, $options);
 				} else {
-                    $json = self::defaultComplete($data, $model, $config, $options);
+                    $json = static::defaultComplete($data, $model, $config, $options);
                 }
                 \Response::json($json);
 			} else {
@@ -514,7 +514,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
                     continue;
                 }
 
-				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
+                if (!empty($config['widget']) && !$options['fieldset']->fields[$name]->before_save($object, $data)) {
+                    continue;
+                }
+
+                if (!empty($config['before_save']) && is_callable($config['before_save'])) {
 					call_user_func($config['before_save'], $object, $data);
 				} else {
 					if ($type == 'checkbox' && empty($data[$name])) {
