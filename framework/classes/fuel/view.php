@@ -15,9 +15,11 @@ class View extends \Fuel\Core\View
 
             $file = static::$redirects[$file];
         }
+
         parent::__construct($file, $data, $filter);
     }
 
+    // Works, but some problems with package and error pages...
     public static function set_application($application) {
         static::$application = $application;
     }

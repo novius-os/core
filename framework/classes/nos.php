@@ -54,6 +54,13 @@ class Nos {
                 $continue_on[] = $e->getCode();
                 \Config::set('errors.continue_on', $continue_on);
                 \Error::show_php_error($e);
+                $backtrace = \Debug::local_backtrace(true);
+                $profiled = array();
+                for ($i = 0; $i < count($backtrace); $i++) {
+                    $profiled[] = $backtrace[$i]['file'].'@'.$backtrace[$i]['line'];
+                }
+                \Debug::dump($profiled);
+
                 \Config::set('errors.continue_on', $old_continue_on);
             }
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
