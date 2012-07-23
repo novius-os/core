@@ -335,17 +335,15 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 	public static function build_from_config($config, $model = null, $options = array()) {
 
+        $instance = null;
 		if (is_object($model)) {
 			$instance = $model;
-			$class = get_class($instance);
 			empty($options['action']) && $options['action'] = 'edit';
 		} else if (is_string($model)) {
 			$instance = null;
-			$class = $model;
 			empty($options['action']) && $options['action'] = 'add';
 		} else if (is_array($model)) {
 			$options = $model;
-			$class = null;
 			$instance = null;
 		}
         $options['instance'] = $instance;
