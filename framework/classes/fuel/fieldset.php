@@ -263,12 +263,14 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			if (!empty($settings['widget'])) {
 				 $class = $settings['widget'];
 				 $attributes['widget_options'] = isset($settings['widget_options']) ? $settings['widget_options'] : array();
-				 $field = new $class($p, $label, $attributes, array(), $this);
+                 $attributes['widget_options']['instance'] = $options['instance'];
+                 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
 			} else {
                 if (\Arr::get($attributes, 'type', '') == 'checkbox') {
                     unset($attributes['empty']);
                 }
+                $attributes['widget_options'] = array('instance' => $options['instance']);
 				$field = $this->add($p, $label, $attributes);
 			}
 			if ( ! empty($settings['validation']))
@@ -346,6 +348,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			$class = null;
 			$instance = null;
 		}
+        $options['instance'] = $instance;
 
         $options = \Arr::merge(array(
             'save' => \Input::method() == 'POST',
