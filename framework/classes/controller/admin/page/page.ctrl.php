@@ -104,9 +104,11 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                         array('page_lang', $page->page_lang),
                     ),
                 ));
-                // $lang_has_home is either 0 or 1 with the double cast
-                $page->page_home     = 1 - $lang_has_home;
-                $page->page_entrance = 1 - $lang_has_home;
+                if ($lang_has_home === 0) {
+                    // $lang_has_home is either 0 or 1 with the double cast
+                    $page->page_home     = 1;
+                    $page->page_entrance = 1;
+                }
 
                 // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
                 // https://github.com/fuel/orm/issues/171
