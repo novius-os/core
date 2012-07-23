@@ -143,96 +143,36 @@ $large = !empty($large) && $large == true;
 
     <div style="clear:both;">
         <div class="line ui-widget" style="margin: 0 2em 2em;">
-            <?php
+<?php
             $menu = empty($menu) ? array() : (array) $menu;
-            ?>
+            $content = empty($content) ? array() : (array) $content;
+?>
             <?= $large ? '' : '<div class="unit col c1"></div>' ?>
             <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
-                <?php
-                if (!is_array($content)) {
-                    $content = array($content);
-                }
-                foreach ($content as $c) {
-                    if (is_callable($c)) {
-                        echo $c();
-                    } else {
-                        echo $c;
-                    }
-                }
-                ?>
+<?php
+    foreach ($content as $view) {
+        if (!empty($view['view'])) {
+            echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);
+        }
+    }
+?>
             </div>
-
-            <?php
-            if (!empty($id)) {
-                $_id = $fieldset->field($id);
-                $_id = !empty($_id) ? $_id->value : null;
-                $admin = __('Admin');
-                if (empty($_id)) {
-                    // Nothing
-                } else {
-                    if (empty($menu)) {
-                        // Display below current content, in a new line
-                    } else if (isset($menu[$admin]['fields'])) {
-                        array_unshift($menu[$admin]['fields'], '_id');
-                    } else if (!isset($menu[$admin])) {
-                        $menu[$admin] = array(
-                            'header_class'  => 'faded',
-                            'content_class' => 'faded',
-                            'fields' => array('_id'),
-                        );
-                    } else {
-                        array_unshift($menu[$admin], '_id');
-                    }
-                }
-            }
-
-            if (!empty($menu)) {
-                $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
-                ?>
+<?php
+    if (!empty($menu)) {
+?>
                 <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
-                     <div class="accordion fieldset">
-                        <?php
-                        foreach ((array) $menu as $title => $options) {
-                            if (!isset($options['fields'])) {
-                                $options = array('fields' => $options);
-                            }
-                            if (!isset($options['field_template'])) {
-                                $options['field_template'] = '<p>{field}</p>';
-                            }
-                            ?>
-                            <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $title ?></a></h3>
-                            <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
-                                <?php
-                                foreach ((array) $options['fields'] as $field) {
-                                    try {
-                                        if ($field instanceof \View) {
-                                            echo $field;
-                                        } else if ($field == '_id') {
-                                            echo strtr($options['field_template'], array('{field}' => 'ID : '.$_id));
-                                        } else {
-                                            echo strtr($options['field_template'], array('{field}' => $fieldset->field($field)->build()));
-                                        }
-                                    } catch (\Exception $e) {
-                                        throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
-                                    }
-                                }
-                                ?>
-                            </div>
-                            <?php
-                        }
-                        ?>
-                     </div>
+<?php
+        foreach ($menu as $view) {
+            if (!empty($view['view'])) {
+                echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);
+            }
+        }
+?>
                  </div>
-                <?php
-                }
-                ?>
+<?php
+    }
+?>
             <?= $large ? '' : '<div class="unit lastUnit"></div>' ?>
         </div>
-
-        <?php
-        if (!empty($id) && empty($menu) && !empty($_id)) {
-            echo '<div class="line" style="margin: -2em 2em 2em;">'.($large ? '' : '<div class="unit col c1"></div>').'<div class="unit">ID : '.$_id.'</div></div>';
-        }
-        ?>
     </div>
 </div>

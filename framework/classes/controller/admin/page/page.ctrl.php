@@ -12,146 +12,96 @@ namespace Nos;
 
 class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
-    protected function crud_item($id)
+    protected $page_parent = false;
+
+    protected function form_item()
     {
-        return $id === null ? Model_Page::forge() : Model_Page::find($id);
-    }
-
-    public function action_form($id = null) {
-
-        $fields = \Config::load('nos::controller/admin/page/form_page', true);
-
-        // $id is set: edit the page
-        if ($id !== null) {
-            $page = Model_Page::find($id);
-        } else {
-            // Create a new page from another one
-            $create_from_id = \Input::get('create_from_id', 0);
-            if (!empty($create_from_id)) {
-                 $page_from = Model_Page::find($create_from_id);
-            }
-
-            if (empty($page_from)) {
-                $page = Model_Page::forge();
-                $page->page_lang_common_id = \Input::get('common_id', null);
-            } else {
-                $page = clone $page_from;
-            }
-            $page->page_lang = \Input::get('lang', key(\Config::get('locales')));
-
+        parent::form_item();
+        if ($this->item->is_new())
+        {
             // New page: no parent
             // Translation: we have a common_id and can determine the parent
-            if (!empty($page->page_lang_common_id)) {
-                $page_lang_common = Model_Page::find($page->page_lang_common_id);
+            if (!empty($this->item->page_lang_common_id)) {
+                $page_lang_common = Model_Page::find($this->item->page_lang_common_id);
                 $page_parent = $page_lang_common->find_parent();
 
                 // Fetch in the appropriate lang
                 if (!empty($page_parent)) {
-                    $page_parent = $page_parent->find_lang($page->page_lang);
+                    $page_parent = $page_parent->find_lang($this->item->page_lang);
                 }
 
                 // Set manually, because set_parent doesn't handle new items
                 if (!empty($page_parent)) {
-                    $page->page_parent_id = $page_parent->page_id;
+                    $this->item->page_parent_id = $page_parent->page_id;
                 }
             }
 
-            $page_parent = Model_Page::find($page->page_parent_id);
+            $this->page_parent = Model_Page::find($this->item->page_parent_id);
 
             // The first page we create is a homepage
             $lang_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
                     array('page_home', '=', 1),
-                    array('page_lang', $page->page_lang),
+                    array('page_lang', $this->item->page_lang),
                 ),
             ));
             // $lang_has_home is either 0 or 1 with the double cast
-            $page->page_home     = 1 - $lang_has_home;
-            $page->page_entrance = 1 - $lang_has_home;
-
-            // Tweak the form for creation
-            $fields = \Arr::merge($fields, array(
-                'page_lang' => array(
-                    'form' => array(
-                        'type' => 'hidden',
-                        // We need to set manually the value here, because the lang field won't be populated (restricted by the Translatable behaviour)
-                        'value' => $page->page_lang,
-                    ),
-                ),
-                'page_lang_common_id' => array(
-                    'form' => array(
-                        'type' => 'hidden',
-                    ),
-                ),
-                'page_parent_id' => array(
-                    'widget_options' => array(
-                        'lang' => $page->page_lang,
-                    ),
-                ),
-                'save' => array(
-                    'form' => array(
-                        'value' => __('Add'),
-                    ),
-                ),
-            ));
+            $this->item->page_home     = 1 - $lang_has_home;
+            $this->item->page_entrance = 1 - $lang_has_home;
         }
+    }
 
-        if (!empty($create_from_id)) {
-            $fields['create_from_id'] = array(
-                'form' => array(
-                    'type' => 'hidden',
-                    'value' => $create_from_id,
-                ),
-            );
-        }
+    protected function build_from_config()
+    {
+        $options = parent::build_from_config();
 
-        $is_new = $page->is_new();
+        $options['before_save'] = function($page, $data) {
+            // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
+            // https://github.com/fuel/orm/issues/171
+            //$parent = $page->find_parent();
 
-        $fieldset = \Fieldset::build_from_config($fields, $page, array(
-            'before_save' => function($page, $data) {
+            // Instead, retrieve the object manually
+            // Model::find(null) returns an Orm\Query. We don't want that.
+            $parent = empty($page->page_parent_id) ? null : Model_Page::find($page->page_parent_id);
 
-                // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
-                // https://github.com/fuel/orm/issues/171
-                //$parent = $page->find_parent();
+            // Event 'after_change_parent' will set the appropriate lang
+            $page->set_parent($parent);
+            $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
-                // Instead, retrieve the object manually
-                // Model::find(null) returns an Orm\Query. We don't want that.
-                $parent = empty($page->page_parent_id) ? null : Model_Page::find($page->page_parent_id);
-
-                // Event 'after_change_parent' will set the appropriate lang
-                $page->set_parent($parent);
-                $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
-
-                foreach (\Input::post('wysiwyg', array()) as $key => $text) {
-                    $page->wysiwygs->$key = $text;
-                }
-            },
-            'success' => function() use ($page, $is_new) {
-
-                $json = array(
-                    'notify' => $is_new ? __('Page sucessfully added.') : __('Page successfully saved.'),
-                    'dispatchEvent' => array(
-                        'name' => get_class($page),
-                        'action' => $is_new ? 'insert' : 'update',
-                        'id' => $page->page_id,
-                        'lang_common_id' => $page->page_lang_common_id,
-                        'lang' => $page->page_lang,
-                    ),
-                );
-                if ($is_new) {
-                    $json['replaceTab'] = 'admin/nos/page/page/crud/'.$page->page_id;
-                }
-                return $json;
+            foreach (\Input::post('wysiwyg', array()) as $key => $text) {
+                $page->wysiwygs->$key = $text;
             }
-        ));
-        $fieldset->js_validation();
+        };
 
-        return \View::forge('nos::admin/page/page_form', array(
-            'page'     => $page,
-            'fieldset' => $fieldset,
-            'lang'     => $page->page_lang,
-            'tabInfos' => $this->get_tabInfos($page)
-        ), false);
+        return $options;
+    }
+
+    protected function fieldset($fieldset)
+    {
+        $fieldset = parent::fieldset($fieldset);
+
+        $fieldset->field('page_parent_id')->set_widget_options(array(
+            'lang' => $this->item->page_lang,
+        ));
+
+        $checkbox_url  = '<label><input type="checkbox" data-id="same_url_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
+        $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
+
+        $fieldset->field('page_cache_duration')->set_template('{label} {field} {required} seconds');
+        $fieldset->field('page_lock')->set_template('{label} {field} {required}');
+        $fieldset->field('page_virtual_name')->set_template('{label}{required} <br /> <div class="table-field">{field} <span>&nbsp;.html</span></div>'.$checkbox_url);
+
+        $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} <br />$checkbox_menu {error_msg}</span>\n");
+
+        $form_attributes = $fieldset->get_config('form_attributes');
+
+        if (!isset($form_attributes['class'])) {
+            $form_attributes['class'] = '';
+        }
+        $form_attributes['class'] .= ' fill-parent';
+        $fieldset->set_config('form_attributes', $form_attributes);
+
+        return $fieldset;
     }
 
     protected static function  _get_page_with_permission($page_id, $permission) {
