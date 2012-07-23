@@ -59,7 +59,15 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
             }
             $this->label = $label;
         }
-        return parent::build();
+        if (isset($this->attributes['widget_options'])) {
+            $widget_options = $this->attributes['widget_options'];
+            unset($this->attributes['widget_options']);
+        }
+        $return = parent::build();
+        if (isset($widget_options)) {
+            $this->attributes['widget_options'] = $widget_options;
+        }
+        return $return;
     }
 
     public function before_save($object, $data) {
