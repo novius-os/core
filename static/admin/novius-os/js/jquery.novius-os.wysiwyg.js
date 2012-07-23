@@ -27,6 +27,7 @@ define('jquery-nos-wysiwyg',
                         script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce' + (module.config().minified ? '' : '_src') + '.js',
                         theme      : 'nos',
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
+                        paste_text_use_dialog : true,
                         theme_nos_enhancers : enhancers
                     }, options || {});
 
