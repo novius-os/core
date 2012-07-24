@@ -24,7 +24,7 @@ define('jquery-nos-wysiwyg',
                 success: function(enhancers) {
                     options = $.extend({
                         // Location of TinyMCE script
-                        script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce' + (module.config().minified ? '' : '_src') + '.js',
+                        script_url : '/static/novius-os/admin/vendor/tinymce/tiny_mce_jquery' + (module.config().minified ? '' : '_src') + '.js',
                         theme      : 'nos',
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
                         paste_text_use_dialog : true,
