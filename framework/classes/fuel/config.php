@@ -81,6 +81,10 @@ class Config extends \Fuel\Core\Config {
         return $config;
     }
 
+    public static function application($module_name) {
+        return static::extendable_load($module_name, 'config');
+    }
+
 }
 
 /* End of file config.php */

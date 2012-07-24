@@ -128,7 +128,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
 
     protected static function getGlobalConfiguration() {
         list($application, $file_name) = self::getLocation();
-        return static::loadConfiguration($application, 'config');
+        return \Config::application($application);
     }
 
     protected static function getLocation() {
