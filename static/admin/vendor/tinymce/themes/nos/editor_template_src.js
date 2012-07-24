@@ -1966,12 +1966,12 @@
 
 			// Open the dialog popup (it returns the node inserted in the body)
             if (metadata.dialog.ajax || !edit) {
-                dialog = $nos(ed.formElement).nosDialog($.extend({
+                dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
                 }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
             } else {
                 // Open empty dialog
-                dialog = $nos(ed.formElement).nosDialog($.extend({
+                dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
                 }, $.extend({}, metadata.dialog, {contentUrl : null})));
 
@@ -2020,7 +2020,7 @@
                 e = ed.dom.getParent(ed.selection.getNode(), 'A');
 
             var dialog = null;
-            dialog = $nos(ed.formElement).nosDialog({
+            dialog = $nos(ed.getElement()).nosDialog({
                 contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
                 title: e ? ed.getLang('nos.link_edit') : ed.getLang('nos.link_insert'),
                 ajax: true,
@@ -2078,7 +2078,7 @@
             var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
 
 			var dialog = null;
-            dialog = $nos(ed.formElement).nosDialog({
+            dialog = $nos(ed.getElement()).nosDialog({
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
 				ajax: true,
