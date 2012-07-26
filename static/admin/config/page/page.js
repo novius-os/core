@@ -25,7 +25,7 @@ define(
                         icon : 'pencil',
                         action : function(item, ui) {
                             $(ui).nosTabs({
-                                url : 'admin/nos/page/page/crud/' + item.id,
+                                url : 'admin/nos/page/page/insert_update/' + item.id,
                                 label : item.title,
                                 iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                             });
@@ -83,7 +83,7 @@ define(
                             label : appDesk.i18n('Add a page'),
                             action : function(ui, appdesk) {
                                 $(ui).nosTabs('add', {
-                                    url: 'admin/nos/page/page/crud?lang=' + appdesk.lang,
+                                    url: 'admin/nos/page/page/insert_update?lang=' + appdesk.lang,
                                     label: appDesk.i18n('Add a page')._(),
                                     iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                                 });

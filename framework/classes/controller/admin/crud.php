@@ -42,7 +42,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         'layout' => array(),
         'fields' => array(),
         'views' => array(
-            'form' => 'nos::form/crud',
+            'form' => 'nos::form/insert_update',
             'delete' => 'nos::form/delete_popup',
         ),
     );
@@ -107,12 +107,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
 
             $params = array_merge($this->view_params(), array(
-                'url_crud' => $this->config['controller_url'].'/crud/'.($this->item->is_new() ? '' : '/'.$this->item->{$this->pk}),
+                'url_insert_update' => $this->config['controller_url'].'/insert_update/'.($this->item->is_new() ? '' : '/'.$this->item->{$this->pk}),
                 'fieldset' => $fieldset,
                 'tab_params' => $this->get_tab_params(),
             ));
 
-            return \View::forge($this->config['views']['form'], array('crud' => $params), false);
+            return \View::forge($this->config['views']['form'], array('view_params' => $params), false);
         } catch (\Exception $e) {
             $this->send_error($e);
         }
@@ -197,13 +197,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $fieldset->js_validation();
         $fieldset->populate_with_instance($this->item);
-        $fieldset->form()->set_config('field_template', \View::forge('nos::form/crud_field_template'));
+        $fieldset->form()->set_config('field_template', \View::forge('nos::form/insert_update_field_template'));
 
         foreach ($fieldset->field() as $field)
         {
             if ($field->type == 'checkbox')
             {
-                $field->set_template(\View::forge('nos::form/crud_field_template', array('type' => 'checkbox')));
+                $field->set_template(\View::forge('nos::form/insert_update_field_template', array('type' => 'checkbox')));
             }
         }
         return $fieldset;
@@ -230,18 +230,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 );
                 if ($is_new)
                 {
-                    $return['replaceTab'] = $this->config['controller_url'].'/crud/'.$object->{$this->pk};
+                    $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
                 }
                 return $return;
             },
         );
     }
 
-    public function action_crud($id = null)
+    public function action_insert_update($id = null)
     {
-        // crud               : add a new item
-        // crud/ID            : edit an existing item
-        // crud/ID?lang=fr_FR : translate an  existing item (can be forbidden if the parent doesn't exists in that language)
+        // insert_update               : add a new item
+        // insert_update/ID            : edit an existing item
+        // insert_update/ID?lang=fr_FR : translate an  existing item (can be forbidden if the parent doesn't exists in that language)
 
         $this->item = $this->crud_item($id);
         $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
@@ -284,7 +284,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'common_id' => \Input::get('common_id', ''),
             'item_text' => $this->config['message']['blank_state_item_text'],
             'url_form'  => $this->config['controller_url'].'/form',
-            'url_crud'  => $this->config['controller_url'].'/crud',
+            'url_insert_update'  => $this->config['controller_url'].'/insert_update',
             'tabInfos'  => $tabInfos,
         );
         return \View::forge('nos::form/layout_blank_slate', $viewData, false);
@@ -296,7 +296,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $tabInfos = array(
             'iconUrl' => $this->config['tab']['iconUrl'],
             'label' => $this->item->is_new() ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
-            'url' => $this->config['controller_url'].'/crud'.($this->item->is_new() ? '?lang='.$this->item->get_lang() : '/'.$this->item->id),
+            'url' => $this->config['controller_url'].'/insert_update'.($this->item->is_new() ? '?lang='.$this->item->get_lang() : '/'.$this->item->id),
             'actions' => array_values($this->get_actions_lang($this->item)),
         );
         if (!$this->item->is_new())
@@ -332,7 +332,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $actions[$locale] = array(
                     'label' => strtr(__('Add in {lang}'), array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                     'action' => array(
-                        'openTab' => $this->config['controller_url'].'/crud?lang='.$locale,
+                        'openTab' => $this->config['controller_url'].'/insert_update?lang='.$locale,
                     ),
                     'iconUrl' => \Nos\Helper::flag_url($locale),
                 );
@@ -349,7 +349,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                             empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'), array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))
                     ),
                     'action' => array(
-                        'openTab' => $this->config['controller_url'].'/crud/'.(empty($item_lang) ? $main_lang->id.'?lang='.$locale : $item_lang->id), // .'?lang='.$locale, // .'&common_id='.$main_lang->id
+                        'openTab' => $this->config['controller_url'].'/insert_update/'.(empty($item_lang) ? $main_lang->id.'?lang='.$locale : $item_lang->id), // .'?lang='.$locale, // .'&common_id='.$main_lang->id
                     ),
                     'iconUrl' => \Nos\Helper::flag_url($locale),
                 );
@@ -369,7 +369,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         try {
             $this->item = $this->crud_item($id);
             $this->check_permission('delete');
-            return \View::forge($this->config['views']['delete'], array('crud' => $this->view_params()), false);
+            return \View::forge($this->config['views']['delete'], array('view_params' => $this->view_params()), false);
         } catch (\Exception $e) {
             $this->send_error($e);
         }

@@ -31,7 +31,7 @@ $common_id = $main_lang ? $main_lang->id : false;
                 <script type="text/javascript">
                     require(['jquery-nos'], function($nos) {
                        $nos('#<?= $uniqid_parent ?>').click(function() {
-                           $nos(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_crud.'/'.$parent->id.'?lang='.$lang)) ?>);
+                           $nos(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_insert_update.'/'.$parent->id.'?lang='.$lang)) ?>);
                        });
                     });
                 </script>
