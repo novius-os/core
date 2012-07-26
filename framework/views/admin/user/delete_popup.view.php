@@ -8,43 +8,8 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
-
+<input type="hidden" name="id" value="<?= $view_params['item']->{$view_params['pk']} ?>" />
+<p>
     <p><?= __('Deleting a user is permanent, there is no undo.') ?></p>
     <p><?= __('Please confirm the deletion:'); ?></p>
-    <p>
-        <button class="primary ui-state-error" data-icon="trash" data-id="confirmation"><?= __('Confirm the deletion') ?></button>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
-    </p>
-</div>
-
-<script type="text/javascript">
-require(
-    ['jquery-nos'],
-    function($) {
-        $(function() {
-            var $container    = $('#<?= $uniqid ?>').nosFormUI();
-
-            $container.find('button[data-id=confirmation]').click(function(e) {
-                e.preventDefault();
-                $container.nosAjax({
-                    url : 'admin/nos/user/user/delete_user_confirm',
-                    method : 'POST',
-                    data : {
-                        id : <?= $user->user_id ?>
-                    },
-                    success : function(json) {
-                        $container.nosDialog('close');
-                    }
-                });
-            });
-
-            $container.find('a[data-id=cancel]').click(function(e) {
-                e.preventDefault();
-                $container.nosDialog('close');
-            });
-
-        });
-    });
-</script>
+</p>

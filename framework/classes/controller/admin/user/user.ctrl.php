@@ -10,74 +10,12 @@
 
 namespace Nos;
 
-class Controller_Admin_User_User extends Controller {
+class Controller_Admin_User_User extends Controller_Admin_Crud {
 
-    protected static function  _get_user_with_permission($user_id, $permission) {
-        if (empty($user_id)) {
-            throw new \Exception('No user specified.');
-        }
-        $media = Model_User::find($user_id);
-        if (empty($media)) {
-            throw new \Exception('User not found.');
-        }
-        if (!static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $media)) {
+    protected function check_permission($action) {
+        parent::check_permission($action);
+        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $this->item)) {
             throw new \Exception('Permission denied');
         }
-        return $media;
-    }
-
-	public function action_delete_user($user_id = null) {
-        try {
-            $user = static::_get_user_with_permission($user_id, 'delete');
-            return \View::forge('nos::admin/user/user_delete', array(
-                'user'       => $user,
-            ));
-        } catch (\Exception $e) {
-            // Easy debug
-            if (\Fuel::$env == \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
-                throw $e;
-            }
-			$body = array(
-				'error' => $e->getMessage(),
-			);
-            \Response::json($body);
-		}
-    }
-
-	public function action_delete_user_confirm() {
-        try {
-            $user_id = \Input::post('id');
-            // Allow GET for easier dev
-            if (empty($user_id) && \Fuel::$env == \Fuel::DEVELOPMENT) {
-                $user_id = \Input::get('id');
-            }
-
-            $user = static::_get_user_with_permission($user_id, 'delete');
-
-            // Recover infos before delete, if not id is null
-            $dispatchEvent = array(
-                'name' => get_class($user),
-                'action' => 'delete',
-                'id' => $user->user_id,
-            );
-
-            // Delete database & relations (link)
-            $user->delete();
-
-			$body = array(
-				'notify' => 'User permanently deleted.',
-                'dispatchEvent' => $dispatchEvent,
-			);
-        } catch (\Exception $e) {
-            // Easy debug
-            if (\Fuel::$env == \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
-                throw $e;
-            }
-			$body = array(
-				'error' => $e->getMessage(),
-			);
-		}
-
-        \Response::json($body);
     }
 }
