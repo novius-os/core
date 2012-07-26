@@ -172,7 +172,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         {
             if ($this->behaviour_translatable && $this->behaviour_tree)
             {
-                $parent_id = $this->parent_relation()->key_from[0];
+                $parent_id = $this->item->parent_relation()->key_from[0];
                 $fields = \Arr::merge($fields, array(
                     $parent_id => array(
                         'widget_options' => array(

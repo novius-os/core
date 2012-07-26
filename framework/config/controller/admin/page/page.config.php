@@ -20,13 +20,22 @@ return array(
     'messages' => array(
         'successfully added' => __('Page successfully added.'),
         'successfully saved' => __('Page successfully saved.'),
+        'successfully deleted' => __('The page has successfully been deleted!'),
+        'you are about to delete, confim' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?'),
+        'you are about to delete' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>.'),
+        'exists in multiple lang' => __('This page exists in <strong>{count} languages</strong>.'),
+        'delete in the following languages' => __('Delete this page in the following languages:'),
+        'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
+        'item has multiple sub-items' => __('This page has <strong>{count} sub-pages</strong>.'),
+        'confirm deletion, enter number' => __('To confirm the deletion, you need to enter this number in the field below'),
+        'yes delete sub-items' => __('Yes, I want to delete this page and all of its {count} sub-pages.'),
         'item deleted' => __('This page has been deleted.'),
+        'not found' => __('Page not found'),
         'blank_state_item_text' => __('page'),
     ),
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
         'labels' => array(
-            'update' => 'page_title',
             'insert' => __('Add a page'),
             'blankSlate' => __('Translate a page'),
         ),

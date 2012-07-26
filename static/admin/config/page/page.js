@@ -38,11 +38,11 @@ define(
                         icon : 'trash',
                         action : function(item, ui) {
                             $(ui).nosConfirmationDialog({
-                                contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
+                                contentUrl: 'admin/nos/page/page/delete/' + item.id,
                                 title: appDesk.i18n('Delete a page')._(),
                                 confirmed: function($dialog) {
                                     $dialog.nosAjax({
-                                        url : 'admin/nos/page/page/delete_page_confirm',
+                                        url : 'admin/nos/page/page/delete_confirm',
                                         method : 'POST',
                                         data : $dialog.find('form').serialize()
                                     });
