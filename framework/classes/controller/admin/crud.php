@@ -17,13 +17,23 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         'messages' => array(
             'successfully added' => 'Item successfully added.',
             'successfully saved' => 'Item successfully saved.',
+            'successfully deleted' => 'The item has successfully been deleted!',
+            'you are about to delete, confim' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?',
+            'you are about to delete' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>.',
+            'exists in multiple lang' => 'This item exists in <strong>{count} languages</strong>.',
+            'delete in the following languages' => 'Delete this item in the following languages:',
+            'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
+            'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
+            'confirm deletion, enter number' => 'To confirm the deletion, you need to enter this number in the field below',
+            'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
             'item deleted' => 'This item has been deleted.',
+            'not found' => 'Item not found',
             'blank_state_item_text' => 'item',
         ),
         'tab' => array(
             'iconUrl' => '',
             'labels' => array(
-                'update' => 'Update an item',
+                'update' => null,
                 'insert' => 'New item',
                 'blankSlate' => 'Translate an item',
             ),
@@ -33,6 +43,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         'fields' => array(),
         'views' => array(
             'form' => 'nos::form/crud',
+            'delete' => 'nos::form/delete_popup',
         ),
     );
 
@@ -58,38 +69,53 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $id === null ? $model::forge() : $model::find($id);
     }
 
-    public function action_form($id = null)
+    protected function view_params()
     {
-        $this->item = $this->crud_item($id);
-        if ($this->item->is_new())
-        {
-            $create_from_id = \Input::get('create_from_id', 0);
-            if (!empty($create_from_id))
-            {
-                $this->item_from = $this->crud_item($create_from_id);
-            }
-        }
-        $this->form_item();
-        $fields = $this->fields($this->config['fields']);
-        $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
-        $fieldset = $this->fieldset($fieldset);
-
         $params = array(
             'model' => $this->config['model'],
             'translatable' => $this->behaviour_translatable,
+            'tree' => $this->behaviour_tree,
             'pk' => $this->pk,
             'item' => $this->item,
             'config' => $this->config,
-            'url_crud' => $this->config['controller_url'].'/crud/'.($this->item->is_new() ? '' : '/'.$this->item->{$this->pk}),
-            'fieldset' => $fieldset,
-            'tab_params' => $this->get_tab_params(),
         );
         if ($this->behaviour_translatable)
         {
             $params['lang'] = $this->item->{$this->behaviour_translatable['lang_property']};
         }
+        return $params;
+    }
 
-        return \View::forge($this->config['views']['form'], $params, false);
+    public function action_form($id = null)
+    {
+        try {
+            $this->item = $this->crud_item($id);
+            if ($this->item->is_new())
+            {
+                $create_from_id = \Input::get('create_from_id', 0);
+                if (!empty($create_from_id))
+                {
+                    $this->item_from = $this->crud_item($create_from_id);
+                }
+            }
+            $this->form_item();
+            $this->check_permission($this->item->is_new() ? 'insert' : 'update');
+
+            $fields = $this->fields($this->config['fields']);
+            $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
+            $fieldset = $this->fieldset($fieldset);
+
+
+            $params = array_merge($this->view_params(), array(
+                'url_crud' => $this->config['controller_url'].'/crud/'.($this->item->is_new() ? '' : '/'.$this->item->{$this->pk}),
+                'fieldset' => $fieldset,
+                'tab_params' => $this->get_tab_params(),
+            ));
+
+            return \View::forge($this->config['views']['form'], array('crud' => $params), false);
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
     }
 
     protected function form_item()
@@ -240,7 +266,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
-    public function blank_slate($id, $selected_lang)
+    public function blank_slate($id, $lang)
     {
         $this->item = $this->crud_item($id);
         if (empty($lang))
@@ -269,7 +295,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $labelUpdate = $this->config['tab']['labels']['update'];
         $tabInfos = array(
             'iconUrl' => $this->config['tab']['iconUrl'],
-            'label' => $this->item->is_new() ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : $this->item->{$labelUpdate}),
+            'label' => $this->item->is_new() ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
             'url' => $this->config['controller_url'].'/crud'.($this->item->is_new() ? '?lang='.$this->item->get_lang() : '/'.$this->item->id),
             'actions' => array_values($this->get_actions_lang($this->item)),
         );
@@ -332,4 +358,120 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $actions;
     }
 
+    protected function check_permission($action) {
+        if ($action === 'delete' && $this->item->is_new()) {
+            throw new \Exception($this->config['messages']['not found']);
+        }
+    }
+
+    public function action_delete($id)
+    {
+        try {
+            $this->item = $this->crud_item($id);
+            $this->check_permission('delete');
+            return \View::forge($this->config['views']['delete'], array('crud' => $this->view_params()), false);
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+    }
+
+    public function action_delete_confirm()
+    {
+        try {
+            $dispatchEvent = null;
+            $id = \Input::post('id', 0);
+            if (empty($id) && \Fuel::$env === \Fuel::DEVELOPMENT) {
+                $id = \Input::get('id');
+            }
+
+            $this->item = $this->crud_item($id);
+            $this->check_permission('delete');
+
+            $dispatchEvent = array(
+                'name' => $this->config['model'],
+                'action' => 'delete',
+                'id' => $id,
+            );
+            if ($this->behaviour_translatable)
+            {
+                $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviour_translatable['common_id_property']};
+                $dispatchEvent['id'] = array();
+                $dispatchEvent['lang'] = array();
+
+                // Delete all languages by default
+                $lang = \Input::post('lang', 'all');
+
+                // Delete children for all languages
+                if ($lang === 'all') {
+                    foreach ($this->item->find_lang('all') as $item_lang)
+                    {
+                        $dispatchEvent['id'][] = $item_lang->{$this->pk};
+                        $dispatchEvent['lang'][] = $item_lang->{$this->behaviour_translatable['lang_property']};
+
+                        if ($this->behaviour_tree)
+                        {
+                            foreach ($item_lang->get_ids_children(false) as $item_id)
+                            {
+                                $dispatchEvent['id'][] = $item_id;
+                            }
+                        }
+                    }
+
+                    // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
+                    // Optimised operation for deleting all languages
+                    $this->item->delete_all_lang();
+
+                } else {
+                    // Search for the appropriate page
+                    if ($this->item->get_lang() != $lang) {
+                        $this->item = $this->item->find_lang($lang);
+                    }
+                    $this->check_permission('delete');
+
+                    $dispatchEvent['id'][] = $this->item->{$this->pk};
+                    $dispatchEvent['lang'][] = $this->item->{$this->behaviour_translatable['lang_property']};
+                    if ($this->behaviour_tree)
+                    {
+                        foreach ($this->item->get_ids_children(false) as $item_id)
+                        {
+                            $dispatchEvent['id'][] = $item_id;
+                        }
+                    }
+
+                    // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
+                    // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
+                    $this->item->delete();
+                }
+            } else {
+                if ($this->behaviour_tree)
+                {
+                    $dispatchEvent['id'] = array($this->item->{$this->pk});
+                    foreach ($this->item->get_ids_children(false) as $item_id)
+                    {
+                        $dispatchEvent['id'][] = $item_id;
+                    }
+                }
+
+                $this->item->delete();
+            }
+
+            $this->response(array(
+                'notify' => $this->config['messages']['successfully deleted'],
+                'dispatchEvent' => $dispatchEvent,
+            ));
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+    }
+
+    protected function send_error($exception) {
+        // Easy debug
+        if (\Fuel::$env === \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
+            throw $exception;
+        }
+        $body = array(
+            'error' => $exception->getMessage(),
+        );
+        \Response::json($body);
+    }
 }

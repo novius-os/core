@@ -263,12 +263,14 @@ class Fieldset extends \Fuel\Core\Fieldset {
 			if (!empty($settings['widget'])) {
 				 $class = $settings['widget'];
 				 $attributes['widget_options'] = isset($settings['widget_options']) ? $settings['widget_options'] : array();
-				 $field = new $class($p, $label, $attributes, array(), $this);
+                 $attributes['widget_options']['instance'] = $options['instance'];
+                 $field = new $class($p, $label, $attributes, array(), $this);
 				 $this->add_field($field);
 			} else {
                 if (\Arr::get($attributes, 'type', '') == 'checkbox') {
                     unset($attributes['empty']);
                 }
+                $attributes['widget_options'] = array('instance' => $options['instance']);
 				$field = $this->add($p, $label, $attributes);
 			}
 			if ( ! empty($settings['validation']))
@@ -333,19 +335,18 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 	public static function build_from_config($config, $model = null, $options = array()) {
 
+        $instance = null;
 		if (is_object($model)) {
 			$instance = $model;
-			$class = get_class($instance);
 			empty($options['action']) && $options['action'] = 'edit';
 		} else if (is_string($model)) {
 			$instance = null;
-			$class = $model;
 			empty($options['action']) && $options['action'] = 'add';
 		} else if (is_array($model)) {
 			$options = $model;
-			$class = null;
 			$instance = null;
 		}
+        $options['instance'] = $instance;
 
         $options = \Arr::merge(array(
             'save' => \Input::method() == 'POST',
@@ -392,7 +393,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				if (!empty($options['complete']) && is_callable($options['complete'])) {
                     $json = call_user_func($options['complete'], $data, $model, $config, $options);
 				} else {
-                    $json = self::defaultComplete($data, $model, $config, $options);
+                    $json = static::defaultComplete($data, $model, $config, $options);
                 }
                 \Response::json($json);
 			} else {
@@ -514,7 +515,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
                     continue;
                 }
 
-				if (!empty($config['before_save']) && is_callable($config['before_save'])) {
+                if (!empty($config['widget']) && !$options['fieldset']->fields[$name]->before_save($object, $data)) {
+                    continue;
+                }
+
+                if (!empty($config['before_save']) && is_callable($config['before_save'])) {
 					call_user_func($config['before_save'], $object, $data);
 				} else {
 					if ($type == 'checkbox' && empty($data[$name])) {

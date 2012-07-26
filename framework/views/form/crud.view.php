@@ -7,17 +7,17 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-echo $fieldset->open($url_crud);
+echo $crud['fieldset']->open($crud['url_crud']);
 echo View::forge('nos::form/crud_tab', array(
-        'model' => $model,
-        'pk' => $pk,
-        'item' => $item,
-        'config' => $config,
-        'fieldset' => $fieldset,
-        'tab_params' => $tab_params,
+        'model' => $crud['model'],
+        'pk' => $crud['pk'],
+        'item' => $crud['item'],
+        'config' => $crud['config'],
+        'fieldset' => $crud['fieldset'],
+        'tab_params' => $crud['tab_params'],
     ), false);
-echo View::forge('nos::form/layout_standard', $config['layout'] + array(
-        'fieldset' => $fieldset,
-        'object' => $item,
+echo View::forge('nos::form/layout_standard', $crud['config']['layout'] + array(
+        'fieldset' => $crud['fieldset'],
+        'object' => $crud['item'],
     ), false);
-echo $fieldset->close();
+echo $crud['fieldset']->close();

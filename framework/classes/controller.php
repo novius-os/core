@@ -14,6 +14,7 @@ use Event;
 
 class Controller extends \Fuel\Core\Controller_Hybrid {
     protected $config = array();
+    protected $app_config = array();
 
     /**
      * @var string page template
@@ -35,6 +36,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         }
 
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
+        $this->app_config = \Arr::merge($this->app_config, static::getGlobalConfiguration());
+        \View::set_global('app_config', $this->app_config);
         $this->trigger('before', $this, 'boolean');
 
         parent::before();
@@ -123,6 +126,11 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         return static::loadConfiguration($application, $file_name);
     }
 
+    protected static function getGlobalConfiguration() {
+        list($application, $file_name) = self::getLocation();
+        return \Config::application($application);
+    }
+
     protected static function getLocation() {
         // @todo use get_called_class() instead
         $controller = explode('\\', \Request::active()->controller);
@@ -140,19 +148,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
     }
 
     protected static function loadConfiguration($module_name, $file_name) {
-        \Config::load($module_name.'::'.$file_name, true);
-        $config = \Config::get($module_name.'::'.$file_name);
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
-        $dependencies = \Config::get('data::app_dependencies', array());
-
-        if (!empty($dependencies[$module_name])) {
-            foreach ($dependencies[$module_name] as $dependency) {
-                \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
-            }
-        }
-        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
-        return $config;
+        return \Config::extendable_load($module_name, $file_name);
     }
 
 

@@ -9,6 +9,8 @@
  */
 if (!empty($begin)) {
     echo $begin;
+} else {
+    echo '<table class="fieldset">';
 }
 foreach ($fields as $field_name) {
     $field = $fieldset->field($field_name);
@@ -22,4 +24,6 @@ foreach ($fields as $field_name) {
 }
 if (!empty($end)) {
     echo $end;
+} else {
+    echo '</table>';
 }

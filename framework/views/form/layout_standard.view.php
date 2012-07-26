@@ -144,25 +144,39 @@ $large = !empty($large) && $large == true;
     <div style="clear:both;">
         <div class="line ui-widget" style="margin: 0 2em 2em;">
 <?php
-            $menu = empty($menu) ? array() : (array) $menu;
-            $content = empty($content) ? array() : (array) $content;
+            $menus = empty($menu) ? array() : (array) $menu;
+            $contents = empty($content) ? array() : (array) $content;
 ?>
             <?= $large ? '' : '<div class="unit col c1"></div>' ?>
             <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
 <?php
-    foreach ($content as $view) {
-        if (!empty($view['view'])) {
-            echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);
+    foreach ($contents as $content) {
+        if (is_array($content) && !empty($content['view'])) {
+            echo View::forge($content['view'], array('fieldset' => $fieldset, 'object' => $object) + $content['params'], false);
+        } else if (is_callable($content)) {
+            echo $content();
+        } else {
+            echo $content;
         }
     }
 ?>
             </div>
 <?php
-    if (!empty($menu)) {
+    if (!empty($menus)) {
+
 ?>
                 <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
 <?php
-        foreach ($menu as $view) {
+        list($menu) = $menus;
+        if (!empty($menu['view'])) {
+            $menus = array(
+                array(
+                    'view' => 'nos::form/accordion',
+                    'params' => $menu
+                ),
+            );
+        }
+        foreach ($menus as $view) {
             if (!empty($view['view'])) {
                 echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);
             }

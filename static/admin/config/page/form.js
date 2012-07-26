@@ -141,12 +141,19 @@ define(
                 }
             }).triggerHandler('change');
 
-            var replace_url = function(text)  {
-                if (!text) {
-                    return text;
+            var replace_url = function(str) {
+                if (!str) {
+                    return str;
                 }
-                return text.replace(/ +/g, '-');
-            }
+                return str.replace(/_/g, '-')
+                    .replace(/ /g, '-')
+                    .replace(/:/g, '-')
+                    .replace(/\\/g, '-')
+                    .replace(/\//g, '-')
+                    .replace(/[^a-zA-Z0-9\-]+/g, '')
+                    .replace(/-{2,}/g, '-')
+                    .toLowerCase();
+            };
 
             var $virtual_name  = $container.find('input[name=page_virtual_name]');
             var $checkbox_url = $container.find('input[data-id=same_url_title]');
