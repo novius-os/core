@@ -167,7 +167,7 @@ $large = !empty($large) && $large == true;
 ?>
                 <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
 <?php
-        list($menu) = $menus;
+        $menu = next($menus);
         if (!empty($menu['view'])) {
             $menus = array(
                 array(
@@ -176,6 +176,7 @@ $large = !empty($large) && $large == true;
                 ),
             );
         }
+        reset($menus);
         foreach ($menus as $view) {
             if (!empty($view['view'])) {
                 echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);
