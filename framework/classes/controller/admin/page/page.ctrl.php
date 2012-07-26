@@ -106,7 +106,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
 
     protected function check_permission($action) {
         parent::check_permission($action);
-        if (!static::check_permission_action('delete', 'controller/admin/page/appdesk/list', $this->item)) {
+        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/page/appdesk/list', $this->item)) {
             throw new \Exception('Permission denied');
         }
     }
