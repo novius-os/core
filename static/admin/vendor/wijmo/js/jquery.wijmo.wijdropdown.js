@@ -495,7 +495,7 @@
 			//self.oldVal = ele.val();
 			//ele.val(self._value);
 			if (oldSelectedIndex !== selectedIndex) {
-				oldSelectedItem.removeAttr('selected');
+				//oldSelectedItem.removeAttr('selected'); // @todo : Fixed Novius OS
 				ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
 
 				ele.trigger("change");
