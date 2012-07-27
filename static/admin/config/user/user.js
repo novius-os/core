@@ -34,12 +34,17 @@ define(
                         icon : 'trash',
                         primary : true,
                         action : function(item, ui) {
-                            $(ui).nosDialog({
-                                contentUrl: 'admin/nos/user/user/delete_user/' + item.id,
-                                ajax : true,
+                            $(ui).nosConfirmationDialog({
+                                contentUrl: 'admin/nos/user/user/delete/' + item.id,
                                 title: appDesk.i18n('Delete a user')._(),
-                                width: 400,
-                                height: 150
+                                confirmed: function($dialog) {
+                                    $dialog.nosAjax({
+                                        url : 'admin/nos/user/user/delete_confirm',
+                                        method : 'POST',
+                                        data : $dialog.find('form').serialize()
+                                    });
+                                },
+                                appDesk: appDesk
                             });
                         }
                     }

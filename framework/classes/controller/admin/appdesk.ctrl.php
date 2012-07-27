@@ -25,28 +25,22 @@ use Asset, Format, Input, Session, View, Uri;
  */
 class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
-    protected $appdesk = array();
-
     public function before() {
         parent::before();
-        if (!isset($this->config['appdesk'])) {
-            list($application, $file_name) = \Config::configFile(get_called_class());
-        } else {
-            list($application, $file_name) = explode('::', $this->config['appdesk']);
-        }
 
-        $this->appdesk = \Config::mergeWithUser($application.'::'.$file_name, \Config::loadConfiguration($application, $file_name));
+        list($application, $file_name) = \Config::configFile(get_called_class());
+        $this->config = \Config::mergeWithUser($application.'::'.$file_name, $this->config);
     }
 
     public function action_index($view = null) {
 
         if (empty($view)) {
-            $view = \Input::get('view', $this->appdesk['selectedView']);
+            $view = \Input::get('view', $this->config['selectedView']);
         }
-        $this->appdesk['selectedView'] = $view;
+        $this->config['selectedView'] = $view;
 
-        if (empty($this->appdesk['custom'])) {
-            $this->appdesk['custom'] = array(
+        if (empty($this->config['custom'])) {
+            $this->config['custom'] = array(
                 'from' => 'default',
             );
         }
@@ -55,13 +49,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
         $locales = \Config::get('locales', array());
 
-        $view->set('appdesk', \Format::forge(array_merge(array('locales' => $locales), $this->appdesk))->to_json(), false);
+        $view->set('appdesk', \Format::forge(array_merge(array('locales' => $locales), $this->config))->to_json(), false);
         return $view;
     }
 
     public function action_json()
     {
-        $config = $this->appdesk;
+        $config = $this->config;
         $where = function($query) use ($config) {
             foreach ($config['inputs'] as $input => $condition) {
                 $value = Input::get('inspectors.'.$input);
@@ -91,11 +85,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
             return $query;
         };
 
-        $return = $this->items(array_merge($this->appdesk['query'], array(
-            'callback' => array_merge(\Arr::get($this->appdesk['query'], 'callback', array()), array($where)),
-            'dataset' => $this->appdesk['dataset'],
+        $return = $this->items(array_merge($this->config['query'], array(
+            'callback' => array_merge(\Arr::get($this->config['query'], 'callback', array()), array($where)),
+            'dataset' => $this->config['dataset'],
             'lang' => Input::get('lang', null),
-            'limit' => intval(Input::get('limit', \Arr::get($this->appdesk['query'], 'limit'))),
+            'limit' => intval(Input::get('limit', \Arr::get($this->config['query'], 'limit'))),
             'offset' => intval(Input::get('offset', 0)),
         )));
 
@@ -123,8 +117,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
 
     public function action_tree_json()
     {
-        $tree_config = $this->appdesk['tree'];
-        $tree_config['id'] =  $this->appdesk['configuration_id'];
+        $tree_config = $this->config['tree'];
+        $tree_config['id'] =  $this->config['configuration_id'];
 
         $json = $this->tree($tree_config);
 

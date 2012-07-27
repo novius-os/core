@@ -266,30 +266,22 @@ define('jquery-nos',
                     },
                     $input = this;
 
-                var $dialog = null;
-
                 var options = $.extend({
                     title: $input.attr('title') || 'File',
                     allowDelete : true,
                     choose: function() {
-                        // Open the dialog to choose the file
-                        if ($dialog === null) {
-                            $dialog = $input.nosDialog({
-                                destroyOnClose : false,
+                        var $dialog = $input.nosDialog({
+                                destroyOnClose : true,
                                 contentUrl: contentUrls[data.mode],
                                 ajax: true,
                                 title: 'Choose a media file'
-                            });
-                            $dialog.bind('select_media', function(e, item) {
+                            }).bind('select_media', function(e, item) {
                                 $input.inputFileThumb({
                                     file: item.thumbnail
                                 });
                                 $input.val(item.id);
                                 $dialog.nosDialog('close');
                             });
-                        } else {
-                            $dialog.nosDialog('open');
-                        }
                     }
                 }, data.inputFileThumb || {});
 

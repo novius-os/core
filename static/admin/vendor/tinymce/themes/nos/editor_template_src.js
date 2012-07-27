@@ -13,7 +13,7 @@
 
     // Generates a preview for a format
     function getPreviewCss(ed, fmt) {
-        var previewElm, dom = ed.dom, previewCss = '', parentFontSize, previewStylesName;
+        var name, previewElm, dom = ed.dom, previewCss = '', parentFontSize, previewStylesName;
 
         previewStyles = ed.settings.preview_styles;
 
@@ -1245,6 +1245,7 @@
 					var f = Event.add(ed.id + '_external_close', 'click', function() {
 						DOM.hide(ed.id + '_external');
 						Event.remove(ed.id + '_external_close', 'click', f);
+                        return false;
 					});
 
 					DOM.show(e);
@@ -1457,6 +1458,8 @@
 							width = startWidth + (e.screenX - startX);
 							height = startHeight + (e.screenY - startY);
 							t.resizeTo(width, height, true);
+
+                            ed.nodeChanged();
 						};
 
 						e.preventDefault();
@@ -1712,7 +1715,7 @@
 						ti += 'id: ' + v + ' ';
 
 					if (v = n.className) {
-						v = v.replace(/\b\s*(webkit|mce|Apple-)\w+\s*\b/g, '')
+                        v = v.replace(/\b\s*(webkit|mce|Apple-)\w+\s*\b/g, '');
 
 						if (v) {
 							ti += 'class: ' + v + ' ';
@@ -1966,12 +1969,12 @@
 
 			// Open the dialog popup (it returns the node inserted in the body)
             if (metadata.dialog.ajax || !edit) {
-                dialog = $nos(ed.formElement).nosDialog($.extend({
+                dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
                 }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
             } else {
                 // Open empty dialog
-                dialog = $nos(ed.formElement).nosDialog($.extend({
+                dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
                 }, $.extend({}, metadata.dialog, {contentUrl : null})));
 
@@ -2020,7 +2023,7 @@
                 e = ed.dom.getParent(ed.selection.getNode(), 'A');
 
             var dialog = null;
-            dialog = $nos(ed.formElement).nosDialog({
+            dialog = $nos(ed.getElement()).nosDialog({
                 contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
                 title: e ? ed.getLang('nos.link_edit') : ed.getLang('nos.link_insert'),
                 ajax: true,
@@ -2078,7 +2081,7 @@
             var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
 
 			var dialog = null;
-            dialog = $nos(ed.formElement).nosDialog({
+            dialog = $nos(ed.getElement()).nosDialog({
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
 				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
 				ajax: true,

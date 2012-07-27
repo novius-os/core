@@ -14,6 +14,7 @@ use Event;
 
 class Controller extends \Fuel\Core\Controller_Hybrid {
     protected $config = array();
+    protected $app_config = array();
 
     /**
      * @var string page template
@@ -35,6 +36,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         }
 
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
+        $this->app_config = \Arr::merge($this->app_config, static::getGlobalConfiguration());
+        \View::set_global('app_config', $this->app_config);
         $this->trigger('before', $this, 'boolean');
 
         parent::before();
@@ -124,61 +127,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    protected static function getGlobalConfiguration() {
+        list($application, $file_name) = \Config::configFile(get_called_class());
+        return \Config::application($application);
+    }
 
 
     /* @todo TO BE MOVED */

@@ -94,7 +94,6 @@ define('jquery-nos-validate',
                 accordion_header.closest('.ui-accordion').unbind('wijaccordionselectedindexchanged').bind('wijaccordionselectedindexchanged', function(e, args) {
                     var contents = $(this).find('.ui-accordion-content');
                     var label = contents.eq(args.newIndex).find('label[generated=true]');
-                    log(label.data('wijtooltip-manuallyclosed'));
 
                     if (label.data('wijtooltip-manuallyclosed')) {
 
