@@ -270,7 +270,7 @@ define('jquery-nos',
                     title: $input.attr('title') || 'File',
                     allowDelete : true,
                     choose: function() {
-                        $input.nosDialog({
+                        var $dialog = $input.nosDialog({
                                 destroyOnClose : true,
                                 contentUrl: contentUrls[data.mode],
                                 ajax: true,
