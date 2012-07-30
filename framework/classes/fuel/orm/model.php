@@ -397,27 +397,34 @@ class Model extends \Orm\Model {
      * Remove empty wysiwyg and medias
      */
 	public function _event_before_save() {
-        $w_keys = array_keys($this->linked_wysiwygs);
-        for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
+        $class = get_called_class();
+        if ($class !== 'Nos\Model_Wysiwyg')
         {
-            $i = $w_keys[$j];
-            // Remove empty wysiwyg
-            if ($this->linked_wysiwygs[$i]->wysiwyg_text == '')
+            $w_keys = array_keys($this->linked_wysiwygs);
+            for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
             {
-                $this->linked_wysiwygs[$i]->delete();
-                unset($this->linked_wysiwygs[$i]);
+                $i = $w_keys[$j];
+                // Remove empty wysiwyg
+                if ($this->linked_wysiwygs[$i]->wysiwyg_text == '')
+                {
+                    $this->linked_wysiwygs[$i]->delete();
+                    unset($this->linked_wysiwygs[$i]);
+                }
             }
         }
 
-        $w_keys = array_keys($this->linked_medias);
-        for ($j = 0; $j < count($this->linked_medias); $j++)
+        if ($class !== 'Nos\Model_Media_Link')
         {
-            $i = $w_keys[$j];
-            // Remove empty medias
-            if ($this->linked_medias[$i]->medil_media_id == '')
+            $w_keys = array_keys($this->linked_medias);
+            for ($j = 0; $j < count($this->linked_medias); $j++)
             {
-                $this->linked_medias[$i]->delete();
-                unset($this->linked_medias[$i]);
+                $i = $w_keys[$j];
+                // Remove empty medias
+                if ($this->linked_medias[$i]->medil_media_id == '')
+                {
+                    $this->linked_medias[$i]->delete();
+                    unset($this->linked_medias[$i]);
+                }
             }
         }
 	}
@@ -536,7 +543,8 @@ class Model extends \Orm\Model {
 
 		if (count($arr_name) > 1)
 		{
-            if ($arr_name[0] == 'wysiwygs')
+            $class = get_called_class();
+            if ($class !== 'Nos\Model_Wysiwyg' && $arr_name[0] == 'wysiwygs')
 			{
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_wysiwygs);
@@ -566,7 +574,7 @@ class Model extends \Orm\Model {
 				return $value;
 			}
 
-            if ($arr_name[0] == 'medias')
+            if ($class !== 'Nos\Model_Media_Link' && $arr_name[0] == 'medias')
 			{
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_medias);
@@ -618,8 +626,9 @@ class Model extends \Orm\Model {
 		$arr_name = explode('->', $name);
 		if (count($arr_name) > 1)
 		{
-            if ($arr_name[0] == 'wysiwygs')
-			{
+            $class = get_called_class();
+            if ($class !== 'Nos\Model_Wysiwyg' && $arr_name[0] == 'wysiwygs')
+            {
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_wysiwygs);
                 for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
@@ -639,7 +648,7 @@ class Model extends \Orm\Model {
 				return $ref;
 			}
 
-            if ($arr_name[0] == 'medias')
+            if ($class !== 'Nos\Model_Media_Link' && $arr_name[0] == 'medias')
 			{
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_medias);
@@ -906,6 +915,7 @@ class Model_Wysiwyg_Provider implements \Iterator
 
     function rewind() {
         $keys = array();
+        $class = get_called_class();
         foreach($this->parent->linked_wysiwygs as $wysiwyg) {
             $keys[] = $wysiwyg->wysiwyg_key;
         }
