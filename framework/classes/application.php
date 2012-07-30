@@ -215,7 +215,7 @@ class Application
         // Load current data
         $data_path = APPPATH.'data'.DS.'config'.DS;
         $config = array();
-        foreach (array('templates', 'enhancers', 'launchers', 'models_url_enhanced', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section)
+        foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section)
         {
             \Config::load($data_path.$section.'.php', 'data::'.$section);
             $config[$section] = \Config::get('data::'.$section, array());
@@ -311,24 +311,6 @@ class Application
         }
 
         // More treatment for enhancers
-        foreach ($added['enhancers'] as $key => $enhancer)
-        {
-            foreach ($enhancer['models_url_enhanced'] as $model)
-            {
-                $config['models_url_enhanced'][$model][] = $key;
-            }
-        }
-
-        foreach ($removed['enhancers'] as $key => $enhancer)
-        {
-            foreach ($enhancer['models_url_enhanced'] as $model)
-            {
-                foreach (array_keys($config['models_url_enhanced'][$model], $key) as $remove)
-                {
-                    unset($config['models_url_enhanced'][$model][$remove]);
-                }
-            }
-        }
 
         $old_namespace = \Arr::get($old_metadata, 'namespace', '');
         $new_namespace = \Arr::get($new_metadata, 'namespace', '');

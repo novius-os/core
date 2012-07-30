@@ -19,41 +19,36 @@ class Orm_Behaviour_Url extends Orm_Behaviour
 	 */
 	protected $_properties = array();
 
-	public function first_url($object) {
-		return static::_possible_url($object, true);
-	}
+    public function urls($object, $first = false) {
+        $urls = array();
+        foreach ($this->_properties['urls'] as $function)
+        {
+            if (is_callable($function))
+            {
+                $temp_urls = call_user_func($function, $object, $first);
+                $temp_urls = is_array($temp_urls) ? $temp_urls : array($temp_urls);
+                if ($first && count($temp_urls))
+                {
+                    return $temp_urls[0];
+                }
+                else
+                {
+                    $urls = array_merge($urls, $temp_urls);
+                }
+            }
+        }
+        return $urls;
+    }
 
-	static protected function _possible_url($object, $first = false) {
-		\Config::load(APPPATH.'data'.DS.'config'.DS.'models_url_enhanced.php', 'models_url_enhanced');
-		\Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
-		\Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'page_enhanced');
-		$models_url_enhanced = \Config::get('models_url_enhanced', array());
-		$enhancers = \Config::get('enhancers', array());
-		$page_enhanced = \Config::get('page_enhanced', array());
-		$class = get_class($object);
-		$urls = array();
-		if (isset($models_url_enhanced[$class])) {
-			foreach ($models_url_enhanced[$class] as $enhancer) {
-				if (isset($enhancers[$enhancer]) && isset($enhancers[$enhancer]['get_url_model']) && isset($page_enhanced[$enhancer])) {
-					$function = $enhancers[$enhancer]['get_url_model'];
-					foreach ($page_enhanced[$enhancer] as $page_id => $params) {
-						if ($page = Model_Page::find($page_id)) {
-                            $urlPath = mb_substr($page->get_href(), 0, -5).'/';
-							if ($url = call_user_func($function, $object, array('urlPath' => $urlPath, 'enhancer_config' => $params))) {
-								if ($url && $first) {
-									return $url;
-								}
-								$urls[] = array(
-									'url' => $url,
-                                    'itemUrl' => str_replace($urlPath, '', $url),
-									'page_id' => $page_id,
-								);
-							}
-						}
-					}
-				}
-			}
-		}
-		return $first ? null : $urls;
-	}
+    public function url_canonical($object) {
+        if ($object::behaviours('Nos\Orm_Behaviour_Sharable')) {
+            $default_nuggets = $object->get_catcher_nuggets(Model_Content_Nuggets::DEFAULT_CATCHER);
+            $nuggets = $default_nuggets->content_data;
+            if (!empty($nuggets[\Nos\DataCatcher::TYPE_URL])) {
+                return $nuggets[\Nos\DataCatcher::TYPE_URL];
+            }
+        }
+
+        return static::urls($object, true);
+    }
 }
