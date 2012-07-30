@@ -25,7 +25,7 @@ define(
                         icon : 'pencil',
                         action : function(item, ui) {
                             $(ui).nosTabs({
-                                url : 'admin/nos/page/page/crud/' + item.id,
+                                url : 'admin/nos/page/page/insert_update/' + item.id,
                                 label : item.title,
                                 iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                             });
@@ -38,11 +38,11 @@ define(
                         icon : 'trash',
                         action : function(item, ui) {
                             $(ui).nosConfirmationDialog({
-                                contentUrl: 'admin/nos/page/page/delete_page/' + item.id,
+                                contentUrl: 'admin/nos/page/page/delete/' + item.id,
                                 title: appDesk.i18n('Delete a page')._(),
                                 confirmed: function($dialog) {
                                     $dialog.nosAjax({
-                                        url : 'admin/nos/page/page/delete_page_confirm',
+                                        url : 'admin/nos/page/page/delete_confirm',
                                         method : 'POST',
                                         data : $dialog.find('form').serialize()
                                     });
@@ -83,7 +83,7 @@ define(
                             label : appDesk.i18n('Add a page'),
                             action : function(ui, appdesk) {
                                 $(ui).nosTabs('add', {
-                                    url: 'admin/nos/page/page/crud?lang=' + appdesk.lang,
+                                    url: 'admin/nos/page/page/insert_update?lang=' + appdesk.lang,
                                     label: appDesk.i18n('Add a page')._(),
                                     iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
                                 });

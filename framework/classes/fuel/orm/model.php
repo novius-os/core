@@ -22,12 +22,69 @@ class Model extends \Orm\Model {
 	protected static $_has_many = array();
 
 	/**
-	 * @var  array  cached observers
+	 * @var  array  cached behaviours
 	 */
 	protected static $_behaviours_cached = array();
 
-	public $medias;
+    /**
+     * @var  array  cached title property
+     */
+    protected static $_title_property_cached = array();
+
+    public $medias;
 	public $wysiwygs;
+
+    /**
+     * Get the class's title property
+     *
+     * @return  mixed
+     */
+    public static function title_property()
+    {
+        $class = get_called_class();
+
+        if ( ! array_key_exists($class, static::$_title_property_cached))
+        {
+            $_title_property = null;
+
+            if (property_exists($class, '_title_property'))
+            {
+                $_title_property = static::$_title_property;
+            }
+
+            $config = static::_config();
+            if (!empty($config) && !empty($config['title_property'])) {
+                $_title_property = $config['title_property'];
+            }
+
+            if (empty($_title_property)) {
+                $properties = static::properties();
+                foreach ($properties as $column => $props) {
+                    if (strpos($column, 'title') !== false || strpos($column, 'label') !== false || strpos($column, 'name') !== false) {
+                        $_title_property = $column;
+                        break;
+                    }
+                }
+            }
+
+            if (empty($_title_property)) {
+                foreach ($properties as $column => $props) {
+                    if ($props['data_type'] === 'varchar') {
+                        $_title_property = $column;
+                        break;
+                    }
+                }
+            }
+
+            if (empty($_title_property)) {
+                $_title_property = \Arr::get(static::primary_key(), 0);
+            }
+
+            static::$_title_property_cached[$class] = $_title_property;
+        }
+
+        return static::$_title_property_cached[$class];
+    }
 
     /**
      *  @see \Orm\Model::table()
@@ -82,31 +139,37 @@ class Model extends \Orm\Model {
 
         if ( ! array_key_exists($class, static::$_relations_cached))
         {
-            static::$_has_many['linked_wysiwygs'] = array(
-                'key_from' => static::$_primary_key[0],
-                'model_to' => 'Nos\Model_Wysiwyg',
-                'key_to' => 'wysiwyg_foreign_id',
-                'cascade_save' => true,
-                'cascade_delete' => false,
-                'conditions'     => array(
-                    'where' => array(
-                        array('wysiwyg_join_table', '=', static::$_table_name),
+            if ($class !== 'Nos\Model_Wysiwyg')
+            {
+                static::$_has_many['linked_wysiwygs'] = array(
+                    'key_from' => static::$_primary_key[0],
+                    'model_to' => 'Nos\Model_Wysiwyg',
+                    'key_to' => 'wysiwyg_foreign_id',
+                    'cascade_save' => true,
+                    'cascade_delete' => false,
+                    'conditions'     => array(
+                        'where' => array(
+                            array('wysiwyg_join_table', '=', static::$_table_name),
+                        ),
                     ),
-                ),
-            );
+                );
+            }
 
-            static::$_has_many['linked_medias'] = array(
-                'key_from' => static::$_primary_key[0],
-                'model_to' => 'Nos\Model_Media_Link',
-                'key_to' => 'medil_foreign_id',
-                'cascade_save' => true,
-                'cascade_delete' => false,
-                'conditions'     => array(
-                    'where' => array(
-                        array('medil_from_table', '=', static::$_table_name),
+            if ($class !== 'Nos\Model_Media_Link')
+            {
+                    static::$_has_many['linked_medias'] = array(
+                    'key_from' => static::$_primary_key[0],
+                    'model_to' => 'Nos\Model_Media_Link',
+                    'key_to' => 'medil_foreign_id',
+                    'cascade_save' => true,
+                    'cascade_delete' => false,
+                    'conditions'     => array(
+                        'where' => array(
+                            array('medil_from_table', '=', static::$_table_name),
+                        ),
                     ),
-                ),
-            );
+                );
+            }
 
             $config = static::_config();
             if (!empty($config))
@@ -430,7 +493,23 @@ class Model extends \Orm\Model {
         return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
     }
 
-	/**
+    /**
+     * Returns the item's title
+     *
+     * @return string
+     */
+    public function title_item() {
+        $title_property = static::title_property();
+        if (is_callable($title_property)) {
+            return $title_property($this);
+        } elseif (is_string($title_property)) {
+            return $this->{$title_property};
+        }
+
+        return null;
+    }
+
+    /**
 	 * Returns the first non empty field. Will add field prefix when needed.
 	 *
 	 * @example $object->pick('menu_title', 'title');

@@ -38,11 +38,15 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         }
 	}
 
+    public function parent_relation() {
+        return $this->_parent_relation;
+    }
+
 	public function before_query(&$options) {
 		if (array_key_exists('where', $options)) {
 			$where = $options['where'];
 			foreach ($where as $k => $w) {
-				if ($w[0] == 'parent') {
+				if (isset($w[0])  && $w[0] == 'parent') {
 					$property = $this->_parent_relation->key_from[0];
 					if ($w[1] === null) {
 						$where[$k] = array($property, 'IS', null);

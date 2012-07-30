@@ -1,7 +1,7 @@
 /* laGrid from Novius Labs (Antoine Lefeuvre and Julian Esperat) http://www.novius-labs.com
    Based on OOCSS,  Nicole Sullivan, http://oocss.org
         and 1140gs, Andy Taylor,     http://cssgrid.net */
-    
+
 .page{margin:0 auto;width:100%;max-width:1680px;}
 #lagrid {position:absolute; width: 100%; max-width: 1680px; background: url('../img/1680.png'); background-size: contain; height:90%; z-index: 999;}
 .line:before,.line:after{content:"";display:table;}
@@ -107,6 +107,7 @@
 .c9 {width: 74.05%;}
 .c10{width: 82.7%;}
 .c11{width: 91.35%;}
+.c12{width: 100%;}
 .c1 .col {margin-right:78.35%;}
 .c1 .unitRight.col {margin-left:78.35%; margin-right: 0 !important;}
 .c2 .c1 {width: 36.06%;}

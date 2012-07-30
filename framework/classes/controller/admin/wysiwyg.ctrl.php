@@ -21,14 +21,14 @@ class Controller_Admin_Wysiwyg extends \Controller {
 		$urlEnhancers = \Input::get('urlEnhancers', false);
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
-        $functions = \Config::get('enhancers', array());
+        $enhancers = \Config::get('enhancers', array());
 
 		if (!$urlEnhancers) {
-			$functions = array_filter($functions, function($params) {
-				return !empty($params['urlEnhancer']);
+			$enhancers = array_filter($enhancers, function($enhancer) {
+				return empty($enhancer['urlEnhancer']);
 			});
 		}
 
-		\Response::json($functions);
+		\Response::json($enhancers);
 	}
 }
