@@ -139,31 +139,37 @@ class Model extends \Orm\Model {
 
         if ( ! array_key_exists($class, static::$_relations_cached))
         {
-            static::$_has_many['linked_wysiwygs'] = array(
-                'key_from' => static::$_primary_key[0],
-                'model_to' => 'Nos\Model_Wysiwyg',
-                'key_to' => 'wysiwyg_foreign_id',
-                'cascade_save' => true,
-                'cascade_delete' => false,
-                'conditions'     => array(
-                    'where' => array(
-                        array('wysiwyg_join_table', '=', static::$_table_name),
+            if ($class !== 'Nos\Model_Wysiwyg')
+            {
+                static::$_has_many['linked_wysiwygs'] = array(
+                    'key_from' => static::$_primary_key[0],
+                    'model_to' => 'Nos\Model_Wysiwyg',
+                    'key_to' => 'wysiwyg_foreign_id',
+                    'cascade_save' => true,
+                    'cascade_delete' => false,
+                    'conditions'     => array(
+                        'where' => array(
+                            array('wysiwyg_join_table', '=', static::$_table_name),
+                        ),
                     ),
-                ),
-            );
+                );
+            }
 
-            static::$_has_many['linked_medias'] = array(
-                'key_from' => static::$_primary_key[0],
-                'model_to' => 'Nos\Model_Media_Link',
-                'key_to' => 'medil_foreign_id',
-                'cascade_save' => true,
-                'cascade_delete' => false,
-                'conditions'     => array(
-                    'where' => array(
-                        array('medil_from_table', '=', static::$_table_name),
+            if ($class !== 'Nos\Model_Media_Link')
+            {
+                    static::$_has_many['linked_medias'] = array(
+                    'key_from' => static::$_primary_key[0],
+                    'model_to' => 'Nos\Model_Media_Link',
+                    'key_to' => 'medil_foreign_id',
+                    'cascade_save' => true,
+                    'cascade_delete' => false,
+                    'conditions'     => array(
+                        'where' => array(
+                            array('medil_from_table', '=', static::$_table_name),
+                        ),
                     ),
-                ),
-            );
+                );
+            }
 
             $config = static::_config();
             if (!empty($config))
