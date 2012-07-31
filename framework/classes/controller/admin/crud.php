@@ -112,7 +112,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'tab_params' => $this->get_tab_params(),
             ));
 
-            return \View::forge($this->config['views']['form'], array('view_params' => $params), false);
+            $return = \View::forge('nos::admin/ribbon', array('view_params' => $params), false);
+            $return .= \View::forge($this->config['views']['form'], array('view_params' => $params), false);
+
+
+            return $return;
         } catch (\Exception $e) {
             $this->send_error($e);
         }
