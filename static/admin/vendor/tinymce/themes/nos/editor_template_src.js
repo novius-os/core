@@ -309,7 +309,6 @@
 						style:  $img.attr('style')
 					})
 				});
-
 				o.content = $('<div></div>').append(content).html();
 			});
 
@@ -321,7 +320,7 @@
 
             // Previously "onSaveContent". But it seems useless...
 			ed.onPostProcess.add(function(ed, o) {
-				var content = $(o.content);
+				var content = $('<div></div>').html(o.content);
 
 				content.find('img').filter(function() {
 					return $(this).data('mediaId') || ($(this).data('media') || {}).id;// || $(this).attr('src').substr(0, 12) == 'nos://media/';
@@ -342,7 +341,7 @@
 					});
                     return $new_img;
 				});
-				o.content = $('<div></div>').append(content).html();
+                o.content = content.html();
 			});
 
 			// Global onClick handlers to execute actions from the enhancers
