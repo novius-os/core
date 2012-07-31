@@ -168,11 +168,13 @@ $large = !empty($large) && $large == true;
                 <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
 <?php
         $menu = next($menus);
-        if (!empty($menu['view'])) {
+        if (empty($menu['view'])) {
             $menus = array(
                 array(
                     'view' => 'nos::form/accordion',
-                    'params' => $menu
+                    'params' => array(
+                        'accordions' => $menu,
+                    ),
                 ),
             );
         }
