@@ -13,7 +13,7 @@
  * Set error reporting and display errors settings.  You will want to change these when in production.
  */
 
-define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
+define('DOCROOT', rtrim($_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
 define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);

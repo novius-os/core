@@ -214,31 +214,35 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     }
 
     protected function build_from_config() {
-        $is_new = $this->item->is_new();
         return array(
-            'success' => function($object, $data) use ($is_new)
-            {
-                $dispatchEvent = array(
-                    'name' => $this->config['model'],
-                    'action' => $is_new ? 'insert' : 'update',
-                    'id' => $object->{$this->pk},
-                );
-                if ($this->behaviour_translatable) {
-                    $dispatchEvent['lang_common_id'] = $object->{$this->behaviour_translatable['common_id_property']};
-                    $dispatchEvent['lang'] = $object->{$this->behaviour_translatable['lang_property']};
-                }
-
-                $return = array(
-                    'notify' =>  $is_new ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
-                    'dispatchEvent' => $dispatchEvent,
-                );
-                if ($is_new)
-                {
-                    $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
-                }
-                return $return;
-            },
+            'before_save' => array($this, 'before_save'),
+            'success' => array($this, 'save'),
         );
+    }
+
+    public function save($object, $data) {
+        $dispatchEvent = array(
+            'name' => $this->config['model'],
+            'action' => $this->item->is_new() ? 'insert' : 'update',
+            'id' => $object->{$this->pk},
+        );
+        if ($this->behaviour_translatable) {
+            $dispatchEvent['lang_common_id'] = $object->{$this->behaviour_translatable['common_id_property']};
+            $dispatchEvent['lang'] = $object->{$this->behaviour_translatable['lang_property']};
+        }
+
+        $return = array(
+            'notify' =>  $this->item->is_new() ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
+            'dispatchEvent' => $dispatchEvent,
+        );
+        if ($this->item->is_new())
+        {
+            $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
+        }
+        return $return;
+    }
+
+    public function before_save($object, $data) {
     }
 
     public function action_insert_update($id = null)

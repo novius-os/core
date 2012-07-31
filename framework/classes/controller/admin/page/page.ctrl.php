@@ -51,29 +51,22 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         }
     }
 
-    protected function build_from_config()
-    {
-        $options = parent::build_from_config();
+    public function before_save($page, $data) {
+        // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
+        // https://github.com/fuel/orm/issues/171
+        //$parent = $page->find_parent();
 
-        $options['before_save'] = function($page, $data) {
-            // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
-            // https://github.com/fuel/orm/issues/171
-            //$parent = $page->find_parent();
+        // Instead, retrieve the object manually
+        // Model::find(null) returns an Orm\Query. We don't want that.
+        $parent = empty($page->page_parent_id) ? null : Model_Page::find($page->page_parent_id);
 
-            // Instead, retrieve the object manually
-            // Model::find(null) returns an Orm\Query. We don't want that.
-            $parent = empty($page->page_parent_id) ? null : Model_Page::find($page->page_parent_id);
+        // Event 'after_change_parent' will set the appropriate lang
+        $page->set_parent($parent);
+        $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
-            // Event 'after_change_parent' will set the appropriate lang
-            $page->set_parent($parent);
-            $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
-
-            foreach (\Input::post('wysiwyg', array()) as $key => $text) {
-                $page->wysiwygs->$key = $text;
-            }
-        };
-
-        return $options;
+        foreach (\Input::post('wysiwyg', array()) as $key => $text) {
+            $page->wysiwygs->$key = $text;
+        }
     }
 
     protected function fieldset($fieldset)
