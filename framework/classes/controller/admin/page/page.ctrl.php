@@ -51,7 +51,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         }
     }
 
-    protected function before_save($page, $data) {
+    public function before_save($page, $data) {
         // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
         // https://github.com/fuel/orm/issues/171
         //$parent = $page->find_parent();

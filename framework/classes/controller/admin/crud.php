@@ -216,7 +216,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
     }
 
-    protected function save($object, $data) {
+    public function save($object, $data) {
         $dispatchEvent = array(
             'name' => $this->config['model'],
             'action' => $this->item->is_new() ? 'insert' : 'update',
@@ -228,17 +228,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $return = array(
-            'notify' =>  $is_new ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
+            'notify' =>  $this->item->is_new() ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
             'dispatchEvent' => $dispatchEvent,
         );
-        if ($is_new)
+        if ($this->item->is_new())
         {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
         }
         return $return;
     }
 
-    protected function before_save($object, $data) {
+    public function before_save($object, $data) {
     }
 
     public function action_insert_update($id = null)
