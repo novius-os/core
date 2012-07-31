@@ -15,7 +15,7 @@
 error_reporting(-1);
 ini_set('display_errors', 1);
 
-define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
+define('DOCROOT', rtrim($_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
 define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
