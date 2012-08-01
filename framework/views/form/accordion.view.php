@@ -13,6 +13,9 @@ $fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class
 <div class="accordion fieldset">
 <?php
     foreach ((array) $accordions as $options) {
+        if (!is_array($options)) {
+            $options = array($options);
+        }
         if (!isset($options['fields'])) {
             $options = array('fields' => $options);
         }
