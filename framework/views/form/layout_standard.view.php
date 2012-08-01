@@ -167,16 +167,23 @@ $large = !empty($large) && $large == true;
 ?>
                 <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
 <?php
-        $menu = next($menus);
-        if (!empty($menu['view'])) {
+        $menu = current($menus);
+        if (empty($menu['view'])) {
+            $accordions = array();
+            foreach ($menus as $key => $menu) {
+                if (isset($menu['fields'])) {
+                    $accordions[$key] = array_merge(array('title' => $key), $menu);
+                } else {
+                    $accordions[$key] = array('title' => $key, 'fields' => $menu);
+                }
+            }
             $menus = array(
                 array(
                     'view' => 'nos::form/accordion',
-                    'params' => $menu
+                    'params' => array('accordions' => $accordions),
                 ),
             );
         }
-        reset($menus);
         foreach ($menus as $view) {
             if (!empty($view['view'])) {
                 echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);

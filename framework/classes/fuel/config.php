@@ -71,10 +71,11 @@ class Config extends \Fuel\Core\Config {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
         $dependencies = \Config::get('data::app_dependencies', array());
 
+
         if (!empty($dependencies[$module_name])) {
             foreach ($dependencies[$module_name] as $dependency) {
                 \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
+                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name, array()));
             }
         }
         $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });

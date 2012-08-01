@@ -180,7 +180,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $fields = \Arr::merge($fields, array(
                     $parent_id => array(
                         'widget_options' => array(
-                            'lang' => $this->item->page_lang,
+                            'lang' => $this->item->{$this->behaviour_translatable['lang_property']},
                         ),
                     ),
                 ));
