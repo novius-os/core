@@ -15,7 +15,7 @@ if (empty($publishable)) {
     return;
 }
 ?>
-<p style="margin: 0 0 1em;">
+<td>
     <?php $published = !empty($object) ? $object->published() : false; ?>
     <table style="margin:0 2em 0 1em;">
         <tr>
@@ -26,7 +26,7 @@ if (empty($publishable)) {
             <td style="padding-left:10px;" id="<?= $label = uniqid('label_') ?>"></td>
         </tr>
     </table>
-</p>
+</td>
 
 <script type="text/javascript">
 require(

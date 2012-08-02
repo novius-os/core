@@ -39,18 +39,15 @@ return array(
             'insert' => __('Add a page'),
             'blankSlate' => __('Translate a page'),
         ),
-
-        'actions' => array(
-            'visualise' => function($item) {
-                return array(
-                    'label' => __('Visualise'),
-                    'action' => array(
-                        'openWindow' => $item->get_href() . '?_preview=1',
-                    ),
-                    'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                );
-            }
-        ),
+    ),
+    'actions' => array(
+        'visualise' => function($item) {
+            return array(
+                'label' => __('Visualise'),
+                'openWindow' => $item->get_href() . '?_preview=1',
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+            );
+        }
     ),
     'views' => array(
         'form' => 'nos::admin/page/page_form',

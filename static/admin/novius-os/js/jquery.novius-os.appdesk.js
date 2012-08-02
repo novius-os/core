@@ -81,19 +81,7 @@ define('jquery-nos-appdesk',
                     self.dispatcher = self.element;
                 }
 
-                self.uiHeaderBar = $('<div></div>').addClass('nos-appdesk-headerbar')
-                    .appendTo(self.element);
-
-                self.uiHeaderBarLeft = $('<div></div>').addClass('nos-appdesk-headerbar-left')
-                    .appendTo(self.uiHeaderBar);
-                self.uiAddsButton = $('<button type="button"></button>').addClass('primary').appendTo(self.uiHeaderBarLeft);
-
-                self.uiHeaderBarRight = $('<div></div>').addClass('nos-appdesk-headerbar-right')
-                    .appendTo(self.uiHeaderBar);
-                self.uiLangsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownlang')
-                    .appendTo(self.uiHeaderBarRight);
-                self.uiViewsDropDownContainer = $('<div></div>').addClass('nos-appdesk-dropdownviews')
-                    .appendTo(self.uiHeaderBarRight);
+                self.element.nosToolbar('create');
 
                 self.uiSplitterVertical = $('<div></div>').addClass('nos-appdesk-splitter-v')
                     .appendTo(self.element);
@@ -217,40 +205,35 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 if (!$.isArray(o.adds) || !o.adds.length) {
-                    self.uiHeaderBarLeft.hide();
                     return self;
                 }
 
-                var first = o.adds.shift();
+                var first = o.adds.shift(),
+                    $button = $('<button></button>').text(first.label)
+                        .data('icon', 'plus')
+                        .addClass('primary')
+                        .click(function(e) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            if ($.isFunction(first.action)) {
+                                first.action($(this), {
+                                    lang: o.selectedLang
+                                });
+                            } else {
+                                $(this).nosTabs('add', {
+                                    iframe : true,
+                                    url : first.url,
+                                    label : first.label
+                                });
+                            }
+                        });
 
-                self.uiAddsButton.button({
-                        label: first.label,
-                        icons : {
-                            primary: 'ui-icon ui-icon-plus',
-                            secondary: null
-                        }
-                    })
-                    .click(function(e) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                        if ($.isFunction(first.action)) {
-                            first.action($(this), {
-                                lang: o.selectedLang
-                            });
-                        } else {
-                            $(this).nosTabs('add', {
-                                iframe : true,
-                                url : first.url,
-                                label : first.label
-                            });
-                        }
-                    });
+                self.element.nosToolbar('add', $button);
 
                 $.each(o.adds, function(i, add) {
-                    $('<a href="#"></a>')
+                    var $a = $('<a href="#"></a>')
                         .addClass('nos-appdesk-action-secondary')
                         .text(this.label)
-                        .appendTo(self.uiHeaderBarLeft)
                         .click(function(e) {
                             e.preventDefault();
                             e.stopImmediatePropagation();
@@ -267,6 +250,7 @@ define('jquery-nos-appdesk',
                             }
                         });
 
+                    self.element.nosToolbar('add', $a);
                 });
 
                 return self;
@@ -277,7 +261,6 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 if (o.hideLocales) {
-                    self.uiLangsDropDownContainer.hide();
                     return self;
                 }
 
@@ -285,7 +268,6 @@ define('jquery-nos-appdesk',
                     o.selectedLang = null;
                 }
 
-                //self.uiLangsDropDown = $('<select></select>').appendTo(self.uiLangsDropDownContainer);
                 if (o.selectedLang == null) {
                     var first = true;
                     $.each(o.locales, function(key, locale) {
@@ -296,22 +278,23 @@ define('jquery-nos-appdesk',
                     });
                 }
 
-                var date = new Date();
-                var uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                var date = new Date(),
+                    uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
+                    $uiLangs = $('<div></div>').addClass('nos-appdesk-dropdownlang');
 
                 $.each(o.locales, function(key, locale) {
                     var flag = key.split('_')[1].toLowerCase();
-                    self.uiLangsDropDownContainer.append(
+                    $uiLangs.append(
                         $('<input type="radio" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedLang == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
                     );
                 });
 
-                self.uiLangsDropDownContainer.append(
+                $uiLangs.append(
                     $('<input type="radio" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedLang == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allLanguages + '</label>')
                 );
-                self.uiLangsDropDownContainer.buttonset();
+                $uiLangs.buttonset();
 
-                self.uiLangsDropDownContainer.find('input[name=' + uniqid + ']').change(function() {
+                $uiLangs.find('input[name=' + uniqid + ']').change(function() {
                     var select = $(this);
 
                     o.selectedLang = select.val();
@@ -325,6 +308,8 @@ define('jquery-nos-appdesk',
                     return $(this).val() == o.selectedlang;
                 });
 
+                self.element.nosToolbar('add', $uiLangs, true);
+
                 return self;
             },
 
@@ -337,14 +322,14 @@ define('jquery-nos-appdesk',
                     return self;
                 }
 
-                self.uiViewsDropDown = $('<select></select>').appendTo(self.uiViewsDropDownContainer);
+                var $viewsDropDown = $('<select></select>');
 
                 $.each(o.views, function(key, view) {
                     // Virtual views can't be switched to
                     if (view.virtual) {
                         return;
                     }
-                    self.uiViewsDropDown.append(
+                    $viewsDropDown.append(
                         $('<option></option>')
                             .attr({
                                 'value': key,
@@ -354,7 +339,7 @@ define('jquery-nos-appdesk',
                     );
                 });
 
-                self.uiViewsDropDown.append(
+                $viewsDropDown.append(
                     $('<option></option>')
                         .attr({
                             'value': 'custom',
@@ -363,20 +348,18 @@ define('jquery-nos-appdesk',
                         .append('Custom view')
                 );
 
-                self.uiViewsDropDown.append(
+                $viewsDropDown.append(
                     $('<option></option>')
                         .attr('value', 'edit_custom')
                         .append('Edit custom view')
                 );
 
-                self.uiViewsDropDown.wijdropdown();
-
-                self.uiViewsDropDown.change(function() {
+                $viewsDropDown.change(function() {
                     var $dropdown = $(this);
 
                     if ($dropdown.val() == 'edit_custom') {
                         var $el = self._uiCustomViewDialog();
-                        self.uiCustomViewDialog = $(self.uiViewsDropDown).nosDialog({
+                        self.uiCustomViewDialog = $($viewsDropDown).nosDialog({
                             title: o.texts.settings,
                             contentUrl: null,
                             content: $el,
@@ -440,7 +423,6 @@ define('jquery-nos-appdesk',
                             }
                         });
 
-
                         $dropdown.find('option').attr('selected', '');
                         $dropdown.find('option[value=custom]').attr('selected', 'selected');
                         $dropdown.wijdropdown("refresh");
@@ -450,6 +432,8 @@ define('jquery-nos-appdesk',
                         self.element.trigger('reloadView', {selectedView: $(this).val()});
                     }
                 });
+
+                self.element.nosToolbar('add', $viewsDropDown, true);
 
                 return self;
             },

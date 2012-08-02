@@ -303,14 +303,28 @@ define('jquery-nos',
 
                 $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
                 $context.find(":input[type='submit'],button").each(function() {
-                    var options = {};
-                    var icon = $(this).data('icon');
-                    if (icon) {
+                    var options = {},
+                        data = $(this).data();
+                    if (data.icon) {
                         options.icons = {
-                            primary: 'ui-icon-' + icon
+                            primary: 'ui-icon-' + data.icon
+                        }
+                    } else if (data.iconClasses) {
+                        options.icons = {
+                            primary: data.iconClasses
+                        }
+                    } else if (data.iconUrl) {
+                        options.icons = {
+                            primary: 'nos-icon16'
                         }
                     }
                     $(this).button(options);
+                    if (data.iconUrl) {
+                        $(this).find('span:first')
+                            .css({
+                                backgroundImage: 'url(' + data.iconUrl + ')',
+                            });
+                    }
                 });
                 $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijdropdown();
@@ -827,6 +841,52 @@ define('jquery-nos',
                                 configuration['selected'] = configuration['user_configuration']['tabs']['selected'];
                             }
                             $noviusos.ostabs(configuration);
+                        })();
+                        break;
+                }
+                return this;
+            },
+
+            nosToolbar : function() {
+                var args = Array.prototype.slice.call(arguments),
+                    method = 'add',
+                    self = this;
+                if (args.length > 0 && $.inArray(args[0], ['create', 'add']) !== -1) {
+                    method = args.shift();
+                }
+
+                switch (method) {
+                    case 'create' :
+                        (function() {
+                            $('<table><tr><td class="nos-toolbar-left"><table><tr class="nos-toolbar-left"></tr></table></td><td class="nos-toolbar-right"><table><tr class="nos-toolbar-right"></tr></table></td></tr></table>')
+                                .addClass('nos-toolbar ui-widget-header')
+                                .insertBefore(self);
+
+                            self.addClass('nos-toolbar-target fill-parent nos-fixed-content')
+                                .parent()
+                                .addClass('nos-toolbar-parent');
+                        })();
+                        break;
+
+                    case 'add' :
+                        return (function() {
+                            var tool = args[0],
+                                right_side = args[1],
+                                $target = self.closest('.nos-toolbar-target'),
+                                $toolbar,
+                                $tool;
+
+                            if (!$target.size()) {
+                                self.nosToolbar();
+                                $target = self;
+                            }
+                            $toolbar = $target.prev();
+                            $tool = $('<td></td>').append(tool)
+                                .appendTo($toolbar.find('tr.nos-toolbar-' + (right_side ? 'right' : 'left')))
+                                .nosFormUI();
+                            $target.css('top', $toolbar.outerHeight());
+
+                            return $tool;
                         })();
                         break;
                 }

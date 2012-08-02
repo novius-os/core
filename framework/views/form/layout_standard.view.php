@@ -20,6 +20,9 @@ require(
             $header.nosOnShow('one', function() {
                 $header.nosFormUI();
             });
+            $content.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+                'save_field' => $fieldset->field($save)
+            ), false))->to_json() ?>);
             $content.nosOnShow('one', function() {
                 $content.nosFormUI();
             });
@@ -36,104 +39,92 @@ $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_cla
 $large = !empty($large) && $large == true;
 ?>
 
-<div id="<?= $uniqid_fixed ?>" class="nos-fixed-header ui-widget-content" style="z-index:100;">
-<?php
-    if (!isset($fixed_layer)) {
-        $fixed_layer = \View::forge('form/layout_fixed_layer');
-    }
-
-    $fixed_layer->set('save',
-        \View::forge('form/layout_save', array(
-            'save_field' => $fieldset->field($save)
-        ), false)
-    , false);
-
-    $fixed_layer->set('publishable',
-        \View::forge('form/publishable', array(
-            'object' => !empty($object) ? $object : null,
-        ), false)
-    , false);
-
-    echo $fixed_layer;
-?>
-</div>
-
 <div id="<?= $uniqid ?>" class="nos-fixed-content fill-parent" style="display:none;">
     <div>
         <?= $large ? '' : '<div class="unit col c1"></div>'; ?>
-        <div class="unit col <?= $large ? 'c8' : 'c6' ?>" style="">
+        <div class="unit col <?= $large ? 'c12' : 'c10' ?>" style="">
             <div class="line ui-widget" style="margin:2em 2em 1em;">
                 <table class="title-fields" style="margin-bottom:1em;">
                     <tr>
-                    <?php
-                    if (!empty($medias)) {
-                        $medias = (array) $medias;
-                        echo '<td style="width:'.(75 * count($medias)).'px;">';
-                        foreach ($medias as $name) {
-                            echo $fieldset->field($name)->set_template('{field}')->build();
-                        }
-                        echo '</td>';
-                    }
+<?php
+    if (!empty($medias)) {
+        $medias = (array) $medias;
+        echo '<td style="width:'.(75 * count($medias)).'px;">';
+        foreach ($medias as $name) {
+            echo $fieldset->field($name)->set_template('{field}')->build();
+        }
+        echo '</td>';
+    }
 
-                    if (!empty($object))
-                    {
-                        $translatable = $object->behaviours('Nos\Orm_Behaviour_Translatable');
-                        if ($translatable)
-                        {
-                            echo '<td style="width:16px;">'.\Nos\Helper::flag($object->get_lang()).'</td>';
-                        }
-                    }
-                    ?>
+    $locales = array_keys(\Config::get('locales'));
+    if (!empty($object) && count($locales) > 1)
+    {
+        $translatable = $object->behaviours('Nos\Orm_Behaviour_Translatable');
+        if ($translatable)
+        {
+            echo '<td style="width:16px;">'.\Nos\Helper::flag($object->get_lang()).'</td>';
+        }
+    }
+?>
                         <td class="table-field">
-                    <?php
-                    if (!empty($title)) {
-                        $title = (array) $title;
-                        $size  = min(6, floor(6 / count($title)));
-                        $first = true;
-                        foreach ($title as $name) {
-                            if ($first) {
-                                $first = false;
-                            } else {
-                                echo '</td><td>';
-                            }
-                            $field = $fieldset->field($name);
-                            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-                            echo ' '.$field
-                                    ->set_attribute('placeholder',$placeholder)
-                                    ->set_attribute('title', $placeholder)
-                                    ->set_attribute('class', 'title')
-                                    ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
-                                    ->build();
-                        }
-                    }
-                    ?>
+<?php
+    if (!empty($title)) {
+        $title = (array) $title;
+        $size  = min(6, floor(6 / count($title)));
+        $first = true;
+        foreach ($title as $name) {
+            if ($first) {
+                $first = false;
+            } else {
+                echo '</td><td>';
+            }
+            $field = $fieldset->field($name);
+            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+            echo ' '.$field
+                    ->set_attribute('placeholder',$placeholder)
+                    ->set_attribute('title', $placeholder)
+                    ->set_attribute('class', 'title')
+                    ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
+                    ->build();
+        }
+    }
+?>
                         </td>
                     </tr>
                 </table>
-                <?php
-                if (!empty($subtitle)) {
-                    ?>
+<?php
+    $publishable = (string) \View::forge('form/publishable', array(
+        'object' => !empty($object) ? $object : null,
+    ), false);
+
+    if (!empty($subtitle) || !empty($publishable)) {
+?>
                     <div class="line" style="overflow:visible;">
                         <table style="width:100%;margin-bottom:1em;">
                             <tr>
-                                <?php
-                                $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
-                                foreach ((array) $subtitle as $name) {
-                                    $field = $fieldset->field($name);
-                                    $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-                                    echo $field
-                                         ->set_attribute('placeholder',$placeholder)
-                                         ->set_attribute('title', $placeholder)
-                                         ->build();
-                                }
-                                $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-                                ?>
+<?php
+        if (!empty($publishable)) {
+            echo $publishable;
+        }
+        if (!empty($subtitle)) {
+            $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+            foreach ((array) $subtitle as $name) {
+                $field = $fieldset->field($name);
+                $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+                echo $field
+                     ->set_attribute('placeholder',$placeholder)
+                     ->set_attribute('title', $placeholder)
+                     ->build();
+            }
+            $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+        }
+?>
                             </tr>
                         </table>
                     </div>
-                <?php
-                }
-                ?>
+<?php
+    }
+?>
             </div>
         </div>
         <div class="unit col c1"></div>

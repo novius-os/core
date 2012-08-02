@@ -35,9 +35,9 @@ a:hover {
 	color   : #036;
 }
 
-.nos-icon16 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 16px; height: 16px; line-height: 16px; vertical-align: middle; }
-.nos-icon24 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 24px; height: 24px; line-height: 24px; vertical-align: middle; }
-.nos-icon32 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 32px; height: 32px; line-height: 32px; vertical-align: middle; }
+.nos-icon16 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 16px; height: 16px; line-height: 16px; vertical-align: middle; border-radius: 0; background-position: center; }
+.nos-icon24 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 24px; height: 24px; line-height: 24px; vertical-align: middle; border-radius: 0; background-position: center; }
+.nos-icon32 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 32px; height: 32px; line-height: 32px; vertical-align: middle; border-radius: 0; background-position: center; }
 
 .nos-icon16-empty { background-image: none; }
 .nos-icon16-language { background-image: url(../img/16/language.png); }
@@ -65,8 +65,7 @@ a:hover {
     background-image: url(../img/icons/eye-616161.png);
 }
 */
-.nos-icon16-eye, .ui-state-active .nos-icon16-eye,
-{
+.nos-icon16-eye, .ui-state-active .nos-icon16-eye, .ui-state-default .nos-icon16-eye {
     background-image: url(../img/icons/eye-38667f.png);
 }
 .ui-state-highlight .nos-icon16-eye {
@@ -114,22 +113,44 @@ a:hover {
     left: 0;
 }
 .fill-parent {
-    position: absolute;
+    position: absolute !important;
 }
 .nos-fixed-content {
     overflow: auto;
     border: 0;
 }
 
-div.nos-fixed-header {
+.nos-toolbar {
+    width: 100%;
+    border-top: 0;
+
+    table {
+        display: inline-table;
+    }
+    td.nos-toolbar-left {
+        padding: 0.2em 0 0.2em 2em;
+    }
+    td.nos-toolbar-right {
+        padding: 0.2em 2em 0.2em 0;
+        text-align: right;
+    }
+    td.nos-toolbar-left td {
+        padding: 0 0.5em 0 0;
+        //line-height : 54px; /* Vertical align = middle */
+    }
+    .nos-toolbar-right td {
+        padding: 0 0 0 0.5em;
+        text-align: left;
+        //line-height : 54px; /* Vertical align = middle */
+    }
+}
+.nos-toolbar-parent {
     position: absolute;
-    top: -6px;
-    right: 2em;
-    left: 68.2%;
-    border: 0;
-    padding: 2em 2em 1em;
-    box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.12);
-    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden !important;
 }
 
 .nos-tabs {

@@ -16,6 +16,12 @@ echo View::forge('nos::form/insert_update_tab', array(
         'fieldset' => $view_params['fieldset'],
         'tab_params' => $view_params['tab_params'],
     ), false);
+echo View::forge('nos::form/insert_update_toolbar', array(
+        'config' => $view_params['config'],
+        'actions' => $view_params['actions'],
+        'fieldset' => $view_params['fieldset'],
+        'object' => $view_params['item'],
+    ), false);
 echo View::forge('nos::form/layout_standard', $view_params['config']['layout'] + array(
         'fieldset' => $view_params['fieldset'],
         'object' => $view_params['item'],
