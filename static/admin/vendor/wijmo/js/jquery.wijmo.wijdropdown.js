@@ -495,10 +495,11 @@
 			//self.oldVal = ele.val();
 			//ele.val(self._value);
 			if (oldSelectedIndex !== selectedIndex) {
-				//oldSelectedItem.removeAttr('selected'); // @todo : Fixed Novius OS
+                // @todo : Fixed Novius OS. Reversal of these two lines
 				ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
+                oldSelectedItem.removeAttr('selected');
 
-				ele.trigger("change");
+                ele.trigger("change");
 			}
 			//if (self.oldVal !== self._value) {
 			//	ele.trigger("change");
