@@ -83,7 +83,7 @@ class Controller_Front extends Controller {
                         $this->_page_url = '';
                         $this->_enhanced_url_path = '';
                     }
-			        $this->_enhancer_url = ltrim(str_replace(mb_substr($temp_url, 0, -1), '', $url), '/');
+			        $this->_enhancer_url = mb_substr(ltrim($url, '/'), mb_strlen($temp_url));
                     try {
 				        $this->_generate_cache();
 			        } catch (NotFoundException $e) {
