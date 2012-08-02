@@ -14,20 +14,11 @@ require(
     ['jquery-nos'],
     function($) {
         $(function() {
-            var $header  = $("#<?= $uniqid_fixed = uniqid('fixed_') ?>");
             var $content = $("#<?= $uniqid = uniqid('id_') ?>");
-
-            $header.nosOnShow('one', function() {
-                $header.nosFormUI();
-            });
-            $content.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
-                'save_field' => $fieldset->field($save)
-            ), false))->to_json() ?>);
             $content.nosOnShow('one', function() {
-                $content.nosFormUI();
-            });
-            $header.nosOnShow();
-            $content.nosOnShow();
+                    $content.nosFormUI();
+                })
+                .nosOnShow();
         });
     });
 </script>

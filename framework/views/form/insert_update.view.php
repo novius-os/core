@@ -16,7 +16,7 @@ echo View::forge('nos::form/insert_update_tab', array(
         'fieldset' => $view_params['fieldset'],
         'tab_params' => $view_params['tab_params'],
     ), false);
-echo View::forge('nos::form/insert_update_toolbar', array(
+echo View::forge('nos::form/insert_update_toolbar', $view_params['config']['layout'] + array(
         'config' => $view_params['config'],
         'actions' => $view_params['actions'],
         'fieldset' => $view_params['fieldset'],

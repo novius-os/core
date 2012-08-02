@@ -121,8 +121,12 @@ a:hover {
 }
 
 .nos-toolbar {
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     border-top: 0;
+    width: 100%;
 
     table {
         display: inline-table;

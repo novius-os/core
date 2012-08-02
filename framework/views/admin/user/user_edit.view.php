@@ -20,6 +20,20 @@ require(
             });
         });
     });
+require([
+    'jquery-nos'
+    ], function($) {
+        $(function() {
+            $container = $('#<?= $uniqid ?>').parent().nosToolbar('create');
+            $save = $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+                'save_field' => $fieldset->field('save')
+            ), false))->to_json() ?>)
+                .click(function() {
+                    $container.find('form:visible').submit();
+                });
+
+        });
+    });
 </script>
 
 
@@ -40,7 +54,7 @@ foreach ($fieldset->field() as $field) {
 	}
 }
 ?>
-
+<div>
 <div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
     <ul style="width: 15%;">
         <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
@@ -53,6 +67,7 @@ foreach ($fieldset->field() as $field) {
        <?= $permissions ?>
     </div>
 </div>
+</div>
 
 <script type="text/javascript">
     require([
@@ -62,10 +77,11 @@ foreach ($fieldset->field() as $field) {
     ], function($) {
         $(function() {
             var $container = $('#<?= $uniqid ?>');
-            $container.css('display', 'block').nosOnShow();
-            $container.wijtabs({
-                alignment: 'left'
-            });
+            $container.css('display', 'block')
+                .nosOnShow()
+                .wijtabs({
+                    alignment: 'left'
+                });
 
             $container.find('> div').addClass('fill-parent').css({
                 left: '15%',

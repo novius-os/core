@@ -15,6 +15,14 @@
             $(function () {
                 var actions = <?= \Format::forge($actions)->to_json(); ?>,
                     $form = $('#<?= $fieldset->form()->get_attribute('id') ?>').nosToolbar('create');
+
+                $save = $form.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+                        'save_field' => $fieldset->field($save)
+                    ), false))->to_json() ?>)
+                    .click(function() {
+                        $form.submit();
+                    });
+
                 $.each(actions, function() {
                     var button = this,
                         $button = $('<button></button>').click(function() {
