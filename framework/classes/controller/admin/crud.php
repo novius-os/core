@@ -33,6 +33,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'delete' => 'Delete',
             'delete a item' => 'Delete a item',
         ),
+        'context_relation' => null,
         'tab' => array(
             'iconUrl' => '',
             'labels' => array(
@@ -45,22 +46,39 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         'layout' => array(),
         'fields' => array(),
         'views' => array(
-            'form' => 'nos::form/insert_update',
-            'delete' => 'nos::form/delete_popup',
+            'form' => 'nos::crud/form',
+            'delete' => 'nos::crud/delete_popup',
         ),
     );
 
     protected $pk = '';
     protected $behaviours = array();
     protected $item = null;
+    protected $clone = null;
+    protected $is_new = false;
     protected $item_from = null;
-    protected $item_parent = null;
+    protected $item_context = null;
+
+    public function & __get($property)
+    {
+        return $this->{$property};
+    }
 
     public function before() {
         parent::before();
 
         $model = $this->config['model'];
 
+        if (!empty($this->config['context_relation']))
+        {
+            $this->config['context_relation'] = $model::relations($this->config['context_relation']);
+            if (!is_a($this->config['context_relation'], 'Orm\\BelongsTo')) {
+                $this->config['context_relation'] = null;
+            }
+        }
+
+        $this->config['views']['insert'] = !empty($this->config['views']['insert']) ? $this->config['views']['insert'] : $this->config['views']['form'];
+        $this->config['views']['update'] = !empty($this->config['views']['update']) ? $this->config['views']['update'] : $this->config['views']['form'];
 
         $this->behaviours = array(
             'translatable' => $model::behaviours('Nos\Orm_Behaviour_Translatable', false),
@@ -83,6 +101,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'behaviours' => $this->behaviours,
             'pk' => $this->pk,
             'item' => $this->item,
+            'context' => $this->item_context,
             'config' => $this->config,
         );
         if ($this->behaviours['translatable'])
@@ -96,30 +115,23 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         try {
             $this->item = $this->crud_item($id);
-            if ($this->item->is_new())
-            {
-                $create_from_id = \Input::get('create_from_id', 0);
-                if (!empty($create_from_id))
-                {
-                    $this->item_from = $this->crud_item($create_from_id);
-                }
-            }
+            $this->clone = clone $this->item;
+            $this->is_new = $this->item->is_new();
             $this->form_item();
-            $this->check_permission($this->item->is_new() ? 'insert' : 'update');
+            $this->check_permission($this->is_new ? 'insert' : 'update');
 
             $fields = $this->fields($this->config['fields']);
             $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
             $fieldset = $this->fieldset($fieldset);
 
-
             $params = array_merge($this->view_params(), array(
-                'url_insert_update' => $this->config['controller_url'].'/insert_update/'.($this->item->is_new() ? '' : '/'.$this->item->{$this->pk}),
+                'url_insert_update' => $this->config['controller_url'].'/insert_update/'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'fieldset' => $fieldset,
                 'actions' => $this->get_actions(),
                 'tab_params' => $this->get_tab_params(),
             ));
 
-            return \View::forge($this->config['views']['form'], array('view_params' => $params), false);
+            return \View::forge($this->is_new ? $this->config['views']['insert'] : $this->config['views']['update'], array('view_params' => $params), false);
         } catch (\Exception $e) {
             $this->send_error($e);
         }
@@ -127,18 +139,25 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function form_item()
     {
-        if ($this->item->is_new())
+        if ($this->is_new)
         {
-            if (!$this->item_from)
+            $create_from_id = \Input::get('create_from_id', 0);
+            $common_id = \Input::get('common_id', null);
+            $context_id = \Input::get('context_id', null);
+            if (!empty($create_from_id))
             {
-                if ($this->behaviours['translatable'])
-                {
-                    $this->item->{$this->behaviours['translatable']['common_id_property']} = \Input::get('common_id');
-                }
+                $this->item_from = $this->crud_item($create_from_id);
+                $this->item = clone $this->item_from;
             }
-            else
+            else if (!empty($common_id) && $this->behaviours['translatable'])
             {
-                $this->item      = clone $this->item_from;
+                $this->item->{$this->behaviours['translatable']['common_id_property']} = $common_id;
+            }
+            else if (!empty($context_id) && !empty($this->config['context_relation']))
+            {
+                $model_context = $this->config['context_relation']->model_to;
+                $this->item_context = $model_context::find($context_id);
+                $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};
             }
             if ($this->behaviours['translatable'])
             {
@@ -164,7 +183,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->behaviours['translatable']['lang_property'] => array(
                     'form' => array(
                         'type' => 'hidden',
-                        'value' => $this->item->is_new() ? \Input::get('lang') : $this->item->{$this->behaviours['translatable']['lang_property']},
+                        'value' => $this->is_new ? \Input::get('lang') : $this->item->{$this->behaviours['translatable']['lang_property']},
                     ),
                 ),
                 $this->behaviours['translatable']['common_id_property'] => array(
@@ -175,7 +194,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             ));
         }
-        if ($this->item->is_new())
+        if ($this->is_new)
         {
             if ($this->behaviours['translatable'] && $this->behaviours['tree'])
             {
@@ -204,13 +223,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $fieldset->js_validation();
         $fieldset->populate_with_instance($this->item);
-        $fieldset->form()->set_config('field_template', \View::forge('nos::form/insert_update_field_template'));
+        $fieldset->form()->set_config('field_template', \View::forge('nos::crud/field_template'));
 
         foreach ($fieldset->field() as $field)
         {
             if ($field->type == 'checkbox')
             {
-                $field->set_template(\View::forge('nos::form/insert_update_field_template', array('type' => 'checkbox')));
+                $field->set_template(\View::forge('nos::crud/field_template', array('type' => 'checkbox')));
             }
         }
         return $fieldset;
@@ -226,7 +245,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function save($object, $data) {
         $dispatchEvent = array(
             'name' => $this->config['model'],
-            'action' => $this->item->is_new() ? 'insert' : 'update',
+            'action' => $this->is_new ? 'insert' : 'update',
             'id' => $object->{$this->pk},
         );
         if ($this->behaviours['translatable']) {
@@ -235,10 +254,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $return = array(
-            'notify' =>  $this->item->is_new() ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
+            'notify' =>  $this->is_new ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
+            'closeDialog' => true,
             'dispatchEvent' => $dispatchEvent,
         );
-        if ($this->item->is_new())
+        if ($this->is_new)
         {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
         }
@@ -255,7 +275,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         // insert_update/ID?lang=fr_FR : translate an  existing item (can be forbidden if the parent doesn't exists in that language)
 
         $this->item = $this->crud_item($id);
-        $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
 
         if ($this->item->is_new())
         {
@@ -263,16 +282,23 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
         else
         {
-            $all_langs = $this->item->get_all_lang();
+            if ($this->behaviours['translatable']) {
+                $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
+                $all_langs = $this->item->get_all_lang();
 
-            if (in_array($selected_lang, $all_langs))
-            {
-                return $this->action_form($id);
+                if (in_array($selected_lang, $all_langs))
+                {
+                    return $this->action_form($id);
+                }
+                else
+                {
+                    $_GET['common_id'] = $id;
+                    return $this->blank_slate($id, $selected_lang);
+                }
             }
             else
             {
-                $_GET['common_id'] = $id;
-                return $this->blank_slate($id, $selected_lang);
+                return $this->action_form($id);
             }
         }
     }
@@ -298,16 +324,38 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'url_insert_update'  => $this->config['controller_url'].'/insert_update',
             'tabInfos'  => $tabInfos,
         );
-        return \View::forge('nos::form/layout_blank_slate', $viewData, false);
+        return \View::forge('nos::crud/blank_slate', $viewData, false);
     }
 
     protected function get_tab_params()
     {
         $labelUpdate = $this->config['tab']['labels']['update'];
+        $url = $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->id);
+        if ($this->is_new)
+        {
+            $params = array();
+            foreach (array('create_from_id', 'common_id', 'context_id') as $key)
+            {
+                $value = \Input::get($key, false);
+                if ($value !== false)
+                {
+                    $params[$key] = $value;
+                }
+            }
+            if ($this->behaviours['translatable'])
+            {
+                $params['lang'] = $this->item->get_lang();
+            }
+            if (count($params))
+            {
+                $url .= '?'.http_build_query($params);
+            }
+        }
+
         $tabInfos = array(
             'iconUrl' => $this->config['tab']['iconUrl'],
-            'label' => $this->item->is_new() ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
-            'url' => $this->config['controller_url'].'/insert_update'.($this->item->is_new() ? '?lang='.$this->item->get_lang() : '/'.$this->item->id),
+            'label' => $this->is_new ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
+            'url' => $url,
         );
 
         return $tabInfos;
@@ -316,7 +364,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function get_actions()
     {
         $actions = array_values($this->get_actions_lang());
-        if (!$this->item->is_new() && $this->behaviours['url'] !== false) {
+        if (!$this->is_new && $this->behaviours['url'] !== false) {
             $url = $this->item->first_url();
             if ($url !== null) {
                 $actions[] = array(
@@ -326,7 +374,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 );
             }
         }
-        if (!$this->item->is_new()) {
+        if (!$this->is_new) {
             $actions[] = array(
                 'label' => $this->config['messages']['delete'],
                 'confirmationDialog' => array(
@@ -355,7 +403,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $actions = array();
         $locales = array_keys(\Config::get('locales'));
-        if ($this->item->is_new())
+        if ($this->is_new)
         {
             foreach ($locales as $locale)
             {
@@ -426,6 +474,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'action' => 'delete',
                 'id' => $id,
             );
+
+            $this->delete();
+
             if ($this->behaviours['translatable'])
             {
                 $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
@@ -496,6 +547,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         } catch (\Exception $e) {
             $this->send_error($e);
         }
+    }
+
+    public function delete()
+    {
     }
 
     protected function send_error($exception) {

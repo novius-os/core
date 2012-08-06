@@ -17,7 +17,7 @@
                     $form = $('#<?= $fieldset->form()->get_attribute('id') ?>').nosToolbar('create');
 
                 $save = $form.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
-                        'save_field' => $fieldset->field($save)
+                        'save_field' => $fieldset->field('save')
                     ), false))->to_json() ?>)
                     .click(function() {
                         $form.submit();

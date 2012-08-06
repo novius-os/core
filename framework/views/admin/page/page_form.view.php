@@ -8,12 +8,11 @@
  * @link http://www.novius-os.org
  */
 
-echo View::forge('nos::form/insert_update', array('view_params' => $view_params), false);
 ?>
 <script type="text/javascript">
     require(['jquery-nos', 'static/novius-os/admin/config/page/form.js'], function ($, callback_fn) {
         $(function () {
-            callback_fn.call($('#<?= $view_params['fieldset']->form()->get_attribute('id') ?>'));
+            callback_fn.call($('#<?= $fieldset->form()->get_attribute('id') ?>'));
         });
     });
 </script>

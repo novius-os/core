@@ -10,241 +10,132 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Folder extends Controller {
+class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
 
-	public function action_add($folder_id = null) {
-
-        if (!static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
-            \Response::json(array(
-                'error' => __('Permission denied'),
-            ));
+    protected function check_permission($action) {
+        parent::check_permission($action);
+        if ($action === 'insert' && !static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
+            throw new \Exception('Permission denied');
         }
-        // Find root folder ID
-        if (!$folder_id) {
+        if ($action === 'update' && !static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
+            throw new \Exception('Permission denied');
+        }
+        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/media/inspector/folder', $this->item)) {
+            throw new \Exception('Permission denied');
+        }
+    }
+
+    protected function form_item()
+    {
+        parent::form_item();
+        if ($this->item->is_new() && empty($this->item_context))
+        {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
-            $folder_id = $root->medif_id;
-            $hide_widget_media_path = false;
-        } else {
-            $hide_widget_media_path = true;
+            $this->item->medif_parent_id = $root->medif_id;
         }
-
-		$folder = Model_Media_Folder::find($folder_id);
-
-        $fieldset = \Fieldset::build_from_config(array(
-            'medif_parent_id' => array(
-                'widget' => $hide_widget_media_path ? null : 'Nos\Widget_Media_Folder',
-                'form' => array(
-                    'type'  => 'hidden',
-                    'value' => $folder->medif_id,
-                ),
-                'label' => __('Choose a folder where to put your sub-folder:'),
-            ),
-            'medif_title' => array(
-                'form' => array(
-                    'type' => 'text',
-                ),
-                'label' => __('Title: '),
-            ),
-            'medif_path' => array(
-                'form' => array(
-                    'type' => 'text',
-                    'size' => 30,
-                ),
-                'label' => __('SEO, folder URL:'),
-            ),
-            'save' => array(
-                'form' => array(
-                    'type' => 'submit',
-                    'tag'  => 'button',
-                    'class' => 'primary',
-                    'value' => __('Add'),
-                    'data-icon' => 'check',
-                ),
-            ),
-        ));
-		return \View::forge('nos::admin/media/folder_add', array(
-            'fieldset' => $fieldset,
-            'folder' => $folder,
-            'hide_widget_media_path' => $hide_widget_media_path,
-		), false);
-	}
-
-	public function action_edit($folder_id = null) {
-
-		$folder = Model_Media_Folder::find($folder_id);
-        $basename = pathinfo($folder->medif_path, PATHINFO_BASENAME);
-        $fieldset = \Fieldset::build_from_config(array(
-            'medif_id' => array(
-                'form' => array(
-                    'type' => 'hidden',
-                    'value' => $folder->medif_id,
-                ),
-            ),
-            'medif_title' => array(
-                'form' => array(
-                    'type' => 'text',
-                    'value' => $folder->medif_title,
-                ),
-                'label' => __('Title: '),
-            ),
-            'medif_path' => array(
-                'form' => array(
-                    'type' => 'text',
-                    'size' => 30,
-                    'value' => $basename,
-                ),
-                'label' => __('SEO, folder URL:'),
-            ),
-            'save' => array(
-                'form' => array(
-                    'type' => 'submit',
-                    'tag'  => 'button',
-                    'class' => 'primary',
-                    'value' => __('Save'),
-                    'data-icon' => 'check',
-                ),
-            ),
-        ));
-		return \View::forge('nos::admin/media/folder_edit', array(
-            'fieldset' => $fieldset,
-            'folder' => $folder,
-            'checked' => $basename == $folder::friendly_slug($folder->medif_title),
-		), false);
-	}
-
-	public function action_do() {
-
-		try {
-            if (!static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
-                throw new \Exception(__('Permission denied'));
-            }
-			$folder = new Model_Media_Folder();
-
-            $folder->medif_title = \Input::post('medif_title');
-            if (empty($folder->medif_title)) {
-                throw new \Exception('Please provide a title or a path.');
-            }
-
-            $path  = \Input::post('medif_path');
-
-            if (empty($path) ) {
-                $path = $folder->medif_title;
-            }
-
-            $path = Model_Media_Folder::friendly_slug($path, '-', true);
-            if (empty($path)) {
-                throw new \Exception(__('Generated folder URL (SEO) was empty.'));
-            }
-
-			$folder->medif_parent_id = \Input::post('medif_parent_id', 1);
-
-            if (false === $folder->set_path($path)) {
-                throw new \Exception(__("The parent folder doesn't exists."));
-            }
-
-            $duplicate_folder = Model_Media_Folder::find_by_medif_path($folder->medif_path);
-            if (!empty($duplicate_folder)) {
-                throw new \Exception(__('A folder with the same name already exists.'));
-            }
-
-			$folder->save();
-			$body = array(
-				'notify' => 'Sub-folder successfully created.',
-				'closeDialog' => true,
-                'dispatchEvent' => array(
-                    'name' => get_class($folder),
-                    'action' => 'insert',
-                    'id' => $folder->medif_id,
-                ),
-			);
-		} catch (\Exception $e) {
-			$body = array(
-				'error' => $e->getMessage(),
-			);
-		}
-
-		\Response::json($body);
-	}
-
-    public function action_do_edit() {
-        try {
-            if (!static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
-                throw new \Exception(__('Permission denied'));
-            }
-
-            $folder = Model_Media_Folder::find(\Input::post('medif_id'));
-            if (empty($folder)) {
-                throw new \Exception('Folder not found.');
-            }
-
-            $folder->medif_title = \Input::post('medif_title');
-            if (empty($folder->medif_title)) {
-                throw new \Exception('Please provide a title.');
-            }
-
-            $old_folder = clone $folder;
-
-            $path  = \Input::post('medif_path');
-
-            if (empty($path) ) {
-                $path = $folder->medif_title;
-            }
-
-            $path = Model_Media_Folder::friendly_slug($path, '-', true);
-            if (empty($path)) {
-                throw new \Exception(__('Generated folder URL (SEO)  was empty.'));
-            }
-
-            if (false === $folder->set_path($path)) {
-                throw new \Exception(__("The parent folder doesn't exists."));
-            }
-
-            // Slug has changed
-            if ($folder->path() != $old_folder->path()) {
-
-                $duplicate_folder = Model_Media_Folder::find_by_medif_path($folder->medif_path);
-                if (!empty($duplicate_folder)) {
-                    throw new \Exception(__('A folder with the same name already exists.'));
-                }
-
-	            if (is_dir($old_folder->path())) {
-	                if (\File::rename_dir($old_folder->path(), $folder->path())) {
-	                    // refresh_path($cascade_children = true, $cascade_media = true
-	                    $folder->refresh_path(true, true);
-	                } else {
-	                    // Restore old path if rename failed
-	                    $folder->medif_path = $old_folder->medif_path;
-	                }
-	            }
-
-                $old_folder->delete_public_cache();
-            }
-            $folder->save();
-
-			$body = array(
-				'notify' => 'Folder successfully edited.',
-				'closeDialog' => true,
-                'dispatchEvent' => array(
-                    'name' => get_class($folder),
-                    'action' => 'update',
-                    'id' => $folder->medif_id,
-                ),
-			);
-
-        } catch (\Exception $e) {
-			$body = array(
-				'error' => $e->getMessage(),
-			);
-		}
-		\Response::json($body);
     }
 
-	protected static function pretty_filename($file) {
-		$file = mb_substr($file, 0, mb_strrpos($file, '.'));
-		$file = preg_replace('`[\W_-]+`u', ' ', $file);
-		$file = \Inflector::humanize($file, ' ');
-		return $file;
-	}
+    public function before_save($folder, $data) {
+        $path  = $folder->medif_path;
+
+        if (empty($path) ) {
+            $path = $folder->medif_title;
+        }
+
+        $path = Model_Media_Folder::friendly_slug($path, '-', true);
+        if (empty($path)) {
+            throw new \Exception(__('Generated folder URL (SEO) was empty.'));
+        }
+
+        if (false === $folder->set_path($path)) {
+            throw new \Exception(__("The parent folder doesn't exists."));
+        }
+
+        $where = array(
+            array('medif_path', $folder->medif_path)
+        );
+        if (!$folder->is_new()) {
+            $where[] = array('medif_id', '!=', $folder->medif_id);
+        }
+
+        $duplicate_folder = Model_Media_Folder::find('all', (array('where' => $where)));
+        if (!empty($duplicate_folder)) {
+            throw new \Exception(__('A folder with the same name already exists.'));
+        }
+
+        if (!$folder->is_new()) {
+            if ($folder->path() != $this->clone->path()) {
+                if (is_dir($this->clone->path())) {
+                    if (\File::rename_dir($this->clone->path(), $folder->path())) {
+                        // refresh_path($cascade_children = true, $cascade_media = true
+                        $folder->refresh_path(true, true);
+                    } else {
+                        // Restore old path if rename failed
+                        $folder->medif_path = $this->clone->medif_path;
+                    }
+                }
+
+                $this->clone->delete_public_cache();
+            }
+        }
+    }
+
+    public function delete() {
+        $count_medias = $this->item->count_media();
+        // Basic check to prevent false supression
+        if (!is_dir($this->item->path()) && $count_medias > 0) {
+            throw new \Exception(strtr('{count} medias were found, but folder was nonexistent.', array(
+                '{count}' => $count_medias,
+            )));
+        }
+
+        // Strategy : try to delete the database records first, as we can sometimes (if supported) rollback with the transaction
+        // Delete the files afterwards and commit the transaction if it's a success
+
+        \DB::start_transaction();
+        // find_children_recursive($include_self = true)
+        $all_folders = $this->item->find_children_recursive(true);
+        $folder_ids = array_keys($all_folders);
+
+        $escaped_folder_ids = array();
+        foreach($folder_ids as $id) {
+            $escaped_folder_ids[] = (int) $id;
+        }
+        // Cleanup empty values
+        $escaped_folder_ids = array_filter($escaped_folder_ids);
+        $escaped_folder_ids = implode(',', $escaped_folder_ids);
+
+        $pk = Model_Media::primary_key();
+        $pk = $pk[0];
+        $table_folder = Model_Media_Folder::table();
+        $table_media  = Model_Media::table();
+        $table_link   = Model_Media_Link::table();
+
+        // Delete linked medias
+        \DB::query("
+            DELETE $table_link.* FROM $table_link
+            LEFT JOIN $table_media ON media_id = medil_media_id
+            WHERE
+                media_folder_id IN ($escaped_folder_ids)")->execute();
+
+        // Delete media entries
+        \DB::query("
+            DELETE $table_media.* FROM $table_media
+            WHERE
+                media_folder_id IN ($escaped_folder_ids)")->execute();
+
+        // Can throw an exception
+        $this->item->delete_from_disk();
+        $this->item->delete_public_cache();
+
+            // Delete folder entries
+        \DB::query("
+            DELETE $table_folder.* FROM $table_folder
+            WHERE
+                medif_id IN ($escaped_folder_ids)")->execute();
+
+        \DB::commit_transaction();
+}
 }

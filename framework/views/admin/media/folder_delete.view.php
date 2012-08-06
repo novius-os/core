@@ -7,9 +7,12 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+$media_count = $view_params['item']->count_media();
 ?>
+<input type="hidden" name="id" value="<?= $view_params['item']->{$view_params['pk']} ?>" />
 <div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
-    <p><?php
+<p><?php
     if ($media_count == 0) {
         ?>
         <p><?= __('The folder is empty and can be safely deleted.') ?></p>
@@ -25,50 +28,9 @@
         )) ?></p>
         <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
         <p><?= strtr(__('Yes, I want to delete all {count} files from the media centre.'), array(
-            '{count}' => '<input data-id="verification" data-verification="'.$media_count.'" size="'.(mb_strlen($media_count) + 1).'" />',
+            '{count}' => '<input class="verification" data-verification="'.$media_count.'" size="'.(mb_strlen($media_count) + 1).'" />',
         )); ?></p>
         <?php
     }
     ?></p>
-    <p>
-        <button class="primary ui-state-error" data-icon="trash" data-id="confirmation"><?= __('Confirm the deletion') ?></button>
-        &nbsp; <?= __('or') ?> &nbsp;
-        <a href="#" data-id="cancel"><?= __('Cancel') ?></a>
-    </p>
 </div>
-
-<script type="text/javascript">
-require(
-    ['jquery-nos'],
-    function($) {
-        $(function() {
-            var $container    = $('#<?= $uniqid ?>').nosFormUI();
-            var $verification = $container.find('input[data-id=verification]');
-            var $confirmation = $container.find('button[data-id=confirmation]');
-
-            $confirmation.click(function(e) {
-                e.preventDefault();
-                if ($verification.length && $verification.val() != $verification.data('verification')) {
-                    $.nosNotify(<?= \Format::forge()->to_json(__('Wrong confirmation')); ?>, 'error');
-                    return;
-                }
-                $container.nosAjax({
-                    url : 'admin/nos/media/actions/delete_folder_confirm',
-                    method : 'POST',
-                    data : {
-                        id : <?= $folder->medif_id ?>
-                    },
-                    success : function(json) {
-                        $container.nosDialog('close');
-                    }
-                });
-            });
-
-            $container.find('a[data-id=cancel]').click(function(e) {
-                e.preventDefault();
-                $container.nosDialog('close');
-            });
-
-        });
-    });
-</script>

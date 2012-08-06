@@ -7,31 +7,12 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-?>
-<script type="text/javascript">
-require(
-    ['jquery-nos-ostabs'],
-    function ($) {
-        $(function () {
-            $('#<?= $uniqid = uniqid('id_') ?>').nosTabs('update', {
-                label : <?= json_encode($media->media_title) ?>,
-                iconUrl : 'static/novius-os/admin/novius-os/img/16/media.png'
-            });
-        });
-    });
-</script>
 
-<?php
+$uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
-
-// Enctype multipart/form-data
-$form_attributes = $fieldset->get_config('form_attributes', array());
-$form_attributes['enctype'] = 'multipart/form-data';
-$fieldset->set_config('form_attributes', $form_attributes);
 ?>
 
 <div class="page line ui-widget" id="<?= $uniqid ?>">
-	<?= $fieldset->open('admin/nos/media/media/update'); ?>
 	<?= $fieldset->build_hidden_fields(); ?>
 	<div class="unit col c1" ></div>
 	<div class="unit col c2" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
@@ -54,8 +35,8 @@ $fieldset->set_config('form_attributes', $form_attributes);
                     <td><?= $fieldset->field('media')->build() ?></td>
                 </tr>
                 <tr>
-                    <th><?= $fieldset->field('slug')->label ?></th>
-                    <td class="table-field"><?= $fieldset->field('slug')->build() ?><span>.<?= $media->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
+                    <th><?= $fieldset->field('media_file')->label ?></th>
+                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $media->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media_folder_id')->label; ?></th>
@@ -64,10 +45,6 @@ $fieldset->set_config('form_attributes', $form_attributes);
             </table>
         </div>
     </div>
-    <div class="unit col c3 lastUnit">
-        <p><?= $fieldset->field('save')->set_template('{field}')->build() ?> &nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$nos(this).nosTabs('close');return false;"><?= __('Cancel') ?></a></p>
-    </div>
-	<?= $fieldset->close(); ?>
 </div>
 
 <script type="text/javascript">
@@ -78,11 +55,11 @@ require(
     ],
     function($) {
         $(function() {
-            var $container = $('#<?= $uniqid ?>').nosFormUI();
+            var $container = $('#<?= $uniqid ?>');
 
             var $file       = $container.find(':file[name=media]');
             var $title      = $container.find('input[name=media_title]');
-            var $slug       = $container.find('input[name=slug]');
+            var $slug       = $container.find('input[name=media_file]');
             var $same_title = $container.find('input[data-id=same_title]');
 
             $file.change(function() {
