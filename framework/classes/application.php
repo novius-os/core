@@ -262,7 +262,13 @@ class Application
             $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
             if (count($pages) > 0)
             {
-                throw new \Exception(count($pages).' pages use a template from this application.');
+                $usedTemplates = array();
+                $pageTitles = array();
+                foreach ($pages as $page) {
+                    $usedTemplates[$page->page_template] = true;
+                    $pageTitles[] = $page->page_id; // page_title? too long...
+                }
+                throw new \Exception(count($pages).' pages use a template from this application. Used templates are: '.implode(', ', array_keys($usedTemplates)).'. Pages ids are: '.implode(', ', $pageTitles));
             }
         }
 
@@ -298,6 +304,13 @@ class Application
 
             $config[$section] = array_merge($config[$section], $added[$section]);
             $config[$section] = array_diff_key($config[$section], $removed[$section]);
+        }
+
+        // More treatment for launchers
+        // Small fix relative to permissions
+        // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
+        foreach ($added['launchers'] as $key => $launcher) {
+            $config['launchers'][$key]['application'] = $this->folder;
         }
 
         // More treatment for enhancers
