@@ -285,12 +285,12 @@ define('jquery-nos-appdesk',
                 $.each(o.locales, function(key, locale) {
                     var flag = key.split('_')[1].toLowerCase();
                     $uiLangs.append(
-                        $('<input type="radio" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedLang == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
+                        $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedLang == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
                     );
                 });
 
                 $uiLangs.append(
-                    $('<input type="radio" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedLang == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allLanguages + '</label>')
+                    $('<input type="radio" class="notransform" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedLang == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allLanguages + '</label>')
                 );
                 $uiLangs.buttonset();
 
