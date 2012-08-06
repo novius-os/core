@@ -14,20 +14,24 @@
         function ($) {
             $(function () {
                 var actions = <?= \Format::forge($actions)->to_json(); ?>,
-                    $form = $('#<?= $fieldset->form()->get_attribute('id') ?>').nosToolbar('create');
+                    $container = $('#<?= $container_id ?>').nosToolbar('create');
 
-                $save = $form.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+                $save = $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                         'save_field' => $fieldset->field('save')
                     ), false))->to_json() ?>)
                     .click(function() {
-                        $form.submit();
+                        if ($container.is('form')) {
+                            $container.submit();
+                        } else {
+                            $container.find('form:visible').submit();
+                        }
                     });
 
                 $.each(actions, function() {
                     var button = this,
                         $button = $('<button></button>').click(function() {
                                 if (button.openTab) {
-                                    $form.nosTabs('open', {
+                                    $container.nosTabs('open', {
                                         url : button.openTab
                                     });
                                 } else if (button.openWindow) {
@@ -49,7 +53,7 @@
                             .text(button.label)
                             .data(button);
 
-                    $form.nosToolbar('add', $button, true);
+                    $container.nosToolbar('add', $button, true);
                 });
             });
         });

@@ -1,4 +1,4 @@
-<?= $fieldset->open('admin/nos/user/form/edit/'.$user->user_id); ?>
+<?= $fieldset->open('admin/nos/user/user/insert_update/'.$user->user_id); ?>
 <?= View::forge('form/layout_standard', array(
     'fieldset' => $fieldset,
     // Used by the behaviours (publishable, etc.)

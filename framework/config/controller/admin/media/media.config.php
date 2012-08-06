@@ -26,9 +26,14 @@ return array(
             'insert' => __('Add a media'),
         ),
     ),
-    'layout' => array(
+    'layout_insert' => array(
         array(
-            'view' => 'nos::admin/media/media',
+            'view' => 'nos::admin/media/media_add',
+        ),
+    ),
+    'layout_update' => array(
+        array(
+            'view' => 'nos::admin/media/media_edit',
         ),
     ),
     'views' => array(

@@ -24,7 +24,7 @@ define(
                         primary : true,
                         action : function(item, ui) {
                             $(ui).nosTabs({
-                                url : 'admin/nos/user/form/edit/' + item.id,
+                                url : 'admin/nos/user/user/insert_update/' + item.id,
                                 label : item.title
                             });
                         }
@@ -56,7 +56,7 @@ define(
                             label : appDesk.i18n('Add a user'),
                             action : function(ui) {
                                 $(ui).nosTabs('add', {
-                                    url : 'admin/nos/user/form/add',
+                                    url : 'admin/nos/user/user/insert_update',
                                     label : appDesk.i18n('Add a user')._()
                                 });
                             }

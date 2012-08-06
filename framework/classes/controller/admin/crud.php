@@ -80,6 +80,15 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->config['views']['insert'] = !empty($this->config['views']['insert']) ? $this->config['views']['insert'] : $this->config['views']['form'];
         $this->config['views']['update'] = !empty($this->config['views']['update']) ? $this->config['views']['update'] : $this->config['views']['form'];
 
+        if (empty($this->config['layout_insert']) && !empty($this->config['layout']))
+        {
+            $this->config['layout_insert'] = $this->config['layout'];
+        }
+        if (empty($this->config['layout_update']) && !empty($this->config['layout']))
+        {
+            $this->config['layout_update'] = $this->config['layout'];
+        }
+
         $this->behaviours = array(
             'translatable' => $model::behaviours('Nos\Orm_Behaviour_Translatable', false),
             'tree' => $model::behaviours('Nos\Orm_Behaviour_Tree', false),
@@ -126,6 +135,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
             $params = array_merge($this->view_params(), array(
                 'url_insert_update' => $this->config['controller_url'].'/insert_update/'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
+                'is_new' => $this->is_new,
                 'fieldset' => $fieldset,
                 'actions' => $this->get_actions(),
                 'tab_params' => $this->get_tab_params(),

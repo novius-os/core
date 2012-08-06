@@ -17,22 +17,24 @@ echo View::forge('nos::crud/tab', array(
         'tab_params' => $view_params['tab_params'],
     ), false);
 echo View::forge('nos::crud/toolbar', array(
+        'container_id' => $fieldset->form()->get_attribute('id'),
         'config' => $view_params['config'],
         'actions' => $view_params['actions'],
         'fieldset' => $view_params['fieldset'],
         'object' => $view_params['item'],
     ), false);
 
-$layout = current($view_params['config']['layout']);
-if (empty($layout['view'])) {
-    $view_params['config']['layout'] = array(
+$layout = $view_params['is_new'] ? $view_params['config']['layout_insert'] : $view_params['config']['layout_update'];
+$view = current($layout);
+if (empty($view['view'])) {
+    $layout = array(
         array(
             'view' => 'nos::form/layout_standard',
-            'view_params' =>  $view_params['config']['layout'],
+            'view_params' =>  $layout,
         ),
     );
 }
-foreach ($view_params['config']['layout'] as $view) {
+foreach ($layout as $view) {
     if (!empty($view['view'])) {
         $view['view_params'] = empty($view['view_params']) ? array() : $view['view_params'];
         echo View::forge($view['view'], $view['view_params'] + array(
