@@ -885,7 +885,11 @@ define('jquery-nos',
                             $('<td></td>').append($tool)
                                 .appendTo($toolbar.find('tr.nos-toolbar-' + (right_side ? 'right' : 'left')))
                                 .nosFormUI();
-                            $target.css('top', $toolbar.outerHeight());
+                            $target.css({
+                                top : $toolbar.outerHeight(),
+                                bottom : 0,
+                                height : 'auto'
+                            });
 
                             return $tool;
                         })();
