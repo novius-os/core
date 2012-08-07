@@ -91,6 +91,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->behaviours = array(
             'translatable' => $model::behaviours('Nos\Orm_Behaviour_Translatable', false),
+            'sharable' => $model::behaviours('Nos\Orm_Behaviour_Sharable', false),
             'tree' => $model::behaviours('Nos\Orm_Behaviour_Tree', false),
             'url' => $model::behaviours('Nos\Orm_Behaviour_Url', false),
         );
@@ -142,7 +143,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             ));
 
             $return = '';
-            if ($this->behaviour_sharable) {
+            if ($this->behaviours['sharable']) {
                 $return .= (string) \Request::forge('nos/admin/datacatcher/form')->execute(array($this->item));
             }
 

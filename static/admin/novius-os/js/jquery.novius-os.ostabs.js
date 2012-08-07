@@ -699,7 +699,6 @@ define('jquery-nos-ostabs',
                         width += $( this ).outerWidth( true );
                     });
                 self.uiOstabsTabs.width( width );
-                log(self.uiOstabsTabs, width);
 
                 var nbLabel = self.uiOstabsTabs.find( '.nos-ostabs-label:visible' ).length,
                     add;
