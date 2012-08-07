@@ -29,32 +29,10 @@
     width : 100%;
     height : 100%;
 
-	.nos-appdesk-headerbar {
-		margin : 0 10px;/* Don't put a top margin, or scrollbar will appear */
-
-		.nos-appdesk-headerbar-left {
-            display : inline-block;
-            line-height : 54px; /* Vertical align = middle */
-		}
-        .nos-appdesk-action-secondary {
-            display : inline-block;
-            margin: 0 1em;
-        }
-        .nos-appdesk-headerbar-right {
-            float: right;
-            line-height : 54px; /* Vertical align = middle */
-        }
-		.nos-appdesk-dropdownviews, .nos-appdesk-dropdownlang {
-            display : inline-block;
-            margin-left: 10px;
-            line-height : 1em;
-		}
-	}
-
 	.nos-appdesk-splitter-v {
 		@include box-sizing(border-box);
 		position : absolute;
-        top : 54px;
+        top : 0;
 		left : 0;
 		right : 0;
 		bottom : 0;

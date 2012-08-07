@@ -273,6 +273,9 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $attributes['widget_options'] = array('instance' => $options['instance']);
 				$field = $this->add($p, $label, $attributes);
 			}
+            if (isset($settings['template'])) {
+                $field->set_template($settings['template']);
+            }
 			if ( ! empty($settings['validation']))
 			{
 				foreach ($settings['validation'] as $rule => $args)

@@ -32,7 +32,7 @@ define('jquery-nos-validate',
                         padding : '0 4px',
                         verticalAlign: 'middle'
                     })
-                    .html('<span class="ui-icon ui-icon-alert nos-icon16"></span>');
+                    .html('<span class="ui-icon ui-icon-alert nos-inline-icon16"></span>');
 
                 label.wijtooltip({
                     group : 'group_' + self.counter++,

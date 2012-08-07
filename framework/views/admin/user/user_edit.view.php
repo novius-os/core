@@ -8,21 +8,25 @@
  * @link http://www.novius-os.org
  */
 
+$uniqid = uniqid('id_');
+
+echo View::forge('nos::crud/tab', array(
+    'model' => $view_params['model'],
+    'pk' => $view_params['pk'],
+    'item' => $view_params['item'],
+    'config' => $view_params['config'],
+    'container_id' => $view_params['fieldset']->form()->get_attribute('id'),
+    'tab_params' => $view_params['tab_params'],
+), false);
+
+echo View::forge('nos::crud/toolbar', array(
+    'container_id' => $uniqid,
+    'config' => $view_params['config'],
+    'actions' => $view_params['actions'],
+    'fieldset' => $view_params['fieldset'],
+    'object' => $view_params['item'],
+), false);
 ?>
-<script type="text/javascript">
-require(
-    ['jquery-nos-ostabs'],
-    function ($) {
-        $(function () {
-	        $('#<?= $uniqid = uniqid('id_'); ?>').nosTabs('update', {
-                label : <?= \Format::forge()->to_json(isset($user) ? $user->fullname() : 'Add a user') ?>,
-                iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
-            });
-        });
-    });
-</script>
-
-
 <style type="text/css">
 /* ? */
 /* @todo check this */
@@ -32,26 +36,46 @@ require(
 </style>
 
 <?php
-$fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+$view_params['fieldset']->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 
-foreach ($fieldset->field() as $field) {
+foreach ($view_params['fieldset']->field() as $field) {
 	if ($field->type == 'checkbox') {
 		$field->set_template('{field} {label}');
 	}
 }
 ?>
-
+<div>
 <div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
     <ul style="width: 15%;">
         <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
         <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
     </ul>
     <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
-        <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $user), false) ?>
+        <?= render('admin/user/user_details_edit', array('fieldset' => $view_params['fieldset'], 'user' => $view_params['item']), false) ?>
     </div>
     <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
-       <?= $permissions ?>
+<?php
+        $role = reset($view_params['item']->roles);
+
+        \Config::load('nos::admin/permissions', 'permissions');
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
+        $applications = array_merge(\Config::get('data::app_installed', array()), \Config::get('permissions', array()));
+        foreach ($applications as $app => $params) {
+            if (isset($params['permission'])) {
+                $apps[$app] = array_merge($params, $params['permission']);
+            }
+        }
+        unset($apps['local']);
+        unset($apps['nos']);
+
+        echo \View::forge('nos::admin/user/permission', array(
+            'user' => $view_params['item'],
+            'role' => $role,
+            'apps' => $apps,
+        ), false);
+?>
     </div>
+</div>
 </div>
 
 <script type="text/javascript">
@@ -62,10 +86,11 @@ foreach ($fieldset->field() as $field) {
     ], function($) {
         $(function() {
             var $container = $('#<?= $uniqid ?>');
-            $container.css('display', 'block').nosOnShow();
-            $container.wijtabs({
-                alignment: 'left'
-            });
+            $container.css('display', 'block')
+                .nosOnShow()
+                .wijtabs({
+                    alignment: 'left'
+                });
 
             $container.find('> div').addClass('fill-parent').css({
                 left: '15%',

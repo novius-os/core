@@ -11,16 +11,16 @@
 <input type="hidden" name="id" value="<?= $view_params['item']->{$view_params['pk']} ?>" />
 <p>
 <?php
-    if ($view_params['translatable']) {
+    if ($view_params['behaviours']['translatable']) {
         $item_langs = $view_params['item']->find_lang('all');
         $lang_count = count($item_langs);
 
-        if ($view_params['tree']) {
+        if ($view_params['behaviours']['tree']) {
             $children = array();
             // Count all children in the primary lang
             foreach ($item_langs as $item) {
                 foreach ($item->find_children_recursive(false) as $child) {
-                    $children[$child->{$view_params['translatable']['common_id_property']}] = true;
+                    $children[$child->{$view_params['behaviours']['translatable']['common_id_property']}] = true;
                 }
             }
             $children_count = count($children);
@@ -94,7 +94,7 @@
             }
         }
     } else {
-        if ($view_params['tree']) {
+        if ($view_params['behaviours']['tree']) {
             $children_count = count($view_params['item']->find_children_recursive(false));
             if ($children_count == 0) {
                 echo Str::tr($view_params['config']['messages']['you are about to delete, confim'], array('title' =>  $view_params['item']->title_item()));

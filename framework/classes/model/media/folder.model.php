@@ -145,7 +145,14 @@ class Model_Media_Folder extends \Nos\Orm\Model {
 
     public function set_path($path) {
 
-		$parent = $this->parent;
+        if ($this->is_new())
+        {
+            $parent = static::find($this->medif_parent_id);
+        }
+        else
+        {
+            $parent = $this->parent;
+        }
         if (empty($parent)) {
             return false;
         }

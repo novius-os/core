@@ -21,7 +21,7 @@ define(
                         label : appDesk.i18n('Edit'),
                         action : function(item, ui) {
                             $(ui).nosTabs({
-                                url: 'admin/nos/media/media/edit/' + item.id,
+                                url: 'admin/nos/media/media/insert_update/' + item.id,
                                 label: appDesk.i18n('Edit a media')._()
                             });
                         }
@@ -32,12 +32,17 @@ define(
                         icon : 'trash',
                         label : appDesk.i18n('Delete'),
                         action : function(item, ui) {
-                            $(ui).nosDialog({
-                                contentUrl: 'admin/nos/media/actions/delete_media/' + item.id,
-                                ajax : true,
+                            $(ui).nosConfirmationDialog({
+                                contentUrl: 'admin/nos/media/media/delete/' + item.id,
                                 title: appDesk.i18n('Delete a media')._(),
-                                width: 400,
-                                height: 150
+                                confirmed: function($dialog) {
+                                    $dialog.nosAjax({
+                                        url : 'admin/nos/media/media/delete_confirm',
+                                        method : 'POST',
+                                        data : $dialog.find('form').serialize()
+                                    });
+                                },
+                                appDesk: appDesk
                             });
                         }
                     },
@@ -109,7 +114,7 @@ define(
                             label : appDesk.i18n('Add a media'),
                             action : function(ui) {
                                 $(ui).nosTabs({
-                                    url: 'admin/nos/media/media/add',
+                                    url: 'admin/nos/media/media/insert_update',
                                     label: appDesk.i18n('Add a media')._()
                                 });
                             }
@@ -118,7 +123,7 @@ define(
                             label : appDesk.i18n('Add a folder'),
                             action : function(ui) {
                                 $(ui).nosTabs({
-                                    url: 'admin/nos/media/folder/add',
+                                    url: 'admin/nos/media/folder/insert_update',
                                     label: 'Add a folder'
                                 }, {
                                     width: 600,
@@ -186,7 +191,7 @@ define(
                                                 icon : 'plus',
                                                 action : function(item, ui) {
                                                     $(ui).nosTabs({
-                                                        url: 'admin/nos/media/media/add/' + item.id,
+                                                        url: 'admin/nos/media/media/insert_update?context_id=' + item.id,
                                                         label: 'Add a media in the "' + item.title + '" folder'
                                                     });
                                                 }
@@ -197,7 +202,7 @@ define(
                                                 icon : 'folder-open',
                                                 action : function(item, ui) {
                                                     $(ui).nosTabs({
-                                                        url: 'admin/nos/media/folder/add/' + item.id,
+                                                        url: 'admin/nos/media/folder/insert_update?context_id=' + item.id,
                                                         label: 'Add a sub-folder in "' + item.title + '"'
                                                     }, {
                                                         width: 600,
@@ -211,7 +216,7 @@ define(
                                                 icon : 'pencil',
                                                 action : function(item, ui) {
                                                     $(ui).nosTabs({
-                                                        url: 'admin/nos/media/folder/edit/' + item.id,
+                                                        url: 'admin/nos/media/folder/insert_update/' + item.id,
                                                         label: 'Edit the "' + item.title + '" folder'
                                                     }, {
                                                         width: 600,
@@ -224,12 +229,17 @@ define(
                                                 label : appDesk.i18n('Delete this folder'),
                                                 icon : 'trash',
                                                 action : function(item, ui) {
-                                                    $(ui).nosDialog({
-                                                        contentUrl: 'admin/nos/media/actions/delete_folder/' + item.id,
-                                                        ajax : true,
-                                                        title: 'Delete the "' + item.title + '" folder',
-                                                        width: 400,
-                                                        height: 200
+                                                    $(ui).nosConfirmationDialog({
+                                                        contentUrl: 'admin/nos/media/folder/delete/' + item.id,
+                                                        title: appDesk.i18n('Delete a folder')._(),
+                                                        confirmed: function($dialog) {
+                                                            $dialog.nosAjax({
+                                                                url : 'admin/nos/media/folder/delete_confirm',
+                                                                method : 'POST',
+                                                                data : $dialog.find('form').serialize()
+                                                            });
+                                                        },
+                                                        appDesk: appDesk
                                                     });
                                                 }
                                             }

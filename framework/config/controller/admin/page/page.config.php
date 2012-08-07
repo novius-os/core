@@ -39,82 +39,84 @@ return array(
             'insert' => __('Add a page'),
             'blankSlate' => __('Translate a page'),
         ),
-
-        'actions' => array(
-            'visualise' => function($item) {
-                return array(
-                    'label' => __('Visualise'),
-                    'action' => array(
-                        'openWindow' => $item->get_href() . '?_preview=1',
-                    ),
-                    'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                );
-            }
-        ),
     ),
-    'views' => array(
-        'form' => 'nos::admin/page/page_form',
+    'actions' => array(
+        'visualise' => function($item) {
+            return array(
+                'label' => __('Visualise'),
+                'openWindow' => $item->get_href() . '?_preview=1',
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+            );
+        }
     ),
     'layout' => array(
-        'title' => 'page_title',
-        'medias' => array(),
-        'large' => true,
-        'save' => 'save',
-        'subtitle' => array('page_type', 'page_template'),
-        'content' => array(
-            'content' => array(
-                'view' => 'nos::form/expander',
-                'params' => array(
-                    'title'   => __('Content'),
-                    'nomargin' => true,
-                    'options' => array(
-                        'allowExpand' => false,
-                    ),
+        array(
+            'view' => 'nos::form/layout_standard',
+            'view_params' => array(
+                'title' => 'page_title',
+                'medias' => array(),
+                'large' => true,
+                'save' => 'save',
+                'subtitle' => array('page_type', 'page_template'),
+                'content' => array(
                     'content' => array(
-                        'view' => 'nos::form/fields',
+                        'view' => 'nos::form/expander',
                         'params' => array(
-                            'begin' => '<div data-id="external"><table>',
-                            'fields' => array(
-                                'page_external_link',
-                                'page_external_link_type',
+                            'title'   => __('Content'),
+                            'nomargin' => true,
+                            'options' => array(
+                                'allowExpand' => false,
                             ),
-                            'end' => '</table>
-                                </div>
-                                <div data-id="internal" style="display:none;">
-                                    <p style="padding:1em;">We\'re sorry, internal links are not supported yet. We need a nice page selector before that.</p>
-                                </div>
-                                <div data-id="wysiwyg" style="display:none;"></div>',
+                            'content' => array(
+                                'view' => 'nos::form/fields',
+                                'params' => array(
+                                    'begin' => '<div data-id="external"><table>',
+                                    'fields' => array(
+                                        'page_external_link',
+                                        'page_external_link_type',
+                                    ),
+                                    'end' => '</table>
+                                        </div>
+                                        <div data-id="internal" style="display:none;">
+                                            <p style="padding:1em;">We\'re sorry, internal links are not supported yet. We need a nice page selector before that.</p>
+                                        </div>
+                                        <div data-id="wysiwyg" style="display:none;"></div>',
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                'menu' => array(
+                    'accordion' => array(
+                        'view' => 'nos::form/accordion',
+                        'params' => array(
+                            'accordions' => array(
+                                'menu' => array(
+                                    'title' => __('Menu'),
+                                    'fields' => array('page_parent_id', 'page_menu', 'page_menu_title'),
+                                ),
+                                'url' => array(
+                                    'title' => __('URL (page address)'),
+                                    'fields' => array('page_virtual_name'),
+                                ),
+                                'seo' => array(
+                                    'title' => __('SEO'),
+                                    'fields' => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
+                                ),
+                                'admin' => array(
+                                    'title' => __('Admin'),
+                                    'header_class'  => 'faded',
+                                    'content_class' => 'faded',
+                                    'fields'        => array('page_cache_duration', 'page_lock'),
+                                ),
+                            ),
                         ),
                     ),
                 ),
             ),
         ),
-        'menu' => array(
-            'accordion' => array(
-                'view' => 'nos::form/accordion',
-                'params' => array(
-                    'accordions' => array(
-                        'menu' => array(
-                            'title' => __('Menu'),
-                            'fields' => array('page_parent_id', 'page_menu', 'page_menu_title'),
-                        ),
-                        'url' => array(
-                            'title' => __('URL (page address)'),
-                            'fields' => array('page_virtual_name'),
-                        ),
-                        'seo' => array(
-                            'title' => __('SEO'),
-                            'fields' => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
-                        ),
-                        'admin' => array(
-                            'title' => __('Admin'),
-                            'header_class'  => 'faded',
-                            'content_class' => 'faded',
-                            'fields'        => array('page_cache_duration', 'page_lock'),
-                        ),
-                    ),
-                ),
-            ),
+        array(
+            'view' => 'nos::admin/page/page_form',
         ),
     ),
     'fields' => array(

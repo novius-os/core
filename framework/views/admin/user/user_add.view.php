@@ -8,20 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+$uniqid = uniqid('id_');
 ?>
-<script type="text/javascript">
-require(
-    ['jquery-nos-ostabs'],
-    function ($) {
-        $(function () {
-	        $('#<?= $uniqid = uniqid('id_'); ?>').nosTabs('update', {
-                label : <?= \Format::forge()->to_json('Add a user') ?>,
-                iconUrl : 'static/novius-os/admin/novius-os/img/16/user.png'
-            });
-        });
-    });
-</script>
-
 
 <style type="text/css">
 /* ? */
@@ -42,7 +30,6 @@ foreach ($fieldset->field() as $field) {
 ?>
 
 <div class="page line ui-widget" id="<?= $uniqid ?>">
-    <?= $fieldset->open('admin/nos/user/form/add'); ?>
     <?= View::forge('form/layout_standard', array(
         'fieldset' => $fieldset,
         'medias' => null,
@@ -65,7 +52,6 @@ foreach ($fieldset->field() as $field) {
             ), false),
         ),
     ), false); ?>
-    <?= $fieldset->close(); ?>
 </div>
 
 

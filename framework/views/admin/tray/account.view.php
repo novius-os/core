@@ -8,14 +8,29 @@
  * @link http://www.novius-os.org
  */
 
+$uniqid = uniqid('id_');
 ?>
-<div class="page line ui-widget fill-parent" id="<?= $uniqid = uniqid('id_'); ?>">
+<script type="text/javascript">
+    require([
+        'jquery-nos'
+    ], function($) {
+        $(function() {
+            $container = $('#<?= $uniqid ?>').nosToolbar('create');
+            $save = $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+                'save_field' => $fieldset_infos->field('save')
+            ), false))->to_json() ?>)
+                .click(function() {
+                    $container.find('form:visible').submit();
+                });
+
+            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/nos/tray/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Disconnect'))->to_json() ?> + '</button></a>', true);
+        });
+    });
+</script>
+
+<div class="page line ui-widget fill-parent" id="<?= $uniqid ?>">
     <div style="margin-left: 4%; margin-right: 4%; height: 28px;">
         <h1 class="title" style="float:left;"><?= $logged_user->fullname(); ?></h1>
-
-        <a style="float:right;overflow:auto;" href="admin/nos/tray/account/disconnect">
-            <button data-icon="power"><?= __('Disconnect') ?></button>
-        </a>
     </div>
 
     <div class="tabs fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;display:none;padding:0;">
