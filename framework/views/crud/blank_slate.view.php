@@ -7,12 +7,24 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+$uniqid = uniqid($lang.'_');
+
 $labels = array();
 $possible = $item->get_possible_lang();
 $main_lang = $item->find_main_lang();
 $common_id = $main_lang ? $main_lang->id : false;
+
+echo View::forge('nos::crud/tab', array(
+    'model' => $model,
+    'pk' => $pk,
+    'item' => $item,
+    'config' => $config,
+    'container_id' => $uniqid,
+    'tab_params' => $tab_params,
+), false);
 ?>
-<div id="<?= $uniqid = uniqid($lang.'_') ?>" class="" style="padding:0;">
+<div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
         <?php
         if (!in_array($lang, $possible))
@@ -107,24 +119,17 @@ $common_id = $main_lang ? $main_lang->id : false;
         <?php
         }
         ?>
-        </div>
     </div>
-    <script type="text/javascript">
-    require(['jquery-nos'], function ($) {
-        $(function () {
-            var $container = $('#<?= $uniqid ?>').nosFormUI();
-            $container.find('form').submit(function(e) {
-                e.preventDefault();
-                var $form = $(this);
-                $container.load($form.get(0).action, $form.serialize());
-            });
-
-            var tabInfos = <?= \Format::forge()->to_json($tabInfos) ?>;
-
-            $container.nosOnShow('bind', function() {
-                $container.nosTabs('update', tabInfos);
-            });
-            $container.nosOnShow();
+</div>
+<script type="text/javascript">
+require(['jquery-nos'], function ($) {
+    $(function () {
+        var $container = $('#<?= $uniqid ?>').nosFormUI();
+        $container.find('form').submit(function(e) {
+            e.preventDefault();
+            var $form = $(this);
+            $container.load($form.get(0).action, $form.serialize());
         });
     });
-    </script>
+});
+</script>

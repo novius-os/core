@@ -13,7 +13,7 @@ echo View::forge('nos::crud/tab', array(
         'pk' => $view_params['pk'],
         'item' => $view_params['item'],
         'config' => $view_params['config'],
-        'fieldset' => $view_params['fieldset'],
+        'container_id' => $view_params['fieldset']->form()->get_attribute('id'),
         'tab_params' => $view_params['tab_params'],
     ), false);
 echo View::forge('nos::crud/toolbar', array(

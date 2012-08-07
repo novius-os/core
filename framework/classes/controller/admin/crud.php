@@ -171,7 +171,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             if ($this->behaviours['translatable'])
             {
-                $this->item->{$this->behaviours['translatable']['lang_property']} = \Input::get('lang', key(\Config::get('locales')));
+                $lang = \Input::get('lang', key(\Config::get('locales')));
+                $this->item->{$this->behaviours['translatable']['lang_property']} = empty($lang) ? key(\Config::get('locales')) : $lang;
             }
         }
     }
@@ -323,17 +324,16 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $tabInfos = $this->get_tab_params();
         $tabInfos['url'] .= '?lang='.$lang;
-        $tabInfos = \Arr::merge($tabInfos, $this->config['tab']['labels']['blankSlate']);
+        $tabInfos = \Arr::merge($tabInfos, array('label' => $this->config['tab']['labels']['blankSlate']));
 
-        $viewData = array(
-            'item'      => $this->item,
+        $viewData = array_merge($this->view_params(), array(
             'lang'      => $lang,
             'common_id' => \Input::get('common_id', ''),
-            'item_text' => $this->config['message']['blank_state_item_text'],
+            'item_text' => $this->config['messages']['blank_state_item_text'],
             'url_form'  => $this->config['controller_url'].'/form',
             'url_insert_update'  => $this->config['controller_url'].'/insert_update',
-            'tabInfos'  => $tabInfos,
-        );
+            'tab_params'  => $tabInfos,
+        ));
         return \View::forge('nos::crud/blank_slate', $viewData, false);
     }
 
@@ -413,39 +413,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $actions = array();
         $locales = array_keys(\Config::get('locales'));
-        if ($this->is_new)
+        $main_lang = $this->item->find_main_lang();
+        foreach ($locales as $locale)
         {
-            foreach ($locales as $locale)
+            if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale)
             {
-                if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale)
-                {
-                    continue;
-                }
-                $actions[$locale] = array(
-                    'label' => strtr(__('Add in {lang}'), array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
-                    'openTab' => $this->config['controller_url'].'/insert_update?lang='.$locale,
-                    'iconUrl' => \Nos\Helper::flag_url($locale),
-                );
+                continue;
             }
-        }
-        else
-        {
-            $main_lang = $this->item->find_main_lang();
-            foreach ($locales as $locale)
-            {
-                if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale)
-                {
-                    continue;
-                }
-                $item_lang = $this->item->find_lang($locale);
-                $actions[$locale] = array(
-                    'label' => strtr(
-                            empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'), array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))
-                    ),
-                    'openTab' => $this->config['controller_url'].'/insert_update/'.(empty($item_lang) ? $main_lang->id.'?lang='.$locale : $item_lang->id), // .'?lang='.$locale, // .'&common_id='.$main_lang->id
-                    'iconUrl' => \Nos\Helper::flag_url($locale),
-                );
-            }
+            $item_lang = $this->item->find_lang($locale);
+            $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
+            $label = empty($main_lang) ? __('Add in {lang}') : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $actions[$locale] = array(
+                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
+                'openTab' => $url,
+                'iconUrl' => \Nos\Helper::flag_url($locale),
+            );
         }
         return $actions;
     }
