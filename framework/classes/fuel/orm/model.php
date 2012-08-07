@@ -139,6 +139,9 @@ class Model extends \Orm\Model {
 
         if ( ! array_key_exists($class, static::$_relations_cached))
         {
+            // unset potential's relations stored in Nos\Orm\Model
+            unset(static::$_has_many['linked_wysiwygs']);
+            unset(static::$_has_many['linked_medias']);
             if ($class !== 'Nos\Model_Wysiwyg')
             {
                 static::$_has_many['linked_wysiwygs'] = array(
@@ -157,7 +160,7 @@ class Model extends \Orm\Model {
 
             if ($class !== 'Nos\Model_Media_Link')
             {
-                    static::$_has_many['linked_medias'] = array(
+                static::$_has_many['linked_medias'] = array(
                     'key_from' => static::$_primary_key[0],
                     'model_to' => 'Nos\Model_Media_Link',
                     'key_to' => 'medil_foreign_id',
