@@ -30,10 +30,10 @@ return array(
         ),
     ),
     'data_catchers' => array(
-        'rss_chanel' => array(
-            'title' => 'RSS Chanel',
+        'rss_channel' => array(
+            'title' => 'RSS Channel',
             'description'  => '',
-            'url' => 'admin/nos/data_catcher/rss_chanel',
+            'url' => 'admin/nos/data_catcher/rss_channel',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/16/rss.png',
             'onDemand' => false,
             'specified_models' => true,
