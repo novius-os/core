@@ -7,9 +7,10 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+$uniqid_close = uniqid('close_');
 if (!$item->is_new()) {
 ?>
-<div id="<?= $uniqid_close = uniqid('close_') ?>" style="display:none;">
+<div id="<?= $uniqid_close ?>" style="display:none;">
     <p><?= $config['messages']['item deleted'] ?></p>
     <p>&nbsp;</p>
     <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
