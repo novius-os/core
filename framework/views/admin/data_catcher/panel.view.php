@@ -53,25 +53,14 @@
         </div>
     </div>
 
-    <form method="POST" action="admin/nos/datacatcher/save">
-        <input type="hidden" name="model_id" value="<?= $model_id ?>" />
-        <input type="hidden" name="model_name" value="<?= $model_name ?>" />
-        <?php
-        echo \View::forge('nos::admin/data_catcher/form', array(
-            'item' => $item,
-            'nugget' => $item->get_default_nuggets(),
-        ));
-        ?>
-        <div class="nos-datacatchers-buttons">
-            <button type="submit" data-icon="check" class="primary">
-                <?= __('Save') ?>
-            </button>
-            &nbsp; <?= __('or') ?> &nbsp;
-            <a href="#" onclick="return false;">
-                <?= __('Cancel') ?>
-            </a>
-        </div>
-    </form>
+    <?php
+    echo \View::forge('nos::admin/data_catcher/form', array(
+        'item' => $item,
+        'model_id' => $model_id,
+        'model_name' => $model_name,
+        'nugget' => $item->get_default_nuggets(),
+    ));
+    ?>
 </div>
 <script type="text/javascript">
 require(

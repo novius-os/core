@@ -20,36 +20,4 @@ class DataCatcher
     const TYPE_DOCUMENT = 6;
     const TYPE_DATE = 7;
     const TYPE_COLLECTION = 8;
-
-    public static function configRssChanel(array $config) {
-        return array_merge(array(
-            'title' => 'RSS Chanel',
-            'description'  => '',
-            'url' => 'admin/nos/data_catcher/rss_chanel',
-            'iconUrl' => 'static/novius-os/admin/novius-os/img/16/rss.png',
-            'onDemand' => false,
-            'specified_models' => true,
-            'required_data' => array(
-                static::TYPE_TITLE,
-            ),
-            'optional_data' => array(
-                static::TYPE_TEXT,
-            ),
-        ), $config);
-    }
-
-    public static function configRssItem(array $config) {
-        return array_merge(array(
-            'title' => 'RSS Item',
-            'description'  => '',
-            'url' => 'admin/nos/data_catcher/rss_item',
-            'iconUrl' => 'static/novius-os/admin/novius-os/img/16/rss.png',
-            'onDemand' => false,
-            'specified_models' => true,
-            'required_data' => array(
-                static::TYPE_TITLE,
-                static::TYPE_TEXT,
-            ),
-        ), $config);
-    }
 }

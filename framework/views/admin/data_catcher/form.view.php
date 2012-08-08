@@ -9,9 +9,11 @@
  */
     $id = uniqid('temp_');
 
-    $fieldset = \Fieldset::forge();
-    //$fieldset->add('model_id', '', array('value' => $model_id, 'type' => 'hidden'));
-    //$fieldset->add('model_name', '', array('value' => $model_name, 'type' => 'hidden'));
+
+
+    $fieldset = \Fieldset::forge(uniqid());
+    $fieldset->add('model_id', '', array('value' => $model_id, 'type' => 'hidden'));
+    $fieldset->add('model_name', '', array('value' => $model_name, 'type' => 'hidden'));
     $fields = array();
     if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE])) {
         $fields[] = \Nos\DataCatcher::TYPE_TITLE;
@@ -34,6 +36,7 @@
             'value' => isset($possible[$value]) ? $value : 0,
         ));
     }
+    echo $fieldset->open('admin/nos/datacatcher/save');
 ?>
 <div id="<?= $id ?>">
 <?php

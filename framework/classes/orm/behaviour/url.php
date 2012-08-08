@@ -37,7 +37,7 @@ class Orm_Behaviour_Url extends Orm_Behaviour
                 }
             }
         }
-        return $urls;
+        return $first ? null : $urls;
     }
 
     public function url_canonical($object) {

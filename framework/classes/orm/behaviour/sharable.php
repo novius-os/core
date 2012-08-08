@@ -14,10 +14,20 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 {
 	protected $_properties = array();
 
+    public function __construct($class)
+    {
+        parent::__construct($class);
+
+        $this->_properties = array_merge(array(
+            'data' => array(),
+            'data_catchers' => array(),
+        ), $this->_properties);
+    }
+
     public function get_default_nuggets($object) {
         $default_nuggets = $object->get_catcher_nuggets(Model_Content_Nuggets::DEFAULT_CATCHER);
         $nuggets = $default_nuggets->content_data;
-        foreach ($this->_properties as $type => $params) {
+        foreach ($this->_properties['data'] as $type => $params) {
             if (!isset($nuggets[$type])) {
                 if (is_string($params['value'])) {
                     $nuggets[$type] = $object->{$params['value']};
@@ -51,9 +61,9 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
     public function get_sharable_property($object, $property = null, $default = null) {
         if (empty($property)) {
-            return $this->_properties;
+            return $this->_properties['data'];
         } else {
-            $value = \Arr::get($this->_properties, $property, null);
+            $value = \Arr::get($this->_properties['data'], $property, null);
             if ($value === null) {
                 return $default;
             }
@@ -67,8 +77,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         $catchers = array();
         foreach ($data_catchers as $id => $config) {
             if (isset($config['specified_models']) &&
-                ((is_bool($config['specified_models']) && $config['specified_models'] === true) ||
-                (is_array($config['specified_models']) && !in_array($this->_class, $config['specified_models'])))
+                ((is_bool($config['specified_models']) && $config['specified_models'] === true))
             ) {
                 continue;
             }
@@ -76,11 +85,21 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
                 $config['required_data'] = array();
             }
             foreach ($config['required_data'] as $type_data) {
-                if (!isset($this->_properties[$type_data])) {
+                if (!isset($this->_properties['data'][$type_data])) {
                     break 2;
                 }
             }
             $catchers[$id] = $config;
+        }
+
+        foreach ($this->_properties['data_catchers'] as $id => $data_catcher) {
+            if (is_array($data_catcher) && $data_catcher['data_catcher'] && !empty($data_catchers[$data_catcher['data_catcher']])) {
+                $catchers[$id] = array_merge($data_catchers[$data_catcher['data_catcher']], $data_catcher);
+                unset($catchers[$id]['data_catcher']);
+            }
+            if (is_string($data_catcher) && !empty($data_catchers[$data_catcher])) {
+                $catchers[$data_catcher] = $data_catchers[$data_catcher];
+            }
         }
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
