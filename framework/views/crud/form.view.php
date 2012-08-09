@@ -26,7 +26,7 @@ echo View::forge('nos::crud/toolbar', array(
 
 $layout = $view_params['is_new'] ? $view_params['config']['layout_insert'] : $view_params['config']['layout_update'];
 $view = current($layout);
-if (empty($view['view'])) {
+if (!is_array($view) || empty($view['view'])) {
     $layout = array(
         array(
             'view' => 'nos::form/layout_standard',

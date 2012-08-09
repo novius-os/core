@@ -66,7 +66,7 @@
 							<td><?= e($app->name) ?></td>
 							<td>
 								<a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;">remove</a>
-								<?= $app->is_dirty() ? '- [<a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'repair'))->to_json()).'" onclick="return false;">repair install</a>]' : '' ?>
+								<?= $app->is_dirty() ? '- [<a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()).'" onclick="return false;">repair install</a>]' : '' ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -138,7 +138,7 @@
                         var data = $(this).data('app');
 
                         $container.nosAjax({
-                            url: 'admin/nos/tray/appmanager/' + (data.action === 'remove' ? 'remove' : 'add') + '/' + data.name,
+                            url: 'admin/nos/tray/appmanager/' + data.action + '/' + data.name,
                             complete: function() {
                                 $container.load('admin/nos/tray/appmanager', function() {
                                     $container.find(':first').unwrap();
