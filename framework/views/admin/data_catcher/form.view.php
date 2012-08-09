@@ -10,16 +10,16 @@
     $id = uniqid('temp_');
 
 
-
     $fieldset = \Fieldset::forge(uniqid());
-    $fieldset->add('model_id', '', array('value' => $model_id, 'type' => 'hidden'));
-    $fieldset->add('model_name', '', array('value' => $model_name, 'type' => 'hidden'));
+    $fieldset->add('model_id', '', array('value' => $item->id, 'type' => 'hidden'));
+    $fieldset->add('model_name', '', array('value' => get_class($item), 'type' => 'hidden'));
     $fields = array();
-    if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE])) {
+    $filter = empty($filter) ? array() : array_flip($filter);
+    if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE]) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE])) {
         $fields[] = \Nos\DataCatcher::TYPE_TITLE;
         $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => $nugget[\Nos\DataCatcher::TYPE_TITLE]));
     }
-    if (isset($nugget[\Nos\DataCatcher::TYPE_URL])) {
+    if (isset($nugget[\Nos\DataCatcher::TYPE_URL]) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL])) {
         $fields[] = \Nos\DataCatcher::TYPE_URL;
         $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.possibles');
         $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array(
@@ -27,7 +27,7 @@
             'value' => $nugget[\Nos\DataCatcher::TYPE_URL]
         ));
     }
-    if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $nugget)) {
+    if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_IMAGE])) {
         $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
         $possible = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.possible'));
         $value = $nugget[\Nos\DataCatcher::TYPE_IMAGE];
@@ -36,10 +36,10 @@
             'value' => isset($possible[$value]) ? $value : 0,
         ));
     }
-    echo $fieldset->open('admin/nos/datacatcher/save');
 ?>
 <div id="<?= $id ?>">
 <?php
+    echo $fieldset->open($action);
     $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
     echo $fieldset->build_hidden_fields();
     echo \View::forge('form/fields', array(
@@ -59,7 +59,7 @@
             $label = strtr(__('Use default {what}'), array(
                 '{what}' => empty($useTitle) ? '' : '('.$useTitle.')',
             ));
-            $nugget_silo = $item->get_catcher_nuggets(\Nos\Model_Content_Nuggets::DEFAULT_CATCHER);
+            $nugget_silo = $item->get_catcher_nuggets(\Nos\Model_Content_Nuggets::DEFAULT_CATCHER)->content_data;
             $checked = isset($nugget_silo[$field_name]) ? '' : 'checked';
             $template = str_replace('{field}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label><div class="nos-datacatchers-nugget-value" style="display:none;">{field}</div>', $template);
 
@@ -95,7 +95,7 @@
             echo $field->build();
         },
     ), false);
-?>
+    ?>
     <div class="nos-datacatchers-buttons">
         <button type="submit" data-icon="check" class="primary">
             <?= __('Save') ?>
@@ -105,7 +105,7 @@
             <?= __('Cancel') ?>
         </a>
     </div>
-<?= $fieldset->close() ?>
+    <?= $fieldset->close() ?>
 </div>
 <script type="text/javascript">
 require(

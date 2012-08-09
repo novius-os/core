@@ -53,14 +53,13 @@
         </div>
     </div>
 
-    <?php
-    echo \View::forge('nos::admin/data_catcher/form', array(
-        'item' => $item,
-        'model_id' => $model_id,
-        'model_name' => $model_name,
-        'nugget' => $item->get_default_nuggets(),
-    ));
-    ?>
+        <?php
+        echo \View::forge('nos::admin/data_catcher/form', array(
+            'action' => 'admin/nos/datacatcher/save',
+            'item' => $item,
+            'nugget' => $item->get_default_nuggets(),
+        ));
+        ?>
 </div>
 <script type="text/javascript">
 require(

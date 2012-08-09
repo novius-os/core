@@ -40,7 +40,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $nuggets;
     }
 
-    public function get_catcher_nuggets($object,$catcher = Model_Content_Nuggets::DEFAULT_CATCHER) {
+    public function get_catcher_nuggets($object, $catcher = Model_Content_Nuggets::DEFAULT_CATCHER) {
         $default_nuggets = Model_Content_Nuggets::find('first', array(
             'where' => array(
                 'content_catcher' => $catcher,

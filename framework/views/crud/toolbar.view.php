@@ -16,7 +16,7 @@
                 var actions = <?= \Format::forge($actions)->to_json(); ?>,
                     $container = $('#<?= $container_id ?>').nosToolbar('create');
 
-                $save = $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+                $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                         'save_field' => $fieldset->field('save')
                     ), false))->to_json() ?>)
                     .click(function() {
