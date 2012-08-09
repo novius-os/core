@@ -66,7 +66,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function before() {
         parent::before();
+        $this->config_build();
+    }
 
+    protected function config_build() {
         $model = $this->config['model'];
 
         if (!empty($this->config['context_relation']))
