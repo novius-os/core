@@ -132,6 +132,27 @@ define('jquery-nos',
                     });
                 }
                 return false;
+            },
+
+            nosAction : function(obj) {
+                try {
+                    switch(obj.action) {
+                        case 'nosTabs' :
+                            return function(ui, data) {
+                                $.each(obj.tab, function(key, value) {
+                                    if ($.type(value) === 'string') {
+                                        obj.tab[key] = value.replace(/\[\:([\w]+)\]/g, data[$1]);
+                                    }
+                                });
+
+                                obj.method ? $(ui).nosTabs(obj.method, obj.tab) : $(ui).nosTabs(obj.tab);
+                            };
+                            break;
+                    }
+                } catch (e) {
+                    log('nosAction', e)
+                }
+                return false;
             }
         });
 
