@@ -137,7 +137,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fieldset = $this->fieldset($fieldset);
 
             $params = array_merge($this->view_params(), array(
-                'url_insert_update' => $this->config['controller_url'].'/insert_update/'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
+                'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
                 'fieldset' => $fieldset,
                 'actions' => $this->get_actions(),
