@@ -77,12 +77,10 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
             'lang' => $this->item->page_lang,
         ));
 
-        $checkbox_url  = '<label><input type="checkbox" data-id="same_url_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
         $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
 
         $fieldset->field('page_cache_duration')->set_template('{label} {field} {required} seconds');
         $fieldset->field('page_lock')->set_template('{label} {field} {required}');
-        $fieldset->field('page_virtual_name')->set_template('{label}{required} <br /> <div class="table-field">{field} <span>&nbsp;.html</span></div>'.$checkbox_url);
 
         $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} <br />$checkbox_menu {error_msg}</span>\n");
 

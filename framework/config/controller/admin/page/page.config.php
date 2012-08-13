@@ -158,9 +158,7 @@ return array(
         ),
         'page_virtual_name' => array(
             'label' => 'URL: ',
-            'form' => array(
-                'type' => 'text',
-            ),
+            'widget' => 'Nos\Widget_Virtualname',
             'validation' => array(
                 'required',
                 'min_length' => array(2),
