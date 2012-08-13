@@ -19,11 +19,12 @@ define(
                         primary : true,
                         icon : 'pencil',
                         label : appDesk.i18n('Edit'),
-                        action : function(item, ui) {
-                            $(ui).nosTabs({
-                                url: 'admin/nos/media/media/insert_update/' + item.id,
+                        action : {
+                            action : 'nosTabs',
+                            tab : {
+                                url: 'admin/nos/media/media/insert_update/{{id}}',
                                 label: appDesk.i18n('Edit a media')._()
-                            });
+                            }
                         }
                     },
                     'delete' : {
@@ -31,19 +32,14 @@ define(
                         primary : true,
                         icon : 'trash',
                         label : appDesk.i18n('Delete'),
-                        action : function(item, ui) {
-                            $(ui).nosConfirmationDialog({
-                                contentUrl: 'admin/nos/media/media/delete/' + item.id,
+                        action : {
+                            action : 'nosConfirmationDialog',
+                            dialog : {
+                                contentUrl: 'admin/nos/media/media/delete/{{id}}',
                                 title: appDesk.i18n('Delete a media')._(),
-                                confirmed: function($dialog) {
-                                    $dialog.nosAjax({
-                                        url : 'admin/nos/media/media/delete_confirm',
-                                        method : 'POST',
-                                        data : $dialog.find('form').serialize()
-                                    });
-                                },
+                                confirmedUrl: 'admin/nos/media/media/delete_confirm',
                                 appDesk: appDesk
-                            });
+                            }
                         }
                     },
                     visualise : {
@@ -52,47 +48,8 @@ define(
                         //icon : 'search',
                         iconClasses : 'nos-icon16 nos-icon16-eye',
                         label : appDesk.i18n('Visualise'),
-                        action : function(item, ui) {
-
-                            if (!item.image) {
-                                window.open(item.path);
-                                return;
-                            }
-
-                            var image = new Image();
-                            image.onerror = function() {
-                                $.nosNotify('Image not found', 'error');
-                            }
-                            image.onload = function() {
-                                // Create the lightbox
-                                var lightbox = $('<div><a href="/' + item.path + '" rel="wijlightbox"><img src="/' + item.path + '" title="' + item.title + '" style="width:0;height:0;" /></a></div>')
-                                .css({
-                                    position : 'absolute',
-                                    dislplay : 'none',
-                                    width : 1,
-                                    height: 1
-                                })
-                                .css($(ui || this).offset())
-                                .appendTo(document.body)
-                                .wijlightbox({
-                                    zIndex : 1201,
-                                    textPosition : 'outside',
-                                    player : 'img',
-                                    dialogButtons: 'fullsize',
-                                    modal : true,
-                                    open : function() {
-                                        $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
-                                    },
-                                    close : function(e) {
-                                        lightbox.wijlightbox('destroy');
-                                        lightbox.remove();
-                                    }
-                                });
-
-                                // Open it
-                                lightbox.find('a').triggerHandler('click');
-                            }
-                            image.src = item.path;
+                        action : {
+                            action : 'nosMediaVisualise'
                         }
                     }
                 },
@@ -112,23 +69,28 @@ define(
                     adds : {
                         media : {
                             label : appDesk.i18n('Add a media'),
-                            action : function(ui) {
-                                $(ui).nosTabs({
+                            action : {
+                                action : 'nosTabs',
+                                method : 'add',
+                                tab : {
                                     url: 'admin/nos/media/media/insert_update',
                                     label: appDesk.i18n('Add a media')._()
-                                });
+                                }
                             }
                         },
                         folder : {
                             label : appDesk.i18n('Add a folder'),
-                            action : function(ui) {
-                                $(ui).nosTabs({
+                            action : {
+                                action : 'nosTabs',
+                                method : 'add',
+                                tab : {
                                     url: 'admin/nos/media/folder/insert_update',
                                     label: 'Add a folder'
-                                }, {
+                                },
+                                dialog : {
                                     width: 600,
                                     height: 250
-                                });
+                                }
                             }
                         }
                     },
@@ -189,58 +151,58 @@ define(
                                                 name : 'add_media',
                                                 label : appDesk.i18n('Add a media in this folder'),
                                                 icon : 'plus',
-                                                action : function(item, ui) {
-                                                    $(ui).nosTabs({
-                                                        url: 'admin/nos/media/media/insert_update?context_id=' + item.id,
-                                                        label: 'Add a media in the "' + item.title + '" folder'
-                                                    });
+                                                action : {
+                                                    action : 'nosTabs',
+                                                    tab : {
+                                                        url: 'admin/nos/media/media/insert_update?context_id={{id}}',
+                                                        label: 'Add a media in the "{{title}}" folder'
+                                                    }
                                                 }
                                             },
                                             {
                                                 name : 'add_folder',
                                                 label : appDesk.i18n('Add a sub-folder to this folder'),
                                                 icon : 'folder-open',
-                                                action : function(item, ui) {
-                                                    $(ui).nosTabs({
-                                                        url: 'admin/nos/media/folder/insert_update?context_id=' + item.id,
-                                                        label: 'Add a sub-folder in "' + item.title + '"'
-                                                    }, {
+                                                action : {
+                                                    action : 'nosTabs',
+                                                    tab : {
+                                                        url: 'admin/nos/media/folder/insert_update?context_id={{id}}',
+                                                        label: 'Add a sub-folder in "{{title}}"'
+                                                    },
+                                                    dialog : {
                                                         width: 600,
                                                         height: 250
-                                                    });
+                                                    }
                                                 }
                                             },
                                             {
                                                 name : 'edit',
                                                 label : appDesk.i18n('Edit this folder'),
                                                 icon : 'pencil',
-                                                action : function(item, ui) {
-                                                    $(ui).nosTabs({
-                                                        url: 'admin/nos/media/folder/insert_update/' + item.id,
-                                                        label: 'Edit the "' + item.title + '" folder'
-                                                    }, {
+                                                action : {
+                                                    action : 'nosTabs',
+                                                    tab : {
+                                                        url: 'admin/nos/media/folder/insert_update/{{id}}',
+                                                        label: 'Edit the "{{title}}" folder'
+                                                    },
+                                                    dialog : {
                                                         width: 600,
                                                         height: 250
-                                                    });
+                                                    }
                                                 }
                                             },
                                             {
                                                 name : 'delete',
                                                 label : appDesk.i18n('Delete this folder'),
                                                 icon : 'trash',
-                                                action : function(item, ui) {
-                                                    $(ui).nosConfirmationDialog({
-                                                        contentUrl: 'admin/nos/media/folder/delete/' + item.id,
+                                                action : {
+                                                    action : 'nosConfirmationDialog',
+                                                    dialog : {
+                                                        contentUrl: 'admin/nos/media/folder/delete/{{id}}',
                                                         title: appDesk.i18n('Delete a folder')._(),
-                                                        confirmed: function($dialog) {
-                                                            $dialog.nosAjax({
-                                                                url : 'admin/nos/media/folder/delete_confirm',
-                                                                method : 'POST',
-                                                                data : $dialog.find('form').serialize()
-                                                            });
-                                                        },
+                                                        confirmedUrl: 'admin/nos/media/folder/delete_confirm',
                                                         appDesk: appDesk
-                                                    });
+                                                    }
                                                 }
                                             }
                                         ]

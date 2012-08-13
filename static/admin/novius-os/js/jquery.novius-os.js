@@ -134,29 +134,140 @@ define('jquery-nos',
                 return false;
             },
 
-            nosAction : function(obj) {
-                try {
-                    switch(obj.action) {
-                        case 'nosTabs' :
-                            return function(ui, data) {
-                                $.each(obj.tab, function(key, value) {
-                                    if ($.type(value) === 'string') {
-                                        obj.tab[key] = value.replace(/\[\:([\w]+)\]/g, data[$1]);
-                                    }
-                                });
+            nosMediaVisualise : function(media) {
+                if (!media.image) {
+                    window.open(media.path);
+                    return;
+                }
 
-                                obj.method ? $(ui).nosTabs(obj.method, obj.tab) : $(ui).nosTabs(obj.tab);
-                            };
-                            break;
+                require([
+                    'wijmo.wijlightbox'
+                ], function() {
+
+                    var image = new Image();
+                    image.onerror = function() {
+                        $.nosNotify('Image not found', 'error');
+                    };
+                    image.onload = function() {
+                        // Create the lightbox
+                        var lightbox = $('<div><a><img /></a></div>')
+                            .find('a')
+                            .attr({
+                                href : media.path,
+                                rel : 'wijlightbox'
+                            })
+                            .find('img')
+                            .attr({
+                                src : media.path,
+                                title : media.title
+                            })
+                            .css({
+                                width : 0,
+                                height: 0
+                            })
+                            .end()
+                            .end()
+                            .css({
+                                position : 'absolute',
+                                dislplay : 'none',
+                                width : 1,
+                                height: 1
+                            })
+                            .css($(ui || this).offset())
+                            .appendTo(document.body)
+                            .wijlightbox({
+                                zIndex : 1201,
+                                textPosition : 'outside',
+                                player : 'img',
+                                dialogButtons: 'fullsize',
+                                modal : true,
+                                open : function() {
+                                    $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
+                                },
+                                close : function(e) {
+                                    lightbox.wijlightbox('destroy');
+                                    lightbox.remove();
+                                }
+                            });
+
+                        // Open it
+                        lightbox.find('a').triggerHandler('click');
+                    }
+                    image.src = media.path;
+                });
+            }
+        });
+
+        $.fn.extend({
+            nosAction : function(obj, data) {
+                data = data || {};
+                try {
+                    if ($.isFunction(obj)) {
+                        obj($(this), data);
+                    } else {
+                        var placeholderReplace = function (obj, data) {
+                            if ($.type(obj) === 'string') {
+                                return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
+                                        return data[p1];
+                                    }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
+                                        return data[p1];
+                                    });
+                            } else if ($.isPlainObject(obj)) {
+                                $.each(obj, function(key, value) {
+                                    obj[key] = placeholderReplace(value, data);
+                                });
+                            }
+                            return obj;
+                        }
+
+                        switch(obj.action) {
+                            case 'nosTabs' :
+                                var args = [];
+                                obj.method && args.push(obj.method);
+                                args.push(placeholderReplace(obj.tab, data));
+                                obj.dialog && args.push(obj.dialog);
+                                $.fn.nosTabs.apply($(this), args);
+                                break;
+
+                            case 'nosConfirmationDialog' :
+                                var params = $.extend({}, placeholderReplace(obj.dialog, data));
+                                params.confirmed = function($dialog) {
+                                    $dialog.nosAjax({
+                                        url : obj.dialog.confirmedUrl,
+                                        method : 'POST',
+                                        data : $dialog.find('form').serialize()
+                                    });
+                                }
+                                delete params.confirmedUrl;
+
+                                $(this).nosConfirmationDialog(params);
+                                break;
+
+                            case 'nosAjax' :
+                                var params = $.extend({}, placeholderReplace(obj.params, data));
+                                $(this).nosAjax(params);
+                                break;
+
+                            case 'nosMediaVisualise' :
+                                $.nosMediaVisualise(data);
+                                break;
+
+                            case 'dialog_pick' :
+                                $(this).closest('.ui-dialog-content').trigger(obj.event, data);
+                                break;
+
+                            case 'window.open' :
+                                var url = placeholderReplace(obj.url, data);
+                                window.open(url);
+                                break;
+                        }
                     }
                 } catch (e) {
                     log('nosAction', e)
                 }
                 return false;
-            }
-        });
+            },
 
-        $.fn.extend({
             nosAjax : function(params) {
                 var options = $.extend({
                         dataType : 'json',
@@ -226,10 +337,13 @@ define('jquery-nos',
 
                 var dialog = this.closest('.ui-dialog-content').size();
                 if (dialog) {
+                    if (json.closeDialog) {
+                        this.nosDialog('close');
+                    }
+                } else {
                     if (json.closeTab) {
                         this.nosTabs('close');
                     }
-                } else {
                     if (json.redirect) {
                         document.location.href = json.redirect;
                     }
@@ -784,8 +898,16 @@ define('jquery-nos',
                     case 'add' :
                         (function() {
                             var tab = args[0],
-                                place = args[1] || 'end';
-                            if (window.parent != window && window.parent.$nos) {
+                                dialogOptions = args[1] || {},
+                                dialog = self.closest('.ui-dialog-content').size(),
+                                place = args[2] || 'end';
+                            if (dialog) {
+                                self.nosDialog($.extend({
+                                    contentUrl: tab.url,
+                                    ajax : !tab.iframe,
+                                    title: tab.label
+                                }, dialogOptions));
+                            } else if (window.parent != window && window.parent.$nos) {
                                 window.parent.$nos(window.frameElement).nosTabs('add', tab, place);
                             } else {
                                 var index;

@@ -28,8 +28,9 @@ define(
                         icon : 'check',
                         text : true,
                         primary : true,
-                        action : function(item, $el) {
-                            $el.closest('.ui-dialog-content').trigger('select_page', item);
+                        action : {
+                            action : 'dialog_pick',
+                            event : 'select_page'
                         }
                     }
                 }

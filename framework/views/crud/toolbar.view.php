@@ -30,25 +30,8 @@
                 $.each(actions, function() {
                     var button = this,
                         $button = $('<button></button>').click(function() {
-                                if (button.openTab) {
-                                    $container.nosTabs('open', {
-                                        url : button.openTab
-                                    });
-                                } else if (button.openWindow) {
-                                    window.open(button.openWindow);
-                                } else if (button.confirmationDialog) {
-                                    $button.nosConfirmationDialog({
-                                        contentUrl: button.confirmationDialog.contentUrl,
-                                        title: button.confirmationDialog.title,
-                                        confirmed: function($dialog) {
-                                            $dialog.nosAjax({
-                                                url : button.confirmationDialog.confirmedUrl,
-                                                method : 'POST',
-                                                data : $dialog.find('form').serialize()
-                                            });
-                                        }
-                                    });
-                                }
+                            log(button.action);
+                                $(this).nosAction(button.action);
                             })
                             .text(button.label)
                             .data(button);

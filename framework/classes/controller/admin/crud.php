@@ -382,18 +382,24 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($url !== null) {
                 $actions[] = array(
                     'label' => $this->config['messages']['visualise'],
-                    'openWindow' => $url . '?_preview=1',
                     'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                    'action' => array(
+                        'action' => 'window.open',
+                        'url' => $url . '?_preview=1',
+                    ),
                 );
             }
         }
         if (!$this->is_new) {
             $actions[] = array(
                 'label' => $this->config['messages']['delete'],
-                'confirmationDialog' => array(
-                    'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                    'title' => $this->config['messages']['delete a item'],
-                    'confirmedUrl' => $this->config['controller_url'].'/delete_confirm',
+                'action' => array(
+                    'action' => 'nosConfirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
+                        'title' => $this->config['messages']['delete a item'],
+                        'confirmedUrl' => $this->config['controller_url'].'/delete_confirm',
+                    ),
                 ),
                 'icon' => 'trash',
             );
@@ -428,8 +434,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $label = empty($main_lang) ? __('Add in {lang}') : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
             $actions[$locale] = array(
                 'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
-                'openTab' => $url,
                 'iconUrl' => \Nos\Helper::flag_url($locale),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => $url
+                    ),
+                ),
             );
         }
         return $actions;

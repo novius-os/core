@@ -22,30 +22,26 @@ define(
                         label : appDesk.i18n('Edit'),
                         icon : 'pencil',
                         primary : true,
-                        action : function(item, ui) {
-                            $(ui).nosTabs({
-                                url : 'admin/nos/user/user/insert_update/' + item.id,
-                                label : item.title
-                            });
+                        action : {
+                            action : 'nosTabs',
+                            tab : {
+                                url : 'admin/nos/user/user/insert_update/{{id}}',
+                                label : '{{title}}'
+                            }
                         }
                     },
                     'delete' : {
                         label : appDesk.i18n('Delete'),
                         icon : 'trash',
                         primary : true,
-                        action : function(item, ui) {
-                            $(ui).nosConfirmationDialog({
-                                contentUrl: 'admin/nos/user/user/delete/' + item.id,
+                        action : {
+                            action : 'nosConfirmationDialog',
+                            dialog : {
+                                contentUrl: 'admin/nos/user/user/delete/{{id}}',
                                 title: appDesk.i18n('Delete a user')._(),
-                                confirmed: function($dialog) {
-                                    $dialog.nosAjax({
-                                        url : 'admin/nos/user/user/delete_confirm',
-                                        method : 'POST',
-                                        data : $dialog.find('form').serialize()
-                                    });
-                                },
+                                confirmedUrl: 'admin/nos/user/user/delete_confirm',
                                 appDesk: appDesk
-                            });
+                            }
                         }
                     }
                 },
@@ -54,11 +50,13 @@ define(
                     adds : {
                         user : {
                             label : appDesk.i18n('Add a user'),
-                            action : function(ui) {
-                                $(ui).nosTabs('add', {
+                            action : {
+                                action : 'nosTabs',
+                                method : 'add',
+                                tab : {
                                     url : 'admin/nos/user/user/insert_update',
                                     label : appDesk.i18n('Add a user')._()
-                                });
+                                }
                             }
                         }
                     },

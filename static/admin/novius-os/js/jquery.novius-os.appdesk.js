@@ -215,17 +215,9 @@ define('jquery-nos-appdesk',
                         .click(function(e) {
                             e.preventDefault();
                             e.stopImmediatePropagation();
-                            if ($.isFunction(first.action)) {
-                                first.action($(this), {
+                            $(this).nosAction(first.action, {
                                     lang: o.selectedLang
                                 });
-                            } else {
-                                $(this).nosTabs('add', {
-                                    iframe : true,
-                                    url : first.url,
-                                    label : first.label
-                                });
-                            }
                         });
 
                 self.element.nosToolbar('add', $button);
@@ -237,17 +229,9 @@ define('jquery-nos-appdesk',
                         .click(function(e) {
                             e.preventDefault();
                             e.stopImmediatePropagation();
-                            if ($.isFunction(add.action)) {
-                                add.action($(this), {
+                            $(this).nosAction(add.action, {
                                     lang: o.selectedLang
                                 });
-                            } else {
-                                $(this).nosTabs('add', {
-                                    iframe : true,
-                                    url : add.url,
-                                    label : add.label
-                                });
-                            }
                         });
 
                     self.element.nosToolbar('add', $a);
@@ -2010,18 +1994,18 @@ define('jquery-nos-appdesk',
                                 });
                         } else {
                             uiAction.click(function(e) {
-                                e.stopImmediatePropagation();
-                                e.preventDefault();
-                                action.action.apply(this, [noParseData, uiAction]);
-                            })
+                                    e.stopImmediatePropagation();
+                                    e.preventDefault();
+                                    uiAction.nosAction(action.action, noParseData);
+                                })
                                 .hover(
-                                function() {
-                                    $(this).addClass("ui-state-hover");
-                                },
-                                function() {
-                                    $(this).removeClass("ui-state-hover");
-                                }
-                            );
+                                    function() {
+                                        $(this).addClass("ui-state-hover");
+                                    },
+                                    function() {
+                                        $(this).removeClass("ui-state-hover");
+                                    }
+                                );
                         }
 
                         if (iconClass && !action.text) {
@@ -2095,7 +2079,7 @@ define('jquery-nos-appdesk',
                                         e.preventDefault();
                                         // Hide me
                                         ul.wijmenu('hideAllMenus');
-                                        action.action.apply(this, [noParseData, li]);
+                                        li.nosAction(action.action, noParseData);
                                     });
                                 }
                             });

@@ -23,12 +23,13 @@ define(
                         name : 'edit',
                         primary : true,
                         icon : 'pencil',
-                        action : function(item, ui) {
-                            $(ui).nosTabs({
-                                url : 'admin/nos/page/page/insert_update/' + item.id,
-                                label : item.title,
+                        action : {
+                            action : 'nosTabs',
+                            tab : {
+                                url : 'admin/nos/page/page/insert_update/{{id}}',
+                                label : '{{title}}',
                                 iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
-                            });
+                            }
                         }
                     },
                     'delete' : {
@@ -36,19 +37,14 @@ define(
                         name : 'delete',
                         primary : false,
                         icon : 'trash',
-                        action : function(item, ui) {
-                            $(ui).nosConfirmationDialog({
-                                contentUrl: 'admin/nos/page/page/delete/' + item.id,
+                        action : {
+                            action : 'nosConfirmationDialog',
+                            dialog : {
+                                contentUrl: 'admin/nos/page/page/delete/{{id}}',
                                 title: appDesk.i18n('Delete a page')._(),
-                                confirmed: function($dialog) {
-                                    $dialog.nosAjax({
-                                        url : 'admin/nos/page/page/delete_confirm',
-                                        method : 'POST',
-                                        data : $dialog.find('form').serialize()
-                                    });
-                                },
+                                confirmedUrl: 'admin/nos/page/page/delete_confirm',
                                 appDesk: appDesk
-                            });
+                            }
                         }
                     },
                     'visualise' : {
@@ -56,8 +52,9 @@ define(
                         name : 'visualise',
                         primary : true,
                         iconClasses : 'nos-icon16 nos-icon16-eye',
-                        action : function(item) {
-                            window.open(item.previewUrl);
+                        action : {
+                            action : 'window.open',
+                            url : '{{previewUrl}}'
                         }
                     },
                     'set_homepage' : {
@@ -65,14 +62,15 @@ define(
                         name : 'set_homepage',
                         primary : false,
                         icon : 'home',
-                        action : function(item, ui) {
-                            $(ui).nosAjax({
+                        action : {
+                            action : 'nosAjax',
+                            params : {
                                 url : 'admin/nos/page/page/set_homepage',
                                 method : 'POST',
                                 data : {
-                                    id : item.id
+                                    id : '{{id}}'
                                 }
-                            });
+                            }
                         }
                     }
                 },
@@ -81,18 +79,16 @@ define(
                     adds: {
                         page : {
                             label : appDesk.i18n('Add a page'),
-                            action : function(ui, appdesk) {
-                                $(ui).nosTabs('add', {
-                                    url: 'admin/nos/page/page/insert_update?lang=' + appdesk.lang,
+                            action : {
+                                action : 'nosTabs',
+                                method : 'add',
+                                tab : {
+                                    url: 'admin/nos/page/page/insert_update?lang={{lang}}',
                                     label: appDesk.i18n('Add a page')._(),
                                     iconUrl: 'static/novius-os/admin/novius-os/img/16/page.png'
-                                });
+                                }
                             }
-                        }/*,
-                        root : {
-                            label : appDesk.i18n('Add a root'),
-                            url : 'admin/nos/page/root/add'
-                        }*/
+                        }
                     },
                     grid : {
                         proxyUrl : 'admin/nos/page/appdesk/json',
