@@ -252,7 +252,7 @@ define('jquery-nos',
                                 $.nosMediaVisualise(data);
                                 break;
 
-                            case 'dialog_pick' :
+                            case 'dialogPick' :
                                 $(this).closest('.ui-dialog-content').trigger(obj.event, data);
                                 break;
 

@@ -29,7 +29,7 @@ define(
                         text : true,
                         primary : true,
                         action : {
-                            action : 'dialog_pick',
+                            action : 'dialogPick',
                             event : 'select_page'
                         }
                     }
