@@ -107,8 +107,8 @@ define('jquery-nos-datacatchers',
                                 model_id : o.model_id
                             },
                             success : function(data) {
+                                self.element.nosAjaxSuccess(data);
                                 self.element.replaceWith(data);
-
                             }
                         })
                     });
