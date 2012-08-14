@@ -30,7 +30,7 @@ class Tools_Enhancer
                 $urlPath = mb_substr($page->get_href(), 0, -5).'/';
                 if ($page->page_lang === $item_lang)
                 {
-                    $urls[] = $callback($item, array('urlPath' => $urlPath));
+                    $urls[] = call_user_func($callback, $item, array('urlPath' => $urlPath));
                 }
             }
             if ($first && count($urls))
