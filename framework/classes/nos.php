@@ -99,8 +99,9 @@ class Nos {
 
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
-        static::parse_enhancers($content, function ($enhancer, $config, $tag) use (&$content, $controller) {
-            $function_content = static::_get_enhancer_content($enhancer, $config, $controller);
+        $callback = array(get_called_class(), 'get_enhancer_content');
+        static::parse_enhancers($content, function ($enhancer, $config, $tag) use (&$content, $controller, $callback) {
+            $function_content = call_user_func($callback, $enhancer, $config, $controller);
             $content = str_replace($tag, $function_content, $content);
         });
     }
@@ -117,7 +118,7 @@ class Nos {
         }
     }
 
-    protected static function _get_enhancer_content($enhancer, $args, $controller) {
+    public static function get_enhancer_content($enhancer, $args, $controller) {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
         )), true);
