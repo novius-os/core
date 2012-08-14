@@ -173,7 +173,7 @@ define('jquery-nos',
                                 width : 1,
                                 height: 1
                             })
-                            .css($(ui || this).offset())
+                            .css($(this).offset())
                             .appendTo(document.body)
                             .wijlightbox({
                                 zIndex : 1201,
@@ -456,7 +456,7 @@ define('jquery-nos',
                     if (data.iconUrl) {
                         $(this).find('span:first')
                             .css({
-                                backgroundImage: 'url(' + data.iconUrl + ')',
+                                backgroundImage: 'url(' + data.iconUrl + ')'
                             });
                     }
                 });
