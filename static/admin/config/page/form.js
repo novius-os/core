@@ -140,38 +140,5 @@ define(
                     $menu_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
                 }
             }).triggerHandler('change');
-
-            var replace_url = function(str) {
-                if (!str) {
-                    return str;
-                }
-                return str.replace(/_/g, '-')
-                    .replace(/ /g, '-')
-                    .replace(/:/g, '-')
-                    .replace(/\\/g, '-')
-                    .replace(/\//g, '-')
-                    .replace(/[^a-zA-Z0-9\-]+/g, '')
-                    .replace(/-{2,}/g, '-')
-                    .toLowerCase();
-            };
-
-            var $virtual_name  = $container.find('input[name=page_virtual_name]');
-            var $checkbox_url = $container.find('input[data-id=same_url_title]');
-            $title.bind('change keyup', function() {
-                if ($checkbox_url.is(':checked')) {
-                    $virtual_name.val(replace_url($title.val()));
-                }
-            });
-            if (replace_url($title.val()) == $virtual_name.val() || $virtual_name.val() == '') {
-                $checkbox_url.attr('checked', true).wijcheckbox("refresh");
-            }
-            $checkbox_url.change(function() {
-                if ($(this).is(':checked')) {
-                    $virtual_name.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-                    $title.triggerHandler('change');
-                } else {
-                    $virtual_name.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-                }
-            }).triggerHandler('change');
         }
     });
