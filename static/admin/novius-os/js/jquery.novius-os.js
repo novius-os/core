@@ -229,18 +229,17 @@ define('jquery-nos',
                                 $.fn.nosTabs.apply($(this), args);
                                 break;
 
-                            case 'nosConfirmationDialog' :
+                            case 'confirmationDialog' :
                                 var params = $.extend({}, placeholderReplace(obj.dialog, data));
-                                params.confirmed = function($dialog) {
-                                    $dialog.nosAjax({
-                                        url : obj.dialog.confirmedUrl,
-                                        method : 'POST',
-                                        data : $dialog.find('form').serialize()
-                                    });
-                                }
-                                delete params.confirmedUrl;
 
-                                $(this).nosConfirmationDialog(params);
+                                params = $.extend({
+                                    ajax : true,
+                                    width: 500,
+                                    height: 'auto',
+                                    'class': 'nos-confirmation-dialog'
+                                }, params);
+
+                                $(this).nosDialog(params);
                                 break;
 
                             case 'nosAjax' :
@@ -586,82 +585,6 @@ define('jquery-nos',
                         break;
                 }
                 return this;
-            },
-
-            nosConfirmationDialog: function(params) {
-                var self = this;
-
-                var i18n = {
-                    'confirm_deletion': 'Confirm the deletion',
-                    'or': 'or',
-                    'cancel': 'Cancel',
-                    'wrong_confirmation': 'Wrong confirmation'
-                };
-                if (params.i18n) {
-                    i18n = params.i18n;
-                } else if (params.appDesk) {
-                    i18n['confirm_deletion'] = params.appDesk.i18n('Confirm the deletion').label;
-                    i18n['or'] = params.appDesk.i18n('or').label;
-                    i18n['cancel'] = params.appDesk.i18n('Cancel').label;
-                    i18n['wrong_confirmation'] = params.appDesk.i18n('Wrong confirmation').label;
-                }
-
-                if (!params) {
-                    params = {};
-                }
-                params = $.extend({
-                    ajax : true,
-                    width: 500,
-                    height: 'auto',
-                    'class': 'nos-confirmation-dialog',
-                    dialogRendered: function($dialog) {
-                        var $form = $('<form class="fieldset standalone"></form>');
-
-                        var $confirmationZone = $('<p></p>');
-                        var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(i18n['confirm_deletion']);
-                        var $cancelButton = $('<a href="#"></a>').append(i18n['cancel']);
-                        var $or = $('<span></span>').text(' ' + i18n['or'] + ' ');
-                        var $verifications = $dialog.find('.verification');
-
-                        $confirmButton.appendTo($confirmationZone);
-                        $or.appendTo($confirmationZone);
-                        $cancelButton.appendTo($confirmationZone);
-
-                        $confirmationZone.appendTo($dialog);
-
-                        $confirmButton.click(function(e) {
-                            e.preventDefault();
-
-                            var allVerificationPassed = true;
-                            $verifications.each(function() {
-                                if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
-                                    allVerificationPassed = false;
-                                    return false;
-                                }
-                            });
-                            if (allVerificationPassed) {
-                                if ($.isFunction(params['confirmed'])) {
-                                    params['confirmed']($dialog);
-                                }
-                                $dialog.nosDialog('close');
-                            } else {
-                                $.nosNotify(i18n['wrong_confirmation'], 'error');
-                            }
-
-                        });
-
-                        $cancelButton.click(function(e) {
-                            e.preventDefault();
-                            $dialog.nosDialog('close');
-                        });
-
-                        $dialog.wrapInner($form);
-
-                        $dialog.parent().nosFormUI();
-                    }
-                }, params);
-
-                self.nosDialog(params);
             },
 
             nosDialog : function() {

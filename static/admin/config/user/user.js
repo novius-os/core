@@ -35,12 +35,10 @@ define(
                         icon : 'trash',
                         primary : true,
                         action : {
-                            action : 'nosConfirmationDialog',
+                            action : 'confirmationDialog',
                             dialog : {
                                 contentUrl: 'admin/nos/user/user/delete/{{id}}',
-                                title: appDesk.i18n('Delete a user')._(),
-                                confirmedUrl: 'admin/nos/user/user/delete_confirm',
-                                appDesk: appDesk
+                                title: appDesk.i18n('Delete a user')._()
                             }
                         }
                     }

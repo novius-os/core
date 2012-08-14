@@ -33,12 +33,10 @@ define(
                         icon : 'trash',
                         label : appDesk.i18n('Delete'),
                         action : {
-                            action : 'nosConfirmationDialog',
+                            action : 'confirmationDialog',
                             dialog : {
                                 contentUrl: 'admin/nos/media/media/delete/{{id}}',
-                                title: appDesk.i18n('Delete a media')._(),
-                                confirmedUrl: 'admin/nos/media/media/delete_confirm',
-                                appDesk: appDesk
+                                title: appDesk.i18n('Delete a media')._()
                             }
                         }
                     },
@@ -196,12 +194,10 @@ define(
                                                 label : appDesk.i18n('Delete this folder'),
                                                 icon : 'trash',
                                                 action : {
-                                                    action : 'nosConfirmationDialog',
+                                                    action : 'confirmationDialog',
                                                     dialog : {
                                                         contentUrl: 'admin/nos/media/folder/delete/{{id}}',
-                                                        title: appDesk.i18n('Delete a folder')._(),
-                                                        confirmedUrl: 'admin/nos/media/folder/delete_confirm',
-                                                        appDesk: appDesk
+                                                        title: appDesk.i18n('Delete a folder')._()
                                                     }
                                                 }
                                             }
