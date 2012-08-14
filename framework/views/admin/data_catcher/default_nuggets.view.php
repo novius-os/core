@@ -20,5 +20,9 @@
         echo '<label>', htmlspecialchars(__('Image:')) ,'</label>';
         echo '<div>', Nos\Model_Media::find($nugget[\Nos\DataCatcher::TYPE_IMAGE])->get_img_tag(array('max_width' => '200', 'max_height' => '300')) ,'</div>';
     }
+    if (isset($nugget[\Nos\DataCatcher::TYPE_TEXT])) {
+        echo '<label>', htmlspecialchars(__('Description:')) ,'</label>';
+        echo '<div>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TEXT]) ,'</div>';
+    }
 ?>
 <button><?= htmlspecialchars(__('Customize')) ?></button>

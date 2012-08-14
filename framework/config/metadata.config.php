@@ -33,21 +33,19 @@ return array(
         'rss_channel' => array(
             'title' => 'RSS Channel',
             'description'  => '',
-            'url' => 'admin/nos/data_catcher/rss_channel',
+            'url' => 'admin/nos/datacatcher/rss_channel',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/16/rss.png',
             'onDemand' => false,
             'specified_models' => true,
             'required_data' => array(
                 \Nos\DataCatcher::TYPE_TITLE,
             ),
-            'optional_data' => array(
-                \Nos\DataCatcher::TYPE_TEXT,
-            ),
+            'optional_data' => array(),
         ),
         'rss_item' => array(
             'title' => 'RSS Item',
             'description'  => '',
-            'url' => 'admin/nos/data_catcher/rss_item',
+            'url' => 'admin/nos/datacatcher/rss_item',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/16/rss.png',
             'onDemand' => false,
             'specified_models' => true,

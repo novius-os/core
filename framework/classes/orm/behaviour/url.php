@@ -25,15 +25,10 @@ class Orm_Behaviour_Url extends Orm_Behaviour
         {
             if (is_callable($function))
             {
-                $temp_urls = call_user_func($function, $object, $first);
-                $temp_urls = is_array($temp_urls) ? $temp_urls : array($temp_urls);
-                if ($first && count($temp_urls))
+                $urls[] = call_user_func($function, $object, $first);
+                if ($first && count($urls))
                 {
-                    return $temp_urls[0];
-                }
-                else
-                {
-                    $urls = array_merge($urls, $temp_urls);
+                    return $urls[0];
                 }
             }
         }

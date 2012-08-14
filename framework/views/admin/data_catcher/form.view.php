@@ -9,17 +9,20 @@
  */
     $id = uniqid('temp_');
 
-
+    (!isset($nugget_db) || !is_array($nugget_db)) && $nugget_db = $item->get_default_nuggets();
     $fieldset = \Fieldset::forge(uniqid());
     $fieldset->add('model_id', '', array('value' => $item->id, 'type' => 'hidden'));
     $fieldset->add('model_name', '', array('value' => get_class($item), 'type' => 'hidden'));
+    $fieldset->add('catcher_name', '', array('value' => $catcher_name, 'type' => 'hidden'));
     $fields = array();
-    $filter = empty($filter) ? array() : array_flip($filter);
-    if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE]) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE])) {
+    $data_catcher = \Arr::get($item->data_catchers(), $catcher_name, array());
+    $filter = empty($filter) ? array_merge(\Arr::get($data_catcher, 'required_data', array()), \Arr::get($data_catcher, 'optional_data', array())) : array();
+    $filter = array_flip($filter);
+    if (array_key_exists(\Nos\DataCatcher::TYPE_TITLE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE])) {
         $fields[] = \Nos\DataCatcher::TYPE_TITLE;
         $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => $nugget[\Nos\DataCatcher::TYPE_TITLE]));
     }
-    if (isset($nugget[\Nos\DataCatcher::TYPE_URL]) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL])) {
+    if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL])) {
         $fields[] = \Nos\DataCatcher::TYPE_URL;
         $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.possibles');
         $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array(
@@ -36,6 +39,10 @@
             'value' => isset($possible[$value]) ? $value : 0,
         ));
     }
+    if (array_key_exists(\Nos\DataCatcher::TYPE_TEXT, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TEXT])) {
+        $fields[] = \Nos\DataCatcher::TYPE_TEXT;
+        $fieldset->add(\Nos\DataCatcher::TYPE_TEXT, __('Description:'), array('value' => $nugget[\Nos\DataCatcher::TYPE_TEXT], 'type' => 'textarea'));
+    }
 ?>
 <div id="<?= $id ?>">
 <?php
@@ -45,7 +52,7 @@
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
         'fields' => $fields,
-        'callback' => function($field) use ($item)
+        'callback' => function($field) use ($item, $nugget_db)
         {
             $template = $field->template;
             if (empty($template))
@@ -59,8 +66,7 @@
             $label = strtr(__('Use default {what}'), array(
                 '{what}' => empty($useTitle) ? '' : '('.$useTitle.')',
             ));
-            $nugget_silo = $item->get_catcher_nuggets(\Nos\Model_Content_Nuggets::DEFAULT_CATCHER)->content_data;
-            $checked = isset($nugget_silo[$field_name]) ? '' : 'checked';
+            $checked = isset($nugget_db[$field_name]) ? '' : 'checked';
             $template = str_replace('{field}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label><div class="nos-datacatchers-nugget-value" style="display:none;">{field}</div>', $template);
 
             // Image field displays a bit differently: radio button with several options
@@ -74,7 +80,7 @@
                         $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
                     ));
                 }
-                $value = isset($nugget_silo[$field_name]) ? $nugget_silo[$field_name] : 0;
+                $value = isset($nugget_db[$field_name]) ? $nugget_db[$field_name] : 0;
                 $field->set_options(array(
                     0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(array(
                         'name' => 'custom_image',

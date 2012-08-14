@@ -23,7 +23,7 @@
 <?php
     $onDemande = false;
     $auto = false;
-    foreach ($data_catchers as $data_catcher) {
+    foreach ($data_catchers as $catcher_name => $data_catcher) {
         if (isset($data_catcher['onDemand']) && $data_catcher['onDemand'] && !$onDemande) {
             $onDemande = true;
             echo '<div>', htmlspecialchars(__('This item can be shared with the following applications.')) ,'</div>';
@@ -37,6 +37,7 @@
         $data_catcher['url'] .= '?'.http_build_query(array(
             'model' => $model_name,
             'id'    => $model_id,
+            'catcher' => $catcher_name,
          ), '', '&');
 
         echo '<button class="catcher" data-params="', htmlspecialchars(\Format::forge($data_catcher)->to_json()) ,'">', htmlspecialchars($data_catcher['title']),'</button>';
@@ -57,7 +58,9 @@
         echo \View::forge('nos::admin/data_catcher/form', array(
             'action' => 'admin/nos/datacatcher/save',
             'item' => $item,
+            'catcher_name' => \Nos\Model_Content_Nuggets::DEFAULT_CATCHER,
             'nugget' => $item->get_default_nuggets(),
+            'nugget_db' => $item->get_catcher_nuggets(\Nos\Model_Content_Nuggets::DEFAULT_CATCHER)->content_data,
         ));
         ?>
 </div>

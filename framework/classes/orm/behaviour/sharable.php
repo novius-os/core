@@ -94,11 +94,13 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
         foreach ($this->_properties['data_catchers'] as $id => $data_catcher) {
             if (is_array($data_catcher) && $data_catcher['data_catcher'] && !empty($data_catchers[$data_catcher['data_catcher']])) {
+                $id = is_int($id) ? $data_catcher['data_catcher'] : $id;
                 $catchers[$id] = array_merge($data_catchers[$data_catcher['data_catcher']], $data_catcher);
                 unset($catchers[$id]['data_catcher']);
             }
             if (is_string($data_catcher) && !empty($data_catchers[$data_catcher])) {
-                $catchers[$data_catcher] = $data_catchers[$data_catcher];
+                $id = is_int($id) ? $data_catcher : $id;
+                $catchers[$id] = $data_catchers[$data_catcher];
             }
         }
 
