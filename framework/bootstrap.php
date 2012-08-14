@@ -75,24 +75,40 @@ Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOP
 
 //* Register application autoloader
 spl_autoload_register(function($class) {
+
     $class = ltrim($class, '\\');
-    list($application, $whatever) = explode('\\', $class.'\\');
-    // can not use Inflector::words_to_upper because is not loaded
-    $application = explode('_', $application);
-    foreach ($application as &$part) {
-        $part = ucfirst($part);
+    $parts = explode('\\', $class);
+    $class = array_pop($parts);
+    $namespace = implode('\\', $parts);
+
+    // We can't load classes inside those namespaces
+    if ($namespace == '' || $namespace == 'Fuel\\Core') {
+        return false;
     }
-    $application = implode('_', $application);
+
+    // Computes this after the above lines, as the Inflector class will be autoloaded
+    $namespace_upper_words = Inflector::words_to_upper($namespace);
 
     // An application can be put inside any namespace when properly configured
-    if (!empty(Fuel::$namespace_aliases[$application])) {
-        if (class_exists(Fuel::$namespace_aliases[$application].'\\'.$whatever)) {
-            class_alias(Fuel::$namespace_aliases[$application].'\\'.$whatever, $class);
+    if (!empty(Fuel::$namespace_aliases[$namespace_upper_words])) {
+        if (class_exists(Fuel::$namespace_aliases[$namespace_upper_words].'\\'.$class)) {
+            class_alias(Fuel::$namespace_aliases[$namespace_upper_words].'\\'.$class, $namespace.'\\'.$class);
         }
-        if (class_exists($class, false)) {
+        if (class_exists($namespace.'\\'.$class, false)) {
             return true;
         }
     }
+
+    // Try to load the application
+    \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+    $namespaces = \Config::get('data::app_namespaces');
+    $application = array_search($namespace, $namespaces);
+    if (false !== $application)
+    {
+        \Module::load($application);
+    }
+
+
     return false;
 }, true, true);
 //*/
