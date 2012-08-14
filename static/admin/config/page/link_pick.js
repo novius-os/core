@@ -12,7 +12,7 @@ define(
     function($) {
         "use strict";
         return function(appDesk) {
-
+            log('link_pick', appDesk);
             // Remove all primary actions
             $.each(appDesk.actions, function() {
                 this.primary = false;

@@ -52,21 +52,7 @@ return array(
         )
     ),
     'i18n' => array(
-        'Media center' => __('Media center'),
-        'Add a media' => __('Add a media'),
-        'Add a folder' => __('Add a folder'),
-        'Title' => __('Title'),
-        'Ext.' => __('Ext.'),
-        'Edit' => __('Edit'),
-        'Delete' => __('Delete'),
-        'Visualise' => __('Visualise'),
         'Pick' => __('Pick'),
-        'Folder' => __('Folder'),
-        'Folders' => __('Folders'),
-        'Type of file' => __('Type of file'),
-        'File name:' => __('File name:'),
-        'Path:' => __('Path:'),
-        'Upload a new file' => __('Upload a new file'),
 
         'addDropDown' => __('Select an action'),
         'columns' => __('Columns'),
@@ -187,4 +173,228 @@ return array(
 			return $query;
 		},
 	),
+    'appdesk' => array(
+        'actions' => array(
+            'edit' => array(
+                'name' => 'edit',
+                'primary' => true,
+                'icon' => 'pencil',
+                'label' => __('Edit'),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => 'admin/nos/media/media/insert_update/{{id}}',
+                        'label' => __('Edit a media'),
+                    ),
+                ),
+            ),
+            'delete' => array(
+                'name' => 'delete',
+                'primary' => true,
+                'icon' => 'trash',
+                'label' => __('Delete'),
+                'action' => array(
+                    'action' => 'confirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => 'admin/nos/media/media/delete/{{id}}',
+                        'title' => __('Delete a media')
+                    ),
+                ),
+            ),
+            'visualise' => array(
+                'name' => 'visualise',
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                'label' => __('Visualise'),
+                'action' => array(
+                    'action' => 'nosMediaVisualise',
+                ),
+            ),
+        ),
+        'tab' => array(
+            'label' => __('Media center'),
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
+        ),
+        'reloadEvent' => array(
+            'Nos\\Model_Media',
+            array(
+                'name' => 'Nos\\Model_Media_Folder',
+                'action' => 'delete',
+            ),
+        ),
+        'appdesk' => array(
+            'splittersVertical' => 300,
+            'adds' => array(
+                'media' => array(
+                    'label' => __('Add a media'),
+                    'action' => array(
+                        'action' => 'nosTabs',
+                        'method' => 'add',
+                        'tab' => array(
+                            'url' => 'admin/nos/media/media/insert_update',
+                            'label' => __('Add a media'),
+                        ),
+                    ),
+                ),
+                'folder' => array(
+                    'label' => __('Add a folder'),
+                    'action' => array(
+                        'action' => 'nosTabs',
+                        'method' => 'add',
+                        'tab' => array(
+                            'url' => 'admin/nos/media/folder/insert_update',
+                            'label' => 'Add a folder',
+                        ),
+                        'dialog' => array(
+                            'width' => 600,
+                            'height' => 250,
+                        ),
+                    ),
+                ),
+            ),
+            'grid' => array(
+                'id' => 'nos_media_grid',
+                'proxyUrl' => 'admin/nos/media/appdesk/json',
+                'columns' => array(
+                    'extension' => array(
+                        'headerText' => __('Ext.'),
+                        'dataKey' => 'extension',
+                        'width' => 60,
+                        'ensurePxWidth' => true,
+                        'allowSizing' => false
+                    ),
+                    'title' => array(
+                        'headerText' => __('Title'),
+                        'dataKey' => 'title',
+                        'sortDirection' => 'ascending'
+                    ),
+                    'actions' => array(
+                        'actions' => array('edit', 'delete', 'visualise'),
+                    ),
+                ),
+            ),
+            'thumbnails' => array(
+                'actions' => array('edit', 'delete', 'visualise'),
+            ),
+            'defaultView' => 'thumbnails',
+            'inspectorsOrder' => 'preview,folders,extensions',
+            'inspectors' => array(
+                'folders' => array(
+                    'vertical' => true,
+                    'label' => __('Folders'),
+                    'url' => 'admin/nos/media/inspector/folder/list',
+                    'inputName' => 'folder_id',
+                    'reloadEvent' => 'Nos\\Model_Media_Folder',
+                    'treeGrid' => array(
+                        'treeUrl' => 'admin/nos/media/inspector/folder/json',
+                        'sortable' => false,
+                        'columns' => array(
+                            'title' => array(
+                                'headerText' => __('Folder'),
+                                'dataKey' => 'title',
+                            ),
+                            'actions' => array(
+                                'showOnlyArrow' => true,
+                                'actions' => array(
+                                    array(
+                                        'name' => 'add_media',
+                                        'label' => __('Add a media in this folder'),
+                                        'icon' => 'plus',
+                                        'action' => array(
+                                            'action' => 'nosTabs',
+                                            'tab' => array(
+                                                'url' => 'admin/nos/media/media/insert_update?context_id={{id}}',
+                                                'label' => 'Add a media in the "{{title}}" folder'
+                                            ),
+                                        ),
+                                    ),
+                                    array(
+                                        'name' => 'add_folder',
+                                        'label' => __('Add a sub-folder to this folder'),
+                                        'icon' => 'folder-open',
+                                        'action' => array(
+                                            'action' => 'nosTabs',
+                                            'tab' => array(
+                                                'url' => 'admin/nos/media/folder/insert_update?context_id={{id}}',
+                                                'label' => 'Add a sub-folder in "{{title}}"',
+                                            ),
+                                            'dialog' => array(
+                                                'width' => 600,
+                                                'height' => 250
+                                            ),
+                                        ),
+                                    ),
+                                    array(
+                                        'name' => 'edit',
+                                        'label' => __('Edit this folder'),
+                                        'icon' => 'pencil',
+                                        'action' => array(
+                                            'action' => 'nosTabs',
+                                            'tab' => array(
+                                                'url' => 'admin/nos/media/folder/insert_update/{{id}}',
+                                                'label' => 'Edit the "{{title}}" folder',
+                                            ),
+                                            'dialog' => array(
+                                                'width' => 600,
+                                                'height' => 250,
+                                            ),
+                                        ),
+                                    ),
+                                    array(
+                                        'name' => 'delete',
+                                        'label' => __('Delete this folder'),
+                                        'icon' => 'trash',
+                                        'action' => array(
+                                            'action' => 'confirmationDialog',
+                                            'dialog' => array(
+                                                'contentUrl' => 'admin/nos/media/folder/delete/{{id}}',
+                                                'title' => __('Delete a folder')
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                'extensions' => array(
+                    'vertical' => true,
+                    'label' => __('Type of file'),
+                    'url' => 'admin/nos/media/inspector/extension/list',
+                    'inputName' => 'media_extension[]',
+                    'grid' => array(
+                        'columns' => array(
+                            'title' => array(
+                                'headerText' => __('Type of file'),
+                                'dataKey' => 'title',
+                            ),
+                            'hide' => array(
+                                'visible' => false,
+                            ),
+                            'hide2' => array(
+                                'visible' => false,
+                            ),
+                        ),
+                    ),
+                ),
+                'preview' => array(
+                    'vertical' => true,
+                    'reloadEvent' => 'Nos\\Model_Media',
+                    'label' => __('Preview'),
+                    'preview' => true,
+                    'options' => array(
+                        'meta' => array(
+                            'fileName' => array(
+                                'label' => __('File name:'),
+                            ),
+                            'pathFolder' => array(
+                                'label' => __('Path:')
+                            ),
+                        ),
+                        'actions' => array('edit', 'delete', 'visualise'),
+                        'actionThumbnail' => 'visualise',
+                    ),
+                ),
+            ),
+        ),
+    ),
 );

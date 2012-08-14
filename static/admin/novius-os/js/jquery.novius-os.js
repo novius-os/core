@@ -218,7 +218,7 @@ define('jquery-nos',
                                 });
                             }
                             return obj;
-                        }
+                        };
 
                         switch(obj.action) {
                             case 'nosTabs' :

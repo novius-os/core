@@ -1619,15 +1619,14 @@ define('jquery-nos-appdesk',
                     jsonFile = config.views[config.selectedView].json;
                 }
 
-                require(jsonFile, function () {
-                    var appdesk = $.appdeskSetup(config);
-                    $.extend(true, appdesk.i18nMessages, config.i18n);
+                var appdesk = $.appdeskSetup(config);
+                $.extend(true, appdesk.i18nMessages, config.i18n);
 
-                    // Extending appdesk with each of the different json files
-                    for (var i = 0; i < arguments.length; i++) {
-                        $.extend(true, appdesk, arguments[i](appdesk));
-                    }
+                if ($.isPlainObject(config.appdesk)) {
+                    $.extend(true, appdesk, config.appdesk);
+                }
 
+                var init = function() {
                     // If the property is set explicitely, use it, else display only if there's more than 1 lang
                     var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.locales).length <= 1);
 
@@ -1686,13 +1685,13 @@ define('jquery-nos-appdesk',
                                 // Or if a update or a insert on a other language's item occurs
                                 if (dispatcher.data('nosLang')) {
                                     match.push({
-                                            name : reloadEvent,
-                                            lang : dispatcher.data('nosLang')
-                                        });
+                                        name : reloadEvent,
+                                        lang : dispatcher.data('nosLang')
+                                    });
                                     match.push({
-                                            name : reloadEvent,
-                                            action : ['delete', 'insert']
-                                        });
+                                        name : reloadEvent,
+                                        action : ['delete', 'insert']
+                                    });
                                 } else {
                                     match.push({
                                         name : reloadEvent
@@ -1703,8 +1702,8 @@ define('jquery-nos-appdesk',
                             }
                         });
                         dispatcher.nosListenEvent(match, function() {
-                                div.appdesk('gridReload');
-                            });
+                            div.appdesk('gridReload');
+                        });
                     }
 
                     div.bind('reloadView', function(e, newConfig) {
@@ -1714,8 +1713,20 @@ define('jquery-nos-appdesk',
                         div.remove();
                         self.appdeskAdd(id, config);
                     });
+                };
 
-                });
+                if (jsonFile && (!$.isArray(jsonFile) || jsonFile.length)) {
+                    require(jsonFile, function () {
+                        // Extending appdesk with each of the different json files
+                        for (var i = 0; i < arguments.length; i++) {
+                            $.extend(true, appdesk, arguments[i](appdesk));
+                        }
+
+                        init();
+                    });
+                } else {
+                    init();
+                }
             },
 
             appdeskSetup : function(config) {
