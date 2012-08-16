@@ -30,7 +30,6 @@
                 $.each(actions, function() {
                     var button = this,
                         $button = $('<button></button>').click(function() {
-                            log(button.action);
                                 $(this).nosAction(button.action);
                             })
                             .text(button.label)
