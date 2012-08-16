@@ -19,25 +19,6 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         parent::form_item();
         if ($this->item->is_new())
         {
-            // New page: no parent
-            // Translation: we have a common_id and can determine the parent
-            if (!empty($this->item->page_lang_common_id)) {
-                $page_lang_common = Model_Page::find($this->item->page_lang_common_id);
-                $page_parent = $page_lang_common->find_parent();
-
-                // Fetch in the appropriate lang
-                if (!empty($page_parent)) {
-                    $page_parent = $page_parent->find_lang($this->item->page_lang);
-                }
-
-                // Set manually, because set_parent doesn't handle new items
-                if (!empty($page_parent)) {
-                    $this->item->page_parent_id = $page_parent->page_id;
-                }
-            }
-
-            $this->page_parent = Model_Page::find($this->item->page_parent_id);
-
             // The first page we create is a homepage
             $lang_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
@@ -52,16 +33,9 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
     }
 
     public function before_save($page, $data) {
-        // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
-        // https://github.com/fuel/orm/issues/171
-        //$parent = $page->find_parent();
+        parent::before_save($page, $data);
 
-        // Instead, retrieve the object manually
-        // Model::find(null) returns an Orm\Query. We don't want that.
-        $parent = empty($page->page_parent_id) ? null : Model_Page::find($page->page_parent_id);
-
-        // Event 'after_change_parent' will set the appropriate lang
-        $page->set_parent($parent);
+        $parent = $page->find_parent();
         $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
         foreach (\Input::post('wysiwyg', array()) as $key => $text) {

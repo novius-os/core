@@ -181,6 +181,25 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $lang = \Input::get('lang', key(\Config::get('locales')));
                 $this->item->{$this->behaviours['translatable']['lang_property']} = empty($lang) ? key(\Config::get('locales')) : $lang;
             }
+            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
+                // New page: no parent
+                // Translation: we have a common_id and can determine the parent
+                if (!empty($this->item->{$this->behaviours['translatable']['common_id_property']})) {
+                    $model = $this->config['model'];
+                    $item_lang_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
+                    $item_parent = $item_lang_common->find_parent();
+
+                    // Fetch in the appropriate lang
+                    if (!empty($item_parent)) {
+                        $item_parent = $item_parent->find_lang($this->item->{$this->behaviours['translatable']['lang_property']});
+                    }
+
+                    // Set manually, because set_parent doesn't handle new items
+                    if (!empty($item_parent)) {
+                        $this->item->{$this->item->parent_relation()->key_from[0]} = $item_parent->{$this->pk};
+                    }
+                }
+            }
         }
     }
 
@@ -284,6 +303,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     }
 
     public function before_save($item, $data) {
+        if ($this->behaviours['tree']) {
+            // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
+            // https://github.com/fuel/orm/issues/171
+            //$item = $item->find_parent();
+
+            // Instead, retrieve the object manually
+            // Model::find(null) returns an Orm\Query. We don't want that.
+            $parent = empty($item->{$item->parent_relation()->key_from[0]}) ? null : $item::find($item->{$item->parent_relation()->key_from[0]});
+
+            // Event 'after_change_parent' will set the appropriate lang
+            $item->set_parent($parent);
+        }
     }
 
     public function action_insert_update($id = null)
