@@ -229,7 +229,6 @@ define('jquery-nos',
                                 params.method && args.push(params.method);
                                 args.push(placeholderReplace(params.tab, data));
                                 params.dialog && args.push(params.dialog);
-                                log(args);
                                 $.fn.nosTabs.apply($(this), args);
                                 break;
 
