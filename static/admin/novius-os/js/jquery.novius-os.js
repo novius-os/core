@@ -200,6 +200,7 @@ define('jquery-nos',
 
         $.fn.extend({
             nosAction : function(obj, data) {
+                var params;
                 data = data || {};
                 try {
                     if ($.isFunction(obj)) {
@@ -223,27 +224,27 @@ define('jquery-nos',
                         switch(obj.action) {
                             case 'nosTabs' :
                                 var args = [];
-                                obj.method && args.push(obj.method);
-                                args.push(placeholderReplace(obj.tab, data));
-                                obj.dialog && args.push(obj.dialog);
+                                params = $.extend(true, {}, obj);
+
+                                params.method && args.push(params.method);
+                                args.push(placeholderReplace(params.tab, data));
+                                params.dialog && args.push(params.dialog);
+                                log(args);
                                 $.fn.nosTabs.apply($(this), args);
                                 break;
 
                             case 'confirmationDialog' :
-                                var params = $.extend({}, placeholderReplace(obj.dialog, data));
-
-                                params = $.extend({
+                                params = $.extend(true, {
                                     ajax : true,
                                     width: 500,
                                     height: 'auto',
                                     'class': 'nos-confirmation-dialog'
-                                }, params);
-
+                                }, placeholderReplace(obj.dialog, data));
                                 $(this).nosDialog(params);
                                 break;
 
                             case 'nosAjax' :
-                                var params = $.extend({}, placeholderReplace(obj.params, data));
+                                params = $.extend({}, placeholderReplace(obj.params, data));
                                 $(this).nosAjax(params);
                                 break;
 
