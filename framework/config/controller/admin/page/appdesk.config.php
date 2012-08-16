@@ -94,16 +94,6 @@ return array(
         'loading' => __('Loading...'),
     ),
 	'dataset' => $dataset,
-	'inputs' => array(
-		'root_id' => function($value, $query) {
-			if ($value) {
-				$query->where(array('page_root_id', '=', $value));
-				//$query->where(array('page_level', '=', 1));
-				$query->order_by('page_title');
-			}
-			return $query;
-		},
-	),
     'appdesk' => array(
         'tab' => array(
             'label' => __('Pages'),
