@@ -260,15 +260,15 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
     }
 
-    public function save($object, $data) {
+    public function save($item, $data) {
         $dispatchEvent = array(
             'name' => $this->config['model'],
             'action' => $this->is_new ? 'insert' : 'update',
-            'id' => $object->{$this->pk},
+            'id' => $item->{$this->pk},
         );
         if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = $object->{$this->behaviours['translatable']['common_id_property']};
-            $dispatchEvent['lang'] = $object->{$this->behaviours['translatable']['lang_property']};
+            $dispatchEvent['lang_common_id'] = $item->{$this->behaviours['translatable']['common_id_property']};
+            $dispatchEvent['lang'] = $item->{$this->behaviours['translatable']['lang_property']};
         }
 
         $return = array(
@@ -278,12 +278,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
         if ($this->is_new)
         {
-            $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
+            $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};
         }
         return $return;
     }
 
-    public function before_save($object, $data) {
+    public function before_save($item, $data) {
     }
 
     public function action_insert_update($id = null)

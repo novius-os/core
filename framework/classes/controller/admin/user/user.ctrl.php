@@ -44,13 +44,13 @@ class Controller_Admin_User_User extends Controller_Admin_Crud {
         return $fields;
     }
 
-    public function save($object, $data)
+    public function save($item, $data)
     {
-        if (!$this->is_new && $object->is_changed('user_password'))
+        if (!$this->is_new && $item->is_changed('user_password'))
         {
             $this->config['messages']['successfully saved'] = __('New password successfully set.');
         }
-        return parent::save($object, $data);
+        return parent::save($item, $data);
     }
 
     public function action_save_permissions() {

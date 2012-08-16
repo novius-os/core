@@ -79,21 +79,21 @@ return array(
 		'title' => 'media_title',
 		'extension' => 'media_ext',
 		'file_name' => 'media_file',
-		'path' => function($object) {
-            return $object->get_public_path();
+		'path' => function($item) {
+            return $item->get_public_path();
         },
-		'path_folder' => function($object) {
-            return dirname($object->get_public_path());
+		'path_folder' => function($item) {
+            return dirname($item->get_public_path());
         },
-		'image' => function($object) {
-            return $object->is_image();
+		'image' => function($item) {
+            return $item->is_image();
         },
-		'thumbnail' => function($object) {
-            return $object->is_image() ? $object->get_public_path_resized(64, 64) : '';
+		'thumbnail' => function($item) {
+            return $item->is_image() ? $item->get_public_path_resized(64, 64) : '';
         },
 		'height' => 'media_height',
 		'width' => 'media_width',
-		'thumbnailAlternate' => function($object) {
+		'thumbnailAlternate' => function($item) {
 			$extensions = array(
 				'gif' => 'image.png',
 				'png' => 'image.png',
@@ -127,7 +127,7 @@ return array(
 				'htm' => 'text.png',
 				'html' => 'text.png',
 			);
-			return isset($extensions[$object->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$object->media_ext] : '';
+			return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$item->media_ext] : '';
 		},
 	),
 	'inputs' => array(

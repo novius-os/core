@@ -24,7 +24,7 @@ echo View::forge('nos::crud/toolbar', array(
     'config' => $view_params['config'],
     'actions' => $view_params['actions'],
     'fieldset' => $view_params['fieldset'],
-    'object' => $view_params['item'],
+    'item' => $view_params['item'],
 ), false);
 ?>
 <style type="text/css">

@@ -12,8 +12,8 @@ $uniqid_radio = uniqid('radio_');
 ?>
 <div class="page" id="<?= $uniqid = uniqid('id_') ?>">
 <?php
-    $basename = pathinfo($object->medif_path, PATHINFO_BASENAME);
-    $checked = $basename === $object::friendly_slug($object->medif_title);
+    $basename = pathinfo($item->medif_path, PATHINFO_BASENAME);
+    $checked = $basename === $item::friendly_slug($item->medif_title);
 
     $fieldset->set_config('field_template', '{field}');
 
@@ -27,7 +27,7 @@ $uniqid_radio = uniqid('radio_');
             $fieldset->set_config('form_attributes', $form_attributes);
         }
     }
-    if (!$object->is_new())
+    if (!$item->is_new())
     {
         echo $fieldset->field('medif_id')->build();
     }
@@ -42,13 +42,13 @@ $uniqid_radio = uniqid('radio_');
             <td style="width:350px;vertical-align: top;">
                 <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Generate from title') ?></label> <br />
                 <span style="vertical-align:middle;">
-                    http://yoursite.com/media/<span data-id="path_prefix"><?= $object->is_new() ? (!empty($context) ? $context->medif_path : '') : $object->parent->medif_path ?></span>
+                    http://yoursite.com/media/<span data-id="path_prefix"><?= $item->is_new() ? (!empty($context) ? $context->medif_path : '') : $item->parent->medif_path ?></span>
                 </span>
                 <?= $fieldset->field('medif_path')->build(); ?>
             </td>
         </tr>
 <?php
-    if ($object->is_new())
+    if ($item->is_new())
     {
 ?>
         <tr>

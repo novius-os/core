@@ -59,13 +59,13 @@ return array(
 		'id' => 'user_id',
 		'fullname' => array(
             'search_column' => \DB::expr('CONCAT(user_firstname, user_name)'),
-            'value' => function($object) {
-                return $object->fullname();
+            'value' => function($item) {
+                return $item->fullname();
             },
         ),
 		'email' => 'user_email',
-		'id_permission' => function($object) {
-			return $object->roles && reset($object->roles)->role_id ?: $object->user_id;
+		'id_permission' => function($item) {
+			return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
 		}
 	),
 	'inputs' => array(),
