@@ -185,7 +185,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $root = $parent;
             $parent = $this->find_parent($parent);
         }
-        return $root;
+        return $root !== $item ? $root : null;
     }
 
     public function get_parent($item) {
@@ -193,10 +193,9 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     }
 
 	public function set_parent_no_observers($item, $parent = null) {
-        // Fetch the relation
-        $item->get($this->_properties['parent_relation']);
         foreach ($this->_parent_relation->key_from as $i => $k) {
             $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
+            $item->set($this->_properties['parent_relation'], $parent);
         }
 	}
 }
