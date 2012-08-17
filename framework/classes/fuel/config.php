@@ -59,6 +59,40 @@ class Config extends \Fuel\Core\Config {
         return \Arr::merge($config, \Arr::get($user->getConfiguration(), static::getDbName($item), array()));
     }
 
+    public static function configFile($class) {
+        $namespace = trim(\Inflector::get_namespace($class), '\\');
+
+        $application = mb_strtolower($namespace);
+        $file = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
+
+        if ($application !== 'nos') {
+            \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+            $namespaces = Config::get('data::app_namespaces', null);
+            if ($app = array_search($namespace, $namespaces))
+            {
+                $application = $app;
+            }
+        }
+
+        return array($application, $file);
+    }
+
+    public static function loadConfiguration($app_name, $file_name) {
+        \Config::load($app_name.'::'.$file_name, true);
+        $config = \Config::get($app_name.'::'.$file_name);
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+        $dependencies = \Config::get('data::app_dependencies', array());
+
+        if (!empty($dependencies[$app_name])) {
+            foreach ($dependencies[$app_name] as $dependency) {
+                \Config::load($dependency.'::'.$file_name, true);
+                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
+            }
+        }
+        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+        return $config;
+    }
+
     public static function getDbName($item) {
         $item = str_replace('::', '/config/', $item);
         $item = str_replace('/', '.', $item);
