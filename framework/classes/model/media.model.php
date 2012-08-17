@@ -41,7 +41,17 @@ class Model_Media extends \Nos\Orm\Model {
 		'\Orm\Observer_Self' => array(
 			'events' => array('before_save'),
 		),
-	);
+        'Orm\Observer_CreatedAt' => array(
+            'events' => array('before_insert'),
+            'mysql_timestamp' => true,
+            'property'=>'media_created_at'
+        ),
+        'Orm\Observer_UpdatedAt' => array(
+            'events' => array('before_save'),
+            'mysql_timestamp' => true,
+            'property'=>'media_updated_at'
+        )
+    );
 
     /**
      * Properties
