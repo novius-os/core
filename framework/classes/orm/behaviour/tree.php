@@ -67,18 +67,18 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Deletes the children recursively
      */
-    public function before_delete(\Nos\Orm\Model $object) {
-        $this->delete_children($object);
+    public function before_delete(\Nos\Orm\Model $item) {
+        $this->delete_children($item);
     }
 
     /**
      * Delete all the children of the item.
      * (will only affect the current language, by design)
      *
-     * @param type $object
+     * @param type $item
      */
-    public function delete_children($object) {
-        foreach ($this->find_children($object) as $child) {
+    public function delete_children($item) {
+        foreach ($this->find_children($item) as $child) {
             $child->delete();
         }
     }
@@ -86,20 +86,20 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Returns all the direct children of the object
      *
-     * @param  \Nos\Orm\Model  $object
+     * @param  \Nos\Orm\Model  $item
      * @param  array  $where
      * @param  array  $order_by
      * @param  array  $options
      * @return array of \Orm\Model
      */
-    public function find_children($object, $where = array(), $order_by = array(), $options = array()) {
+    public function find_children($item, $where = array(), $order_by = array(), $options = array()) {
         // Search items whose parent is self
-        $where[] = array('parent', $object);
+        $where[] = array('parent', $item);
         $options = \Arr::merge($options, array(
             'where'    => $where,
             'order_by' => $order_by,
         ));
-        return $object::find('all', $options);
+        return $item::find('all', $options);
     }
 
     /**
@@ -107,8 +107,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      *
      * @return  Orm\Model  The parent object
      */
-	public function find_parent($object) {
-        return $object->get($this->_properties['parent_relation']);
+	public function find_parent($item) {
+        return $item->get($this->_properties['parent_relation']);
 	}
 
     /**
@@ -117,7 +117,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param   Orm\Model The parent object
      * @return  void
      */
-	public function set_parent($object, $parent = null) {
+	public function set_parent($item, $parent = null) {
         if ($parent !== null) {
             // Check if the object is appropriate
             if (get_class($parent) != $this->_parent_relation->model_to) {
@@ -128,8 +128,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                     ));
             }
 
-            if (!$object->is_new()) {
-                $children_ids = $this->get_ids_children($object, true);
+            if (!$item->is_new()) {
+                $children_ids = $this->get_ids_children($item, true);
                 if (in_array($parent->id, $children_ids)) {
                     // Dev details : Cannot move an element inside of its own children
                     throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
@@ -137,12 +137,12 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             }
         }
 
-        $this->set_parent_no_observers($object, $parent);
-        $object->observe('before_change_parent');
-        if (!$object->is_new()) {
-            $object->save();
+        $this->set_parent_no_observers($item, $parent);
+        $item->observe('before_change_parent');
+        if (!$item->is_new()) {
+            $item->save();
         }
-        $object->observe('after_change_parent');
+        $item->observe('after_change_parent');
 	}
 
     /**
@@ -151,23 +151,23 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param bool $include_self
      * @return array
      */
-    public function get_ids_children($object, $include_self = true) {
+    public function get_ids_children($item, $include_self = true) {
         $ids = array();
         if ($include_self) {
-            $ids[] = $object->get(\Arr::get($object->primary_key(), 0));
+            $ids[] = $item->get(\Arr::get($item->primary_key(), 0));
         }
-        $this->_populate_id_children($object, $this->_properties['children_relation'], $ids);
+        $this->_populate_id_children($item, $this->_properties['children_relation'], $ids);
         return $ids;
     }
 
-    public function find_children_recursive($object, $include_self = true) {
+    public function find_children_recursive($item, $include_self = true) {
 
         // This is weird, but it doesn't work when called directly...
-        $ids = $this->get_ids_children($object, $include_self);
+        $ids = $this->get_ids_children($item, $include_self);
         if (empty($ids)) {
             return array();
         }
-        return $object::find('all', array('where' => array(array(\Arr::get($object->primary_key(), 0), 'IN', $this->get_ids_children($object, $include_self)))));
+        return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $this->get_ids_children($item, $include_self)))));
     }
 
     protected static function _populate_id_children($current_item, $children_relation, &$array) {
@@ -179,24 +179,23 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     }
 
-    public function find_root($object) {
-        $parent = $object;
+    public function find_root($item) {
+        $parent = $item;
         while (!empty($parent)) {
             $root = $parent;
             $parent = $this->find_parent($parent);
         }
-        return $root;
+        return $root !== $item ? $root : null;
     }
 
-    public function get_parent($object) {
-        return $object->get($this->_properties['parent_relation']);
+    public function get_parent($item) {
+        return $item->get($this->_properties['parent_relation']);
     }
 
-	public function set_parent_no_observers($object, $parent = null) {
-        // Fetch the relation
-        $object->get($this->_properties['parent_relation']);
+	public function set_parent_no_observers($item, $parent = null) {
         foreach ($this->_parent_relation->key_from as $i => $k) {
-            $object->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
+            $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
+            $item->set($this->_properties['parent_relation'], $parent);
         }
 	}
 }

@@ -13,146 +13,7 @@ define(
         "use strict";
         return function(appDesk) {
             return {
-                actions : {
-                    edit : {
-                        name : 'edit',
-                        primary : true,
-                        icon : 'pencil',
-                        label : appDesk.i18n('Edit'),
-                        action : function(item, ui) {
-                            $(ui).nosTabs({
-                                url: 'admin/nos/media/media/insert_update/' + item.id,
-                                label: appDesk.i18n('Edit a media')._()
-                            });
-                        }
-                    },
-                    'delete' : {
-                        name : 'delete',
-                        primary : true,
-                        icon : 'trash',
-                        label : appDesk.i18n('Delete'),
-                        action : function(item, ui) {
-                            $(ui).nosConfirmationDialog({
-                                contentUrl: 'admin/nos/media/media/delete/' + item.id,
-                                title: appDesk.i18n('Delete a media')._(),
-                                confirmed: function($dialog) {
-                                    $dialog.nosAjax({
-                                        url : 'admin/nos/media/media/delete_confirm',
-                                        method : 'POST',
-                                        data : $dialog.find('form').serialize()
-                                    });
-                                },
-                                appDesk: appDesk
-                            });
-                        }
-                    },
-                    visualise : {
-                        name : 'visualise',
-                        //primary : true,
-                        //icon : 'search',
-                        iconClasses : 'nos-icon16 nos-icon16-eye',
-                        label : appDesk.i18n('Visualise'),
-                        action : function(item, ui) {
-
-                            if (!item.image) {
-                                window.open(item.path);
-                                return;
-                            }
-
-                            var image = new Image();
-                            image.onerror = function() {
-                                $.nosNotify('Image not found', 'error');
-                            }
-                            image.onload = function() {
-                                // Create the lightbox
-                                var lightbox = $('<div><a href="/' + item.path + '" rel="wijlightbox"><img src="/' + item.path + '" title="' + item.title + '" style="width:0;height:0;" /></a></div>')
-                                .css({
-                                    position : 'absolute',
-                                    dislplay : 'none',
-                                    width : 1,
-                                    height: 1
-                                })
-                                .css($(ui || this).offset())
-                                .appendTo(document.body)
-                                .wijlightbox({
-                                    zIndex : 1201,
-                                    textPosition : 'outside',
-                                    player : 'img',
-                                    dialogButtons: 'fullsize',
-                                    modal : true,
-                                    open : function() {
-                                        $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
-                                    },
-                                    close : function(e) {
-                                        lightbox.wijlightbox('destroy');
-                                        lightbox.remove();
-                                    }
-                                });
-
-                                // Open it
-                                lightbox.find('a').triggerHandler('click');
-                            }
-                            image.src = item.path;
-                        }
-                    }
-                },
-                tab : {
-                    label : appDesk.i18n('Media center'),
-                    iconUrl : 'static/novius-os/admin/novius-os/img/32/media.png'
-                },
-                reloadEvent : [
-                    'Nos\\Model_Media',
-                    {
-                        name : 'Nos\\Model_Media_Folder',
-                        action : 'delete'
-                    }
-                ],
                 appdesk : {
-                    splittersVertical : 300,
-                    adds : {
-                        media : {
-                            label : appDesk.i18n('Add a media'),
-                            action : function(ui) {
-                                $(ui).nosTabs({
-                                    url: 'admin/nos/media/media/insert_update',
-                                    label: appDesk.i18n('Add a media')._()
-                                });
-                            }
-                        },
-                        folder : {
-                            label : appDesk.i18n('Add a folder'),
-                            action : function(ui) {
-                                $(ui).nosTabs({
-                                    url: 'admin/nos/media/folder/insert_update',
-                                    label: 'Add a folder'
-                                }, {
-                                    width: 600,
-                                    height: 250
-                                });
-                            }
-                        }
-                    },
-                    grid : {
-                        id : 'nos_media_grid',
-                        proxyUrl : 'admin/nos/media/appdesk/json',
-                        columns : {
-                            extension : {
-                                headerText : appDesk.i18n('Ext.'),
-                                dataKey : 'extension',
-                                width : 60,
-                                ensurePxWidth : true,
-                                allowSizing : false
-                            },
-                            title : {
-                                headerText : appDesk.i18n('Title'),
-                                dataKey : 'title',
-                                sortDirection : 'ascending'
-                            },
-                            actions : {
-                                actions : ['edit', 'delete', 'visualise']
-                            }
-                        }
-                    },
                     thumbnails : {
                         dataParser : function(size, item) {
                             var data = {
@@ -162,102 +23,13 @@ define(
                                 actions : []
                             };
                             return data;
-                        },
-                        actions : ['edit', 'delete', 'visualise']
+                        }
                     },
-                    defaultView : 'thumbnails',
-                    inspectorsOrder : 'preview,folders,extensions',
                     inspectors : {
-                        folders : {
-                            vertical : true,
-                            label : appDesk.i18n('Folders'),
-                            url : 'admin/nos/media/inspector/folder/list',
-                            inputName : 'folder_id',
-                            reloadEvent : 'Nos\\Model_Media_Folder',
-                            treeGrid : {
-                                treeUrl : 'admin/nos/media/inspector/folder/json',
-                                sortable : false,
-                                columns : {
-                                    title : {
-                                        headerText : appDesk.i18n('Folder'),
-                                        dataKey : 'title'
-                                    },
-                                    actions : {
-                                        showOnlyArrow : true,
-                                        actions : [
-                                            {
-                                                name : 'add_media',
-                                                label : appDesk.i18n('Add a media in this folder'),
-                                                icon : 'plus',
-                                                action : function(item, ui) {
-                                                    $(ui).nosTabs({
-                                                        url: 'admin/nos/media/media/insert_update?context_id=' + item.id,
-                                                        label: 'Add a media in the "' + item.title + '" folder'
-                                                    });
-                                                }
-                                            },
-                                            {
-                                                name : 'add_folder',
-                                                label : appDesk.i18n('Add a sub-folder to this folder'),
-                                                icon : 'folder-open',
-                                                action : function(item, ui) {
-                                                    $(ui).nosTabs({
-                                                        url: 'admin/nos/media/folder/insert_update?context_id=' + item.id,
-                                                        label: 'Add a sub-folder in "' + item.title + '"'
-                                                    }, {
-                                                        width: 600,
-                                                        height: 250
-                                                    });
-                                                }
-                                            },
-                                            {
-                                                name : 'edit',
-                                                label : appDesk.i18n('Edit this folder'),
-                                                icon : 'pencil',
-                                                action : function(item, ui) {
-                                                    $(ui).nosTabs({
-                                                        url: 'admin/nos/media/folder/insert_update/' + item.id,
-                                                        label: 'Edit the "' + item.title + '" folder'
-                                                    }, {
-                                                        width: 600,
-                                                        height: 250
-                                                    });
-                                                }
-                                            },
-                                            {
-                                                name : 'delete',
-                                                label : appDesk.i18n('Delete this folder'),
-                                                icon : 'trash',
-                                                action : function(item, ui) {
-                                                    $(ui).nosConfirmationDialog({
-                                                        contentUrl: 'admin/nos/media/folder/delete/' + item.id,
-                                                        title: appDesk.i18n('Delete a folder')._(),
-                                                        confirmed: function($dialog) {
-                                                            $dialog.nosAjax({
-                                                                url : 'admin/nos/media/folder/delete_confirm',
-                                                                method : 'POST',
-                                                                data : $dialog.find('form').serialize()
-                                                            });
-                                                        },
-                                                        appDesk: appDesk
-                                                    });
-                                                }
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        },
                         extensions : {
-                            vertical : true,
-                            label : appDesk.i18n('Type of file'),
-                            url : 'admin/nos/media/inspector/extension/list',
-                            inputName : 'media_extension[]',
                             grid : {
                                 columns : {
                                     title : {
-                                        headerText : appDesk.i18n('Type of file'),
-                                        dataKey : 'title',
                                         cellFormatter : function(args) {
                                             if ($.isPlainObject(args.row.data)) {
                                                 var text = "";
@@ -271,32 +43,12 @@ define(
                                                 return true;
                                             }
                                         }
-                                    },
-                                    hide : {
-                                        visible : false
-                                    },
-                                    hide2 : {
-                                        visible : false
                                     }
                                 }
                             }
                         },
                         preview : {
-                            vertical : true,
-                            reloadEvent : 'Nos\\Model_Media',
-                            label : appDesk.i18n('Preview'),
-                            preview : true,
                             options : {
-                                meta : {
-                                    fileName : {
-                                        label : appDesk.i18n('File name:')
-                                    },
-                                    pathFolder : {
-                                        label : appDesk.i18n('Path:')
-                                    }
-                                },
-                                actions : ['edit', 'delete', 'visualise'],
-                                actionThumbnail: 'visualise',
                                 dataParser : function(item) {
                                     var data = {
                                         title : item.title,

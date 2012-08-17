@@ -116,7 +116,7 @@ define('jquery-nos-preview',
                                 .click(function(e) {
                                     e.preventDefault();
                                     e.stopImmediatePropagation();
-                                    action.action.apply(this, [self.data, $(this)]);
+                                    $(this).nosAction(action.action, self.data);
                                 })
                         } else {
                             text = (iconClass ? '<span class="' + iconClass +'"></span> ' : '');
@@ -131,7 +131,7 @@ define('jquery-nos-preview',
                                 .click(function(e) {
                                     e.preventDefault();
                                     e.stopImmediatePropagation();
-                                    action.action.apply(this, [self.data, $(this)]);
+                                    $(this).nosAction(action.action, self.data);
                                 })
                         }
                     });

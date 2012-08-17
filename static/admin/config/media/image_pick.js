@@ -30,8 +30,9 @@ define(
                         icon : 'check',
                         text : true,
                         primary : true,
-                        action : function(item, $el) {
-                            $el.closest('.ui-dialog-content').trigger('select_media', item);
+                        action : {
+                            action : 'dialogPick',
+                            event : 'select_media'
                         }
                     }
                 },

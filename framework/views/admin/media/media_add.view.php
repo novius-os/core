@@ -30,16 +30,10 @@ $fieldset->set_config('field_template', '{field}');
                     <th><?= $fieldset->field('media_file')->label ?></th>
                     <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
                 </tr>
-                <?php
-                    if (empty($context)) {
-                ?>
-                    <tr>
-                        <th><?= $fieldset->field('media_folder_id')->label ?></th>
-                        <td><?= $fieldset->field('media_folder_id')->build() ?></td>
-                    </tr>
-                <?php
-                }
-                ?>
+                <tr>
+                    <th><?= $fieldset->field('media_folder_id')->label ?></th>
+                    <td><?= $fieldset->field('media_folder_id')->build() ?></td>
+                </tr>
             </table>
         </div>
     </div>

@@ -38,6 +38,8 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
     }
 
     public function before_save($folder, $data) {
+        parent::before_save($folder, $data);
+
         $path  = $folder->medif_path;
 
         if (empty($path) ) {

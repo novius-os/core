@@ -34,16 +34,16 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      * @param   Orm\Model The parent object
      * @return  void
      */
-	public function move_before($object, $before = null) {
-        $this->_move($object, $before->get_sort() - 0.5);
+	public function move_before($item, $before = null) {
+        $this->_move($item, $before->get_sort() - 0.5);
 	}
 
-	public function move_after($object, $before = null) {
-        $this->_move($object, $before->get_sort() + 0.5);
+	public function move_after($item, $before = null) {
+        $this->_move($item, $before->get_sort() + 0.5);
 	}
 
-	public function move_to_last_position($object) {
-        $this->_move($object, 10000);
+	public function move_to_last_position($item) {
+        $this->_move($item, 10000);
 	}
 
     public function get_sort(\Nos\Orm\Model $obj) {
@@ -51,17 +51,17 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         return $obj->get($sort_property);
     }
 
-    public function set_sort(\Nos\Orm\Model $obj, $sort) {
+    public function set_sort(\Nos\Orm\Model $item, $sort) {
         $sort_property = $this->_properties['sort_property'];
-        $obj->set($sort_property, $sort);
+        $item->set($sort_property, $sort);
     }
 
-    protected function _move($object, $sort) {
+    protected function _move($item, $sort) {
         $sort_property = $this->_properties['sort_property'];
-        $object->set($sort_property, $sort);
-        $object->observe('before_sort');
-        $object->save();
-        $object->observe('after_sort');
+        $item->set($sort_property, $sort);
+        $item->observe('before_sort');
+        $item->save();
+        $item->observe('after_sort');
     }
 
     public function after_sort(\Nos\Orm\Model $obj) {

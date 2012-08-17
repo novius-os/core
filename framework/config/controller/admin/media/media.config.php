@@ -52,6 +52,7 @@ return array(
             'label' => __('Choose a folder where to put your media:'),
         ),
         'media' => array(
+            'dont_save' => true,
             'form' => array(
                 'type' => 'file',
             ),

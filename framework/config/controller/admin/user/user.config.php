@@ -86,9 +86,9 @@ return array(
                 'size' => 20,
                 'value' => '',
             ),
-            'before_save' => function($object, $data) {
+            'before_save' => function($item, $data) {
                 if (!empty($data['password_reset'])) {
-                    $object->user_password = $data['password_reset'];
+                    $item->user_password = $data['password_reset'];
                 }
             },
             'validation' => array(
@@ -101,7 +101,7 @@ return array(
                 'type' => 'password',
                 'size' => 20,
             ),
-            'before_save' => function($object, $data) {
+            'before_save' => function($item, $data) {
             },
             'validation' => array(
                 'match_field' => array('user_password'),

@@ -21,7 +21,7 @@ echo View::forge('nos::crud/toolbar', array(
         'config' => $view_params['config'],
         'actions' => $view_params['actions'],
         'fieldset' => $view_params['fieldset'],
-        'object' => $view_params['item'],
+        'item' => $view_params['item'],
     ), false);
 
 $layout = $view_params['is_new'] ? $view_params['config']['layout_insert'] : $view_params['config']['layout_update'];
@@ -39,7 +39,7 @@ foreach ($layout as $view) {
         $view['view_params'] = empty($view['view_params']) ? array() : $view['view_params'];
         echo View::forge($view['view'], $view['view_params'] + array(
             'fieldset' => $view_params['fieldset'],
-            'object' => $view_params['item'],
+            'item' => $view_params['item'],
             'context' => $view_params['context'],
         ), false);
     }

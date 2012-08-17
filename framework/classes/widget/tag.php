@@ -43,7 +43,7 @@ class Widget_Tag extends \Fieldset_Field {
         return $this;
     }
 
-    public function before_save($object, $data) {
+    public function before_save($item, $data) {
         $tags_from = str_replace(' ', ',', $this->value);
         $tags_from = explode(',', $tags_from);
         $tags = array();
@@ -52,21 +52,21 @@ class Widget_Tag extends \Fieldset_Field {
                 $tags[$tag] = $tag;
             }
         }
-        $object->{$this->options['relation_name']} = array();
+        $item->{$this->options['relation_name']} = array();
         if (!count($tags)) {
             return;
         }
 
         $tag_class = $this->options['model'];
 
-        $object->{$this->options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->options['label_column'], 'IN', array_keys($tags)))));
+        $item->{$this->options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->options['label_column'], 'IN', array_keys($tags)))));
 
-        foreach ($object->{$this->options['relation_name']} as $obj) {
+        foreach ($item->{$this->options['relation_name']} as $obj) {
             unset($tags[$obj->{$this->options['label_column']}]);
         }
         foreach ($tags as $tag) {
             $tag_obj = new $tag_class(array($this->options['label_column'] => $tag));
-            $object->{$this->options['relation_name']}[] = $tag_obj;
+            $item->{$this->options['relation_name']}[] = $tag_obj;
         }
         return false;
     }

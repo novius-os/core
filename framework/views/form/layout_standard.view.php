@@ -48,12 +48,12 @@ $large = !empty($large) && $large == true;
     }
 
     $locales = array_keys(\Config::get('locales'));
-    if (!empty($object) && count($locales) > 1)
+    if (!empty($item) && count($locales) > 1)
     {
-        $translatable = $object->behaviours('Nos\Orm_Behaviour_Translatable');
+        $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
         if ($translatable)
         {
-            echo '<td style="width:16px;">'.\Nos\Helper::flag($object->get_lang()).'</td>';
+            echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_lang()).'</td>';
         }
     }
 ?>
@@ -85,7 +85,7 @@ $large = !empty($large) && $large == true;
                 </table>
 <?php
     $publishable = (string) \View::forge('form/publishable', array(
-        'object' => !empty($object) ? $object : null,
+        'item' => !empty($item) ? $item : null,
     ), false);
 
     if (!empty($subtitle) || !empty($publishable)) {
@@ -134,7 +134,7 @@ $large = !empty($large) && $large == true;
 <?php
     foreach ($contents as $content) {
         if (is_array($content) && !empty($content['view'])) {
-            echo View::forge($content['view'], array('fieldset' => $fieldset, 'object' => $object) + $content['params'], false);
+            echo View::forge($content['view'], array('fieldset' => $fieldset, 'item' => $item) + $content['params'], false);
         } else if (is_callable($content)) {
             echo $content();
         } else {
@@ -168,7 +168,7 @@ $large = !empty($large) && $large == true;
         }
         foreach ($menus as $view) {
             if (!empty($view['view'])) {
-                echo View::forge($view['view'], array('fieldset' => $fieldset, 'object' => $object) + $view['params'], false);
+                echo View::forge($view['view'], array('fieldset' => $fieldset, 'item' => $item) + $view['params'], false);
             }
         }
 ?>

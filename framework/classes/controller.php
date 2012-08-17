@@ -298,11 +298,15 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     $items[$key]['lang'] = $langs[$common_id];
                 }
                 if ($tree) {
-                    $all_langs = reset($objects)->find_root()->get_all_lang();
+                    $root = reset($objects)->find_root();
+                    if (!empty($root)) {
+                        $all_langs = $root->get_all_lang();
+                    } else {
+                        $all_langs = array_unique(\Arr::flatten($langs));
+                    }
                 } else {
                     $all_langs = array_unique(\Arr::flatten($langs));
                 }
-
                 foreach ($items as &$item) {
                     $flags = '';
                     $langs = $item['lang'];

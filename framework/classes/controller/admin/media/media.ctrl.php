@@ -59,6 +59,8 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
 
     public function before_save($media, $data)
     {
+        parent::before_save($media, $data);
+
         $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
         if ($is_uploaded) {
             $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));

@@ -456,7 +456,7 @@ class Controller_Front extends Controller {
     }
 
     public function save_cache() {
-        $page_fields = array('id', 'root_id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
+        $page_fields = array('id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
         $this->cache['page'] = array();
         foreach ($page_fields as $field) {
             $this->cache['page'][$field] = $this->_page->{'page_'.$field};

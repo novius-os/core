@@ -41,10 +41,10 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 	 *
 	 * @return string
 	 */
-	public function published($object) {
+	public function published($item) {
         $bool = $this->_properties['publication_bool_property'];
         if (!empty($bool)) {
-            return (bool) $object->get($bool);
+            return (bool) $item->get($bool);
         }
         return false;
         // @todo publication start / end
