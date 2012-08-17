@@ -139,4 +139,15 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
         return $medias;
     }
+
+    public function get_nugget_content($item, $catcher_name) {
+        $extended_content = $item->get_catcher_nuggets($catcher_name)->content_data;
+        $content = $item->get_default_nuggets();
+        foreach ($extended_content as $key => $params) {
+            $content[$key] = $params;
+        }
+
+        return $content;
+    }
+
 }
