@@ -125,10 +125,10 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * Check if the parent exists in all the langages of the child
      * @param \Nos\Orm\Model $item
      */
-    public function before_change_parent(\Nos\Orm\Model $item) {
+    public function change_parent(\Nos\Orm\Model $item) {
 
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
-        $new_parent = $item->find_parent();
+        $new_parent = $item->get_parent();
 
         // Parent was removed, it's ok
         if (null === $new_parent) {
@@ -154,13 +154,6 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
                 )));
             }
         }
-    }
-
-    /**
-     * Check if the parent exists in all the langages of the child
-     * @param \Nos\Orm\Model $item
-     */
-    public function after_change_parent(\Nos\Orm\Model $item) {
 
         static $in_progress = array();
 
@@ -172,7 +165,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         $in_progress = array_keys($items);
 
         // This event has been sent from the tree behaviour, so we don't need to check it exists
-        $new_parent = $item->find_parent();
+        $new_parent = $item->get_parent();
 
         foreach ($items as $item) {
             $parent = $new_parent === null ? null : $new_parent->find_lang($item->get_lang());

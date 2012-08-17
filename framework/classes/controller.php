@@ -610,6 +610,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                         break;
                 }
             }
+            $from->save();
         } catch (\Exception $e) {
             \Response::json(array(
                 'error' => $e->getMessage(),

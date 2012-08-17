@@ -103,13 +103,13 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     }
 
     /**
-     * Find the parent of the object
+     * return the parent of the object
      *
      * @return  Orm\Model  The parent object
      */
-	public function find_parent($item) {
+    public function get_parent($item) {
         return $item->get($this->_properties['parent_relation']);
-	}
+    }
 
     /**
      * Sets a new parent for the object
@@ -138,11 +138,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         }
 
         $this->set_parent_no_observers($item, $parent);
-        $item->observe('before_change_parent');
-        if (!$item->is_new()) {
-            $item->save();
-        }
-        $item->observe('after_change_parent');
+        $item->observe('change_parent');
 	}
 
     /**
@@ -183,13 +179,9 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         $parent = $item;
         while (!empty($parent)) {
             $root = $parent;
-            $parent = $this->find_parent($parent);
+            $parent = $this->get_parent($parent);
         }
         return $root !== $item ? $root : null;
-    }
-
-    public function get_parent($item) {
-        return $item->get($this->_properties['parent_relation']);
     }
 
 	public function set_parent_no_observers($item, $parent = null) {

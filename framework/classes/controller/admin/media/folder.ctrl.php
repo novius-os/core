@@ -40,41 +40,10 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
     public function before_save($folder, $data) {
         parent::before_save($folder, $data);
 
-        $path  = $folder->medif_path;
-
-        if (empty($path) ) {
-            $path = $folder->medif_title;
-        }
-
-        $path = Model_Media_Folder::friendly_slug($path, '-', true);
-        if (empty($path)) {
-            throw new \Exception(__('Generated folder URL (SEO) was empty.'));
-        }
-
-        if (false === $folder->set_path($path)) {
-            throw new \Exception(__("The parent folder doesn't exists."));
-        }
-
-        $where = array(
-            array('medif_path', $folder->medif_path)
-        );
-        if (!$folder->is_new()) {
-            $where[] = array('medif_id', '!=', $folder->medif_id);
-        }
-
-        $duplicate_folder = Model_Media_Folder::find('all', (array('where' => $where)));
-        if (!empty($duplicate_folder)) {
-            throw new \Exception(__('A folder with the same name already exists.'));
-        }
-
         if (!$folder->is_new()) {
             if ($folder->path() != $this->clone->path()) {
                 if (is_dir($this->clone->path())) {
-                    if (\File::rename_dir($this->clone->path(), $folder->path())) {
-                        // refresh_path($cascade_children = true, $cascade_media = true
-                        $folder->refresh_path(true, true);
-                    } else {
-                        // Restore old path if rename failed
+                    if (!\File::rename_dir($this->clone->path(), $folder->path())) {
                         $folder->medif_path = $this->clone->medif_path;
                     }
                 }

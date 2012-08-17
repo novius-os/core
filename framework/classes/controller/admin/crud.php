@@ -187,7 +187,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 if (!empty($this->item->{$this->behaviours['translatable']['common_id_property']})) {
                     $model = $this->config['model'];
                     $item_lang_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
-                    $item_parent = $item_lang_common->find_parent();
+                    $item_parent = $item_lang_common->get_parent();
 
                     // Fetch in the appropriate lang
                     if (!empty($item_parent)) {
@@ -306,13 +306,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if ($this->behaviours['tree']) {
             // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
             // https://github.com/fuel/orm/issues/171
-            //$item = $item->find_parent();
+            //$item = $item->get_parent();
 
             // Instead, retrieve the object manually
             // Model::find(null) returns an Orm\Query. We don't want that.
             $parent = empty($item->{$item->parent_relation()->key_from[0]}) ? null : $item::find($item->{$item->parent_relation()->key_from[0]});
 
-            // Event 'after_change_parent' will set the appropriate lang
+            // Event 'change_parent' will set the appropriate lang
             $item->set_parent($parent);
         }
     }

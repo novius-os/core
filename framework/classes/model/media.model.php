@@ -83,7 +83,7 @@ class Model_Media extends \Nos\Orm\Model {
     }
 
     public function get_path() {
-        return ltrim($this->media_path, '/').$this->media_file;
+        return ltrim($this->virtual_path(), '/');
     }
 
     public function get_public_path() {
@@ -135,36 +135,8 @@ class Model_Media extends \Nos\Orm\Model {
         return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->media_path, '/').str_replace('.'.$this->media_ext, '', $this->media_file).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 
-	public function refresh_path() {
-		$folder = Model_Media_Folder::find($this->media_folder_id);
-        if (empty($folder)) {
-            return false;
-        }
-        $this->media_path = $folder->medif_path;
-        return true;
-	}
-
-    public function check_and_filter_slug($sep = '-', $lowercase = true) {
-
-
-        $ext = pathinfo($this->media_file, PATHINFO_EXTENSION);
-        if (!empty($ext)) {
-            $ext = '.'.$ext;
-            $this->media_file = mb_substr($this->media_file, 0, -mb_strlen($ext));
-        }
-
-        $this->media_file = Model_Media_Folder::friendly_slug($this->media_file, $sep, $lowercase);
-
-        if (empty($this->media_file)) {
-            return false;
-        }
-        $this->media_file .= mb_strtolower($ext);
-        return true;
-    }
-
 	public function _event_before_save() {
         parent::_event_before_save();
-		$this->media_ext = pathinfo($this->media_file, PATHINFO_EXTENSION);
 		$is_image = @getimagesize(APPPATH.$this->get_private_path());
 		if ($is_image !== false) {
 			list($this->media_width, $this->media_height) = $is_image;

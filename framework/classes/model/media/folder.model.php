@@ -49,8 +49,15 @@ class Model_Media_Folder extends \Nos\Orm\Model {
 			'parent_relation' => 'parent',
 			'children_relation' => 'children',
 		),
+        'Nos\Orm_Behaviour_Virtualpath' => array(
+            'events' => array('before_save', 'after_save', 'change_parent'),
+            'virtual_name_property' => 'medif_dir_name',
+            'virtual_path_property' => 'medif_path',
+            'extension_property' => '/',
+        ),
     );
 
+    protected $_data_events = array();
 
     /**
      * Delete all the public/cache entries (image thumbnails) for this folder
@@ -108,81 +115,27 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         ));
     }
 
-    public static function friendly_slug($slug, $sep = '-', $lowercase = true) {
+    public function _event_before_save()
+    {
+        parent::_event_before_save();
+        $diff = $this->get_diff();
 
-        $slug = strtr($slug, '@€', 'ae');
-		$slug = \Inflector::ascii($slug);
-
-        if ($lowercase) {
-            $slug = \Str::lower($slug);
+        if (!empty($diff[0]['medif_path'])) {
+            $this->_data_events = $diff;
         }
-
-        $quoted_sep = preg_quote($sep);
-        $slug = preg_replace("`[\s+]`u", $sep, $slug);
-        $slug = preg_replace("`[^\w$quoted_sep]`iu", '', $slug);
-        $slug = preg_replace("`$quoted_sep+`u", $sep, $slug);
-        $slug = trim($slug, $sep);
-
-        return $slug;
     }
 
-    public function check_and_filter_slug($sep = '-', $lowercase = true) {
+    public function _event_after_save()
+    {
+        $diff = $this->_data_events;
 
-        $exploded_path = explode('/', trim($this->medif_path, '/'));
-        $path = '';
-        foreach ($exploded_path as $part) {
-            $path .= static::friendly_slug($part, '-', true).'/';
-        }
-
-        // empty or "/"
-        if (mb_strlen($path) <= 1) {
-            return false;
-        }
-		$this->medif_path = $path;
-
-        return true;
-    }
-
-    public function set_path($path) {
-
-        if ($this->is_new())
-        {
-            $parent = static::find($this->medif_parent_id);
-        }
-        else
-        {
-            $parent = $this->parent;
-        }
-        if (empty($parent)) {
-            return false;
-        }
-        $this->medif_path = $parent->medif_path.$path.'/';
-        return true;
-    }
-
-	public function refresh_path($cascade_children = true, $cascade_media = true) {
-        $current_path = pathinfo($this->medif_path, PATHINFO_BASENAME);
-        $this->set_path($current_path);
-        if ($cascade_children) {
-            foreach ($this->children as $child) {
-                $child->refresh_path(true, $cascade_media);
-                $child->save();
-            }
-        }
-        if ($cascade_media) {
-            // 1 request for each updated folder
+        if (!empty($diff[0]['medif_path'])) {
             \DB::update(Model_Media::table())
-                ->value('media_path', $this->medif_path)
-                ->where('media_folder_id', $this->medif_id)
+                    ->set(array(
+                    'media_path' => \DB::expr('REPLACE(media_path, '.\DB::escape($diff[0]['medif_path']).', '.\DB::escape($diff[1]['medif_path']).')'),
+                ))
+                ->where('media_path', 'LIKE', $diff[0]['medif_path'].'%')
                 ->execute();
         }
     }
-
-    /**
-     * Properties
-     * medif_id
-     * medif_parent_id
-     * medif_path
-     * medif_title
-     */
 }
