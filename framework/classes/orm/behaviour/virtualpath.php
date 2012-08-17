@@ -20,6 +20,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     public function __construct($class)
     {
         parent::__construct($class);
+        $this->_properties['unique'] = false;
         if (is_array($this->_properties['extension_property']))
         {
             $this->_properties['extension_property'] = array_merge(array(
