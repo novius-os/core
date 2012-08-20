@@ -20,20 +20,20 @@
     $filter = array_flip($filter);
     if (array_key_exists(\Nos\DataCatcher::TYPE_TITLE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE])) {
         $fields[] = \Nos\DataCatcher::TYPE_TITLE;
-        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => $nugget[\Nos\DataCatcher::TYPE_TITLE]));
+        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TITLE, '')));
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL])) {
         $fields[] = \Nos\DataCatcher::TYPE_URL;
         $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.possibles');
         $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array(
             'type' => 'select',
-            'value' => $nugget[\Nos\DataCatcher::TYPE_URL]
+            'value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_URL, ''),
         ));
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_IMAGE])) {
         $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
         $possible = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.possible'));
-        $value = $nugget[\Nos\DataCatcher::TYPE_IMAGE];
+        $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
         $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
             'type' => 'radio',
             'value' => isset($possible[$value]) ? $value : 0,
@@ -41,7 +41,7 @@
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_TEXT, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TEXT])) {
         $fields[] = \Nos\DataCatcher::TYPE_TEXT;
-        $fieldset->add(\Nos\DataCatcher::TYPE_TEXT, __('Description:'), array('value' => $nugget[\Nos\DataCatcher::TYPE_TEXT], 'type' => 'textarea'));
+        $fieldset->add(\Nos\DataCatcher::TYPE_TEXT, __('Description:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TEXT, ''), 'type' => 'textarea'));
     }
 ?>
 <div id="<?= $id ?>">

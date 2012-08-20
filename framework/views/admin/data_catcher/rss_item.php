@@ -11,7 +11,7 @@ echo \View::forge('nos::admin/data_catcher/form', array(
     // The plus operator allow a merge without reindexing
     'nugget' => $nugget_item + $nugget_default,
     'nugget_db' => $nugget_item,
-));
+), false);
 
 ?>
 </div>

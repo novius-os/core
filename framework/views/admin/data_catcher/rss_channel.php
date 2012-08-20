@@ -2,9 +2,7 @@
 <?php
 
 $nugget_channel = $item->get_catcher_nuggets($catcher_name)->content_data;
-$nugget_default = array(
-    \Nos\DataCatcher::TYPE_TITLE => Arr::get($item->data_catchers(), $catcher_name.'.title'),
-);
+$nugget_default = $item->get_default_nuggets();
 
 echo \View::forge('nos::admin/data_catcher/form', array(
     'action' => 'admin/nos/datacatcher/rss_channel_save',
@@ -13,7 +11,7 @@ echo \View::forge('nos::admin/data_catcher/form', array(
     // The plus operator allow a merge without reindexing
     'nugget' => $nugget_channel + $nugget_default,
     'nugget_db' => $nugget_channel,
-));
+), false);
 
 ?>
 </div>

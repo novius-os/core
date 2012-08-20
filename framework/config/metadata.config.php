@@ -40,7 +40,9 @@ return array(
             'required_data' => array(
                 \Nos\DataCatcher::TYPE_TITLE,
             ),
-            'optional_data' => array(),
+            'optional_data' => array(
+                \Nos\DataCatcher::TYPE_TEXT,
+            ),
         ),
         'rss_item' => array(
             'title' => 'RSS Item',
