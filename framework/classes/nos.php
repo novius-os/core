@@ -95,7 +95,7 @@ class Nos {
 
     protected static function _parse_enhancers(&$content, $controller) {
         // Fetch the available functions
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
 
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
@@ -123,7 +123,7 @@ class Nos {
             '&quot;' => '"',
         )), true);
 
-        $config = \Config::get("enhancers.$enhancer", false);
+        $config = \Config::get("data::enhancers.$enhancer", false);
 
         $found  = $config !== false;
 

@@ -68,8 +68,8 @@ class Controller_Front extends Controller {
             $cache->start();
 
 
-	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'url_enhanced');
-	        $url_enhanced = \Config::get("url_enhanced", array());
+	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
+	        $url_enhanced = \Config::get('data::url_enhanced', array());
 	        $url_enhanced[$url.'/'] = 0;
 
 	        $_404 = true;

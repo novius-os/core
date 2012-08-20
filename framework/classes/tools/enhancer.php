@@ -12,31 +12,71 @@ namespace Nos;
 
 class Tools_Enhancer
 {
-
-    public static function url_item($enhancer, $callback, $item, $first = false)
+    public static function url_item($enhancer_name, $item, $params = array())
     {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'page_enhanced');
-        $page_enhanced = \Config::get('page_enhanced', array());
-        $item_lang = $item->get_lang();
-        $urls = array();
-        if (!isset($page_enhanced[$enhancer]))
+        // Check if any page contains this enhancer
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
+        $page_enhanced = \Config::get('data::page_enhanced.'.$enhancer_name, array());
+        if (empty($page_enhanced))
         {
-            return $first ? false : array();
+            return array();
         }
-        foreach ($page_enhanced[$enhancer] as $page_id => $params)
+
+        // Check if this enhancer exists
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
+        $enhancer = \Config::get('data::enhancers.'.$enhancer_name, array());
+        if (empty($enhancer))
         {
-            if ($page = Model_Page::find($page_id))
+            return array();
+        }
+
+        $urlEnhancer = $enhancer['urlEnhancer'];
+
+        // Calculate the classname of the enhancer's Controller
+        // eg. noviusos_blog would match to Nos\Blog\Controller_Front
+        $parts = explode('/', $urlEnhancer);
+        $application_name = $parts[0];
+        // Replace the application name with 'controller'
+        $parts[0] = 'controller';
+        // Remove the action
+        array_pop($parts);
+        // We're left with the fuel Controller classname!
+        $controller_name = implode('_', $parts);
+        $controller_name = \Inflector::words_to_upper($controller_name);
+
+        // Check if the application exists
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_namespaces.php', 'data::app_namespaces');
+        $namespace = \Config::get('data::app_namespaces.'.$application_name, '');
+        if (empty($page_enhanced))
+        {
+            return array();
+        }
+
+        // This files contains all the urlPath for the pages containing an URL enhancer
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
+        $url_enhanced = \Config::get('data::url_enhanced', array());
+        $url_enhanced_flipped = array_flip($url_enhanced);
+
+        $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
+        $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable', false);
+        if ($translatable) {
+            $item_lang = $item->get_lang();
+        }
+        $urlItem   = call_user_func($callback, $item, $params);
+        // Now fetch all the possible URLS
+        $urls = array();
+        $urlPath = \Arr::get($params, 'urlPath', false);
+        $preview = \Arr::get($params, 'preview', false);
+        if ($urlPath === false) {
+            foreach ($page_enhanced as $page_id => $params)
             {
-                $urlPath = mb_substr($page->get_href(), 0, -5).'/';
-                if ($page->page_lang === $item_lang)
-                {
-                    $urls[] = call_user_func($callback, $item, array('urlPath' => $urlPath));
+                $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
+                if ($urlPath !== false && (!$translatable || $params['lang'] == $item_lang) && ($preview || $params['published'])) {
+                    $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
                 }
             }
-            if ($first && count($urls))
-            {
-                return $urls[0];
-            }
+        } else {
+            $urls[] = $params['urlPath'].$urlItem;
         }
         return $urls;
     }

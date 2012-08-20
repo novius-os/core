@@ -420,7 +420,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $actions = array_values($this->get_actions_lang());
         if (!$this->is_new && $this->behaviours['url'] !== false) {
-            $url = $this->item->url_canonical();
+            $url = $this->item->url_canonical(array('preview' => true));
             if ($url !== null) {
                 $actions[] = array(
                     'label' => $this->config['messages']['visualise'],

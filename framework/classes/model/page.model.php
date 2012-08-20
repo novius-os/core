@@ -212,6 +212,7 @@ class Model_Page extends \Nos\Orm\Model {
 					$page_enhanced[$name][$this->page_id] = array(
 						'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
 						'lang' => $this->page_lang,
+						'published' => $this->published(),
 					);
 
 					\Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
