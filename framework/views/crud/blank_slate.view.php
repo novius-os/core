@@ -30,7 +30,7 @@ echo View::forge('nos::crud/tab', array(
         if (!in_array($lang, $possible))
         {
             echo '<p>&nbsp;</p>';
-            $parent = $item->find_parent();
+            $parent = $item->get_parent();
             if (!empty($parent))
             {
                 $uniqid_parent = uniqid('parent_');

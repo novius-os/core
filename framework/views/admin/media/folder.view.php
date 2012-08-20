@@ -13,7 +13,7 @@ $uniqid_radio = uniqid('radio_');
 <div class="page" id="<?= $uniqid = uniqid('id_') ?>">
 <?php
     $basename = pathinfo($item->medif_path, PATHINFO_BASENAME);
-    $checked = $basename === $item::friendly_slug($item->medif_title);
+    $checked = $basename === \Nos\Orm_Behaviour_Virtualname::friendly_slug($item->medif_title);
 
     $fieldset->set_config('field_template', '{field}');
 
@@ -38,13 +38,13 @@ $uniqid_radio = uniqid('radio_');
             <td><?= $fieldset->field('medif_title')->build(); ?></td>
         </tr>
         <tr style="height:85px;">
-            <th style="vertical-align: top;"><?= $fieldset->field('medif_path')->label; ?></th>
+            <th style="vertical-align: top;"><?= $fieldset->field('medif_dir_name')->label; ?></th>
             <td style="width:350px;vertical-align: top;">
                 <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Generate from title') ?></label> <br />
                 <span style="vertical-align:middle;">
                     http://yoursite.com/media/<span data-id="path_prefix"><?= $item->is_new() ? (!empty($context) ? $context->medif_path : '') : $item->parent->medif_path ?></span>
                 </span>
-                <?= $fieldset->field('medif_path')->build(); ?>
+                <?= $fieldset->field('medif_dir_name')->build(); ?>
             </td>
         </tr>
 <?php
@@ -69,7 +69,7 @@ $uniqid_radio = uniqid('radio_');
                 var $container = $('#<?= $uniqid ?>').nosFormUI();
 
                 var $title      = $container.find('input[name=medif_title]');
-                var $seo_title  = $container.find('input[name=medif_path]');
+                var $seo_title  = $container.find('input[name=medif_dir_name]');
                 var $same_title = $container.find('input[data-id=same_title]');
 
                 // Same title and description (alt)

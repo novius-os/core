@@ -33,9 +33,21 @@ class Model_User extends \Nos\Orm\Model {
         ),
     );
 
-    protected static $_observers = array('Orm\\Observer_Self' => array(
-		'events' => array('before_save', 'after_save', 'before_delete', 'after_delete'),
-	));
+    protected static $_observers = array(
+        'Orm\\Observer_Self' => array(
+		    'events' => array('before_save', 'after_save', 'before_delete', 'after_delete'),
+	    ),
+        'Orm\Observer_CreatedAt' => array(
+            'events' => array('before_insert'),
+            'mysql_timestamp' => true,
+            'property'=>'user_created_at'
+        ),
+        'Orm\Observer_UpdatedAt' => array(
+            'events' => array('before_save'),
+            'mysql_timestamp' => true,
+            'property'=>'user_updated_at'
+        ),
+    );
 
     public function check_password($password) {
         $ph = new \PasswordHash(8, false);

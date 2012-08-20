@@ -347,7 +347,7 @@ class Model extends \Orm\Model {
         }
 
         // Return langs from parent if available
-        $parent = $this->find_parent();
+        $parent = $this->get_parent();
         if (!empty($parent)) {
             return $parent->get_all_lang();
         }

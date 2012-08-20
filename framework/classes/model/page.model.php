@@ -37,11 +37,23 @@ class Model_Page extends \Nos\Orm\Model {
 		),
 	);
 
-	protected static $_observers = array('Orm\\Observer_Self');
+	protected static $_observers = array(
+        'Orm\\Observer_Self',
+        'Orm\Observer_CreatedAt' => array(
+            'events' => array('before_insert'),
+            'mysql_timestamp' => true,
+            'property'=>'page_created_at'
+        ),
+        'Orm\Observer_UpdatedAt' => array(
+            'events' => array('before_save'),
+            'mysql_timestamp' => true,
+            'property'=>'page_updated_at'
+        ),
+    );
 
 	protected static $_behaviours = array(
 		'Nos\Orm_Behaviour_Translatable' => array(
-			'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'before_change_parent', 'after_change_parent'),
+			'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'change_parent'),
 			'lang_property'      => 'page_lang',
 			'common_id_property' => 'page_lang_common_id',
 			'single_id_property' => 'page_lang_single_id',
@@ -64,7 +76,13 @@ class Model_Page extends \Nos\Orm\Model {
 			'parent_relation' => 'parent',
 			'children_relation' => 'children',
 		),
-		'Nos\Orm_Behaviour_Sortable' => array(
+        'Nos\Orm_Behaviour_Virtualpath' => array(
+            'events' => array('before_save', 'after_save', 'change_parent'),
+            'virtual_name_property' => 'page_virtual_name',
+            'virtual_path_property' => 'page_virtual_url',
+            'extension_property' => '.html',
+        ),
+        'Nos\Orm_Behaviour_Sortable' => array(
 			'events' => array('after_sort'),
 			'sort_property' => 'page_sort',
 		),
@@ -72,8 +90,6 @@ class Model_Page extends \Nos\Orm\Model {
 			'publication_bool_property' => 'page_published',
 		),
 	);
-
-	protected $_data_events = array();
 
 	const TYPE_CLASSIC       = 0;
 	const TYPE_POPUP         = 1;
@@ -90,7 +106,7 @@ class Model_Page extends \Nos\Orm\Model {
     const LOCK_DELETION = 1;
     const LOCK_EDITION  = 2;
 
-	public static function find($id = null, array $options = array()) {
+    public static function find($id = null, array $options = array()) {
 		if (array_key_exists('order_by', $options)) {
 			isset($options['order_by']['page_sort']) or $options['order_by']['page_sort'] = 'ASC';
 		}
@@ -158,40 +174,7 @@ class Model_Page extends \Nos\Orm\Model {
         return $this->get_href($params).($this->page_type == self::TYPE_EXTERNAL_LINK ? '' : '?_preview=1');
     }
 
-    public function _event_after_change_parent() {
-
-        $parent = $this->find_parent();
-        $this->page_virtual_url = $parent !== null ? str_replace('.html', '', $parent->page_virtual_url).'/' : '';
-        $this->page_virtual_url .= $this->page_virtual_name.'.html';
-    }
-
-	public function _event_before_save() {
-        parent::_event_before_save();
-		$diff = $this->get_diff();
-
-		if (!empty($diff[0]['page_virtual_name'])) {
-			$diff[0]['page_virtual_url'] = $this->page_virtual_url;
-			$this->page_virtual_url = str_replace($diff[0]['page_virtual_name'].'.html', $diff[1]['page_virtual_name'].'.html', $this->page_virtual_url);
-			$diff[1]['page_virtual_url'] = $this->page_virtual_url;
-			$this->_data_events = $diff;
-		}
-	}
-
 	public function _event_after_save() {
-		$diff = $this->_data_events;
-
-		if (!empty($diff[0]['page_virtual_name'])) {
-
-			$old_virtual_url = str_replace('.html', '/', $diff[0]['page_virtual_url']);
-			$new_virtual_url = str_replace($diff[0]['page_virtual_name'].'/', $this->page_virtual_name.'/', $old_virtual_url);
-			\DB::update($this->table())
-				->set(array(
-					'page_virtual_url' => \DB::expr('REPLACE(page_virtual_url, '.\DB::escape($old_virtual_url).', '.\DB::escape($new_virtual_url).')'),
-				))
-				->where('page_virtual_url', 'LIKE', $old_virtual_url.'%')
-				->execute();
-		}
-
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
 
 		$content = '';

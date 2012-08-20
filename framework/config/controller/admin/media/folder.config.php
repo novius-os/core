@@ -57,7 +57,7 @@ return array(
                 'min_length' => array(2),
             ),
         ),
-        'medif_path' => array(
+        'medif_dir_name' => array(
             'form' => array(
                 'type' => 'text',
                 'size' => 30,

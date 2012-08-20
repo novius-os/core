@@ -35,7 +35,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
     public function before_save($page, $data) {
         parent::before_save($page, $data);
 
-        $parent = $page->find_parent();
+        $parent = $page->get_parent();
         $page->page_level = $parent === null ? 1 : $parent->page_level + 1;
 
         foreach (\Input::post('wysiwyg', array()) as $key => $text) {

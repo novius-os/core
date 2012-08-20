@@ -59,8 +59,6 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
 
     public function before_save($media, $data)
     {
-        parent::before_save($media, $data);
-
         $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
         if ($is_uploaded) {
             $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
@@ -80,23 +78,12 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
             if (!$media->is_new() && empty($pathinfo['basename'])) {
                 throw new \Exception('Please provide a title.');
             }
-            $media->media_title = static::pretty_title($pathinfo['basename']);
+            $media->media_title = $pathinfo['basename'];
         }
 
-        // Empty slug = auto-generated with title
-        if (empty($media->media_file)) {
-            $media->media_file  = $media->media_title;
-        }
-        if (!empty($pathinfo['extension'])) {
-            $media->media_file .= '.'.$pathinfo['extension'];
-        }
+        $media->media_ext = $pathinfo['extension'];
 
-        if (false === $media->check_and_filter_slug()) {
-            throw new \Exception(__('Generated media URL (SEO) was empty.'));
-        }
-        if (false === $media->refresh_path()) {
-            throw new \Exception(__("The parent folder doesn't exists."));
-        }
+        parent::before_save($media, $data);
 
         $dest = APPPATH.$media->get_private_path();
 
