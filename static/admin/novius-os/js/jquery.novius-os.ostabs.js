@@ -652,19 +652,7 @@ define('jquery-nos-ostabs',
                         .addClass( 'nos-ostabs-action' )
                         .click(function(e) {
                             e.preventDefault();
-                            if (action.action) {
-                                if ($.isFunction(action.action.click)) {
-                                    action.action.click(e, {ui : $el, action : action});
-                                }
-                                if (action.action.openTab) {
-                                    $(this).nosTabs('open', {
-                                        url : action.action.openTab
-                                    });
-                                }
-                                if (action.action.openWindow) {
-                                    window.open(action.action.openWindow);
-                                }
-                            }
+                            $(this).nosAction(action.action);
                         })
                         .appendTo( links );
 

@@ -32,6 +32,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'visualise' => 'Visualise',
             'delete' => 'Delete',
             'delete a item' => 'Delete a item',
+            'confirm deletion ok' => 'Confirm the deletion',
+            'confirm deletion or' => 'or',
+            'confirm deletion cancel' => 'Cancel',
+            'confirm deletion wrong_confirmation' => 'Wrong confirmation',
         ),
         'context_relation' => null,
         'tab' => array(
@@ -138,7 +142,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fieldset = $this->fieldset($fieldset);
 
             $params = array_merge($this->view_params(), array(
-                'url_insert_update' => $this->config['controller_url'].'/insert_update/'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
+                'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
                 'fieldset' => $fieldset,
                 'actions' => $this->get_actions(),
@@ -183,6 +187,25 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             {
                 $lang = \Input::get('lang', key(\Config::get('locales')));
                 $this->item->{$this->behaviours['translatable']['lang_property']} = empty($lang) ? key(\Config::get('locales')) : $lang;
+            }
+            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
+                // New page: no parent
+                // Translation: we have a common_id and can determine the parent
+                if (!empty($this->item->{$this->behaviours['translatable']['common_id_property']})) {
+                    $model = $this->config['model'];
+                    $item_lang_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
+                    $item_parent = $item_lang_common->get_parent();
+
+                    // Fetch in the appropriate lang
+                    if (!empty($item_parent)) {
+                        $item_parent = $item_parent->find_lang($this->item->{$this->behaviours['translatable']['lang_property']});
+                    }
+
+                    // Set manually, because set_parent doesn't handle new items
+                    if (!empty($item_parent)) {
+                        $this->item->{$this->item->parent_relation()->key_from[0]} = $item_parent->{$this->pk};
+                    }
+                }
             }
         }
     }
@@ -263,15 +286,15 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
     }
 
-    public function save($object, $data) {
+    public function save($item, $data) {
         $dispatchEvent = array(
             'name' => $this->config['model'],
             'action' => $this->is_new ? 'insert' : 'update',
-            'id' => $object->{$this->pk},
+            'id' => $item->{$this->pk},
         );
         if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = $object->{$this->behaviours['translatable']['common_id_property']};
-            $dispatchEvent['lang'] = $object->{$this->behaviours['translatable']['lang_property']};
+            $dispatchEvent['lang_common_id'] = $item->{$this->behaviours['translatable']['common_id_property']};
+            $dispatchEvent['lang'] = $item->{$this->behaviours['translatable']['lang_property']};
         }
 
         $return = array(
@@ -281,12 +304,24 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
         if ($this->is_new)
         {
-            $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$object->{$this->pk};
+            $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};
         }
         return $return;
     }
 
-    public function before_save($object, $data) {
+    public function before_save($item, $data) {
+        if ($this->behaviours['tree']) {
+            // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
+            // https://github.com/fuel/orm/issues/171
+            //$item = $item->get_parent();
+
+            // Instead, retrieve the object manually
+            // Model::find(null) returns an Orm\Query. We don't want that.
+            $parent = empty($item->{$item->parent_relation()->key_from[0]}) ? null : $item::find($item->{$item->parent_relation()->key_from[0]});
+
+            // Event 'change_parent' will set the appropriate lang
+            $item->set_parent($parent);
+        }
     }
 
     public function action_insert_update($id = null)
@@ -389,18 +424,23 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($url !== null) {
                 $actions[] = array(
                     'label' => $this->config['messages']['visualise'],
-                    'openWindow' => $url . '?_preview=1',
                     'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                    'action' => array(
+                        'action' => 'window.open',
+                        'url' => $url . '?_preview=1',
+                    ),
                 );
             }
         }
         if (!$this->is_new) {
             $actions[] = array(
                 'label' => $this->config['messages']['delete'],
-                'confirmationDialog' => array(
-                    'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                    'title' => $this->config['messages']['delete a item'],
-                    'confirmedUrl' => $this->config['controller_url'].'/delete_confirm',
+                'action' => array(
+                    'action' => 'confirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
+                        'title' => $this->config['messages']['delete a item'],
+                    ),
                 ),
                 'icon' => 'trash',
             );
@@ -435,8 +475,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $label = empty($main_lang) ? __('Add in {lang}') : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
             $actions[$locale] = array(
                 'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
-                'openTab' => $url,
                 'iconUrl' => \Nos\Helper::flag_url($locale),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => $url
+                    ),
+                ),
             );
         }
         return $actions;
@@ -448,107 +493,107 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
-    public function action_delete($id)
+    public function action_delete($id = null)
     {
         try {
-            $this->item = $this->crud_item($id);
-            $this->check_permission('delete');
-            return \View::forge($this->config['views']['delete'], array('view_params' => $this->view_params()), false);
+            if (\Input::method() === 'POST') {
+                $this->delete_confirm();
+            } else {
+                $this->item = $this->crud_item($id);
+                $this->check_permission('delete');
+                return \View::forge('nos::crud/delete_popup_layout', array('view_params' => $this->view_params()), false);
+            }
         } catch (\Exception $e) {
             $this->send_error($e);
         }
     }
 
-    public function action_delete_confirm()
+    public function delete_confirm()
     {
-        try {
-            $dispatchEvent = null;
-            $id = \Input::post('id', 0);
-            if (empty($id) && \Fuel::$env === \Fuel::DEVELOPMENT) {
-                $id = \Input::get('id');
-            }
+        $dispatchEvent = null;
+        $id = \Input::post('id', 0);
+        if (empty($id) && \Fuel::$env === \Fuel::DEVELOPMENT) {
+            $id = \Input::get('id');
+        }
 
-            $this->item = $this->crud_item($id);
-            $this->check_permission('delete');
+        $this->item = $this->crud_item($id);
+        $this->check_permission('delete');
 
-            $dispatchEvent = array(
-                'name' => $this->config['model'],
-                'action' => 'delete',
-                'id' => $id,
-            );
+        $dispatchEvent = array(
+            'name' => $this->config['model'],
+            'action' => 'delete',
+            'id' => $id,
+        );
 
-            $this->delete();
+        $this->delete();
 
-            if ($this->behaviours['translatable'])
-            {
-                $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
-                $dispatchEvent['id'] = array();
-                $dispatchEvent['lang'] = array();
+        if ($this->behaviours['translatable'])
+        {
+            $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
+            $dispatchEvent['id'] = array();
+            $dispatchEvent['lang'] = array();
 
-                // Delete all languages by default
-                $lang = \Input::post('lang', 'all');
+            // Delete all languages by default
+            $lang = \Input::post('lang', 'all');
 
-                // Delete children for all languages
-                if ($lang === 'all') {
-                    foreach ($this->item->find_lang('all') as $item_lang)
-                    {
-                        $dispatchEvent['id'][] = $item_lang->{$this->pk};
-                        $dispatchEvent['lang'][] = $item_lang->{$this->behaviours['translatable']['lang_property']};
+            // Delete children for all languages
+            if ($lang === 'all') {
+                foreach ($this->item->find_lang('all') as $item_lang)
+                {
+                    $dispatchEvent['id'][] = $item_lang->{$this->pk};
+                    $dispatchEvent['lang'][] = $item_lang->{$this->behaviours['translatable']['lang_property']};
 
-                        if ($this->behaviours['tree'])
-                        {
-                            foreach ($item_lang->get_ids_children(false) as $item_id)
-                            {
-                                $dispatchEvent['id'][] = $item_id;
-                            }
-                        }
-                    }
-
-                    // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                    // Optimised operation for deleting all languages
-                    $this->item->delete_all_lang();
-
-                } else {
-                    // Search for the appropriate page
-                    if ($this->item->get_lang() != $lang) {
-                        $this->item = $this->item->find_lang($lang);
-                    }
-                    $this->check_permission('delete');
-
-                    $dispatchEvent['id'][] = $this->item->{$this->pk};
-                    $dispatchEvent['lang'][] = $this->item->{$this->behaviours['translatable']['lang_property']};
                     if ($this->behaviours['tree'])
                     {
-                        foreach ($this->item->get_ids_children(false) as $item_id)
+                        foreach ($item_lang->get_ids_children(false) as $item_id)
                         {
                             $dispatchEvent['id'][] = $item_id;
                         }
                     }
-
-                    // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
-                    // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                    $this->item->delete();
                 }
+
+                // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
+                // Optimised operation for deleting all languages
+                $this->item->delete_all_lang();
+
             } else {
+                // Search for the appropriate page
+                if ($this->item->get_lang() != $lang) {
+                    $this->item = $this->item->find_lang($lang);
+                }
+                $this->check_permission('delete');
+
+                $dispatchEvent['id'][] = $this->item->{$this->pk};
+                $dispatchEvent['lang'][] = $this->item->{$this->behaviours['translatable']['lang_property']};
                 if ($this->behaviours['tree'])
                 {
-                    $dispatchEvent['id'] = array($this->item->{$this->pk});
                     foreach ($this->item->get_ids_children(false) as $item_id)
                     {
                         $dispatchEvent['id'][] = $item_id;
                     }
                 }
 
+                // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
+                // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 $this->item->delete();
             }
+        } else {
+            if ($this->behaviours['tree'])
+            {
+                $dispatchEvent['id'] = array($this->item->{$this->pk});
+                foreach ($this->item->get_ids_children(false) as $item_id)
+                {
+                    $dispatchEvent['id'][] = $item_id;
+                }
+            }
 
-            $this->response(array(
-                'notify' => $this->config['messages']['successfully deleted'],
-                'dispatchEvent' => $dispatchEvent,
-            ));
-        } catch (\Exception $e) {
-            $this->send_error($e);
+            $this->item->delete();
         }
+
+        $this->response(array(
+            'notify' => $this->config['messages']['successfully deleted'],
+            'dispatchEvent' => $dispatchEvent,
+        ));
     }
 
     public function delete()

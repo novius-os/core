@@ -2,7 +2,7 @@
 <?= View::forge('form/layout_standard', array(
     'fieldset' => $fieldset,
     // Used by the behaviours (publishable, etc.)
-    'object' => $user,
+    'item' => $user,
     'medias' => null,
     'title' => array('user_firstname', 'user_name'),
     'id' => 'user_id',

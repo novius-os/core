@@ -130,7 +130,17 @@ class Model extends \Orm\Model {
 		return static::$_properties_cached[$class];
 	}
 
-	/**
+    public static function linked_wysiwygs() {
+        $class = get_called_class();
+        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
+    }
+
+    public static function linked_medias() {
+        $class = get_called_class();
+        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
+    }
+
+    /**
 	 * @see \Orm\Model::relations()
 	 */
 	public static function relations($specific = false)
@@ -142,7 +152,7 @@ class Model extends \Orm\Model {
             // unset potential's relations stored in Nos\Orm\Model
             unset(static::$_has_many['linked_wysiwygs']);
             unset(static::$_has_many['linked_medias']);
-            if ($class !== 'Nos\Model_Wysiwyg')
+            if (static::linked_wysiwygs())
             {
                 static::$_has_many['linked_wysiwygs'] = array(
                     'key_from' => static::$_primary_key[0],
@@ -158,7 +168,7 @@ class Model extends \Orm\Model {
                 );
             }
 
-            if ($class !== 'Nos\Model_Media_Link')
+            if (static::linked_medias())
             {
                 static::$_has_many['linked_medias'] = array(
                     'key_from' => static::$_primary_key[0],
@@ -337,7 +347,7 @@ class Model extends \Orm\Model {
         }
 
         // Return langs from parent if available
-        $parent = $this->find_parent();
+        $parent = $this->get_parent();
         if (!empty($parent)) {
             return $parent->get_all_lang();
         }
@@ -401,7 +411,7 @@ class Model extends \Orm\Model {
      */
 	public function _event_before_save() {
         $class = get_called_class();
-        if ($class !== 'Nos\Model_Wysiwyg')
+        if (static::linked_wysiwygs())
         {
             $w_keys = array_keys($this->linked_wysiwygs);
             for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
@@ -416,7 +426,7 @@ class Model extends \Orm\Model {
             }
         }
 
-        if ($class !== 'Nos\Model_Media_Link')
+        if (static::linked_medias())
         {
             $w_keys = array_keys($this->linked_medias);
             for ($j = 0; $j < count($this->linked_medias); $j++)
@@ -547,7 +557,7 @@ class Model extends \Orm\Model {
 		if (count($arr_name) > 1)
 		{
             $class = get_called_class();
-            if ($class !== 'Nos\Model_Wysiwyg' && $arr_name[0] == 'wysiwygs')
+            if (static::linked_wysiwygs() && $arr_name[0] == 'wysiwygs')
 			{
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_wysiwygs);
@@ -577,7 +587,7 @@ class Model extends \Orm\Model {
 				return $value;
 			}
 
-            if ($class !== 'Nos\Model_Media_Link' && $arr_name[0] == 'medias')
+            if (static::linked_medias() && $arr_name[0] == 'medias')
 			{
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_medias);
@@ -630,7 +640,7 @@ class Model extends \Orm\Model {
 		if (count($arr_name) > 1)
 		{
             $class = get_called_class();
-            if ($class !== 'Nos\Model_Wysiwyg' && $arr_name[0] == 'wysiwygs')
+            if (static::linked_wysiwygs() && $arr_name[0] == 'wysiwygs')
             {
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_wysiwygs);
@@ -651,7 +661,7 @@ class Model extends \Orm\Model {
 				return $ref;
 			}
 
-            if ($class !== 'Nos\Model_Media_Link' && $arr_name[0] == 'medias')
+            if (static::linked_medias() && $arr_name[0] == 'medias')
 			{
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_medias);
@@ -730,7 +740,7 @@ class Model extends \Orm\Model {
 						and $this->_original_relations[$key] !== $new_pk))
 				{
 					$diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
-					$diff[1][$key] = isset($val) ? $new_pk : null;
+					$diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
 				}
 			}
 			else

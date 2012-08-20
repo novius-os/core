@@ -12,7 +12,7 @@ define(
     function($) {
         "use strict";
         return function(appDesk) {
-
+            log('link_pick', appDesk);
             // Remove all primary actions
             $.each(appDesk.actions, function() {
                 this.primary = false;
@@ -28,8 +28,9 @@ define(
                         icon : 'check',
                         text : true,
                         primary : true,
-                        action : function(item, $el) {
-                            $el.closest('.ui-dialog-content').trigger('select_page', item);
+                        action : {
+                            action : 'dialogPick',
+                            event : 'select_page'
                         }
                     }
                 }

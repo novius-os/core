@@ -7,8 +7,8 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-if (empty($publishable) && !empty($object)) {
-    $publishable = $object->behaviours('Nos\Orm_Behaviour_Publishable');
+if (empty($publishable) && !empty($item)) {
+    $publishable = $item->behaviours('Nos\Orm_Behaviour_Publishable');
 }
 
 if (empty($publishable)) {
@@ -16,7 +16,7 @@ if (empty($publishable)) {
 }
 ?>
 <td>
-    <?php $published = !empty($object) ? $object->published() : false; ?>
+    <?php $published = !empty($item) ? $item->published() : false; ?>
     <table style="margin:0 2em 0 1em;">
         <tr>
             <td id="<?= $buttonset = uniqid('buttonset_') ?>" class="publishable" style="width:50px;">
@@ -50,7 +50,7 @@ require(
             }
         };
 
-        var initial_status = '<?= empty($object) || $object->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>';
+        var initial_status = '<?= empty($item) || $item->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>';
 
         $(function() {
             var $buttonset = $('#<?= $buttonset ?>');

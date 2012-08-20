@@ -70,7 +70,7 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
         return $return;
     }
 
-    public function before_save($object, $data) {
+    public function before_save($item, $data) {
         return true;
     }
 }

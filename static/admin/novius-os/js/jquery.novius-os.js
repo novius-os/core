@@ -132,10 +132,141 @@ define('jquery-nos',
                     });
                 }
                 return false;
+            },
+
+            nosMediaVisualise : function(media) {
+                if (!media.image) {
+                    window.open(media.path);
+                    return;
+                }
+
+                require([
+                    'wijmo.wijlightbox'
+                ], function() {
+
+                    var image = new Image();
+                    image.onerror = function() {
+                        $.nosNotify('Image not found', 'error');
+                    };
+                    image.onload = function() {
+                        // Create the lightbox
+                        var lightbox = $('<div><a><img /></a></div>')
+                            .find('a')
+                            .attr({
+                                href : media.path,
+                                rel : 'wijlightbox'
+                            })
+                            .find('img')
+                            .attr({
+                                src : media.path,
+                                title : media.title
+                            })
+                            .css({
+                                width : 0,
+                                height: 0
+                            })
+                            .end()
+                            .end()
+                            .css({
+                                position : 'absolute',
+                                dislplay : 'none',
+                                width : 1,
+                                height: 1
+                            })
+                            .css($(this).offset())
+                            .appendTo(document.body)
+                            .wijlightbox({
+                                zIndex : 1201,
+                                textPosition : 'outside',
+                                player : 'img',
+                                dialogButtons: 'fullsize',
+                                modal : true,
+                                open : function() {
+                                    $('.wijmo-wijlightbox-overlay').css('z-index', 1200);
+                                },
+                                close : function(e) {
+                                    lightbox.wijlightbox('destroy');
+                                    lightbox.remove();
+                                }
+                            });
+
+                        // Open it
+                        lightbox.find('a').triggerHandler('click');
+                    }
+                    image.src = media.path;
+                });
             }
         });
 
         $.fn.extend({
+            nosAction : function(obj, data) {
+                var params;
+                data = data || {};
+                try {
+                    if ($.isFunction(obj)) {
+                        obj($(this), data);
+                    } else {
+                        var placeholderReplace = function (obj, data) {
+                            if ($.type(obj) === 'string') {
+                                return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
+                                        return data[p1];
+                                    }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
+                                        return data[p1];
+                                    });
+                            } else if ($.isPlainObject(obj)) {
+                                $.each(obj, function(key, value) {
+                                    obj[key] = placeholderReplace(value, data);
+                                });
+                            }
+                            return obj;
+                        };
+
+                        switch(obj.action) {
+                            case 'nosTabs' :
+                                var args = [];
+                                params = $.extend(true, {}, obj);
+
+                                params.method && args.push(params.method);
+                                args.push(placeholderReplace(params.tab, data));
+                                params.dialog && args.push(params.dialog);
+                                $.fn.nosTabs.apply($(this), args);
+                                break;
+
+                            case 'confirmationDialog' :
+                                params = $.extend(true, {
+                                    ajax : true,
+                                    width: 500,
+                                    height: 'auto',
+                                    'class': 'nos-confirmation-dialog'
+                                }, placeholderReplace(obj.dialog, data));
+                                $(this).nosDialog(params);
+                                break;
+
+                            case 'nosAjax' :
+                                params = $.extend({}, placeholderReplace(obj.params, data));
+                                $(this).nosAjax(params);
+                                break;
+
+                            case 'nosMediaVisualise' :
+                                $.nosMediaVisualise(data);
+                                break;
+
+                            case 'dialogPick' :
+                                $(this).closest('.ui-dialog-content').trigger(obj.event, data);
+                                break;
+
+                            case 'window.open' :
+                                var url = placeholderReplace(obj.url, data);
+                                window.open(url);
+                                break;
+                        }
+                    }
+                } catch (e) {
+                    log('nosAction', e)
+                }
+                return false;
+            },
+
             nosAjax : function(params) {
                 var options = $.extend({
                         dataType : 'json',
@@ -205,10 +336,13 @@ define('jquery-nos',
 
                 var dialog = this.closest('.ui-dialog-content').size();
                 if (dialog) {
+                    if (json.closeDialog) {
+                        this.nosDialog('close');
+                    }
+                } else {
                     if (json.closeTab) {
                         this.nosTabs('close');
                     }
-                } else {
                     if (json.redirect) {
                         document.location.href = json.redirect;
                     }
@@ -322,7 +456,7 @@ define('jquery-nos',
                     if (data.iconUrl) {
                         $(this).find('span:first')
                             .css({
-                                backgroundImage: 'url(' + data.iconUrl + ')',
+                                backgroundImage: 'url(' + data.iconUrl + ')'
                             });
                     }
                 });
@@ -451,82 +585,6 @@ define('jquery-nos',
                         break;
                 }
                 return this;
-            },
-
-            nosConfirmationDialog: function(params) {
-                var self = this;
-
-                var i18n = {
-                    'confirm_deletion': 'Confirm the deletion',
-                    'or': 'or',
-                    'cancel': 'Cancel',
-                    'wrong_confirmation': 'Wrong confirmation'
-                };
-                if (params.i18n) {
-                    i18n = params.i18n;
-                } else if (params.appDesk) {
-                    i18n['confirm_deletion'] = params.appDesk.i18n('Confirm the deletion').label;
-                    i18n['or'] = params.appDesk.i18n('or').label;
-                    i18n['cancel'] = params.appDesk.i18n('Cancel').label;
-                    i18n['wrong_confirmation'] = params.appDesk.i18n('Wrong confirmation').label;
-                }
-
-                if (!params) {
-                    params = {};
-                }
-                params = $.extend({
-                    ajax : true,
-                    width: 500,
-                    height: 'auto',
-                    'class': 'nos-confirmation-dialog',
-                    dialogRendered: function($dialog) {
-                        var $form = $('<form class="fieldset standalone"></form>');
-
-                        var $confirmationZone = $('<p></p>');
-                        var $confirmButton = $('<button type="submit" class="primary ui-state-error"></button>').data('icon', 'trash').append(i18n['confirm_deletion']);
-                        var $cancelButton = $('<a href="#"></a>').append(i18n['cancel']);
-                        var $or = $('<span></span>').text(' ' + i18n['or'] + ' ');
-                        var $verifications = $dialog.find('.verification');
-
-                        $confirmButton.appendTo($confirmationZone);
-                        $or.appendTo($confirmationZone);
-                        $cancelButton.appendTo($confirmationZone);
-
-                        $confirmationZone.appendTo($dialog);
-
-                        $confirmButton.click(function(e) {
-                            e.preventDefault();
-
-                            var allVerificationPassed = true;
-                            $verifications.each(function() {
-                                if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
-                                    allVerificationPassed = false;
-                                    return false;
-                                }
-                            });
-                            if (allVerificationPassed) {
-                                if ($.isFunction(params['confirmed'])) {
-                                    params['confirmed']($dialog);
-                                }
-                                $dialog.nosDialog('close');
-                            } else {
-                                $.nosNotify(i18n['wrong_confirmation'], 'error');
-                            }
-
-                        });
-
-                        $cancelButton.click(function(e) {
-                            e.preventDefault();
-                            $dialog.nosDialog('close');
-                        });
-
-                        $dialog.wrapInner($form);
-
-                        $dialog.parent().nosFormUI();
-                    }
-                }, params);
-
-                self.nosDialog(params);
             },
 
             nosDialog : function() {
@@ -763,8 +821,16 @@ define('jquery-nos',
                     case 'add' :
                         (function() {
                             var tab = args[0],
-                                place = args[1] || 'end';
-                            if (window.parent != window && window.parent.$nos) {
+                                dialogOptions = args[1] || {},
+                                dialog = self.closest('.ui-dialog-content').size(),
+                                place = args[2] || 'end';
+                            if (dialog) {
+                                self.nosDialog($.extend({
+                                    contentUrl: tab.url,
+                                    ajax : !tab.iframe,
+                                    title: tab.label
+                                }, dialogOptions));
+                            } else if (window.parent != window && window.parent.$nos) {
                                 window.parent.$nos(window.frameElement).nosTabs('add', tab, place);
                             } else {
                                 var index;

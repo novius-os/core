@@ -10,7 +10,7 @@
 
 $uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
-$pathinfo = pathinfo($object->media_file);
+$pathinfo = pathinfo($item->media_file);
 $filename = $pathinfo['filename'];
 ?>
 
@@ -19,8 +19,8 @@ $filename = $pathinfo['filename'];
 	<div class="unit col c1" ></div>
 	<div class="unit col c2" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
         <?php
-        if ($object->is_image()) {
-            list($src, $width, $height, $ratio) = $object->get_img_infos(128, null);
+        if ($item->is_image()) {
+            list($src, $width, $height, $ratio) = $item->get_img_infos(128, null);
             printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
         }
         ?>
@@ -38,7 +38,7 @@ $filename = $pathinfo['filename'];
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media_file')->label ?></th>
-                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $object->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
+                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $item->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media_folder_id')->label; ?></th>
