@@ -92,7 +92,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             $catchers[$id] = $config;
         }
 
-        foreach ($this->_properties['data_catchers'] as $id => $data_catcher) {
+        $set_data_catcher = function($data_catcher, $id) use ($data_catchers, &$catchers) {
             if (is_array($data_catcher) && $data_catcher['data_catcher'] && !empty($data_catchers[$data_catcher['data_catcher']])) {
                 $id = is_int($id) ? $data_catcher['data_catcher'] : $id;
                 $catchers[$id] = array_merge($data_catchers[$data_catcher['data_catcher']], $data_catcher);
@@ -102,18 +102,20 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
                 $id = is_int($id) ? $data_catcher : $id;
                 $catchers[$id] = $data_catchers[$data_catcher];
             }
+        };
+
+        foreach ($this->_properties['data_catchers'] as $id => $data_catcher) {
+            $set_data_catcher($data_catcher, $id);
         }
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
         foreach ($object->wysiwygs as $wysiwyg) {
-            \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers) {
+            \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
                 $params = \Config::get('enhancers.'.$enhancer, false);
                 if ($params !== false) {
                     if (isset($params['data_catchers_added']) && is_array($params['data_catchers_added'])) {
-                        foreach ($params['data_catchers_added'] as $catcher) {
-                            if (isset($data_catchers[$catcher])) {
-                                $catchers[$catcher] = $data_catchers[$catcher];
-                            }
+                        foreach ($params['data_catchers_added'] as $id => $data_catcher) {
+                            $set_data_catcher($data_catcher, $id);
                         }
                     }
                 }
