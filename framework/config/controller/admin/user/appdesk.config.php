@@ -121,14 +121,14 @@ return array(
                     'user' => array(
                         'headerText' => __('Name'),
                         'dataKey' => 'fullname',
-                        'sortDirection' => 'ascending'
+                        'sortDirection' => 'ascending',
                     ),
                     'email' => array(
                         'headerText' => __('Email'),
-                        'dataKey' => 'email'
+                        'dataKey' => 'email',
                     ),
                     'actions' => array(
-                        'actions' => ['edit', 'delete']
+                        'actions' => array('edit', 'delete'),
                     ),
                 ),
             ),
