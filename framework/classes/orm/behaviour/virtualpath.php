@@ -63,7 +63,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
 
         if (!$object::behaviours('Nos\Orm_Behaviour_Tree', false) && !empty($this->_parent_relation))
         {
-            if (!empty($diff[0][$this->_parent_relation->key_from[0]]))
+            if (array_key_exists($this->_parent_relation->key_from[0], $diff[0]))
             {
                 $class = $this->_parent_relation->model_to;
                 $parent = null;

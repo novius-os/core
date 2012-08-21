@@ -49,7 +49,7 @@ if ($is_media)
 
     $media = false;
     $res = \DB::select()->from(\Nos\Model_Media::table())->where(array(
-                array(DB::expr('CONCAT(media_path, media_file)'), '=', '/'.$media_url),
+                array('media_path', '=', '/'.$media_url),
             ))->execute()->as_array();
 
     if (!empty($res))
