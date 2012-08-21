@@ -24,9 +24,9 @@
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL])) {
         $fields[] = \Nos\DataCatcher::TYPE_URL;
-        $options = $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.possibles');
         $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('Url:'), array(
             'type' => 'select',
+            'options' => $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.options'),
             'value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_URL, ''),
         ));
     }

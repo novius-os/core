@@ -76,7 +76,7 @@ class Orm_Behaviour_Url extends Orm_Behaviour
             if (!empty($nugget_url)) {
                 list($page_id, $itemPath) = explode('::', $nugget_url);
                 \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-                $url_enhanced = \Config::get('url_enhanced', array());
+                $url_enhanced = \Config::get('data::url_enhanced', array());
                 $url_enhanced = array_flip($url_enhanced);
                 $urlPath = \Arr::get($url_enhanced, $page_id, false);
                 if ($urlPath !== false) {
