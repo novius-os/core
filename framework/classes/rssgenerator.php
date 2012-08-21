@@ -1,5 +1,7 @@
-<?
+<?php
+
 namespace Nos;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASS NAME      : RSS_GENERATOR                                                                        //
 // LANGUAGE        : PHP                                                                                  //
@@ -117,7 +119,10 @@ class RssGenerator {
                 $rss_item['title'] = $content[\Nos\DataCatcher::TYPE_TITLE];
             }
             if (isset($content[\Nos\DataCatcher::TYPE_URL])) {
-                $rss_item['link'] = \Uri::base(false).$content[\Nos\DataCatcher::TYPE_URL];
+                // Nugget contains <page_id::item_slug>
+                list($page_id, $itemPath) = explode('::', $content[\Nos\DataCatcher::TYPE_URL]);
+                $urlPath = \Nos\Tools_Enhancer::url_page($page_id);
+                $rss_item['link'] = \Uri::base(false).$urlPath.$itemPath;
             }
             if (isset($content[\Nos\DataCatcher::TYPE_IMAGE])) {
                 $rss_item['img'] = \Uri::base(false).$content[\Nos\DataCatcher::TYPE_IMAGE];

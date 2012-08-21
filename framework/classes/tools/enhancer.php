@@ -81,4 +81,11 @@ class Tools_Enhancer
         return $urls;
     }
 
+    public static function url_page($page_id) {
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
+        $url_enhanced = \Config::get('data::url_enhanced', array());
+        $url_enhanced = array_flip($url_enhanced);
+        return \Arr::get($url_enhanced, $page_id, false);
+    }
+
 }
