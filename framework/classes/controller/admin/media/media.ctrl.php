@@ -85,6 +85,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
 
         parent::before_save($media, $data);
 
+        $media->observe('before_save');
         $dest = APPPATH.$media->get_private_path();
 
         if ($media->is_new()){

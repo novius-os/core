@@ -142,7 +142,7 @@ class Model_Media extends \Nos\Orm\Model {
         if (!$this->is_image()) {
             return false;
         }
-        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->media_path, '/').str_replace('.'.$this->media_ext, '', $this->media_file).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
+        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 
 	public function _event_before_save() {

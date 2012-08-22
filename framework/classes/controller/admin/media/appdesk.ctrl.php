@@ -19,7 +19,7 @@ class Controller_Admin_Media_Appdesk extends Controller_Admin_Appdesk {
         $media = Model_Media::find($id);
 
         if (!empty($media)) {
-            $dataset = \Arr::get($this->appdesk, 'dataset');
+            $dataset = \Arr::get($this->config, 'dataset');
             $media->import_dataset_behaviours($dataset);
             unset($dataset['actions']);
             $item = array();

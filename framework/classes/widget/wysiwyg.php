@@ -39,6 +39,7 @@ class Widget_Wysiwyg extends \Fieldset_Field {
         parent::build();
 	    $this->fieldset()->append($this->js_init());
 
+        $this->value = Tools_Wysiwyg::prepare_widget($this->value);
 		$this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
         return (string) parent::build();
     }
