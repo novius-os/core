@@ -238,12 +238,12 @@ define('jquery-nos',
                                     width: 500,
                                     height: 'auto',
                                     'class': 'nos-confirmation-dialog'
-                                }, placeholderReplace(obj.dialog, data));
+                                }, placeholderReplace($.extend(true, {}, obj.dialog), data));
                                 $(this).nosDialog(params);
                                 break;
 
                             case 'nosAjax' :
-                                params = $.extend({}, placeholderReplace(obj.params, data));
+                                params = placeholderReplace($.extend(true, {}, obj.params), data);
                                 $(this).nosAjax(params);
                                 break;
 
