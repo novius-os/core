@@ -21,7 +21,6 @@ if (!MBSTRING) {
     require_once NOSPATH.'mb_string.php';
 }
 
-
 \Autoloader::add_classes(array(
     // Add classes you want to override here
     // Example: 'View' => APPPATH.'classes/view.php',
@@ -68,10 +67,15 @@ Autoloader::register();
  * Fuel::STAGE
  * Fuel::PRODUCTION
  */
-if (\Input::server('SERVER_NAME') == 'os1.novius.fr') {
-    $_SERVER['FUEL_ENV'] = Fuel::STAGE;
-}
 Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOPMENT);
+
+/**
+ * Set error reporting and display errors settings.
+ */
+if (Fuel::$env != FUEL::PRODUCTION) {
+    error_reporting(-1);
+    ini_set('display_errors', 1);
+}
 
 //* Register application autoloader
 spl_autoload_register(function($class) {
@@ -121,7 +125,7 @@ if ($routes_novius === false) {
     $routes_novius = include(NOSPATH.'config/routes.php');
 }
 
-$config_app    = include(APPPATH.'config/config.php');
+$config_app = include(APPPATH.'config/config.php');
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
 

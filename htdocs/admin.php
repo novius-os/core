@@ -8,14 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-
-/**
- * Set error reporting and display errors settings.  You will want to change these when in production.
- */
-error_reporting(-1);
-ini_set('display_errors', 1);
-
-define('DOCROOT', rtrim($_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
+define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
 define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
@@ -35,7 +28,6 @@ if (mb_substr($uri, 0, 6) != '/admin')
 	$uri = '/admin'.$uri;
 }
 
-// Generate the request, execute it and send the output.
 // Generate the request, execute it and send the output.
 try
 {

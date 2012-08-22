@@ -8,12 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-
-/**
- * Set error reporting and display errors settings.  You will want to change these when in production.
- */
-
-define('DOCROOT', rtrim($_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
+define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
 
 define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
 define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
@@ -33,7 +28,6 @@ $is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
 
 if ($is_media)
 {
-
     $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $redirect_url, $m);
 
     if ($is_resized)
