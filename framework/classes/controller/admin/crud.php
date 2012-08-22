@@ -100,7 +100,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'translatable' => $model::behaviours('Nos\Orm_Behaviour_Translatable', false),
             'sharable' => $model::behaviours('Nos\Orm_Behaviour_Sharable', false),
             'tree' => $model::behaviours('Nos\Orm_Behaviour_Tree', false),
-            'url' => $model::behaviours('Nos\Orm_Behaviour_Url', false),
+            'url' => $model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false),
         );
         $this->pk = \Arr::get($model::primary_key(), 0);
     }

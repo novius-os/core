@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Orm_Behaviour_Url extends Orm_Behaviour
+class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 {
 	/**
 	 * publication_bool_property
@@ -22,7 +22,7 @@ class Orm_Behaviour_Url extends Orm_Behaviour
     /**
      * Returns all available URL for this item. The array contains:
      *
-     *   page_id::item_url_enhancer_part => full_url (relative to base)
+     *   page_id::item_slug => full_url (relative to base)
      *
      * This way, we get all the informations we want:
      *  - The page ID
