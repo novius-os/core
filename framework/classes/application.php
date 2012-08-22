@@ -399,7 +399,7 @@ class Application
                 {
                     unlink($public);
                 }
-                if (!symlink($private, $public))
+                if (!symlink(Tools_File::relativePath($public, $private), $public))
                 {
                     throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
                 }
@@ -424,9 +424,9 @@ class Application
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private))
         {
-            return is_link($public) && readlink($public) == $private;
+            return is_link($public) && readlink($public) == Tools_File::relativePath($public, $private);
         }
-        return!is_link($public);
+        return !is_link($public);
     }
 
     protected static function _refresh_dependencies(array $params = array())
