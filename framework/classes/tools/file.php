@@ -78,6 +78,40 @@ class Tools_File
     }
 
     /**
+     * Strip out "../" in a path
+     * simplifyPath('number1/number2/../') == 'number1/'
+     *
+     * @param   string  $path
+     * @return  string  The simplified path
+     */
+    public static function simplifyPath($path) {
+
+        $parts = explode(DS, $path);
+        $path = array();
+        foreach ($parts as $part) {
+            if ('.'  == $part) continue;
+            if ('..' == $part) {
+                array_pop($path);
+            } else {
+                $path[] = $part;
+            }
+        }
+        return implode(DS, $path);
+    }
+
+    /**
+     * Workaround for native realpath(), which has difficulties with '../' in
+     * the middle of a path, such as "my/folder/../example"
+     *
+     * @param   string  $path
+     * @return  string  @see realpath()
+     */
+    public static function realpath($path) {
+        return realpath(static::simplifyPath($path));
+    }
+
+
+    /**
      *
      * @param  string  $file  Absolute path to local file
      * @param  string  $mime  Mime type. Default = null (automatic)
