@@ -141,7 +141,7 @@ class Tools_File
 
             // Check whether the file is in the data directory
             $data_path = APPPATH.'data';
-            $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) != $data_path;
+            $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) == $data_path;
 
             // X-Sendfile is better when available
             if (static::$use_xsendfile and $xsendfile_allowed)
@@ -172,7 +172,11 @@ class Tools_File
         // New way (default PHP 5.3)
         if (function_exists('finfo_file'))
         {
-            return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
+            $autocorrect = array(
+                'image/x-ico' => 'image/x-icon',
+            );
+            $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
+            return \Arr::get($autocorrect, $mime, $mime);
         }
         // Old way
         return static::_content_type_fallback($file);
@@ -202,6 +206,7 @@ class Tools_File
             'htm' => 'text/html',
             'html' => 'text/html',
             'txt' => 'text/plain',
+            'ico' => 'image/x-icon',
         );
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         return $content_types[$extension] ? : 'application/force-download';

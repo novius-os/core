@@ -1,3 +1,4 @@
+
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
@@ -23,6 +24,15 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 require_once NOSPATH.'bootstrap.php';
 
 $redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), 1);
+
+if (in_array($redirect_url, array(
+    'favicon.ico',
+    'robots.txt',
+    'humans.txt',
+))) {
+     is_file(DOCROOT.$redirect_url) && Nos\Tools_File::send(DOCROOT.$redirect_url);
+     exit();
+}
 
 $is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
 
@@ -105,7 +115,7 @@ if ($is_media)
 }
 
 // real 404
-if (!$is_media)
+if (!$is_media && pathinfo($redirect_url, PATHINFO_EXTENSION) == 'html')
 {
     $response = Request::forge('nos/front/index', false)->execute()->response();
     $response->send(true);
