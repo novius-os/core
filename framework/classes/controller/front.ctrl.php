@@ -42,7 +42,7 @@ class Controller_Front extends Controller {
 
     protected $_page;
 
-    public function router($action, array $params) {
+    public function router($action, array $params, $status = 200) {
 
 	    $this->_base_href = \URI::base();
 
@@ -112,7 +112,7 @@ class Controller_Front extends Controller {
                     // If no redirection then we display 404
                     if (!empty($url)) {
                         $_SERVER['REDIRECT_URL'] = '/';
-                        return $this->router('index', $params);
+                        return $this->router('index', $params, 404);
                     } else {
                         echo \View::forge('nos::errors/blank_slate_front');
                         exit();
@@ -127,7 +127,7 @@ class Controller_Front extends Controller {
 			is_callable($c) && call_user_func_array($c, array(&$content));
 		}
 
-		return $content;
+		return \Response::forge($content, $status);
     }
 
     /**
