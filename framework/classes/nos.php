@@ -150,13 +150,17 @@ class Nos {
 
         static::parse_medias($content, function($media, $width, $height, $tag) use (&$content)
         {
-            if (!empty($height))
-            {
-                $media_url = $media->get_public_path_resized($width, $height);
-            }
-            else
-            {
-                $media_url = $media->get_public_path();
+            if (empty($media)) {
+                $media_url = '';
+            } else {
+                if (!empty($height))
+                {
+                    $media_url = $media->get_public_path_resized($width, $height);
+                }
+                else
+                {
+                    $media_url = $media->get_public_path();
+                }
             }
 
             $content = str_replace($tag, $media_url, $content);
@@ -176,7 +180,7 @@ class Nos {
             $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
             foreach ($matches[1] as $match_id => $media_id)
             {
-                $closure($medias[$media_id], \Arr::get($matches[2], $match_id, null), \Arr::get($matches[3], $match_id, null), $matches[0][$match_id]);
+                $closure(\Arr::get($medias, $media_id, null), \Arr::get($matches[2], $match_id, null), \Arr::get($matches[3], $match_id, null), $matches[0][$match_id]);
             }
         }
     }
