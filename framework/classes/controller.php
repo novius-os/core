@@ -230,10 +230,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         if ($config['offset']) {
             $new_query->offset($config['offset']);
         }
-        $objects = $new_query->execute($query->connection())->as_array('group_by_pk');
+        $items = $new_query->execute($query->connection())->as_array('group_by_pk');
 
-        if (!empty($objects)) {
-            $query = $model::find()->where(array($select, 'in', array_keys($objects)));
+        if (!empty($items)) {
+            $query = $model::find()->where(array($select, 'in', array_keys($items)));
             foreach ($config['related'] as $related) {
                 $query->related($related);
             }
@@ -257,13 +257,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 }
             }
 
-            $objects = $query->get();
-            foreach ($objects as $object) {
+            $items = $query->get();
+            foreach ($items as $item) {
                 $item = array();
                 $dataset = $config['dataset'];
                 $actions = \Arr::get($dataset, 'actions', array());
                 unset($dataset['actions']);
-                $object->import_dataset_behaviours($dataset);
+                $item->import_dataset_behaviours($dataset);
                 foreach ($dataset as $key => $data) {
                     // Array with a 'value' key
                     if (is_array($data) and !empty($data['value'])) {
@@ -271,20 +271,20 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     }
 
                     if (is_callable($data)) {
-                        $item[$key] = call_user_func($data, $object);
+                        $item[$key] = call_user_func($data, $item);
                     } else {
-                        $item[$key] = $object->get($data);
+                        $item[$key] = $item->get($data);
                     }
                 }
                 $item['actions'] = array();
                 foreach ($actions as $action => $callback) {
-                    $item['actions'][$action] = $callback($object);
+                    $item['actions'][$action] = $callback($item);
                 }
-                $item['_id'] = $object->{$pk};
+                $item['_id'] = $item->{$pk};
                 $item['_model'] = $model;
                 $items[] = $item;
                 if ($translatable) {
-                    $common_id = $object->{$translatable['common_id_property']};
+                    $common_id = $item->{$translatable['common_id_property']};
                     $keys[] = $common_id;
                     $common_ids[$translatable['common_id_property']][] = $common_id;
                 }
@@ -298,7 +298,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     $items[$key]['lang'] = $langs[$common_id];
                 }
                 if ($tree) {
-                    $root = reset($objects)->find_root();
+                    $root = reset($items)->find_root();
                     if (!empty($root)) {
                         $all_langs = $root->get_all_lang();
                     } else {
@@ -625,12 +625,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     return $query;
                 }),
                 'dataset' => array_merge($tree_model['dataset'], array(
-                    'treeChilds' => function($object) use ($controller, $tree_config, $params, $child, $pk) {
-                        $open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$object->{$pk}, null);
+                    'treeChilds' => function($item) use ($controller, $tree_config, $params, $child, $pk) {
+                        $open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$item->{$pk}, null);
                         if ($open === true || ($params['deep'] > 1 && $open !== false)) {
                             $items = $controller->tree_items($tree_config, array(
                                 'model' => $child['model'],
-                                'id' => $object->{$pk},
+                                'id' => $item->{$pk},
                                 'deep' => $params['deep'] - 1,
                                 'lang' => $params['lang'],
                             ));
@@ -639,7 +639,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                             return $controller->tree_items($tree_config, array(
                                 'countProcess' => true,
                                 'model' => $child['model'],
-                                'id' => $object->{$pk},
+                                'id' => $item->{$pk},
                                 'lang' => $params['lang'],
                             ));
                         }

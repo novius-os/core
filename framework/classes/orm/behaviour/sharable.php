@@ -24,15 +24,15 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         ), $this->_properties);
     }
 
-    public function get_default_nuggets($object) {
-        $default_nuggets = $object->get_catcher_nuggets(Model_Content_Nuggets::DEFAULT_CATCHER);
+    public function get_default_nuggets($item) {
+        $default_nuggets = $item->get_catcher_nuggets(Model_Content_Nuggets::DEFAULT_CATCHER);
         $nuggets = $default_nuggets->content_data;
         foreach ($this->_properties['data'] as $type => $params) {
             if (!isset($nuggets[$type])) {
                 if (is_string($params['value'])) {
-                    $nuggets[$type] = $object->{$params['value']};
+                    $nuggets[$type] = $item->{$params['value']};
                 } else if (is_callable($params['value'])) {
-                    $nuggets[$type] = $params['value']($object);
+                    $nuggets[$type] = $params['value']($item);
                 }
             }
         }
@@ -40,26 +40,26 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $nuggets;
     }
 
-    public function get_catcher_nuggets($object, $catcher = Model_Content_Nuggets::DEFAULT_CATCHER) {
+    public function get_catcher_nuggets($item, $catcher = Model_Content_Nuggets::DEFAULT_CATCHER) {
         $default_nuggets = Model_Content_Nuggets::find('first', array(
             'where' => array(
                 'content_catcher' => $catcher,
-                'content_model_name' => get_class($object),
-                'content_model_id' => $object->get(\Arr::get($object->primary_key(), 0)),
+                'content_model_name' => get_class($item),
+                'content_model_id' => $item->get(\Arr::get($item->primary_key(), 0)),
             ),
         ));
         if (empty($default_nuggets)) {
             $default_nuggets = Model_Content_Nuggets::forge();
             $default_nuggets->content_catcher = $catcher;
-            $default_nuggets->content_model_id = $object->get(\Arr::get($object->primary_key(), 0));
-            $default_nuggets->content_model_name = get_class($object);
+            $default_nuggets->content_model_id = $item->get(\Arr::get($item->primary_key(), 0));
+            $default_nuggets->content_model_name = get_class($item);
             $default_nuggets->content_data = array();
         }
 
         return $default_nuggets;
     }
 
-    public function get_sharable_property($object, $property = null, $default = null) {
+    public function get_sharable_property($item, $property = null, $default = null) {
         if (empty($property)) {
             return $this->_properties['data'];
         } else {
@@ -67,11 +67,11 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             if ($value === null) {
                 return $default;
             }
-            return is_callable($value) ? $value($object) : $value;
+            return is_callable($value) ? $value($item) : $value;
         }
     }
 
-    public function data_catchers($object) {
+    public function data_catchers($item) {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'data_catchers.php', 'data_catchers');
         $data_catchers = \Config::get("data_catchers", array());
         $catchers = array();
@@ -109,7 +109,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         }
 
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
-        foreach ($object->wysiwygs as $wysiwyg) {
+        foreach ($item->wysiwygs as $wysiwyg) {
             \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
                 $params = \Config::get('enhancers.'.$enhancer, false);
                 if ($params !== false) {
@@ -125,14 +125,14 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $catchers;
     }
 
-    public function possible_medias($object)
+    public function possible_medias($item)
     {
         $medias = array();
-        foreach ($object->medias as $media)
+        foreach ($item->medias as $media)
         {
             $medias[$media->media_id] = $media;
         }
-        foreach ($object->wysiwygs as $wysiwyg)
+        foreach ($item->wysiwygs as $wysiwyg)
         {
             \Nos\Nos::parse_medias($wysiwyg, function($media) use (&$medias) {
                 $medias[$media->media_id] = $media;

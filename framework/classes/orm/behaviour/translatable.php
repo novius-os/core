@@ -66,8 +66,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
             $update->execute();
 
             // Database were updated using DB directly, because save() triggers all the observers, and we don't need that
-            // $object->update() would be better here, because save() triggers all the observers, and we don't need that
-            // $object->save();
+            // $item->update() would be better here, because save() triggers all the observers, and we don't need that
+            // $item->save();
         }
     }
 

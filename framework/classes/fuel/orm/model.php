@@ -532,7 +532,7 @@ class Model extends \Orm\Model {
     /**
 	 * Returns the first non empty field. Will add field prefix when needed.
 	 *
-	 * @example $object->pick('menu_title', 'title');
+	 * @example $item->pick('menu_title', 'title');
 	 * @return mixed
 	 */
 	public function pick() {

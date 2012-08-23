@@ -476,18 +476,18 @@ class Fieldset extends \Fuel\Core\Fieldset {
         $this->populate($populate);
     }
 
-    public static function defaultComplete($data, $object, $fields, $options) {
+    public static function defaultComplete($data, $item, $fields, $options) {
         if (isset($options['fieldset'])) {
             $fieldset = $options['fieldset'];
         } else {
             $fieldset = false;
         }
-		if (!is_object($object)) {
+		if (!is_object($item)) {
 			return;
 		}
 
 		if (empty($options['error'])) {
-			$options['error'] = function(\Exception $e, $object, $data) {
+			$options['error'] = function(\Exception $e, $item, $data) {
 				return array(
 					'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : 'An error occured.',
 				);
@@ -496,7 +496,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
         $json_response = array();
 
-        $pk = $object->primary_key();
+        $pk = $item->primary_key();
 
 	    // Will trigger cascade_save for media and wysiwyg
 	    try {
@@ -518,18 +518,18 @@ class Fieldset extends \Fuel\Core\Fieldset {
                     continue;
                 }
 
-                if (!empty($config['widget']) && !$options['fieldset']->fields[$name]->before_save($object, $data)) {
+                if (!empty($config['widget']) && !$options['fieldset']->fields[$name]->before_save($item, $data)) {
                     continue;
                 }
 
                 if (!empty($config['before_save']) && is_callable($config['before_save'])) {
-					call_user_func($config['before_save'], $object, $data);
+					call_user_func($config['before_save'], $item, $data);
 				} else {
 					if ($type == 'checkbox' && empty($data[$name])) {
-						$object->$name = \Arr::get($config, 'form.empty', null);
+						$item->$name = \Arr::get($config, 'form.empty', null);
 
 					} else if (isset($data[$name]) && !in_array($name, $pk)) {
-						$object->$name = $data[$name];
+						$item->$name = $data[$name];
 					}
 				}
 			}
@@ -537,30 +537,30 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
 
             // Let behaviours do their job (publication for example)
-            $object->form_processing_behaviours($data, $json_response);
+            $item->form_processing_behaviours($data, $json_response);
 
 
             if (!empty($options['before_save']) && is_callable($options['before_save']))
             {
-                call_user_func($options['before_save'], $object, $data);
+                call_user_func($options['before_save'], $item, $data);
             }
 
 			if (!empty($options['success']) && is_callable($options['success']))
 			{
-                if ($object->is_new()) {
+                if ($item->is_new()) {
                     // The callback is called after save() to access the ID
-                    $object->save();
-                    $json_user = call_user_func($options['success'], $object, $data);
+                    $item->save();
+                    $json_user = call_user_func($options['success'], $item, $data);
                 } else {
                     // The callback is called before save() to allow a check for is_changed() properties
-                    $json_user = call_user_func($options['success'], $object, $data);
-                    $object->save();
+                    $json_user = call_user_func($options['success'], $item, $data);
+                    $item->save();
                 }
                 $json_response = \Arr::merge($json_response, $json_user);
 			}
             else
             {
-                $object->save();
+                $item->save();
 				$json_response['notify'] = __('Operation completed successfully.');
 			}
 
@@ -577,14 +577,14 @@ class Fieldset extends \Fuel\Core\Fieldset {
 				}
 
 				if (!empty($config['success']) && is_callable($config['success'])) {
-					$json_field = call_user_func($config['success'], $object, $data);
+					$json_field = call_user_func($config['success'], $item, $data);
 					$json_response = \Arr::merge($json_response, $json_field);
 				}
 			}
 
 		} catch (Exception $e) {
 			if (empty($options['error']) && is_callable($options['error'])) {
-				$json_response = call_user_func($options['error'], $e, $object, $data);
+				$json_response = call_user_func($options['error'], $e, $item, $data);
 			} else {
 				$json_response['error'] = $e->getMessage();
 			}

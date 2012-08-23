@@ -49,9 +49,9 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $urls;
     }
 
-    public function url_canonical($object, $params = array()) {
+    public function url_canonical($item, $params = array()) {
         $params['canonical'] = true;
-        return $this->url($object, $params);
+        return $this->url($item, $params);
     }
 
     // @todo Figure out the appripriate method name : url() / url_item() / other()?

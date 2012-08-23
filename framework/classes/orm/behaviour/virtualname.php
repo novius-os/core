@@ -27,17 +27,17 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         }
     }
 
-    public function before_save(\Nos\Orm\Model $object) {
-        $diff = $object->get_diff();
+    public function before_save(\Nos\Orm\Model $item) {
+        $diff = $item->get_diff();
 
         if (!empty($diff[0][$this->_properties['virtual_name_property']]))
         {
-            $object->{$this->_properties['virtual_name_property']} = static::friendly_slug($object->{$this->_properties['virtual_name_property']});
-            if (empty($object->{$this->_properties['virtual_name_property']}))
+            $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$this->_properties['virtual_name_property']});
+            if (empty($item->{$this->_properties['virtual_name_property']}))
             {
-                $object->{$this->_properties['virtual_name_property']} = static::friendly_slug($object->{$object->title_property()});
+                $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$item->title_property()});
             }
-            if (empty($object->{$this->_properties['virtual_name_property']}))
+            if (empty($item->{$this->_properties['virtual_name_property']}))
             {
                 throw new \Exception(__('URL (SEO) was empty.'));
             }
@@ -45,19 +45,19 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
             if ($this->_properties['unique'])
             {
                 $where = array(
-                    array($this->_properties['virtual_name_property'], $object->{$this->_properties['virtual_name_property']})
+                    array($this->_properties['virtual_name_property'], $item->{$this->_properties['virtual_name_property']})
                 );
                 if (is_array($this->_properties['unique']) && !empty($this->_properties['unique']['lang_property']))
                 {
-                    $where[] = array($this->_properties['unique']['lang_property'], '=', $object->{$this->_properties['unique']['lang_property']});
+                    $where[] = array($this->_properties['unique']['lang_property'], '=', $item->{$this->_properties['unique']['lang_property']});
                 }
-                if (!$object->is_new())
+                if (!$item->is_new())
                 {
-                    $pk = \Arr::get($object::primary_key(), 0);
-                    $where[] = array($pk, '!=', $object->{$pk});
+                    $pk = \Arr::get($item::primary_key(), 0);
+                    $where[] = array($pk, '!=', $item->{$pk});
                 }
 
-                $duplicate = $object::find('all', (array('where' => $where)));
+                $duplicate = $item::find('all', (array('where' => $where)));
                 if (!empty($duplicate))
                 {
                     throw new \Exception(__('A item with the same virtual name already exists.'));
@@ -66,8 +66,8 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         }
     }
 
-    public function virtual_name(\Nos\Orm\Model $object) {
-        return $object->{$this->_properties['virtual_name_property']};
+    public function virtual_name(\Nos\Orm\Model $item) {
+        return $item->{$this->_properties['virtual_name_property']};
     }
 
     public static function friendly_slug($slug) {
