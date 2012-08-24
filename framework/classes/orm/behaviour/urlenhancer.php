@@ -85,6 +85,6 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         }
 
         $urls = $this->urls($item, $params);
-        return \Arr::get($urls, 0, null);
+        return reset($urls);
     }
 }
