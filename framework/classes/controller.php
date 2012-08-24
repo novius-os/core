@@ -230,10 +230,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         if ($config['offset']) {
             $new_query->offset($config['offset']);
         }
-        $items = $new_query->execute($query->connection())->as_array('group_by_pk');
+        $objects = $new_query->execute($query->connection())->as_array('group_by_pk');
 
-        if (!empty($items)) {
-            $query = $model::find()->where(array($select, 'in', array_keys($items)));
+        if (!empty($objects)) {
+            $query = $model::find()->where(array($select, 'in', array_keys($objects)));
             foreach ($config['related'] as $related) {
                 $query->related($related);
             }
@@ -257,13 +257,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 }
             }
 
-            $items = $query->get();
-            foreach ($items as $item) {
+            $objects = $query->get();
+            foreach ($objects as $object) {
                 $item = array();
                 $dataset = $config['dataset'];
                 $actions = \Arr::get($dataset, 'actions', array());
                 unset($dataset['actions']);
-                $item->import_dataset_behaviours($dataset);
+                $object->import_dataset_behaviours($dataset);
                 foreach ($dataset as $key => $data) {
                     // Array with a 'value' key
                     if (is_array($data) and !empty($data['value'])) {
@@ -271,20 +271,20 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     }
 
                     if (is_callable($data)) {
-                        $item[$key] = call_user_func($data, $item);
+                        $item[$key] = call_user_func($data, $object);
                     } else {
-                        $item[$key] = $item->get($data);
+                        $item[$key] = $object->get($data);
                     }
                 }
                 $item['actions'] = array();
                 foreach ($actions as $action => $callback) {
-                    $item['actions'][$action] = $callback($item);
+                    $item['actions'][$action] = $callback($object);
                 }
-                $item['_id'] = $item->{$pk};
+                $item['_id'] = $object->{$pk};
                 $item['_model'] = $model;
                 $items[] = $item;
                 if ($translatable) {
-                    $common_id = $item->{$translatable['common_id_property']};
+                    $common_id = $object->{$translatable['common_id_property']};
                     $keys[] = $common_id;
                     $common_ids[$translatable['common_id_property']][] = $common_id;
                 }
@@ -298,7 +298,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     $items[$key]['lang'] = $langs[$common_id];
                 }
                 if ($tree) {
-                    $root = reset($items)->find_root();
+                    $root = reset($objects)->find_root();
                     if (!empty($root)) {
                         $all_langs = $root->get_all_lang();
                     } else {
