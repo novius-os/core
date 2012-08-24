@@ -14,28 +14,45 @@ class Tools_Wysiwyg {
 
     public static function prepare_widget($content) {
 
-        preg_match_all('`src="nos://media/(\d+)(?:/(\d+)/(\d+))?"`u', $content, $matches);
-        $ids      = array();
         $replaces = array();
-        foreach ($matches[1] as $id)
-        {
-            $ids[] = $id;
-        }
-        $medias = \Nos\Model_Media::find($ids);
-        foreach ($matches[1] as $k => $id)
-        {
-            $media = \Nos\Model_Media::find($id);
-            list($width, $height) = array($matches[2][$k], $matches[3][$k]);
-            if ($width && $height && ($width != $media->media_width || $height != $media->media_height))
-            {
-                $replaces[$matches[0][$k]] = 'src="'.\Uri::base(true).$media->get_public_path_resized($width, $height).'" width="'.$width.'" height="'.$height.'" data-media-id="'.$id.'"';
+        static::parse_medias($content, function($media, $params) use(&$replaces) {
+            if (empty($media)) {
+                $replaces[$params['tag']] = '';
+            } else {
+                if (!empty($params['width']) && !empty($params['height']) && ($params['width'] != $media->media_width || $params['height'] != $media->media_height))
+                {
+                    $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path_resized($params['width'], $params['height']).'" width="'.$params['width'].'" height="'.$params['height'].'" data-media-id="'.$media->id.'"';
+                }
+                else
+                {
+                    $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path().'" data-media-id="'.$media->id.'"';
+                }
             }
-            else
-            {
-                $replaces[$matches[0][$k]] = 'src="'.\Uri::base(true).$media->get_public_path().'" data-media-id="'.$id.'"';
-            }
-        }
+        });
 
         return strtr($content, $replaces);
+    }
+
+    public static function parse_medias(&$content, $closure) {
+
+        // Find all medias
+        preg_match_all('`<img(?:.+?)src="(nos://media/(\d+)(?:/(\d+)/(\d+))?)"(?:.+?)>`u', $content, $matches);
+        if (!empty($matches[0])) {
+            $media_ids = array();
+            foreach ($matches[2] as $match_id => $media_id)
+            {
+                $media_ids[] = $media_id;
+            }
+            $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+            foreach ($matches[2] as $match_id => $media_id)
+            {
+                $closure(\Arr::get($medias, $media_id, null), array(
+                    'tag' => $matches[0][$match_id],
+                    'src' => $matches[1][$match_id],
+                    'width' => \Arr::get($matches[3], $match_id, null),
+                    'height' => \Arr::get($matches[4], $match_id, null),
+                ));
+            }
+        }
     }
 }

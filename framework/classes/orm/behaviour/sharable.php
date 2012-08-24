@@ -134,8 +134,10 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         }
         foreach ($item->wysiwygs as $wysiwyg)
         {
-            \Nos\Nos::parse_medias($wysiwyg, function($media) use (&$medias) {
-                $medias[$media->media_id] = $media;
+            \Nos\Tools_Wysiwyg::parse_medias($wysiwyg, function($media) use (&$medias) {
+                if (!empty($media)) {
+                    $medias[$media->media_id] = $media;
+                }
             });
         }
 

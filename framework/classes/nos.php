@@ -148,41 +148,22 @@ class Nos {
 
     protected static function _parse_medias(&$content) {
 
-        static::parse_medias($content, function($media, $width, $height, $tag) use (&$content)
+        Tools_Wysiwyg::parse_medias($content, function($media, $params) use (&$content)
         {
             if (empty($media)) {
-                $media_url = '';
+                $content = str_replace($params['tag'], '', $content);
             } else {
-                if (!empty($height))
+                if (!empty($params['height']))
                 {
-                    $media_url = $media->get_public_path_resized($width, $height);
+                    $media_url = $media->get_public_path_resized($params['width'], $params['height']);
                 }
                 else
                 {
                     $media_url = $media->get_public_path();
                 }
+                $content = str_replace($params['src'], $media_url, $content);
             }
-
-            $content = str_replace($tag, $media_url, $content);
         });
-    }
-
-    public static function parse_medias(&$content, $closure) {
-
-        // Replace media URL
-        preg_match_all('`nos://media/(\d+)(?:/(\d+)/(\d+))?`u', $content, $matches);
-        if (!empty($matches[0])) {
-            $media_ids = array();
-            foreach ($matches[1] as $match_id => $media_id)
-            {
-                $media_ids[] = $media_id;
-            }
-            $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
-            foreach ($matches[1] as $match_id => $media_id)
-            {
-                $closure(\Arr::get($medias, $media_id, null), \Arr::get($matches[2], $match_id, null), \Arr::get($matches[3], $match_id, null), $matches[0][$match_id]);
-            }
-        }
     }
 
     protected static function _parse_internals(&$content) {
