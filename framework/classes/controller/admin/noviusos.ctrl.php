@@ -182,15 +182,13 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             $apps = \Arr::sort($apps, 'order', 'asc');
         }
 
-        //\Debug::dump($apps);
-
         $user = \Session::user();
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
         $background = $background_id ? Model_Media::find($background_id) : false;
 
         $view = \View::forge('admin/appstab', array(
-                    'apps' => $apps,
-                ));
+            'apps' => $apps,
+        ));
         $view->set('background', $background, false);
         return $view;
     }
@@ -198,12 +196,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
     public function action_save_user_configuration()
     {
         $key = \Input::post('key');
-        $new_config = \Input::post('configuration');
-
-        if (!$new_config)
-        {
-            $new_config = array();
-        }
+        $new_config = \Input::post('configuration', array());
         $new_config = $this->convertFromPost($new_config);
 
 
