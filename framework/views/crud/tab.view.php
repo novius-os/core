@@ -32,7 +32,7 @@ if (!$item->is_new()) {
                     $container.nosListenEvent({
                             name: <?= \Format::forge()->to_json($model) ?>,
                             action: 'delete',
-                            id: '<?= $item->{$pk} ?>'
+                            id: <?= (int) $item->{$pk} ?>
                         }, function() {
                             var $close = $('#<?= $uniqid_close ?>');
                             $close.show().nosFormUI();

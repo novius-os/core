@@ -290,10 +290,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $dispatchEvent = array(
             'name' => $this->config['model'],
             'action' => $this->is_new ? 'insert' : 'update',
-            'id' => $item->{$this->pk},
+            'id' => (int) $item->{$this->pk},
         );
         if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = $item->{$this->behaviours['translatable']['common_id_property']};
+            $dispatchEvent['lang_common_id'] = (int) $item->{$this->behaviours['translatable']['common_id_property']};
             $dispatchEvent['lang'] = $item->{$this->behaviours['translatable']['lang_property']};
         }
 
@@ -522,7 +522,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $dispatchEvent = array(
             'name' => $this->config['model'],
             'action' => 'delete',
-            'id' => $id,
+            'id' => (int) $id,
         );
 
         $this->delete();
@@ -540,14 +540,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($lang === 'all') {
                 foreach ($this->item->find_lang('all') as $item_lang)
                 {
-                    $dispatchEvent['id'][] = $item_lang->{$this->pk};
+                    $dispatchEvent['id'][] = (int) $item_lang->{$this->pk};
                     $dispatchEvent['lang'][] = $item_lang->{$this->behaviours['translatable']['lang_property']};
 
                     if ($this->behaviours['tree'])
                     {
                         foreach ($item_lang->get_ids_children(false) as $item_id)
                         {
-                            $dispatchEvent['id'][] = $item_id;
+                            $dispatchEvent['id'][] = (int) $item_id;
                         }
                     }
                 }
@@ -569,7 +569,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 {
                     foreach ($this->item->get_ids_children(false) as $item_id)
                     {
-                        $dispatchEvent['id'][] = $item_id;
+                        $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
 
@@ -583,7 +583,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $dispatchEvent['id'] = array($this->item->{$this->pk});
                 foreach ($this->item->get_ids_children(false) as $item_id)
                 {
-                    $dispatchEvent['id'][] = $item_id;
+                    $dispatchEvent['id'][] = (int) $item_id;
                 }
             }
 
