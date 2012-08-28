@@ -332,6 +332,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->item = $this->crud_item($id);
 
+        if (empty($this->item)) {
+            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+        }
+
         if ($this->item->is_new())
         {
             return $this->action_form($id);
