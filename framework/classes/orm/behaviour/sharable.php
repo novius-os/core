@@ -108,10 +108,10 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             $set_data_catcher($data_catcher, $id);
         }
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
         foreach ($item->wysiwygs as $wysiwyg) {
             \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
-                $params = \Config::get('enhancers.'.$enhancer, false);
+                $params = \Config::get('data::enhancers.'.$enhancer, false);
                 if ($params !== false) {
                     if (isset($params['data_catchers_added']) && is_array($params['data_catchers_added'])) {
                         foreach ($params['data_catchers_added'] as $id => $data_catcher) {

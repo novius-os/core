@@ -20,8 +20,8 @@ class Controller_Admin_Wysiwyg extends \Controller {
 
 		$urlEnhancers = \Input::get('urlEnhancers', false);
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'enhancers');
-        $enhancers = \Config::get('enhancers', array());
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
+        $enhancers = \Config::get('data::enhancers', array());
 
 		if (!$urlEnhancers) {
 			$enhancers = array_filter($enhancers, function($enhancer) {
