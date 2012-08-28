@@ -54,7 +54,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $this->url($item, $params);
     }
 
-    // @todo Figure out the appripriate method name : url() / url_item() / other()?
+    // @todo Figure out the appropriate method name : url() / url_item() / other()?
     public function url($item, $params = array()) {
 
         $canonical = \Arr::get($params, 'canonical', false);
@@ -85,6 +85,6 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         }
 
         $urls = $this->urls($item, $params);
-        return reset($urls);
+        return reset($urls) ?: null;
     }
 }
