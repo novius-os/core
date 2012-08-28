@@ -59,6 +59,7 @@ class Controller_Front extends Controller {
 		$nocache = \Input::method() == 'POST' || \Fuel::$env === \Fuel::DEVELOPMENT;
 
 		\Event::trigger('front.start');
+		\Event::trigger_function('front.start', array(&$url));
 
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
