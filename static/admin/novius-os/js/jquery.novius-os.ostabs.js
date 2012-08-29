@@ -1017,7 +1017,15 @@ define('jquery-nos-ostabs',
 
                             $.data( a, "cache.tabs", true );
                         },
-                        complete: function() {
+                        complete: function(xhr) {
+
+                            // If response looks like JSON, execute standard success callback
+                            try {
+                                var json = $.parseJSON(xhr.responseText)
+                                $(self).nosAjaxSuccess(json);
+
+                            } catch (e) {}
+
                             // take care of tab labels
                             self._cleanup();
 
