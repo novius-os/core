@@ -809,8 +809,9 @@ define('jquery-nos-ostabs',
                 return li;
             },
 
-            remove: function( index ) {
+            remove: function( index, notSelectAfter ) {
                 var self = this;
+                notSelectAfter = notSelectAfter || false;
                 index = self._getIndex( index );
                 var $li = self.lis.eq( index ),
                     $a = self.anchors.eq( index ),
@@ -836,17 +837,19 @@ define('jquery-nos-ostabs',
 
                 $li.removeClass( "ui-state-active ui-state-open" );
 
-                // Open the last tab in stack opening or the 0 index
-                self.lis.each(function(i) {
-                    var $litemp = $(this),
-                        tab = $litemp.data( 'ui-ostab') || {};
+                if (!notSelectAfter) {
+                    // Open the last tab in stack opening or the 0 index
+                    self.lis.each(function(i) {
+                        var $litemp = $(this),
+                            tab = $litemp.data( 'ui-ostab') || {};
 
-                    if ($litemp[0] != $li[0] && tab.openRank && tab.openRank > openRank) {
-                        openRank = tab.openRank;
-                        openIndex = i;
-                    }
-                });
-                self.select( openIndex );
+                        if ($litemp[0] != $li[0] && tab.openRank && tab.openRank > openRank) {
+                            openRank = tab.openRank;
+                            openIndex = i;
+                        }
+                    });
+                    openIndex = self.anchors.eq(openIndex).attr('href');
+                }
 
                 if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
                     $( '> *', $panel ).not( '.nos-ostabs-actions' ).remove();
@@ -859,6 +862,10 @@ define('jquery-nos-ostabs',
                 self._tabify();
 
                 self._trigger( "remove", null, self._ui( $li[ 0 ], $panel[ 0 ] ) );
+
+                if (!notSelectAfter) {
+                    self.select( openIndex );
+                }
                 return self;
             },
 
@@ -899,7 +906,7 @@ define('jquery-nos-ostabs',
 
                 if (replaceTab) {
                     delete tab.reload;
-                    this.remove(index);
+                    this.remove(index, false);
                     this.add(tab, index);
                     this.select(index);
                 } else {
