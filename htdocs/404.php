@@ -1,4 +1,3 @@
-
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
@@ -9,19 +8,8 @@
  * @link http://www.novius-os.org
  */
 
-define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
-
-define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
-define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
-define('COREPATH', realpath(DOCROOT.'../novius-os/fuel-core/').DIRECTORY_SEPARATOR);
-define('NOSPATH',  realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
-
-// Get the start time and memory for use later
-defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
-defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
-
 // Boot the app
-require_once NOSPATH.'bootstrap.php';
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
 $redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), 1);
 

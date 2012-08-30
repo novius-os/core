@@ -306,7 +306,7 @@ img.publication_status {
  *|H||O||M||E|
  *+-++-++-++-+*/
 #search {
-	display: inline-block;
+	display: none;/*display: inline-block;*/
 	margin: 20px auto 60px;
 	width: 40%;
 	position:relative;
@@ -348,7 +348,7 @@ img.publication_status {
 	border-radius: 45px;
 	overflow:hidden;
 	box-shadow: 0 0 5px 0px #888;
-	margin-bottom: 6px;
+	margin-bottom: 5px;
 	position:relative;
 }
 
@@ -373,14 +373,13 @@ img.publication_status {
 	background: rgba(255, 255, 255, 0.6);
 	color: #333;
 	font-weight: bold;
-	margin-top: 4px;
 	padding: 2px 5px;
 	border-radius: 4px;
 }
 #apps .app {
 	display: inline-block;
 	text-align: center;
-	margin: 0 45px;
+	margin: 20px 45px 20px;
 	width: 90px;
 }
 
