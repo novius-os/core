@@ -8,6 +8,27 @@
  * @link http://www.novius-os.org
  */
 
+// Get the start time and memory for use later
+defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
+defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
+
+// Setup dir constants
+if (isset($_SERVER['NOS_ROOT'])) {
+    define('DOCROOT', $_SERVER['NOS_ROOT'].'/public'.DIRECTORY_SEPARATOR);
+
+    define('APPPATH',  $_SERVER['NOS_ROOT'].'/local/');
+    define('PKGPATH',  $_SERVER['NOS_ROOT'].'/novius-os/packages/');
+    define('COREPATH', $_SERVER['NOS_ROOT'].'/novius-os/fuel-core/');
+    define('NOSPATH',  $_SERVER['NOS_ROOT'].'/novius-os/framework/');
+} else {
+
+    define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
+
+    define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
+    define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
+    define('COREPATH', realpath(DOCROOT.'../novius-os/fuel-core/').DIRECTORY_SEPARATOR);
+    define('NOSPATH',  realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
+}
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
