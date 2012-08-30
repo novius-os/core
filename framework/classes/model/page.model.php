@@ -83,7 +83,7 @@ class Model_Page extends \Nos\Orm\Model {
             'extension_property' => '.html',
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
-			'events' => array('after_sort'),
+			'events' => array('after_sort', 'before_insert'),
 			'sort_property' => 'page_sort',
 		),
 		'Nos\Orm_Behaviour_Publishable' => array(

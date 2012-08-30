@@ -473,14 +473,25 @@ define('jquery-nos-treegrid',
                             } else {
                                 var oldParent = self._getTreeNode(dragNode.treePath),
                                     newParent = self._getTreeNode(dropNode.treePath),
-                                    newParentIndex = $.inArray(newParent, self.data()),
+                                    newParentIndex,
+                                    $tr;
+
+                                if (newParent) {
+                                    newParentIndex = $.inArray(newParent, self.data());
                                     $tr = self.element.find('tr.wijmo-wijgrid-row').eq(newParentIndex);
+                                }
 
                                 self._removeNode(dragNode);
-                                delete oldParent.treeChilds[dragNode.treeHash];
-                                delete oldParent.treeChilds.length;
-                                oldParent.treeChilds = self._completeChilds(oldParent, oldParent.treeChilds);
-                                self._toggle($tr, true);
+                                if (oldParent) {
+                                    delete oldParent.treeChilds[dragNode.treeHash];
+                                    delete oldParent.treeChilds.length;
+                                    oldParent.treeChilds = self._completeChilds(oldParent, oldParent.treeChilds);
+                                }
+                                if ($tr) {
+                                    self._toggle($tr, true);
+                                } else {
+                                    self.reload();
+                                }
                             }
                         }
                         if (data.error) {
