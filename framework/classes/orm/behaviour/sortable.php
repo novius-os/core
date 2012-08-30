@@ -64,15 +64,36 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         $item->observe('after_sort');
     }
 
-    public function after_sort(\Nos\Orm\Model $obj) {
-        $tree = $obj->behaviours('Nos\Orm_Behaviour_Tree');
+    public function before_insert(\Nos\Orm\Model $item)
+    {
+        $sort_property = $this->_properties['sort_property'];
+        if (empty($item->{$sort_property})) {
+            $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
+            $conditions = array();
+            if (!empty($tree)) {
+                $conditions[] = array('parent', $item->get_parent());
+            }
+            $last = $item::find('first', array(
+                'where' => $conditions,
+                'order_by' => array($this->_properties['sort_property'] => 'DESC')
+            ));
+            if (!empty($last)) {
+                $item->{$sort_property} = $last->{$sort_property} + 1;
+            } else {
+                $item->{$sort_property} = 1;
+            }
+        }
+    }
+
+    public function after_sort(\Nos\Orm\Model $item) {
+        $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
         $sort_property = $this->_properties['sort_property'];
         $conditions = array();
         if (!empty($tree)) {
-            $conditions[] = array('parent', $obj->get_parent());
+            $conditions[] = array('parent', $item->get_parent());
         }
         $i = 1;
-        $unsorted = $obj::find('all', array(
+        $unsorted = $item::find('all', array(
             'where' => $conditions,
             'order_by' => array('default_sort' => 'ASC')
         ));
