@@ -20,7 +20,10 @@ class Controller_Admin_Tray_Account extends \Controller {
         $config_user = \Config::load('nos::controller/admin/user/user');
         $fields = $config_user['fields'];
         $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
-        $fieldset_infos = \Fieldset::build_from_config($fields, $user);
+        // Form target is Controller_Admin_User_User, we only display the fieldset here
+        $fieldset_infos = \Fieldset::build_from_config($fields, $user, array(
+            'save' => false,
+        ));
 		$fieldset_infos->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
         $fieldset_display  = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
@@ -47,16 +50,6 @@ class Controller_Admin_Tray_Account extends \Controller {
 				'form' => array(
 					'value' => \Arr::get($configuration, 'misc.display.background', ''),
 				),
-            ),
-            'save' => array(
-                'label' => '',
-                'form' => array(
-                    'class' => 'primary',
-                    'data-icon' => 'check',
-                    'type' => 'submit',
-                    'tag' => 'button',
-                    'value' => __('Save'),
-                ),
             ),
         );
 
