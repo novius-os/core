@@ -828,6 +828,10 @@ define('jquery-nos-ostabs',
                 if ( $li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
                     $li.remove();
                     $panel.remove();
+                } else {
+                    var tab = $li.data( 'ui-ostab');
+                    tab.openRank = false;
+                    $li.data( 'ui-ostab', tab);
                 }
 
                 $li.removeClass( "ui-state-active ui-state-open" );
