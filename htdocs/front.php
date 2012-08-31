@@ -12,11 +12,10 @@
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
 if (empty($_SERVER['REDIRECT_URL']) && !empty($_GET['URL'])) {
-	$_SERVER['REDIRECT_URL'] = $_GET['URL'].'.html';
-	if ($_SERVER['REDIRECT_URL'] == '/index.html')
-	{
-		$_SERVER['REDIRECT_URL'] = '/';
-	}
+    $_SERVER['REDIRECT_URL'] = $_GET['URL'].'.html';
+    if ($_SERVER['REDIRECT_URL'] == '/index.html') {
+        $_SERVER['REDIRECT_URL'] = '/';
+    }
 }
 
 // Generate the request, execute it and send the output.

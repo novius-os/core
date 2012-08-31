@@ -25,7 +25,6 @@ call_user_func(function() {
     $core_path      = '../fuel-core/';
     $novius_path    = '../framework/';
 
-
     /**
      * Website docroot
      */
