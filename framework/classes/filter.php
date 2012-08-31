@@ -28,7 +28,6 @@ class Filter
         self::applyFiltering($query, $filtering, $config);
     }
 
-
     /** Get the database column from a configuration key and join
      *  the table containing the value if necessary
      *

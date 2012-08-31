@@ -136,7 +136,6 @@ class Model_User extends \Nos\Orm\Model
         static::$_properties['user_last_connection']['default'] = \DB::expr('NOW()');
     }*/
 
-
     public function getConfiguration()
     {
         if (!$this->user_configuration) {

@@ -10,8 +10,6 @@
  * @link       http://fuelphp.com
  */
 
-
-
 class Str extends \Fuel\Core\Str
 {
 	/**

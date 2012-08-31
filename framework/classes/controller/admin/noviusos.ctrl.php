@@ -74,7 +74,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         }
         $count_trayTabs = count($trayTabs);
 
-
         if (!empty($deep_linking_url)) {
             if (!isset($user_configuration['tabs'])) {
                 $user_configuration['tabs']  = array();
@@ -186,7 +185,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $new_config = \Input::post('configuration', array());
         $new_config = $this->convertFromPost($new_config);
 
-
         $json = array(
             'success' => true,
         );
@@ -205,7 +203,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             $user->save();
             \Session::setUser($user);
         }
-
 
         \Response::json($json);
     }

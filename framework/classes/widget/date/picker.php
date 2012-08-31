@@ -96,7 +96,6 @@ class Widget_Date_Picker extends \Fieldset_Field
         return array($widget, $widget_options);
     }
 
-
     /**
      * Generates the JavaScript to initialise the widget
      *

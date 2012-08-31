@@ -104,7 +104,6 @@ class Tools_File
         return realpath(static::simplifyPath($path));
     }
 
-
     /**
      *
      * @param string $file Absolute path to local file

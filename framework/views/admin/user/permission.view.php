@@ -26,7 +26,6 @@
 			</div>
 	    </div>
 
-
 <?php
 foreach ($apps as $app => $perms) {
 
@@ -78,8 +77,6 @@ foreach ($apps as $app => $perms) {
 
 </form>
 </div>
-
-
 
 <script type="text/javascript">
 require(

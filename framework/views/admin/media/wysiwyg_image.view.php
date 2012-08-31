@@ -239,7 +239,6 @@ require(
             $proportional.triggerHandler('change');
             $same_title_alt.triggerHandler('change');
 
-
             if (!newimg) {
                 $container.wijtabs('select', 1)
                     .bind('wijtabsshow', function() {

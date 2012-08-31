@@ -54,7 +54,6 @@ foreach ($fieldset->field() as $field) {
     ), false); ?>
 </div>
 
-
 <script type="text/javascript">
     require([
 	    'jquery-nos',

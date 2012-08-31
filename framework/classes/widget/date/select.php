@@ -27,7 +27,6 @@ class Widget_Date_Select extends \Fieldset_Field
      */
     protected $day;
 
-
     /**
      * @var \Nos\Fieldset_Field
      */

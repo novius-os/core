@@ -102,9 +102,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $response = $this->response;
         }
 
-
-
-
         // <--
         return parent::after($response);
     }
@@ -124,14 +121,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         return \Config::loadConfiguration($application, $file_name);
     }
 
-
     protected static function getGlobalConfiguration()
     {
         list($application, $file_name) = \Config::configFile(get_called_class());
 
         return \Config::application($application);
     }
-
 
     /* @todo TO BE MOVED */
     protected static function check_permission_action($action, $dataset_location, $item = null)
@@ -580,7 +575,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             'id' => $parent->{$pk},
         ));
     }
-
 
     public function tree_items(array $tree_config, array $params)
     {

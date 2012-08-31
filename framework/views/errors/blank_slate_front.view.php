@@ -48,7 +48,6 @@ body {
 
 </head>
 
-
 <body>
     <div id="blank_slate">
         <h1><img src="static/novius-os/admin/novius-os/img/logo.png">Novius OS is up and running. Now what?</h1>

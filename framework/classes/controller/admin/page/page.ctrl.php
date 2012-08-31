@@ -77,7 +77,6 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
         }
     }
 
-
     public function action_set_homepage()
     {
         try {

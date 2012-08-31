@@ -30,5 +30,4 @@ class Session extends \Fuel\Core\Session
         static::$user = $user;
     }
 
-
 }

@@ -383,7 +383,6 @@ if (hash.substr(0, 4) == 'tab=') {
 <?= $js ?>
 </head>
 
-
 <body>
 	<?= !empty($body) ? $body : '' ?>
 </body>

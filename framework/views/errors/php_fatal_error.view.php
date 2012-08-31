@@ -35,7 +35,6 @@ if (\Input::is_ajax()) {
 <?php echo $type; ?> [ <?php echo $severity; ?> ]: <?php echo $message; ?>
 <?php echo $filepath; ?> @ line <?php echo $error_line; ?>
 
-
 <?php
 	foreach($backtrace as $trace) {
 		$debug_lines = \Debug::file_lines($trace['file'], $trace['line'], false, 0);

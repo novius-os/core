@@ -10,14 +10,12 @@
 
 require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
 
-
 class Autoloader extends Fuel\Core\Autoloader
 {
     public static $suffixed = array(
         'model' => 'model',
         'controller' => 'ctrl'
     );
-
 
 /*
     public static function load($class)

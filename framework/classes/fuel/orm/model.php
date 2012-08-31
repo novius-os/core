@@ -275,7 +275,6 @@ class Model extends \Orm\Model
 		return static::$_behaviours_cached[$class];
 	}
 
-
     protected static $_configs = array();
 
     protected static function _config()
@@ -666,7 +665,6 @@ class Model extends \Orm\Model
 			return false;
 		}
 	}
-
 
 	/**
 	 * Generates an array with keys new & old that contain ONLY the values that differ between the original and

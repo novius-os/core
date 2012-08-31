@@ -225,7 +225,6 @@ MIGRATION;
         $build and static::build();
     }
 
-
     public static function help()
     {
         $output = <<<HELP
@@ -261,9 +260,7 @@ HELP;
         \Cli::write($output);
     }
 
-
     // Helper methods
-
 
     private static function _working_path()
     {

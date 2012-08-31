@@ -11,7 +11,6 @@
 class Refine extends Oil\Refine
 {
 
-
     public static function run($task, $args)
     {
         $task = strtolower($task);
@@ -79,8 +78,6 @@ class Refine extends Oil\Refine
         if (\Cli::option('help') && is_callable(array($new_task, 'help'))) {
             $method = 'help';
         }
-
-
 
         if ($return = call_user_func_array(array($new_task, $method), $args)) {
             \Cli::write($return);

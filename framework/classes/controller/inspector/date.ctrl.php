@@ -157,7 +157,6 @@ class Controller_Inspector_Date extends Controller_Admin_Application
 		$view->set('content', \Format::forge($content)->to_json(), false);
 		$view->set('label_custom', $this->config['label_custom_inputs']);
 
-
 		$view->set('date_begin', \Nos\Widget_Date_Picker::widget(array(
             'name' => $this->config['input_begin'],
         )), false);

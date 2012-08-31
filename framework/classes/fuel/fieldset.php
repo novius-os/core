@@ -372,11 +372,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             $instance->form_fieldset_fields($config);
         }
 
-
-
 		$fieldset->add_widgets($config, $options);
-
-
 
 		if (!empty($options['extend']) && is_callable($options['extend'])) {
 			call_user_func($options['extend'], $fieldset);
@@ -502,7 +498,6 @@ class Fieldset extends \Fuel\Core\Fieldset
 	    // Will trigger cascade_save for media and wysiwyg
 	    try {
 
-
 			foreach ($fields as $name => $config) {
 				if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
 					continue;
@@ -533,11 +528,8 @@ class Fieldset extends \Fuel\Core\Fieldset
 				}
 			}
 
-
-
             // Let behaviours do their job (publication for example)
             $item->form_processing_behaviours($data, $json_response);
-
 
             if (!empty($options['before_save']) && is_callable($options['before_save'])) {
                 call_user_func($options['before_save'], $item, $data);
@@ -558,7 +550,6 @@ class Fieldset extends \Fuel\Core\Fieldset
                 $item->save();
 				$json_response['notify'] = __('Operation completed successfully.');
 			}
-
 
 		    foreach ($fields as $name => $config) {
 				if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {

@@ -15,7 +15,6 @@ class Controller_Admin_Application extends Controller_Admin_Auth
     public $template = 'nos::admin/html';
     public $bypass   = false;
 
-
     public function before()
     {
         parent::before();
@@ -33,7 +32,6 @@ class Controller_Admin_Application extends Controller_Admin_Auth
             }
         }
     }
-
 
     public function after($response)
     {
