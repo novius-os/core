@@ -103,5 +103,3 @@ return array(
     //    'database'            => 'default'                // name of the redis database to use (as configured in config/db.php)
     //)
 );
-
-

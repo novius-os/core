@@ -913,4 +913,3 @@ class Model_Wysiwyg_Provider implements \Iterator
         return false !== current($this->iterator);
     }
 }
-

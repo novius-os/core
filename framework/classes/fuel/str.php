@@ -189,5 +189,3 @@ class Str extends \Fuel\Core\Str
         return $text;
     }
 }
-
-

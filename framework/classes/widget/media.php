@@ -106,4 +106,3 @@ class Widget_Media extends \Fieldset_Field
         ), false);
     }
 }
-

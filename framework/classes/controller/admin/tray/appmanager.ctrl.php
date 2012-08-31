@@ -207,5 +207,3 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
     }
 
 }
-
-

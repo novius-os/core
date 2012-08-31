@@ -60,4 +60,3 @@ class Widget_Time_Picker extends \Fieldset_Field
 	}
 
 }
-

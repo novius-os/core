@@ -146,4 +146,3 @@ class Model_User extends \Nos\Orm\Model
         }
     }
 }
-

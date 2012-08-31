@@ -111,5 +111,3 @@ class Widget_Date_Picker extends \Fieldset_Field
         ), false);
     }
 }
-
-
