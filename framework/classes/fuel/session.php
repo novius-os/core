@@ -10,7 +10,7 @@
 
 class Session extends \Fuel\Core\Session {
 
-    static $user = null;
+    public static $user = null;
 
     /**
      * Returns the current logged user

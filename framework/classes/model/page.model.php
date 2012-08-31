@@ -231,7 +231,7 @@ class Model_Page extends \Nos\Orm\Model {
 		static::_remove_page_enhanced($this->page_id);
 	}
 
-	static protected function _remove_url_enhanced($id) {
+	protected static function _remove_url_enhanced($id) {
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
 		$url_enhanced = \Config::get("data::url_enhanced", array());
@@ -244,7 +244,7 @@ class Model_Page extends \Nos\Orm\Model {
         \Config::set('data::url_enhanced', $url_enhanced);
 	}
 
-	static protected function _remove_page_enhanced($id) {
+	protected static function _remove_page_enhanced($id) {
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
 
 		$page_enhanced = \Config::get("data::page_enhanced", array());

@@ -12,7 +12,7 @@ namespace Nos;
 
 class Helper
 {
-    static $locales = array();
+    public static $locales = array();
 
     public static function _init()
     {

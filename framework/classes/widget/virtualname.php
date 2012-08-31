@@ -11,7 +11,7 @@
 namespace Nos;
 
 class Widget_Virtualname extends \Fieldset_Field {
-    var $template = '{label}{required} <div class="table-field">{field} <span>&nbsp;.html</span></div> {use_title_checkbox}';
+    public $template = '{label}{required} <div class="table-field">{field} <span>&nbsp;.html</span></div> {use_title_checkbox}';
 
     public function build() {
         parent::build();

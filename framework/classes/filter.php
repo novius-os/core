@@ -20,7 +20,7 @@ class Filter {
      * @param $query : Query instanciation
      * @param $config : Controller configuration
      */
-    static public function apply($query, $config) {
+    public static function apply($query, $config) {
         $sorting = Input::get('sorting', array());
         $filtering = Input::get('filtering', array());
         self::applySorting($query, $sorting, $config);
@@ -36,7 +36,7 @@ class Filter {
      * @param $key : configuration key
      * @return column name (string)
      */
-    static public function getColumnFromKey($query, $key, $config) {
+    public static function getColumnFromKey($query, $key, $config) {
         if (is_array($config['dataset'][$key])) {
             if (!empty($config['dataset'][$key]['search_relation'])) {
                 $query->related($config['dataset'][$key]['search_relation']);
@@ -55,7 +55,7 @@ class Filter {
      * @param $query : Query instanciation
      * @param $sorting : sorting parameters sent by wijmo
      */
-    static public function applySorting($query, $sorting, $config) {
+    public static function applySorting($query, $sorting, $config) {
         for ($i = 0; $i < count($sorting); $i++) {
             $key = $sorting[$i]['dataKey'];
             $column = self::getColumnFromKey($query, $key, $config);
@@ -71,7 +71,7 @@ class Filter {
      * @param $query : Query instanciation
      * @param $filtering : filtering parameters sent by wijmo
      */
-    static public function applyFiltering($query, $filtering, $config) {
+    public static function applyFiltering($query, $filtering, $config) {
         for ($i = 0; $i < count($filtering); $i++) {
             $key = $filtering[$i]['dataKey'];
             $column = self::getColumnFromKey($query, $key, $config);

@@ -856,7 +856,7 @@ class Model_Media_Provider
 		return (!empty($value));
 	}
 
-    function rewind() {
+    public function rewind() {
         $keys = array();
         foreach($this->parent->linked_medias as $wysiwyg) {
             $keys[] = $wysiwyg->medil_key;
@@ -865,23 +865,23 @@ class Model_Media_Provider
         reset($keys);
     }
 
-    function current() {
+    public function current() {
         return $this->__get(current($this->iterator));
     }
 
-    function key() {
+    public function key() {
         return current($this->iterator);
     }
 
-    function next() {
+    public function next() {
         next($this->iterator);
     }
 
-    function valid() {
+    public function valid() {
         return false !== current($this->iterator);
     }
 
-    function setParent($obj) {
+    public function setParent($obj) {
         $this->parent = $obj;
     }
 }
@@ -933,7 +933,7 @@ class Model_Wysiwyg_Provider implements \Iterator
 		return (!empty($value));
 	}
 
-    function rewind() {
+    public function rewind() {
         $keys = array();
         $class = get_called_class();
         foreach($this->parent->linked_wysiwygs as $wysiwyg) {
@@ -943,19 +943,19 @@ class Model_Wysiwyg_Provider implements \Iterator
         reset($keys);
     }
 
-    function current() {
+    public function current() {
         return $this->__get(current($this->iterator));
     }
 
-    function key() {
+    public function key() {
         return current($this->iterator);
     }
 
-    function next() {
+    public function next() {
         next($this->iterator);
     }
 
-    function valid() {
+    public function valid() {
         return false !== current($this->iterator);
     }
 }

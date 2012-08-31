@@ -12,7 +12,7 @@ namespace Nos;
 
 class Auth {
 
-    static $default_cookie_lasting = 2592000; //60 * 60 * 24 * 30;
+    public static $default_cookie_lasting = 2592000; //60 * 60 * 24 * 30;
 
 	public static function login($login, $password, $remember_me = true) {
 
