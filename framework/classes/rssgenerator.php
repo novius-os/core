@@ -40,8 +40,8 @@ namespace Nos;
 //   get($items)                                                                                          //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RssGenerator {
-
+class RssGenerator
+{
     private $_encoding="UTF-8";
     private $_title="";
     private $_language="en-us";
@@ -50,10 +50,12 @@ class RssGenerator {
     private $_generator="rss_generator on Novius-OS";
     private $_version="2.0";
 
-    public function __construct($title) {
+    public function __construct($title)
+    {
         $this->_title=$title;
     }
-    public function __get($name) {
+    public function __get($name)
+    {
         if ($name=='encoding')		return $this->_encoding;
         if ($name=='title')		return $this->_title;
         if ($name=='language')		return $this->_language;
@@ -61,7 +63,8 @@ class RssGenerator {
         if ($name=='generator')		return $this->_generator;
         if ($name=='link')		return $this->_link;
     }
-    public function __set($name,$value) {
+    public function __set($name,$value)
+    {
         if ($name=='encoding')		$this->_encoding=stripslashes($value);
         if ($name=='title')		$this->_title=stripslashes($value);
         if ($name=='language')		$this->_language=stripslashes(static::toRssLanguageCode($value));
@@ -80,7 +83,8 @@ class RssGenerator {
     'link': url to show the item
     @result: xml document of rss stream
      **/
-    public function get($items) {
+    public function get($items)
+    {
         $res ="";
         // header
         $res.="<rss version=\"2.0\">\n";
@@ -111,7 +115,8 @@ class RssGenerator {
         return $res;
     }
 
-    public function getFromNuggets($items) {
+    public function getFromNuggets($items)
+    {
         $rss_list = array();
         foreach ($items as $item) {
             $content = $item->get_nugget_content('rss_item');
@@ -137,7 +142,8 @@ class RssGenerator {
         return $this->get($rss_list);
     }
 
-    public static function toRssLanguageCode($code) {
+    public static function toRssLanguageCode($code)
+    {
         return str_replace('_', '-', \Str::lower($code));
     }
 }

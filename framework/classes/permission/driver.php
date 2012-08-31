@@ -10,14 +10,14 @@
 
 namespace Nos;
 
-class Permission_Driver {
-
+class Permission_Driver
+{
 	protected $identifier;
 	protected $application;
 	protected $label;
 
-	public function __construct($application, $identifier, $label, $options = array()) {
-
+	public function __construct($application, $identifier, $label, $options = array())
+	{
 		$this->application = $application;
 		$this->identifier  = $identifier;
 		$this->label       = $label;
@@ -25,19 +25,23 @@ class Permission_Driver {
 		$this->set_options($options);
 	}
 
-	public function set_option() {
+	public function set_option()
+	{
 		return;
 	}
 
-	public function check_permission() {
+	public function check_permission()
+	{
 		return false;
 	}
 
-	public function display($role) {
+	public function display($role)
+	{
 		return '';
 	}
 
-	public function save($role, $data) {
+	public function save($role, $data)
+	{
 		return;
 	}
 }

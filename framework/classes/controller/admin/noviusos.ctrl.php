@@ -22,8 +22,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
         ) as $var => $default)
         {
-            if (empty($this->template->$var))
-            {
+            if (empty($this->template->$var)) {
                 $this->template->$var = $default;
             }
         }
@@ -65,8 +64,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 'iconSize' => 24,
             ),
         );
-        if ($user->check_permission('nos_tray', 'access'))
-        {
+        if ($user->check_permission('nos_tray', 'access')) {
             array_unshift($trayTabs, array(
                 'url' => 'admin/nos/tray/appmanager',
                 'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
@@ -77,8 +75,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $count_trayTabs = count($trayTabs);
 
 
-        if (!empty($deep_linking_url))
-        {
+        if (!empty($deep_linking_url)) {
             if (!isset($user_configuration['tabs'])) {
                 $user_configuration['tabs']  = array();
             }
@@ -93,22 +90,17 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             array_unshift($nativeTabs, $osTabs);
 
             // Search native tabs
-            foreach ($nativeTabs as $i => $tab)
-            {
-                if ($tab['url'] == $deep_linking_url)
-                {
+            foreach ($nativeTabs as $i => $tab) {
+                if ($tab['url'] == $deep_linking_url) {
                     $user_configuration['tabs']['selected'] = $i;
                     $found = true;
                 }
             }
 
             // Search user tabs
-            if (!$found)
-            {
-                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
-                {
-                    if ($tab['url'] == $deep_linking_url)
-                    {
+            if (!$found) {
+                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab) {
+                    if ($tab['url'] == $deep_linking_url) {
                         $openRank = $tab['openRank'];
                         $tab['openRank'] = 0;
                         $user_configuration['tabs']['selected'] = $i + $count_trayTabs + 1;
@@ -119,8 +111,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             }
 
             // Tab was not found found, add it
-            if (!$found)
-            {
+            if (!$found) {
                 $user_configuration['tabs']['selected'] = count($user_configuration['tabs']['tabs']) + 1 + $count_trayTabs;
                 $openRank = 1;
                 $user_configuration['tabs']['tabs'][] = array(
@@ -129,10 +120,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 );
 
                 // Rank from every tab goes up
-                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab)
-                {
-                    if ($tab['openRank'] < $openRank)
-                    {
+                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab) {
+                    if ($tab['openRank'] < $openRank) {
                         $tab['openRank']++;
                     }
                 }
@@ -166,20 +155,16 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $launchers = \Config::mergeWithUser('misc.apps', $launchers);
 
         $apps = array();
-        foreach ($launchers as $key => $app)
-        {
-            if (!empty($app['url']) && !empty($app['icon64']))
-            { // do we have to display the application?
+        foreach ($launchers as $key => $app) {
+            if (!empty($app['url']) && !empty($app['icon64'])) { // do we have to display the application?
                 //\Debug::dump($app['application'], Permission::check($app['application'], 'access'));
-                if (!isset($app['application']) || Permission::check($app['application'], 'access'))
-                { // do we have the rights to access the application?
+                if (!isset($app['application']) || Permission::check($app['application'], 'access')) { // do we have the rights to access the application?
                     $app['key'] = $key;
                     $apps[] = $app;
                 }
             }
         }
-        if (count($apps) > 0)
-        {
+        if (count($apps) > 0) {
             $apps = \Arr::sort($apps, 'order', 'asc');
         }
 
@@ -207,14 +192,10 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         );
 
         $user = \Session::user();
-        if ($user)
-        {
-            if (!$user->user_configuration)
-            {
+        if ($user) {
+            if (!$user->user_configuration) {
                 $user_configuration = array();
-            }
-            else
-            {
+            } else {
                 $user_configuration = unserialize($user->user_configuration);
             }
             $configuration = &$user_configuration;
@@ -231,16 +212,11 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
     protected function convertFromPost($arr)
     {
-        if (is_array($arr))
-        {
-            foreach ($arr as $key => $value)
-            {
-                if (is_array($value))
-                {
+        if (is_array($arr)) {
+            foreach ($arr as $key => $value) {
+                if (is_array($value)) {
                     $arr[$key] = $this->convertFromPost($arr[$key]);
-                }
-                else
-                {
+                } else {
                     $arr[$key] = $arr[$key] == 'true' ? true : ($arr[$key] == 'false' ? false : $arr[$key]);
                     $arr[$key] = is_numeric($arr[$key]) ? floatval($arr[$key]) : $arr[$key];
                 }

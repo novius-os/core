@@ -18,24 +18,18 @@ class Tools_File
     public static function _init()
     {
         static::$use_xsendfile = \Config::get('use_xsendfile', null);
-        if (null === static::$use_xsendfile)
-        {
+        if (null === static::$use_xsendfile) {
             // No config defined: auto detection
             static::$use_xsendfile = self::xsendfile_available();
-        }
-        else if (is_string(static::$use_xsendfile))
-        {
+        } else if (is_string(static::$use_xsendfile)) {
             static::$xsendfile_header = static::$use_xsendfile;
             static::$use_xsendfile = true;
         }
 
         // Check availability
-        if (static::$use_xsendfile && !static::xsendfile_available())
-        {
+        if (static::$use_xsendfile && !static::xsendfile_available()) {
             \Fuel::$profiling && \Profiler::console('X-Sendfile enabled but not available on your installation.');
-        }
-        else if (!static::$use_xsendfile && static::xsendfile_available())
-        {
+        } else if (!static::$use_xsendfile && static::xsendfile_available()) {
             \Fuel::$profiling && \Profiler::console('X-Sendfile available on your installation but not enabled.');
         }
     }
@@ -43,8 +37,7 @@ class Tools_File
     public static function xsendfile_available()
     {
         // On Apache
-        if (function_exists('apache_get_modules') && in_array('mod_xsendfile', apache_get_modules()))
-        {
+        if (function_exists('apache_get_modules') && in_array('mod_xsendfile', apache_get_modules())) {
             // Doesn't mean it's configured properly but it's available
             // We consider that if it has benn installed, then it's also been configured
             return true;
@@ -67,8 +60,7 @@ class Tools_File
         $arTo = explode($ds, rtrim($to, $ds));
         $similar = 0;
 
-        while (isset($arFrom[$similar]) && isset($arTo[$similar]) && ($arFrom[$similar] == $arTo[$similar]))
-        {
+        while (isset($arFrom[$similar]) && isset($arTo[$similar]) && ($arFrom[$similar] == $arTo[$similar])) {
             $similar++;
         }
         $arFrom = array_slice($arFrom, $similar);
@@ -84,8 +76,8 @@ class Tools_File
      * @param   string  $path
      * @return  string  The simplified path
      */
-    public static function simplifyPath($path) {
-
+    public static function simplifyPath($path)
+    {
         $parts = explode(DS, $path);
         $path = array();
         foreach ($parts as $part) {
@@ -107,7 +99,8 @@ class Tools_File
      * @param   string  $path
      * @return  string  @see realpath()
      */
-    public static function realpath($path) {
+    public static function realpath($path)
+    {
         return realpath(static::simplifyPath($path));
     }
 
@@ -122,16 +115,13 @@ class Tools_File
     {
         $file = realpath($file);
 
-        if (is_file($file))
-        {
+        if (is_file($file)) {
             // Send Content-Type
-            if ($mime === null)
-            {
+            if ($mime === null) {
                 $mime = static::content_type($file);
             }
 
-            while (ob_get_level() > 0)
-            {
+            while (ob_get_level() > 0) {
                 ob_end_clean();
             }
 
@@ -145,18 +135,14 @@ class Tools_File
             $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) == $data_path;
 
             // X-Sendfile is better when available
-            if (static::$use_xsendfile and $xsendfile_allowed)
-            {
+            if (static::$use_xsendfile and $xsendfile_allowed) {
                 header(static::$xsendfile_header.': '.$file);
-            }
-            else
-            {
+            } else {
                 readfile($file);
             }
         }
 
-        if ($exit)
-        {
+        if ($exit) {
             \Event::shutdown();
             exit;
         }
@@ -171,8 +157,7 @@ class Tools_File
     public static function content_type($file)
     {
         // New way (default PHP 5.3)
-        if (function_exists('finfo_file'))
-        {
+        if (function_exists('finfo_file')) {
             $autocorrect = array(
                 'image/x-ico' => 'image/x-icon',
             );

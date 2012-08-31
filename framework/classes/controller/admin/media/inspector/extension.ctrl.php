@@ -10,6 +10,6 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Inspector_Extension extends Controller_Inspector_Data {
-
+class Controller_Admin_Media_Inspector_Extension extends Controller_Inspector_Data
+{
 }

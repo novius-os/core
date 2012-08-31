@@ -10,8 +10,8 @@
 
 namespace Nos;
 
-class Widget_Date_Select extends \Fieldset_Field {
-
+class Widget_Date_Select extends \Fieldset_Field
+{
     /**
      * @var \Nos\Fieldset_Field
      */
@@ -47,7 +47,8 @@ class Widget_Date_Select extends \Fieldset_Field {
      * @param  \Fuel\Core\Fieldset  $fieldset
      * @return  Nos\Widget_Date
      */
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
+    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
+    {
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
 
 		$attributes = \Arr::merge($attributes, array(
@@ -91,7 +92,8 @@ class Widget_Date_Select extends \Fieldset_Field {
         }));
     }
 
-    protected static function _get_month_names() {
+    protected static function _get_month_names()
+    {
         static $months = null;
         empty($months) and $months = array(
             1  => \Date::create_from_string('01/01/2011', 'eu')->format('%B'),
@@ -116,8 +118,8 @@ class Widget_Date_Select extends \Fieldset_Field {
 	 * @param string  $value       YYYY-MM-DD time
 	 * @param bool    $repopulate
 	 */
-    public function set_value($value, $repopulate = false) {
-
+    public function set_value($value, $repopulate = false)
+    {
         list($date, $time) = explode(' ', $value.' ');
         list($year, $month ,$day) = explode('-', $date);
 
@@ -133,8 +135,8 @@ class Widget_Date_Select extends \Fieldset_Field {
      * How to display the field
      * @return string HTML output
      */
-    public function build() {
-
+    public function build()
+    {
         if (!empty($this->attributes['readonly'])) {
             if (empty($this->attributes['date_format'])) {
                 $html = $this->value;
@@ -153,7 +155,8 @@ class Widget_Date_Select extends \Fieldset_Field {
 		return $this->template($html);
     }
 
-	public static function field($args = array()) {
+	public static function field($args = array())
+	{
 		$args = \Arr::merge(array(
 			'name' => 'date',
 			'readonly' => false,
@@ -202,7 +205,8 @@ class Widget_Date_Select extends \Fieldset_Field {
      * repopulate() takes the whole input array as parameter
      * @param array $input
      */
-    public function repopulate(array $input) {
+    public function repopulate(array $input)
+    {
         list($year, $month, $day, $time) = array(
 			isset($input[$this->name.'_year'])  ? $input[$this->name.'_year']  : null,
 			isset($input[$this->name.'_month']) ? $input[$this->name.'_month'] : null,

@@ -68,16 +68,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $this->{$property};
     }
 
-    public function before() {
+    public function before()
+    {
         parent::before();
         $this->config_build();
     }
 
-    protected function config_build() {
+    protected function config_build()
+    {
         $model = $this->config['model'];
 
-        if (!empty($this->config['context_relation']))
-        {
+        if (!empty($this->config['context_relation'])) {
             $this->config['context_relation'] = $model::relations($this->config['context_relation']);
             if (!is_a($this->config['context_relation'], 'Orm\\BelongsTo')) {
                 $this->config['context_relation'] = null;
@@ -87,12 +88,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->config['views']['insert'] = !empty($this->config['views']['insert']) ? $this->config['views']['insert'] : $this->config['views']['form'];
         $this->config['views']['update'] = !empty($this->config['views']['update']) ? $this->config['views']['update'] : $this->config['views']['form'];
 
-        if (empty($this->config['layout_insert']) && !empty($this->config['layout']))
-        {
+        if (empty($this->config['layout_insert']) && !empty($this->config['layout'])) {
             $this->config['layout_insert'] = $this->config['layout'];
         }
-        if (empty($this->config['layout_update']) && !empty($this->config['layout']))
-        {
+        if (empty($this->config['layout_update']) && !empty($this->config['layout'])) {
             $this->config['layout_update'] = $this->config['layout'];
         }
 
@@ -122,8 +121,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'context' => $this->item_context,
             'config' => $this->config,
         );
-        if ($this->behaviours['translatable'])
-        {
+        if ($this->behaviours['translatable']) {
             $params['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
         }
 
@@ -166,28 +164,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function form_item()
     {
-        if ($this->is_new)
-        {
+        if ($this->is_new) {
             $create_from_id = \Input::get('create_from_id', 0);
             $common_id = \Input::get('common_id', null);
             $context_id = \Input::get('context_id', null);
-            if (!empty($create_from_id))
-            {
+            if (!empty($create_from_id)) {
                 $this->item_from = $this->crud_item($create_from_id);
                 $this->item = clone $this->item_from;
-            }
-            else if (!empty($common_id) && $this->behaviours['translatable'])
-            {
+            } else if (!empty($common_id) && $this->behaviours['translatable']) {
                 $this->item->{$this->behaviours['translatable']['common_id_property']} = $common_id;
-            }
-            else if (!empty($context_id) && !empty($this->config['context_relation']))
-            {
+            } else if (!empty($context_id) && !empty($this->config['context_relation'])) {
                 $model_context = $this->config['context_relation']->model_to;
                 $this->item_context = $model_context::find($context_id);
                 $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};
             }
-            if ($this->behaviours['translatable'])
-            {
+            if ($this->behaviours['translatable']) {
                 $lang = \Input::get('lang', key(\Config::get('locales')));
                 $this->item->{$this->behaviours['translatable']['lang_property']} = empty($lang) ? key(\Config::get('locales')) : $lang;
             }
@@ -215,8 +206,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function fields($fields)
     {
-        if (!empty($this->item_from))
-        {
+        if (!empty($this->item_from)) {
             $fields['create_from_id'] = array(
                 'form' => array(
                     'type' => 'hidden',
@@ -224,8 +214,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             );
         }
-        if ($this->behaviours['translatable'])
-        {
+        if ($this->behaviours['translatable']) {
             $fields = \Arr::merge($fields, array(
                 $this->behaviours['translatable']['lang_property'] => array(
                     'form' => array(
@@ -241,10 +230,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             ));
         }
-        if ($this->is_new)
-        {
-            if ($this->behaviours['translatable'] && $this->behaviours['tree'])
-            {
+        if ($this->is_new) {
+            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
                 $parent_id = $this->item->parent_relation()->key_from[0];
                 $fields = \Arr::merge($fields, array(
                     $parent_id => array(
@@ -273,10 +260,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $fieldset->populate_with_instance($this->item);
         $fieldset->form()->set_config('field_template', \View::forge('nos::crud/field_template'));
 
-        foreach ($fieldset->field() as $field)
-        {
-            if ($field->type == 'checkbox')
-            {
+        foreach ($fieldset->field() as $field) {
+            if ($field->type == 'checkbox') {
                 $field->set_template(\View::forge('nos::crud/field_template', array('type' => 'checkbox')));
             }
         }
@@ -284,14 +269,16 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $fieldset;
     }
 
-    protected function build_from_config() {
+    protected function build_from_config()
+    {
         return array(
             'before_save' => array($this, 'before_save'),
             'success' => array($this, 'save'),
         );
     }
 
-    public function save($item, $data) {
+    public function save($item, $data)
+    {
         $dispatchEvent = array(
             'name' => $this->config['model'],
             'action' => $this->is_new ? 'insert' : 'update',
@@ -307,15 +294,15 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'closeDialog' => true,
             'dispatchEvent' => $dispatchEvent,
         );
-        if ($this->is_new)
-        {
+        if ($this->is_new) {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};
         }
 
         return $return;
     }
 
-    public function before_save($item, $data) {
+    public function before_save($item, $data)
+    {
         if ($this->behaviours['tree']) {
             // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
             // https://github.com/fuel/orm/issues/171
@@ -342,29 +329,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
 
-        if ($this->item->is_new())
-        {
+        if ($this->item->is_new()) {
             return $this->action_form($id);
-        }
-        else
-        {
+        } else {
             if ($this->behaviours['translatable']) {
                 $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
                 $all_langs = $this->item->get_all_lang();
 
-                if (in_array($selected_lang, $all_langs))
-                {
+                if (in_array($selected_lang, $all_langs)) {
                     return $this->action_form($id);
-                }
-                else
-                {
+                } else {
                     $_GET['common_id'] = $id;
 
                     return $this->blank_slate($id, $selected_lang);
                 }
-            }
-            else
-            {
+            } else {
                 return $this->action_form($id);
             }
         }
@@ -373,8 +352,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function blank_slate($id, $lang)
     {
         $this->item = $this->crud_item($id);
-        if (empty($lang))
-        {
+        if (empty($lang)) {
             $lang = \Input::get('lang', key(\Config::get('locales')));
         }
 
@@ -398,23 +376,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $labelUpdate = $this->config['tab']['labels']['update'];
         $url = $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->id);
-        if ($this->is_new)
-        {
+        if ($this->is_new) {
             $params = array();
-            foreach (array('create_from_id', 'common_id', 'context_id') as $key)
-            {
+            foreach (array('create_from_id', 'common_id', 'context_id') as $key) {
                 $value = \Input::get($key, false);
-                if ($value !== false)
-                {
+                if ($value !== false) {
                     $params[$key] = $value;
                 }
             }
-            if ($this->behaviours['translatable'])
-            {
+            if ($this->behaviours['translatable']) {
                 $params['lang'] = $this->item->get_lang();
             }
-            if (count($params))
-            {
+            if (count($params)) {
                 $url .= '?'.http_build_query($params);
             }
         }
@@ -457,8 +430,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'icon' => 'trash',
             );
         }
-        foreach ($this->config['actions'] as $actionClosure)
-        {
+        foreach ($this->config['actions'] as $actionClosure) {
             if ($action = $actionClosure($this->item)) {
                 $actions[] = $action;
             }
@@ -476,10 +448,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $actions = array();
         $locales = array_keys(\Config::get('locales'));
         $main_lang = $this->item->find_main_lang();
-        foreach ($locales as $locale)
-        {
-            if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale)
-            {
+        foreach ($locales as $locale) {
+            if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale) {
                 continue;
             }
             $item_lang = $this->item->find_lang($locale);
@@ -501,7 +471,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $actions;
     }
 
-    protected function check_permission($action) {
+    protected function check_permission($action)
+    {
         if ($action === 'delete' && $this->item->is_new()) {
             throw new \Exception($this->config['messages']['not found']);
         }
@@ -542,8 +513,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->delete();
 
-        if ($this->behaviours['translatable'])
-        {
+        if ($this->behaviours['translatable']) {
             $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
             $dispatchEvent['id'] = array();
             $dispatchEvent['lang'] = array();
@@ -553,15 +523,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
             // Delete children for all languages
             if ($lang === 'all') {
-                foreach ($this->item->find_lang('all') as $item_lang)
-                {
+                foreach ($this->item->find_lang('all') as $item_lang) {
                     $dispatchEvent['id'][] = (int) $item_lang->{$this->pk};
                     $dispatchEvent['lang'][] = $item_lang->{$this->behaviours['translatable']['lang_property']};
 
-                    if ($this->behaviours['tree'])
-                    {
-                        foreach ($item_lang->get_ids_children(false) as $item_id)
-                        {
+                    if ($this->behaviours['tree']) {
+                        foreach ($item_lang->get_ids_children(false) as $item_id) {
                             $dispatchEvent['id'][] = (int) $item_id;
                         }
                     }
@@ -580,10 +547,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
                 $dispatchEvent['id'][] = $this->item->{$this->pk};
                 $dispatchEvent['lang'][] = $this->item->{$this->behaviours['translatable']['lang_property']};
-                if ($this->behaviours['tree'])
-                {
-                    foreach ($this->item->get_ids_children(false) as $item_id)
-                    {
+                if ($this->behaviours['tree']) {
+                    foreach ($this->item->get_ids_children(false) as $item_id) {
                         $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
@@ -593,11 +558,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->item->delete();
             }
         } else {
-            if ($this->behaviours['tree'])
-            {
+            if ($this->behaviours['tree']) {
                 $dispatchEvent['id'] = array($this->item->{$this->pk});
-                foreach ($this->item->get_ids_children(false) as $item_id)
-                {
+                foreach ($this->item->get_ids_children(false) as $item_id) {
                     $dispatchEvent['id'][] = (int) $item_id;
                 }
             }
@@ -615,7 +578,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
     }
 
-    protected function send_error($exception) {
+    protected function send_error($exception)
+    {
         // Easy debug
         if (\Fuel::$env === \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
             throw $exception;

@@ -3,7 +3,8 @@ class Debug extends \Fuel\Core\Debug
 {
     public static $core_paths = array(FUEL_EXTEND_PATH, COREPATH, PKGPATH);
 
-    public static function local_backtrace($array = false) {
+    public static function local_backtrace($array = false)
+    {
         $backtrace = debug_backtrace();
         $local_backtrace = array();
         for ($i = 0; $i < count($backtrace); $i++) {

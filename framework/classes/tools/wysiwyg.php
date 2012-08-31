@@ -10,21 +10,18 @@
 
 namespace Nos;
 
-class Tools_Wysiwyg {
-
-    public static function prepare_widget($content) {
-
+class Tools_Wysiwyg
+{
+    public static function prepare_widget($content)
+    {
         $replaces = array();
         static::parse_medias($content, function($media, $params) use(&$replaces) {
             if (empty($media)) {
                 $replaces[$params['tag']] = '';
             } else {
-                if (!empty($params['width']) && !empty($params['height']) && ($params['width'] != $media->media_width || $params['height'] != $media->media_height))
-                {
+                if (!empty($params['width']) && !empty($params['height']) && ($params['width'] != $media->media_width || $params['height'] != $media->media_height)) {
                     $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path_resized($params['width'], $params['height']).'" width="'.$params['width'].'" height="'.$params['height'].'" data-media-id="'.$media->id.'"';
-                }
-                else
-                {
+                } else {
                     $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path().'" data-media-id="'.$media->id.'"';
                 }
             }
@@ -33,19 +30,17 @@ class Tools_Wysiwyg {
         return strtr($content, $replaces);
     }
 
-    public static function parse_medias(&$content, $closure) {
-
+    public static function parse_medias(&$content, $closure)
+    {
         // Find all medias
         preg_match_all('`<img(?:.+?)src="(nos://media/(\d+)(?:/(\d+)/(\d+))?)"(?:.+?)>`u', $content, $matches);
         if (!empty($matches[0])) {
             $media_ids = array();
-            foreach ($matches[2] as $match_id => $media_id)
-            {
+            foreach ($matches[2] as $match_id => $media_id) {
                 $media_ids[] = $media_id;
             }
             $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
-            foreach ($matches[2] as $match_id => $media_id)
-            {
+            foreach ($matches[2] as $match_id => $media_id) {
                 $closure(\Arr::get($medias, $media_id, null), array(
                     'tag' => $matches[0][$match_id],
                     'src' => $matches[1][$match_id],

@@ -10,25 +10,27 @@
 
 namespace Nos;
 
-class Permission_Select extends Permission_Driver {
-
+class Permission_Select extends Permission_Driver
+{
 	protected $choices;
 
 	protected $permissions;
 
 	protected static $data;
 
-	protected function set_options($options = array()) {
-
+	protected function set_options($options = array())
+	{
 		$this->choices = $options['choices'];
 	}
 
-	public function check($role, $key) {
+	public function check($role, $key)
+	{
 		static::_load_permissions($role);
 		return isset(static::$data[$role->role_id][$this->application]) && in_array($key, (array) static::$data[$role->role_id][$this->application]);
 	}
 
-	public function display($role) {
+	public function display($role)
+	{
 		echo \View::forge('nos::admin/user/permission/driver_select', array(
 			'role'        => $role,
 			'application' => $this->application,
@@ -38,8 +40,8 @@ class Permission_Select extends Permission_Driver {
 		), false);
 	}
 
-	public function save($role, $data) {
-
+	public function save($role, $data)
+	{
 		$perms = Model_User_Permission::find('all', array(
             'where' => array(
                 array('perm_role_id',     $role->role_id),
@@ -64,7 +66,8 @@ class Permission_Select extends Permission_Driver {
         }
 	}
 
-	protected static function _load_permissions($role) {
+	protected static function _load_permissions($role)
+	{
 		if (!empty(static::$data[$role->role_id])) {
 			return;
 		}

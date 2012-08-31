@@ -10,6 +10,6 @@
 
 namespace Nos;
 
-class Controller_Admin_User_Appdesk extends Controller_Admin_Appdesk {
-
+class Controller_Admin_User_Appdesk extends Controller_Admin_Appdesk
+{
 }

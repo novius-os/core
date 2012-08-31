@@ -10,10 +10,10 @@
 
 namespace Nos;
 
-class Widget_Media_Folder extends \Nos\Widget_Selector {
-
-
-    public function before_construct(&$attributes, &$rules) {
+class Widget_Media_Folder extends \Nos\Widget_Selector
+{
+    public function before_construct(&$attributes, &$rules)
+    {
         $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' media';
 
         if (empty($attributes['id'])) {
@@ -21,7 +21,8 @@ class Widget_Media_Folder extends \Nos\Widget_Selector {
         }
     }
 
-    public function build() {
+    public function build()
+    {
         return $this->template(static::widget(array(
             'input_name' => $this->name,
             'selected' => array(
@@ -43,7 +44,8 @@ class Widget_Media_Folder extends \Nos\Widget_Selector {
      * @abstract
      * @param array $options
      */
-    public static function widget($options = array()) {
+    public static function widget($options = array())
+    {
         $options = \Arr::merge(array(
             'treeUrl' => 'admin/nos/media/inspector/folder/json',
             'reloadEvent' => 'Nos\\Model_Media_Folder',

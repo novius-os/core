@@ -11,7 +11,8 @@
 require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
 
 
-class Autoloader extends Fuel\Core\Autoloader {
+class Autoloader extends Fuel\Core\Autoloader
+{
     public static $suffixed = array(
         'model' => 'model',
         'controller' => 'ctrl'
@@ -63,8 +64,7 @@ class Autoloader extends Fuel\Core\Autoloader {
     public static function load($class)
     {
         // deal with funny is_callable('static::classname') side-effect
-        if (strpos($class, 'static::') === 0)
-        {
+        if (strpos($class, 'static::') === 0) {
             // is called from within the class, so it's already loaded
             return true;
         }
@@ -73,46 +73,35 @@ class Autoloader extends Fuel\Core\Autoloader {
         $class = ltrim($class, '\\');
         $namespaced = ($pos = strripos($class, '\\')) !== false;
 
-        if (empty(static::$auto_initialize))
-        {
+        if (empty(static::$auto_initialize)) {
             static::$auto_initialize = $class;
         }
 
-        if (array_key_exists($class, static::$classes))
-        {
+        if (array_key_exists($class, static::$classes)) {
             include str_replace('/', DS, static::$classes[$class]);
             static::init_class($class);
             $loaded = true;
-        }
-        elseif ($full_class = static::find_core_class($class))
-        {
-            if ( ! class_exists($full_class, false) and ! interface_exists($full_class, false))
-            {
+        } elseif ($full_class = static::find_core_class($class)) {
+            if ( ! class_exists($full_class, false) and ! interface_exists($full_class, false)) {
                 include static::prep_path(static::$classes[$full_class]);
             }
             class_alias($full_class, $class);
             static::init_class($class);
             $loaded = true;
-        }
-        else
-        {
+        } else {
             $full_ns = substr($class, 0, $pos);
 
-            if ($full_ns)
-            {
-                foreach (static::$namespaces as $ns => $path)
-                {
+            if ($full_ns) {
+                foreach (static::$namespaces as $ns => $path) {
                     $ns = ltrim($ns, '\\');
-                    if (stripos($full_ns, $ns) === 0)
-                    {
+                    if (stripos($full_ns, $ns) === 0) {
                         $path .= static::class_to_path(
                             substr($class, strlen($ns) + 1),
                             array_key_exists($ns, static::$psr_namespaces)
                         );
 
                         $path = static::get_valid_class_path($path);
-                        if ($path)
-                        {
+                        if ($path) {
                             require $path;
                             static::init_class($class);
                             $loaded = true;
@@ -122,12 +111,10 @@ class Autoloader extends Fuel\Core\Autoloader {
                 }
             }
 
-            if ( ! $loaded)
-            {
+            if ( ! $loaded) {
                 $path = static::get_valid_class_path(APPPATH.'classes/'.static::class_to_path($class));
 
-                if ($path)
-                {
+                if ($path) {
                     include $path;
                     static::init_class($class);
                     $loaded = true;
@@ -136,15 +123,15 @@ class Autoloader extends Fuel\Core\Autoloader {
         }
 
         // Prevent failed load from keeping other classes from initializing
-        if (static::$auto_initialize == $class)
-        {
+        if (static::$auto_initialize == $class) {
             static::$auto_initialize = null;
         }
 
         return $loaded;
     }
 
-    public static function get_valid_class_path($path) {
+    public static function get_valid_class_path($path)
+    {
         $path_parts = explode('/', $path);
         $suffix = false;
         for ($i = 0; $i < count($path_parts) - 1; $i++) {

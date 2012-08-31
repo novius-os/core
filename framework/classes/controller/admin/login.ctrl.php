@@ -10,11 +10,12 @@
 
 namespace Nos;
 
-class Controller_Admin_Login extends Controller {
-
+class Controller_Admin_Login extends Controller
+{
 	public $template = 'nos::admin/html';
 
-    public function before() {
+    public function before()
+    {
         parent::before();
 
         // If user is already logged in, proceed
@@ -23,14 +24,14 @@ class Controller_Admin_Login extends Controller {
 		}
     }
 
-    protected function redirect() {
-
+    protected function redirect()
+    {
         \Response::redirect(urldecode(\Input::get('redirect', '/admin/')));
         exit();
     }
 
-    public function action_index() {
-
+    public function action_index()
+    {
         $error = (\Input::method() == 'POST') ? $this->post_login() : '';
 
 		\Asset::add_path('static/novius-os/admin/novius-os/');
@@ -43,15 +44,15 @@ class Controller_Admin_Login extends Controller {
         return $this->template;
     }
 
-    public function action_reset() {
-
+    public function action_reset()
+    {
         $this->template->body = \View::forge('admin/login_reset');
 
         return $this->template;
     }
 
-	public function after($response) {
-
+	public function after($response)
+	{
 		foreach (array(
 			         'title' => 'Administration',
 			         'base' => \Uri::base(false),
@@ -69,8 +70,8 @@ class Controller_Admin_Login extends Controller {
 		return $ret;
 	}
 
-	protected function post_login() {
-
+	protected function post_login()
+	{
 		if (\Nos\Auth::login($_POST['email'], $_POST['password'], \Input::post('remember_me', false) ? true : false)) {
 			\Event::trigger('user_login');
 			$this->redirect();

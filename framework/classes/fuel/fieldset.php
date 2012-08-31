@@ -8,24 +8,25 @@
  * @link http://www.novius-os.org
  */
 
-class Fieldset extends \Fuel\Core\Fieldset {
-
+class Fieldset extends \Fuel\Core\Fieldset
+{
 	protected $append = array();
     protected $config_used = array();
     protected $js_validation = false;
 
-	public function append($content) {
+	public function append($content)
+	{
 		$this->append[] = $content;
 	}
 
-	public function open($action = null) {
+	public function open($action = null)
+	{
 		$attributes = $this->get_config('form_attributes');
         if (empty($attributes['id'])) {
             $attributes['id'] = uniqid('form_');
             $this->set_config('form_attributes', $attributes);
         }
-		if ($action and ($this->fieldset_tag == 'form' or empty($this->fieldset_tag)))
-		{
+		if ($action and ($this->fieldset_tag == 'form' or empty($this->fieldset_tag))) {
 			$attributes['action'] = $action;
 		}
 
@@ -36,14 +37,15 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return $open;
 	}
 
-    public function build($action = null) {
+    public function build($action = null)
+    {
         $build = parent::build($action);
 
         return $build.$this->build_append();
     }
 
-	public function close() {
-
+	public function close()
+	{
 		$close = ($this->fieldset_tag == 'form' or empty($this->fieldset_tag))
 			? $this->form()->close().PHP_EOL
 			: $this->form()->{$this->fieldset_tag.'_close'}();
@@ -51,7 +53,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return $close.$this->build_append();
 	}
 
-    public function build_hidden_fields() {
+    public function build_hidden_fields()
+    {
         $output = '';
         foreach ($this->field() as $field) {
             if (false != mb_strpos(get_class($field), 'Widget_')) {
@@ -65,8 +68,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
         return $output;
     }
 
-    protected function build_append() {
-
+    protected function build_append()
+    {
 		$json = array();
         if ($this->js_validation) {
             foreach ($this->fields as $f) {
@@ -120,7 +123,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
         return implode('', $append);
     }
 
-	public function form_name($value) {
+	public function form_name($value)
+	{
 		if ($field = $this->field('form_name')) {
 			return $field->value == $value;
 		}
@@ -132,16 +136,15 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 * @param   \Fuel\Core\Fieldset_Field  $field  A field instance
 	 * @return  \Fuel\Core\Fieldset_Field
 	 */
-	public function add_field(\Fuel\Core\Fieldset_Field $field) {
+	public function add_field(\Fuel\Core\Fieldset_Field $field)
+	{
 		$name = $field->name;
-		if (empty($name))
-		{
+		if (empty($name)) {
 			throw new \InvalidArgumentException('Cannot create field without name.');
 		}
 
 		// Check if it exists already, if so: return and give notice
-		if ($existing = static::field($name))
-		{
+		if ($existing = static::field($name)) {
 			\Error::notice('Field with this name "'.$name.'" exists already, cannot be overwritten through add().');
 			return $existing;
 		}
@@ -162,7 +165,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 * @param   bool          Also repopulate?
 	 * @return  Fieldset this, to allow chaining
 	 */
-	public function populate($input, $repopulate = false) {
+	public function populate($input, $repopulate = false)
+	{
 		foreach ($this->fields as $f) {
 			$class = mb_strtolower(\Inflector::denamespace(get_class($f)));
 			if (mb_substr($class, 0, 6) == 'widget' && isset($input->{$f->name})) {
@@ -178,8 +182,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 * @param   array|object  input for initial population of fields, this is deprecated - you should use populate() instea
 	 * @return  Fieldset  this, to allow chaining
 	 */
-	public function repopulate() {
-
+	public function repopulate()
+	{
 		$input = mb_strtolower($this->form()->get_attribute('method', 'post')) == 'get' ? \Input::get() : \Input::post();
 
 		foreach ($this->fields as $f) {
@@ -188,12 +192,10 @@ class Fieldset extends \Fuel\Core\Fieldset {
             }
 
 			// Don't repopulate the CSRF field
-			if ($f->name === \Config::get('security.csrf_token_key', 'fuel_csrf_token'))
-			{
+			if ($f->name === \Config::get('security.csrf_token_key', 'fuel_csrf_token')) {
 				continue;
 			}
-			if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 6) == 'widget')
-			{
+			if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 6) == 'widget') {
 				// Widgets populates themselves
 				$f->repopulate($input);
 			}
@@ -208,12 +210,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	 * @param    string         null to fetch an array of all
 	 * @return    array|false     returns false when field wasn't found
 	 */
-	public function value($name = null) {
-		if ($name === null)
-		{
+	public function value($name = null)
+	{
+		if ($name === null) {
             $values = array();
-            foreach ($this->fields as $f)
-			{
+            foreach ($this->fields as $f) {
 
                 if ($f->type == 'checkbox' && $f->get_attribute('checked') == null) {
                     $values[$f->name] = null;
@@ -251,12 +252,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return $this;
 	}
 
-	public function add_widgets($properties, $options = array()) {
-
+	public function add_widgets($properties, $options = array())
+	{
         $this->config_used = $properties;
 
-		foreach ($properties as $p => $settings)
-		{
+		foreach ($properties as $p => $settings) {
 			if (!empty($options['action']) && isset($settings[$options['action']]) && false === $settings[$options['action']]) {
 				continue;
 			}
@@ -279,16 +279,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
             if (isset($settings['template'])) {
                 $field->set_template($settings['template']);
             }
-			if ( ! empty($settings['validation']))
-			{
-				foreach ($settings['validation'] as $rule => $args)
-				{
-					if (is_int($rule) and is_string($args))
-					{
+			if ( ! empty($settings['validation'])) {
+				foreach ($settings['validation'] as $rule => $args) {
+					if (is_int($rule) and is_string($args)) {
 						$args = array($args);
-					}
-					else
-					{
+					} else {
 						array_unshift($args, $rule);
 					}
 
@@ -298,8 +293,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		}
 	}
 
-	public function format_js_validation($name, $args) {
-
+	public function format_js_validation($name, $args)
+	{
 		static $i = 1;
 
 		if ($name == 'required') {
@@ -335,12 +330,13 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return array($name, $args);
 	}
 
-	public function js_validation($validation = true) {
+	public function js_validation($validation = true)
+	{
         $this->js_validation = $validation;
 	}
 
-	public static function build_from_config($config, $model = null, $options = array()) {
-
+	public static function build_from_config($config, $model = null, $options = array())
+	{
         $instance = null;
 		if (is_object($model)) {
 			$instance = $model;
@@ -412,7 +408,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
 		return $fieldset;
 	}
 
-    public function readonly_lang($instance) {
+    public function readonly_lang($instance)
+    {
         if (empty($instance)) {
             return;
         }
@@ -429,8 +426,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
         }
     }
 
-    public function populate_with_instance($instance = null, $generate_id = true) {
-
+    public function populate_with_instance($instance = null, $generate_id = true)
+    {
         if ($generate_id) {
             $uniqid = uniqid();
             // Generate a new ID for the form
@@ -479,7 +476,8 @@ class Fieldset extends \Fuel\Core\Fieldset {
         $this->populate($populate);
     }
 
-    public static function defaultComplete($data, $item, $fields, $options) {
+    public static function defaultComplete($data, $item, $fields, $options)
+    {
         if (isset($options['fieldset'])) {
             $fieldset = $options['fieldset'];
         } else {
@@ -505,8 +503,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 	    try {
 
 
-			foreach ($fields as $name => $config)
-			{
+			foreach ($fields as $name => $config) {
 				if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
 					continue;
 				}
@@ -516,8 +513,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 					continue;
 				}
 
-                if(isset($config['dont_save']) && $config['dont_save'])
-                {
+                if(isset($config['dont_save']) && $config['dont_save']) {
                     continue;
                 }
 
@@ -543,13 +539,11 @@ class Fieldset extends \Fuel\Core\Fieldset {
             $item->form_processing_behaviours($data, $json_response);
 
 
-            if (!empty($options['before_save']) && is_callable($options['before_save']))
-            {
+            if (!empty($options['before_save']) && is_callable($options['before_save'])) {
                 call_user_func($options['before_save'], $item, $data);
             }
 
-			if (!empty($options['success']) && is_callable($options['success']))
-			{
+			if (!empty($options['success']) && is_callable($options['success'])) {
                 if ($item->is_new()) {
                     // The callback is called after save() to access the ID
                     $item->save();
@@ -560,16 +554,13 @@ class Fieldset extends \Fuel\Core\Fieldset {
                     $item->save();
                 }
                 $json_response = \Arr::merge($json_response, $json_user);
-			}
-            else
-            {
+			} else {
                 $item->save();
 				$json_response['notify'] = __('Operation completed successfully.');
 			}
 
 
-		    foreach ($fields as $name => $config)
-			{
+		    foreach ($fields as $name => $config) {
 				if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
 					continue;
 				}

@@ -10,8 +10,8 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Media extends Controller_Admin_Crud {
-
+class Controller_Admin_Media_Media extends Controller_Admin_Crud
+{
     protected function check_permission($action)
     {
         parent::check_permission($action);
@@ -29,15 +29,13 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
     protected function form_item()
     {
         parent::form_item();
-        if ($this->item->is_new() && empty($this->item_context))
-        {
+        if ($this->item->is_new() && empty($this->item_context)) {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
             $this->item->media_folder_id = $root->medif_id;
         }
-        if (!$this->item->is_new())
-        {
+        if (!$this->item->is_new()) {
             $pathinfo = pathinfo($this->item->media_file);
             $this->item->media_file = $pathinfo['filename'];
         }
@@ -50,8 +48,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
         $form_attributes['enctype'] = 'multipart/form-data';
         $fieldset->set_config('form_attributes', $form_attributes);
 
-        if (!$this->is_new)
-        {
+        if (!$this->is_new) {
             $fieldset->field('media')->set_label(__('Change the file:'));
         }
 
@@ -68,9 +65,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
             if (in_array($pathinfo['extension'], $disallowed_extensions)) {
                 throw new \Exception(__('This extension is not allowed due to security reasons.'));
             }
-        }
-        else if (!$media->is_new())
-        {
+        } else if (!$media->is_new()) {
             $pathinfo = pathinfo(APPPATH.$media->get_private_path());
         }
 
@@ -109,9 +104,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
             if (!is_writeable($dest_dir)) {
                 throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
             }
-        }
-        else
-        {
+        } else {
             if ($this->clone->get_private_path() != $media->get_private_path()) {
                 if (is_file($dest)) {
                     throw new \Exception(__('A file with the same name already exists.'));
@@ -139,15 +132,14 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
             // Move the file
             if (move_uploaded_file($_FILES['media']['tmp_name'], $dest)) {
                 chmod($dest, 0664);
-            }
-            else
-            {
+            } else {
                 throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
             }
         }
     }
 
-    public function delete() {
+    public function delete()
+    {
         // Delete database & relations (link)
         $this->item->delete();
         // Delete file from the hard drive

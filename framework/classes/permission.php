@@ -10,10 +10,10 @@
 
 namespace Nos;
 
-class Permission {
-
-	public static function forge($app_name, $key, $driver_config) {
-
+class Permission
+{
+	public static function forge($app_name, $key, $driver_config)
+	{
 		$driver = $driver_config['driver'];
 		// @todo Inflector::words_to_upper ?
 		$class = '\Nos\Permission_'.ucfirst($driver);
@@ -28,14 +28,16 @@ class Permission {
 		throw new \Exception('The permission driver '.$driver.' has not be found for application '.$app_name.' ('.$key.').');
 	}
 
-    public static function check($app, $key) {
+    public static function check($app, $key)
+    {
         $user = \Session::user();
         $role = reset($user->roles);
 
         return $role->check_permission($app, $key);
     }
 
-	public static function add($app, $key) {
+	public static function add($app, $key)
+	{
         $user = \Session::user();
         $role = reset($user->roles);
         try {

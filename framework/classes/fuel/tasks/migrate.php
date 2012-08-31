@@ -23,8 +23,7 @@ class Migrate extends \Fuel\Tasks\Migrate
     public function __construct()
     {
         parent::__construct();
-        if (count(glob(NOSPATH.\Config::get('migrations.folder').'/*.php')))
-        {
+        if (count(glob(NOSPATH.\Config::get('migrations.folder').'/*.php'))) {
             static::$packages[] = 'nos';
         }
 
@@ -45,12 +44,10 @@ class Migrate extends \Fuel\Tasks\Migrate
         $version = \Cli::option('v', \Cli::option('version', ''));
 
         // version is used as a flag, so show it
-        if ($version === true)
-        {
+        if ($version === true) {
             \Cli::write('Currently installed migrations for '.$type.':'.$name.':', 'green');
 
-            foreach (\Config::get('migrations.version.'.$type.'.'.$name, array()) as $version)
-            {
+            foreach (\Config::get('migrations.version.'.$type.'.'.$name, array()) as $version) {
                 \Cli::write('- '.$version);
             }
 
@@ -58,11 +55,9 @@ class Migrate extends \Fuel\Tasks\Migrate
         }
 
         // version contains a timestamp of sorts
-        elseif ($version !== '')
-        {
+        elseif ($version !== '') {
             // if version has a value, make sure only 1 item was passed
-            if (static::$default + static::$module_count + static::$package_count > 1)
-            {
+            if (static::$default + static::$module_count + static::$package_count > 1) {
                 \Cli::write('Migration: version only excepts 1 item.');
 
                 return;
@@ -71,29 +66,21 @@ class Migrate extends \Fuel\Tasks\Migrate
         }
 
         // migrate to the latest version
-        else
-        {
+        else {
             $migrations = \Migrate::latest($name, $type);
         }
 
         // any migrations executed?
-        if ($migrations)
-        {
+        if ($migrations) {
             \Cli::write('Performed migrations for '.$type.':'.$name.':', 'green');
 
-            foreach ($migrations as $migration)
-            {
+            foreach ($migrations as $migration) {
                 \Cli::write($migration);
             }
-        }
-        else
-        {
-            if ($version !== '')
-            {
+        } else {
+            if ($version !== '') {
                 \Cli::write('No migrations were found for '.$type.':'.$name.'.');
-            }
-            else
-            {
+            } else {
                 \Cli::write('Already on the latest migration for '.$type.':'.$name.'.');
             }
         }
@@ -108,23 +95,18 @@ class Migrate extends \Fuel\Tasks\Migrate
     protected static function _current($name, $type)
     {
         // -v or --version
-        if (\Cli::option('v', \Cli::option('version', '')) !== '')
-        {
+        if (\Cli::option('v', \Cli::option('version', '')) !== '') {
             \Cli::write('You can not define a version when using the "current" command.', 'red');
         }
 
         $migrations = \Migrate::current($name, $type);
 
-        if ($migrations)
-        {
+        if ($migrations) {
             \Cli::write('Newly installed migrations for '.$type.':'.$name.':', 'green');
-            foreach ($migrations as $migration)
-            {
+            foreach ($migrations as $migration) {
                 \Cli::write('- '.$migration);
             }
-        }
-        else
-        {
+        } else {
             // migration is already on current version
             \Cli::write('Already on the current migration version for '.$type.':'.$name.'.');
         }
@@ -142,8 +124,7 @@ class Migrate extends \Fuel\Tasks\Migrate
         $version = \Cli::option('v', \Cli::option('version', null));
 
         // if version has a value, make sure only 1 item was passed
-        if ($version and (static::$default + static::$module_count + static::$package_count > 1))
-        {
+        if ($version and (static::$default + static::$module_count + static::$package_count > 1)) {
             \Cli::write('Migration: version only excepts 1 item.');
 
             return;
@@ -151,16 +132,12 @@ class Migrate extends \Fuel\Tasks\Migrate
 
         $migrations = \Migrate::up($version, $name, $type);
 
-        if ($migrations)
-        {
+        if ($migrations) {
             \Cli::write('Newly installed migrations for '.$type.':'.$name.':', 'green');
-            foreach ($migrations as $migration)
-            {
+            foreach ($migrations as $migration) {
                 \Cli::write('- '.$migration);
             }
-        }
-        else
-        {
+        } else {
             // there is no 'up'...
             \Cli::write('You are already on the latest migration version for '.$type.':'.$name.'.');
         }
@@ -178,8 +155,7 @@ class Migrate extends \Fuel\Tasks\Migrate
         $version = \Cli::option('v', \Cli::option('version', null));
 
         // if version has a value, make sure only 1 item was passed
-        if ($version and (static::$default + static::$module_count + static::$package_count > 1))
-        {
+        if ($version and (static::$default + static::$module_count + static::$package_count > 1)) {
             \Cli::write('Migration: version only excepts 1 item.');
 
             return;
@@ -187,16 +163,12 @@ class Migrate extends \Fuel\Tasks\Migrate
 
         $migrations = \Migrate::down($version, $name, $type);
 
-        if ($migrations)
-        {
+        if ($migrations) {
             \Cli::write('Reverted migrations for '.$type.':'.$name.':', 'green');
-            foreach ($migrations as $migration)
-            {
+            foreach ($migrations as $migration) {
                 \Cli::write('- '.$migration);
             }
-        }
-        else
-        {
+        } else {
             // there is no 'down'...
             \Cli::write('You are already on the first migration for '.$type.':'.$name.'.');
         }

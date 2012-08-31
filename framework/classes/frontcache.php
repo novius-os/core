@@ -13,8 +13,8 @@ namespace Nos;
 class CacheNotFoundException extends \Exception {}
 class CacheExpiredException extends \Exception {}
 
-class FrontCache {
-
+class FrontCache
+{
     /**
      * Loads any default caching settings when available
      */
@@ -55,12 +55,13 @@ class FrontCache {
         rmdir($dir);
     }
 
-    public static function forge($path) {
+    public static function forge($path)
+    {
         return new static($path);
     }
 
-    public static function get($path, $params = array()) {
-
+    public static function get($path, $params = array())
+    {
         if (empty($params['callback_func']) || !is_callable($params['callback_func'])) {
             \Fuel::$profiling && \Profiler::console($params);
             \Fuel::$profiling && \Console::logError(new \Exception(), "Invalid callback_func.");
@@ -89,8 +90,8 @@ class FrontCache {
     protected $_content = '';
     protected $_lock_fp = null;
 
-    public function __construct($path = false) {
-
+    public function __construct($path = false)
+    {
         if ($path == false) {
             $this->_path = false;
         } else {
@@ -98,7 +99,8 @@ class FrontCache {
         }
     }
 
-    public function execute($controller = null) {
+    public function execute($controller = null)
+    {
          // Get an exclusive lock
          //$this->_lock_fp = fopen($this->_path, 'c');
          //flock($this->_lock_fp, LOCK_EX);
@@ -117,19 +119,22 @@ class FrontCache {
         throw new CacheNotFoundException();
     }
 
-    public function start() {
+    public function start()
+    {
         ob_start();
         ob_implicit_flush(false);
         $this->_level = ob_get_level();
     }
 
-    public static function check_expires($expires) {
+    public static function check_expires($expires)
+    {
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
     }
 
-    public function save($duration = -1, $controller = null) {
+    public function save($duration = -1, $controller = null)
+    {
         if ($duration == -1) {
             //flock($this->_lock_fp, LOCK_UN);
             $expires = 0;
@@ -159,13 +164,15 @@ class FrontCache {
         //flock($this->_lock_fp, LOCK_UN);
     }
 
-    public function save_and_execute($duration = -1, $controller = null) {
+    public function save_and_execute($duration = -1, $controller = null)
+    {
         $this->save($duration, $controller);
 
         return $this->execute($controller);
     }
 
-    public function execute_or_start($controller = null) {
+    public function execute_or_start($controller = null)
+    {
         try {
             return $this->execute($controller);
         } catch (CacheNotFoundException $e) {
@@ -175,7 +182,8 @@ class FrontCache {
         }
     }
 
-    protected function store() {
+    protected function store()
+    {
         $dir = dirname($this->_path);
         // check if specified subdir exists
         if (!@is_dir($dir)) {
@@ -189,11 +197,13 @@ class FrontCache {
         return true;
     }
 
-    public function get_path() {
+    public function get_path()
+    {
         return $this->_path;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->content;
     }
 }

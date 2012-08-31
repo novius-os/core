@@ -10,8 +10,8 @@
 
 namespace Nos;
 
-class Controller_Admin_Datacatcher extends Controller_Admin_Application {
-
+class Controller_Admin_Datacatcher extends Controller_Admin_Application
+{
     public $bypass   = true;
 
     public function action_form($item = null)
@@ -27,8 +27,8 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
         ), false);
     }
 
-    public function action_save() {
-
+    public function action_save()
+    {
         try {
             list($item, $catcher_name) = static::save_catcher_nugget();
             $default_nuggets = $item->get_default_nuggets();
@@ -46,7 +46,8 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
         }
     }
 
-    public function action_rss_item() {
+    public function action_rss_item()
+    {
         return self::catcher_form(array(
             'view'  => 'nos::admin/data_catcher/rss_item',
         ));
@@ -69,7 +70,8 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
         }
     }
 
-    public function action_rss_channel() {
+    public function action_rss_channel()
+    {
         return self::catcher_form(array(
             'view'  => 'nos::admin/data_catcher/rss_channel',
         ));
@@ -92,14 +94,13 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
         }
     }
 
-    public static function catcher_form($params = array()) {
-
+    public static function catcher_form($params = array())
+    {
         $params['model']        = \Arr::get($params, 'model', \Input::get('model', null));
         $params['id']           = \Arr::get($params, 'id', \Input::get('id', null));
         $params['catcher_name'] = \Arr::get($params, 'catcher_name', \Input::get('catcher', null));
 
-        if (empty($params['model']) or empty($params['id']) or empty($params['view']) or empty($params['catcher_name']))
-        {
+        if (empty($params['model']) or empty($params['id']) or empty($params['view']) or empty($params['catcher_name'])) {
             \Response::json(array(
                 'error' => 'Insufficient parameters.',
             ));
@@ -132,7 +133,8 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
         ), false);
     }
 
-    public static function save_catcher_nugget($params = array()) {
+    public static function save_catcher_nugget($params = array())
+    {
         $id = \Input::post('model_id');
         $model = \Input::post('model_name');
         $catcher_name = \Input::post('catcher_name');
@@ -142,31 +144,23 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
 
         $data = array();
         $sharable_properties = $item->get_sharable_property();
-        if (!empty($params['filter']))
-        {
+        if (!empty($params['filter'])) {
             $sharable_properties = array_intersect_key($sharable_properties, array_flip($params['filter']));
         }
-        foreach ($sharable_properties as $type => $idc)
-        {
+        foreach ($sharable_properties as $type => $idc) {
             $use_default = \Input::post('default.'.$type, false);
-            if (!empty($use_default))
-            {
+            if (!empty($use_default)) {
                 unset($data[$type]);
-            }
-            else
-            {
+            } else {
                 $data[$type] = \Input::post($type);
-                if (empty($data[$type]))
-                {
+                if (empty($data[$type])) {
                     unset($data[$type]);
                 }
             }
         }
-        if (isset($sharable_properties[\Nos\DataCatcher::TYPE_IMAGE]) && !\Input::post('default.'.$type, false) && \Input::post(\Nos\DataCatcher::TYPE_IMAGE, 0) == 0)
-        {
+        if (isset($sharable_properties[\Nos\DataCatcher::TYPE_IMAGE]) && !\Input::post('default.'.$type, false) && \Input::post(\Nos\DataCatcher::TYPE_IMAGE, 0) == 0) {
             $data[\Nos\DataCatcher::TYPE_IMAGE] = \Input::post('custom_image', 0);
-            if (empty($data[\Nos\DataCatcher::TYPE_IMAGE]))
-            {
+            if (empty($data[\Nos\DataCatcher::TYPE_IMAGE])) {
                 unset($data[\Nos\DataCatcher::TYPE_IMAGE]);
             }
         }

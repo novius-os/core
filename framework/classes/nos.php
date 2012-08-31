@@ -10,14 +10,15 @@
 
 namespace Nos;
 
-class Nos {
-
+class Nos
+{
     /**
      * Returns the controller instance from the main request
      *
      * @return \Nos\Controller
      */
-    public static function main_controller() {
+    public static function main_controller()
+    {
         return \Request::main()->controller_instance;
     }
 
@@ -29,8 +30,8 @@ class Nos {
      *                           false will writes the function call and include it
      * @return string
      */
-    public static function hmvc($where, $args = null) {
-
+    public static function hmvc($where, $args = null)
+    {
         \Fuel::$profiling && \Profiler::console("HMVC $where");
 
         if (empty($args['args'])) {
@@ -77,8 +78,8 @@ class Nos {
      * @param  \Nos\Controller  $controller  Context for the execution
      * @return string
      */
-    public static function parse_wysiwyg($content, $controller) {
-
+    public static function parse_wysiwyg($content, $controller)
+    {
         static::_parse_enhancers($content, $controller);
         static::_parse_medias($content);
         static::_parse_internals($content);
@@ -94,7 +95,8 @@ class Nos {
         return $content;
     }
 
-    protected static function _parse_enhancers(&$content, $controller) {
+    protected static function _parse_enhancers(&$content, $controller)
+    {
         // Fetch the available functions
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
 
@@ -107,7 +109,8 @@ class Nos {
         });
     }
 
-    public static function parse_enhancers($content, $closure) {
+    public static function parse_enhancers($content, $closure)
+    {
         preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
         foreach ($matches[2] as $match_id => $enhancer) {
             $closure($enhancer, $matches[3][$match_id], $matches[0][$match_id]);
@@ -119,7 +122,8 @@ class Nos {
         }
     }
 
-    public static function get_enhancer_content($enhancer, $args, $controller) {
+    public static function get_enhancer_content($enhancer, $args, $controller)
+    {
         $args = json_decode(strtr($args, array(
             '&quot;' => '"',
         )), true);
@@ -148,19 +152,15 @@ class Nos {
         return $function_content;
     }
 
-    protected static function _parse_medias(&$content) {
-
-        Tools_Wysiwyg::parse_medias($content, function($media, $params) use (&$content)
-        {
+    protected static function _parse_medias(&$content)
+    {
+        Tools_Wysiwyg::parse_medias($content, function($media, $params) use (&$content) {
             if (empty($media)) {
                 $content = str_replace($params['tag'], '', $content);
             } else {
-                if (!empty($params['height']))
-                {
+                if (!empty($params['height'])) {
                     $media_url = $media->get_public_path_resized($params['width'], $params['height']);
-                }
-                else
-                {
+                } else {
                     $media_url = $media->get_public_path();
                 }
                 $content = str_replace($params['src'], $media_url, $content);
@@ -168,19 +168,17 @@ class Nos {
         });
     }
 
-    protected static function _parse_internals(&$content) {
-
+    protected static function _parse_internals(&$content)
+    {
         // Replace internal links
         preg_match_all('`nos://page/(\d+)`u', $content, $matches);
         if (!empty($matches[0])) {
             $page_ids = array();
-            foreach ($matches[1] as $match_id => $page_id)
-            {
+            foreach ($matches[1] as $match_id => $page_id) {
                 $page_ids[] = $page_id;
             }
             $pages = Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
-            foreach ($matches[1] as $match_id => $page_id)
-            {
+            foreach ($matches[1] as $match_id => $page_id) {
                 $content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);
             }
         }

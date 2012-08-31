@@ -24,7 +24,8 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         ), $this->_properties);
     }
 
-    public function get_default_nuggets($item) {
+    public function get_default_nuggets($item)
+    {
         $default_nuggets = $item->get_catcher_nuggets(Model_Content_Nuggets::DEFAULT_CATCHER);
         $nuggets = $default_nuggets->content_data;
         foreach ($this->_properties['data'] as $type => $params) {
@@ -40,7 +41,8 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $nuggets;
     }
 
-    public function get_catcher_nuggets($item, $catcher = Model_Content_Nuggets::DEFAULT_CATCHER) {
+    public function get_catcher_nuggets($item, $catcher = Model_Content_Nuggets::DEFAULT_CATCHER)
+    {
         $default_nuggets = Model_Content_Nuggets::find('first', array(
             'where' => array(
                 'content_catcher' => $catcher,
@@ -59,7 +61,8 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $default_nuggets;
     }
 
-    public function get_sharable_property($item, $property = null, $default = null) {
+    public function get_sharable_property($item, $property = null, $default = null)
+    {
         if (empty($property)) {
             return $this->_properties['data'];
         } else {
@@ -72,7 +75,8 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         }
     }
 
-    public function data_catchers($item) {
+    public function data_catchers($item)
+    {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'data_catchers.php', 'data_catchers');
         $data_catchers = \Config::get("data_catchers", array());
         $catchers = array();
@@ -129,12 +133,10 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
     public function possible_medias($item)
     {
         $medias = array();
-        foreach ($item->medias as $media)
-        {
+        foreach ($item->medias as $media) {
             $medias[$media->media_id] = $media;
         }
-        foreach ($item->wysiwygs as $wysiwyg)
-        {
+        foreach ($item->wysiwygs as $wysiwyg) {
             \Nos\Tools_Wysiwyg::parse_medias($wysiwyg, function($media) use (&$medias) {
                 if (!empty($media)) {
                     $medias[$media->media_id] = $media;
@@ -145,7 +147,8 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         return $medias;
     }
 
-    public function get_nugget_content($item, $catcher_name) {
+    public function get_nugget_content($item, $catcher_name)
+    {
         $extended_content = $item->get_catcher_nuggets($catcher_name)->content_data;
         $content = $item->get_default_nuggets();
         foreach ($extended_content as $key => $params) {

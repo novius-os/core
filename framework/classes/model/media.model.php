@@ -10,7 +10,8 @@
 
 namespace Nos;
 
-class Model_Media extends \Nos\Orm\Model {
+class Model_Media extends \Nos\Orm\Model
+{
     protected static $_table_name = 'nos_media';
     protected static $_primary_key = array('media_id');
 
@@ -66,8 +67,8 @@ class Model_Media extends \Nos\Orm\Model {
      * media_height
      */
 
-    public function delete_from_disk() {
-
+    public function delete_from_disk()
+    {
         $file = APPPATH.$this->get_private_path();
         if (is_file($file)) {
             \File::delete($file);
@@ -76,8 +77,8 @@ class Model_Media extends \Nos\Orm\Model {
         return true;
     }
 
-    public function delete_public_cache() {
-
+    public function delete_public_cache()
+    {
         // Delete cached media entries
         $path_public     = DOCROOT.$this->get_public_path();
         $path_thumbnails = DOCROOT.str_replace('media/', 'cache/media/', static::$public_path).$this->media_path;
@@ -94,19 +95,23 @@ class Model_Media extends \Nos\Orm\Model {
         }
     }
 
-    public function get_path() {
+    public function get_path()
+    {
         return ltrim($this->virtual_path(), '/');
     }
 
-    public function get_public_path() {
+    public function get_public_path()
+    {
         return static::$public_path.$this->get_path();
     }
 
-    public function get_private_path() {
+    public function get_private_path()
+    {
         return static::$private_path.$this->get_path();
     }
 
-    public function get_img_tag($params = array()) {
+    public function get_img_tag($params = array())
+    {
         if (!$this->is_image()) {
             return false;
         }
@@ -115,14 +120,16 @@ class Model_Media extends \Nos\Orm\Model {
         return '<img src="'.$src.'" width="'.$width.'" height="'.$height.'" />';
     }
 
-    public function get_img_tag_resized($max_width = null, $max_height = null) {
+    public function get_img_tag_resized($max_width = null, $max_height = null)
+    {
         return $this->get_img_tag(array(
             'max_width'  => $max_width,
             'max_height' => $max_height,
         ));
     }
 
-    public function get_img_infos($max_width = null, $max_height = null) {
+    public function get_img_infos($max_width = null, $max_height = null)
+    {
         if (!$this->is_image()) {
             return false;
         }
@@ -138,11 +145,13 @@ class Model_Media extends \Nos\Orm\Model {
         return array($src, $width, $height, $ratio);
     }
 
-    public function is_image() {
+    public function is_image()
+    {
         return in_array($this->media_ext, array('jpg', 'png', 'gif', 'jpeg', 'bmp'));
     }
 
-    public function get_public_path_resized($max_width = 0, $max_height = 0) {
+    public function get_public_path_resized($max_width = 0, $max_height = 0)
+    {
         if (!$this->is_image()) {
             return false;
         }
@@ -150,7 +159,8 @@ class Model_Media extends \Nos\Orm\Model {
         return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 
-	public function _event_before_save() {
+	public function _event_before_save()
+	{
         parent::_event_before_save();
 		$is_image = @getimagesize(APPPATH.$this->get_private_path());
 		if ($is_image !== false) {

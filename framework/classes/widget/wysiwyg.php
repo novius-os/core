@@ -10,12 +10,12 @@
 
 namespace Nos;
 
-class Widget_Wysiwyg extends \Fieldset_Field {
-
+class Widget_Wysiwyg extends \Fieldset_Field
+{
 	protected $options = array();
 
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
-
+    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
+    {
         $attributes['type']  = 'textarea';
 		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce not_initialized';
 
@@ -35,7 +35,8 @@ class Widget_Wysiwyg extends \Fieldset_Field {
      * How to display the field
      * @return string
      */
-    public function build() {
+    public function build()
+    {
         parent::build();
 	    $this->fieldset()->append($this->js_init());
 
@@ -45,7 +46,8 @@ class Widget_Wysiwyg extends \Fieldset_Field {
         return (string) parent::build();
     }
 
-	public function js_init() {
+	public function js_init()
+	{
 	    // we have to find why it's called two times...
 
         return \View::forge('widget/wysiwyg', array(

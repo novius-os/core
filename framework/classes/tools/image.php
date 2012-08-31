@@ -10,11 +10,12 @@
 
 namespace Nos;
 
-class Tools_Image {
-
+class Tools_Image
+{
     public static $cmd_convert = null;
 
-    public static function _init() {
+    public static function _init()
+    {
         static::$cmd_convert = \Config::get('cmd_convert');
     }
 
@@ -26,8 +27,8 @@ class Tools_Image {
      * @param  string  $dest        Destination file
      * @return bool
      */
-    public static function resize($source, $max_width = null, $max_height = null, $dest = null) {
-
+    public static function resize($source, $max_width = null, $max_height = null, $dest = null)
+    {
 	    if (!is_file($source)) {
 		    throw new \Exception(__('This image doesn\'t exist.'));
 	    }
@@ -77,8 +78,8 @@ class Tools_Image {
      * @param  int  $max_height   Max height
      * @return array  0: width, 1: height, 2: ratio
      */
-    public static function calculate_ratio($orig_width, $orig_height, $max_width = null, $max_height = null) {
-
+    public static function calculate_ratio($orig_width, $orig_height, $max_width = null, $max_height = null)
+    {
         $dont_resize =
             ($orig_width <= $max_width && $orig_height <= $max_height) ||
             (empty($max_width) && $orig_height <= $max_height) ||
@@ -107,8 +108,8 @@ class Tools_Image {
      * @param type $dest
      * @param type $iteration_count
      */
-    protected static function _resize_convert($source, $max_width, $max_height, $dest, $iteration_count = 1) {
-
+    protected static function _resize_convert($source, $max_width, $max_height, $dest, $iteration_count = 1)
+    {
         for ($i = $iteration_count; $i >= 1; $i--) {
             if ($i < $iteration_count) {
                 $source = $dest;
@@ -139,8 +140,8 @@ class Tools_Image {
      * @param type $height
      * @param type $dest
      */
-    protected static function _resize_gd($image_info, $source, $width, $height, $dest) {
-
+    protected static function _resize_gd($image_info, $source, $width, $height, $dest)
+    {
         $image_type = $image_info[2];
 
         if (!in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {

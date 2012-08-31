@@ -153,7 +153,8 @@ class Str extends \Fuel\Core\Str
         return $text;
     }
 
-    public static function bbToHtml($text) {
+    public static function bbToHtml($text)
+    {
         $text = stripslashes($text);
         $text = nl2br($text); //htmlentities
         $input = array(
@@ -181,8 +182,7 @@ class Str extends \Fuel\Core\Str
             '<div style="text-align:right;">$1</div>'
         );
         $count = count($input)-1;
-        for($i=0;$i<=$count;$i++)
-        {
+        for($i=0;$i<=$count;$i++) {
             $text = preg_replace($input[$i],$output[$i],$text);
         }
 

@@ -10,13 +10,14 @@
 
 namespace Nos;
 
-class Controller_Admin_Application extends Controller_Admin_Auth {
-
+class Controller_Admin_Application extends Controller_Admin_Auth
+{
     public $template = 'nos::admin/html';
     public $bypass   = false;
 
 
-    public function before() {
+    public function before()
+    {
         parent::before();
 
         if (!$this->bypass) {
@@ -34,7 +35,8 @@ class Controller_Admin_Application extends Controller_Admin_Auth {
     }
 
 
-    public function after($response) {
+    public function after($response)
+    {
         foreach (array(
                      'title' => 'Administration',
                      'base' => \Uri::base(false),

@@ -17,16 +17,14 @@ class Tools_Enhancer
         // Check if any page contains this enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
         $page_enhanced = \Config::get('data::page_enhanced.'.$enhancer_name, array());
-        if (empty($page_enhanced))
-        {
+        if (empty($page_enhanced)) {
             return array();
         }
 
         // Check if this enhancer exists
         \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
         $enhancer = \Config::get('data::enhancers.'.$enhancer_name, array());
-        if (empty($enhancer))
-        {
+        if (empty($enhancer)) {
             return array();
         }
 
@@ -47,8 +45,7 @@ class Tools_Enhancer
         // Check if the application exists
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_namespaces.php', 'data::app_namespaces');
         $namespace = \Config::get('data::app_namespaces.'.$application_name, '');
-        if (empty($page_enhanced))
-        {
+        if (empty($page_enhanced)) {
             return array();
         }
 
@@ -68,8 +65,7 @@ class Tools_Enhancer
         $urlPath = \Arr::get($params, 'urlPath', false);
         $preview = \Arr::get($params, 'preview', false);
         if ($urlPath === false) {
-            foreach ($page_enhanced as $page_id => $params)
-            {
+            foreach ($page_enhanced as $page_id => $params) {
                 $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
                 if ($urlPath !== false && (!$translatable || $params['lang'] == $item_lang) && ($preview || $params['published'])) {
                     $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
@@ -82,7 +78,8 @@ class Tools_Enhancer
         return $urls;
     }
 
-    public static function url_page($page_id) {
+    public static function url_page($page_id)
+    {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
         $url_enhanced = array_flip($url_enhanced);

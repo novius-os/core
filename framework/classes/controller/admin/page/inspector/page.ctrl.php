@@ -23,8 +23,7 @@ class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltre
         $json = parent::tree($tree_config);
 
         // If we're requesting the root
-        if ($id === null)
-        {
+        if ($id === null) {
             $json['total'] = 0;
             $json['items'] = array(
                 array(

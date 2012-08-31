@@ -10,7 +10,8 @@
 
 namespace Nos;
 
-class Model_Wysiwyg extends \Nos\Orm\Model {
+class Model_Wysiwyg extends \Nos\Orm\Model
+{
     protected static $_table_name = 'nos_wysiwyg';
     protected static $_primary_key = array('wysiwyg_id');
 }

@@ -10,11 +10,14 @@
 
 namespace Nos\Orm;
 
-class Query extends \Orm\Query {
-	public function alias() {
+class Query extends \Orm\Query
+{
+	public function alias()
+	{
 		return $this->alias;
 	}
-	public function connection() {
+	public function connection()
+	{
 		return $this->connection;
 	}
 }

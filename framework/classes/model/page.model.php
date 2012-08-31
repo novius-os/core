@@ -12,8 +12,8 @@ namespace Nos;
 
 use Fuel\Core\Uri;
 
-class Model_Page extends \Nos\Orm\Model {
-
+class Model_Page extends \Nos\Orm\Model
+{
     protected static $_table_name = 'nos_page';
     protected static $_primary_key = array('page_id');
 
@@ -106,7 +106,8 @@ class Model_Page extends \Nos\Orm\Model {
     const LOCK_DELETION = 1;
     const LOCK_EDITION  = 2;
 
-    public static function find($id = null, array $options = array()) {
+    public static function find($id = null, array $options = array())
+    {
 		if (array_key_exists('order_by', $options)) {
 			isset($options['order_by']['page_sort']) or $options['order_by']['page_sort'] = 'ASC';
 		}
@@ -118,7 +119,8 @@ class Model_Page extends \Nos\Orm\Model {
      *
      * @return string
      */
-    public function get_link() {
+    public function get_link()
+    {
         $attr = array(
             'href' => $this->get_href(),
         );
@@ -136,13 +138,15 @@ class Model_Page extends \Nos\Orm\Model {
      * @param int $params Id of the page
      * @return type
      */
-    public static function get_url($params) {
+    public static function get_url($params)
+    {
         if (is_numeric($params)) {
             return static::find($params)->get_href();
         }
     }
 
-    public static function get_url_absolute($params) {
+    public static function get_url_absolute($params)
+    {
         if (is_numeric($params)) {
             return static::find($params)->get_href(array(
                 'absolute' => true,
@@ -155,7 +159,8 @@ class Model_Page extends \Nos\Orm\Model {
      * @param   array   params
      * @return  string  the href of the page (external link or virtuak URL)
      */
-    public function get_href($params = array()) {
+    public function get_href($params = array())
+    {
         if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
             $page_external_link = $this->page_external_link;
             if (empty($page_external_link) && !$this->is_main_lang()) {
@@ -173,11 +178,13 @@ class Model_Page extends \Nos\Orm\Model {
         return $url;
     }
 
-    public function get_preview_href($params) {
+    public function get_preview_href($params)
+    {
         return $this->get_href($params).($this->page_type == self::TYPE_EXTERNAL_LINK ? '' : '?_preview=1');
     }
 
-	public function _event_after_save() {
+	public function _event_after_save()
+	{
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
 
 		$content = '';
@@ -226,12 +233,14 @@ class Model_Page extends \Nos\Orm\Model {
 		}
 	}
 
-	public function _event_after_delete() {
+	public function _event_after_delete()
+	{
 		static::_remove_url_enhanced($this->page_id);
 		static::_remove_page_enhanced($this->page_id);
 	}
 
-	protected static function _remove_url_enhanced($id) {
+	protected static function _remove_url_enhanced($id)
+	{
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
 		$url_enhanced = \Config::get("data::url_enhanced", array());
@@ -244,7 +253,8 @@ class Model_Page extends \Nos\Orm\Model {
         \Config::set('data::url_enhanced', $url_enhanced);
 	}
 
-	protected static function _remove_page_enhanced($id) {
+	protected static function _remove_page_enhanced($id)
+	{
 		\Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
 
 		$page_enhanced = \Config::get("data::page_enhanced", array());

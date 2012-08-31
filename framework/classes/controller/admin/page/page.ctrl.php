@@ -10,15 +10,14 @@
 
 namespace Nos;
 
-class Controller_Admin_Page_Page extends Controller_Admin_Crud {
-
+class Controller_Admin_Page_Page extends Controller_Admin_Crud
+{
     protected $page_parent = false;
 
     protected function form_item()
     {
         parent::form_item();
-        if ($this->item->is_new())
-        {
+        if ($this->item->is_new()) {
             // The first page we create is a homepage
             $lang_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
@@ -32,7 +31,8 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         }
     }
 
-    public function before_save($page, $data) {
+    public function before_save($page, $data)
+    {
         parent::before_save($page, $data);
 
         $parent = $page->get_parent();
@@ -69,7 +69,8 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
         return $fieldset;
     }
 
-    protected function check_permission($action) {
+    protected function check_permission($action)
+    {
         parent::check_permission($action);
         if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/page/appdesk/list', $this->item)) {
             throw new \Exception('Permission denied');
@@ -77,7 +78,8 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
     }
 
 
-    public function action_set_homepage() {
+    public function action_set_homepage()
+    {
         try {
             $id = \Input::post('id', 0);
             if (empty($id) && \Fuel::$env === \Fuel::DEVELOPMENT) {
@@ -96,15 +98,13 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud {
                 ),
             ));
 
-            foreach ($pages_lang as $page_lang)
-            {
+            foreach ($pages_lang as $page_lang) {
                 $page_lang->page_home = 1;
                 $page_lang->page_entrance = 1;
                 $page_lang->save();
             }
 
-            foreach ($pages_old as $page_old)
-            {
+            foreach ($pages_old as $page_old) {
                 $page_old->page_home = 0;
                 $page_old->page_entrance = 0;
                 $page_old->save();

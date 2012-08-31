@@ -13,20 +13,16 @@ class Command extends \Oil\Command
     public static function init($args)
     {
         //set up the environment
-        if (($env = \Cli::option('env')))
-        {
+        if (($env = \Cli::option('env'))) {
             \Fuel::$env = constant('\Fuel::'. mb_strtoupper($env)) ?: \Fuel::DEVELOPMENT;
         }
 
         // Remove flag options from the main argument list
         $args = self::_clear_args($args);
 
-        try
-        {
-            if ( ! isset($args[1]))
-            {
-                if (\Cli::option('v', \Cli::option('version')))
-                {
+        try {
+            if ( ! isset($args[1])) {
+                if (\Cli::option('v', \Cli::option('version'))) {
                     \Cli::write('Fuel: '.\Fuel::VERSION);
 
                     return;
@@ -37,21 +33,18 @@ class Command extends \Oil\Command
                 return;
             }
 
-            switch ($args[1])
-            {
+            switch ($args[1]) {
                 case 'g':
                 case 'generate':
 
                     $action = isset($args[2]) ? $args[2]: 'help';
 
                     $subfolder = 'orm';
-                    if (is_int(mb_strpos($action, '/')))
-                    {
+                    if (is_int(mb_strpos($action, '/'))) {
                         list($action, $subfolder)=explode('/', $action);
                     }
 
-                    switch ($action)
-                    {
+                    switch ($action) {
                         case 'config':
                         case 'controller':
                         case 'model':
@@ -103,8 +96,7 @@ class Command extends \Oil\Command
 
                     $action = isset($args[2]) ? $args[2]: 'help';
 
-                    switch ($action)
-                    {
+                    switch ($action) {
                         case 'list':
                             call_user_func('Oil\Cell::all');
                             break;
@@ -135,8 +127,7 @@ class Command extends \Oil\Command
                     @include_once('PHPUnit/Autoload.php');
 
                     // Attempt to load PHUnit.  If it fails, we are done.
-                    if ( ! class_exists('PHPUnit_Framework_TestCase'))
-                    {
+                    if ( ! class_exists('PHPUnit_Framework_TestCase')) {
                         throw new Exception('PHPUnit does not appear to be installed.'.PHP_EOL.PHP_EOL."\tPlease visit http://phpunit.de and install.");
                     }
 
@@ -151,8 +142,7 @@ class Command extends \Oil\Command
 
                     \Cli::write('Tests Running...This may take a few moments.', 'green');
 
-                    foreach(explode(';', $command) as $c)
-                    {
+                    foreach(explode(';', $command) as $c) {
                         passthru($c);
                     }
 
@@ -162,10 +152,7 @@ class Command extends \Oil\Command
 
                     static::help();
             }
-        }
-
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             \Cli::error('Error: '.$e->getMessage());
             \Cli::beep();
 
@@ -176,10 +163,8 @@ class Command extends \Oil\Command
 
     private static function _clear_args($actions = array())
     {
-        foreach ($actions as $key => $action)
-        {
-            if (mb_substr($action, 0, 1) === '-')
-            {
+        foreach ($actions as $key => $action) {
+            if (mb_substr($action, 0, 1) === '-') {
                 unset($actions[$key]);
             }
         }

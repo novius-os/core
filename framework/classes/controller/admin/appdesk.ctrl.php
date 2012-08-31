@@ -21,17 +21,18 @@ use Asset, Format, Input, Session, View, Uri;
  * @package  app
  * @extends  Controller
  */
-class Controller_Admin_Appdesk extends Controller_Admin_Application {
-
-    public function before() {
+class Controller_Admin_Appdesk extends Controller_Admin_Application
+{
+    public function before()
+    {
         parent::before();
 
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, $this->config);
     }
 
-    public function action_index($view = null) {
-
+    public function action_index($view = null)
+    {
         if (empty($view)) {
             $view = \Input::get('view', $this->config['selectedView']);
         }
@@ -70,9 +71,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
                 foreach ((array)$condition as $field) {
                     if (is_callable($field)) {
                         $query = $field($value, $query);
-                    }
-                    else
-                    {
+                    } else {
                         $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
                     }
                 }

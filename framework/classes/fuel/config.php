@@ -11,36 +11,39 @@
 /**
  * Extended Config class to allow callback on the loaded config
  */
-class Config extends \Fuel\Core\Config {
-
-    public static function load($file, $group = null, $reload = false, $overwrite = false) {
+class Config extends \Fuel\Core\Config
+{
+    public static function load($file, $group = null, $reload = false, $overwrite = false)
+    {
         $originFileName = $file;
         $file = static::convertFileName($file, 'load');
         if ($originFileName == 'db')  {
             $group = 'db';
         }
-		if (!$reload and is_array($file) and is_string($group))
-		{
+		if (!$reload and is_array($file) and is_string($group)) {
             Event::trigger_function('config|'.$group, array(&$file));
 		}
 
         return parent::load($file, $group, $reload, $overwrite);
     }
 
-    public static function get($item, $default = null) {
+    public static function get($item, $default = null)
+    {
         $item = static::convertFileName($item, 'get');
         //print_r($item."\n");
         //print_r(parent::get($item, $default));
         return parent::get($item, $default);
 	}
 
-    public static function save($file, $config) {
+    public static function save($file, $config)
+    {
 		$file = static::convertFileName($file, 'save');
 
         return parent::save($file, $config);
 	}
 
-    public static function convertFileName($file, $from = 'load') {
+    public static function convertFileName($file, $from = 'load')
+    {
         if (is_string($file) && mb_strpos($file, '::') !== false && mb_substr($file, 0, 4) == 'nos_') {
             list($application, $configuration_path) = explode('::', $file);
             $file = 'nos::admin/'.$application.'/'.$configuration_path;
@@ -49,11 +52,13 @@ class Config extends \Fuel\Core\Config {
         return $file;
     }
 
-    public static function getFromUser($item, $default = null) {
+    public static function getFromUser($item, $default = null)
+    {
         return static::mergeWithUser($item, static::get($item, $default));
     }
 
-    public static function mergeWithUser($item, $config) {
+    public static function mergeWithUser($item, $config)
+    {
         $user = Session::user();
 
         Arr::set($config, 'configuration_id', static::getDbName($item));
@@ -61,7 +66,8 @@ class Config extends \Fuel\Core\Config {
         return \Arr::merge($config, \Arr::get($user->getConfiguration(), static::getDbName($item), array()));
     }
 
-    public static function configFile($class) {
+    public static function configFile($class)
+    {
         $namespace = trim(\Inflector::get_namespace($class), '\\');
 
         $application = mb_strtolower($namespace);
@@ -70,8 +76,7 @@ class Config extends \Fuel\Core\Config {
         if ($application !== 'nos') {
             \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
             $namespaces = Config::get('data::app_namespaces', null);
-            if ($app = array_search($namespace, $namespaces))
-            {
+            if ($app = array_search($namespace, $namespaces)) {
                 $application = $app;
             }
         }
@@ -79,7 +84,8 @@ class Config extends \Fuel\Core\Config {
         return array($application, $file);
     }
 
-    public static function loadConfiguration($app_name, $file_name) {
+    public static function loadConfiguration($app_name, $file_name)
+    {
         \Config::load($app_name.'::'.$file_name, true);
         $config = \Config::get($app_name.'::'.$file_name);
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
@@ -96,14 +102,16 @@ class Config extends \Fuel\Core\Config {
         return $config;
     }
 
-    public static function getDbName($item) {
+    public static function getDbName($item)
+    {
         $item = str_replace('::', '/config/', $item);
         $item = str_replace('/', '.', $item);
 
         return $item;
     }
 
-    public static function extendable_load($module_name, $file_name) {
+    public static function extendable_load($module_name, $file_name)
+    {
         \Config::load($module_name.'::'.$file_name, true);
         $config = \Config::get($module_name.'::'.$file_name);
         \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
@@ -121,7 +129,8 @@ class Config extends \Fuel\Core\Config {
         return $config;
     }
 
-    public static function application($module_name) {
+    public static function application($module_name)
+    {
         return static::extendable_load($module_name, 'config');
     }
 

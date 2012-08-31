@@ -15,8 +15,8 @@ class UnknownMethodBehaviourException extends \Exception {};
 
 use Arr;
 
-class Model extends \Orm\Model {
-
+class Model extends \Orm\Model
+{
 	protected static $_has_many = array();
 
 	/**
@@ -41,12 +41,10 @@ class Model extends \Orm\Model {
     {
         $class = get_called_class();
 
-        if ( ! array_key_exists($class, static::$_title_property_cached))
-        {
+        if ( ! array_key_exists($class, static::$_title_property_cached)) {
             $_title_property = null;
 
-            if (property_exists($class, '_title_property'))
-            {
+            if (property_exists($class, '_title_property')) {
                 $_title_property = static::$_title_property;
             }
 
@@ -92,14 +90,11 @@ class Model extends \Orm\Model {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_table_names_cached);
 
-        if ( ! $init)
-        {
+        if ( ! $init) {
             $config = static::_config();
             if (!empty($config) && !empty($config['table_name'])) {
                 static::$_table_names_cached[$class] = $config['table_name'];
-            }
-            else
-            {
+            } else {
                 parent::table();
             }
         }
@@ -110,13 +105,12 @@ class Model extends \Orm\Model {
     /**
 	 *  @see \Orm\Model::properties()
 	 */
-	public static function properties() {
-
+	public static function properties()
+	{
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
 
-        if (!$init)
-        {
+        if (!$init) {
             parent::properties();
 
             $config = static::_config();
@@ -128,13 +122,15 @@ class Model extends \Orm\Model {
 		return static::$_properties_cached[$class];
 	}
 
-    public static function linked_wysiwygs() {
+    public static function linked_wysiwygs()
+    {
         $class = get_called_class();
 
         return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
     }
 
-    public static function linked_medias() {
+    public static function linked_medias()
+    {
         $class = get_called_class();
 
         return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
@@ -147,13 +143,11 @@ class Model extends \Orm\Model {
     {
         $class = get_called_class();
 
-        if ( ! array_key_exists($class, static::$_relations_cached))
-        {
+        if ( ! array_key_exists($class, static::$_relations_cached)) {
             // unset potential's relations stored in Nos\Orm\Model
             unset(static::$_has_many['linked_wysiwygs']);
             unset(static::$_has_many['linked_medias']);
-            if (static::linked_wysiwygs())
-            {
+            if (static::linked_wysiwygs()) {
                 static::$_has_many['linked_wysiwygs'] = array(
                     'key_from' => static::$_primary_key[0],
                     'model_to' => 'Nos\Model_Wysiwyg',
@@ -168,8 +162,7 @@ class Model extends \Orm\Model {
                 );
             }
 
-            if (static::linked_medias())
-            {
+            if (static::linked_medias()) {
                 static::$_has_many['linked_medias'] = array(
                     'key_from' => static::$_primary_key[0],
                     'model_to' => 'Nos\Model_Media_Link',
@@ -185,18 +178,12 @@ class Model extends \Orm\Model {
             }
 
             $config = static::_config();
-            if (!empty($config))
-            {
-                foreach (static::$_valid_relations as $rel_name => $rel_class)
-                {
-                    if (!empty($config[$rel_name]))
-                    {
-                        if (property_exists($class, '_'.$rel_name))
-                        {
+            if (!empty($config)) {
+                foreach (static::$_valid_relations as $rel_name => $rel_class) {
+                    if (!empty($config[$rel_name])) {
+                        if (property_exists($class, '_'.$rel_name)) {
                             static::${'_'.$rel_name} = \Arr::merge(static::${'_'.$rel_name}, $config[$rel_name]);
-                        }
-                        else
-                        {
+                        } else {
                             static::${'_'.$rel_name} = $config[$rel_name];
                         }
                     }
@@ -217,8 +204,7 @@ class Model extends \Orm\Model {
 
 		parent::observers($specific, $default);
 
-		if (!$init)
-		{
+		if (!$init) {
             $config = static::_config();
             if (!empty($config) && !empty($config['observers'])) {
                 static::$_observers_cached[$class] = \Arr::merge(static::$_observers_cached[$class], $config['observers']);
@@ -240,8 +226,7 @@ class Model extends \Orm\Model {
             }
 		}
 
-		if ($specific)
-		{
+		if ($specific) {
 			return \Arr::get(static::$_observers_cached[$class], $specific, $default);
 		}
 
@@ -259,13 +244,11 @@ class Model extends \Orm\Model {
 	{
 		$class = get_called_class();
 
-		if ( ! array_key_exists($class, static::$_behaviours_cached))
-		{
+		if ( ! array_key_exists($class, static::$_behaviours_cached)) {
             $behaviours = array();
             $_behaviours = array();
 
-            if (property_exists($class, '_behaviours'))
-            {
+            if (property_exists($class, '_behaviours')) {
                 $_behaviours = static::$_behaviours;
             }
 
@@ -274,14 +257,10 @@ class Model extends \Orm\Model {
                 $_behaviours = \Arr::merge($_behaviours, $config['behaviours']);
             }
 
-            foreach ($_behaviours as $beha_k => $beha_v)
-            {
-                if (is_int($beha_k))
-                {
+            foreach ($_behaviours as $beha_k => $beha_v) {
+                if (is_int($beha_k)) {
                     $behaviours[$beha_v] = array();
-                }
-                else
-                {
+                } else {
                     $behaviours[$beha_k] = $beha_v;
                 }
             }
@@ -289,8 +268,7 @@ class Model extends \Orm\Model {
             static::$_behaviours_cached[$class] = $behaviours;
         }
 
-		if ($specific)
-		{
+		if ($specific) {
 			return \Arr::get(static::$_behaviours_cached[$class], $specific, $default);
 		}
 
@@ -303,8 +281,7 @@ class Model extends \Orm\Model {
     protected static function _config()
     {
         $class = get_called_class();
-        if (!isset(static::$_configs[$class]))
-        {
+        if (!isset(static::$_configs[$class])) {
             $namespace = trim(\Inflector::get_namespace($class), '\\');
 
             $application = mb_strtolower($namespace);
@@ -313,10 +290,8 @@ class Model extends \Orm\Model {
             if ($application !== 'nos') {
                 \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
                 $apps = \Config::get('data::app_installed', array());
-                foreach ($apps as $app => $conf)
-                {
-                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace)
-                    {
+                foreach ($apps as $app => $conf) {
+                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace) {
                         $application = $app;
                     }
                 }
@@ -339,7 +314,8 @@ class Model extends \Orm\Model {
         return static::$_configs[$class];
     }
 
-    public function get_possible_lang() {
+    public function get_possible_lang()
+    {
         $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
         $tree         = static::behaviours('Nos\Orm_Behaviour_Tree');
 
@@ -359,12 +335,14 @@ class Model extends \Orm\Model {
 	/**
 	 * @see \Orm\Model::__construct()
 	 */
-	public function __construct() {
+	public function __construct()
+	{
         $this->initProviders();
 		call_user_func_array('parent::__construct', func_get_args());
 	}
 
-	public function __call($method, $args) {
+	public function __call($method, $args)
+	{
 		try {
 			return static::_callBehaviour($this, $method, $args);
 		} catch (\Nos\Orm\UnknownBehaviourException $e) {}
@@ -372,7 +350,8 @@ class Model extends \Orm\Model {
 		return parent::__call($method, $args);
 	}
 
-	public static function __callStatic($method, $args) {
+	public static function __callStatic($method, $args)
+	{
 		try {
 			return static::_callBehaviour(get_called_class(), $method, $args);
 		} catch (\Nos\Orm\UnknownBehaviourException $e) {}
@@ -380,11 +359,10 @@ class Model extends \Orm\Model {
 		return parent::__callStatic($method, $args);
 	}
 
-	private static function _callBehaviour($context, $method, $args) {
-		foreach (static::behaviours() as $behaviour => $settings)
-		{
-			if ( ! class_exists($behaviour))
-			{
+	private static function _callBehaviour($context, $method, $args)
+	{
+		foreach (static::behaviours() as $behaviour => $settings) {
+			if ( ! class_exists($behaviour)) {
                 throw new \UnexpectedValueException($behaviour);
 			}
             try {
@@ -394,11 +372,10 @@ class Model extends \Orm\Model {
 		throw new \Nos\Orm\UnknownBehaviourException();
 	}
 
-	public static function _callAllBehaviours($context, $method, $args) {
-		foreach (static::behaviours() as $behaviour => $settings)
-		{
-			if ( ! class_exists($behaviour))
-			{
+	public static function _callAllBehaviours($context, $method, $args)
+	{
+		foreach (static::behaviours() as $behaviour => $settings) {
+			if ( ! class_exists($behaviour)) {
                 throw new \UnexpectedValueException($behaviour);
 			}
 
@@ -411,32 +388,27 @@ class Model extends \Orm\Model {
     /**
      * Remove empty wysiwyg and medias
      */
-	public function _event_before_save() {
+	public function _event_before_save()
+	{
         $class = get_called_class();
-        if (static::linked_wysiwygs())
-        {
+        if (static::linked_wysiwygs()) {
             $w_keys = array_keys($this->linked_wysiwygs);
-            for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
-            {
+            for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
                 $i = $w_keys[$j];
                 // Remove empty wysiwyg
-                if ($this->linked_wysiwygs[$i]->wysiwyg_text == '')
-                {
+                if ($this->linked_wysiwygs[$i]->wysiwyg_text == '') {
                     $this->linked_wysiwygs[$i]->delete();
                     unset($this->linked_wysiwygs[$i]);
                 }
             }
         }
 
-        if (static::linked_medias())
-        {
+        if (static::linked_medias()) {
             $w_keys = array_keys($this->linked_medias);
-            for ($j = 0; $j < count($this->linked_medias); $j++)
-            {
+            for ($j = 0; $j < count($this->linked_medias); $j++) {
                 $i = $w_keys[$j];
                 // Remove empty medias
-                if ($this->linked_medias[$i]->medil_media_id == '')
-                {
+                if ($this->linked_medias[$i]->medil_media_id == '') {
                     $this->linked_medias[$i]->delete();
                     unset($this->linked_medias[$i]);
                 }
@@ -446,15 +418,11 @@ class Model extends \Orm\Model {
 
 	public function _update_original_relations($relations = null)
 	{
-		if (is_null($relations))
-		{
+		if (is_null($relations)) {
 			$this->_original_relations = array();
 			$relations = $this->_data_relations;
-		}
-		else
-		{
-			foreach ($relations as $key => $rel)
-			{
+		} else {
+			foreach ($relations as $key => $rel) {
 				// Unload the just fetched relation from the originals
 				unset($this->_original_relations[$rel]);
 
@@ -464,53 +432,53 @@ class Model extends \Orm\Model {
 			}
 		}
 
-		foreach ($relations as $rel => $data)
-		{
-			if (is_array($data))
-			{
+		foreach ($relations as $rel => $data) {
+			if (is_array($data)) {
 				$this->_original_relations[$rel] = array();
-				foreach ($data as $obj)
-				{
+				foreach ($data as $obj) {
 					$this->_original_relations[$rel][] = $obj ? $obj->implode_pk($obj) : null;
 				}
-			}
-			else
-			{
+			} else {
 				$this->_original_relations[$rel] = $data ? $data->implode_pk($data) : null;
 			}
 		}
 	}
 
-	public static function add_properties($properties) {
+	public static function add_properties($properties)
+	{
 		static::$_properties = Arr::merge(static::$_properties, $properties);
 	}
 
-    public function import_dataset_behaviours(&$dataset) {
+    public function import_dataset_behaviours(&$dataset)
+    {
 		try {
             static::_callAllBehaviours(get_called_class(), 'dataset', array(&$dataset, $this));
         } catch (\Exception $e) {}
     }
 
-    public function form_processing_behaviours($data, &$json_response) {
+    public function form_processing_behaviours($data, &$json_response)
+    {
 		try {
             static::_callAllBehaviours($this, 'form_processing', array($data, &$json_response));
         } catch (\Exception $e) {}
     }
 
-    public function form_fieldset_fields(&$fieldset) {
+    public function form_fieldset_fields(&$fieldset)
+    {
 		try {
             static::_callAllBehaviours($this, 'form_fieldset_fields', array(&$fieldset));
         } catch (\Exception $e) {}
     }
 
-	public static function query($options = array()) {
-
+	public static function query($options = array())
+	{
 		static::_callAllBehaviours(get_called_class(), 'before_query', array(&$options));
 
         return Query::forge(get_called_class(), static::connection(), $options);
 	}
 
-    public static function  get_prefix() {
+    public static function  get_prefix()
+    {
         return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
     }
 
@@ -519,7 +487,8 @@ class Model extends \Orm\Model {
      *
      * @return string
      */
-    public function title_item() {
+    public function title_item()
+    {
         $title_property = static::title_property();
         if (is_callable($title_property)) {
             return $title_property($this);
@@ -536,8 +505,8 @@ class Model extends \Orm\Model {
 	 * @example $item->pick('menu_title', 'title');
 	 * @return mixed
 	 */
-	public function pick() {
-
+	public function pick()
+	{
         $prefix_length = mb_strlen(static::get_prefix());
 
 		foreach (func_get_args() as $property) {
@@ -555,21 +524,16 @@ class Model extends \Orm\Model {
 	{
 		$arr_name = explode('->', $name);
 
-		if (count($arr_name) > 1)
-		{
+		if (count($arr_name) > 1) {
             $class = get_called_class();
-            if (static::linked_wysiwygs() && $arr_name[0] == 'wysiwygs')
-			{
+            if (static::linked_wysiwygs() && $arr_name[0] == 'wysiwygs') {
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_wysiwygs);
-                for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
-				{
+                for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
 					$i = $w_keys[$j];
-                    if ($this->linked_wysiwygs[$i]->wysiwyg_key == $key)
-					{
+                    if ($this->linked_wysiwygs[$i]->wysiwyg_key == $key) {
 						array_splice ($arr_name, 0, 2);
-						if (empty($arr_name))
-						{
+						if (empty($arr_name)) {
                             return $this->linked_wysiwygs[$i];
 						}
 
@@ -589,18 +553,14 @@ class Model extends \Orm\Model {
 				return $value;
 			}
 
-            if (static::linked_medias() && $arr_name[0] == 'medias')
-			{
+            if (static::linked_medias() && $arr_name[0] == 'medias') {
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_medias);
-                for ($j = 0; $j < count($this->linked_medias); $j++)
-				{
+                for ($j = 0; $j < count($this->linked_medias); $j++) {
 					$i = $w_keys[$j];
-                    if ($this->linked_medias[$i]->medil_key == $key)
-					{
+                    if ($this->linked_medias[$i]->medil_key == $key) {
 						array_splice ($arr_name, 0, 2);
-						if (empty($arr_name))
-						{
+						if (empty($arr_name)) {
                             return $this->linked_medias[$i];
 						}
 
@@ -625,8 +585,7 @@ class Model extends \Orm\Model {
 			// We need to access the relation and not the final object
             // So we don't want to use the provider but the __get({"medias->key"}) instead
 			//$arr_name[0] = $arr_name[0].'->'.$arr_name[1];
-			for ($i = 0; $i < count($arr_name); $i++)
-			{
+			for ($i = 0; $i < count($arr_name); $i++) {
 				$obj = &$obj->{$arr_name[$i]};
 			}
 			return $obj = $value;
@@ -640,21 +599,16 @@ class Model extends \Orm\Model {
 	public function & __get($name)
 	{
 		$arr_name = explode('->', $name);
-		if (count($arr_name) > 1)
-		{
+		if (count($arr_name) > 1) {
             $class = get_called_class();
-            if (static::linked_wysiwygs() && $arr_name[0] == 'wysiwygs')
-            {
+            if (static::linked_wysiwygs() && $arr_name[0] == 'wysiwygs') {
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_wysiwygs);
-                for ($j = 0; $j < count($this->linked_wysiwygs); $j++)
-				{
+                for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
 					$i = $w_keys[$j];
-                    if ($this->linked_wysiwygs[$i]->wysiwyg_key == $key)
-					{
+                    if ($this->linked_wysiwygs[$i]->wysiwyg_key == $key) {
 						array_splice ($arr_name, 0, 2);
-						if (empty($arr_name))
-						{
+						if (empty($arr_name)) {
                             return $this->linked_wysiwygs[$i];
 						}
 
@@ -665,16 +619,14 @@ class Model extends \Orm\Model {
 				return $ref;
 			}
 
-            if (static::linked_medias() && $arr_name[0] == 'medias')
-			{
+            if (static::linked_medias() && $arr_name[0] == 'medias') {
 				$key = $arr_name[1];
                 $w_keys = array_keys($this->linked_medias);
                 for ($j = 0; $j < count($this->linked_medias); $j++) {
 					$i = $w_keys[$j];
                     if ($this->linked_medias[$i]->medil_key == $key) {
 						array_splice ($arr_name, 0, 2);
-						if (empty($arr_name))
-						{
+						if (empty($arr_name)) {
                             return $this->linked_medias[$i];
 						}
 
@@ -686,27 +638,27 @@ class Model extends \Orm\Model {
 			}
 
 			$obj = $this;
-			for ($i = 0; $i < count($arr_name); $i++)
-			{
+			for ($i = 0; $i < count($arr_name); $i++) {
 				$obj = $obj->{$arr_name[$i]};
 			}
 			return $obj;
 		}
 
 		// Special getter for ID without prefix
-		if ($name == 'id')
-		{
+		if ($name == 'id') {
 			$name = static::$_primary_key[0];
 		}
 
 		return parent::__get($name);
 	}
 
-	public function __toString() {
+	public function __toString()
+	{
 		return get_class($this);
 	}
 
-	public function __isset($name) {
+	public function __isset($name)
+	{
 		try {
 			$this->__get($name);
 			return true;
@@ -726,19 +678,15 @@ class Model extends \Orm\Model {
 	public function get_diff()
 	{
 		$diff = array(0 => array(), 1 => array());
-		foreach ($this->_data as $key => $val)
-		{
-			if ($this->is_changed($key))
-			{
+		foreach ($this->_data as $key => $val) {
+			if ($this->is_changed($key)) {
 				$diff[0][$key] = array_key_exists($key, $this->_original) ? $this->_original[$key] : null;
 				$diff[1][$key] = $val;
 			}
 		}
-		foreach ($this->_data_relations as $key => $val)
-		{
+		foreach ($this->_data_relations as $key => $val) {
 			$rel = static::relations($key);
-			if ($rel->singular)
-			{
+			if ($rel->singular) {
 				if (empty($this->_original_relations[$key]) !== empty($val)
 					or ( ! empty($this->_original_relations[$key])
 						and $new_pk = $val->implode_pk($val)
@@ -747,19 +695,13 @@ class Model extends \Orm\Model {
 					$diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
 					$diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
 				}
-			}
-			else
-			{
+			} else {
 				$original_pks = $this->_original_relations[$key];
 				$new_pks = array();
-				foreach ($val as $v)
-				{
-					if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks))
-					{
+				foreach ($val as $v) {
+					if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
 						$new_pks[] = $new_pk;
-					}
-					else
-					{
+					} else {
 						$original_pks = array_diff($original_pks, array($new_pk));
 					}
 				}
@@ -776,7 +718,8 @@ class Model extends \Orm\Model {
     /**
      * Clone nested objects manually, it's not native
      */
-    public function __clone() {
+    public function __clone()
+    {
         parent::__clone();
         $wysiwygs = array();
         $medias = array();
@@ -795,7 +738,8 @@ class Model extends \Orm\Model {
         }
     }
 
-    protected function initProviders() {
+    protected function initProviders()
+    {
         $this->medias   = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
@@ -829,8 +773,7 @@ class Model_Media_Provider
 		// Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
 		$media_id = (string) ($value instanceof \Nos\Model_Media ? $value->media_id : $value);
 		$media = \Nos\Model_Media::find($media_id);
-		if (is_null($media))
-		{
+		if (is_null($media)) {
 			$pk = $this->parent->primary_key();
 			throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(get_class($this->parent))."(".$this->parent->{$pk[0]}.")");
 		}
@@ -839,8 +782,7 @@ class Model_Media_Provider
         $media_link = $this->parent->{'medias->'.$property};
 
 		// Create the new relation if it doesn't exists yet
-		if (is_null($media_link))
-		{
+		if (is_null($media_link)) {
             $this->parent->{'medias->'.$property} = $media_id;
 			return;
 		}
@@ -851,12 +793,14 @@ class Model_Media_Provider
 		// Don't save the link here, it's done with cascade_save = true
 	}
 
-	public function __isset($value) {
+	public function __isset($value)
+	{
 		$value = $this->__get($value);
 		return (!empty($value));
 	}
 
-    public function rewind() {
+    public function rewind()
+    {
         $keys = array();
         foreach($this->parent->linked_medias as $wysiwyg) {
             $keys[] = $wysiwyg->medil_key;
@@ -865,23 +809,28 @@ class Model_Media_Provider
         reset($keys);
     }
 
-    public function current() {
+    public function current()
+    {
         return $this->__get(current($this->iterator));
     }
 
-    public function key() {
+    public function key()
+    {
         return current($this->iterator);
     }
 
-    public function next() {
+    public function next()
+    {
         next($this->iterator);
     }
 
-    public function valid() {
+    public function valid()
+    {
         return false !== current($this->iterator);
     }
 
-    public function setParent($obj) {
+    public function setParent($obj)
+    {
         $this->parent = $obj;
     }
 }
@@ -916,8 +865,7 @@ class Model_Wysiwyg_Provider implements \Iterator
         $wysiwyg = $this->parent->{'wysiwygs->'.$property};
 
 		// Create the new relation if it doesn't exists yet
-		if (is_null($wysiwyg))
-		{
+		if (is_null($wysiwyg)) {
             $this->parent->{'wysiwygs->'.$property} = $value;
 			return;
 		}
@@ -928,12 +876,14 @@ class Model_Wysiwyg_Provider implements \Iterator
 		// Don't save the link here, it's done with cascade_save = true
 	}
 
-	public function __isset($value) {
+	public function __isset($value)
+	{
 		$value = $this->__get($value);
 		return (!empty($value));
 	}
 
-    public function rewind() {
+    public function rewind()
+    {
         $keys = array();
         $class = get_called_class();
         foreach($this->parent->linked_wysiwygs as $wysiwyg) {
@@ -943,19 +893,23 @@ class Model_Wysiwyg_Provider implements \Iterator
         reset($keys);
     }
 
-    public function current() {
+    public function current()
+    {
         return $this->__get(current($this->iterator));
     }
 
-    public function key() {
+    public function key()
+    {
         return current($this->iterator);
     }
 
-    public function next() {
+    public function next()
+    {
         next($this->iterator);
     }
 
-    public function valid() {
+    public function valid()
+    {
         return false !== current($this->iterator);
     }
 }

@@ -10,9 +10,10 @@
 
 namespace Nos;
 
-class Widget_Page_Selector extends \Nos\Widget_Selector {
-
-    public function before_construct(&$attributes, &$rules) {
+class Widget_Page_Selector extends \Nos\Widget_Selector
+{
+    public function before_construct(&$attributes, &$rules)
+    {
         $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' nos-page';
 
         if (empty($attributes['id'])) {
@@ -20,7 +21,8 @@ class Widget_Page_Selector extends \Nos\Widget_Selector {
         }
     }
 
-    public function build() {
+    public function build()
+    {
         return $this->template(static::widget(array(
             'input_name' => $this->name,
             'selected' => array(
@@ -40,7 +42,8 @@ class Widget_Page_Selector extends \Nos\Widget_Selector {
      * @static
      * @param array $options
      */
-    public static function widget($options = array()) {
+    public static function widget($options = array())
+    {
         $options = \Arr::merge(array(
             'treeUrl' => 'admin/nos/page/inspector/page/json',
             'reloadEvent' => 'Nos\\Model_Page',

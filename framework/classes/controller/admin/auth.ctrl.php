@@ -17,16 +17,12 @@ class Controller_Admin_Auth extends Controller
     {
         parent::before();
 
-        if (!\Nos\Auth::check())
-        {
-            if (\Input::is_ajax())
-            {
+        if (!\Nos\Auth::check()) {
+            if (\Input::is_ajax()) {
                 $this->response(array(
                     'login_page' => \Uri::base(false).'admin/nos/login',
                 ), 403);
-            }
-            else
-            {
+            } else {
                 \Response::redirect('/admin/nos/login?'.http_build_query(array(
                     'redirect' => \Input::server('REDIRECT_SCRIPT_URL', \Input::server('REDIRECT_URL', '/admin/')).'?tab='.\Input::get('tab', ''),
                 ), '', '&'));

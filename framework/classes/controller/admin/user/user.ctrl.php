@@ -10,16 +10,18 @@
 
 namespace Nos;
 
-class Controller_Admin_User_User extends Controller_Admin_Crud {
-
-    public function before() {
+class Controller_Admin_User_User extends Controller_Admin_Crud
+{
+    public function before()
+    {
         if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->method_params[0] == $user->user_id) {
             $this->bypass = true;
         }
         parent::before();
     }
 
-    protected function check_permission($action) {
+    protected function check_permission($action)
+    {
         parent::check_permission($action);
         if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $this->item)) {
             throw new \Exception('Permission denied');
@@ -29,15 +31,12 @@ class Controller_Admin_User_User extends Controller_Admin_Crud {
     protected function fields($fields)
     {
         $fields = parent::fields($fields);
-        if ($this->is_new)
-        {
+        if ($this->is_new) {
             $fields['user_password']['validation'][] = 'required';
             $fields['password_confirmation']['validation'][] = 'required';
             $fields['user_last_connection']['dont_populate'] = true;
             $fields['user_last_connection']['dont_save'] = true;
-        }
-        else
-        {
+        } else {
             unset($fields['user_password']);
             $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
         }
@@ -47,16 +46,15 @@ class Controller_Admin_User_User extends Controller_Admin_Crud {
 
     public function save($item, $data)
     {
-        if (!$this->is_new && $item->is_changed('user_password'))
-        {
+        if (!$this->is_new && $item->is_changed('user_password')) {
             $this->config['messages']['successfully saved'] = __('New password successfully set.');
         }
 
         return parent::save($item, $data);
     }
 
-    public function action_save_permissions() {
-
+    public function action_save_permissions()
+    {
         $role = Model_User_Role::find(\Input::post('role_id'));
 
         $applications = \Input::post('applications');

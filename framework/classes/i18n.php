@@ -69,14 +69,10 @@ class I18n
 		array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
 
 		$_messages = array();
-		foreach ($languages as $lang)
-		{
-			if ($path = \Finder::search('lang/'.$lang, $file, '.php', true))
-			{
-				foreach ($path as $p)
-				{
-                    if (array_key_exists($p, static::$_loaded_files))
-                    {
+		foreach ($languages as $lang) {
+			if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
+				foreach ($path as $p) {
+                    if (array_key_exists($p, static::$_loaded_files)) {
                         break;
                     }
 					$_messages = \Arr::merge(\Fuel::load($p), $_messages);
@@ -87,14 +83,12 @@ class I18n
 		}
 
         if (count($_messages)) {
-            if ( ! isset(static::$_messages[static::$_locale]))
-            {
+            if ( ! isset(static::$_messages[static::$_locale])) {
                 static::$_messages[static::$_locale] = array();
             }
             $group = ($group === null) ? $file : $group;
             static::$_group = $group;
-            if ( ! isset(static::$_messages[$group]))
-            {
+            if ( ! isset(static::$_messages[$group])) {
                 static::$_messages[static::$_locale][$group] = array();
             }
             static::$_messages[static::$_locale][$group] = \Arr::merge($_messages, static::$_messages[static::$_locale][$group]);

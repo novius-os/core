@@ -14,8 +14,8 @@ use \Input;
 use \View;
 use \Config;
 
-class Controller_Inspector_Model extends Controller_Admin_Application {
-
+class Controller_Inspector_Model extends Controller_Admin_Application
+{
     protected $config = array(
         'model' => '',
         'limit' => 20,

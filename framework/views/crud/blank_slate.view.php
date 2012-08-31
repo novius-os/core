@@ -27,12 +27,10 @@ echo View::forge('nos::crud/tab', array(
 <div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
         <?php
-        if (!in_array($lang, $possible))
-        {
+        if (!in_array($lang, $possible)) {
             echo '<p>&nbsp;</p>';
             $parent = $item->get_parent();
-            if (!empty($parent))
-            {
+            if (!empty($parent)) {
                 $uniqid_parent = uniqid('parent_');
                 echo strtr(__('This {item} cannot be added {lang} because its {parent} is not available in this language yet.'), array(
                     '{item}' => null === $item_text ? '' : $item_text,
@@ -48,22 +46,16 @@ echo View::forge('nos::crud/tab', array(
                     });
                 </script>
                 <?php
-            }
-            else
-            {
+            } else {
                 echo strtr(__('This {item} cannot be added {lang}.'), array(
                     '{item}' => null === $item_text ? '' : $item_text,
                     '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
                 ));
             }
-        }
-        else
-        {
-            foreach ($possible as $locale)
-            {
+        } else {
+            foreach ($possible as $locale) {
                 $item_lang = $item->find_lang($locale);
-                if (!empty($item_lang))
-                {
+                if (!empty($item_lang)) {
                     $labels[$item_lang->id] = \Config::get("locales.$locale", $locale);
                 }
             }
@@ -97,13 +89,10 @@ echo View::forge('nos::crud/tab', array(
                         <?= Form::hidden('lang', $lang) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
                         <?php
-                        if (count($labels) == 1)
-                        {
+                        if (count($labels) == 1) {
                             echo Form::hidden('create_from_id', key($labels));
                             $selected_lang = current($labels);
-                        }
-                        else
-                        {
+                        } else {
                             $selected_lang = Form::select('create_from_id', null, $labels);
                         }
 

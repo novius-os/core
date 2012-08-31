@@ -58,8 +58,7 @@ class Widget_Media extends \Fieldset_Field
     {
         $widget['class'] = (isset($widget['class']) ? $widget['class'] : '').' media';
 
-        if (empty($widget['id']))
-        {
+        if (empty($widget['id'])) {
             $widget['id'] = uniqid('media_');
         }
 
@@ -71,8 +70,7 @@ class Widget_Media extends \Fieldset_Field
             ),
         );
 
-        if (!empty($widget['widget_options']))
-        {
+        if (!empty($widget['widget_options'])) {
             $widget_options = \Arr::merge($widget_options, $widget['widget_options']);
         }
         unset($widget['widget_options']);
@@ -87,11 +85,9 @@ class Widget_Media extends \Fieldset_Field
      */
     protected static function hydrate_options(&$options, $media_id = null)
     {
-        if (!empty($media_id))
-        {
+        if (!empty($media_id)) {
             $media = \Nos\Model_Media::find($media_id);
-            if (!empty($media))
-            {
+            if (!empty($media)) {
                 $options['inputFileThumb']['file'] = $media->get_public_path_resized(64, 64);
             }
         }

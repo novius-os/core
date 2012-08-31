@@ -16,8 +16,8 @@ use View;
 
 class NotFoundException extends \Exception {}
 
-class Controller_Front extends Controller {
-
+class Controller_Front extends Controller
+{
     protected $_url = '';
     protected $_page_url = '';
     protected $_enhancer_url = false;
@@ -41,8 +41,8 @@ class Controller_Front extends Controller {
 
     protected $_page;
 
-    public function router($action, array $params, $status = 200) {
-
+    public function router($action, array $params, $status = 200)
+    {
 	    $this->_base_href = \URI::base();
 
         // Strip out leading / and trailing .html
@@ -134,35 +134,40 @@ class Controller_Front extends Controller {
     /**
      * @return mixed
      */
-    public function getPage() {
+    public function getPage()
+    {
         return $this->_page;
     }
 
     /**
      * @return string
      */
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->_url;
     }
 
     /**
      * @return string
      */
-    public function getPageUrl() {
+    public function getPageUrl()
+    {
         return $this->_page_url;
     }
 
     /**
      * @return mixed
      */
-    public function getEnhancedUrlPath() {
+    public function getEnhancedUrlPath()
+    {
         return $this->_enhanced_url_path;
     }
 
     /**
      * @return mixed
      */
-    public function getEnhancerUrl() {
+    public function getEnhancerUrl()
+    {
         return $this->_enhancer_url;
     }
 
@@ -170,7 +175,8 @@ class Controller_Front extends Controller {
      * @param $base_href
      * @return Controller_Front
      */
-    public function setBaseHref($base_href) {
+    public function setBaseHref($base_href)
+    {
         $this->_base_href = $base_href;
 
         return $this;
@@ -180,7 +186,8 @@ class Controller_Front extends Controller {
      * @param $title
      * @return Controller_Front
      */
-    public function setTitle($title, $template = null) {
+    public function setTitle($title, $template = null)
+    {
         if (!$template) {
             $template = \Config::get('title_template', null);
             if (!$template) {
@@ -197,7 +204,8 @@ class Controller_Front extends Controller {
      * @param $meta_description
      * @return Controller_Front
      */
-    public function setMetaDescription($meta_description) {
+    public function setMetaDescription($meta_description)
+    {
         $this->_meta_description = $meta_description;
 
         return $this;
@@ -207,7 +215,8 @@ class Controller_Front extends Controller {
      * @param $meta_keywords
      * @return Controller_Front
      */
-    public function setMetaKeywords($meta_keywords) {
+    public function setMetaKeywords($meta_keywords)
+    {
         $this->_meta_keywords = $meta_keywords;
 
         return $this;
@@ -217,7 +226,8 @@ class Controller_Front extends Controller {
      * @param $meta_robots
      * @return Controller_Front
      */
-    public function setMetaRobots($meta_robots) {
+    public function setMetaRobots($meta_robots)
+    {
         $this->_meta_robots = $meta_robots;
 
         return $this;
@@ -227,7 +237,8 @@ class Controller_Front extends Controller {
      * @param $meta
      * @return Controller_Front
      */
-    public function addMeta($meta) {
+    public function addMeta($meta)
+    {
         $this->_metas[] = $meta;
 
         return $this;
@@ -238,7 +249,8 @@ class Controller_Front extends Controller {
      * @param bool $footer
      * @return Controller_Front
      */
-    public function addJavascript($url, $footer = true) {
+    public function addJavascript($url, $footer = true)
+    {
         if ($footer) {
             $this->_js_footer[] = $url;
         } else {
@@ -253,7 +265,8 @@ class Controller_Front extends Controller {
      * @param bool $footer
      * @return Controller_Front
      */
-    public function addJavascriptInline($js, $footer = true) {
+    public function addJavascriptInline($js, $footer = true)
+    {
         return $this->addJavascript(array('js' => $js, 'inline' => true), $footer);
     }
 
@@ -261,7 +274,8 @@ class Controller_Front extends Controller {
      * @param $url
      * @return Controller_Front
      */
-    public function addCss($url) {
+    public function addCss($url)
+    {
         $this->_css[] = $url;
 
         return $this;
@@ -271,18 +285,21 @@ class Controller_Front extends Controller {
      * @param $css
      * @return Controller_Front
      */
-    public function addCssInline($css) {
+    public function addCssInline($css)
+    {
         return $this->addCss(array('css' => $css, 'inline' => true));
     }
 
     /**
      * @return bool
      */
-    public function isPreview() {
+    public function isPreview()
+    {
         return $this->_is_preview;
     }
 
-    protected function _handle_head(&$content) {
+    protected function _handle_head(&$content)
+    {
         $replaces  = array(
             '_base_href'         => array(
                 'pattern' => '<base [^>]*\/?>',
@@ -384,8 +401,8 @@ class Controller_Front extends Controller {
     /**
      * Generate the cache. Renders all wysiwyg and assign them to the view.
      */
-    protected function _generate_cache() {
-
+    protected function _generate_cache()
+    {
         $this->_find_page();
         $this->_find_template();
 
@@ -407,7 +424,8 @@ class Controller_Front extends Controller {
     /**
      * Find the page in the database and fill in the page variable.
      */
-    protected function _find_page() {
+    protected function _find_page()
+    {
         $where = array();
         if (!$this->_is_preview) {
             $where[] = array('page_published', 1);
@@ -435,8 +453,8 @@ class Controller_Front extends Controller {
         \Nos\I18n::setLocale($this->_page->get_lang());
     }
 
-    protected function _find_template() {
-
+    protected function _find_template()
+    {
         // Find the template
         Config::load(APPPATH.'data'.DS.'config'.DS.'templates.php', 'templates');
         $templates = Config::get('templates', array());
@@ -465,7 +483,8 @@ class Controller_Front extends Controller {
         }
     }
 
-    public function save_cache() {
+    public function save_cache()
+    {
         $page_fields = array('id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
         $this->cache['page'] = array();
         foreach ($page_fields as $field) {
@@ -475,7 +494,8 @@ class Controller_Front extends Controller {
         return $this->cache; //@todo: to be reviewed
     }
 
-    public function rebuild_cache($cache) {
+    public function rebuild_cache($cache)
+    {
         $this->_page = new Model_Page();
         foreach ($cache['page'] as $field => $value) {
             $this->_page->{'page_'.$field} = $value;

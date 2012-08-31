@@ -128,8 +128,7 @@ spl_autoload_register(function($class) {
     \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
     $namespaces = \Config::get('data::app_namespaces');
     $application = array_search($namespace, $namespaces);
-    if (false !== $application)
-    {
+    if (false !== $application) {
         \Module::load($application);
     }
 

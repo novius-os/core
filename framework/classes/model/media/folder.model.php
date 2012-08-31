@@ -10,7 +10,8 @@
 
 namespace Nos;
 
-class Model_Media_Folder extends \Nos\Orm\Model {
+class Model_Media_Folder extends \Nos\Orm\Model
+{
     protected static $_table_name = 'nos_media_folder';
     protected static $_primary_key = array('medif_id');
 
@@ -75,8 +76,8 @@ class Model_Media_Folder extends \Nos\Orm\Model {
      *
      * @return void
      */
-    public function delete_public_cache() {
-
+    public function delete_public_cache()
+    {
         // Delete cached media entries
         $path_public     = DOCROOT.Model_Media::$public_path.$this->medif_path;
         $path_thumbnails = str_replace(DOCROOT.'media/', DOCROOT.'cache/media/', $path_public);
@@ -93,8 +94,8 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         }
     }
 
-    public function delete_from_disk() {
-
+    public function delete_from_disk()
+    {
         $path = $this->path();
         if (is_dir($path)) {
             // delete_dir($path, $recursive, $delete_top)
@@ -104,11 +105,13 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         return true;
     }
 
-    public function path($file = '') {
+    public function path($file = '')
+    {
         return APPPATH.'data/media/'.$this->medif_path.$file;
     }
 
-    public function count_media() {
+    public function count_media()
+    {
         /// get_ids_children($include_self)
         $folder_ids = $this->get_ids_children(true);
 
@@ -119,7 +122,8 @@ class Model_Media_Folder extends \Nos\Orm\Model {
         ));
     }
 
-    public function count_media_usage() {
+    public function count_media_usage()
+    {
         $folder_ids = $this->get_ids_children(true);
 
         return Model_Media_Link::count(array(

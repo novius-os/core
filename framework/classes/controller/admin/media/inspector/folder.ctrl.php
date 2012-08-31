@@ -10,6 +10,6 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Inspector_Folder extends Controller_Inspector_Modeltree {
-
+class Controller_Admin_Media_Inspector_Folder extends Controller_Inspector_Modeltree
+{
 }

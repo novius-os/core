@@ -10,9 +10,9 @@
 
 namespace Nos;
 
-class Permission_Tree extends Permission_Driver {
-
-	public function set_options(array $options = array()) {
-
+class Permission_Tree extends Permission_Driver
+{
+	public function set_options(array $options = array())
+	{
 	}
 }

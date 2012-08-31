@@ -17,7 +17,8 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 	 */
 	protected $_properties = array();
 
-	public function before_query(&$options) {
+	public function before_query(&$options)
+	{
 		if (array_key_exists('order_by', $options)) {
 			$order_by = $options['order_by'];
 	        if (!empty($order_by['default_sort'])) {
@@ -34,30 +35,36 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      * @param   Orm\Model The parent object
      * @return  void
      */
-	public function move_before($item, $before = null) {
+	public function move_before($item, $before = null)
+	{
         $this->_move($item, $before->get_sort() - 0.5);
 	}
 
-	public function move_after($item, $before = null) {
+	public function move_after($item, $before = null)
+	{
         $this->_move($item, $before->get_sort() + 0.5);
 	}
 
-	public function move_to_last_position($item) {
+	public function move_to_last_position($item)
+	{
         $this->_move($item, 10000);
 	}
 
-    public function get_sort(\Nos\Orm\Model $obj) {
+    public function get_sort(\Nos\Orm\Model $obj)
+    {
         $sort_property = $this->_properties['sort_property'];
 
         return $obj->get($sort_property);
     }
 
-    public function set_sort(\Nos\Orm\Model $item, $sort) {
+    public function set_sort(\Nos\Orm\Model $item, $sort)
+    {
         $sort_property = $this->_properties['sort_property'];
         $item->set($sort_property, $sort);
     }
 
-    protected function _move($item, $sort) {
+    protected function _move($item, $sort)
+    {
         $sort_property = $this->_properties['sort_property'];
         $item->set($sort_property, $sort);
         $item->observe('before_sort');
@@ -86,7 +93,8 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         }
     }
 
-    public function after_sort(\Nos\Orm\Model $item) {
+    public function after_sort(\Nos\Orm\Model $item)
+    {
         $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
         $sort_property = $this->_properties['sort_property'];
         $conditions = array();

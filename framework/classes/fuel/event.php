@@ -32,8 +32,7 @@ class Event extends Fuel\Core\Event
 		$priority = isset($callback[0]) and is_int($callback[0]) ? array_shift($callback) : 10;
 
 		// if the arguments are valid, register the event
-		if (is_string($event) and isset($callback[0]) and is_callable($callback[0]))
-		{
+		if (is_string($event) and isset($callback[0]) and is_callable($callback[0])) {
 			// make sure we have an array for this event
 			isset(static::$_events[$event]) or static::$_events[$event] = array();
 			isset(static::$_events[$event][$priority]) or static::$_events[$event][$priority] = array();
@@ -43,9 +42,7 @@ class Event extends Fuel\Core\Event
 
 			// and report success
 			return true;
-		}
-		else
-		{
+		} else {
 			// can't register the event
 			return false;
 		}
@@ -75,22 +72,18 @@ class Event extends Fuel\Core\Event
 		$calls = array();
 
 		// check if we have events registered
-		if (static::has_events($event))
-		{
+		if (static::has_events($event)) {
 			// order them by priority (lowest key is higest priority)
 			ksort(static::$_events[$event]);
 
 			// process them
-			foreach (static::$_events[$event] as $events)
-			{
-				foreach ($events as $arguments)
-				{
+			foreach (static::$_events[$event] as $events) {
+				foreach ($events as $arguments) {
 					// get the callback method
 					$callback = array_shift($arguments);
 
 					// call the callback event
-					if (is_callable($callback))
-					{
+					if (is_callable($callback)) {
 						$calls[] = call_user_func($callback, $data, $arguments);
 					}
 				}
@@ -100,7 +93,8 @@ class Event extends Fuel\Core\Event
 		return static::_format_return($calls, $return_type);
 	}
 
-    public static function register_function() {
+    public static function register_function()
+    {
 		// get any arguments passed
 		$args     = func_get_args();
 		$event    = array_shift($args);
@@ -108,8 +102,7 @@ class Event extends Fuel\Core\Event
         $callback = isset($args[0]) ? array_shift($args) : null;
 
 		// if the arguments are valid, register the event
-		if (is_string($event) and is_callable($callback))
-		{
+		if (is_string($event) and is_callable($callback)) {
             $callback_function = function() use ($callback) {
                 return $callback;
             };

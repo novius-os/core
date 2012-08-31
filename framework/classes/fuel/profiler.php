@@ -1,6 +1,8 @@
 <?php
-class Profiler extends \Fuel\Core\Profiler {
-    public static function start($dbname, $sql) {
+class Profiler extends \Fuel\Core\Profiler
+{
+    public static function start($dbname, $sql)
+    {
         $backtrace = \Debug::local_backtrace(true);
         $profiled = array();
         for ($i = 0; $i < count($backtrace); $i++) {

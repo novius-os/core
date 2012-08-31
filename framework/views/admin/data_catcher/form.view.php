@@ -52,11 +52,9 @@
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
         'fields' => $fields,
-        'callback' => function($field) use ($item, $nugget_db)
-        {
+        'callback' => function($field) use ($item, $nugget_db) {
             $template = $field->template;
-            if (empty($template))
-            {
+            if (empty($template)) {
                 $template = $field->fieldset->form()->get_config('field_template');
             }
             // Actually, field_name is an number
@@ -70,8 +68,7 @@
             $template = str_replace('{field}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label><div class="nos-datacatchers-nugget-value" style="display:none;">{field}</div>', $template);
 
             // Image field displays a bit differently: radio button with several options
-            if ($field->name == \Nos\DataCatcher::TYPE_IMAGE)
-            {
+            if ($field->name == \Nos\DataCatcher::TYPE_IMAGE) {
                 $field->set_template('{field}');
                 $possibles = $item->get_sharable_property($field_name.'.possibles');
                 foreach ($possibles as $media_id => $idk) {

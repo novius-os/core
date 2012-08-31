@@ -10,9 +10,10 @@
 
 namespace Nos;
 
-class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
-
-    protected function check_permission($action) {
+class Controller_Admin_Media_Folder extends Controller_Admin_Crud
+{
+    protected function check_permission($action)
+    {
         parent::check_permission($action);
         if ($action === 'insert' && !static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
             throw new \Exception('Permission denied');
@@ -28,8 +29,7 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
     protected function form_item()
     {
         parent::form_item();
-        if ($this->item->is_new() && empty($this->item_context))
-        {
+        if ($this->item->is_new() && empty($this->item_context)) {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
@@ -37,7 +37,8 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
         }
     }
 
-    public function before_save($folder, $data) {
+    public function before_save($folder, $data)
+    {
         parent::before_save($folder, $data);
 
         if (!$folder->is_new()) {
@@ -53,7 +54,8 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud {
         }
     }
 
-    public function delete() {
+    public function delete()
+    {
         $count_medias = $this->item->count_media();
         // Basic check to prevent false supression
         if (!is_dir($this->item->path()) && $count_medias > 0) {

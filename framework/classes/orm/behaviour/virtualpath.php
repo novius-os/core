@@ -21,31 +21,28 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     {
         parent::__construct($class);
         $this->_properties['unique'] = false;
-        if (is_array($this->_properties['extension_property']))
-        {
+        if (is_array($this->_properties['extension_property'])) {
             $this->_properties['extension_property'] = array_merge(array(
                 'before' => '.',
                 'after' => '',
             ), $this->_properties['extension_property']);
 
-            if (empty($this->_properties['extension_property']['property']))
-            {
+            if (empty($this->_properties['extension_property']['property'])) {
                 throw new \Exception('Extension property not found by virtualname behaviour: '.$this->_class);
             }
         }
 
-        if (!empty($this->_properties['parent_relation']))
-        {
+        if (!empty($this->_properties['parent_relation'])) {
             $this->_parent_relation = $class::relations($this->_properties['parent_relation']);
         }
 
-        if (false === $this->_parent_relation)
-        {
+        if (false === $this->_parent_relation) {
             throw new \Exception('Relation "parent" not found by virtualname behaviour: '.$this->_class);
         }
     }
 
-    public function change_parent(\Nos\Orm\Model $item) {
+    public function change_parent(\Nos\Orm\Model $item)
+    {
         $parent = $item->get_parent();
         $parent_path = $parent !== null ? $parent->{$this->_properties['virtual_path_property']} : '';
         if (!empty($this->_properties['extension_property']) && !empty($parent_path)) {
@@ -58,13 +55,12 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         }
     }
 
-    public function before_save(\Nos\Orm\Model $item) {
+    public function before_save(\Nos\Orm\Model $item)
+    {
         $diff = $item->get_diff();
 
-        if (!$item::behaviours('Nos\Orm_Behaviour_Tree', false) && !empty($this->_parent_relation))
-        {
-            if (array_key_exists($this->_parent_relation->key_from[0], $diff[0]))
-            {
+        if (!$item::behaviours('Nos\Orm_Behaviour_Tree', false) && !empty($this->_parent_relation)) {
+            if (array_key_exists($this->_parent_relation->key_from[0], $diff[0])) {
                 $class = $this->_parent_relation->model_to;
                 $parent = null;
                 if (!empty($item->{$this->_parent_relation->key_from[0]})) {
@@ -109,7 +105,8 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         }
     }
 
-    public function after_save(\Nos\Orm\Model $item) {
+    public function after_save(\Nos\Orm\Model $item)
+    {
         if (isset($this->_data_diff[$item->{$this->_properties['virtual_path_property']}])) {
             $diff = $this->_data_diff[$item->{$this->_properties['virtual_path_property']}];
 
@@ -127,34 +124,28 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         }
     }
 
-    public function virtual_path(\Nos\Orm\Model $item, $dir = false) {
-        if (!empty($this->_properties['virtual_path_property']))
-        {
+    public function virtual_path(\Nos\Orm\Model $item, $dir = false)
+    {
+        if (!empty($this->_properties['virtual_path_property'])) {
             $path = $item->{$this->_properties['virtual_path_property']};
-        }
-        else
-        {
+        } else {
             $path = '';
         }
-        if ($dir)
-        {
+        if ($dir) {
             $path = preg_replace('`'.$this->extension($item).'$`iUu', '', $path).'/';
         }
 
         return $path;
     }
 
-    public function extension(\Nos\Orm\Model $item, $old = false) {
-        if (!empty($this->_properties['extension_property']))
-        {
-            if (is_array($this->_properties['extension_property']))
-            {
+    public function extension(\Nos\Orm\Model $item, $old = false)
+    {
+        if (!empty($this->_properties['extension_property'])) {
+            if (is_array($this->_properties['extension_property'])) {
                 $ext = $item->{$this->_properties['extension_property']['property']};
-                if ($old)
-                {
+                if ($old) {
                     $diff = $item->get_diff();
-                    if (!empty($diff[0][$this->_properties['extension_property']['property']]))
-                    {
+                    if (!empty($diff[0][$this->_properties['extension_property']['property']])) {
                         $ext = $diff[0][$this->_properties['extension_property']['property']];
                     }
                 }

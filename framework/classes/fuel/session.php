@@ -8,15 +8,16 @@
      * @link http://www.novius-os.org
      */
 
-class Session extends \Fuel\Core\Session {
-
+class Session extends \Fuel\Core\Session
+{
     public static $user = null;
 
     /**
      * Returns the current logged user
      * @return Nos\Model_User
      */
-    public static function user() {
+    public static function user()
+    {
         if (static::$user === null) {
             \Nos\Auth::check();
         }
@@ -24,7 +25,8 @@ class Session extends \Fuel\Core\Session {
         return static::$user;
     }
 
-    public static function setUser($user) {
+    public static function setUser($user)
+    {
         static::$user = $user;
     }
 

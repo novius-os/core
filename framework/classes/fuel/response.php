@@ -8,10 +8,10 @@
  * @link http://www.novius-os.org
  */
 
-class Response extends \Fuel\Core\Response {
-
-	public static function json($status, $data = null) {
-
+class Response extends \Fuel\Core\Response
+{
+	public static function json($status, $data = null)
+	{
 		if ($data === null) {
 			$data = $status;
 			$status = 200;

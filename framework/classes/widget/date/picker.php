@@ -77,21 +77,18 @@ class Widget_Date_Picker extends \Fieldset_Field
         $widget['type'] = 'text';
         $widget['class'] = (isset($widget['class']) ? $widget['class'] : '').' datepicker';
 
-        if (empty($widget['id']))
-        {
+        if (empty($widget['id'])) {
             $widget['id'] = uniqid('datepicker_');
         }
 
-        if (empty($widget['size']))
-        {
+        if (empty($widget['size'])) {
             $widget['size'] = 9;
         }
 
         // Default options of the widget
         $widget_options = static::$DEFAULT_WIDGET_OPTIONS;
 
-        if (!empty($widget['widget_options']))
-        {
+        if (!empty($widget['widget_options'])) {
             $widget_options = \Arr::merge($widget_options, $widget['widget_options']);
         }
         unset($widget['widget_options']);

@@ -10,8 +10,8 @@
 
 namespace Nos;
 
-class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk {
-
+class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk
+{
     public function action_info($id)
     {
         $page = Model_Page::find($id);
@@ -21,8 +21,7 @@ class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk {
             $page->import_dataset_behaviours($dataset);
             unset($dataset['actions']);
             $item = array();
-            foreach ($dataset as $key => $data)
-            {
+            foreach ($dataset as $key => $data) {
                 // Array with a 'value' key
                 if (is_array($data) and !empty($data['value'])) {
                     $data = $data['value'];

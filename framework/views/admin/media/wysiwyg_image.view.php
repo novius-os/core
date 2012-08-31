@@ -169,8 +169,7 @@ require(
                                 .show();
                         }
 
-                        if (image_dom == null)
-                        {
+                        if (image_dom == null) {
                             $height.val(media_json.height);
                             $width.val(media_json.width);
                             $title.val(media_json.title);
@@ -193,8 +192,7 @@ require(
                             $proportional.prop('checked', false).removeAttr('checked', true).change();
                         }
 
-                        if ($title.val() != $alt.val())
-                        {
+                        if ($title.val() != $alt.val()) {
                             $same_title_alt.prop('checked', false).removeAttr('checked').change();
                         }
                     };

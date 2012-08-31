@@ -76,7 +76,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @param Model $item
      */
-    public function before_save(\Nos\Orm\Model $item) {
+    public function before_save(\Nos\Orm\Model $item)
+    {
         if ($this->is_main_lang($item) || $item->is_new()) {
             return;
         }
@@ -94,8 +95,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         }
     }
 
-    public function after_delete(\Nos\Orm\Model $item) {
-
+    public function after_delete(\Nos\Orm\Model $item)
+    {
         if (!$this->is_main_lang($item)) {
             return;
         }
@@ -125,8 +126,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * Check if the parent exists in all the langages of the child
      * @param \Nos\Orm\Model $item
      */
-    public function change_parent(\Nos\Orm\Model $item) {
-
+    public function change_parent(\Nos\Orm\Model $item)
+    {
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
         $new_parent = $item->get_parent();
 
@@ -181,7 +182,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @param  \Nos\Orm\Model  $item
      */
-    public function delete_all_lang($item) {
+    public function delete_all_lang($item)
+    {
         $single_id_property = $this->_properties['common_id_property'];
         foreach ($item->find_lang('all') as $item) {
             // This is to trick the is_main_lang() method
@@ -196,7 +198,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @return  bool
      */
-    public function is_main_lang($item) {
+    public function is_main_lang($item)
+    {
         return $item->get($this->_properties['single_id_property']) !== null;
     }
 
@@ -205,7 +208,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @return  \Nos\Model
      */
-    public function find_main_lang($item) {
+    public function find_main_lang($item)
+    {
         return $item->find_lang('main');
     }
 
@@ -217,7 +221,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *  - 'all'  will return all the available objects
      *  - any valid locale
      */
-    public function find_lang($item, $lang = null) {
+    public function find_lang($item, $lang = null)
+    {
         $common_id_property = $this->_properties['common_id_property'];
         $common_id          = $item->get($common_id_property);
 
@@ -241,7 +246,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @return array
      */
-    public function get_all_lang($item) {
+    public function get_all_lang($item)
+    {
         $all = array();
         foreach ($item->find_lang('all') as $item) {
             $all[$item->id] = $item->get($this->_properties['lang_property']);
@@ -255,7 +261,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @return string
      */
-    public function get_lang($item) {
+    public function get_lang($item)
+    {
         return $item->get($this->_properties['lang_property']);
     }
 
@@ -264,7 +271,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      *
      * @return array
      */
-    public function get_other_lang($item) {
+    public function get_other_lang($item)
+    {
         $current_lang = $item->get_lang();
         $all = $this->get_all_lang($item);
         foreach ($all as $k => $lang) {
@@ -276,7 +284,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         return $all;
     }
 
-    public function form_fieldset_fields($item, &$fieldset) {
+    public function form_fieldset_fields($item, &$fieldset)
+    {
         $lang_property = $this->_properties['lang_property'];
         // Empty array just so the data are retrieved from the input
         if (isset($fieldset[$lang_property])) {
@@ -320,7 +329,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         return $data;
     }
 
-	public function before_query(&$options) {
+	public function before_query(&$options)
+	{
 		if (array_key_exists('where', $options)) {
 			$where = $options['where'];
 			foreach ($where as $k => $w) {

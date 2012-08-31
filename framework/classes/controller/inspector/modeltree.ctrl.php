@@ -14,8 +14,8 @@ use \Input;
 use \View;
 use \Config;
 
-class Controller_Inspector_Modeltree extends Controller_Admin_Application {
-
+class Controller_Inspector_Modeltree extends Controller_Admin_Application
+{
     protected $config = array();
 
 	public function action_list($view = null, $view_data = array())

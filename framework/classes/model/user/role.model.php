@@ -10,14 +10,16 @@
 
 namespace Nos;
 
-class Model_User_Role extends \Nos\Orm\Model {
+class Model_User_Role extends \Nos\Orm\Model
+{
     protected static $_table_name = 'nos_role';
     protected static $_primary_key = array('role_id');
 
     protected static $permissions;
 	protected $access;
 
-    public function check_permission($application, $key) {
+    public function check_permission($application, $key)
+    {
 		if ($key == 'access') {
 			$this->load_access($application);
 			return $this->access->check($this, $application);
@@ -30,13 +32,14 @@ class Model_User_Role extends \Nos\Orm\Model {
 		return call_user_func_array(array($driver, 'check'), $args);
     }
 
-	public static function get_permission_driver($application, $key) {
-
+	public static function get_permission_driver($application, $key)
+	{
 		static::load_permission_driver($application, $key);
 		return static::$permissions[$application][$key];
 	}
 
-	public function load_access($application) {
+	public function load_access($application)
+	{
 		$this->access = Permission::forge('access', '', array(
 			'driver' => 'select',
 			'title'=> 'Grant access to the application',
@@ -51,8 +54,8 @@ class Model_User_Role extends \Nos\Orm\Model {
 		));
 	}
 
-    public static function load_permission_driver($application, $key) {
-
+    public static function load_permission_driver($application, $key)
+    {
 		if (isset(static::$permissions[$application][$key])) {
 			return;
 		}

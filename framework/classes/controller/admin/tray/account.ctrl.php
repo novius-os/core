@@ -12,9 +12,10 @@ namespace Nos;
 
 use View;
 
-class Controller_Admin_Tray_Account extends \Controller {
-
-    public function action_index() {
+class Controller_Admin_Tray_Account extends \Controller
+{
+    public function action_index()
+    {
 		$user = \Session::user();
         $config_user = \Config::load('nos::controller/admin/user/user');
         $fields = $config_user['fields'];
@@ -33,14 +34,15 @@ class Controller_Admin_Tray_Account extends \Controller {
 		), false);
 	}
 
-	public function action_disconnect() {
+	public function action_disconnect()
+	{
         Auth::disconnect();
 		\Response::redirect('/admin/nos/login/reset');
 		exit();
 	}
 
-    public static function fieldset_display($user) {
-
+    public static function fieldset_display($user)
+    {
 		$configuration = $user->getConfiguration();
         $fields = array (
             'background' => array (

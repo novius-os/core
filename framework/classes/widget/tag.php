@@ -10,12 +10,12 @@
 
 namespace Nos;
 
-class Widget_Tag extends \Fieldset_Field {
-
+class Widget_Tag extends \Fieldset_Field
+{
     protected $options = array();
 
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
-
+    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
+    {
         $attributes['type']  = 'text';
         $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce not_initialized';
 
@@ -44,7 +44,8 @@ class Widget_Tag extends \Fieldset_Field {
         return $this;
     }
 
-    public function before_save($item, $data) {
+    public function before_save($item, $data)
+    {
         $tags_from = str_replace(' ', ',', $this->value);
         $tags_from = explode(',', $tags_from);
         $tags = array();
@@ -77,14 +78,16 @@ class Widget_Tag extends \Fieldset_Field {
      * How to display the field
      * @return string
      */
-    public function build() {
+    public function build()
+    {
         parent::build();
         $this->fieldset()->append($this->js_init());
 
         return (string) parent::build();
     }
 
-    public function js_init() {
+    public function js_init()
+    {
         // we have to find why it's called two times...
         // @todo: This widget is supposing that they are not a lot of tags (< 500) : this is generally the case, but if there is more, think of an Ajax mode       $tags = $this->options['model']::find('all');
         $model = $this->options['model'];
@@ -97,7 +100,8 @@ class Widget_Tag extends \Fieldset_Field {
         ), false);
     }
 
-    public static function get_labels_from_tags($tags, $label_column) {
+    public static function get_labels_from_tags($tags, $label_column)
+    {
         $labels = array();
         foreach ($tags as $tag) {
             $labels[] = $tag->{$label_column};

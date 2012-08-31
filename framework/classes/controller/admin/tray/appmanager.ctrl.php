@@ -22,14 +22,10 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         $app_installed = array();
         $app_others = array();
 
-        foreach ($applications as $app)
-        {
-            if ($app->is_installed())
-            {
+        foreach ($applications as $app) {
+            if ($app->is_installed()) {
                 $app_installed[$app->folder] = $app;
-            }
-            else
-            {
+            } else {
                 $app_others[$app->folder] = $app;
             }
         }
@@ -50,13 +46,10 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
     {
         \Module::load($app_name);
 
-        try
-        {
+        try {
             $application = Application::forge($app_name);
             $application->install();
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->response(array(
                 'error' => $e->getMessage(),
             ));
@@ -71,19 +64,15 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
 
     public function action_remove($app_name)
     {
-        try
-        {
+        try {
             $application = Application::forge($app_name);
-            if ($application->uninstall())
-            {
+            if ($application->uninstall()) {
                 $app_installed = \Config::get('data::app_installed', array());
                 unset($app_installed[$app_name]);
 
                 \Config::save(APPPATH.'data/config/app_installed.php', $app_installed);
             }
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->response(array(
                 'error' => $e->getMessage(),
             ));
@@ -99,18 +88,15 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
 
     public function action_upload()
     {
-        if (\Config::get('allow_plugin_upload', false) == false)
-        {
+        if (\Config::get('allow_plugin_upload', false) == false) {
             Response::redirect('admin/nos/tray/appmanager');
         }
 
-        if (empty($_FILES['zip']))
-        {
+        if (empty($_FILES['zip'])) {
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
-        if (!is_uploaded_file($_FILES['zip']['tmp_name']))
-        {
+        if (!is_uploaded_file($_FILES['zip']['tmp_name'])) {
             \Session::forge()->set_flash('notification.plugins', array(
                 'title' => 'Upload error.',
                 'type' => 'error',
@@ -118,8 +104,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
-        if ($_FILES['zip']['error'] != UPLOAD_ERR_OK)
-        {
+        if ($_FILES['zip']['error'] != UPLOAD_ERR_OK) {
             \Session::forge()->set_flash('notification.plugins', array(
                 'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
                 'type' => 'error',
@@ -131,23 +116,19 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         $za = new \ZipArchive();
         $zip_file = $_FILES['zip']['tmp_name'];
         $za->open($zip_file);
-        for ($i = 0; $i < $za->numFiles; $i++)
-        {
+        for ($i = 0; $i < $za->numFiles; $i++) {
             $files[] = $za->getNameIndex($i);
         }
 
         $root_files = array();
-        foreach ($files as $k => $f)
-        {
-            if (mb_substr($f, -1) == '/' && substr_count($f, '/') <= 1)
-            {
+        foreach ($files as $k => $f) {
+            if (mb_substr($f, -1) == '/' && substr_count($f, '/') <= 1) {
                 $root_files[] = $f;
             }
         }
 
         $count = count($root_files);
-        if ($count == 0)
-        {
+        if ($count == 0) {
             \Session::forge()->set_flash('notification.plugins', array(
                 'title' => $name.' already exists in you module directory.',
                 'type' => 'error',
@@ -159,8 +140,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         $metadata_file = $root.'config/metadata.php';
         $metadata = \Fuel::load('zip://'.$zip_file.'#'.$metadata_file);
 
-        if (empty($metadata['install_folder']))
-        {
+        if (empty($metadata['install_folder'])) {
             \Session::forge()->set_flash('notification.plugins', array(
                 'title' => 'This is not a valid application archive.',
                 'type' => 'error',
@@ -169,8 +149,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         }
 
         $path = APPPATH.'applications'.DS.$metadata['install_folder'];
-        if (is_dir($path.$name))
-        {
+        if (is_dir($path.$name)) {
             \Session::forge()->set_flash('notification.plugins', array(
                 'title' => $metadata['install_folder'].' already exists in you module directory.',
                 'type' => 'error',
@@ -178,37 +157,29 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
-        usort($files, function($a, $b)
-                {
+        usort($files, function($a, $b) {
                     return mb_strlen($a) > mb_strlen($b);
                 });
 
         // @todo better error handling ?
         // @todo skip stupid files ?
         // @todo appropriate chmod ?
-        try
-        {
+        try {
             $old = umask(0);
             @mkdir($path, 0777);
             umask($old);
 
             $root_length = mb_strlen($root);
 
-            foreach ($files as $file)
-            {
+            foreach ($files as $file) {
                 $dest = $path.DS.mb_substr($file, $root_length);
-                if (mb_substr($file, -1) == '/')
-                {
+                if (mb_substr($file, -1) == '/') {
                     is_dir($dest) || @mkdir($dest, 0777);
-                }
-                else
-                {
+                } else {
                     copy('zip://'.$zip_file.'#'.$file, $dest);
                 }
             }
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             \Fuel\Core\File::delete_dir($path, true, true);
         }
         \Response::redirect('admin/nos/tray/appmanager');
@@ -222,8 +193,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
     'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
         ) as $var => $default)
         {
-            if (empty($this->template->$var))
-            {
+            if (empty($this->template->$var)) {
                 $this->template->$var = $default;
             }
         }

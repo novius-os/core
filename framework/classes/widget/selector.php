@@ -10,12 +10,12 @@
 
 namespace Nos;
 
-abstract class Widget_Selector extends \Fieldset_Field {
-
+abstract class Widget_Selector extends \Fieldset_Field
+{
     protected $widget_options = array();
 
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null) {
-
+    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
+    {
         $this->before_construct($attributes, $rules);
 
         if (!empty($attributes['widget_options'])) {
@@ -26,7 +26,8 @@ abstract class Widget_Selector extends \Fieldset_Field {
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
-    public function set_widget_options(array $options) {
+    public function set_widget_options(array $options)
+    {
         $this->widget_options = \Arr::merge($this->widget_options, $options);
     }
 

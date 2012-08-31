@@ -8,21 +8,21 @@
  * @link http://www.novius-os.org
  */
 
-class Finder extends Fuel\Core\Finder {
-
+class Finder extends Fuel\Core\Finder
+{
     protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view');
 
 	public static function instance()
 	{
-		if ( ! static::$instance)
-		{
+		if ( ! static::$instance) {
 			static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
 		}
 
 		return static::$instance;
 	}
 
-	public static function normalize_namespace($name) {
+	public static function normalize_namespace($name)
+	{
 		return implode('\\', array_map(function($a) {
 			return Inflector::words_to_upper($a);
 		}, explode('\\', $name)));
@@ -126,8 +126,7 @@ class Finder extends Fuel\Core\Finder {
 		}
 
 		$file_ext = pathinfo($file_no_ns, PATHINFO_EXTENSION);
-		if (!$file_ext)
-		{
+		if (!$file_ext) {
 			$file_no_ns .= $ext;
 		}
 

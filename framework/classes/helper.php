@@ -25,12 +25,10 @@ class Helper
     {
         // Convert lang_LOCALE to locale
         list($lang, $country) = explode('_', $locale.'_');
-        if (!empty($country))
-        {
+        if (!empty($country)) {
             $lang = mb_strtolower($country);
         }
-        switch ($lang)
-        {
+        switch ($lang) {
             case 'en':
                 $lang = 'gb';
                 break;

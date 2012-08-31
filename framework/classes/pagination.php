@@ -10,8 +10,8 @@
 
 namespace Nos;
 
-class Pagination {
-
+class Pagination
+{
     /**
      * @var    integer    The current page
      */
@@ -83,11 +83,10 @@ class Pagination {
      * @param array   $config The configuration array
      * @return void
      */
-    public function set_config($config) {
-        foreach ($config as $key => $value)
-        {
-            if ($key == 'template')
-            {
+    public function set_config($config)
+    {
+        foreach ($config as $key => $value) {
+            if ($key == 'template') {
                 $this->template = array_merge($this->template, $config['template']);
                 continue;
             }
@@ -110,12 +109,9 @@ class Pagination {
     {
         $this->total_pages = ceil($this->total_items / $this->per_page) ?: 1;
 
-        if ($this->current_page > $this->total_pages)
-        {
+        if ($this->current_page > $this->total_pages) {
             $this->current_page = $this->total_pages;
-        }
-        elseif ($this->current_page < 1)
-        {
+        } elseif ($this->current_page < 1) {
             $this->current_page = 1;
         }
 
@@ -133,8 +129,7 @@ class Pagination {
      */
     public function create_links($pagination_url = null)
     {
-        if ($this->total_pages == 1)
-        {
+        if ($this->total_pages == 1) {
             return '';
         }
 
@@ -168,8 +163,7 @@ class Pagination {
      */
     public function page_links()
     {
-        if ($this->total_pages == 1)
-        {
+        if ($this->total_pages == 1) {
             return '';
         }
 
@@ -181,14 +175,10 @@ class Pagination {
         // Let's get the ending page number
         $end   = (($this->current_page + $this->num_links) < $this->total_pages) ? $this->current_page + $this->num_links : $this->total_pages;
 
-        for($i = $start; $i <= $end; $i++)
-        {
-            if ($this->current_page == $i)
-            {
+        for($i = $start; $i <= $end; $i++) {
+            if ($this->current_page == $i) {
                 $pagination .= $this->template['active_start'].$i.$this->template['active_end'];
-            }
-            else
-            {
+            } else {
                 $pagination .= '<a href="'.call_user_func($this->pagination_url, $i).'">'.$i.'</a>';
             }
         }
@@ -207,17 +197,13 @@ class Pagination {
      */
     public function next_link($value)
     {
-        if ($this->total_pages == 1)
-        {
+        if ($this->total_pages == 1) {
             return '';
         }
 
-        if ($this->current_page == $this->total_pages)
-        {
+        if ($this->current_page == $this->total_pages) {
             return $value.$this->template['next_mark'];
-        }
-        else
-        {
+        } else {
             $next_page = $this->current_page + 1;
             $url = call_user_func($this->pagination_url, $next_page);
 
@@ -236,17 +222,13 @@ class Pagination {
      */
     public function prev_link($value)
     {
-        if ($this->total_pages == 1)
-        {
+        if ($this->total_pages == 1) {
             return '';
         }
 
-        if ($this->current_page == 1)
-        {
+        if ($this->current_page == 1) {
             return $this->template['previous_mark'].$value;
-        }
-        else
-        {
+        } else {
             $previous_page = $this->current_page - 1;
             $url = call_user_func($this->pagination_url, $previous_page);
 

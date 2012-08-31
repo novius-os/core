@@ -10,12 +10,12 @@
 
 namespace Nos;
 
-class Auth {
-
+class Auth
+{
     public static $default_cookie_lasting = 2592000; //60 * 60 * 24 * 30;
 
-	public static function login($login, $password, $remember_me = true) {
-
+	public static function login($login, $password, $remember_me = true)
+	{
 		$user = Model_User::find('all', array(
 			'where' => array(
 				'user_email' => $login,
@@ -38,8 +38,8 @@ class Auth {
 		return false;
 	}
 
-	public static function check() {
-
+	public static function check()
+	{
         // Might be great to add some additional verifications here !
 		$logged_user_id = \Session::get('logged_user_id', false);
         $logged_user_md5 = \Session::get('logged_user_md5', false);
@@ -69,14 +69,16 @@ class Auth {
         }
 	}
 
-    public static function set_user_md5($user_md5) {
+    public static function set_user_md5($user_md5)
+    {
         \Session::set('logged_user_md5', $user_md5);
         if (\Cookie::get('remember_me', false)) {
             \Cookie::set('logged_user_md5', $user_md5, static::$default_cookie_lasting);
         }
     }
 
-    public static function disconnect() {
+    public static function disconnect()
+    {
         \Session::destroy();
         \Cookie::set('logged_user_id', false);
     }

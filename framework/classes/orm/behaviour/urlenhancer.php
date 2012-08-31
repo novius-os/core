@@ -37,12 +37,11 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      * @param  array       $params
      * @return  null|string|array
      */
-    public function urls($item, $params = array()) {
+    public function urls($item, $params = array())
+    {
         $urls = array();
-        foreach ($this->_properties['enhancers'] as $enhancer_name)
-        {
-            foreach (\Nos\Tools_Enhancer::url_item($enhancer_name, $item, $params) as $key => $url)
-            {
+        foreach ($this->_properties['enhancers'] as $enhancer_name) {
+            foreach (\Nos\Tools_Enhancer::url_item($enhancer_name, $item, $params) as $key => $url) {
                 $urls[$key] = $url;
             }
         }
@@ -50,15 +49,16 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $urls;
     }
 
-    public function url_canonical($item, $params = array()) {
+    public function url_canonical($item, $params = array())
+    {
         $params['canonical'] = true;
 
         return $this->url($item, $params);
     }
 
     // @todo Figure out the appropriate method name : url() / url_item() / other()?
-    public function url($item, $params = array()) {
-
+    public function url($item, $params = array())
+    {
         $canonical = \Arr::get($params, 'canonical', false);
         unset($params['canonical']);
         if ($canonical) {

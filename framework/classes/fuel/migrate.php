@@ -27,15 +27,12 @@ class Migrate extends \Fuel\Core\Migrate
     protected static function _find_package($name = null)
     {
         $files = parent::_find_package();
-        if ($name)
-        {
+        if ($name) {
             if ($name == 'nos') {
                 // find a package
                 $files = glob(NOSPATH.\Config::get('migrations.folder').'*_*.php');
             }
-        }
-        else
-        {
+        } else {
             // find all modules
             $files = array_merge($files, glob(NOSPATH.\Config::get('migrations.folder').'*_*.php'));
         }

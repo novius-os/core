@@ -10,7 +10,8 @@
 
 namespace Nos;
 
-class Model_Content_Nuggets extends \Nos\Orm\Model {
+class Model_Content_Nuggets extends \Nos\Orm\Model
+{
     const DEFAULT_CATCHER = 'default';
 
     protected static $_table_name = 'nos_content_nuggets';

@@ -20,11 +20,13 @@ class View extends \Fuel\Core\View
     }
 
     // Works, but some problems with package and error pages...
-    public static function set_application($application) {
+    public static function set_application($application)
+    {
         static::$application = $application;
     }
 
-    public static function redirect($from, $to) {
+    public static function redirect($from, $to)
+    {
         static::$redirects[$from] = $to;
     }
 

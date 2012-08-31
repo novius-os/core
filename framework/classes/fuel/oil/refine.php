@@ -17,8 +17,7 @@ class Refine extends Oil\Refine
         $task = strtolower($task);
 
         // Make sure something is set
-        if (empty($task) or $task === 'help')
-        {
+        if (empty($task) or $task === 'help') {
             static::help();
 
             return;
@@ -27,22 +26,17 @@ class Refine extends Oil\Refine
         $module = false;
         list($module, $task) = array_pad(explode('::', $task), 2, null);
 
-        if ($task === null)
-        {
+        if ($task === null) {
             $task = $module;
             $module = false;
         }
 
-        if ($module)
-        {
-            try
-            {
+        if ($module) {
+            try {
                 \Module::load($module);
                 $path = \Module::exists($module);
                 \Finder::instance()->add_path($path);
-            }
-            catch (\FuelException $e)
-            {
+            } catch (\FuelException $e) {
                 throw new Exception(sprintf('Module "%s" does not exist.', $module));
             }
         }
@@ -51,12 +45,10 @@ class Refine extends Oil\Refine
         list($task, $method) = array_pad(explode(':', $task), 2, 'run');
 
         // Find the task
-        if ( ! $file = \Finder::search('tasks', $task))
-        {
+        if ( ! $file = \Finder::search('tasks', $task)) {
             $files = \Finder::instance()->list_files('tasks');
             $possibilities = array();
-            foreach($files as $file)
-            {
+            foreach($files as $file) {
                 $possible_task = pathinfo($file, \PATHINFO_FILENAME);
                 $difference = levenshtein($possible_task, $task);
                 $possibilities[$difference] = $possible_task;
@@ -64,12 +56,9 @@ class Refine extends Oil\Refine
 
             ksort($possibilities);
 
-            if ($possibilities and current($possibilities) <= 5)
-            {
+            if ($possibilities and current($possibilities) <= 5) {
                 throw new Exception(sprintf('Task "%s" does not exist. Did you mean "%s"?', $task, current($possibilities)));
-            }
-            else
-            {
+            } else {
                 throw new Exception(sprintf('Task "%s" does not exist.', $task));
             }
 
@@ -87,15 +76,13 @@ class Refine extends Oil\Refine
         $new_task = new $task;
 
         // The help option hs been called, so call help instead
-        if (\Cli::option('help') && is_callable(array($new_task, 'help')))
-        {
+        if (\Cli::option('help') && is_callable(array($new_task, 'help'))) {
             $method = 'help';
         }
 
 
 
-        if ($return = call_user_func_array(array($new_task, $method), $args))
-        {
+        if ($return = call_user_func_array(array($new_task, $method), $args)) {
             \Cli::write($return);
         }
     }

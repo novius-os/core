@@ -27,22 +27,22 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         $this->_parent_relation = call_user_func($class . '::relations', $this->_properties['parent_relation']);
         $this->_children_relation = call_user_func($class . '::relations', $this->_properties['children_relation']);
 
-        if (false === $this->_parent_relation)
-        {
+        if (false === $this->_parent_relation) {
             throw new \Exception('Relation "parent" not found by tree behaviour: '.$this->_class);
         }
 
-        if (false === $this->_children_relation)
-        {
+        if (false === $this->_children_relation) {
             throw new \Exception('Relation "children" not found by tree behaviour: '.$this->_class);
         }
 	}
 
-    public function parent_relation() {
+    public function parent_relation()
+    {
         return $this->_parent_relation;
     }
 
-	public function before_query(&$options) {
+	public function before_query(&$options)
+	{
 		if (array_key_exists('where', $options)) {
 			$where = $options['where'];
 			foreach ($where as $k => $w) {
@@ -67,7 +67,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Deletes the children recursively
      */
-    public function before_delete(\Nos\Orm\Model $item) {
+    public function before_delete(\Nos\Orm\Model $item)
+    {
         $this->delete_children($item);
     }
 
@@ -77,7 +78,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      *
      * @param type $item
      */
-    public function delete_children($item) {
+    public function delete_children($item)
+    {
         foreach ($this->find_children($item) as $child) {
             $child->delete();
         }
@@ -92,7 +94,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param  array  $options
      * @return array of \Orm\Model
      */
-    public function find_children($item, $where = array(), $order_by = array(), $options = array()) {
+    public function find_children($item, $where = array(), $order_by = array(), $options = array())
+    {
         // Search items whose parent is self
         $where[] = array('parent', $item);
         $options = \Arr::merge($options, array(
@@ -108,7 +111,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      *
      * @return  Orm\Model  The parent object
      */
-    public function get_parent($item) {
+    public function get_parent($item)
+    {
         return $item->get($this->_properties['parent_relation']);
     }
 
@@ -118,7 +122,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param   Orm\Model The parent object
      * @return  void
      */
-	public function set_parent($item, $parent = null) {
+	public function set_parent($item, $parent = null)
+	{
         if ($parent !== null) {
             // Check if the object is appropriate
             if (get_class($parent) != $this->_parent_relation->model_to) {
@@ -148,7 +153,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param bool $include_self
      * @return array
      */
-    public function get_ids_children($item, $include_self = true) {
+    public function get_ids_children($item, $include_self = true)
+    {
         $ids = array();
         if ($include_self) {
             $ids[] = $item->get(\Arr::get($item->primary_key(), 0));
@@ -158,8 +164,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         return $ids;
     }
 
-    public function find_children_recursive($item, $include_self = true) {
-
+    public function find_children_recursive($item, $include_self = true)
+    {
         // This is weird, but it doesn't work when called directly...
         $ids = $this->get_ids_children($item, $include_self);
         if (empty($ids)) {
@@ -169,7 +175,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $this->get_ids_children($item, $include_self)))));
     }
 
-    protected static function _populate_id_children($current_item, $children_relation, &$array) {
+    protected static function _populate_id_children($current_item, $children_relation, &$array)
+    {
         $pk = \Arr::get($current_item->primary_key(), 0);
         foreach ($current_item->get($children_relation) as $child) {
             $array[] = $child->get($pk);
@@ -178,7 +185,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     }
 
-    public function find_root($item) {
+    public function find_root($item)
+    {
         $parent = $item;
         while (!empty($parent)) {
             $root = $parent;
@@ -188,7 +196,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         return $root !== $item ? $root : null;
     }
 
-	public function set_parent_no_observers($item, $parent = null) {
+	public function set_parent_no_observers($item, $parent = null)
+	{
         foreach ($this->_parent_relation->key_from as $i => $k) {
             $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
             $item->set($this->_properties['parent_relation'], $parent);

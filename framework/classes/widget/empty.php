@@ -13,9 +13,10 @@ namespace Nos;
 /**
  * @todo rename to Widget_Validation
  */
-class Widget_Empty extends \Fieldset_Field {
-
-    public function build() {
+class Widget_Empty extends \Fieldset_Field
+{
+    public function build()
+    {
         return '';
     }
 

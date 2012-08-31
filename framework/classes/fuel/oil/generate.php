@@ -16,22 +16,18 @@ class Generate extends \Oil\Generate
         // Get the migration name
         $migration_name = \Str::lower(str_replace(array('-', '/'), '_', array_shift($args)));
 
-        if (empty($migration_name) or mb_strpos($migration_name, ':'))
-        {
+        if (empty($migration_name) or mb_strpos($migration_name, ':')) {
             throw new Exception("Command is invalid.".PHP_EOL."\tphp oil g migration <migrationname> [<fieldname1>:<type1> |<fieldname2>:<type2> |..]");
         }
 
         // Check if a migration with this name already exists
-        if (($duplicates = glob($working_path."migrations/*_{$migration_name}*")) === false)
-        {
+        if (($duplicates = glob($working_path."migrations/*_{$migration_name}*")) === false) {
             throw new Exception("Unable to read existing migrations. Do you have an 'open_basedir' defined?");
         }
 
-        if (count($duplicates) > 0)
-        {
+        if (count($duplicates) > 0) {
             // Don't override a file
-            if (\Cli::option('s', \Cli::option('skip')) === true)
-            {
+            if (\Cli::option('s', \Cli::option('skip')) === true) {
                 return;
             }
 
@@ -39,14 +35,12 @@ class Generate extends \Oil\Generate
             $file_name = pathinfo(end($duplicates), PATHINFO_FILENAME);
 
             // Override the (most recent) migration with the same name by using its number
-            if (\Cli::option('f', \Cli::option('force')) === true)
-            {
+            if (\Cli::option('f', \Cli::option('force')) === true) {
                 list($number) = explode('_', $file_name);
             }
 
             // Name clashes but this is done by hand. Assume they know what they're doing and just increment the file
-            elseif (static::$scaffolding === false)
-            {
+            elseif (static::$scaffolding === false) {
                 // Increment the name of this
                 $migration_name = \Str::increment(mb_substr($file_name, 4), 2);
             }
@@ -59,11 +53,9 @@ class Generate extends \Oil\Generate
         $migration = array('', '');
 
         // Loop through the actions and act on a matching action appropriately
-        foreach ($methods as $method_name)
-        {
+        foreach ($methods as $method_name) {
             // If the miration name starts with the name of the action method
-            if (mb_substr($migration_name, 0, mb_strlen($method_name)) === $method_name)
-            {
+            if (mb_substr($migration_name, 0, mb_strlen($method_name)) === $method_name) {
                 /**
                  *	Create an array of the subject the migration is about
                  *
@@ -80,20 +72,16 @@ class Generate extends \Oil\Generate
                 $matches = explode('_', str_replace($method_name . '_', '', $migration_name));
 
                 // create_{table}
-                if (count($matches) == 1)
-                {
+                if (count($matches) == 1) {
                     $subjects = array(false, $matches[0]);
                 }
 
-                // add_{field}_to_{table}
-                else if (count($matches) == 3 && $matches[1] == 'to')
-                {
+                // add_{field}_to_{table} else if (count($matches) == 3 && $matches[1] == 'to') {
                     $subjects = array($matches[0], $matches[2]);
                 }
 
                 // rename_field_{field}_to_{field}_in_{table} (with underscores in field names)
-                else if (count($matches) >= 5 && in_array('to', $matches) && in_array('in', $matches))
-                {
+                else if (count($matches) >= 5 && in_array('to', $matches) && in_array('in', $matches)) {
                     $subjects = array(
                         implode('_', array_slice($matches, array_search('in', $matches)+1)),
                         implode('_', array_slice($matches, 0, array_search('to', $matches))),
@@ -102,14 +90,11 @@ class Generate extends \Oil\Generate
                 }
 
                 // create_{table} or drop_{table} (with underscores in table name)
-                else if (count($matches) !== 0)
-                {
+                else if (count($matches) !== 0) {
                     $name = str_replace(array('create_', 'add_', '_to_'), array('create-', 'add-', '-to-'), $migration_name);
 
-                    if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/iu', $name, $deep_matches))
-                    {
-                        switch ($deep_matches[1])
-                        {
+                    if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/iu', $name, $deep_matches)) {
+                        switch ($deep_matches[1]) {
                             case 'create' :
                                 $subjects = array(false, $deep_matches[2]);
                                 break;
@@ -122,31 +107,26 @@ class Generate extends \Oil\Generate
                 }
 
                 // There is no subject here so just carry on with a normal empty migration
-                else
-                {
+                else {
                     break;
                 }
 
                 // We always pass in fields to a migration, so lets sort them out here.
                 $fields = array();
-                foreach ($args as $field)
-                {
+                foreach ($args as $field) {
                     $field_array = array();
 
                     // Each paramater for a field is seperated by the : character
                     $parts = explode(":", $field);
 
                     // We must have the 'name:type' if nothing else!
-                    if (count($parts) >= 2)
-                    {
+                    if (count($parts) >= 2) {
                         $field_array['name'] = array_shift($parts);
-                        foreach ($parts as $part_i => $part)
-                        {
+                        foreach ($parts as $part_i => $part) {
                             preg_match('/([a-z0-9_-]+)(?:\[([0-9a-z\,\s]+)\])?/iu', $part, $part_matches);
                             array_shift($part_matches);
 
-                            if (count($part_matches) < 1)
-                            {
+                            if (count($part_matches) < 1) {
                                 // Move onto the next part, something is wrong here...
                                 continue;
                             }
@@ -155,63 +135,45 @@ class Generate extends \Oil\Generate
                             $option = $part_matches;
 
                             // The first option always has to be the field type
-                            if ($part_i == 0)
-                            {
+                            if ($part_i == 0) {
                                 $option_name = 'type';
                                 $type = $option[0];
-                                if ($type === 'string')
-                                {
+                                if ($type === 'string') {
                                     $type = 'varchar';
-                                }
-                                else if ($type === 'integer')
-                                {
+                                } else if ($type === 'integer') {
                                     $type = 'int';
                                 }
 
-                                if ( ! in_array($type, array('text', 'blob', 'datetime', 'date', 'timestamp', 'time')))
-                                {
-                                    if ( ! isset($option[1]) || $option[1] == NULL)
-                                    {
-                                        if (isset(self::$_default_constraints[$type]))
-                                        {
+                                if ( ! in_array($type, array('text', 'blob', 'datetime', 'date', 'timestamp', 'time'))) {
+                                    if ( ! isset($option[1]) || $option[1] == NULL) {
+                                        if (isset(self::$_default_constraints[$type])) {
                                             $field_array['constraint'] = self::$_default_constraints[$type];
                                         }
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         // should support field_name:enum[value1,value2]
-                                        if ($type === 'enum')
-                                        {
+                                        if ($type === 'enum') {
                                             $values = explode(',', $option[1]);
                                             $option[1] = '"'.implode('","', $values).'"';
 
                                             $field_array['constraint'] = $option[1];
                                         }
                                         // should support field_name:decimal[10,2]
-                                        elseif (in_array($type, array('decimal', 'float')))
-                                        {
+                                        elseif (in_array($type, array('decimal', 'float'))) {
                                             $field_array['constraint'] = $option[1];
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             $field_array['constraint'] = (int) $option[1];
                                         }
 
                                     }
                                 }
                                 $option = $type;
-                            }
-                            else
-                            {
+                            } else {
                                 // This allows you to put any number of :option or :option[val] into your field and these will...
                                 // ... always be passed through to the action making it really easy to add extra options for a field
                                 $option_name = array_shift($option);
-                                if (count($option) > 0)
-                                {
+                                if (count($option) > 0) {
                                     $option = $option[0];
-                                }
-                                else
-                                {
+                                } else {
                                     $option = true;
                                 }
                             }
@@ -220,9 +182,7 @@ class Generate extends \Oil\Generate
 
                         }
                         $fields[] = $field_array;
-                    }
-                    else
-                    {
+                    } else {
                         // Invalid field passed in
                         continue;
                     }
@@ -305,11 +265,11 @@ HELP;
     // Helper methods
 
 
-    private static function _working_path() {
+    private static function _working_path()
+    {
         $module = \Cli::option('module', \Cli::option('m'));
         if ($module) {
-            foreach (\Config::get('module_paths') as $m)
-            {
+            foreach (\Config::get('module_paths') as $m) {
                 if (is_dir($m .$module)) {
                     return $m .$module .DS;
                 }

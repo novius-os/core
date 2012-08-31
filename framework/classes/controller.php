@@ -12,7 +12,8 @@ namespace Nos;
 
 use Event;
 
-class Controller extends \Fuel\Core\Controller_Hybrid {
+class Controller extends \Fuel\Core\Controller_Hybrid
+{
     protected $config = array();
     protected $app_config = array();
 
@@ -22,15 +23,14 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
     public $template = null;
     public $format = 'json';
 
-    public function before() {
-        if ( ! empty($this->template) and is_string($this->template))
-        {
+    public function before()
+    {
+        if ( ! empty($this->template) and is_string($this->template)) {
             // Load the template
             $this->template = \View::forge($this->template);
         }
 
-        if (is_null($this->format) or ! array_key_exists($this->format, $this->_supported_formats))
-        {
+        if (is_null($this->format) or ! array_key_exists($this->format, $this->_supported_formats)) {
             // auto-detect the format
             $this->format = array_key_exists(\Input::extension(), $this->_supported_formats) ? \Input::extension() : 'json';
         }
@@ -43,7 +43,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         parent::before();
     }
 
-    public function after($response) {
+    public function after($response)
+    {
         if (isset($this->config['assets'])) {
             if (isset($this->config['assets']['paths'])) {
                 foreach ($this->config['assets']['paths'] as $path) {
@@ -65,15 +66,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         }
         /*
         // If nothing was returned default to the template
-        if (empty($response))
-        {
+        if (empty($response)) {
             $response = $this->template;
         }
 
         // If the response isn't a Response object, embed in the available one for BC
         // @deprecated  can be removed when $this->response is removed
-        if ( ! $response instanceof Response)
-        {
+        if ( ! $response instanceof Response) {
             $this->response->body = $response;
             $response = $this->response;
         }*/
@@ -84,26 +83,22 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
 
         // @todo; this is a quick fix to allow html loading via ajax by returning a view.
         // -->
-        if ( \Input::is_ajax() && $this->response !== null)
-        {
+        if ( \Input::is_ajax() && $this->response !== null) {
             // If nothing was returned default to the template
-            if (empty($response))
-            {
+            if (empty($response)) {
                 $response = $this->template;
             }
 
 
             // If the response isn't a Response object, embed in the available one for BC
             // @deprecated  can be removed when $this->response is removed
-            if ( ! $response instanceof Response && $this->response->body == null)
-            {
+            if ( ! $response instanceof Response && $this->response->body == null) {
                 $this->response->body = $response;
                 $response = $this->response;
             }
         }
 
-        if ( ! $response instanceof \Response && $this->response->body !== null)
-        {
+        if ( ! $response instanceof \Response && $this->response->body !== null) {
             $response = $this->response;
         }
 
@@ -114,21 +109,24 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         return parent::after($response);
     }
 
-    protected function trigger($event, $data = '', $return_type = 'string') {
+    protected function trigger($event, $data = '', $return_type = 'string')
+    {
         list($application, $file_name) = \Config::configFile(get_called_class());
         $file_name = str_replace('/', '_', $file_name);
 
         return \Event::trigger($application.'.'.$file_name.'.'.$event, $data, $return_type);
     }
 
-    protected static function getConfiguration() {
+    protected static function getConfiguration()
+    {
         list($application, $file_name) = \Config::configFile(get_called_class());
 
         return \Config::loadConfiguration($application, $file_name);
     }
 
 
-    protected static function getGlobalConfiguration() {
+    protected static function getGlobalConfiguration()
+    {
         list($application, $file_name) = \Config::configFile(get_called_class());
 
         return \Config::application($application);
@@ -136,7 +134,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
 
 
     /* @todo TO BE MOVED */
-    protected static function check_permission_action($action, $dataset_location, $item = null) {
+    protected static function check_permission_action($action, $dataset_location, $item = null)
+    {
         \Config::load($dataset_location, true);
         $dataset = \Config::get($dataset_location.'.dataset');
         // An unknown action is authorized
@@ -335,7 +334,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         );
     }
 
-    protected function build_tree($tree) {
+    protected function build_tree($tree)
+    {
         $list_models  = array();
         foreach ($tree['models'] as $model) {
             if (!is_array($model)) {

@@ -10,17 +10,14 @@
 
 namespace Nos;
 
-class Widget {
-
-    public static function date($field, $value = null, array $attributes = array()) {
-
-        if (is_array($field))
-        {
+class Widget
+{
+    public static function date($field, $value = null, array $attributes = array())
+    {
+        if (is_array($field)) {
             $attributes = $field;
             ! array_key_exists('value', $attributes) and $attributes['value'] = '';
-        }
-        else
-        {
+        } else {
             $attributes['name'] = (string) $field;
             $attributes['value'] = (string) $value;
         }

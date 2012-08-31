@@ -8,19 +8,19 @@
  * @link http://www.novius-os.org
  */
 
-class Arr extends Fuel\Core\Arr {
-    public static function recursive_filter($array, $callback = null) {
+class Arr extends Fuel\Core\Arr
+{
+    public static function recursive_filter($array, $callback = null)
+    {
         foreach ($array as $key => & $value) {
             if (is_array($value)) {
                 $value = static::recursive_filter($value, $callback);
-            }
-            else {
+            } else {
                 if ( ! is_null($callback)) {
                     if ( ! $callback($value)) {
                         unset($array[$key]);
                     }
-                }
-                else {
+                } else {
                     if ( ! (bool) $value) {
                         unset($array[$key]);
                     }

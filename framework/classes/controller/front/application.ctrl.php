@@ -12,33 +12,38 @@ namespace Nos;
 
 use Event;
 
-class Controller_Front_Application extends Controller {
-
+class Controller_Front_Application extends Controller
+{
     public $main_controller;
 
     public $cache;
 
     public $default_config = array();
 
-    public function before() {
+    public function before()
+    {
         $this->main_controller = \Nos\Nos::main_controller();
 
         return parent::before();
     }
 
-    public function trigger($event, $data = '', $return_type = 'string') {
+    public function trigger($event, $data = '', $return_type = 'string')
+    {
         Event::trigger(get_called_class().'.'.$event, $this, 'array');
     }
 
-    public function save_cache() {
+    public function save_cache()
+    {
         return $this->cache;
     }
 
-    public function rebuild_cache($cache) {
+    public function rebuild_cache($cache)
+    {
         $this->cache = $cache;
     }
 
-    protected function merge_config($mixed) {
+    protected function merge_config($mixed)
+    {
         if (is_array($mixed)) {
             $this->config = \Arr::merge($this->config, $mixed);
 
@@ -49,7 +54,8 @@ class Controller_Front_Application extends Controller {
         }
     }
 
-    protected static function _compute_views($views = array()) {
+    protected static function _compute_views($views = array())
+    {
         $views = array();
         foreach ($views as $view => $fields) {
             foreach ($fields as $field) {

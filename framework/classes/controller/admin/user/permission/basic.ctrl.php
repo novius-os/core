@@ -12,10 +12,10 @@ namespace Nos;
 
 use View;
 
-class Controller_Admin_User_Permission_Basic extends Controller {
-
-    public function action_edit($role_id, $app) {
-
+class Controller_Admin_User_Permission_Basic extends Controller
+{
+    public function action_edit($role_id, $app)
+    {
         $role = Model_User_Role::find($role_id);
 
         \Config::load("$app::permissions", true);
@@ -28,7 +28,8 @@ class Controller_Admin_User_Permission_Basic extends Controller {
         ));
     }
 
-    protected function post_edit() {
+    protected function post_edit()
+    {
         $perms = Model_User_Permission::find('all', array(
             'where' => array(
                 array('perm_role_id', $_POST['role_id']),

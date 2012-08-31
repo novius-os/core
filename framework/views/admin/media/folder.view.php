@@ -27,8 +27,7 @@ $uniqid_radio = uniqid('radio_');
             $fieldset->set_config('form_attributes', $form_attributes);
         }
     }
-    if (!$item->is_new())
-    {
+    if (!$item->is_new()) {
         echo $fieldset->field('medif_id')->build();
     }
 ?>
@@ -48,8 +47,7 @@ $uniqid_radio = uniqid('radio_');
             </td>
         </tr>
 <?php
-    if ($item->is_new())
-    {
+    if ($item->is_new()) {
 ?>
         <tr>
             <th><?= !empty($context) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>

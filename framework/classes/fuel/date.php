@@ -8,8 +8,8 @@
  * @link http://www.novius-os.org
  */
 
-class Date extends \Fuel\Core\Date {
-
+class Date extends \Fuel\Core\Date
+{
 	/**
 	 * Compare two dates without regard to hours.
 	 *
@@ -26,13 +26,9 @@ class Date extends \Fuel\Core\Date {
 		$date2 = $date2->format('%Y-%m-%d');
 		if ($date1 < $date2) {
 			return -1;
-		}
-		elseif ($date1 > $date2)
-		{
+		} elseif ($date1 > $date2) {
 			return 1;
-		}
-		else
-		{
+		} else {
 			return 0;
 		}
 	}
@@ -47,27 +43,22 @@ class Date extends \Fuel\Core\Date {
 	public function modify($modify)
 	{
 		// Temporarily change timezone when different from default
-		if (\Fuel::$timezone != $this->timezone)
-		{
+		if (\Fuel::$timezone != $this->timezone) {
 			date_default_timezone_set($this->timezone);
 		}
 
 		// Modify the timestamp
 		$timestamp = strtotime($modify, $this->timestamp);
 
-		if ($timestamp === false)
-		{
+		if ($timestamp === false) {
 			\Error::notice('Invalid input for modify given.');
 			return false;
-		}
-		else
-		{
+		} else {
 			$this->timestamp = $timestamp;
 		}
 
 		// Change timezone back to default if changed previously
-		if (\Fuel::$timezone != $this->timezone)
-		{
+		if (\Fuel::$timezone != $this->timezone) {
 			date_default_timezone_set(\Fuel::$timezone);
 		}
 

@@ -7,12 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-if ($type === 'checkbox')
-{
+if ($type === 'checkbox') {
     echo '{field} {label}';
-}
-else
-{
+} else {
 ?>
         <tr><th class="{error_class}">{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>
 <?php

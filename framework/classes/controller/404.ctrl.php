@@ -10,13 +10,15 @@
 
 namespace Nos;
 
-class Controller_404 extends \Controller {
-
-    public function action_front() {
+class Controller_404 extends \Controller
+{
+    public function action_front()
+    {
         return \View::forge('errors/404_front');
     }
 
-    public function action_admin() {
+    public function action_admin()
+    {
 	    $view = \View::forge('nos::admin/html');
 	    $view->set('title', 'Novius OS');
 	    $view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);

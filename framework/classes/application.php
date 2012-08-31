@@ -43,13 +43,11 @@ class Application
         // @todo use config.modules_path?
 
         $applications = array();
-        foreach ($repositories as $where => $path)
-        {
+        foreach ($repositories as $where => $path) {
             $list = \File::read_dir($path, 1);
 
             // idc = I don't care
-            foreach ($list as $folder => $idc)
-            {
+            foreach ($list as $folder => $idc) {
                 $app_name = trim($folder, '/\\');
                 $applications[$app_name] = static::forge($app_name);
             }
@@ -76,8 +74,7 @@ class Application
     public function get_name()
     {
         $metadata = $this->metadata;
-        if (empty($metadata))
-        {
+        if (empty($metadata)) {
             $metadata = $this->get_real_metadata();
         }
 
@@ -99,8 +96,7 @@ class Application
      */
     public function get_real_metadata()
     {
-        if (empty($this->real_metadata))
-        {
+        if (empty($this->real_metadata)) {
             \Config::load($this->folder.'::metadata', true);
             $this->real_metadata = \Config::get($this->folder.'::metadata');
         }
@@ -175,8 +171,7 @@ class Application
         $config = $this->prepare_config($old_metadata, $new_metadata);
 
         // If symlinks are created, save the config
-        if ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install())
-        {
+        if ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install()) {
             $this->unsymlink('static') && $this->unsymlink('htdocs');
             $this->symlink('static') && $this->symlink('htdocs');
         }
@@ -205,8 +200,7 @@ class Application
         // Check if the installation is compatible with other applications
         $config = $this->prepare_config($old_metadata, $new_metadata);
 
-        if ($this->unsymlink('static') && $this->unsymlink('htdocs'))
-        {
+        if ($this->unsymlink('static') && $this->unsymlink('htdocs')) {
             // Remove the application
             $config['app_installed'] = \Config::get('data::app_installed', array());
             unset($config['app_installed'][$this->folder]);
@@ -221,31 +215,24 @@ class Application
         // Load current data
         $data_path = APPPATH.'data'.DS.'config'.DS;
         $config = array();
-        foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section)
-        {
+        foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section) {
             \Config::load($data_path.$section.'.php', 'data::'.$section);
             $config[$section] = \Config::get('data::'.$section, array());
         }
 
-        foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section)
-        {
-            if (!isset($new_metadata[$section]))
-            {
+        foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section) {
+            if (!isset($new_metadata[$section])) {
                 $new_metadata[$section] = array();
             }
-            if (!isset($old_metadata[$section]))
-            {
+            if (!isset($old_metadata[$section])) {
                 $old_metadata[$section] = array();
             }
             $removed[$section] = array();
 
-            if (empty($old_metadata))
-            {
+            if (empty($old_metadata)) {
                 // Add
                 $added[$section] = $new_metadata[$section];
-            }
-            else
-            {
+            } else {
                 // Repair
                 $added[$section]   = array_diff_key($new_metadata[$section], $old_metadata[$section]);
                 $removed[$section] = array_diff_key($old_metadata[$section], $new_metadata[$section]);
@@ -253,21 +240,17 @@ class Application
         }
 
         // Check duplicate templates
-        if (!empty($added['templates']))
-        {
+        if (!empty($added['templates'])) {
             $duplicates = array_intersect_key($config['templates'], $added['templates']);
-            if (count($duplicates) > 0)
-            {
+            if (count($duplicates) > 0) {
                 throw new \Exception(count($duplicates).' templates from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
             }
         }
 
-        if (!empty($removed['templates']))
-        {
+        if (!empty($removed['templates'])) {
             // Check template usage in the page
             $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
-            if (count($pages) > 0)
-            {
+            if (count($pages) > 0) {
                 $usedTemplates = array();
                 $pageTitles = array();
                 foreach ($pages as $page) {
@@ -279,42 +262,34 @@ class Application
         }
 
         // Check duplicate launchers
-        if (!empty($added['launchers']))
-        {
+        if (!empty($added['launchers'])) {
             $duplicates = array_intersect_key($config['launchers'], $added['launchers']);
-            if (count($duplicates) > 0)
-            {
+            if (count($duplicates) > 0) {
                 throw new \Exception(count($duplicates).' launchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
             }
         }
 
         // Check duplicate enhancers
-        if (!empty($added['enhancers']))
-        {
+        if (!empty($added['enhancers'])) {
             $duplicates = array_intersect_key($config['enhancers'], $added['enhancers']);
-            if (count($duplicates) > 0)
-            {
+            if (count($duplicates) > 0) {
                 throw new \Exception(count($duplicates).' enhancers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
             }
         }
 
         // Check duplicate data catchers
-        if (!empty($added['data_catchers']))
-        {
+        if (!empty($added['data_catchers'])) {
             $duplicates = array_intersect_key($config['data_catchers'], $added['data_catchers']);
-            if (count($duplicates) > 0)
-            {
+            if (count($duplicates) > 0) {
                 throw new \Exception(count($duplicates).' data catchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
             }
         }
 
         // Update actual configuration
-        foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section)
-        {
+        foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section) {
             // Update
             $updated = array_intersect_key($new_metadata[$section], $old_metadata[$section]);
-            foreach ($updated as $k => $v)
-            {
+            foreach ($updated as $k => $v) {
                 $config[$section][$k] = $v;
             }
 
@@ -334,11 +309,9 @@ class Application
         $old_namespace = \Arr::get($old_metadata, 'namespace', '');
         $new_namespace = \Arr::get($new_metadata, 'namespace', '');
 
-        if ($old_namespace != $new_namespace)
-        {
+        if ($old_namespace != $new_namespace) {
             unset($config['app_namespaces'][$this->folder]);
-            if ($new_namespace != '')
-            {
+            if ($new_namespace != '') {
                 $config['app_namespaces'][$this->folder] = $new_namespace;
             }
         }
@@ -346,23 +319,18 @@ class Application
         $old_dependency = \Arr::get($old_metadata, 'extends', '');
         $new_dependency = \Arr::get($new_metadata, 'extends', '');
 
-        if ($old_dependency != $new_dependency)
-        {
+        if ($old_dependency != $new_dependency) {
             // Add new dependency
-            if ($new_dependency != '')
-            {
-                if (empty($config['app_dependencies'][$new_dependency]))
-                {
+            if ($new_dependency != '') {
+                if (empty($config['app_dependencies'][$new_dependency])) {
                     $config['app_dependencies'][$new_dependency] = array();
                 }
                 $config['app_dependencies'][$new_dependency][] = $this->folder;
             }
 
             // Remove old dependency
-            if (!empty($config['app_dependencies'][$old_dependency]))
-            {
-                foreach (array_keys($config['app_dependencies'][$old_dependency], $this->folder) as $key)
-                {
+            if (!empty($config['app_dependencies'][$old_dependency])) {
+                foreach (array_keys($config['app_dependencies'][$old_dependency], $this->folder) as $key) {
                     unset($config['app_dependencies'][$old_dependency][$key]);
                 }
             }
@@ -374,8 +342,7 @@ class Application
     protected function save_config($config)
     {
         $data_path = APPPATH.'data'.DS.'config'.DS;
-        foreach ($config as $file => $content)
-        {
+        foreach ($config as $file => $content) {
             \Config::save($data_path.$file.'.php', $content);
             \Config::set('data::'.$file, $content);
         }
@@ -383,18 +350,14 @@ class Application
 
     protected function symlink($folder)
     {
-        if (!$this->is_link($folder))
-        {
+        if (!$this->is_link($folder)) {
             $private = APPPATH.'applications'.DS.$this->folder.DS.$folder;
-            if (is_dir($private))
-            {
+            if (is_dir($private)) {
                 $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-                if (is_link($public))
-                {
+                if (is_link($public)) {
                     unlink($public);
                 }
-                if (!symlink(Tools_File::relativePath(dirname($public), $private), $public))
-                {
+                if (!symlink(Tools_File::relativePath(dirname($public), $private), $public)) {
                     throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
                 }
             }
@@ -406,8 +369,7 @@ class Application
     protected function unsymlink($folder)
     {
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-        if (is_link($public) || file_exists($public))
-        {
+        if (is_link($public) || file_exists($public)) {
             return unlink($public);
         }
 
@@ -418,8 +380,7 @@ class Application
     {
         $private = APPPATH.'applications'.DS.$this->folder.DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-        if (file_exists($private))
-        {
+        if (file_exists($private)) {
             return is_link($public) && readlink($public) == Tools_File::relativePath(dirname($public), $private);
         }
 
@@ -433,15 +394,12 @@ class Application
         $app_refresh = $add ? $add : $remove;
 
         $dependencies = array();
-        if ($add)
-        {
+        if ($add) {
             \Config::load($app_refresh.'::metadata', true);
             $config = \Config::get($app_refresh.'::metadata', array());
 
-            if (isset($config['extends']))
-            {
-                if (!isset($dependencies[$config['extends']]))
-                {
+            if (isset($config['extends'])) {
+                if (!isset($dependencies[$config['extends']])) {
                     $dependencies[$config['extends']] = array();
                 }
                 $dependencies[$config['extends']][] = $app_refresh;
@@ -451,16 +409,12 @@ class Application
         \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
         $app_installed = \Config::get('data::app_installed', array());
 
-        foreach ($app_installed as $app_name => $app)
-        {
-            if ($app_refresh !== $app_name)
-            {
+        foreach ($app_installed as $app_name => $app) {
+            if ($app_refresh !== $app_name) {
                 \Config::load($app_name.'::metadata', true);
                 $config = \Config::get($app_name.'::metadata', array());
-                if (isset($config['extends']))
-                {
-                    if (!isset($dependencies[$config['extends']]))
-                    {
+                if (isset($config['extends'])) {
+                    if (!isset($dependencies[$config['extends']])) {
                         $dependencies[$config['extends']] = array();
                     }
                     $dependencies[$config['extends']][] = $app_name;
@@ -479,8 +433,7 @@ class Application
 
     public function __get($property)
     {
-        if (method_exists($this, 'get_'.$property))
-        {
+        if (method_exists($this, 'get_'.$property)) {
             return $this->{'get_'.$property}();
         }
 
@@ -495,30 +448,21 @@ class Application
      */
     protected static function array_diff_key_assoc($arr1, $arr2, &$diff = array())
     {
-        foreach ($arr1 as $k => $v)
-        {
-            if (!isset($arr2[$k]))
-            {
+        foreach ($arr1 as $k => $v) {
+            if (!isset($arr2[$k])) {
                 $diff[$k] = array($v, null);
-            }
-            else if (is_array($v))
-            {
+            } else if (is_array($v)) {
                 unset($subdiff);
                 static::array_diff_key_assoc($v, $arr2[$k], $subdiff);
-                if (!empty($subdiff))
-                {
+                if (!empty($subdiff)) {
                     $diff[$k] = $subdiff;
                 }
-            }
-            else if ($arr2[$k] !== $v)
-            {
+            } else if ($arr2[$k] !== $v) {
                 $diff[$k] = array($v, $arr2[$k]);
             }
         }
-        foreach ($arr2 as $k => $v)
-        {
-            if (!isset($arr1[$k]))
-            {
+        foreach ($arr2 as $k => $v) {
+            if (!isset($arr1[$k])) {
                 $diff[$k] = array(null, $v);
             }
         }

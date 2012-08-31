@@ -10,15 +10,15 @@
 
 namespace Nos;
 
-class Widget_Time_Picker extends \Fieldset_Field {
-
+class Widget_Time_Picker extends \Fieldset_Field
+{
 	protected $options = array(
         'timeFormat' => 'hh:mm',
         'separator' => ' ',
     );
 
-    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset) {
-
+    public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset)
+    {
         $attributes['type']  = 'text';
 		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' timepicker';
 
@@ -41,7 +41,8 @@ class Widget_Time_Picker extends \Fieldset_Field {
      * How to display the field
      * @return string
      */
-    public function build() {
+    public function build()
+    {
         parent::build();
 
 	    $this->fieldset()->append($this->js_init());
@@ -51,7 +52,8 @@ class Widget_Time_Picker extends \Fieldset_Field {
         return (string) parent::build();
     }
 
-	public function js_init() {
+	public function js_init()
+	{
         return \View::forge('widget/time_picker', array(
             'id' => $this->get_attribute('id'),
         ), false);

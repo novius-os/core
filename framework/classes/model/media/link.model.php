@@ -10,7 +10,8 @@
 
 namespace Nos;
 
-class Model_Media_Link extends \Nos\Orm\Model {
+class Model_Media_Link extends \Nos\Orm\Model
+{
     protected static $_table_name = 'nos_media_link';
     protected static $_primary_key = array('medil_id');
 

@@ -48,11 +48,9 @@ $large = !empty($large) && $large == true;
     }
 
     $locales = array_keys(\Config::get('locales'));
-    if (!empty($item) && count($locales) > 1)
-    {
+    if (!empty($item) && count($locales) > 1) {
         $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-        if ($translatable)
-        {
+        if ($translatable) {
             echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_lang()).'</td>';
         }
     }
