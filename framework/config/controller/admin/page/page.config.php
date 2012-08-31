@@ -33,6 +33,7 @@ return array(
         'not found' => __('Page not found'),
         'blank_state_item_text' => __('page'),
     ),
+    'context_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
         'labels' => array(

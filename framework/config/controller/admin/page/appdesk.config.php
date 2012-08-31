@@ -114,6 +114,19 @@ return array(
                     ),
                 ),
             ),
+            'add_subpage' => array(
+                'name' => 'add_page',
+                'label' => __('Add a sub-page to this page'),
+                'icon' => 'plus',
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => 'admin/nos/page/page/insert_update?context_id={{id}}',
+                        'label' => __('Add a page'),
+                        'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+                    ),
+                ),
+            ),
             'delete' => array(
                 'label' => __('Delete'),
                 'name' => 'delete',
@@ -190,7 +203,7 @@ return array(
                         'dataKey' => 'publication_status',
                     ),
                     'actions' => array(
-                        'actions' => array('edit', 'visualise', 'delete', 'set_homepage'),
+                        'actions' => array('edit', 'add_subpage', 'visualise', 'delete', 'set_homepage'),
                     ),
                 ),
             ),
