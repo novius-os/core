@@ -67,7 +67,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 
         // Front-office (enhancer context) = calculate urlPath based on current page, except if canonical URL was asked for
         if (!$canonical && ($main_controller = \Nos\Nos::main_controller()) instanceof \Nos\Controller_Front) {
-            $params['urlPath'] = $main_controller->getEnhancedUrlPath();
+            $page_id = $main_controller->getPage()->page_id;
         }
 
         // Real canonical URL can only be computed using default sharable data
@@ -77,6 +77,11 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
             $nugget_url = \Arr::get($nuggets, \Nos\DataCatcher::TYPE_URL, false);
             if (!empty($nugget_url)) {
                 list($page_id, $itemPath) = explode('::', $nugget_url);
+            }
+        }
+
+        if (!empty($page_id)) {
+
                 $urlPath = \Nos\Tools_Enhancer::url_page($page_id);
                 if ($urlPath !== false) {
                     $params['urlPath'] = $urlPath;
@@ -84,10 +89,8 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
                     // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
                 }
             }
-        }
 
         $urls = $this->urls($item, $params);
-
         return reset($urls) ?: null;
     }
 }
