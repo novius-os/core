@@ -13,13 +13,13 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field
     public function populate($input, $repopulate = false)
     {
         if (is_array($input))
-        { // or $input instanceof \ArrayAccess
+        {
             if (isset($input[$this->name]))
             {
                 $this->set_value($input[$this->name], true);
             }
         }
-        elseif (is_object($input)) // and property_exists($input, $f->name)
+        elseif (is_object($input))
         {
             $this->set_value($input->{$this->name}, true);
         }
