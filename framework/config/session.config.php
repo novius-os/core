@@ -85,8 +85,8 @@ return array(
     //    'cookie_name'        => 'fuelmid',                // name of the session cookie for memcached based sessions
     //    'servers'            => array(                    // array of servers and portnumbers that run the memcached service
     //                            array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100)
-	//	),
-	//),
+    //	),
+    //),
 
     // specific configuration settings for database based sessions
     //'db'            => array(
@@ -94,7 +94,7 @@ return array(
     //    'database'            => null,                    // name of the database name (as configured in config/db.php)
     //    'table'                => 'sessions',                // name of the sessions table
     //    'gc_probability'    => 5                        // probability % (between 0 and 100) for garbage collection
-	//),
+    //),
 
     // specific configuration settings for redis based sessions
     //'redis'            => array(

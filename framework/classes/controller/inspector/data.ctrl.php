@@ -15,16 +15,16 @@ use Fuel\Core\Config;
 
 class Controller_Inspector_Data extends Controller_Admin_Application
 {
-	protected $config = array(
-		'data' => '',
-	);
+    protected $config = array(
+        'data' => '',
+    );
 
-	public function action_list()
-	{
-		$view = View::forge('inspector/plain_data');
+    public function action_list()
+    {
+        $view = View::forge('inspector/plain_data');
 
-		$view->set('data', \Format::forge()->to_json($this->config['data']), false);
+        $view->set('data', \Format::forge()->to_json($this->config['data']), false);
 
-		return $view;
-	}
+        return $view;
+    }
 }

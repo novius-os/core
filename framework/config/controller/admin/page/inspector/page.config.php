@@ -9,22 +9,22 @@
  */
 
 return array(
-	'models' => array(
-		array(
-			'model' => 'Nos\Model_Page',
+    'models' => array(
+        array(
+            'model' => 'Nos\Model_Page',
             'order_by' => 'page_sort',
-			'childs' => array('Nos\Model_Page'),
-			'dataset' => array(
-				'id' => 'page_id',
-				'title' => 'page_title',
-			),
-		),
-	),
-	'roots' => array(
-		array(
-			'model' => 'Nos\Model_Page',
-			'where' => array(array('page_parent_id', 'IS', \DB::expr('NULL'))),
+            'childs' => array('Nos\Model_Page'),
+            'dataset' => array(
+                'id' => 'page_id',
+                'title' => 'page_title',
+            ),
+        ),
+    ),
+    'roots' => array(
+        array(
+            'model' => 'Nos\Model_Page',
+            'where' => array(array('page_parent_id', 'IS', \DB::expr('NULL'))),
             'order_by' => 'page_sort',
-		),
-	),
+        ),
+    ),
 );

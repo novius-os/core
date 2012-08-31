@@ -35,28 +35,28 @@ $dataset = array(
 );
 
 return array(
-	'tree' => array(
-		'models' => array(
-			array(
-				'model' => 'Nos\Model_Page',
-				'order_by' => 'page_sort',
-				'childs' => array('Nos\Model_Page'),
-				'dataset' => $dataset,
-			),
-		),
-		'roots' => array(
-			array(
-				'model' => 'Nos\Model_Page',
-				'where' => array(array('page_parent_id', 'IS', \DB::expr('NULL'))),
-				'order_by' => 'page_sort',
-			),
-		),
-	),
-	'query' => array(
-		'model' => 'Nos\Model_Page',
-		'related' => array(),
-	),
-	'search_text' => 'page_title',
+    'tree' => array(
+        'models' => array(
+            array(
+                'model' => 'Nos\Model_Page',
+                'order_by' => 'page_sort',
+                'childs' => array('Nos\Model_Page'),
+                'dataset' => $dataset,
+            ),
+        ),
+        'roots' => array(
+            array(
+                'model' => 'Nos\Model_Page',
+                'where' => array(array('page_parent_id', 'IS', \DB::expr('NULL'))),
+                'order_by' => 'page_sort',
+            ),
+        ),
+    ),
+    'query' => array(
+        'model' => 'Nos\Model_Page',
+        'related' => array(),
+    ),
+    'search_text' => 'page_title',
     'selectedView' => 'default',
     'views' => array(
         'default' => array(
@@ -93,7 +93,7 @@ return array(
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
     ),
-	'dataset' => $dataset,
+    'dataset' => $dataset,
     'appdesk' => array(
         'tab' => array(
             'label' => __('Pages'),

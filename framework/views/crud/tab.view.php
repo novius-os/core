@@ -19,7 +19,7 @@ if (!$item->is_new()) {
 }
 ?>
 <script type="text/javascript">
-	require(
+    require(
         ['jquery-nos-ostabs'],
         function ($) {
             $(function () {

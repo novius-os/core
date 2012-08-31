@@ -29,19 +29,19 @@ class Model_Media extends \Nos\Orm\Model
     );
 
     protected static $_has_many = array(
-		'link' => array(
-			'key_from' => 'media_id',
-			'model_to' => 'Nos\Model_Media_Link',
-			'key_to' => 'medil_media_id',
-			'cascade_save' => false,
-			'cascade_delete' => false,
-		),
+        'link' => array(
+            'key_from' => 'media_id',
+            'model_to' => 'Nos\Model_Media_Link',
+            'key_to' => 'medil_media_id',
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        ),
     );
 
-	protected static $_observers = array(
-		'\Orm\Observer_Self' => array(
-			'events' => array('before_save'),
-		),
+    protected static $_observers = array(
+        '\Orm\Observer_Self' => array(
+            'events' => array('before_save'),
+        ),
         'Orm\Observer_CreatedAt' => array(
             'events' => array('before_insert'),
             'mysql_timestamp' => true,
@@ -159,12 +159,12 @@ class Model_Media extends \Nos\Orm\Model
         return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 
-	public function _event_before_save()
-	{
+    public function _event_before_save()
+    {
         parent::_event_before_save();
-		$is_image = @getimagesize(APPPATH.$this->get_private_path());
-		if ($is_image !== false) {
-			list($this->media_width, $this->media_height) = $is_image;
-		}
-	}
+        $is_image = @getimagesize(APPPATH.$this->get_private_path());
+        if ($is_image !== false) {
+            list($this->media_width, $this->media_height) = $is_image;
+        }
+    }
 }

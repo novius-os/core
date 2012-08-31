@@ -9,5 +9,5 @@
  */
 
 return array(
-	'Pages' => 'Pages',
+    'Pages' => 'Pages',
 );

@@ -15,32 +15,32 @@ class Model_Media_Folder extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media_folder';
     protected static $_primary_key = array('medif_id');
 
-	protected static $_has_many = array(
-		'children' => array(
-			'key_from'       => 'medif_id',
-			'model_to'       => '\Nos\Model_Media_Folder',
-			'key_to'         => 'medif_parent_id',
-			'cascade_save'   => false,
-			'cascade_delete' => false,
-		),
+    protected static $_has_many = array(
+        'children' => array(
+            'key_from'       => 'medif_id',
+            'model_to'       => '\Nos\Model_Media_Folder',
+            'key_to'         => 'medif_parent_id',
+            'cascade_save'   => false,
+            'cascade_delete' => false,
+        ),
         'media' => array(
-			'key_from'       => 'medif_id',
-			'model_to'       => '\Nos\Model_Media',
-			'key_to'         => 'media_folder_id',
-			'cascade_save'   => false,
-			'cascade_delete' => false,
-		),
-	);
+            'key_from'       => 'medif_id',
+            'model_to'       => '\Nos\Model_Media',
+            'key_to'         => 'media_folder_id',
+            'cascade_save'   => false,
+            'cascade_delete' => false,
+        ),
+    );
 
-	protected static $_belongs_to = array(
-		'parent' => array(
-			'key_from'       => 'medif_parent_id',
-			'model_to'       => '\Nos\Model_Media_Folder',
-			'key_to'         => 'medif_id',
-			'cascade_save'   => false,
-			'cascade_delete' => false,
-		),
-	);
+    protected static $_belongs_to = array(
+        'parent' => array(
+            'key_from'       => 'medif_parent_id',
+            'model_to'       => '\Nos\Model_Media_Folder',
+            'key_to'         => 'medif_id',
+            'cascade_save'   => false,
+            'cascade_delete' => false,
+        ),
+    );
 
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(
@@ -56,11 +56,11 @@ class Model_Media_Folder extends \Nos\Orm\Model
     );
 
     protected static $_behaviours = array(
-		'Nos\Orm_Behaviour_Tree' => array(
-			'events' => array('before'),
-			'parent_relation' => 'parent',
-			'children_relation' => 'children',
-		),
+        'Nos\Orm_Behaviour_Tree' => array(
+            'events' => array('before'),
+            'parent_relation' => 'parent',
+            'children_relation' => 'children',
+        ),
         'Nos\Orm_Behaviour_Virtualpath' => array(
             'events' => array('before_save', 'after_save', 'change_parent'),
             'virtual_name_property' => 'medif_dir_name',

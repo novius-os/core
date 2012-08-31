@@ -26,7 +26,7 @@ class FrontCache
     public static function delete($path)
     {
         // Disabled
-		// Experimental
+        // Experimental
 
         return;
 

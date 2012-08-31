@@ -29,9 +29,9 @@ class Tools_Image
      */
     public static function resize($source, $max_width = null, $max_height = null, $dest = null)
     {
-	    if (!is_file($source)) {
-		    throw new \Exception(__('This image doesn\'t exist.'));
-	    }
+        if (!is_file($source)) {
+            throw new \Exception(__('This image doesn\'t exist.'));
+        }
         $image_info = @getimagesize($source);
         list($width, $height, $image_type, ) = $image_info;
 

@@ -9,9 +9,9 @@
  */
 
 return array(
-	'required' => 'This field is required.',
-	'min_length' => 'This field has to contain at least :param:1 characters.',
-	'max_length' => 'This field may not contain more than :param:1 characters.',
-	'valid_date' => 'The entered date is invalid.',
-	'check_old_password' => 'The old password is incorrect.',
+    'required' => 'This field is required.',
+    'min_length' => 'This field has to contain at least :param:1 characters.',
+    'max_length' => 'This field may not contain more than :param:1 characters.',
+    'valid_date' => 'The entered date is invalid.',
+    'check_old_password' => 'The old password is incorrect.',
 );

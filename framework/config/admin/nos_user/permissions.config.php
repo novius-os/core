@@ -9,12 +9,12 @@
  */
 
 return array(
-	'general' => array(
-		'driver' => 'select',
-		'label'=> 'Access',
-		'driver_config' => array(
-			'choices' => array(
-			),
-		),
-	),
+    'general' => array(
+        'driver' => 'select',
+        'label'=> 'Access',
+        'driver_config' => array(
+            'choices' => array(
+            ),
+        ),
+    ),
 );

@@ -9,23 +9,23 @@
  */
 
 return array(
-	'_root_' => 'nos/admin/noviusos/index',
-	'^admin' => 'nos/admin/noviusos/index',
+    '_root_' => 'nos/admin/noviusos/index',
+    '^admin' => 'nos/admin/noviusos/index',
 
-	//'admin/nos/(:any)' => 'nos/$1',
-	'^admin/(:segment)/(:any)' => '$1/admin/$2',
-	//'(:any)' => 'nos/admin/dispatch/$1',
+    //'admin/nos/(:any)' => 'nos/$1',
+    '^admin/(:segment)/(:any)' => '$1/admin/$2',
+    //'(:any)' => 'nos/admin/dispatch/$1',
 
-	'_404_' => null,
+    '_404_' => null,
 );
 
 Config::load('cloud', true);
 // Not installed: Controller_Install
 if (!Config::get('cloud.installed', false)) {
-	return array(
-		'_root_' => 'install/index',
-		'_404_' => 'install/404',
-	);
+    return array(
+        '_root_' => 'install/index',
+        '_404_' => 'install/404',
+    );
 }
 
 // No routes, everything's manual!

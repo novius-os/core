@@ -205,15 +205,15 @@ namespace Fuel\Migrations;
 
 class {$migration_name}
 {
-	public function up()
-	{
+    public function up()
+    {
 {$up}
-	}
+    }
 
-	public function down()
-	{
+    public function down()
+    {
 {$down}
-	}
+    }
 }
 MIGRATION;
 

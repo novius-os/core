@@ -12,7 +12,7 @@ namespace Nos;
 
 class Orm_Behaviour_Sharable extends Orm_Behaviour
 {
-	protected $_properties = array();
+    protected $_properties = array();
 
     public function __construct($class)
     {

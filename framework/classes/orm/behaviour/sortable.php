@@ -12,22 +12,22 @@ namespace Nos;
 
 class Orm_Behaviour_Sortable extends Orm_Behaviour
 {
-	/**
-	 * sort_property
-	 */
-	protected $_properties = array();
+    /**
+     * sort_property
+     */
+    protected $_properties = array();
 
-	public function before_query(&$options)
-	{
-		if (array_key_exists('order_by', $options)) {
-			$order_by = $options['order_by'];
-	        if (!empty($order_by['default_sort'])) {
-	            unset($order_by['default_sort']);
-	            $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
-	        }
-			$options['order_by'] = $order_by;
-		}
-	}
+    public function before_query(&$options)
+    {
+        if (array_key_exists('order_by', $options)) {
+            $order_by = $options['order_by'];
+            if (!empty($order_by['default_sort'])) {
+                unset($order_by['default_sort']);
+                $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
+            }
+            $options['order_by'] = $order_by;
+        }
+    }
 
     /**
      * Sets a new parent for the object
@@ -35,20 +35,20 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      * @param   Orm\Model The parent object
      * @return void
      */
-	public function move_before($item, $before = null)
-	{
+    public function move_before($item, $before = null)
+    {
         $this->_move($item, $before->get_sort() - 0.5);
-	}
+    }
 
-	public function move_after($item, $before = null)
-	{
+    public function move_after($item, $before = null)
+    {
         $this->_move($item, $before->get_sort() + 0.5);
-	}
+    }
 
-	public function move_to_last_position($item)
-	{
+    public function move_to_last_position($item)
+    {
         $this->_move($item, 10000);
-	}
+    }
 
     public function get_sort(\Nos\Orm\Model $obj)
     {

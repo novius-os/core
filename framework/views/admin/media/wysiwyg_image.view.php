@@ -8,57 +8,57 @@
  * @link http://www.novius-os.org
  */
 
-	$appdeskview = (string) Request::forge('nos/admin/media/appdesk/index')->execute(array('image_pick'))->response();
-	$uniqid = uniqid('tabs_');
-	$id_library = $uniqid.'_library';
-	$id_properties = $uniqid.'_properties';
+    $appdeskview = (string) Request::forge('nos/admin/media/appdesk/index')->execute(array('image_pick'))->response();
+    $uniqid = uniqid('tabs_');
+    $id_library = $uniqid.'_library';
+    $id_properties = $uniqid.'_properties';
 ?>
 <style type="text/css">
-	.box-sizing-border {
-		box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		-webkit-box-sizing: border-box;
-		height: 100%;
-	}
+    .box-sizing-border {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        height: 100%;
+    }
 </style>
 <div id="<?= $uniqid ?>" class="box-sizing-border">
-	<ul>
-		<li><a href="#<?= $id_library ?>"><?= $edit ? __('Pick a new image') : __('1. Pick your image') ?></a></li>
-		<li><a href="#<?= $id_properties ?>"><?= $edit ? __('Edit properties') : __('2. Set the properties') ?></a></li>
-	</ul>
-	<div id="<?= $id_library ?>" class="box-sizing-border"></div>
+    <ul>
+        <li><a href="#<?= $id_library ?>"><?= $edit ? __('Pick a new image') : __('1. Pick your image') ?></a></li>
+        <li><a href="#<?= $id_properties ?>"><?= $edit ? __('Edit properties') : __('2. Set the properties') ?></a></li>
+    </ul>
+    <div id="<?= $id_library ?>" class="box-sizing-border"></div>
 
-	<form action="#">
-		<div id="<?= $id_properties ?>">
-			<table class="fieldset">
-				<tr>
-					<td rowspan="6"><img /></td>
-					<th><label for="<?= $uniqid ?>_title"><?= __('Title:') ?> </label></th>
-					<td><input type="text" name="title" data-id="title" size="30" id="<?= $uniqid ?>_title" /></td>
-				</tr>
-				<tr>
-					<th><label for="<?= $uniqid ?>_alt"><?= __('Description:') ?> </label></th>
-					<td><input type="text" name="alt" data-id="alt" size="30" id="<?= $uniqid ?>_alt" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= strtr(__('Use {field}'), array('{field}' => __('title'))) ?></label></td>
-				</tr>
-				<tr>
-					<th><label for="<?= $uniqid ?>_width"><?= __('Width:') ?> </label></th>
-					<td><input type="text" name="width" data-id="width" size="5" id="<?= $uniqid ?>_width" /> &nbsp; <label><input type="checkbox" data-id="proportional" checked> &nbsp;<?= __('Keep proportions') ?></label></td>
-				</tr>
-				<tr>
-					<th><label for="<?= $uniqid ?>_height"><?= __('Height:') ?> </label></th>
-					<td><input type="text" name="height" data-id="height" size="5" readonly id="<?= $uniqid ?>_height" /></td>
-				</tr>
-				<tr>
-					<th><label for="<?= $uniqid ?>_style"><?= __('Style:') ?> </label></th>
-					<td><input type="text" name="style" data-id="style" id="<?= $uniqid ?>_style" /></td>
-				</tr>
-				<tr>
-					<th></th>
-					<td> <button type="submit" class="primary" data-icon="check" data-id="save"><?= $edit ? __('Update this image') : __('Insert this image') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
-				</tr>
-			</table>
-		</div>
-	</form>
+    <form action="#">
+        <div id="<?= $id_properties ?>">
+            <table class="fieldset">
+                <tr>
+                    <td rowspan="6"><img /></td>
+                    <th><label for="<?= $uniqid ?>_title"><?= __('Title:') ?> </label></th>
+                    <td><input type="text" name="title" data-id="title" size="30" id="<?= $uniqid ?>_title" /></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_alt"><?= __('Description:') ?> </label></th>
+                    <td><input type="text" name="alt" data-id="alt" size="30" id="<?= $uniqid ?>_alt" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= strtr(__('Use {field}'), array('{field}' => __('title'))) ?></label></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_width"><?= __('Width:') ?> </label></th>
+                    <td><input type="text" name="width" data-id="width" size="5" id="<?= $uniqid ?>_width" /> &nbsp; <label><input type="checkbox" data-id="proportional" checked> &nbsp;<?= __('Keep proportions') ?></label></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_height"><?= __('Height:') ?> </label></th>
+                    <td><input type="text" name="height" data-id="height" size="5" readonly id="<?= $uniqid ?>_height" /></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_style"><?= __('Style:') ?> </label></th>
+                    <td><input type="text" name="style" data-id="style" id="<?= $uniqid ?>_style" /></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td> <button type="submit" class="primary" data-icon="check" data-id="save"><?= $edit ? __('Update this image') : __('Insert this image') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
+                </tr>
+            </table>
+        </div>
+    </form>
 </div>
 <script type="text/javascript">
 require(

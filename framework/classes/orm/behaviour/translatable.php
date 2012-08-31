@@ -329,18 +329,18 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         return $data;
     }
 
-	public function before_query(&$options)
-	{
-		if (array_key_exists('where', $options)) {
-			$where = $options['where'];
-			foreach ($where as $k => $w) {
-				if ($w[0] == 'lang_main') {
-					if ($w[1] == true) {
-						$where[$k] = array($this->_properties['single_id_property'], 'IS NOT', null);
-					} elseif ($w[1] == false) {
-						$where[$k] = array($this->_properties['single_id_property'], 'IS', null);
-					}
-				}
+    public function before_query(&$options)
+    {
+        if (array_key_exists('where', $options)) {
+            $where = $options['where'];
+            foreach ($where as $k => $w) {
+                if ($w[0] == 'lang_main') {
+                    if ($w[1] == true) {
+                        $where[$k] = array($this->_properties['single_id_property'], 'IS NOT', null);
+                    } elseif ($w[1] == false) {
+                        $where[$k] = array($this->_properties['single_id_property'], 'IS', null);
+                    }
+                }
                 if ($w[0] == 'lang') {
                     if (! is_array($w[1])) {
                         $where[$k] = array($this->_properties['lang_property'], '=', $w[1]);
@@ -349,7 +349,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
                     }
                 }
             }
-			$options['where'] = $where;
-		}
-	}
+            $options['where'] = $where;
+        }
+    }
 }

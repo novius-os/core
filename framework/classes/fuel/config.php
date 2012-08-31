@@ -20,9 +20,9 @@ class Config extends \Fuel\Core\Config
         if ($originFileName == 'db') {
             $group = 'db';
         }
-		if (!$reload and is_array($file) and is_string($group)) {
+        if (!$reload and is_array($file) and is_string($group)) {
             Event::trigger_function('config|'.$group, array(&$file));
-		}
+        }
 
         return parent::load($file, $group, $reload, $overwrite);
     }
@@ -33,14 +33,14 @@ class Config extends \Fuel\Core\Config
         //print_r($item."\n");
         //print_r(parent::get($item, $default));
         return parent::get($item, $default);
-	}
+    }
 
     public static function save($file, $config)
     {
-		$file = static::convertFileName($file, 'save');
+        $file = static::convertFileName($file, 'save');
 
         return parent::save($file, $config);
-	}
+    }
 
     public static function convertFileName($file, $from = 'load')
     {

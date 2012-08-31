@@ -10,18 +10,18 @@
 
 class Response extends \Fuel\Core\Response
 {
-	public static function json($status, $data = null)
-	{
-		if ($data === null) {
-			$data = $status;
-			$status = 200;
-		}
-		static::forge(\Format::forge()->to_json($data), $status, array(
-			'Content-Type' => 'application/json',
-		))->send(true);
-		Event::shutdown();
-		exit();
-	}
+    public static function json($status, $data = null)
+    {
+        if ($data === null) {
+            $data = $status;
+            $status = 200;
+        }
+        static::forge(\Format::forge()->to_json($data), $status, array(
+            'Content-Type' => 'application/json',
+        ))->send(true);
+        Event::shutdown();
+        exit();
+    }
 }
 
 /* End of file date.php */

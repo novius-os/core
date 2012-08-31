@@ -31,7 +31,7 @@ echo View::forge('nos::crud/toolbar', array(
 /* ? */
 /* @todo check this */
 .ui-accordion-content-active {
-	overflow: visible !important;
+    overflow: visible !important;
 }
 </style>
 
@@ -39,9 +39,9 @@ echo View::forge('nos::crud/toolbar', array(
 $view_params['fieldset']->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 
 foreach ($view_params['fieldset']->field() as $field) {
-	if ($field->type == 'checkbox') {
-		$field->set_template('{field} {label}');
-	}
+    if ($field->type == 'checkbox') {
+        $field->set_template('{field} {label}');
+    }
 }
 ?>
 <div>
@@ -80,7 +80,7 @@ foreach ($view_params['fieldset']->field() as $field) {
 
 <script type="text/javascript">
     require([
-	    'jquery-nos',
+        'jquery-nos',
         'jquery.passwordstrength',
         'wijmo.wijtabs'
     ], function($) {

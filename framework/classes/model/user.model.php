@@ -17,7 +17,7 @@ class Model_User extends \Nos\Orm\Model
     protected static $_table_name = 'nos_user';
     protected static $_primary_key = array('user_id');
 
-	protected static $_delete;
+    protected static $_delete;
 
     protected static $_many_many = array(
         'roles' => array(
@@ -34,8 +34,8 @@ class Model_User extends \Nos\Orm\Model
 
     protected static $_observers = array(
         'Orm\\Observer_Self' => array(
-		    'events' => array('before_save', 'after_save', 'before_delete', 'after_delete'),
-	    ),
+            'events' => array('before_save', 'after_save', 'before_delete', 'after_delete'),
+        ),
         'Orm\Observer_CreatedAt' => array(
             'events' => array('before_insert'),
             'mysql_timestamp' => true,
@@ -63,7 +63,7 @@ class Model_User extends \Nos\Orm\Model
     public function _event_before_save()
     {
         parent::_event_before_save();
-		// Don't hash twice
+        // Don't hash twice
         if ($this->is_changed('user_password')) {
             $ph = new \PasswordHash(8, false);
             $this->user_password = $ph->HashPassword($this->user_password);
@@ -78,35 +78,35 @@ class Model_User extends \Nos\Orm\Model
 
     public function _event_after_save()
     {
-		// Don't trigger the event in a loop, because we call save() and this will trigger _event_after_save()
-		static $already_saved = array();
-		if (!empty($already_saved[$this->user_id])) {
-			return;
-		}
-		$already_saved[$this->user_id] = true;
+        // Don't trigger the event in a loop, because we call save() and this will trigger _event_after_save()
+        static $already_saved = array();
+        if (!empty($already_saved[$this->user_id])) {
+            return;
+        }
+        $already_saved[$this->user_id] = true;
 
-		if (empty($this->roles)) {
+        if (empty($this->roles)) {
             $role = new Model_User_Role();
             $role->role_user_id = $this->user_id;
-		} else {
+        } else {
             $role = reset($this->roles);
-		}
+        }
         $role->role_name = $this->fullname();
-		$this->roles[] = $role;
-		$this->save(array('roles'));
+        $this->roles[] = $role;
+        $this->save(array('roles'));
     }
 
-	public function _event_before_delete()
-	{
-		// Load the roles to delete
-		static::$_delete['roles'] = $this->roles;
-	}
-	public function _event_after_delete()
-	{
-		foreach (static::$_delete['roles'] as $role) {
+    public function _event_before_delete()
+    {
+        // Load the roles to delete
+        static::$_delete['roles'] = $this->roles;
+    }
+    public function _event_after_delete()
+    {
+        foreach (static::$_delete['roles'] as $role) {
             $role->delete();
-		}
-	}
+        }
+    }
 
     public static function hash_password($password)
     {
@@ -115,7 +115,7 @@ class Model_User extends \Nos\Orm\Model
 
     public function check_permission($app, $key)
     {
-		$args = func_get_args();
+        $args = func_get_args();
         foreach ($this->roles as $g) {
             if (call_user_func_array(array($g, 'check_permission'), $args)) {
                 return true;
@@ -125,12 +125,12 @@ class Model_User extends \Nos\Orm\Model
         return false;
     }
 
-	public function fullname()
-	{
-		return $this->user_firstname.(empty($this->user_firstname) ? '' : ' ').$this->user_name;
-	}
+    public function fullname()
+    {
+        return $this->user_firstname.(empty($this->user_firstname) ? '' : ' ').$this->user_name;
+    }
 
-	/*
+    /*
     public static function _init()
     {
         static::$_properties['user_last_connection']['default'] = \DB::expr('NOW()');

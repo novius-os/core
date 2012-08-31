@@ -12,7 +12,7 @@
 ?>
 <div <?= array_to_attr($attributes); ?>><table class="nos-treegrid"></table></div>
 <script type="text/javascript">
-	require(
+    require(
         ['jquery', 'jquery-nos-treegrid'],
         function( $ ) {
             $(function() {

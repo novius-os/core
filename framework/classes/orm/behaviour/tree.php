@@ -15,14 +15,14 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     protected $_parent_relation = null;
     protected $_children_relation = null;
 
-	/**
-	 * parent_relation
-	 * children_relation
-	 */
-	protected $_properties = array();
+    /**
+     * parent_relation
+     * children_relation
+     */
+    protected $_properties = array();
 
-	public function __construct($class)
-	{
+    public function __construct($class)
+    {
         parent::__construct($class);
         $this->_parent_relation = call_user_func($class . '::relations', $this->_properties['parent_relation']);
         $this->_children_relation = call_user_func($class . '::relations', $this->_properties['children_relation']);
@@ -34,35 +34,35 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         if (false === $this->_children_relation) {
             throw new \Exception('Relation "children" not found by tree behaviour: '.$this->_class);
         }
-	}
+    }
 
     public function parent_relation()
     {
         return $this->_parent_relation;
     }
 
-	public function before_query(&$options)
-	{
-		if (array_key_exists('where', $options)) {
-			$where = $options['where'];
-			foreach ($where as $k => $w) {
-				if (isset($w[0])  && $w[0] == 'parent') {
-					$property = $this->_parent_relation->key_from[0];
-					if ($w[1] === null) {
-						$where[$k] = array($property, 'IS', null);
-					} else {
-						$id = $w[1]->id;
-						if (empty($id)) {
-							unset($where[$k]);
-						} else {
-							$where[$k] = array($property, $id);
-						}
-					}
-				}
-			}
-			$options['where'] = $where;
-		}
-	}
+    public function before_query(&$options)
+    {
+        if (array_key_exists('where', $options)) {
+            $where = $options['where'];
+            foreach ($where as $k => $w) {
+                if (isset($w[0])  && $w[0] == 'parent') {
+                    $property = $this->_parent_relation->key_from[0];
+                    if ($w[1] === null) {
+                        $where[$k] = array($property, 'IS', null);
+                    } else {
+                        $id = $w[1]->id;
+                        if (empty($id)) {
+                            unset($where[$k]);
+                        } else {
+                            $where[$k] = array($property, $id);
+                        }
+                    }
+                }
+            }
+            $options['where'] = $where;
+        }
+    }
 
     /**
      * Deletes the children recursively
@@ -122,8 +122,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param   Orm\Model The parent object
      * @return void
      */
-	public function set_parent($item, $parent = null)
-	{
+    public function set_parent($item, $parent = null)
+    {
         if ($parent !== null) {
             // Check if the object is appropriate
             if (get_class($parent) != $this->_parent_relation->model_to) {
@@ -145,7 +145,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
         $this->set_parent_no_observers($item, $parent);
         $item->observe('change_parent');
-	}
+    }
 
     /**
      * Get the list of all IDs of the children
@@ -196,11 +196,11 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         return $root !== $item ? $root : null;
     }
 
-	public function set_parent_no_observers($item, $parent = null)
-	{
+    public function set_parent_no_observers($item, $parent = null)
+    {
         foreach ($this->_parent_relation->key_from as $i => $k) {
             $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
             $item->set($this->_properties['parent_relation'], $parent);
         }
-	}
+    }
 }

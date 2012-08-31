@@ -13,7 +13,7 @@ namespace Nos;
 class I18n
 {
 
-	private static $_messages = array();
+    private static $_messages = array();
 
     private static $_group;
 
@@ -25,13 +25,13 @@ class I18n
 
     private static $_loaded_files = array();
 
-	public static $fallback;
+    public static $fallback;
 
-	public static function _init()
-	{
-		static::$fallback = (array) \Config::get('language_fallback', 'en');
+    public static function _init()
+    {
+        static::$fallback = (array) \Config::get('language_fallback', 'en');
         static::setLocale(\Fuel::$locale);
-	}
+    }
 
     public static function setLocale($locale)
     {
@@ -63,24 +63,24 @@ class I18n
         static::$_locale = array_pop(static::$_locale_stack);
     }
 
-	public static function load($file, $group = null)
-	{
-		$languages = static::$fallback;
-		array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
+    public static function load($file, $group = null)
+    {
+        $languages = static::$fallback;
+        array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
 
-		$_messages = array();
-		foreach ($languages as $lang) {
-			if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
-				foreach ($path as $p) {
+        $_messages = array();
+        foreach ($languages as $lang) {
+            if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
+                foreach ($path as $p) {
                     if (array_key_exists($p, static::$_loaded_files)) {
                         break;
                     }
-					$_messages = \Arr::merge(\Fuel::load($p), $_messages);
-				}
+                    $_messages = \Arr::merge(\Fuel::load($p), $_messages);
+                }
                 static::$_loaded_files[$p] = true;
-				break;
-			}
-		}
+                break;
+            }
+        }
 
         if (count($_messages)) {
             if ( ! isset(static::$_messages[static::$_locale])) {
@@ -93,12 +93,12 @@ class I18n
             }
             static::$_messages[static::$_locale][$group] = \Arr::merge($_messages, static::$_messages[static::$_locale][$group]);
         }
-	}
+    }
 
-	public static function get($_message, $default = null)
-	{
+    public static function get($_message, $default = null)
+    {
         return static::gget(static::$_group, $_message, $default);
-	}
+    }
 
     public static function gget($group, $_message, $default = null)
     {

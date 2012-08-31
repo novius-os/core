@@ -12,12 +12,12 @@ namespace Nos;
 
 class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 {
-	/**
-	 * publication_bool_property
-	 * publication_start_property
-	 * publication_end_property
-	 */
-	protected $_properties = array();
+    /**
+     * publication_bool_property
+     * publication_start_property
+     * publication_end_property
+     */
+    protected $_properties = array();
 
     /**
      * Returns all available URL for this item. The array contains:

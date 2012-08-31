@@ -16,7 +16,7 @@ class Controller_Admin_Tray_Account extends \Controller
 {
     public function action_index()
     {
-		$user = \Session::user();
+        $user = \Session::user();
         $config_user = \Config::load('nos::controller/admin/user/user');
         $fields = $config_user['fields'];
         $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
@@ -24,33 +24,33 @@ class Controller_Admin_Tray_Account extends \Controller
         $fieldset_infos = \Fieldset::build_from_config($fields, $user, array(
             'save' => false,
         ));
-		$fieldset_infos->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
+        $fieldset_infos->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
         $fieldset_display  = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return View::forge('admin/tray/account', array(
-			'logged_user' => $user,
-			'fieldset_infos' => $fieldset_infos,
+            'logged_user' => $user,
+            'fieldset_infos' => $fieldset_infos,
             'fieldset_display' => $fieldset_display,
-		), false);
-	}
+        ), false);
+    }
 
-	public function action_disconnect()
-	{
+    public function action_disconnect()
+    {
         Auth::disconnect();
-		\Response::redirect('/admin/nos/login/reset');
-		exit();
-	}
+        \Response::redirect('/admin/nos/login/reset');
+        exit();
+    }
 
     public static function fieldset_display($user)
     {
-		$configuration = $user->getConfiguration();
+        $configuration = $user->getConfiguration();
         $fields = array (
             'background' => array (
                 'label' => 'Wallpaper',
                 'widget' => 'Nos\Widget_Media',
-				'form' => array(
-					'value' => \Arr::get($configuration, 'misc.display.background', ''),
-				),
+                'form' => array(
+                    'value' => \Arr::get($configuration, 'misc.display.background', ''),
+                ),
             ),
         );
 
@@ -58,27 +58,27 @@ class Controller_Admin_Tray_Account extends \Controller
             'form_name' => 'edit_user_display',
             'complete' => function($data) use ($user) {
 
-				$body = array();
+                $body = array();
 
                 try {
                     $configuration = $user->getConfiguration();
-					if (!empty($data['background'])) {
-						$media = Model_Media::find($data['background']);
-						if (!empty($media)) {
-							\Arr::set($configuration, 'misc.display.background', $data['background']);
-							$notify = strtr(__('Your wallpaper is now "{title}"'), array(
+                    if (!empty($data['background'])) {
+                        $media = Model_Media::find($data['background']);
+                        if (!empty($media)) {
+                            \Arr::set($configuration, 'misc.display.background', $data['background']);
+                            $notify = strtr(__('Your wallpaper is now "{title}"'), array(
                                 '{title}' => $media->media_title,
                             ));
-							$body['wallpaper_url'] = \Uri::create($media->get_public_path());
-						} else {
-							$data['background'] = null;
-							$error = __('The selected image does not exists.');
-						}
+                            $body['wallpaper_url'] = \Uri::create($media->get_public_path());
+                        } else {
+                            $data['background'] = null;
+                            $error = __('The selected image does not exists.');
+                        }
                     }
-					if (empty($data['background'])) {
-						\Arr::delete($configuration, 'misc.display.background');
-						$notify = __('Your wallpaper has been removed.');
-					}
+                    if (empty($data['background'])) {
+                        \Arr::delete($configuration, 'misc.display.background');
+                        $notify = __('Your wallpaper has been removed.');
+                    }
 
                     $user->user_configuration = serialize($configuration);
                     $user->save();
@@ -86,12 +86,12 @@ class Controller_Admin_Tray_Account extends \Controller
                     $error = \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : 'An error occured.';
                 }
 
-				if (!empty($notify)) {
-					$body['notify'] = $notify;
-				}
-				if (!empty($error)) {
-					$body['error'] = $error;
-				}
+                if (!empty($notify)) {
+                    $body['notify'] = $notify;
+                }
+                if (!empty($error)) {
+                    $body['error'] = $error;
+                }
 
                 \Response::json($body);
             }

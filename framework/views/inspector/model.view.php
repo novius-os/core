@@ -15,20 +15,20 @@
 require(
     ['jquery-nos-listgrid'],
     function( $, undefined ) {
-		$(function() {
-			var inspector = $('#<?= $id ?>').removeAttr('id'),
-				connector = inspector.closest('.nos-inspector, body')
-					.on('langChange', function() {
-						if (inspectorData.langChange) {
-							inspector.noslistgrid('ensureControl', true);
-						}
-					}),
-				parent = inspector.parent()
-					.on({
-						widgetResize : function() {
-	                        inspector.noslistgrid('setSize', parent.width(), parent.height());
-						},
-						widgetReload : function() {
+        $(function() {
+            var inspector = $('#<?= $id ?>').removeAttr('id'),
+                connector = inspector.closest('.nos-inspector, body')
+                    .on('langChange', function() {
+                        if (inspectorData.langChange) {
+                            inspector.noslistgrid('ensureControl', true);
+                        }
+                    }),
+                parent = inspector.parent()
+                    .on({
+                        widgetResize : function() {
+                            inspector.noslistgrid('setSize', parent.width(), parent.height());
+                        },
+                        widgetReload : function() {
                             var size = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
                             if (size != pageSize) {
                                 pageSize = size
@@ -36,15 +36,15 @@ require(
                             } else {
                                 inspector.noslistgrid('ensureControl', true);
                             }
-						}
-					}),
+                        }
+                    }),
                 inspectorData = parent.data('inspector'),
                 table_heights = $.grid.getHeights(),
                 showFilter = inspectorData.grid.showFilter || false,
-				rendered = false,
+                rendered = false,
                 pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
 
-			if (inspectorData.reloadEvent) {
+            if (inspectorData.reloadEvent) {
                 var match = {
                         name : inspectorData.reloadEvent
                     };
@@ -54,7 +54,7 @@ require(
                 inspector.nosListenEvent(match, function() {
                         parent.trigger('widgetReload');
                     });
-			}
+            }
 
             inspector.css({
                     height : '100%',
@@ -83,7 +83,7 @@ require(
                         }),
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
-	                        dataSource.proxy.options.data.lang = connector.data('nosLang') || '';
+                            dataSource.proxy.options.data.lang = connector.data('nosLang') || '';
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                             dataSource.proxy.options.data.limit = r.pageSize;
                         },
@@ -112,6 +112,6 @@ require(
                         inspector.css('height', 'auto');
                     }
                 });
-		});
-	});
+        });
+    });
 </script>

@@ -10,21 +10,21 @@
 
 function mb_substr($str, $start, $length = null, $encoding = null)
 {
-		return substr($str, $start, $length);
+        return substr($str, $start, $length);
 }
 function mb_strlen($str, $encoding = null)
 {
-	return strlen($str);
+    return strlen($str);
 }
 function mb_strtolower($str, $encoding = null)
 {
-	return strtolower($str);
+    return strtolower($str);
 }
 function mb_strtoupper($str, $encoding = null)
 {
-	return strtoupper($str);
+    return strtoupper($str);
 }
 function mb_convert_case($str, $mode = MB_CASE_UPPER, $encoding = null)
 {
-	return $mode === MB_CASE_TITLE ? ucwords(strtolower($str)) : ($mode === MB_CASE_UPPER ? strtoupper($str) : strtolower($str));
+    return $mode === MB_CASE_TITLE ? ucwords(strtolower($str)) : ($mode === MB_CASE_UPPER ? strtoupper($str) : strtolower($str));
 }

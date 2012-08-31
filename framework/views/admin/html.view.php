@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-	$assets_minified = \Config::get('assets_minified', true);
+    $assets_minified = \Config::get('assets_minified', true);
     $config = array(
         'baseUrl' => $base,
         'paths' => array(
@@ -222,8 +222,8 @@
         ),
     );
 
-	if (!$assets_minified) {
-		$config['paths'] = array_merge($config['paths'], array(
+    if (!$assets_minified) {
+        $config['paths'] = array_merge($config['paths'], array(
             'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
             'log' => 'static/novius-os/admin/vendor/log',
 
@@ -330,15 +330,15 @@
             'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
             'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
         ));
-	}
+    }
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <?php
-	if (isset($base)) {
-		echo '<base href="'.$base.'" />';
-	}
+    if (isset($base)) {
+        echo '<base href="'.$base.'" />';
+    }
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -357,11 +357,11 @@ if (hash.substr(0, 4) == 'tab=') {
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.css">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.1.4.min.css">
 <?php
-	if ($assets_minified) {
+    if ($assets_minified) {
 ?>
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/nos.min.css">
 <?php
-	} else {
+    } else {
 ?>
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/laGrid.css">
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/novius-os.css">
@@ -373,7 +373,7 @@ if (hash.substr(0, 4) == 'tab=') {
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/jquery.novius-os.preview.css">
 <link rel="stylesheet" href="static/novius-os/admin/novius-os/css/jquery.novius-os.datacatchers.css">
 <?php
-	}
+    }
 ?>
 <?= $css ?>
 <script src="<?= $require ?>" type="text/javascript"></script>
@@ -384,6 +384,6 @@ if (hash.substr(0, 4) == 'tab=') {
 </head>
 
 <body>
-	<?= !empty($body) ? $body : '' ?>
+    <?= !empty($body) ? $body : '' ?>
 </body>
 </html>

@@ -14,16 +14,16 @@
 require(
     ['jquery-nos-listgrid'],
     function( $ ) {
-		$(function() {
-			var inspector = $('#<?= $id ?>').removeAttr('id'),
-				parent = inspector.parent()
-					.bind({
-						widgetResize: function() {
+        $(function() {
+            var inspector = $('#<?= $id ?>').removeAttr('id'),
+                parent = inspector.parent()
+                    .bind({
+                        widgetResize: function() {
                             inspector.noslistgrid('setSize', parent.width(), parent.height());
-						}
-					}),
+                        }
+                    }),
                 inspectorData = parent.data('inspector'),
-				rendered = false;
+                rendered = false;
 
             inspector.css({
                     height : '100%',
@@ -55,6 +55,6 @@ require(
                         inspector.css('height', 'auto');
                     }
                 });
-		});
-	});
+        });
+    });
 </script>

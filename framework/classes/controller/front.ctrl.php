@@ -43,11 +43,11 @@ class Controller_Front extends Controller
 
     public function router($action, array $params, $status = 200)
     {
-	    $this->_base_href = \URI::base();
+        $this->_base_href = \URI::base();
 
         // Strip out leading / and trailing .html
         $this->_url = mb_substr($_SERVER['REDIRECT_URL'], 1);
-	    $url = str_replace('.html', '', $this->_url);
+        $url = str_replace('.html', '', $this->_url);
 
         $this->_is_preview = \Input::get('_preview', false);
 
@@ -55,10 +55,10 @@ class Controller_Front extends Controller
         $cache_path = (empty($url) ? 'index/' : $url).$cache_path;
         $cache_path = rtrim($cache_path, '/');
 
-		$nocache = \Input::method() == 'POST' || \Fuel::$env === \Fuel::DEVELOPMENT;
+        $nocache = \Input::method() == 'POST' || \Fuel::$env === \Fuel::DEVELOPMENT;
 
-		\Event::trigger('front.start');
-		\Event::trigger_function('front.start', array(&$url));
+        \Event::trigger('front.start');
+        \Event::trigger_function('front.start', array(&$url));
 
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
@@ -67,12 +67,12 @@ class Controller_Front extends Controller
         } catch (CacheNotFoundException $e) {
             $cache->start();
 
-	        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-	        $url_enhanced = \Config::get('data::url_enhanced', array());
-	        $url_enhanced[$url.'/'] = 0;
+            \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
+            $url_enhanced = \Config::get('data::url_enhanced', array());
+            $url_enhanced[$url.'/'] = 0;
 
-	        $_404 = true;
-	        foreach ($url_enhanced as $temp_url => $page_id) {
+            $_404 = true;
+            foreach ($url_enhanced as $temp_url => $page_id) {
                 if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
                     $_404 = false;
                     if (!in_array($temp_url, array('', '/'))) {
@@ -82,29 +82,29 @@ class Controller_Front extends Controller
                         $this->_page_url = '';
                         $this->_enhanced_url_path = '';
                     }
-			        $this->_enhancer_url = mb_substr(ltrim($url, '/'), mb_strlen($temp_url));
+                    $this->_enhancer_url = mb_substr(ltrim($url, '/'), mb_strlen($temp_url));
                     try {
-				        $this->_generate_cache();
-			        } catch (NotFoundException $e) {
-				        $_404 = true;
+                        $this->_generate_cache();
+                    } catch (NotFoundException $e) {
+                        $_404 = true;
                         $this->_enhanced_url_path = false;
                         $this->_enhancer_url = false;
                         continue;
-			        } catch (\Exception $e) {
-				        // Cannot generate cache: fatal error...
-				        //@todo : cas de la page d'erreur
-				        exit($e->getMessage());
-			        }
+                    } catch (\Exception $e) {
+                        // Cannot generate cache: fatal error...
+                        //@todo : cas de la page d'erreur
+                        exit($e->getMessage());
+                    }
 
-		            echo $this->_view->render();
-			        $cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
-			        $content = $cache->execute();
+                    echo $this->_view->render();
+                    $cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
+                    $content = $cache->execute();
 
-			        break;
-		        }
+                    break;
+                }
             }
 
-	        if ($_404) {
+            if ($_404) {
                 $event_404 = \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
                 $event_404 = array_filter($event_404);
                 if (empty($event_404)) {
@@ -118,16 +118,16 @@ class Controller_Front extends Controller
                         exit();
                     }
                 }
-	        }
+            }
         }
 
-		$this->_handle_head($content);
+        $this->_handle_head($content);
 
-		foreach (\Event::trigger('front.display', null, 'array') as $c) {
-			is_callable($c) && call_user_func_array($c, array(&$content));
-		}
+        foreach (\Event::trigger('front.display', null, 'array') as $c) {
+            is_callable($c) && call_user_func_array($c, array(&$content));
+        }
 
-		return \Response::forge($content, $status);
+        return \Response::forge($content, $status);
     }
 
     /**
@@ -463,17 +463,17 @@ class Controller_Front extends Controller
         }
 
         $this->_template = $templates[$this->_page->page_template];
-		if (empty($this->_template['file'])) {
-			throw new \Exception('The template file for '. ($this->_template['title'] ?: $this->_page->page_template ).' is not defined.');
-		}
+        if (empty($this->_template['file'])) {
+            throw new \Exception('The template file for '. ($this->_template['title'] ?: $this->_page->page_template ).' is not defined.');
+        }
 
         try {
-			// @todo : always load from the template directory?
+            // @todo : always load from the template directory?
             // Try normal loading
             $this->_view = View::forge($this->_template['file']);
         } catch (\FuelException $e) {
 
-			$template_file = \Finder::search('views', $this->_template['file']);
+            $template_file = \Finder::search('views', $this->_template['file']);
 
             if (!is_file($template_file)) {
                 throw new \Exception('The template '.$this->_template['file'].' cannot be found.');

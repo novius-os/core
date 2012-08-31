@@ -15,8 +15,8 @@
 require(
     ['jquery-nos-ostabs'],
     function( $ ) {
-		$(function() {
-			$('#noviusos').nosTabs('init', <?= $ostabs ?>);
-		});
-	});
+        $(function() {
+            $('#noviusos').nosTabs('init', <?= $ostabs ?>);
+        });
+    });
 </script>

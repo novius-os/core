@@ -12,7 +12,7 @@ namespace Nos;
 
 class Widget_Time_Picker extends \Fieldset_Field
 {
-	protected $options = array(
+    protected $options = array(
         'timeFormat' => 'hh:mm',
         'separator' => ' ',
     );
@@ -20,15 +20,15 @@ class Widget_Time_Picker extends \Fieldset_Field
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset)
     {
         $attributes['type']  = 'text';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' timepicker';
+        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' timepicker';
 
-		if (empty($attributes['id'])) {
-			$attributes['id'] = uniqid('date_');
-		}
-		if (!empty($attributes['widget_options'])) {
-			$this->options = \Arr::merge($this->options, $attributes['widget_options']);
-		}
-		unset($attributes['widget_options']);
+        if (empty($attributes['id'])) {
+            $attributes['id'] = uniqid('date_');
+        }
+        if (!empty($attributes['widget_options'])) {
+            $this->options = \Arr::merge($this->options, $attributes['widget_options']);
+        }
+        unset($attributes['widget_options']);
 
         if (empty($attributes['size'])) {
             $attributes['size'] = 5;
@@ -45,18 +45,18 @@ class Widget_Time_Picker extends \Fieldset_Field
     {
         parent::build();
 
-	    $this->fieldset()->append($this->js_init());
+        $this->fieldset()->append($this->js_init());
 
-		$this->set_attribute('data-timepicker-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+        $this->set_attribute('data-timepicker-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
 
         return (string) parent::build();
     }
 
-	public function js_init()
-	{
+    public function js_init()
+    {
         return \View::forge('widget/time_picker', array(
             'id' => $this->get_attribute('id'),
         ), false);
-	}
+    }
 
 }

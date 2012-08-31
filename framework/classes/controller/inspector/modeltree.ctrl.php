@@ -18,7 +18,7 @@ class Controller_Inspector_Modeltree extends Controller_Admin_Application
 {
     protected $config = array();
 
-	public function action_list($view = null, $view_data = array())
+    public function action_list($view = null, $view_data = array())
     {
         if (empty($view)) {
             $view = 'inspector/modeltree';
@@ -33,16 +33,16 @@ class Controller_Inspector_Modeltree extends Controller_Admin_Application
 
     public function action_json()
     {
-	    $json = $this->tree($this->config);
+        $json = $this->tree($this->config);
 
-	    if (\Fuel::$env === \Fuel::DEVELOPMENT) {
-		    $json['get'] = Input::get();
-	    }
-	    if (\Input::get('debug') !== null) {
-		    \Debug::dump($json);
-		    exit();
-	    }
+        if (\Fuel::$env === \Fuel::DEVELOPMENT) {
+            $json['get'] = Input::get();
+        }
+        if (\Input::get('debug') !== null) {
+            \Debug::dump($json);
+            exit();
+        }
 
-	    \Response::json($json);
+        \Response::json($json);
     }
 }

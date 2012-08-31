@@ -12,21 +12,21 @@ namespace Nos;
 
 class Widget_Wysiwyg extends \Fieldset_Field
 {
-	protected $options = array();
+    protected $options = array();
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
         $attributes['type']  = 'textarea';
-		$attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce not_initialized';
+        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce not_initialized';
 
-		if (empty($attributes['id'])) {
-			$attributes['id'] = uniqid('wysiwyg_');
-		}
+        if (empty($attributes['id'])) {
+            $attributes['id'] = uniqid('wysiwyg_');
+        }
 
-		if (!empty($attributes['widget_options'])) {
-			$this->options = \Arr::merge($this->options, $attributes['widget_options']);
-		}
-		unset($attributes['widget_options']);
+        if (!empty($attributes['widget_options'])) {
+            $this->options = \Arr::merge($this->options, $attributes['widget_options']);
+        }
+        unset($attributes['widget_options']);
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
@@ -38,21 +38,21 @@ class Widget_Wysiwyg extends \Fieldset_Field
     public function build()
     {
         parent::build();
-	    $this->fieldset()->append($this->js_init());
+        $this->fieldset()->append($this->js_init());
 
         $this->value = Tools_Wysiwyg::prepare_widget($this->value);
-		$this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+        $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
 
         return (string) parent::build();
     }
 
-	public function js_init()
-	{
-	    // we have to find why it's called two times...
+    public function js_init()
+    {
+        // we have to find why it's called two times...
 
         return \View::forge('widget/wysiwyg', array(
             'id' => $this->get_attribute('id'),
         ), false);
-	}
+    }
 
 }

@@ -12,15 +12,15 @@ use Nos\I18n;
 I18n::load('user', 'nos_user');
 
 return array(
-	'query' => array(
-		'model' => 'Nos\Model_User',
-		'related' => array('roles'),
-	),
-	'search_text' => array(
-		'user_firstname',
-		'user_name',
-		'user_email',
-	),
+    'query' => array(
+        'model' => 'Nos\Model_User',
+        'related' => array('roles'),
+    ),
+    'search_text' => array(
+        'user_firstname',
+        'user_name',
+        'user_email',
+    ),
     'hideLocales' => true,
     'selectedView' => 'default',
     'views' => array(
@@ -55,20 +55,20 @@ return array(
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
     ),
-	'dataset' => array(
-		'id' => 'user_id',
-		'fullname' => array(
+    'dataset' => array(
+        'id' => 'user_id',
+        'fullname' => array(
             'search_column' => \DB::expr('CONCAT(user_firstname, user_name)'),
             'value' => function($item) {
                 return $item->fullname();
             },
         ),
-		'email' => 'user_email',
-		'id_permission' => function($item) {
-			return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
-		}
-	),
-	'inputs' => array(),
+        'email' => 'user_email',
+        'id_permission' => function($item) {
+            return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
+        }
+    ),
+    'inputs' => array(),
     'appdesk' => array(
         'tab' => array(
             'label' => __('Users'),

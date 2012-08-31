@@ -12,8 +12,8 @@ namespace Nos;
 
 class Permission_Radio extends Permission_Driver
 {
-	public function set_options(array $options = array())
-	{
-	}
+    public function set_options(array $options = array())
+    {
+    }
 
 }

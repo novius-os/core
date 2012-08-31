@@ -12,12 +12,12 @@ namespace Nos;
 
 class Orm_Behaviour_Publishable extends Orm_Behaviour
 {
-	/**
-	 * publication_bool_property
-	 * publication_start_property
-	 * publication_end_property
-	 */
-	protected $_properties = array();
+    /**
+     * publication_bool_property
+     * publication_start_property
+     * publication_end_property
+     */
+    protected $_properties = array();
 
     public static function dataset(&$dataset)
     {
@@ -39,13 +39,13 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         ));
     }
 
-	/**
-	 * Returns the locale of the current object
-	 *
-	 * @return string
-	 */
-	public function published($item)
-	{
+    /**
+     * Returns the locale of the current object
+     *
+     * @return string
+     */
+    public function published($item)
+    {
         $bool = $this->_properties['publication_bool_property'];
         if (!empty($bool)) {
             return (bool) $item->get($bool);
@@ -53,27 +53,27 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 
         return false;
         // @todo publication start / end
-	}
+    }
 
-	public function before_query(&$options)
-	{
-		if (array_key_exists('where', $options)) {
-			$where = $options['where'];
-			foreach ($where as $k => $w) {
-				if ($w[0] == 'published') {
+    public function before_query(&$options)
+    {
+        if (array_key_exists('where', $options)) {
+            $where = $options['where'];
+            foreach ($where as $k => $w) {
+                if ($w[0] == 'published') {
                     $bool = $this->_properties['publication_bool_property'];
-					if ($w[1] === true) {
-						$where[$k] = array($bool, 1);
-					} elseif ($w[1] === false) {
-						$where[$k] = array($bool, 0);
-					} else {
-						unset($where[$k]);
-					}
-				}
-			}
-			$options['where'] = $where;
-		}
-	}
+                    if ($w[1] === true) {
+                        $where[$k] = array($bool, 1);
+                    } elseif ($w[1] === false) {
+                        $where[$k] = array($bool, 0);
+                    } else {
+                        unset($where[$k]);
+                    }
+                }
+            }
+            $options['where'] = $where;
+        }
+    }
 
     public function form_processing($item, $data, $response_json)
     {

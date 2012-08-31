@@ -31,40 +31,40 @@ class Controller_Inspector_Model extends Controller_Admin_Application
 
     public function action_json()
     {
-	    $config = $this->config;
-	    $where = function($query) use ($config) {
-		    Filter::apply($query, $config);
+        $config = $this->config;
+        $where = function($query) use ($config) {
+            Filter::apply($query, $config);
 
-		    return $query;
-	    };
+            return $query;
+        };
 
-	    $return = $this->items(array_merge($this->config['query'], array(
-		    'callback' => array($where),
-		    'dataset' => $this->config['dataset'],
-		    'lang' => Input::get('lang', null),
-		    'limit' => intval(Input::get('limit', $this->config['limit'])),
-		    'offset' => intval(Input::get('offset', 0)),
-	    )));
+        $return = $this->items(array_merge($this->config['query'], array(
+            'callback' => array($where),
+            'dataset' => $this->config['dataset'],
+            'lang' => Input::get('lang', null),
+            'limit' => intval(Input::get('limit', $this->config['limit'])),
+            'offset' => intval(Input::get('offset', 0)),
+        )));
 
-	    $json = array(
-		    'get' => '',
-		    'query' =>  '',
-		    'query2' =>  '',
-		    'offset' => $return['offset'],
-		    'items' => $return['items'],
-		    'total' => $return['total'],
-	    );
+        $json = array(
+            'get' => '',
+            'query' =>  '',
+            'query2' =>  '',
+            'offset' => $return['offset'],
+            'items' => $return['items'],
+            'total' => $return['total'],
+        );
 
-	    if (\Fuel::$env === \Fuel::DEVELOPMENT) {
-		    $json['get'] = Input::get();
-		    $json['query'] = $return['query'];
-		    $json['query2'] = $return['query2'];
-	    }
-	    if (\Input::get('debug') !== null) {
-		    \Debug::dump($json);
-		    exit();
-	    }
+        if (\Fuel::$env === \Fuel::DEVELOPMENT) {
+            $json['get'] = Input::get();
+            $json['query'] = $return['query'];
+            $json['query2'] = $return['query2'];
+        }
+        if (\Input::get('debug') !== null) {
+            \Debug::dump($json);
+            exit();
+        }
 
-	    \Response::json($json);
+        \Response::json($json);
     }
 }

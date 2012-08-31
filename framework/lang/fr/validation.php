@@ -9,9 +9,9 @@
  */
 
 return array(
-	'required' => 'Ce champ est obligatoire.',
-	'min_length' => 'Ce champ doit contenir au moins :param:1 caractères.',
-	'max_length' => 'Ce champ ne doit pas contenir plus que :param:1 caractères.',
-	'valid_date' => 'Cette date n\'existe pas.',
-	'check_old_password' => 'L\'ancien mot passe est invalide.',
+    'required' => 'Ce champ est obligatoire.',
+    'min_length' => 'Ce champ doit contenir au moins :param:1 caractères.',
+    'max_length' => 'Ce champ ne doit pas contenir plus que :param:1 caractères.',
+    'valid_date' => 'Cette date n\'existe pas.',
+    'check_old_password' => 'L\'ancien mot passe est invalide.',
 );

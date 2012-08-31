@@ -15,8 +15,8 @@
 require(
     ['jquery-nos-listgrid', 'jquery-ui.datepicker'],
     function( $, undefined ) {
-		$(function() {
-			var label_custom = $('#<?= $id ?>').removeAttr('id')
+        $(function() {
+            var label_custom = $('#<?= $id ?>').removeAttr('id')
                     .css({
                         display : 'inline-block'
                     }).hide(),
@@ -28,32 +28,32 @@ require(
                         }
                     }),
                 inspectorData = parent.data('inspector'),
-				dates = label_custom.find(':input').datepicker('option', 'onSelect', function( selectedDate ) {
-						var option = this === label_custom.find(':input:first')[0] ? "minDate" : "maxDate",
-							instance = $( this ).data( "datepicker" ),
-							begin = label_custom.find(':input:first').val(),
-						    end = label_custom.find(':input:last').val(),
-						    label = "<?= $label_custom ?>";
+                dates = label_custom.find(':input').datepicker('option', 'onSelect', function( selectedDate ) {
+                        var option = this === label_custom.find(':input:first')[0] ? "minDate" : "maxDate",
+                            instance = $( this ).data( "datepicker" ),
+                            begin = label_custom.find(':input:first').val(),
+                            end = label_custom.find(':input:last').val(),
+                            label = "<?= $label_custom ?>";
 
-						var date = $.datepicker.parseDate( instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
-						dates.not( this ).datepicker( "option", option, date );
+                        var date = $.datepicker.parseDate( instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
+                        dates.not( this ).datepicker( "option", option, date );
 
-						if (begin || end) {
-							if (begin) {
-								label = label.replace('xxxbeginxxx', begin);
-							} else {
-								label = 'Until ' + end;
-							}
-							if (end) {
-								label = label.replace('xxxendxxx', end);
-							} else {
-								label = 'Since ' + begin;
-							}
+                        if (begin || end) {
+                            if (begin) {
+                                label = label.replace('xxxbeginxxx', begin);
+                            } else {
+                                label = 'Until ' + end;
+                            }
+                            if (end) {
+                                label = label.replace('xxxendxxx', end);
+                            } else {
+                                label = 'Since ' + begin;
+                            }
                             if ($.isFunction(inspectorData.selectionChanged)) {
                                 inspectorData.selectionChanged(begin + '|' + end, label);
                             }
-						}
-					}),
+                        }
+                    }),
                 rendered = false;
 
             inspector.css({
@@ -127,6 +127,6 @@ require(
                         inspector.css('height', 'auto');
                     }
                 });
-		});
-	});
+        });
+    });
 </script>

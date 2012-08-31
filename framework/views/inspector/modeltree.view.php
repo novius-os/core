@@ -15,29 +15,29 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
 require(
     ['jquery-nos-treegrid'],
     function($) {
-		$(function() {
-			var inspector = $('#<?= $attributes['id'] ?>'),
-				connector = inspector.closest('.nos-inspector, body')
-					.on('langChange', function() {
-						if (inspectorData.langChange) {
-							inspector.nostreegrid('option', 'treeOptions', {
-								lang : connector.data('nosLang') || ''
-							});
-						}
-					}),
-				parent = inspector.parent()
-					.on({
-						widgetResize : function() {
+        $(function() {
+            var inspector = $('#<?= $attributes['id'] ?>'),
+                connector = inspector.closest('.nos-inspector, body')
+                    .on('langChange', function() {
+                        if (inspectorData.langChange) {
+                            inspector.nostreegrid('option', 'treeOptions', {
+                                lang : connector.data('nosLang') || ''
+                            });
+                        }
+                    }),
+                parent = inspector.parent()
+                    .on({
+                        widgetResize : function() {
                             inspector.nostreegrid('setSize', parent.width(), parent.height());
-						},
-						widgetReload : function() {
-							inspector.nostreegrid('reload');
-						}
-					}),
+                        },
+                        widgetReload : function() {
+                            inspector.nostreegrid('reload');
+                        }
+                    }),
                 inspectorData = parent.data('inspector'),
-				rendered = false;
+                rendered = false;
 
-			if (inspectorData.reloadEvent) {
+            if (inspectorData.reloadEvent) {
                 var match = {
                         name : inspectorData.reloadEvent
                     };
@@ -47,16 +47,16 @@ require(
                 inspector.nosListenEvent(match, function() {
                         parent.trigger('widgetReload');
                     });
-			}
+            }
 
             inspector.css({
                     height : '100%',
                     width : '100%'
                 })
                 .nostreegrid($.extend({
-		            treeOptions : {
-			            lang : connector.data('nosLang') || ''
-		            },
+                    treeOptions : {
+                        lang : connector.data('nosLang') || ''
+                    },
                     columnsAutogenerationMode : 'none',
                     scrollMode : 'auto',
                     allowColSizing : true,
@@ -78,6 +78,6 @@ require(
                         inspector.css("height", "auto");
                     }
                 }, inspectorData.treeGrid));
-		});
-	});
+        });
+    });
 </script>

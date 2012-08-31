@@ -9,41 +9,41 @@
  */
 
 return array(
-	'data' => array(
-		array(
-			'id' => 'image',
-			'title' => 'Images',
-			'icon' => 'image.png',
-		),
-		array(
-			'id' => 'document',
-			'title' => 'Documents',
-			'icon' => 'document-office.png',
-		),
-		array(
-			'id' => 'music',
-			'title' => 'Music',
-			'icon' => 'music-beam.png',
-		),
-		array(
-			'id' => 'video',
-			'title' => 'Videos',
-			'icon' => 'film.png',
-		),
-		array(
-			'id' => 'archive',
-			'title' => 'Compressed archive',
-			'icon' => 'folder-zipper.png',
-		),
-		array(
-			'id' => 'text',
-			'title' => 'Textual content',
-			'icon' => 'document-text.png',
-		),
-		array(
-			'id' => 'other',
-			'title' => 'Other',
-			'icon' => 'book-question.png',
-		),
-	),
+    'data' => array(
+        array(
+            'id' => 'image',
+            'title' => 'Images',
+            'icon' => 'image.png',
+        ),
+        array(
+            'id' => 'document',
+            'title' => 'Documents',
+            'icon' => 'document-office.png',
+        ),
+        array(
+            'id' => 'music',
+            'title' => 'Music',
+            'icon' => 'music-beam.png',
+        ),
+        array(
+            'id' => 'video',
+            'title' => 'Videos',
+            'icon' => 'film.png',
+        ),
+        array(
+            'id' => 'archive',
+            'title' => 'Compressed archive',
+            'icon' => 'folder-zipper.png',
+        ),
+        array(
+            'id' => 'text',
+            'title' => 'Textual content',
+            'icon' => 'document-text.png',
+        ),
+        array(
+            'id' => 'other',
+            'title' => 'Other',
+            'icon' => 'book-question.png',
+        ),
+    ),
 );

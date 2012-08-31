@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-	$uniqid = uniqid('tabs_');
+    $uniqid = uniqid('tabs_');
     $id_type = $uniqid.'_type';
     $id_appdesk = $uniqid.'_appdesk';
     $id_properties = $uniqid.'_properties';
@@ -18,21 +18,21 @@
     $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties');
 ?>
 <style type="text/css">
-	.box-sizing-border {
-		box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		-webkit-box-sizing: border-box;
-		height: 100%;
-	}
+    .box-sizing-border {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        height: 100%;
+    }
     .target_radio .wijmo-wijradio, .target_radio label {
         display: inline-block;
     }
 </style>
 <div id="<?= $uniqid ?>" class="box-sizing-border">
-	<ul>
+    <ul>
         <li><a href="#<?= $id_type ?>"><?= $edit ? __('Choose a new link type') : __('1. Choose a link type') ?></a></li>
-		<li><a href="#<?= $id_properties ?>"><?= $title_properties_2 ?></a></li>
-	</ul>
+        <li><a href="#<?= $id_properties ?>"><?= $title_properties_2 ?></a></li>
+    </ul>
     <div id="<?= $id_type ?>">
         <form action="#" >
             <table class="fieldset">
