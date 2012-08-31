@@ -10,10 +10,8 @@
 
 namespace Nos;
 
-use Fuel\Core\Request;
 use View;
 use Fuel\Core\Config;
-
 
 class Controller_Inspector_Data extends Controller_Admin_Application {
 

@@ -10,8 +10,6 @@
 
 namespace Nos;
 
-use Str;
-
 class Controller_Admin_Login extends Controller {
 
 	public $template = 'nos::admin/html';

@@ -10,7 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\File;
 use View;
 
 class Controller_Admin_Tray_Account extends \Controller {

@@ -10,8 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\Config;
-
 class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk {
 
     public function action_info($id)

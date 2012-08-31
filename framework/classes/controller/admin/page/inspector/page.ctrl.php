@@ -10,9 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\Arr;
-use Fuel\Core\Config;
-
 class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltree
 {
 

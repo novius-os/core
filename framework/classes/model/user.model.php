@@ -10,8 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\Uri;
-
 \Autoloader::add_class('PasswordHash', NOSPATH.'vendor'.DS.'phpass'.DS.'PasswordHash.php');
 
 class Model_User extends \Nos\Orm\Model {

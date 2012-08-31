@@ -10,9 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\Arr;
-use Fuel\Core\Config;
-
 class Controller_Admin_Media_Inspector_Folder extends Controller_Inspector_Modeltree {
 
 }

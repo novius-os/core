@@ -10,12 +10,8 @@
 
 namespace Nos;
 
-use Fuel\Core\Request;
-
 use View;
-
 use Fuel\Core\Config;
-
 use Date;
 
 class Controller_Inspector_Date extends Controller_Admin_Application {

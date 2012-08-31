@@ -14,8 +14,6 @@ class UnknownBehaviourException extends \Exception {};
 class UnknownMethodBehaviourException extends \Exception {};
 
 use Arr;
-use DB;
-use Event;
 
 class Model extends \Orm\Model {
 

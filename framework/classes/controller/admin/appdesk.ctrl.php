@@ -10,8 +10,6 @@
 
 namespace Nos;
 
-use Fuel\Core\Request;
-
 use Asset, Format, Input, Session, View, Uri;
 
 /**

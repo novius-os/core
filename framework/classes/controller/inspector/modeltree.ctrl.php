@@ -11,7 +11,6 @@
 namespace Nos;
 
 use \Input;
-use \Format;
 use \View;
 use \Config;
 
