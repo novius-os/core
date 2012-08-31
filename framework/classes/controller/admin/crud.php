@@ -482,6 +482,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',
+                    'method' => empty($main_lang) ? 'add' : 'open',
                     'tab' => array(
                         'url' => $url
                     ),
