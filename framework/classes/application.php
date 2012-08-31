@@ -337,18 +337,6 @@ class Application
             }
         }
 
-        $old_namespace = \Arr::get($old_metadata, 'namespace', '');
-        $new_namespace = \Arr::get($new_metadata, 'namespace', '');
-
-        if ($old_namespace != $new_namespace)
-        {
-            unset($config['app_namespaces'][$this->folder]);
-            if ($new_namespace != '')
-            {
-                $config['app_namespaces'][$this->folder] = $new_namespace;
-            }
-        }
-
         $old_dependency = \Arr::get($old_metadata, 'extends', '');
         $new_dependency = \Arr::get($new_metadata, 'extends', '');
 

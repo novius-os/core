@@ -210,7 +210,7 @@ define('jquery-nos-appdesk',
 
                 var first = o.adds.shift(),
                     $button = $('<button></button>').text(first.label)
-                        .data('icon', 'plus')
+                        .data('icon', first.icon || 'plus')
                         .addClass('primary')
                         .click(function(e) {
                             e.preventDefault();
