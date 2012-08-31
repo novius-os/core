@@ -24,9 +24,9 @@ class Nos
 
     /**
      *
-     * @param  string   $where   Route for the request
-     * @param  array    $args    The method parameters
-     * @param  boolean  $inline  true  will execute the controller's action directly
+     * @param string  $where  Route for the request
+     * @param array   $args   The method parameters
+     * @param boolean $inline true  will execute the controller's action directly
      *                           false will writes the function call and include it
      * @return string
      */
@@ -74,8 +74,8 @@ class Nos
     /**
      * Parse a wyiswyg
      *
-     * @param  string           $content     Wysiwyg content to parse
-     * @param  \Nos\Controller  $controller  Context for the execution
+     * @param  string          $content    Wysiwyg content to parse
+     * @param  \Nos\Controller $controller Context for the execution
      * @return string
      */
     public static function parse_wysiwyg($content, $controller)

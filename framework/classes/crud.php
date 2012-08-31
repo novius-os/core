@@ -18,7 +18,7 @@ class Crud
      *
      * @param   string
      * @param   Fieldset|null
-     * @return  Fieldset
+     * @return Fieldset
      */
     public static function set_fields($obj, $fieldset = null)
     {

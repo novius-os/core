@@ -246,7 +246,7 @@ class Controller_Front extends Controller
 
     /**
      * @param $url
-     * @param bool $footer
+     * @param  bool             $footer
      * @return Controller_Front
      */
     public function addJavascript($url, $footer = true)
@@ -262,7 +262,7 @@ class Controller_Front extends Controller
 
     /**
      * @param $js
-     * @param bool $footer
+     * @param  bool             $footer
      * @return Controller_Front
      */
     public function addJavascriptInline($js, $footer = true)

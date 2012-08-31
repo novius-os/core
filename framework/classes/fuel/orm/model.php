@@ -35,7 +35,7 @@ class Model extends \Orm\Model
     /**
      * Get the class's title property
      *
-     * @return  mixed
+     * @return mixed
      */
     public static function title_property()
     {

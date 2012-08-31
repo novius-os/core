@@ -49,10 +49,10 @@ class Tools_File
 
     /**
      *
-     * @param   string  $from  Absolute path of first folder
-     * @param   string  $to    Absolute path of second folder
-     * @param   string  $ds    Directory separator
-     * @return  string  Resulting relative path. Possible value: '../../my/folder'
+     * @param  string $from Absolute path of first folder
+     * @param  string $to   Absolute path of second folder
+     * @param  string $ds   Directory separator
+     * @return string Resulting relative path. Possible value: '../../my/folder'
      */
     public static function relativePath($from, $to, $ds = DIRECTORY_SEPARATOR)
     {
@@ -73,8 +73,8 @@ class Tools_File
      * Strip out "../" in a path
      * simplifyPath('number1/number2/../') == 'number1/'
      *
-     * @param   string  $path
-     * @return  string  The simplified path
+     * @param  string $path
+     * @return string The simplified path
      */
     public static function simplifyPath($path)
     {
@@ -96,8 +96,8 @@ class Tools_File
      * Workaround for native realpath(), which has difficulties with '../' in
      * the middle of a path, such as "my/folder/../example"
      *
-     * @param   string  $path
-     * @return  string  @see realpath()
+     * @param  string $path
+     * @return string @see realpath()
      */
     public static function realpath($path)
     {
@@ -107,9 +107,9 @@ class Tools_File
 
     /**
      *
-     * @param  string  $file  Absolute path to local file
-     * @param  string  $mime  Mime type. Default = null (automatic)
-     * @param  bool    $exit  Should we exit? Default = true
+     * @param string $file Absolute path to local file
+     * @param string $mime Mime type. Default = null (automatic)
+     * @param bool   $exit Should we exit? Default = true
      */
     public static function send($file, $mime = null, $exit = true)
     {
@@ -151,8 +151,8 @@ class Tools_File
     /**
      * Determines the content type of a file
      *
-     * @param  string  $file  Path on the file system
-     * @return string  The appropriate Content-type (eg. image/png)
+     * @param  string $file Path on the file system
+     * @return string The appropriate Content-type (eg. image/png)
      */
     public static function content_type($file)
     {

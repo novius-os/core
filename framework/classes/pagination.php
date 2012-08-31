@@ -80,7 +80,7 @@ class Pagination
      * Sets the configuration for pagination
      *
      * @access public
-     * @param array   $config The configuration array
+     * @param  array $config The configuration array
      * @return void
      */
     public function set_config($config)
@@ -103,7 +103,7 @@ class Pagination
      * Prepares vars for creating links
      *
      * @access public
-     * @return array    The pagination variables
+     * @return array The pagination variables
      */
     protected function initialize()
     {
@@ -125,7 +125,7 @@ class Pagination
      * Creates the pagination links
      *
      * @access public
-     * @return mixed    The pagination links
+     * @return mixed The pagination links
      */
     public function create_links($pagination_url = null)
     {
@@ -159,7 +159,7 @@ class Pagination
      * Pagination Page Number links
      *
      * @access public
-     * @return mixed    Markup for page number links
+     * @return mixed Markup for page number links
      */
     public function page_links()
     {
@@ -192,8 +192,8 @@ class Pagination
      * Pagination "Next" link
      *
      * @access public
-     * @param string $value The text displayed in link
-     * @return mixed    The next link
+     * @param  string $value The text displayed in link
+     * @return mixed  The next link
      */
     public function next_link($value)
     {
@@ -217,8 +217,8 @@ class Pagination
      * Pagination "Previous" link
      *
      * @access public
-     * @param string $value The text displayed in link
-     * @return mixed    The previous link
+     * @param  string $value The text displayed in link
+     * @return mixed  The previous link
      */
     public function prev_link($value)
     {

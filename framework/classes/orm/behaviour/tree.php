@@ -88,11 +88,11 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Returns all the direct children of the object
      *
-     * @param  \Nos\Orm\Model  $item
-     * @param  array  $where
-     * @param  array  $order_by
-     * @param  array  $options
-     * @return array of \Orm\Model
+     * @param  \Nos\Orm\Model $item
+     * @param  array          $where
+     * @param  array          $order_by
+     * @param  array          $options
+     * @return array          of \Orm\Model
      */
     public function find_children($item, $where = array(), $order_by = array(), $options = array())
     {
@@ -109,7 +109,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * return the parent of the object
      *
-     * @return  Orm\Model  The parent object
+     * @return Orm\Model The parent object
      */
     public function get_parent($item)
     {
@@ -120,7 +120,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * Sets a new parent for the object
      *
      * @param   Orm\Model The parent object
-     * @return  void
+     * @return void
      */
 	public function set_parent($item, $parent = null)
 	{
@@ -150,7 +150,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Get the list of all IDs of the children
      *
-     * @param bool $include_self
+     * @param  bool  $include_self
      * @return array
      */
     public function get_ids_children($item, $include_self = true)

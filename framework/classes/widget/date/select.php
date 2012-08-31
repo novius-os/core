@@ -40,12 +40,12 @@ class Widget_Date_Select extends \Fieldset_Field
 
     /**
      *
-     * @param  string  $name
-     * @param  string  $label
-     * @param  array   $attributes
-     * @param  array   $rules
-     * @param  \Fuel\Core\Fieldset  $fieldset
-     * @return  Nos\Widget_Date
+     * @param  string              $name
+     * @param  string              $label
+     * @param  array               $attributes
+     * @param  array               $rules
+     * @param  \Fuel\Core\Fieldset $fieldset
+     * @return Nos\Widget_Date
      */
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {

@@ -25,7 +25,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * Fill in the lang_common_id and lang properties when creating the object
      *
      * @param   Model  The object
-     * @return  void
+     * @return void
      */
     public function before_insert(\Nos\Orm\Model $item)
     {
@@ -42,8 +42,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     }
     /**
      * Updates the lang_common_id property
-     * @param Model $item
-     * @return  void
+     * @param  Model $item
+     * @return void
      */
     public function after_insert(\Nos\Orm\Model $item)
     {
@@ -180,7 +180,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * Optimised operation for deleting all languages
      *
-     * @param  \Nos\Orm\Model  $item
+     * @param \Nos\Orm\Model $item
      */
     public function delete_all_lang($item)
     {
@@ -196,7 +196,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * Returns null if the Model is not translatable. Returns true or false whether the object is in the main language.
      *
-     * @return  bool
+     * @return bool
      */
     public function is_main_lang($item)
     {
@@ -206,7 +206,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * Find the object in the main language
      *
-     * @return  \Nos\Model
+     * @return \Nos\Model
      */
     public function find_main_lang($item)
     {
@@ -296,8 +296,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * Returns all available languages for the requested items
      *
-     * @param  array  $where
-     * @return array  List of available languages for each single_id
+     * @param  array $where
+     * @return array List of available languages for each single_id
      */
     public function languages($where)
     {

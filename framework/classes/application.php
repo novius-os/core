@@ -21,8 +21,8 @@ class Application
 
     /**
      *
-     * @param string $name
-     * @param array $real_metadata Optional
+     * @param  string      $name
+     * @param  array       $real_metadata Optional
      * @return Application
      */
     public static function forge($name, $real_metadata = array())
@@ -32,7 +32,7 @@ class Application
 
     /**
      *
-     * @param string[] $repositories
+     * @param  string[]    $repositories
      * @return Application
      */
     public static function search_all($repositories = array())
@@ -442,9 +442,9 @@ class Application
 
     /**
      * Computes the diff between 2 arrays, bith on keys and values.
-     * @param type $arr1  First array to compare
-     * @param type $arr2  Second array to compare
-     * @param type $diff  Returns the diff between the 2 array
+     * @param type $arr1 First array to compare
+     * @param type $arr2 Second array to compare
+     * @param type $diff Returns the diff between the 2 array
      */
     protected static function array_diff_key_assoc($arr1, $arr2, &$diff = array())
     {

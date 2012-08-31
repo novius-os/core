@@ -33,7 +33,7 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      * Sets a new parent for the object
      *
      * @param   Orm\Model The parent object
-     * @return  void
+     * @return void
      */
 	public function move_before($item, $before = null)
 	{

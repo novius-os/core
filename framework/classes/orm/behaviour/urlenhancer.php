@@ -33,9 +33,9 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      *
      * If there's no result, the function will either return null or empty array()
      *
-     * @param  \Nos\Model  $item
-     * @param  array       $params
-     * @return  null|string|array
+     * @param  \Nos\Model        $item
+     * @param  array             $params
+     * @return null|string|array
      */
     public function urls($item, $params = array())
     {

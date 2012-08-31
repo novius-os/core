@@ -34,8 +34,8 @@ class Widget_Date_Picker extends \Fieldset_Field
     /**
      * Standalone build of the media widget.
      *
-     * @param   array   $widget  Widget definition (attributes + widget_options)
-     * @return  string  The <input> tag + JavaScript to initialise it
+     * @param  array  $widget Widget definition (attributes + widget_options)
+     * @return string The <input> tag + JavaScript to initialise it
      */
     public static function widget($widget = array())
     {
@@ -69,8 +69,8 @@ class Widget_Date_Picker extends \Fieldset_Field
 
     /**
      * Parse the widget array to get attributes and the widget options
-     * @param   array  $widget
-     * @return  array  0: attributes, 1: widget options
+     * @param  array $widget
+     * @return array 0: attributes, 1: widget options
      */
     protected static function parse_options($widget = array())
     {
@@ -101,7 +101,7 @@ class Widget_Date_Picker extends \Fieldset_Field
      * Generates the JavaScript to initialise the widget
      *
      * @param   string  HTML ID attribute of the <input> tag
-     * @return  string  JavaScript to execute to initialise the widget
+     * @return string JavaScript to execute to initialise the widget
      */
     protected static function js_init($id, $widget_options = array())
     {

@@ -21,10 +21,10 @@ class Tools_Image
 
     /**
      *
-     * @param  string  $source      a
-     * @param  int     $max_width   Maximum width
-     * @param  int     $max_height  Maximum height
-     * @param  string  $dest        Destination file
+     * @param  string $source     a
+     * @param  int    $max_width  Maximum width
+     * @param  int    $max_height Maximum height
+     * @param  string $dest       Destination file
      * @return bool
      */
     public static function resize($source, $max_width = null, $max_height = null, $dest = null)
@@ -72,11 +72,11 @@ class Tools_Image
     /**
      * Calculates aspect-ratio from an original size to a maximum size
      *
-     * @param  int  $orig_width   Original width
-     * @param  int  $orig_height  Original height
-     * @param  int  $max_width    Max width
-     * @param  int  $max_height   Max height
-     * @return array  0: width, 1: height, 2: ratio
+     * @param  int   $orig_width  Original width
+     * @param  int   $orig_height Original height
+     * @param  int   $max_width   Max width
+     * @param  int   $max_height  Max height
+     * @return array 0: width, 1: height, 2: ratio
      */
     public static function calculate_ratio($orig_width, $orig_height, $max_width = null, $max_height = null)
     {

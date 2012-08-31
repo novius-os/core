@@ -15,8 +15,8 @@ class Widget_Media extends \Fieldset_Field
     /**
      * Standalone build of the media widget.
      *
-     * @param   array   $widget  Widget definition (attributes + widget_options)
-     * @return  string  The <input> tag + JavaScript to initialise it
+     * @param  array  $widget Widget definition (attributes + widget_options)
+     * @return string The <input> tag + JavaScript to initialise it
      */
     public static function widget($widget = array())
     {
@@ -51,8 +51,8 @@ class Widget_Media extends \Fieldset_Field
 
     /**
      * Parse the widget array to get attributes and the widget options
-     * @param   array  $widget
-     * @return  array  0: attributes, 1: widget options
+     * @param  array $widget
+     * @return array 0: attributes, 1: widget options
      */
     protected static function parse_options($widget = array())
     {
@@ -80,8 +80,8 @@ class Widget_Media extends \Fieldset_Field
 
     /**
      * Hydrate the options array to fill in the media URL for the specified value
-     * @param  array  $options
-     * @param  int    $media_id
+     * @param array $options
+     * @param int   $media_id
      */
     protected static function hydrate_options(&$options, $media_id = null)
     {
@@ -97,7 +97,7 @@ class Widget_Media extends \Fieldset_Field
      * Generates the JavaScript to initialise the widget
      *
      * @param   string  HTML ID attribute of the <input> tag
-     * @return  string  JavaScript to execute to initialise the widget
+     * @return string JavaScript to execute to initialise the widget
      */
     protected static function js_init($id)
     {

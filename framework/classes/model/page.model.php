@@ -135,7 +135,7 @@ class Model_Page extends \Nos\Orm\Model
 
     /**
      *
-     * @param int $params Id of the page
+     * @param  int  $params Id of the page
      * @return type
      */
     public static function get_url($params)
@@ -157,7 +157,7 @@ class Model_Page extends \Nos\Orm\Model
     /**
      *
      * @param   array   params
-     * @return  string  the href of the page (external link or virtuak URL)
+     * @return string the href of the page (external link or virtuak URL)
      */
     public function get_href($params = array())
     {

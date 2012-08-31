@@ -22,7 +22,7 @@ class Migrate extends \Fuel\Core\Migrate
      *
      * @param   string	name of the package
      *
-     * @return  array
+     * @return array
      */
     protected static function _find_package($name = null)
     {
