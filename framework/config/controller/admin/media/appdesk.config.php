@@ -149,7 +149,7 @@ return array(
 			$ext = array();
 			$other = array();
 			$value = (array) $value;
-			foreach($extensions as $extension => $extension_list) {
+			foreach ($extensions as $extension => $extension_list) {
 				$extension_list = explode(',', $extension_list);
 				if (in_array($extension, $value)) {
 					$ext = array_merge($ext, $extension_list);

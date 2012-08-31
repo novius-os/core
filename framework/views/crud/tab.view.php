@@ -28,7 +28,7 @@ if (!$item->is_new()) {
 
                 var $container = $('#<?= $container_id ?>');
                 $container.nosTabs('update', tabInfos);
-                if  (!isNew) {
+                if (!isNew) {
                     $container.nosListenEvent({
                             name: <?= \Format::forge()->to_json($model) ?>,
                             action: 'delete',

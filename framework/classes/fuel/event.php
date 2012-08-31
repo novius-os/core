@@ -116,7 +116,7 @@ class Event extends Fuel\Core\Event
 
     public static function trigger_function($event, $args = array())
     {
-		foreach(\Event::trigger($event, null, 'array') as $c) {
+		foreach (\Event::trigger($event, null, 'array') as $c) {
 			is_callable($c) && call_user_func_array($c, $args);
 		}
     }

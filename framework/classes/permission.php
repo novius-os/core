@@ -47,7 +47,7 @@ class Permission
 	        $access->perm_identifier  = '';
 	        $access->perm_key         = $app;
 	        $access->save();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
         }
 

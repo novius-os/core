@@ -155,7 +155,7 @@ class FrontCache
             \Fuel::$profiling && \Profiler::console('FrontCache:'.\Fuel::clean_path($this->_path).' saved for '.$duration.' s.');
         }
 
-        while(ob_get_level() >= $this->_level) {
+        while (ob_get_level() >= $this->_level) {
             $this->_content .= ob_get_clean();
         }
         if (!$this->store()) {

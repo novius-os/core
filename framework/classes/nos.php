@@ -88,7 +88,7 @@ class Nos
             'nos://anchor/' => static::main_controller()->getUrl(),
         ));
 
-        foreach(\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
+        foreach (\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
             is_callable($c) && call_user_func_array($c, array(&$content));
         }
 

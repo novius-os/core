@@ -175,7 +175,7 @@ class Pagination
         // Let's get the ending page number
         $end   = (($this->current_page + $this->num_links) < $this->total_pages) ? $this->current_page + $this->num_links : $this->total_pages;
 
-        for($i = $start; $i <= $end; $i++) {
+        for ($i = $start; $i <= $end; $i++) {
             if ($this->current_page == $i) {
                 $pagination .= $this->template['active_start'].$i.$this->template['active_end'];
             } else {

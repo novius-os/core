@@ -78,7 +78,7 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                                             if ($.isPlainObject(selected) && selected.id) {
                                                 container.find(':checkbox[value=' + selected.id + ']').prop('checked', true);
                                                 table.data('nostreegrid');
-                                                if(selected.disable_check){
+                                                if (selected.disable_check) {
                                                     container.find(':checkbox[value=' + selected.id + ']').attr('disabled', selected.disable_check);
                                                 }
                                             }

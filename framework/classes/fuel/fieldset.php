@@ -508,7 +508,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 					continue;
 				}
 
-                if(isset($config['dont_save']) && $config['dont_save']) {
+                if (isset($config['dont_save']) && $config['dont_save']) {
                     continue;
                 }
 

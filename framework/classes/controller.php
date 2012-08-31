@@ -72,7 +72,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
         // If the response isn't a Response object, embed in the available one for BC
         // @deprecated  can be removed when $this->response is removed
-        if ( ! $response instanceof Response) {
+        if (! $response instanceof Response) {
             $this->response->body = $response;
             $response = $this->response;
         }*/
@@ -92,13 +92,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             // If the response isn't a Response object, embed in the available one for BC
             // @deprecated  can be removed when $this->response is removed
-            if ( ! $response instanceof Response && $this->response->body == null) {
+            if (! $response instanceof Response && $this->response->body == null) {
                 $this->response->body = $response;
                 $response = $this->response;
             }
         }
 
-        if ( ! $response instanceof \Response && $this->response->body !== null) {
+        if (! $response instanceof \Response && $this->response->body !== null) {
             $response = $this->response;
         }
 
@@ -192,7 +192,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             } else if (is_array($config['lang'])) {
                 // Multiple langs
                 $query->where($translatable['lang_property'], 'IN', $config['lang']);
-            } else  {
+            } else {
                 $query->where($translatable['lang_property'],  '=', $config['lang']);
             }
             $common_ids = array();
@@ -520,7 +520,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             // Change sort order
             $behaviour_sort = $model_from::behaviours('Nos\Orm_Behaviour_Sortable');
             if (!empty($behaviour_sort)) {
-                switch($params['targetType']) {
+                switch ($params['targetType']) {
                     case 'before':
                         $from->move_before($to);
                         break;
@@ -614,10 +614,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $config = array_merge($tree_model, array(
                 'lang' => $params['lang'],
                 'callback' => array(function($query) use ($child, $tree_model) {
-                    foreach($child['where'] as $where) {
+                    foreach ($child['where'] as $where) {
                         $query->where($where);
                     }
-                    foreach($tree_model['order_by'] as $order_by) {
+                    foreach ($tree_model['order_by'] as $order_by) {
                         $query->order_by(is_array($order_by) ? $order_by : array($order_by));
                     }
 

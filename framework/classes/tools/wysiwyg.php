@@ -15,7 +15,7 @@ class Tools_Wysiwyg
     public static function prepare_widget($content)
     {
         $replaces = array();
-        static::parse_medias($content, function($media, $params) use(&$replaces) {
+        static::parse_medias($content, function($media, $params) use (&$replaces) {
             if (empty($media)) {
                 $replaces[$params['tag']] = '';
             } else {

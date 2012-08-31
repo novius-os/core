@@ -17,7 +17,7 @@ class Config extends \Fuel\Core\Config
     {
         $originFileName = $file;
         $file = static::convertFileName($file, 'load');
-        if ($originFileName == 'db')  {
+        if ($originFileName == 'db') {
             $group = 'db';
         }
 		if (!$reload and is_array($file) and is_string($group)) {

@@ -123,7 +123,7 @@ class Controller_Front extends Controller
 
 		$this->_handle_head($content);
 
-		foreach(\Event::trigger('front.display', null, 'array') as $c) {
+		foreach (\Event::trigger('front.display', null, 'array') as $c) {
 			is_callable($c) && call_user_func_array($c, array(&$content));
 		}
 

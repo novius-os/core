@@ -14,7 +14,7 @@ class Finder extends Fuel\Core\Finder
 
 	public static function instance()
 	{
-		if ( ! static::$instance) {
+		if (! static::$instance) {
 			static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
 		}
 

@@ -84,7 +84,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud
         $media->observe('before_save');
         $dest = APPPATH.$media->get_private_path();
 
-        if ($media->is_new()){
+        if ($media->is_new()) {
 
             if (!$is_uploaded) {
                 throw new \Exception(__('Please pick a file from your hard drive.'));

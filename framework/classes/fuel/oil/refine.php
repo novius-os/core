@@ -47,7 +47,7 @@ class Refine extends Oil\Refine
         if ( ! $file = \Finder::search('tasks', $task)) {
             $files = \Finder::instance()->list_files('tasks');
             $possibilities = array();
-            foreach($files as $file) {
+            foreach ($files as $file) {
                 $possible_task = pathinfo($file, \PATHINFO_FILENAME);
                 $difference = levenshtein($possible_task, $task);
                 $possibilities[$difference] = $possible_task;

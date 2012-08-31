@@ -73,7 +73,7 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud
         $folder_ids = array_keys($all_folders);
 
         $escaped_folder_ids = array();
-        foreach($folder_ids as $id) {
+        foreach ($folder_ids as $id) {
             $escaped_folder_ids[] = (int) $id;
         }
         // Cleanup empty values

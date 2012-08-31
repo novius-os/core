@@ -42,7 +42,7 @@ class Autoloader extends Fuel\Core\Autoloader
             return parent::load($class);
         }
         $loaded = false;
-        try  {
+        try {
             echo $class.$suffix."\n";
             $loaded = parent::load($class.$suffix);
         } catch (\Exception $e) {
@@ -109,7 +109,7 @@ class Autoloader extends Fuel\Core\Autoloader
                 }
             }
 
-            if ( ! $loaded) {
+            if (! $loaded) {
                 $path = static::get_valid_class_path(APPPATH.'classes/'.static::class_to_path($class));
 
                 if ($path) {

@@ -142,7 +142,7 @@ class Command extends \Oil\Command
 
                     \Cli::write('Tests Running...This may take a few moments.', 'green');
 
-                    foreach(explode(';', $command) as $c) {
+                    foreach (explode(';', $command) as $c) {
                         passthru($c);
                     }
 

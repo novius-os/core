@@ -24,7 +24,7 @@ class Controller_Inspector_Modeltree extends Controller_Admin_Application
             $view = 'inspector/modeltree';
         }
         $view = View::forge(str_replace('\\', '/', $view));
-        foreach($view_data as $k => $v) {
+        foreach ($view_data as $k => $v) {
             $view->set($k, $v, false);
         }
 

@@ -68,7 +68,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             $condition = $config['search_text'];
             if (!empty($value)) {
                 $query->and_where_open();
-                foreach ((array)$condition as $field) {
+                foreach ((array) $condition as $field) {
                     if (is_callable($field)) {
                         $query = $field($value, $query);
                     } else {

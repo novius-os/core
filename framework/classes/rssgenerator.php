@@ -96,7 +96,7 @@ class RssGenerator
         $res.="\t\t<language>".$this->_language."</language>\n";
         $res.="\t\t<generator>".$this->_generator."</generator>\n";
         //items
-        foreach($items as $item) {
+        foreach ($items as $item) {
             //$date = date("r", stripslashes($item["pubDate"]));
             $res.="\t\t<item>\n";
             $res.="\t\t\t<title><![CDATA[".stripslashes($item["title"])."]]></title>\n";

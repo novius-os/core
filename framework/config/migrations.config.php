@@ -1,15 +1,15 @@
 <?php
 return array(
-	'version' => 
+	'version' =>
 	array(
-		'app' => 
+		'app' =>
 		array(
 			'default' => 2,
 		),
-		'module' => 
+		'module' =>
 		array(
 		),
-		'package' => 
+		'package' =>
 		array(
 		),
 	),

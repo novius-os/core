@@ -90,7 +90,7 @@ class Model extends \Orm\Model
         $class = get_called_class();
         $init = array_key_exists($class, static::$_table_names_cached);
 
-        if ( ! $init) {
+        if (! $init) {
             $config = static::_config();
             if (!empty($config) && !empty($config['table_name'])) {
                 static::$_table_names_cached[$class] = $config['table_name'];
@@ -800,7 +800,7 @@ class Model_Media_Provider
     public function rewind()
     {
         $keys = array();
-        foreach($this->parent->linked_medias as $wysiwyg) {
+        foreach ($this->parent->linked_medias as $wysiwyg) {
             $keys[] = $wysiwyg->medil_key;
         }
         $this->iterator = $keys;
@@ -884,7 +884,7 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $keys = array();
         $class = get_called_class();
-        foreach($this->parent->linked_wysiwygs as $wysiwyg) {
+        foreach ($this->parent->linked_wysiwygs as $wysiwyg) {
             $keys[] = $wysiwyg->wysiwyg_key;
         }
         $this->iterator = $keys;

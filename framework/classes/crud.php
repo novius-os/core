@@ -27,7 +27,7 @@ class Crud
         $class = is_object($obj) ? get_class($obj) : $obj;
         if (is_null($fieldset)) {
             $fieldset = \Fieldset::instance($class);
-            if ( ! $fieldset) {
+            if (! $fieldset) {
                 $fieldset = \Fieldset::forge($class);
             }
         }
