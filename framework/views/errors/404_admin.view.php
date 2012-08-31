@@ -19,7 +19,7 @@ if ($css) {
 	p { margin: 0 0 15px; line-height: 22px;}
 	.wip img { vertical-align: middle; }
 </style>
-<?
+<?php
 }
 if ($js) {
 ?>
@@ -34,7 +34,7 @@ require(
         });
     });
 </script>
-<?
+<?php
 }
 if ($body) {
 ?>
@@ -53,5 +53,5 @@ if ($body) {
 
 	<p class="intro"></p>
 </div>
-<?
+<?php
 }

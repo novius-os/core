@@ -72,7 +72,7 @@ if (\Input::is_ajax()) {
 		.backtrace_block { display: none; }
 		.wip img { vertical-align: middle; }
 	</style>
-<?
+<?php
 		$css = ob_get_contents();
 		ob_end_clean();
 		ob_start();
@@ -90,7 +90,7 @@ if (\Input::is_ajax()) {
             });
         });
 	</script>
-<?
+<?php
 		$js = ob_get_contents();
 		ob_end_clean();
 		ob_start();
@@ -170,7 +170,7 @@ if (\Input::is_ajax()) {
 		</p>
 	</div>
 	</div>
-<?
+<?php
 	$body = ob_get_contents();
 	ob_end_clean();
 	ob_start();
@@ -187,4 +187,3 @@ if (\Input::is_ajax()) {
 	} else {
 		echo $body;
 	}
-?>

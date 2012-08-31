@@ -40,4 +40,4 @@
         ), false),
     ),
 ), false); ?>
-<?= $fieldset->close(); ?>
+<?= $fieldset->close();

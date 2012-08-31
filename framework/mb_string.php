@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * NOVIUS OS - Web OS for digital communication
  *

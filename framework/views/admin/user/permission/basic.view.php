@@ -16,4 +16,3 @@ foreach ($permissions as $permission) {
     <li><label><input type="checkbox" name="app[<?= $app; ?>][]" value="<?= $permission['key']; ?>" <?= $checked ? 'checked' : ''; ?> /> <?= $permission['title']; ?></label></li>
     <?php
 }
-?>
