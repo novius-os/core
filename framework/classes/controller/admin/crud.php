@@ -227,7 +227,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->behaviours['translatable']['lang_property'] => array(
                     'form' => array(
                         'type' => 'hidden',
-                        'value' => $this->is_new ? \Input::get('lang') : $this->item->{$this->behaviours['translatable']['lang_property']},
+                        'value' => $this->item->{$this->behaviours['translatable']['lang_property']},
                     ),
                 ),
                 $this->behaviours['translatable']['common_id_property'] => array(
