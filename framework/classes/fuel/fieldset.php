@@ -341,10 +341,10 @@ class Fieldset extends \Fuel\Core\Fieldset
 		if (is_object($model)) {
 			$instance = $model;
 			empty($options['action']) && $options['action'] = 'edit';
-		} else if (is_string($model)) {
+		} elseif (is_string($model)) {
 			$instance = null;
 			empty($options['action']) && $options['action'] = 'add';
-		} else if (is_array($model)) {
+		} elseif (is_array($model)) {
 			$options = $model;
 			$instance = null;
 		}
@@ -522,7 +522,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 					if ($type == 'checkbox' && empty($data[$name])) {
 						$item->$name = \Arr::get($config, 'form.empty', null);
 
-					} else if (isset($data[$name]) && !in_array($name, $pk)) {
+					} elseif (isset($data[$name]) && !in_array($name, $pk)) {
 						$item->$name = $data[$name];
 					}
 				}

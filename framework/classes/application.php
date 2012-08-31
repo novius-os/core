@@ -451,13 +451,13 @@ class Application
         foreach ($arr1 as $k => $v) {
             if (!isset($arr2[$k])) {
                 $diff[$k] = array($v, null);
-            } else if (is_array($v)) {
+            } elseif (is_array($v)) {
                 unset($subdiff);
                 static::array_diff_key_assoc($v, $arr2[$k], $subdiff);
                 if (!empty($subdiff)) {
                     $diff[$k] = $subdiff;
                 }
-            } else if ($arr2[$k] !== $v) {
+            } elseif ($arr2[$k] !== $v) {
                 $diff[$k] = array($v, $arr2[$k]);
             }
         }

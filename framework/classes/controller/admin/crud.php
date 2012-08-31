@@ -171,9 +171,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if (!empty($create_from_id)) {
                 $this->item_from = $this->crud_item($create_from_id);
                 $this->item = clone $this->item_from;
-            } else if (!empty($common_id) && $this->behaviours['translatable']) {
+            } elseif (!empty($common_id) && $this->behaviours['translatable']) {
                 $this->item->{$this->behaviours['translatable']['common_id_property']} = $common_id;
-            } else if (!empty($context_id) && !empty($this->config['context_relation'])) {
+            } elseif (!empty($context_id) && !empty($this->config['context_relation'])) {
                 $model_context = $this->config['context_relation']->model_to;
                 $this->item_context = $model_context::find($context_id);
                 $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};

@@ -133,7 +133,7 @@ $large = !empty($large) && $large == true;
     foreach ($contents as $content) {
         if (is_array($content) && !empty($content['view'])) {
             echo View::forge($content['view'], array('fieldset' => $fieldset, 'item' => $item) + $content['params'], false);
-        } else if (is_callable($content)) {
+        } elseif (is_callable($content)) {
             echo $content();
         } else {
             echo $content;

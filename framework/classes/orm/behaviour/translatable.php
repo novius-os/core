@@ -337,14 +337,14 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
 				if ($w[0] == 'lang_main') {
 					if ($w[1] == true) {
 						$where[$k] = array($this->_properties['single_id_property'], 'IS NOT', null);
-					} else if ($w[1] == false) {
+					} elseif ($w[1] == false) {
 						$where[$k] = array($this->_properties['single_id_property'], 'IS', null);
 					}
 				}
                 if ($w[0] == 'lang') {
                     if (! is_array($w[1])) {
                         $where[$k] = array($this->_properties['lang_property'], '=', $w[1]);
-                    } else if (count($w[1])) {
+                    } elseif (count($w[1])) {
                         $where[$k] = array($this->_properties['lang_property'], 'IN', $w[1]);
                     }
                 }

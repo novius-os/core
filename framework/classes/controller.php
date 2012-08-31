@@ -189,7 +189,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             if (empty($config['lang'])) {
                 // No inspector, we only search items in their primary language
                 $query->where($translatable['single_id_property'], 'IS NOT', null);
-            } else if (is_array($config['lang'])) {
+            } elseif (is_array($config['lang'])) {
                 // Multiple langs
                 $query->where($translatable['lang_property'], 'IN', $config['lang']);
             } else {

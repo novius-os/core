@@ -77,7 +77,7 @@ if (\Input::is_ajax()) {
 		ob_start();
 ?>
 	<script type="text/javascript">
-	public function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']) {var disp = elem.style['display'];} else if (elem.currentStyle) {var disp = elem.currentStyle['display'];}else if (window.getComputedStyle) {var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;}
+	public function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']) {var disp = elem.style['display'];} elseif (elem.currentStyle) {var disp = elem.currentStyle['display'];}else if (window.getComputedStyle) {var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;}
 	require(
         ['jquery-nos-ostabs'],
         function($) {

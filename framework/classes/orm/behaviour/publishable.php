@@ -64,7 +64,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                     $bool = $this->_properties['publication_bool_property'];
 					if ($w[1] === true) {
 						$where[$k] = array($bool, 1);
-					} else if ($w[1] === false) {
+					} elseif ($w[1] === false) {
 						$where[$k] = array($bool, 0);
 					} else {
 						unset($where[$k]);

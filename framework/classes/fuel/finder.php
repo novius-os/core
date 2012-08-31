@@ -157,7 +157,7 @@ class Finder extends Fuel\Core\Finder
 					File::create_dir(dirname($search[0]), basename($search[0]));
 				}
 				return $search[0].$file_no_ns;
-			} else if (!$is_namespaced) {
+			} elseif (!$is_namespaced) {
 				$found = parent::locate($directory, $file, $ext, $multiple, $cache);
 			}
 		}

@@ -255,7 +255,7 @@ require(
                         });
                         $input_url_params.val(found[2]);
                     }
-                } else if (href.substr(0, 12) === 'nos://media/') {
+                } elseif (href.substr(0, 12) === 'nos://media/') {
                     found = href.match(/nos:\/\/media\/(\d+)/i)
                     if (found) {
                         link_type = 'media';
@@ -268,13 +268,13 @@ require(
                             }
                         });
                     }
-                } else if (href.substr(0, 1) === '#') {
+                } elseif (href.substr(0, 1) === '#') {
                     link_type = 'anchor';
                     $select_anchors.find('option[value="' + href + '"]').prop('selected', true);
-                } else if (href.substr(0, 7) === 'mailto:') {
+                } elseif (href.substr(0, 7) === 'mailto:') {
                     link_type = 'email';
                     $input_email.val(href.replace('mailto:', ''));
-                } else if (href.substr(0, 4) === 'tel:') {
+                } elseif (href.substr(0, 4) === 'tel:') {
                     link_type = 'phone';
                     $input_phone.val(href.replace('tel:', ''));
                 } else {
@@ -305,7 +305,7 @@ require(
                                     .load(link_type === 'internal' ? 'admin/nos/page/appdesk/index/link_pick' : 'admin/nos/media/appdesk/index/media_pick');
                                 appdesk_loaded = link_type;
                             }
-                        } else if (ui.panel === $panel_properties[0]) {
+                        } elseif (ui.panel === $panel_properties[0]) {
                             var visible_properties = types_properties[link_type],
                                 $target = $panel_properties.find(':radio[name=target]:checked');
 

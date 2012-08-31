@@ -76,7 +76,7 @@ class Generate extends \Oil\Generate
                     $subjects = array(false, $matches[0]);
                 }
 
-                // add_{field}_to_{table} else if (count($matches) == 3 && $matches[1] == 'to') {
+                // add_{field}_to_{table} elseif (count($matches) == 3 && $matches[1] == 'to') {
                     $subjects = array($matches[0], $matches[2]);
                 }
 
@@ -140,7 +140,7 @@ class Generate extends \Oil\Generate
                                 $type = $option[0];
                                 if ($type === 'string') {
                                     $type = 'varchar';
-                                } else if ($type === 'integer') {
+                                } elseif ($type === 'integer') {
                                     $type = 'int';
                                 }
 

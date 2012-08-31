@@ -21,7 +21,7 @@ class Tools_File
         if (null === static::$use_xsendfile) {
             // No config defined: auto detection
             static::$use_xsendfile = self::xsendfile_available();
-        } else if (is_string(static::$use_xsendfile)) {
+        } elseif (is_string(static::$use_xsendfile)) {
             static::$xsendfile_header = static::$use_xsendfile;
             static::$use_xsendfile = true;
         }
@@ -29,7 +29,7 @@ class Tools_File
         // Check availability
         if (static::$use_xsendfile && !static::xsendfile_available()) {
             \Fuel::$profiling && \Profiler::console('X-Sendfile enabled but not available on your installation.');
-        } else if (!static::$use_xsendfile && static::xsendfile_available()) {
+        } elseif (!static::$use_xsendfile && static::xsendfile_available()) {
             \Fuel::$profiling && \Profiler::console('X-Sendfile available on your installation but not enabled.');
         }
     }

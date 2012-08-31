@@ -65,7 +65,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud
             if (in_array($pathinfo['extension'], $disallowed_extensions)) {
                 throw new \Exception(__('This extension is not allowed due to security reasons.'));
             }
-        } else if (!$media->is_new()) {
+        } elseif (!$media->is_new()) {
             $pathinfo = pathinfo(APPPATH.$media->get_private_path());
         }
 
