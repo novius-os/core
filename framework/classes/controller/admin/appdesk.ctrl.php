@@ -48,6 +48,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application {
         $locales = \Config::get('locales', array());
 
         $view->set('appdesk', \Format::forge(array_merge(array('locales' => $locales), $this->config))->to_json(), false);
+
         return $view;
     }
 

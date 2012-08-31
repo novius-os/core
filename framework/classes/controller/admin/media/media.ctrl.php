@@ -54,6 +54,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud {
         {
             $fieldset->field('media')->set_label(__('Change the file:'));
         }
+
         return $fieldset;
     }
 

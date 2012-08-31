@@ -246,6 +246,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         foreach ($item->find_lang('all') as $item) {
             $all[$item->id] = $item->get($this->_properties['lang_property']);
         }
+
         return $all;
     }
 
@@ -271,6 +272,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
                 unset($all[$k]);
             }
         }
+
         return $all;
     }
 
@@ -314,6 +316,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         foreach ($query->execute() as $row) {
             $data[$row[$common_id_property]] = $row['list_lang'];
         }
+
         return $data;
     }
 

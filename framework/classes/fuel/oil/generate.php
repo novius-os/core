@@ -315,6 +315,7 @@ HELP;
                 }
             }
         }
+
         return APPPATH;
     }
 

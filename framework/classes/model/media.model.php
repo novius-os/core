@@ -72,6 +72,7 @@ class Model_Media extends \Nos\Orm\Model {
         if (is_file($file)) {
             \File::delete($file);
         }
+
         return true;
     }
 
@@ -84,6 +85,7 @@ class Model_Media extends \Nos\Orm\Model {
             // delete_dir($path, $recursive, $delete_top)
             is_link($path_public)    and \File::delete($path_public);
             is_dir($path_thumbnails) and \File::delete_dir($path_thumbnails, true, true);
+
             return true;
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
@@ -109,6 +111,7 @@ class Model_Media extends \Nos\Orm\Model {
             return false;
         }
         list($src, $width, $height, $ratio) = $this->get_img_infos($params['max_width'], $params['max_height']);
+
         return '<img src="'.$src.'" width="'.$width.'" height="'.$height.'" />';
     }
 
@@ -131,6 +134,7 @@ class Model_Media extends \Nos\Orm\Model {
             $src = $this->get_public_path();
             $ration = 1;
         }
+
         return array($src, $width, $height, $ratio);
     }
 
@@ -142,6 +146,7 @@ class Model_Media extends \Nos\Orm\Model {
         if (!$this->is_image()) {
             return false;
         }
+
         return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 

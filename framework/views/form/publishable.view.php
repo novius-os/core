@@ -71,6 +71,7 @@ require(
             $buttonset.closest('form').bind('ajax_success', function(e, json) {
                 if (json.publication_initial_status == null) {
                     log('Potential error: publication_initial_status in JSON response.');
+
                     return;
                 }
                 initial_status = json.publication_initial_status == 1 ? 'yes' : 'no';

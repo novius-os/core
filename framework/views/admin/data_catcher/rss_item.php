@@ -44,6 +44,7 @@ require(
                 } else if ($target.is('a')) {
                     $target.nosTabs('close');
                 }
+
                 return false;
             });
         });

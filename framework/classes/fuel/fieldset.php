@@ -38,6 +38,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
 
     public function build($action = null) {
         $build = parent::build($action);
+
         return $build.$this->build_append();
     }
 
@@ -60,6 +61,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
                 $output .= $field->build();
             }
         }
+
         return $output;
     }
 
@@ -114,6 +116,7 @@ class Fieldset extends \Fuel\Core\Fieldset {
             'id' => $form_attributes['id'],
             'rules' => \Format::forge()->to_json($json),
         ), false);
+
         return implode('', $append);
     }
 

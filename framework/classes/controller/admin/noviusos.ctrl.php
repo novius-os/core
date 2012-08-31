@@ -155,6 +155,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $view->set('ostabs', \Format::forge($ostabs)->to_json(), false);
         $this->template->body = $view;
+
         return $this->template;
     }
 
@@ -190,6 +191,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             'apps' => $apps,
         ));
         $view->set('background', $background, false);
+
         return $view;
     }
 
@@ -244,6 +246,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 }
             }
         }
+
         return $arr;
     }
 

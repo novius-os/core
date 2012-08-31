@@ -112,6 +112,7 @@ class Controller_Front extends Controller {
                     // If no redirection then we display 404
                     if (!empty($url)) {
                         $_SERVER['REDIRECT_URL'] = '/';
+
                         return $this->router('index', $params, 404);
                     } else {
                         echo \View::forge('nos::errors/blank_slate_front');
@@ -171,6 +172,7 @@ class Controller_Front extends Controller {
      */
     public function setBaseHref($base_href) {
         $this->_base_href = $base_href;
+
         return $this;
     }
 
@@ -187,6 +189,7 @@ class Controller_Front extends Controller {
         }
 
         $this->_title = \Str::tr($template, array('title' => $title));
+
         return $this;
     }
 
@@ -196,6 +199,7 @@ class Controller_Front extends Controller {
      */
     public function setMetaDescription($meta_description) {
         $this->_meta_description = $meta_description;
+
         return $this;
     }
 
@@ -205,6 +209,7 @@ class Controller_Front extends Controller {
      */
     public function setMetaKeywords($meta_keywords) {
         $this->_meta_keywords = $meta_keywords;
+
         return $this;
     }
 
@@ -214,6 +219,7 @@ class Controller_Front extends Controller {
      */
     public function setMetaRobots($meta_robots) {
         $this->_meta_robots = $meta_robots;
+
         return $this;
     }
 
@@ -223,6 +229,7 @@ class Controller_Front extends Controller {
      */
     public function addMeta($meta) {
         $this->_metas[] = $meta;
+
         return $this;
     }
 
@@ -237,6 +244,7 @@ class Controller_Front extends Controller {
         } else {
             $this->_js_header[] = $url;
         }
+
         return $this;
     }
 
@@ -255,6 +263,7 @@ class Controller_Front extends Controller {
      */
     public function addCss($url) {
         $this->_css[] = $url;
+
         return $this;
     }
 
@@ -316,6 +325,7 @@ class Controller_Front extends Controller {
                     $count
                 );
             }
+
             return $count;
         };
 

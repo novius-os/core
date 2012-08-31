@@ -110,6 +110,7 @@ class I18n
     {
         $result = isset(static::$_messages[static::$_locale][$group][$_message]) ? static::$_messages[static::$_locale][$group][$_message] : $default;
         $result = $result ? : $_message;
+
         return $result;
     }
 }

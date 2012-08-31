@@ -60,6 +60,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             $this->response(array(
                 'error' => $e->getMessage(),
             ));
+
             return;
         }
         $this->response(array(
@@ -86,6 +87,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             $this->response(array(
                 'error' => $e->getMessage(),
             ));
+
             return;
         }
 

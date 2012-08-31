@@ -49,6 +49,7 @@ class Model_User extends \Nos\Orm\Model {
 
     public function check_password($password) {
         $ph = new \PasswordHash(8, false);
+
         return $ph->CheckPassword($password, $this->user_password);
     }
 
@@ -111,6 +112,7 @@ class Model_User extends \Nos\Orm\Model {
                 return true;
             }
         }
+
         return false;
     }
 

@@ -49,6 +49,7 @@ class Controller_Admin_Application extends Controller_Admin_Auth {
             'css' => \Asset::render('css'),
             'js'  => \Asset::render('js'),
         ), false, false);
+
         return $ret;
     }
 }

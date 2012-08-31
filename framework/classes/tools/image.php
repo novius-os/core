@@ -59,10 +59,12 @@ class Tools_Image {
         // Use the convert command-line binary when available
         if (!is_null(static::$cmd_convert)) {
             static::_resize_convert($source, $new_width, $new_height, $dest, $ratio > 4 ? 2 : 1);
+
             return true;
         }
         // Fallback to GD if not
         static::_resize_gd($image_info, $source, $new_width, $new_height, $dest);
+
         return true;
     }
 

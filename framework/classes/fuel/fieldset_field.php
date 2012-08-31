@@ -67,6 +67,7 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field {
         if (isset($widget_options)) {
             $this->attributes['widget_options'] = $widget_options;
         }
+
         return $return;
     }
 

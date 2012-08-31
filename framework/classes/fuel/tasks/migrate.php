@@ -53,6 +53,7 @@ class Migrate extends \Fuel\Tasks\Migrate
             {
                 \Cli::write('- '.$version);
             }
+
             return;
         }
 
@@ -63,6 +64,7 @@ class Migrate extends \Fuel\Tasks\Migrate
             if (static::$default + static::$module_count + static::$package_count > 1)
             {
                 \Cli::write('Migration: version only excepts 1 item.');
+
                 return;
             }
             $migrations = \Migrate::version($version, $name, $type);
@@ -143,6 +145,7 @@ class Migrate extends \Fuel\Tasks\Migrate
         if ($version and (static::$default + static::$module_count + static::$package_count > 1))
         {
             \Cli::write('Migration: version only excepts 1 item.');
+
             return;
         }
 
@@ -178,6 +181,7 @@ class Migrate extends \Fuel\Tasks\Migrate
         if ($version and (static::$default + static::$module_count + static::$package_count > 1))
         {
             \Cli::write('Migration: version only excepts 1 item.');
+
             return;
         }
 

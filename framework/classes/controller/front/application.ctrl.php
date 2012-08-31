@@ -41,6 +41,7 @@ class Controller_Front_Application extends Controller {
     protected function merge_config($mixed) {
         if (is_array($mixed)) {
             $this->config = \Arr::merge($this->config, $mixed);
+
             return;
         }
         if (!empty($this->default_config[$mixed]) && is_array($this->default_config[$mixed])) {
@@ -55,6 +56,7 @@ class Controller_Front_Application extends Controller {
                 $views[$field] = $view;
             }
         }
+
         return $views;
     }
 }

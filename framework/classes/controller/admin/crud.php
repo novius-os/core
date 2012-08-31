@@ -108,6 +108,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function crud_item($id)
     {
         $model = $this->config['model'];
+
         return $id === null ? $model::forge() : $model::find($id);
     }
 
@@ -125,6 +126,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         {
             $params['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
         }
+
         return $params;
     }
 
@@ -155,6 +157,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
 
             $return .= (string) \View::forge($this->is_new ? $this->config['views']['insert'] : $this->config['views']['update'], array('view_params' => $params), false);
+
             return $return;
         } catch (\Exception $e) {
             $this->send_error($e);
@@ -260,6 +263,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             ));
         }
+
         return $fields;
     }
 
@@ -276,6 +280,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $field->set_template(\View::forge('nos::crud/field_template', array('type' => 'checkbox')));
             }
         }
+
         return $fieldset;
     }
 
@@ -306,6 +311,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};
         }
+
         return $return;
     }
 
@@ -353,6 +359,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 else
                 {
                     $_GET['common_id'] = $id;
+
                     return $this->blank_slate($id, $selected_lang);
                 }
             }
@@ -383,6 +390,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'url_insert_update'  => $this->config['controller_url'].'/insert_update',
             'tab_params'  => $tabInfos,
         ));
+
         return \View::forge('nos::crud/blank_slate', $viewData, false);
     }
 
@@ -489,6 +497,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             );
         }
+
         return $actions;
     }
 
@@ -506,6 +515,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             } else {
                 $this->item = $this->crud_item($id);
                 $this->check_permission('delete');
+
                 return \View::forge('nos::crud/delete_popup_layout', array('view_params' => $this->view_params()), false);
             }
         } catch (\Exception $e) {

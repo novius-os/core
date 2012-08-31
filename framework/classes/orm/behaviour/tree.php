@@ -99,6 +99,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             'where'    => $where,
             'order_by' => $order_by,
         ));
+
         return $item::find('all', $options);
     }
 
@@ -153,6 +154,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $ids[] = $item->get(\Arr::get($item->primary_key(), 0));
         }
         $this->_populate_id_children($item, $this->_properties['children_relation'], $ids);
+
         return $ids;
     }
 
@@ -163,6 +165,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         if (empty($ids)) {
             return array();
         }
+
         return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $this->get_ids_children($item, $include_self)))));
     }
 
@@ -181,6 +184,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $root = $parent;
             $parent = $this->get_parent($parent);
         }
+
         return $root !== $item ? $root : null;
     }
 

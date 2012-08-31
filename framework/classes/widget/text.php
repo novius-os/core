@@ -13,7 +13,6 @@ namespace Nos;
 class Widget_Text extends \Fieldset_Field {
 
     public function build() {
-
         return $this->template((string) $this->value);
     }
 

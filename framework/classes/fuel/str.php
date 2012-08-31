@@ -149,6 +149,7 @@ class Str extends \Fuel\Core\Str
         $text   = preg_replace('{(((f|ht){1}tp://)['.$masque.'\.]+['.str_replace(',', '', $masque).'])}iu', '<a href="\\1">\\1</a>', $text);
         $text   = preg_replace('#([[:space:]()[{}])(www.[-a-zA-Z0-9@:%_\+.~\#?&//=,;]+)#iu', '\\1<a href="http://\\2">\\2</a>', $text);
         $text   = preg_replace('#([_\.0-9a-z-]+@([0-9a-z][0-9a-z-]+\.)+[a-z]{2,3})#iu', '<a href="mailto:\\1">\\1</a>', $text);
+
         return $text;
     }
 
@@ -184,6 +185,7 @@ class Str extends \Fuel\Core\Str
         {
             $text = preg_replace($input[$i],$output[$i],$text);
         }
+
         return $text;
     }
 }

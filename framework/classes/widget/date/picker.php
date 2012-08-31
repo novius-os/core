@@ -41,6 +41,7 @@ class Widget_Date_Picker extends \Fieldset_Field
     {
         list($attributes, $widget_options) = static::parse_options($widget);
         $attributes['data-datepicker-options'] = htmlspecialchars(\Format::forge()->to_json($widget_options['datepicker']));
+
         return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id'], $widget_options);
     }
 
@@ -62,6 +63,7 @@ class Widget_Date_Picker extends \Fieldset_Field
         $this->fieldset()->append(static::js_init($this->get_attribute('id'), $this->options));
         $datepicker_options = $this->options['datepicker'];
         $this->set_attribute('data-datepicker-options', htmlspecialchars(\Format::forge()->to_json($datepicker_options)));
+
         return (string) parent::build();
     }
 

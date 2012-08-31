@@ -133,7 +133,6 @@ spl_autoload_register(function($class) {
         \Module::load($application);
     }
 
-
     return false;
 }, true, true);
 //*/

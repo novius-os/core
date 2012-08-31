@@ -33,6 +33,7 @@ $id = $uniqid = uniqid('form_');
                     $verifications.each(function() {
                         if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
                             allVerificationPassed = false;
+
                             return false;
                         }
                     });

@@ -66,6 +66,7 @@ class Nos {
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
         }
         $content = ob_get_clean();
+
         return $content;
     }
 
@@ -143,6 +144,7 @@ class Nos {
             $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found in '.get_class($controller).'.' : '';
             \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found in '.get_class($controller).'.');
         }
+
         return $function_content;
     }
 

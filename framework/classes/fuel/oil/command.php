@@ -28,10 +28,12 @@ class Command extends \Oil\Command
                 if (\Cli::option('v', \Cli::option('version')))
                 {
                     \Cli::write('Fuel: '.\Fuel::VERSION);
+
                     return;
                 }
 
                 static::help();
+
                 return;
             }
 

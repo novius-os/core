@@ -107,6 +107,7 @@ class RssGenerator {
         //footer
         $res.="\t</channel>\n";
         $res.="</rss>\n";
+
         return $res;
     }
 

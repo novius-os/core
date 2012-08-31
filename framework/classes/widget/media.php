@@ -45,6 +45,7 @@ class Widget_Media extends \Fieldset_Field
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
         static::hydrate_options($this->options, $this->value);
         $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+
         return (string) parent::build();
     }
 

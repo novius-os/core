@@ -67,6 +67,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             if ($value === null) {
                 return $default;
             }
+
             return is_callable($value) ? $value($item) : $value;
         }
     }

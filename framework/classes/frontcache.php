@@ -27,6 +27,7 @@ class FrontCache {
     {
         // Disabled
 		// Experimental
+
         return;
 
         $dir = \Config::get('cache_dir').$path.'/';
@@ -63,6 +64,7 @@ class FrontCache {
         if (empty($params['callback_func']) || !is_callable($params['callback_func'])) {
             \Fuel::$profiling && \Profiler::console($params);
             \Fuel::$profiling && \Console::logError(new \Exception(), "Invalid callback_func.");
+
             return;
         }
 
@@ -77,6 +79,7 @@ class FrontCache {
             return $cache->execute_or_start($params['controller']);
         } catch (CacheNotFoundException $e) {
             call_user_func_array($params['callback_func'], $params['callback_args']);
+
             return $cache->save_and_execute($params['duration'], $params['controller']);
         }
     }
@@ -158,6 +161,7 @@ class FrontCache {
 
     public function save_and_execute($duration = -1, $controller = null) {
         $this->save($duration, $controller);
+
         return $this->execute($controller);
     }
 
@@ -181,6 +185,7 @@ class FrontCache {
             }
         }
         file_put_contents($this->_path, $this->_content);
+
         return true;
     }
 

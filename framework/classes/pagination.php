@@ -220,6 +220,7 @@ class Pagination {
         {
             $next_page = $this->current_page + 1;
             $url = call_user_func($this->pagination_url, $next_page);
+
             return '<a href="'.$url.'">'.$value.$this->template['next_mark'].'</a>';
         }
     }
@@ -248,6 +249,7 @@ class Pagination {
         {
             $previous_page = $this->current_page - 1;
             $url = call_user_func($this->pagination_url, $previous_page);
+
             return '<a href="'.$url.'">'.$this->template['previous_mark'].$value.'</a>';
         }
     }

@@ -35,6 +35,7 @@ class Helper
                 $lang = 'gb';
                 break;
         }
+
         return 'static/novius-os/admin/novius-os/img/flags/'.$lang.'.png';
     }
 

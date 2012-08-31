@@ -125,6 +125,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
                 'error' => 'Wrong parameters.',
             ));
         }
+
         return \View::forge($params['view'], array(
             'item' => $item,
             'catcher_name' => $params['catcher_name'],
@@ -171,6 +172,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application {
         }
         $nugget->content_data = $data;
         $nugget->save();
+
         return array($item, $catcher_name);
     }
 }

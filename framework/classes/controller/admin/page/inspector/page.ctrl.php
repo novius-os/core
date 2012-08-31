@@ -39,6 +39,7 @@ class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltre
                 ),
             );
         }
+
         return $json;
     }
 }

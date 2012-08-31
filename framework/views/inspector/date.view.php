@@ -90,6 +90,7 @@ require(
                                             })
                                         .appendTo(args.$container);
                                     label_custom.appendTo(args.$container);
+
                                     return true;
                                 } else {
                                     args.$container.css('padding-left', '30px');

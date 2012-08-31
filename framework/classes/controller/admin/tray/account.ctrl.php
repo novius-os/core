@@ -95,6 +95,7 @@ class Controller_Admin_Tray_Account extends \Controller {
             }
         ));
         $fieldset_display->js_validation();
+
         return $fieldset_display;
     }
 }

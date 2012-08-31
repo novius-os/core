@@ -54,6 +54,7 @@ class Application
                 $applications[$app_name] = static::forge($app_name);
             }
         }
+
         return $applications;
     }
 
@@ -79,6 +80,7 @@ class Application
         {
             $metadata = $this->get_real_metadata();
         }
+
         return isset($metadata['name']) ? $metadata['name'] : $this->folder;
     }
 
@@ -102,6 +104,7 @@ class Application
             \Config::load($this->folder.'::metadata', true);
             $this->real_metadata = \Config::get($this->folder.'::metadata');
         }
+
         return $this->real_metadata;
     }
 
@@ -135,6 +138,7 @@ class Application
     public function check_metadata()
     {
         $diff_metadata = $this->diff_metadata();
+
         return empty($diff_metadata);
     }
 
@@ -146,6 +150,7 @@ class Application
     {
         $diff_metadata = array();
         static::array_diff_key_assoc($this->get_metadata(), $this->get_real_metadata(), $diff_metadata);
+
         return $diff_metadata;
     }
 
@@ -207,6 +212,7 @@ class Application
             unset($config['app_installed'][$this->folder]);
             $this->save_config($config);
         }
+
         return true;
     }
 
@@ -393,6 +399,7 @@ class Application
                 }
             }
         }
+
         return true;
     }
 
@@ -403,6 +410,7 @@ class Application
         {
             return unlink($public);
         }
+
         return true;
     }
 
@@ -414,6 +422,7 @@ class Application
         {
             return is_link($public) && readlink($public) == Tools_File::relativePath(dirname($public), $private);
         }
+
         return !is_link($public);
     }
 
@@ -474,6 +483,7 @@ class Application
         {
             return $this->{'get_'.$property}();
         }
+
         return $this->$property;
     }
 

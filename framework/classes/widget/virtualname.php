@@ -23,6 +23,7 @@ class Widget_Virtualname extends \Fieldset_Field {
         if (empty($this->value)) {
             $this->set_attribute('data-usetitle', 1);
         }
+
         return (string) parent::build();
     }
 

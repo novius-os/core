@@ -78,6 +78,7 @@ class Tools_Enhancer
         } else {
             $urls[] = $params['urlPath'].$urlItem;
         }
+
         return $urls;
     }
 
@@ -85,6 +86,7 @@ class Tools_Enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
         $url_enhanced = array_flip($url_enhanced);
+
         return \Arr::get($url_enhanced, $page_id, false);
     }
 

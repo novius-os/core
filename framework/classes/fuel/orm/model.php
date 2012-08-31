@@ -130,11 +130,13 @@ class Model extends \Orm\Model {
 
     public static function linked_wysiwygs() {
         $class = get_called_class();
+
         return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
     }
 
     public static function linked_medias() {
         $class = get_called_class();
+
         return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
     }
 
@@ -333,6 +335,7 @@ class Model extends \Orm\Model {
             }
             static::$_configs[$class] = \Arr::recursive_filter($config, function($var) { return $var !== null; });
         }
+
         return static::$_configs[$class];
     }
 
@@ -349,6 +352,7 @@ class Model extends \Orm\Model {
         if (!empty($parent)) {
             return $parent->get_all_lang();
         }
+
         return array_keys(\Config::get('locales'));
     }
 
@@ -507,7 +511,6 @@ class Model extends \Orm\Model {
 	}
 
     public static function  get_prefix() {
-
         return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
     }
 
@@ -569,6 +572,7 @@ class Model extends \Orm\Model {
 						{
                             return $this->linked_wysiwygs[$i];
 						}
+
                         return $this->linked_wysiwygs[$i]->{implode('->', $arr_name)} = $value;
 					}
 				}
@@ -599,6 +603,7 @@ class Model extends \Orm\Model {
 						{
                             return $this->linked_medias[$i];
 						}
+
                         return $this->linked_medias[$i]->{implode('->', $arr_name)} = $value;
 					}
 				}
@@ -652,6 +657,7 @@ class Model extends \Orm\Model {
 						{
                             return $this->linked_wysiwygs[$i];
 						}
+
                         return $this->linked_wysiwygs[$i]->__get(implode('->', $arr_name));
 					}
 				}
@@ -671,6 +677,7 @@ class Model extends \Orm\Model {
 						{
                             return $this->linked_medias[$i];
 						}
+
                         return $this->linked_medias[$i]->__get(implode('->', $arr_name));
 					}
 				}
@@ -813,6 +820,7 @@ class Model_Media_Provider
         if ($media === null) {
             return $media;
         }
+
         return $media->get('media');
 	}
 
@@ -896,6 +904,7 @@ class Model_Wysiwyg_Provider implements \Iterator
         if ($wysiwyg === null) {
             return $wysiwyg;
         }
+
         return $wysiwyg->get('wysiwyg_text');
 	}
 

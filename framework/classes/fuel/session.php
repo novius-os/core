@@ -20,6 +20,7 @@ class Session extends \Fuel\Core\Session {
         if (static::$user === null) {
             \Nos\Auth::check();
         }
+
         return static::$user;
     }
 

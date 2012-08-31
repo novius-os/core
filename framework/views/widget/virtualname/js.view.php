@@ -16,6 +16,7 @@
                 if (!str) {
                     return str;
                 }
+
                 return str.replace(/ /g, '-')
                     .replace(/[\?|:|\\|\/|\#|\[|\]|@]/g, '-')
                     .replace(/-{2,}/g, '-')

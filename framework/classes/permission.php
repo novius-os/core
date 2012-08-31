@@ -31,6 +31,7 @@ class Permission {
     public static function check($app, $key) {
         $user = \Session::user();
         $role = reset($user->roles);
+
         return $role->check_permission($app, $key);
     }
 
@@ -47,6 +48,7 @@ class Permission {
         } catch(\Exception $e) {
 
         }
+
         return true;
     }
 }

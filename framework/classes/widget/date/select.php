@@ -86,6 +86,7 @@ class Widget_Date_Select extends \Fieldset_Field {
 	        if (count($date) >= 3) {
                 list($year, $month ,$day) = $date;
 	        }
+
             return empty($value) or !empty($year) and !empty($month) and !empty($day) and checkdate((int) $month, (int) $day, (int) $year);
         }));
     }
@@ -106,6 +107,7 @@ class Widget_Date_Select extends \Fieldset_Field {
             11 => \Date::create_from_string('01/11/2011', 'eu')->format('%B'),
             12 => \Date::create_from_string('01/12/2011', 'eu')->format('%B'),
         );
+
         return $months;
     }
 

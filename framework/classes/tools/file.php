@@ -96,6 +96,7 @@ class Tools_File
                 $path[] = $part;
             }
         }
+
         return implode(DS, $path);
     }
 
@@ -176,6 +177,7 @@ class Tools_File
                 'image/x-ico' => 'image/x-icon',
             );
             $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
+
             return \Arr::get($autocorrect, $mime, $mime);
         }
         // Old way
@@ -209,6 +211,7 @@ class Tools_File
             'ico' => 'image/x-icon',
         );
         $extension = pathinfo($file, PATHINFO_EXTENSION);
+
         return $content_types[$extension] ? : 'application/force-download';
     }
 }

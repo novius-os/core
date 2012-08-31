@@ -41,6 +41,7 @@ class Controller_Admin_User_User extends Controller_Admin_Crud {
             unset($fields['user_password']);
             $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
         }
+
         return $fields;
     }
 
@@ -50,6 +51,7 @@ class Controller_Admin_User_User extends Controller_Admin_Crud {
         {
             $this->config['messages']['successfully saved'] = __('New password successfully set.');
         }
+
         return parent::save($item, $data);
     }
 

@@ -48,6 +48,7 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
     public function get_sort(\Nos\Orm\Model $obj) {
         $sort_property = $this->_properties['sort_property'];
+
         return $obj->get($sort_property);
     }
 

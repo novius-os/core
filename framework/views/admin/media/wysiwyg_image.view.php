@@ -88,6 +88,7 @@ require(
 
                         if (!media || !media.id) {
                             $.nosNotify(<?= \Format::forge()->to_json(__('Please choose an image first')) ?>, 'error');
+
                             return;
                         }
 
@@ -178,6 +179,7 @@ require(
 
                             $container.wijtabs('enableTab', 1)
                                 .wijtabs('select', 1);
+
                             return;
                         }
 

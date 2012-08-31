@@ -41,11 +41,13 @@ class Widget_Wysiwyg extends \Fieldset_Field {
 
         $this->value = Tools_Wysiwyg::prepare_widget($this->value);
 		$this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+
         return (string) parent::build();
     }
 
 	public function js_init() {
 	    // we have to find why it's called two times...
+
         return \View::forge('widget/wysiwyg', array(
             'id' => $this->get_attribute('id'),
         ), false);

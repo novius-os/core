@@ -47,6 +47,7 @@ class Widget_Time_Picker extends \Fieldset_Field {
 	    $this->fieldset()->append($this->js_init());
 
 		$this->set_attribute('data-timepicker-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+
         return (string) parent::build();
     }
 

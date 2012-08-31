@@ -20,6 +20,7 @@ class Debug extends \Fuel\Core\Debug
                 }
             }
         }
+
         return $array ? $local_backtrace : static::dump($local_backtrace);
     }
 }

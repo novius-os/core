@@ -36,6 +36,7 @@ class Config extends \Fuel\Core\Config {
 
     public static function save($file, $config) {
 		$file = static::convertFileName($file, 'save');
+
         return parent::save($file, $config);
 	}
 
@@ -44,6 +45,7 @@ class Config extends \Fuel\Core\Config {
             list($application, $configuration_path) = explode('::', $file);
             $file = 'nos::admin/'.$application.'/'.$configuration_path;
         }
+
         return $file;
     }
 
@@ -90,12 +92,14 @@ class Config extends \Fuel\Core\Config {
             }
         }
         $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+
         return $config;
     }
 
     public static function getDbName($item) {
         $item = str_replace('::', '/config/', $item);
         $item = str_replace('/', '.', $item);
+
         return $item;
     }
 
@@ -113,6 +117,7 @@ class Config extends \Fuel\Core\Config {
             }
         }
         $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+
         return $config;
     }
 

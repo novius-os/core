@@ -31,6 +31,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         if ($published === false) {
             return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
         }
+
         return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-schedule.png"> '.strtr(__('From {date}'), array(
             '{date}' => \Date::create_from_string($published)->format('local'),
         ));
@@ -46,6 +47,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         if (!empty($bool)) {
             return (bool) $item->get($bool);
         }
+
         return false;
         // @todo publication start / end
 	}

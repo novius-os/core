@@ -84,6 +84,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
             // delete_dir($path, $recursive, $delete_top)
             is_dir($path_public)     and \File::delete_dir($path_public,     true, true);
             is_dir($path_thumbnails) and \File::delete_dir($path_thumbnails, true, true);
+
             return true;
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
@@ -99,6 +100,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
             // delete_dir($path, $recursive, $delete_top)
             return \File::delete_dir($path, true, true);
         }
+
         return true;
     }
 
@@ -109,6 +111,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
     public function count_media() {
         /// get_ids_children($include_self)
         $folder_ids = $this->get_ids_children(true);
+
         return Model_Media::count(array(
             'where' => array(
                 array('media_folder_id', 'IN', $folder_ids),
@@ -118,6 +121,7 @@ class Model_Media_Folder extends \Nos\Orm\Model {
 
     public function count_media_usage() {
         $folder_ids = $this->get_ids_children(true);
+
         return Model_Media_Link::count(array(
             'related' => array('media'),
             'where' => array(

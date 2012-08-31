@@ -39,6 +39,7 @@ class Autoloader extends Fuel\Core\Autoloader {
 
         if ($suffix == '') {
             echo 'Load directly: '.$class."\n";
+
             return parent::load($class);
         }
         $loaded = false;
@@ -164,10 +165,10 @@ class Autoloader extends Fuel\Core\Autoloader {
 
         foreach ($possibles_path as $possible_path) {
             if (is_file($possible_path)) {
-
                 return $possible_path;
             }
         }
+
         return false;
     }
 }

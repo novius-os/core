@@ -20,6 +20,7 @@ class Refine extends Oil\Refine
         if (empty($task) or $task === 'help')
         {
             static::help();
+
             return;
         }
 

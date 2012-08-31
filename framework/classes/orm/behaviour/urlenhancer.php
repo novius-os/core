@@ -46,11 +46,13 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
                 $urls[$key] = $url;
             }
         }
+
         return $urls;
     }
 
     public function url_canonical($item, $params = array()) {
         $params['canonical'] = true;
+
         return $this->url($item, $params);
     }
 
@@ -85,6 +87,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         }
 
         $urls = $this->urls($item, $params);
+
         return reset($urls) ?: null;
     }
 }

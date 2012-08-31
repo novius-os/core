@@ -40,6 +40,7 @@ class Widget_Tag extends \Fieldset_Field {
 
         $this->value = $value;
         $this->set_attribute('value', $value);
+
         return $this;
     }
 
@@ -68,6 +69,7 @@ class Widget_Tag extends \Fieldset_Field {
             $tag_obj = new $tag_class(array($this->options['label_column'] => $tag));
             $item->{$this->options['relation_name']}[] = $tag_obj;
         }
+
         return false;
     }
 
@@ -88,6 +90,7 @@ class Widget_Tag extends \Fieldset_Field {
         $model = $this->options['model'];
         $tags = $model::find('all');
         $labels = static::get_labels_from_tags($tags, $this->options['label_column']);
+
         return \View::forge('widget/tag', array(
             'id' => $this->get_attribute('id'),
             'labels' => $labels
@@ -99,6 +102,7 @@ class Widget_Tag extends \Fieldset_Field {
         foreach ($tags as $tag) {
             $labels[] = $tag->{$label_column};
         }
+
         return $labels;
     }
 

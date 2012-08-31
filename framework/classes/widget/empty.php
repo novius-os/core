@@ -16,7 +16,6 @@ namespace Nos;
 class Widget_Empty extends \Fieldset_Field {
 
     public function build() {
-
         return '';
     }
 

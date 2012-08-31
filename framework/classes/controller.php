@@ -111,24 +111,26 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
 
 
         // <--
-
         return parent::after($response);
     }
 
     protected function trigger($event, $data = '', $return_type = 'string') {
         list($application, $file_name) = \Config::configFile(get_called_class());
         $file_name = str_replace('/', '_', $file_name);
+
         return \Event::trigger($application.'.'.$file_name.'.'.$event, $data, $return_type);
     }
 
     protected static function getConfiguration() {
         list($application, $file_name) = \Config::configFile(get_called_class());
+
         return \Config::loadConfiguration($application, $file_name);
     }
 
 
     protected static function getGlobalConfiguration() {
         list($application, $file_name) = \Config::configFile(get_called_class());
+
         return \Config::application($application);
     }
 
@@ -142,6 +144,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
         if (empty($dataset['actions']) || empty($dataset['actions'][$action])) {
             return true;
         }
+
         return $dataset['actions'][$action]($item);
     }
 
@@ -469,6 +472,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 'total' => count($items),
             );
         }
+
         return $json;
     }
 
@@ -622,6 +626,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                     foreach($tree_model['order_by'] as $order_by) {
                         $query->order_by(is_array($order_by) ? $order_by : array($order_by));
                     }
+
                     return $query;
                 }),
                 'dataset' => array_merge($tree_model['dataset'], array(
@@ -634,6 +639,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                                 'deep' => $params['deep'] - 1,
                                 'lang' => $params['lang'],
                             ));
+
                             return count($items) ? $items : 0;
                         } else {
                             return $controller->tree_items($tree_config, array(
@@ -655,6 +661,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid {
                 $items = array_merge($items, $return['items']);
             }
         }
+
         return $params['countProcess'] ? $count : $items;
     }
 }

@@ -39,12 +39,14 @@ class Controller_Admin_Login extends Controller {
         $this->template->body = \View::forge('admin/login', array(
 			'error' => $error,
 		));
+
         return $this->template;
     }
 
     public function action_reset() {
 
         $this->template->body = \View::forge('admin/login_reset');
+
         return $this->template;
     }
 

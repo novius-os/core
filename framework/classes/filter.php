@@ -45,6 +45,7 @@ class Filter {
         } else {
             $column = $config['dataset'][$key];
         }
+
         return $column;
     }
 

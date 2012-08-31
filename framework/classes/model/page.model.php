@@ -127,6 +127,7 @@ class Model_Page extends \Nos\Orm\Model {
                 $attr['target'] = '_blank';
             }
         }
+
         return array_to_attr($attr);
     }
 
@@ -160,6 +161,7 @@ class Model_Page extends \Nos\Orm\Model {
             if (empty($page_external_link) && !$this->is_main_lang()) {
                 $page_external_link = $this->find_main_lang()->page_external_link;
             }
+
             return $page_external_link;
         }
         $url = !empty($params['absolute']) ? Uri::base(false) : '';
@@ -167,6 +169,7 @@ class Model_Page extends \Nos\Orm\Model {
         if (!$this->page_home || !$this->is_main_lang()) {
             $url .= $this->page_virtual_url;
         }
+
         return $url;
     }
 
