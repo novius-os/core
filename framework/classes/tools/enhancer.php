@@ -78,6 +78,43 @@ class Tools_Enhancer
         return $urls;
     }
 
+    public static function urls($enhancer_name, $params = array())
+    {
+        // Check if any page contains this enhancer
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
+        $page_enhanced = \Config::get('data::page_enhanced.'.$enhancer_name, array());
+        if (empty($page_enhanced)) {
+            return array();
+        }
+
+        // @todo: check if this enhancer exists?
+        // @todo: check if the application exists?
+
+        // This files contains all the urlPath for the pages containing an URL enhancer
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
+        $url_enhanced = \Config::get('data::url_enhanced', array());
+        $url_enhanced_flipped = array_flip($url_enhanced);
+
+        // Now fetch all the possible URLS
+        $urls = array();
+        $preview = \Arr::get($params, 'preview', false);
+        $lang    = \Arr::get($params, 'lang', false);
+        foreach ($page_enhanced as $page_id => $params) {
+            $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
+            if ($urlPath !== false && ($lang === false || $params['lang'] == $lang) && ($preview || $params['published'])) {
+                $urls[$page_id] = $urlPath;
+            }
+        }
+
+        return $urls;
+    }
+
+    public static function url($enhancer_name, $params = array())
+    {
+        $urls = static::urls($enhancer_name, $params);
+        return reset($urls) ?: null;
+    }
+
     public static function url_page($page_id)
     {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
