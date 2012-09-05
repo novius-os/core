@@ -415,7 +415,7 @@ define('jquery-nos',
                                 });
                                 $input.val(item.id).trigger('change', {
                                     item : item
-                                };
+                                });
                                 $dialog.nosDialog('close');
                             });
                     }
