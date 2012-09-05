@@ -22,7 +22,7 @@ if (isset($_SERVER['NOS_ROOT'])) {
     define('NOSPATH',  $_SERVER['NOS_ROOT'].'/novius-os/framework/');
 } else {
 
-    define('DOCROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
+    define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
 
     define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
     define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
