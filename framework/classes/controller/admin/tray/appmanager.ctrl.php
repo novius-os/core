@@ -70,7 +70,7 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
                 $app_installed = \Config::get('data::app_installed', array());
                 unset($app_installed[$app_name]);
 
-                \Config::save(APPPATH.'data/config/app_installed.php', $app_installed);
+                \Config::save(APPPATH.'metadata/app_installed.php', $app_installed);
             }
         } catch (\Exception $e) {
             $this->response(array(

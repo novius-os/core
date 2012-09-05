@@ -22,7 +22,7 @@ class Tools_Enhancer
         }
 
         // Check if this enhancer exists
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
+        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
         $enhancer = \Config::get('data::enhancers.'.$enhancer_name, array());
         if (empty($enhancer)) {
             return array();
@@ -43,7 +43,7 @@ class Tools_Enhancer
         $controller_name = \Inflector::words_to_upper($controller_name);
 
         // Check if the application exists
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_namespaces.php', 'data::app_namespaces');
+        \Config::load(APPPATH.'metadata'.DS.'app_namespaces.php', 'data::app_namespaces');
         $namespace = \Config::get('data::app_namespaces.'.$application_name, '');
         if (empty($page_enhanced)) {
             return array();

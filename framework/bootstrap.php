@@ -125,7 +125,7 @@ spl_autoload_register(function($class) {
     }
 
     // Try to load the application
-    \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+    \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
     $namespaces = \Config::get('data::app_namespaces');
     $application = array_search($namespace, $namespaces);
     if (false !== $application) {

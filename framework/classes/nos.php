@@ -98,7 +98,7 @@ class Nos
     protected static function _parse_enhancers(&$content, $controller)
     {
         // Fetch the available functions
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
+        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
 
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 

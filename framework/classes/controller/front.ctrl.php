@@ -455,8 +455,8 @@ class Controller_Front extends Controller
     protected function _find_template()
     {
         // Find the template
-        Config::load(APPPATH.'data'.DS.'config'.DS.'templates.php', 'templates');
-        $templates = Config::get('templates', array());
+        Config::load(APPPATH.'metadata'.DS.'templates.php', 'data::templates');
+        $templates = Config::get('data::templates', array());
 
         if (!isset($templates[$this->_page->page_template])) {
             throw new \Exception('The template '.$this->_page->page_template.' is not configured.');

@@ -77,8 +77,8 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
     public function data_catchers($item)
     {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'data_catchers.php', 'data_catchers');
-        $data_catchers = \Config::get("data_catchers", array());
+        \Config::load(APPPATH.'metadata'.DS.'data_catchers.php', 'data::data_catchers');
+        $data_catchers = \Config::get('data::data_catchers', array());
         $catchers = array();
         foreach ($data_catchers as $id => $config) {
             if (isset($config['specified_models']) &&
@@ -113,7 +113,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             $set_data_catcher($data_catcher, $id);
         }
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
+        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
         foreach ($item->wysiwygs as $wysiwyg) {
             \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
                 $params = \Config::get('data::enhancers.'.$enhancer, false);

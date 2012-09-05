@@ -20,7 +20,7 @@ class Module extends Fuel\Core\Module
 
             // Load the config (namespace + dependencies)
 
-            \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+            \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
             $namespace = Config::get('data::app_namespaces.'.$module, null);
             if (!empty($namespace)) {
                 Autoloader::add_namespaces(array(
@@ -36,7 +36,7 @@ class Module extends Fuel\Core\Module
             }
 
             // Load dependent applications
-            Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+            Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
             $dependencies = Config::get('data::app_dependencies', array());
             if (!empty($dependencies[$module])) {
                 foreach ($dependencies[$module] as $dependence) {

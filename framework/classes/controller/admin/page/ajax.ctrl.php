@@ -16,14 +16,14 @@ class Controller_Admin_Page_Ajax extends \Controller
 {
     public function before()
     {
-        Config::load(APPPATH.'data'.DS.'config'.DS.'templates.php', 'templates');
+        Config::load(APPPATH.'metadata'.DS.'templates.php', 'data::templates');
         parent::before();
     }
 
     public function action_wysiwyg($page_id = null)
     {
         $id = $_GET['template_id'];
-        $data = \Config::get('templates', array());
+        $data = \Config::get('data::templates', array());
         $data = $data[$id];
 
         $data['layout'] = (array) $data['layout'];

@@ -185,7 +185,7 @@ class Model_Page extends \Nos\Orm\Model
 
     public function _event_after_save()
     {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'enhancers.php', 'data::enhancers');
+        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
 
         $content = '';
         foreach ($this->wysiwygs as $text) {

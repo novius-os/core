@@ -74,7 +74,7 @@ class Config extends \Fuel\Core\Config
         $file = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
         if ($application !== 'nos') {
-            \Config::load(APPPATH.'data/config/app_namespaces.php', 'data::app_namespaces');
+            \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
             $namespaces = Config::get('data::app_namespaces', null);
             if ($app = array_search($namespace, $namespaces)) {
                 $application = $app;
@@ -88,7 +88,7 @@ class Config extends \Fuel\Core\Config
     {
         \Config::load($app_name.'::'.$file_name, true);
         $config = \Config::get($app_name.'::'.$file_name);
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+        \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
         $dependencies = \Config::get('data::app_dependencies', array());
 
         if (!empty($dependencies[$app_name])) {
@@ -114,7 +114,7 @@ class Config extends \Fuel\Core\Config
     {
         \Config::load($module_name.'::'.$file_name, true);
         $config = \Config::get($module_name.'::'.$file_name);
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', 'data::app_dependencies');
+        \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
         $dependencies = \Config::get('data::app_dependencies', array());
 
         if (!empty($dependencies[$module_name])) {

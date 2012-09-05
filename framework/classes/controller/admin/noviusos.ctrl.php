@@ -149,8 +149,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
     public function action_appstab()
     {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'launchers.php', 'launchers');
-        $launchers = \Config::get('launchers', array());
+        \Config::load(APPPATH.'metadata'.DS.'launchers.php', 'data::launchers');
+        $launchers = \Config::get('data::launchers', array());
         $launchers = \Config::mergeWithUser('misc.apps', $launchers);
 
         $apps = array();

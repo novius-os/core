@@ -58,7 +58,7 @@ foreach ($view_params['fieldset']->field() as $field) {
         $role = reset($view_params['item']->roles);
 
         \Config::load('nos::admin/permissions', 'permissions');
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'app_installed.php', 'data::app_installed');
+        \Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
         $applications = array_merge(\Config::get('data::app_installed', array()), \Config::get('permissions', array()));
         foreach ($applications as $app => $params) {
             if (isset($params['permission'])) {

@@ -16,7 +16,7 @@ class Application
     {
         // @todo repair that
         //\Module::load('data', APPPATH.'data');
-        \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
+        \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
     }
 
     /**
@@ -213,7 +213,7 @@ class Application
     protected function prepare_config($old_metadata, $new_metadata)
     {
         // Load current data
-        $data_path = APPPATH.'data'.DS.'config'.DS;
+        $data_path = APPPATH.'metadata'.DS;
         $config = array();
         foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section) {
             \Config::load($data_path.$section.'.php', 'data::'.$section);
@@ -343,7 +343,7 @@ class Application
 
     protected function save_config($config)
     {
-        $data_path = APPPATH.'data'.DS.'config'.DS;
+        $data_path = APPPATH.'metadata'.DS;
         foreach ($config as $file => $content) {
             \Config::save($data_path.$file.'.php', $content);
             \Config::set('data::'.$file, $content);
@@ -408,7 +408,7 @@ class Application
             }
         }
 
-        \Config::load(APPPATH.'data/config/app_installed.php', 'data::app_installed');
+        \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
         $app_installed = \Config::get('data::app_installed', array());
 
         foreach ($app_installed as $app_name => $app) {
@@ -425,7 +425,7 @@ class Application
         }
 
         \Config::set('app_dependencies', $dependencies);
-        \Config::save(APPPATH.'data'.DS.'config'.DS.'app_dependencies.php', $dependencies);
+        \Config::save(APPPATH.'metadata'.DS.'app_dependencies.php', $dependencies);
     }
 
     public function addPermission()

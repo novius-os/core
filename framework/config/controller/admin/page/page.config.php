@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-Config::load(APPPATH.'data'.DS.'config'.DS.'templates.php', 'templates');
+Config::load(APPPATH.'metadata'.DS.'templates.php', 'data::templates');
 $templates = array();
-foreach (Config::get('templates', array()) as $tpl_key => $template) {
+foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
     $templates[$tpl_key] = $template['title'];
 }
 
