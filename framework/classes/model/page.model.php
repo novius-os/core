@@ -75,6 +75,7 @@ class Model_Page extends \Nos\Orm\Model
             'events' => array('before_query', 'after_delete'),
             'parent_relation' => 'parent',
             'children_relation' => 'children',
+            'level_property' => 'page_level',
         ),
         'Nos\Orm_Behaviour_Virtualpath' => array(
             'events' => array('before_save', 'after_save', 'change_parent'),
@@ -237,12 +238,6 @@ class Model_Page extends \Nos\Orm\Model
     {
         static::_remove_url_enhanced($this->page_id);
         static::_remove_page_enhanced($this->page_id);
-    }
-
-    public function _event_change_parent()
-    {
-        $parent = $this->get_parent();
-        $this->page_level = $parent === null ? 1 : $parent->page_level + 1;
     }
 
     protected static function _remove_url_enhanced($id)

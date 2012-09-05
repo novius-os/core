@@ -202,5 +202,9 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
             $item->set($this->_properties['parent_relation'], $parent);
         }
+
+        if (!empty($this->_properties['level_property'])) {
+            $item->{$this->_properties['level_property']} = $parent === null ? 1 : $parent->{$this->_properties['level_property']} + 1;
+        }
     }
 }
