@@ -413,7 +413,9 @@ define('jquery-nos',
                                 $input.inputFileThumb({
                                     file: item.thumbnail
                                 });
-                                $input.val(item.id);
+                                $input.val(item.id).trigger('change', {
+                                    item : item
+                                };
                                 $dialog.nosDialog('close');
                             });
                     }
