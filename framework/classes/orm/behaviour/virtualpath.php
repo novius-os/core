@@ -32,6 +32,11 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
             }
         }
 
+        $tree = $class::behaviours('Nos\Orm_Behaviour_Tree', false);
+        if (!empty($tree)) {
+            $this->_properties['level_property'] = \Arr::get($tree, 'level_property', false);
+        }
+
         if (!empty($this->_properties['parent_relation'])) {
             $this->_parent_relation = $class::relations($this->_properties['parent_relation']);
         }
@@ -59,8 +64,10 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     {
         $diff = $item->get_diff();
 
-        if (!$item::behaviours('Nos\Orm_Behaviour_Tree', false) && !empty($this->_parent_relation)) {
-            if (array_key_exists($this->_parent_relation->key_from[0], $diff[0])) {
+        if ($item::behaviours('Nos\Orm_Behaviour_Tree', false) && !empty($this->_parent_relation)) {
+            $key_from = $this->_parent_relation->key_from[0];
+            // Compare $diff[0] and $diff[1] because the former can be (string) and latter (int), even if it's the same value
+            if (array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from]) {
                 $class = $this->_parent_relation->model_to;
                 $parent = null;
                 if (!empty($item->{$this->_parent_relation->key_from[0]})) {
@@ -71,6 +78,8 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 if (!empty($this->_properties['extension_property'])) {
                     $item->{$this->_properties['virtual_path_property']} .= $this->extension($item);
                 }
+                // If the parent changes, then the virtual path changes
+                $this->_data_diff[$item->{$this->_properties['virtual_path_property']}] = $diff;
             }
         }
 
@@ -110,16 +119,28 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         if (isset($this->_data_diff[$item->{$this->_properties['virtual_path_property']}])) {
             $diff = $this->_data_diff[$item->{$this->_properties['virtual_path_property']}];
 
-            $old_virtual_url = $diff[0][$this->_properties['virtual_path_property']];
+            $old_virtual_path = \Arr::get($diff[0], $this->_properties['virtual_path_property'], $item->{$this->_properties['virtual_path_property']});
             if (!empty($this->_properties['extension_property'])) {
-                $old_virtual_url = preg_replace('`'.$this->extension($item).'$`iUu', '/', $old_virtual_url);
+                $old_virtual_path = preg_replace('`'.$this->extension($item).'$`iUu', '/', $old_virtual_path);
             }
-            $new_virtual_url = preg_replace('`'.$diff[0][$this->_properties['virtual_name_property']].'/$`iUu', $item->{$this->_properties['virtual_name_property']}.'/', $old_virtual_url);
+            $new_virtual_path = $this->virtual_path($item, true);
+
+            // Change the virtual path for all items
+            $replaces = array(
+                $this->_properties['virtual_path_property'] => \DB::expr('REPLACE('.$this->_properties['virtual_path_property'].', '.\DB::escape($old_virtual_path).', '.\DB::escape($new_virtual_path).')'),
+            );
+
+            // Level property also could have to be updated
+            if (!empty($this->_properties['level_property'])) {
+                $diff_level = \Arr::get($diff[0], $this->_properties['level_property'], $item->{$this->_properties['level_property']}) - $item->{$this->_properties['level_property']};
+                if ($diff_level != 0) {
+                    $replaces[$this->_properties['level_property']] = \DB::expr($this->_properties['level_property'].' '.($diff_level > 0 ? '-' : '+').' '.abs($diff_level));
+                }
+            }
+
             \DB::update($item->table())
-                    ->set(array(
-                $this->_properties['virtual_path_property'] => \DB::expr('REPLACE('.$this->_properties['virtual_path_property'].', '.\DB::escape($old_virtual_url).', '.\DB::escape($new_virtual_url).')'),
-                ))
-                ->where($this->_properties['virtual_path_property'], 'LIKE', $old_virtual_url.'%')
+                ->set($replaces)
+                ->where($this->_properties['virtual_path_property'], 'LIKE', $old_virtual_path.'%')
                 ->execute();
         }
     }

@@ -82,6 +82,7 @@ class Model_Page extends \Nos\Orm\Model
             'virtual_name_property' => 'page_virtual_name',
             'virtual_path_property' => 'page_virtual_url',
             'extension_property' => '.html',
+            'parent_relation' => 'parent',
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
             'events' => array('after_sort', 'before_insert'),
