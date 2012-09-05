@@ -642,7 +642,7 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 self.gridRendered = false;
-                self.uiGridTitle.text(o.texts.item);
+                self.uiGridTitle.text(o.texts.items);
 
                 self.uiThumbnail.thumbnailsgrid('destroy')
                     .empty()
