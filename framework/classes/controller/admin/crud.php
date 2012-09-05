@@ -303,7 +303,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function before_save($item, $data)
     {
-        if ($this->behaviours['translatable']) {
+        if ($this->behaviours['translatable'] && $this->is_new) {
 
             $item_lang = $this->item->get_lang();
             $existing = $this->item->find_lang($item_lang);
