@@ -154,7 +154,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $return .= (string) \Request::forge('nos/admin/datacatcher/form')->execute(array($this->item));
             }
 
-            $return .= (string) \View::forge($this->is_new ? $this->config['views']['insert'] : $this->config['views']['update'], array('view_params' => $params), false);
+            $return .= (string) \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], array('view_params' => $params), false);
 
             return $return;
         } catch (\Exception $e) {
@@ -303,6 +303,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function before_save($item, $data)
     {
+        if ($this->behaviours['translatable']) {
+
+            $item_lang = $this->item->get_lang();
+            $existing = $this->item->find_lang($item_lang);
+            if (!empty($existing)) {
+                $message = strtr(__('This item already exists in {lang}. Therefore your item cannot be added.'), array(
+                    '{lang}' => \Arr::get(\Config::get('locales'), $item_lang, $item_lang),
+                ));
+                $this->send_error(new \Exception($message));
+            }
+        }
+
         if ($this->behaviours['tree']) {
             // This doesn't work for now, because Fuel prevent relation from being fetch on new objects
             // https://github.com/fuel/orm/issues/171
@@ -321,7 +333,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         // insert_update               : add a new item
         // insert_update/ID            : edit an existing item
-        // insert_update/ID?lang=fr_FR : translate an  existing item (can be forbidden if the parent doesn't exists in that language)
+        // insert_update/ID?lang=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that language)
 
         $this->item = $this->crud_item($id);
 
@@ -329,23 +341,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
 
-        if ($this->item->is_new()) {
+        if ($this->item->is_new() || !$this->behaviours['translatable']) {
             return $this->action_form($id);
-        } else {
-            if ($this->behaviours['translatable']) {
-                $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
-                $all_langs = $this->item->get_all_lang();
+        }
 
-                if (in_array($selected_lang, $all_langs)) {
-                    return $this->action_form($id);
-                } else {
-                    $_GET['common_id'] = $id;
+        if ($this->behaviours['translatable']) {
+            $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
 
-                    return $this->blank_slate($id, $selected_lang);
+            foreach ($this->item->get_all_lang() as $lang_id => $lang) {
+                if ($selected_lang == $lang) {
+                    return $this->action_form($lang_id);
                 }
-            } else {
-                return $this->action_form($id);
             }
+
+            $_GET['common_id'] = $id;
+            return $this->blank_slate($id, $selected_lang);
         }
     }
 
