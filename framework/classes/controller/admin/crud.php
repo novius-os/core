@@ -454,9 +454,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_lang = $this->item->find_lang($locale);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? __('Add in {lang}') : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $label = empty($main_lang) ? __('Add a new {item} in {lang}') : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
             $actions[$locale] = array(
-                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
+                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale), '{item}' => $this->config['messages']['blank_state_item_text'])),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',
