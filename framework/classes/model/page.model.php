@@ -239,6 +239,12 @@ class Model_Page extends \Nos\Orm\Model
         static::_remove_page_enhanced($this->page_id);
     }
 
+    public function _event_change_parent()
+    {
+        $parent = $this->get_parent();
+        $this->page_level = $parent === null ? 1 : $parent->page_level + 1;
+    }
+
     protected static function _remove_url_enhanced($id)
     {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
