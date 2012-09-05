@@ -76,7 +76,8 @@ class Generate extends \Oil\Generate
                     $subjects = array(false, $matches[0]);
                 }
 
-                // add_{field}_to_{table} elseif (count($matches) == 3 && $matches[1] == 'to') {
+                // add_{field}_to_{table}
+                elseif (count($matches) == 3 && $matches[1] == 'to') {
                     $subjects = array($matches[0], $matches[2]);
                 }
 
