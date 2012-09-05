@@ -156,7 +156,7 @@ class Model extends \Orm\Model
                     'cascade_delete' => false,
                     'conditions'     => array(
                         'where' => array(
-                            array('wysiwyg_join_table', '=', static::$_table_name),
+                            array('wysiwyg_join_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
                         ),
                     ),
                 );
@@ -171,7 +171,7 @@ class Model extends \Orm\Model
                     'cascade_delete' => false,
                     'conditions'     => array(
                         'where' => array(
-                            array('medil_from_table', '=', static::$_table_name),
+                            array('medil_from_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
                         ),
                     ),
                 );
