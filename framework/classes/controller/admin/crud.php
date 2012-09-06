@@ -587,16 +587,4 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function delete()
     {
     }
-
-    protected function send_error($exception)
-    {
-        // Easy debug
-        if (\Fuel::$env === \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
-            throw $exception;
-        }
-        $body = array(
-            'error' => $exception->getMessage(),
-        );
-        \Response::json($body);
-    }
 }
