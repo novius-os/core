@@ -82,13 +82,13 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 
         if (!empty($page_id)) {
 
-                $urlPath = \Nos\Tools_Enhancer::url_page($page_id);
-                if ($urlPath !== false) {
-                    $params['urlPath'] = $urlPath;
-                } else {
-                    // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
-                }
+            $urlPath = \Nos\Tools_Enhancer::url_page($page_id);
+            if ($urlPath !== false) {
+                $params['urlPath'] = $urlPath;
+            } else {
+                // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
             }
+        }
 
         $urls = $this->urls($item, $params);
         return reset($urls) ?: null;
