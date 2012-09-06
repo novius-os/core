@@ -20,7 +20,7 @@
     $filter = array_flip($filter);
     if (array_key_exists(\Nos\DataCatcher::TYPE_TITLE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE])) {
         $fields[] = \Nos\DataCatcher::TYPE_TITLE;
-        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Name:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TITLE, '')));
+        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Title:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TITLE, '')));
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL])) {
         $fields[] = \Nos\DataCatcher::TYPE_URL;

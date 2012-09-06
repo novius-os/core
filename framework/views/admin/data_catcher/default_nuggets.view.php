@@ -11,7 +11,7 @@
 <table class="fieldset">
 <?php
     if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE])) {
-        echo '<tr><th><label>', htmlspecialchars(__('Name:')) ,'</label></th>';
+        echo '<tr><th><label>', htmlspecialchars(__('Title:')) ,'</label></th>';
         echo '<td>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TITLE]) ,'</td></tr>';
     }
     if (isset($nugget[\Nos\DataCatcher::TYPE_URL])) {

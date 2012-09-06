@@ -12,12 +12,8 @@ namespace Nos;
 
 class DataCatcher
 {
-    const TYPE_TITLE = 1;
-    const TYPE_URL = 2;
-    const TYPE_TEXT = 3;
-    const TYPE_IMAGE = 4;
-    const TYPE_VIDEO = 5;
-    const TYPE_DOCUMENT = 6;
-    const TYPE_DATE = 7;
-    const TYPE_COLLECTION = 8;
+    const TYPE_TITLE = 'title';
+    const TYPE_URL = 'url';
+    const TYPE_TEXT = 'text';
+    const TYPE_IMAGE = 'image';
 }
