@@ -14,13 +14,11 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 {
     public $bypass   = true;
 
-    public function action_form($item = null)
+    public function action_form()
     {
-        if (empty($item)) {
-            $id = \Input::get('model_id');
-            $model = \Input::get('model_name');
-            $item = $model::find($id);
-        }
+        $id = \Input::get('model_id');
+        $model = \Input::get('model_name');
+        $item = $model::find($id);
 
         return \View::forge('nos::admin/data_catcher/panel', array(
             'item' => $item,

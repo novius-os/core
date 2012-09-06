@@ -149,14 +149,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'tab_params' => $this->get_tab_params(),
             ));
 
-            $return = '';
-            if ($this->behaviours['sharable']) {
-                $return .= (string) \Request::forge('nos/admin/datacatcher/form')->execute(array($this->item));
-            }
-
-            $return .= (string) \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], array('view_params' => $params), false);
-
-            return $return;
+            return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], array('view_params' => $params), false);
         } catch (\Exception $e) {
             $this->send_error($e);
         }
@@ -414,20 +407,20 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function get_actions()
     {
         $actions = array_values($this->get_actions_lang());
-        if (!$this->is_new && $this->behaviours['url'] !== false) {
-            $url = $this->item->url_canonical(array('preview' => true));
-            if ($url !== null) {
-                $actions[] = array(
-                    'label' => $this->config['messages']['visualise'],
-                    'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                    'action' => array(
-                        'action' => 'window.open',
-                        'url' => $url . '?_preview=1',
-                    ),
-                );
-            }
-        }
         if (!$this->is_new) {
+            if ($this->behaviours['url'] !== false) {
+                $url = $this->item->url_canonical(array('preview' => true));
+                if ($url !== null) {
+                    $actions[] = array(
+                        'label' => $this->config['messages']['visualise'],
+                        'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                        'action' => array(
+                            'action' => 'window.open',
+                            'url' => $url . '?_preview=1',
+                        ),
+                    );
+                }
+            }
             $actions[] = array(
                 'label' => $this->config['messages']['delete'],
                 'action' => array(
@@ -443,6 +436,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         foreach ($this->config['actions'] as $actionClosure) {
             if ($action = $actionClosure($this->item)) {
                 $actions[] = $action;
+            }
+        }
+        if (!$this->is_new) {
+            if ($this->behaviours['sharable']) {
+                $actions[] = array(
+                    'label' => __('Share'),
+                    'iconClasses' => 'nos-icon16 nos-icon16-share',
+                    'action' => array(
+                        'action' => 'share',
+                        'data' => array(
+                            'model_id' => $this->item->{$this->pk},
+                            'model_name' => $this->config['model'],
+                        ),
+                    ),
+                );
             }
         }
 

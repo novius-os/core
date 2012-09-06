@@ -15,10 +15,10 @@
     $data_catchers = $item->data_catchers();
     $default_nuggets = $item->get_default_nuggets();
 ?>
-<div id="<?= $id ?>" class="nos-dark-theme">
-    <h2><?= __('Share') ?></h2>
+<div id="<?= $id ?>" class="nos-dark-theme line">
+    <div class="unit col c4">
     <div class="accordion">
-        <h3><?= __('Catchers') ?></h3>
+        <h3><?= __('Applications') ?></h3>
         <div>
 <?php
     $onDemande = false;
@@ -44,7 +44,11 @@
     }
 ?>
         </div>
-        <h3><?= __('What will be shared') ?></h3>
+    </div>
+    </div>
+    <div class="unit col c8 lastUnit">
+    <div class="accordion">
+        <h3><?= __('What is shared') ?></h3>
         <div class="nos-datacatchers-default-nuggets">
             <?php
             echo \View::forge('nos::admin/data_catcher/default_nuggets', array(
@@ -52,6 +56,7 @@
             ), false);
             ?>
         </div>
+    </div>
     </div>
 
         <?php
