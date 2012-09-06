@@ -45,7 +45,7 @@ class Tools_Enhancer
         // Check if the application exists
         \Config::load(APPPATH.'metadata'.DS.'app_namespaces.php', 'data::app_namespaces');
         $namespace = \Config::get('data::app_namespaces.'.$application_name, '');
-        if (empty($page_enhanced)) {
+        if (empty($namespace)) {
             return array();
         }
 
