@@ -182,6 +182,15 @@ return array(
                         ),
                     ),
                 ),
+                'renew_cache' => array(
+                    'label' => __('Renew pages\' cache'),
+                    'action' => array(
+                        'action' => 'nosAjax',
+                        'params' => array(
+                            'url' => 'admin/nos/page/appdesk/clear_cache',
+                        ),
+                    ),
+                ),
             ),
             'grid' => array(
                 'proxyUrl' => 'admin/nos/page/appdesk/json',
