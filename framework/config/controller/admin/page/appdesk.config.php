@@ -19,7 +19,10 @@ $dataset = array(
         return $page->get_href();
     },
     'previewUrl' => function($page) {
-        return $page->get_preview_href(array('absolute' => true));;
+        return $page->get_href(array(
+            'preview'  => true,
+            'absolute' => true,
+        ));
     },
     'is_home' => function($page) {
         return (bool) (int) $page->page_home;

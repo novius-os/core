@@ -159,7 +159,7 @@ class Model_Page extends \Nos\Orm\Model
     /**
      *
      * @param   array   params
-     * @return string the href of the page (external link or virtuak URL)
+     * @return string the href of the page (external link or virtual URL)
      */
     public function get_href($params = array())
     {
@@ -171,18 +171,17 @@ class Model_Page extends \Nos\Orm\Model
 
             return $page_external_link;
         }
+
         $url = !empty($params['absolute']) ? Uri::base(false) : '';
 
-        if (!$this->page_home || !$this->is_main_lang()) {
-            $url .= $this->page_virtual_url;
+        if (!($this->page_home && $this->get_lang() == key(\Config::get('locales')))) {
+            $url .= $this->virtual_path();
+        }
+        if (!empty($params['preview'])) {
+            $url .= '?_preview=1';
         }
 
         return $url;
-    }
-
-    public function get_preview_href($params)
-    {
-        return $this->get_href($params).($this->page_type == self::TYPE_EXTERNAL_LINK ? '' : '?_preview=1');
     }
 
     public function _event_after_save()
