@@ -120,13 +120,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             );
 
         } catch (\Exception $e) {
-            // Easy debug
-            if (\Fuel::$env == \Fuel::DEVELOPMENT && !\Input::is_ajax()) {
-                throw $e;
-            }
-            $body = array(
-                'error' => $e->getMessage(),
-            );
+            $this->send_error($e);
         }
 
         \Response::json($body);

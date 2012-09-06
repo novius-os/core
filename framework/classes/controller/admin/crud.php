@@ -179,8 +179,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};
             }
             if ($this->behaviours['translatable']) {
-                $lang = \Input::get('lang', key(\Config::get('locales')));
-                $this->item->{$this->behaviours['translatable']['lang_property']} = empty($lang) ? key(\Config::get('locales')) : $lang;
+                $this->item->{$this->behaviours['translatable']['lang_property']} = \Input::get('lang', false) ?: key(\Config::get('locales'));
             }
             if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
                 // New page: no parent
