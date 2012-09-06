@@ -938,14 +938,16 @@ define('jquery-nos',
 
                 switch (method) {
                     case 'create' :
-                        (function() {
-                            $('<table><tr><td class="nos-toolbar-left"><table><tr class="nos-toolbar-left"></tr></table></td><td class="nos-toolbar-right"><table><tr class="nos-toolbar-right"></tr></table></td></tr></table>')
+                        return (function() {
+                            var $toolbar = $('<table><tr><td class="nos-toolbar-left"><table><tr class="nos-toolbar-left"></tr></table></td><td class="nos-toolbar-right"><table><tr class="nos-toolbar-right"></tr></table></td></tr></table>')
                                 .addClass('nos-toolbar ui-widget-header')
                                 .insertBefore(self);
 
                             self.addClass('nos-toolbar-target fill-parent nos-fixed-content')
                                 .parent()
                                 .addClass('nos-toolbar-parent');
+
+                            return $toolbar;
                         })();
                         break;
 

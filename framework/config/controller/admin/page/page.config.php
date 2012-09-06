@@ -43,14 +43,21 @@ return array(
     ),
     'actions' => array(
         'visualise' => function($item) {
-            return array(
-                'label' => __('Visualise'),
-                'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                'action' => array(
-                    'action' => 'window.open',
-                    'url' => $item->get_href() . '?_preview=1',
-                ),
-            );
+            if (!$item->is_new())
+            {
+                return array(
+                    'label' => __('Visualise'),
+                    'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                    'action' => array(
+                        'action' => 'window.open',
+                        'url' => $item->get_href() . '?_preview=1',
+                    ),
+                );
+            }
+            else
+            {
+                return array();
+            }
         }
     ),
     'layout' => array(

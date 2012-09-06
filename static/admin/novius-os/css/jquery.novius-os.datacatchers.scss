@@ -9,25 +9,13 @@
 @import "compass/css3/transition";
 
 .nos-datacatchers {
-    position : absolute;
-    top: 10px;
-    left: -300px;
-    bottom: 20px;
-    width : 300px;
+    height : auto;
     z-index: 1000;
     border-top: 0;
     border-left: 0;
-    // deactivated, because it needs to be synchronised with JavaScript callback
-    // (nosOnShow shall execute after the transition)
-    //@include transition( all 0.5s linear);
+    padding : 2em;
 
-    &.nos-datacatchers-open {
-        left: 0px;
-    }
     &.nos-datacatchers-form {
-        right: 100px;
-        width: auto;
-
         .nos-datacatchers-accordion {
             display: none;
         }
@@ -36,34 +24,7 @@
             display: block;
         }
     }
-
-	.nos-datacatchers-header {
-        position: relative;
-        padding-left: 0.5em;
-        line-height: 30px;
-        border-left: 0;
-        font-size: 1.5em;
-        margin-right: -28px;
-    }
-
-    .nos-datacatchers-header-icon {
-        position: absolute;
-        top: 50%;
-        right: 2px;
-        background: url('../img/24/share.png') no-repeat;
-        height: 24px;
-        width: 24px;
-        margin-top: -12px;
-        cursor: pointer;
-    }
-
-    .nos-datacatchers-body {
-        position: absolute;
-        bottom: 0px;
-        right: 30px;
-    }
-
-    .nos-datacatchers-accordion {
+    .c4 {
         .ui-button {
             width: 100%;
             text-align: left;

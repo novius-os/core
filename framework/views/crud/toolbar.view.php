@@ -14,7 +14,9 @@
         function ($) {
             $(function () {
                 var actions = <?= \Format::forge($actions)->to_json(); ?>,
-                    $container = $('#<?= $container_id ?>').nosToolbar('create');
+                    $container = $('#<?= $container_id ?>'),
+                    $toolbar = $container.nosToolbar('create'),
+                    $share = false;
 
                 $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                         'save_field' => $fieldset->field('save')
@@ -29,8 +31,49 @@
 
                 $.each(actions, function() {
                     var button = this,
+                        openShare = false;
                         $button = $('<button></button>').click(function() {
-                                $(this).nosAction(button.action);
+                                var $button = $(this);
+                                if (button.action.action === 'share') {
+                                    $button.hover(function() {
+                                        if (openShare) {
+                                            $button.addClass('ui-state-active');
+                                        }
+                                    });
+                                    var open_close = function(state) {
+                                        $share[state ? 'show' : 'hide']();
+                                        $toolbar.find('.ui-button').not($button).each(function() {
+                                            $(this).button(state ? 'disable' : 'enable');
+                                        });
+
+                                        $button.blur()[state ? 'addClass' : 'removeClass']('ui-state-active');
+                                        openShare = state;
+
+                                    };
+
+                                    if ($share) {
+                                        if ($share !== true) {
+                                            open_close(!openShare);
+                                        }
+                                    } else {
+                                        $share = true;
+                                        $.ajax({
+                                            url : 'admin/nos/datacatcher/form',
+                                            data : button.action.data,
+                                            success : function(data) {
+                                                $share = $(data).insertAfter($container)
+                                                    .addClass('fill-parent nos-fixed-content')
+                                                    .css({
+                                                        top : $container.css('top'),
+                                                        bottom : $container.css('bottom')
+                                                    });
+                                                open_close(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    $button.nosAction(button.action);
+                                }
                             })
                             .text(button.label)
                             .data(button);
