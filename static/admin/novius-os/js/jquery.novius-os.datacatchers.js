@@ -24,19 +24,9 @@ define('jquery-nos-datacatchers',
 
                 self.element.addClass('nos-datacatchers ui-widget-content');
 
-                self.uiHeader = self.element.find('> h2')
-                    .addClass('nos-datacatchers-header ui-widget-header ui-corner-right');
-                self.uiHeaderTitle = self.uiHeader.wrapInner('<div />')
-                    .find('> div')
-                    .addClass('nos-datacatchers-header-title');
-                self.uiHeaderIcon = $('<div></div>').addClass('nos-datacatchers-header-icon')
-                    .appendTo(self.uiHeader);
-
-                self.uiAccordion = self.element.find('.accordion')
-                    .addClass('nos-datacatchers-accordion');
-
-                self.uiDefaultNuggets = self.element.find('.nos-datacatchers-default-nuggets');
-
+                self.uiApplications = self.element.find('.catchers div');
+                self.uiDefaultNuggets = self.element.find('.nos-datacatchers-default-nuggets-preview');
+                self.uiCatcherForm = self.element.find('.nos-datacatchers-catecherform');
                 self.uiForm = self.element.find('form');
                 self.uiSave = self.uiForm.find('.nos-datacatchers-buttons button');
                 self.uiCancel = self.uiForm.find('.nos-datacatchers-buttons a');
@@ -46,53 +36,28 @@ define('jquery-nos-datacatchers',
                 var self = this,
                     o = self.options;
 
-                self.uiHeaderIcon.click(function() {
-                    self.element.removeClass('nos-datacatchers-form');
-                    self.element.toggleClass('nos-datacatchers-open');
-                });
+                self.element.find('.accordion').wijaccordion();
 
-                self.uiAccordion.wijaccordion();
+                self._applications();
 
-                self.uiAccordion.find('button.catcher').each(function() {
-                    var $button = $(this),
-                        params = $button.data('params');
-
-                    $button.button({
-                            label : params.title,
-                            icons : {
-                                primary: params.iconClasses || 'nos-icon16 nos-icon16-share'
-                            }
-                        })
-                        .click(function() {
-                            var current = $($button).nosTabs('current');
-                            $($button).nosTabs('add', {
-                                iconClasses: params.iconClasses || null,
-                                iconUrl: params.iconUrl || null,
-                                url : params.url,
-                                label : current.tab.data('ui-ostab').label
-                            }, current.index);
-                        });
-                    if (params.iconUrl) {
-                        $button.find('.ui-button-icon-primary')
-                            .removeClass( 'nos-icon16-share' )
-                            .addClass( 'nos-icon16' )
-                            .css( 'background-image', 'url("' + params.iconUrl + '")' );
-                    }
-                });
-
-                $(self.uiForm).nosFormUI();
+                self.uiForm.nosFormUI();
+                self._form(self.uiForm);
 
                 self._defaultNuggets();
 
                 self.uiForm.bind('ajax_success', function(e, json) {
+                    self.uiApplications.html(json.applications);
+                    self._applications();
                     self.uiDefaultNuggets.html(json.default_nuggets);
                     self._defaultNuggets();
                     self.uiCancel.triggerHandler('click');
+                    self.uiCatcherForm.empty();
                 });
 
                 self.uiCancel.click(function(e) {
                         e.preventDefault();
-                        self.element.removeClass('nos-datacatchers-form');
+                        self.uiDefaultNuggets.show();
+                        $(self.uiForm).hide();
                     });
 
                 self.element.nosListenEvent({
@@ -121,9 +86,92 @@ define('jquery-nos-datacatchers',
                 self.uiDefaultNuggets.find('button')
                     .button()
                     .click(function() {
-                        self.element.addClass('nos-datacatchers-form');
-                        // Care: this needs to be triggered after the CSS transition (if any).
-                        $(self.uiForm).nosOnShow('show');
+                        self.uiDefaultNuggets.hide();
+                        $(self.uiForm).show().nosOnShow('show');
+                    });
+
+                return self;
+            },
+
+            _applications : function() {
+                var self = this,
+                    o = self.options;
+
+                self.uiApplications.find('button.catcher').each(function() {
+                    var $button = $(this),
+                        params = $button.data('params'),
+                        nuggets = $button.data('nuggets');
+
+                    $button.button({
+                            label : params.title,
+                            icons : {
+                                primary: params.iconClasses || 'nos-icon16 nos-icon16-share'
+                            }
+                        })
+                        .click(function(e) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            if (params.action) {
+                                $(this).nosAction(params.action, nuggets);
+                            } else {
+                                $.ajax({
+                                    url : params.url,
+                                    success : function(data) {
+                                        self.uiCatcherForm.empty();
+                                        $('<div><h3></h3><div></div></div>')
+                                            .appendTo(self.uiCatcherForm)
+                                            .find('h3')
+                                            .text(params.title)
+                                            .end()
+                                            .find('div')
+                                            .html(data)
+                                            .end()
+                                            .wijaccordion()
+                                            .nosFormUI();
+
+                                        self._form(self.uiCatcherForm);
+
+                                        self.uiCatcherForm.find('.nos-datacatchers-buttons a')
+                                            .click(function(e) {
+                                                e.preventDefault();
+                                                self.uiCatcherForm.empty();
+                                            });
+                                    }
+                                })
+                            }
+                        });
+                    if (params.iconUrl) {
+                        $button.find('.ui-button-icon-primary')
+                            .removeClass( 'nos-icon16-share' )
+                            .addClass( 'nos-icon16' )
+                            .css( 'background-image', 'url("' + params.iconUrl + '")' );
+                    }
+                });
+
+                return self;
+            },
+
+            _form : function($container) {
+                var self = this,
+                    o = self.options;
+
+                $container.find('.nos-datacatchers-nugget-checkbox').each(function() {
+                    $(this).change(function() {
+                        if ($(this).is(':checked')) {
+                            $(this).closest('td').find('.nos-datacatchers-nugget-value').hide();
+                        } else {
+                            $(this).closest('td').find('.nos-datacatchers-nugget-value').show().nosOnShow();
+                        }
+                    }).triggerHandler('change');
+                });
+
+                $container.find('.nos-datacatchers-nugget-image').hover(function() {
+                        $(this).addClass('ui-state-hover');
+                    }, function() {
+                        $(this).removeClass('ui-state-hover');
+                    }).click(function() {
+                        $(this).find('input').prop('checked', true).wijradio('refresh');
+                        $(this).addClass('ui-state-active').siblings().removeClass('ui-state-active');
                     });
 
                 return self;

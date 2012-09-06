@@ -25,28 +25,3 @@ echo \View::forge('nos::admin/data_catcher/form', array(
 
 ?>
 </div>
-
-<script type="text/javascript">
-require(
-    ['jquery-nos'],
-    function($) {
-        $(function() {
-            var $container = $("#<?= $uniqid ?>").nosFormUI(),
-                $form = $container.find('form');
-
-            $container.nosToolbar('create');
-
-            $container.nosToolbar('add', $container.find('.nos-datacatchers-buttons')).click(function(e) {
-                var $target = $(e.target);
-
-                if ($target.parent().is(':button')) {
-                    $form.submit();
-                } else if ($target.is('a')) {
-                    $target.nosTabs('close');
-                }
-
-                return false;
-            });
-        });
-    });
-</script>

@@ -100,7 +100,7 @@
     ), false);
     ?>
     <div class="nos-datacatchers-buttons">
-        <button type="submit" data-icon="check" class="primary">
+        <button type="submit" data-icon="check">
             <?= __('Save') ?>
         </button>
         &nbsp; <?= __('or') ?> &nbsp;
@@ -110,31 +110,3 @@
     </div>
     <?= $fieldset->close() ?>
 </div>
-<script type="text/javascript">
-require(
-    ['jquery-nos'],
-    function($) {
-        $(function() {
-            var $container = $("#<?= $id ?>");
-
-            $container.find('.nos-datacatchers-nugget-checkbox').each(function() {
-                $(this).change(function() {
-                    if ($(this).is(':checked')) {
-                        $(this).closest('td').find('.nos-datacatchers-nugget-value').hide();
-                    } else {
-                        $(this).closest('td').find('.nos-datacatchers-nugget-value').show().nosOnShow();
-                    }
-                }).triggerHandler('change');
-            });
-
-            $container.find('.nos-datacatchers-nugget-image').hover(function() {
-                $(this).addClass('ui-state-hover');
-            }, function() {
-                $(this).removeClass('ui-state-hover');
-            }).click(function() {
-                $(this).find('input').prop('checked', true).wijradio('refresh');
-                $(this).addClass('ui-state-active').siblings().removeClass('ui-state-active');
-            });
-        });
-    });
-</script>

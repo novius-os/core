@@ -7,22 +7,27 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-
+?>
+<table class="fieldset">
+<?php
     if (isset($nugget[\Nos\DataCatcher::TYPE_TITLE])) {
-        echo '<label>', htmlspecialchars(__('Name:')) ,'</label>';
-        echo '<div>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TITLE]) ,'</div>';
+        echo '<tr><th><label>', htmlspecialchars(__('Name:')) ,'</label></th>';
+        echo '<td>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TITLE]) ,'</td></tr>';
     }
     if (isset($nugget[\Nos\DataCatcher::TYPE_URL])) {
-        echo '<label>', htmlspecialchars(__('Url:')) ,'</label>';
-        echo '<div>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_URL]) ,'</div>';
+        echo '<tr><th><label>', htmlspecialchars(__('Url:')) ,'</label></th>';
+        echo '<td>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_URL]) ,'</td></tr>';
     }
     if (isset($nugget[\Nos\DataCatcher::TYPE_IMAGE])) {
-        echo '<label>', htmlspecialchars(__('Image:')) ,'</label>';
-        echo '<div>', Nos\Model_Media::find($nugget[\Nos\DataCatcher::TYPE_IMAGE])->get_img_tag(array('max_width' => '200', 'max_height' => '300')) ,'</div>';
+        echo '<tr><th><label>', htmlspecialchars(__('Image:')) ,'</label></th>';
+        echo '<td>', Nos\Model_Media::find($nugget[\Nos\DataCatcher::TYPE_IMAGE])->get_img_tag(array('max_width' => '200', 'max_height' => '300')) ,'</td></tr>';
     }
     if (isset($nugget[\Nos\DataCatcher::TYPE_TEXT])) {
-        echo '<label>', htmlspecialchars(__('Description:')) ,'</label>';
-        echo '<div>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TEXT]) ,'</div>';
+        echo '<tr><th><label>', htmlspecialchars(__('Description:')) ,'</label></th>';
+        echo '<td>', htmlspecialchars($nugget[\Nos\DataCatcher::TYPE_TEXT]) ,'</td></tr>';
     }
 ?>
-<button><?= htmlspecialchars(__('Customize')) ?></button>
+</table>
+<div class="nos-datacatchers-buttons">
+    <button><?= htmlspecialchars(__('Customise')) ?></button>
+</div>

@@ -29,12 +29,22 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
     {
         try {
             list($item, $catcher_name) = static::save_catcher_nugget();
+            $model_name = get_class($item);
+            $model_id   = $item->id;
+
+            $data_catchers = $item->data_catchers();
             $default_nuggets = $item->get_default_nuggets();
 
             \Response::json(array(
                 'notify' => __('Operation completed successfully.'),
                 'default_nuggets' => (string) \View::forge('nos::admin/data_catcher/default_nuggets', array(
                     'nugget' => $default_nuggets,
+                ), false),
+                'applications' => (string) \View::forge('nos::admin/data_catcher/applications', array(
+                    'data_catchers' => $data_catchers,
+                    'model_id' => $model_id,
+                    'model_name' => $model_name,
+                    'nuggets' => $default_nuggets,
                 ), false),
             ));
         } catch (\Exception $e) {
