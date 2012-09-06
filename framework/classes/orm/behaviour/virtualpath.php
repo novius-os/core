@@ -153,7 +153,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
             $path = '';
         }
         if ($dir) {
-            $path = preg_replace('`'.$this->extension($item).'$`iUu', '', $path).'/';
+            $path = preg_replace('`'.preg_quote($this->extension($item)).'$`iUu', '', $path).'/';
         }
 
         return $path;

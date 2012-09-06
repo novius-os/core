@@ -40,4 +40,19 @@ class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk
         \Response::json($item);
     }
 
+    public function post_clear_cache()
+    {
+        try {
+            // delete_dir($path, $recursive, $delete_top);
+            \File::delete_dir(\Config::get('cache_dir').'pages', true, false);
+        } catch (\InvalidPathException $e) {
+            // Dir doesn't exists, no problem
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+        \Response::json(array(
+            'notify' => 'Cache has been renewed.',
+        ));
+    }
+
 }

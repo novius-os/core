@@ -51,11 +51,16 @@ class Controller_Front extends Controller
 
         $this->_is_preview = \Input::get('_preview', false);
 
-        $cache_path = $url;
-        $cache_path = (empty($url) ? 'index/' : $url).$cache_path;
+        $cache_path = (empty($url) ? 'index/' : $url);
         $cache_path = rtrim($cache_path, '/');
 
-        $nocache = \Input::method() == 'POST' || \Fuel::$env === \Fuel::DEVELOPMENT;
+        // POST or preview means no cache. Ever.
+        // We don't want cache in DEV except if _cache=1
+        if (\Input::method() == 'POST' || $this->_is_preview) {
+            $no_cache = true;
+        } else {
+            $no_cache = \Fuel::$env === \Fuel::DEVELOPMENT && \Input::get('_cache', 0) != 1;
+        }
 
         \Event::trigger('front.start');
         \Event::trigger_function('front.start', array(&$url));
@@ -97,7 +102,7 @@ class Controller_Front extends Controller
                     }
 
                     echo $this->_view->render();
-                    $cache->save($nocache ? -1 : CACHE_DURATION_PAGE, $this);
+                    $cache->save($no_cache ? -1 : CACHE_DURATION_PAGE, $this);
                     $content = $cache->execute();
 
                     break;
@@ -431,6 +436,7 @@ class Controller_Front extends Controller
         }
         if (empty($this->_page_url)) {
             $where[] = array('page_entrance', 1);
+            $where[] = array('page_lang', key(\Config::get('locales')));
         } else {
             $where[] = array('page_virtual_url', $this->_page_url);
             //$where[] = array('page_parent_id', 'IS NOT', null);
