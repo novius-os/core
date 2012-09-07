@@ -28,6 +28,7 @@ define('jquery-nos-datacatchers',
                 self.uiCatcherForm = self.element.find('.nos-datacatchers-catecherform');
                 self.uiForm = self.element.find('form');
                 self.uiSave = self.uiForm.find('.nos-datacatchers-buttons button');
+                self.uiClose = self.element.find('.nos-datacatchers-close');
             },
 
             _init: function() {
@@ -45,6 +46,11 @@ define('jquery-nos-datacatchers',
                     self.uiApplications.html(json.applications);
                     self._applications();
                     self.uiCatcherForm.empty();
+                });
+
+                self.uiClose.click(function(e) {
+                    e.preventDefault();
+                    self.element.trigger('close');
                 });
 
                 self.element.nosListenEvent({

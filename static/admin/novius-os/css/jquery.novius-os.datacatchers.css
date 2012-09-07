@@ -21,11 +21,17 @@
   margin: 0.2em 0 0.3em;
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000325}}
+.nos-datacatchers .nos-datacatchers-close {
+  float: right;
+  margin-top: -2em;
+  margin-right: -2em;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000331}}
 .nos-datacatchers .nos-datacatchers-buttons {
   text-align: right;
   margin: 2em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000330}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000336}}
 .nos-datacatchers .nos-datacatchers-nugget-image {
   display: inline-block;
   color: black;
@@ -40,52 +46,52 @@
   cursor: pointer;
   border: 1px solid transparent;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000344}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000350}}
 .nos-datacatchers .nos-datacatchers-nugget-image:not(.ui-state-hover):not(.ui-state-active) {
   background: white;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000348}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000354}}
 .nos-datacatchers .nos-datacatchers-nugget-image label {
   line-height: 80px;
   /* Centers text */
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000351}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000357}}
 .nos-datacatchers .nos-datacatchers-nugget-image img {
   vertical-align: middle;
   /* Centers image */
   cursor: pointer;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000356}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000362}}
 .nos-datacatchers .nos-datacatchers-nugget-image .wijmo-wijradio {
   padding-right: 5px;
   position: absolute;
   bottom: 5px;
   width: 80px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000363}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000369}}
 .nos-datacatchers .nos-datacatchers-nugget-image .wijmo-wijradio-box {
   float: none;
   margin-left: auto;
   margin-right: auto;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000369}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000375}}
 .nos-datacatchers .nos-datacatchers-nugget-image .ui-inputfilethumb {
   line-height: 1em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000373}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000379}}
 .nos-datacatchers .nos-datacatchers-nugget-image .ui-inputfilethumb-hover {
   background: #fff;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000378}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000384}}
 .nos-datacatchers .nos-datacatchers-catecherform {
   margin-top: 1em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000382}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000388}}
 .nos-datacatchers td.use_default {
   vertical-align: top;
   padding-left: 0.5em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000386}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/home\/lyon\/felix\/www\/novius-os-feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.datacatchers\.scss}line{font-family:\0000392}}
 .nos-datacatchers td.use_default label {
   white-space: nowrap;
 }

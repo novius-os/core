@@ -62,6 +62,9 @@
                                             data : button.action.data,
                                             success : function(data) {
                                                 $share = $(data).insertAfter($container)
+                                                    .bind('close', function() {
+                                                        open_close(false);
+                                                    })
                                                     .addClass('fill-parent nos-fixed-content')
                                                     .css({
                                                         top : $container.css('top'),

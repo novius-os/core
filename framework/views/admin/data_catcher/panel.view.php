@@ -16,6 +16,7 @@
     $default_nuggets = $item->get_default_nuggets();
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">
+    <a href="#" class="nos-datacatchers-close"><img src="static/novius-os/admin/novius-os/img/icons/close.png" /></a>
     <div class="unit col c4">
         <div class="accordion catchers">
             <h3><?= __('Applications') ?></h3>
