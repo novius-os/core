@@ -64,7 +64,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     {
         $diff = $item->get_diff();
 
-        if ($item::behaviours('Nos\Orm_Behaviour_Tree', false) && !empty($this->_parent_relation)) {
+        if (!empty($this->_parent_relation)) {
             $key_from = $this->_parent_relation->key_from[0];
             // Compare $diff[0] and $diff[1] because the former can be (string) and latter (int), even if it's the same value
             if (array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from]) {
@@ -82,18 +82,16 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 $this->_data_diff[$item->{$this->_properties['virtual_path_property']}] = $diff;
             }
         }
-
         parent::before_save($item);
 
-        if (!empty($diff[0][$this->_properties['virtual_name_property']])) {
+        if (!empty($diff[1][$this->_properties['virtual_name_property']])) {
             $diff[0][$this->_properties['virtual_path_property']] = $item->{$this->_properties['virtual_path_property']};
             $old_name = $diff[0][$this->_properties['virtual_name_property']];
-            $new_name = $item->{$this->_properties['virtual_name_property']};
-            if (!empty($this->_properties['extension_property'])) {
+            $new_name = $item->{$this->_properties['virtual_name_property']}.$this->extension($item);
+            if (!empty($old_name)) {
                 $old_name .= $this->extension($item, true);
-                $new_name .= $this->extension($item);
+                $item->{$this->_properties['virtual_path_property']} = preg_replace('`'.preg_quote($old_name).'$`iUu', $new_name, $item->{$this->_properties['virtual_path_property']});
             }
-            $item->{$this->_properties['virtual_path_property']} = preg_replace('`'.$old_name.'$`iUu', $new_name, $item->{$this->_properties['virtual_path_property']});
             $diff[1][$this->_properties['virtual_path_property']] = $item->{$this->_properties['virtual_path_property']};
             $this->_data_diff[$item->{$this->_properties['virtual_path_property']}] = $diff;
         }
