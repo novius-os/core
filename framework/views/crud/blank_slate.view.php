@@ -32,8 +32,7 @@ echo View::forge('nos::crud/tab', array(
             $parent = $item->get_parent();
             if (!empty($parent)) {
                 $uniqid_parent = uniqid('parent_');
-                echo strtr(__('This {item} cannot be added {lang} because its {parent} is not available in this language yet.'), array(
-                    '{item}' => null === $item_text ? '' : $item_text,
+                echo strtr($config['messages']['error added in lang not parent'], array(
                     '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
                     '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
                 ));
@@ -47,10 +46,7 @@ echo View::forge('nos::crud/tab', array(
                 </script>
                 <?php
             } else {
-                echo strtr(__('This {item} cannot be added {lang}.'), array(
-                    '{item}' => null === $item_text ? '' : $item_text,
-                    '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
-                ));
+                echo strtr($config['messages']['error added in lang'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
             }
         } else {
             foreach ($possible as $locale) {
@@ -61,10 +57,7 @@ echo View::forge('nos::crud/tab', array(
             }
             ?>
             <p><?=
-            strtr(__('This {item} has not been added in {lang} yet.'), array(
-                '{item}' => null === $item_text ? '' : $item_text,
-                '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
-            ))
+            strtr($config['messages']['item inexistent in lang yet'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)))
             ?></p>
 
             <p>&nbsp;</p>

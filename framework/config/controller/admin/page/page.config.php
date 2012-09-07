@@ -31,7 +31,10 @@ return array(
         'yes delete sub-items' => __('Yes, I want to delete this page and all of its {count} sub-pages.'),
         'item deleted' => __('This page has been deleted.'),
         'not found' => __('Page not found'),
-        'blank_state_item_text' => __('page'),
+        'error added in lang not parent' => __('This page cannot be added {lang} because its {parent} is not available in this language yet.'),
+        'error added in lang' => __('This page cannot be added {lang}.'),
+        'item inexistent in lang yet' => __('This page has not been added in {lang} yet.'),
+        'add a item in lang' => __('Add a new page in {lang}'),
     ),
     'context_relation' => 'parent',
     'tab' => array(

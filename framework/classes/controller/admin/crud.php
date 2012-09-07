@@ -28,7 +28,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
             'item deleted' => 'This item has been deleted.',
             'not found' => 'Item not found',
-            'blank_state_item_text' => 'item',
+            'error added in lang not parent' => 'This item cannot be added {lang} because its {parent} is not available in this language yet.',
+            'error added in lang' => 'This item cannot be added {lang}.',
+            'item inexistent in lang yet' => 'This item has not been added in {lang} yet.',
             'visualise' => 'Visualise',
             'delete' => 'Delete',
             'delete a item' => 'Delete a item',
@@ -36,6 +38,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'confirm deletion or' => 'or',
             'confirm deletion cancel' => 'Cancel',
             'confirm deletion wrong_confirmation' => 'Wrong confirmation',
+            'add a item in lang' => 'Add a new item in {lang}',
         ),
         'context_relation' => null,
         'tab' => array(
@@ -365,7 +368,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $viewData = array_merge($this->view_params(), array(
             'lang'      => $lang,
             'common_id' => \Input::get('common_id', ''),
-            'item_text' => $this->config['messages']['blank_state_item_text'],
             'url_form'  => $this->config['controller_url'].'/form',
             'url_insert_update'  => $this->config['controller_url'].'/insert_update',
             'tab_params'  => $tabInfos,
@@ -471,9 +473,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_lang = $this->item->find_lang($locale);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? __('Add a new {item} in {lang}') : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $label = empty($main_lang) ? $this->config['messages']['add a item in lang'] : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
             $actions[$locale] = array(
-                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale), '{item}' => $this->config['messages']['blank_state_item_text'])),
+                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',

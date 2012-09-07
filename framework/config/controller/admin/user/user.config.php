@@ -16,7 +16,6 @@ return array(
         'successfully deleted' => __('The user has successfully been deleted!'),
         'item deleted' => __('This user has been deleted.'),
         'not found' => __('User not found'),
-        'blank_state_item_text' => __('user'),
     ),
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/user.png',

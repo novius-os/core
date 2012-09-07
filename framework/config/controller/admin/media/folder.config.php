@@ -17,7 +17,6 @@ return array(
         'successfully deleted' => __('The folder has successfully been deleted!'),
         'item deleted' => __('This folder has been deleted.'),
         'not found' => __('Folder not found'),
-        'blank_state_item_text' => __('folder'),
     ),
     'context_relation' => 'parent',
     'tab' => array(
