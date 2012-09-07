@@ -56,7 +56,7 @@
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
         'fields' => $fields,
-        'callback' => function($field) use ($item, $nugget_db) {
+        'callback' => function($field) use ($item, $nugget_db, $nugget_default) {
             $template = $field->template;
             if (empty($template))
             {
@@ -65,17 +65,15 @@
             // Actually, field_name is an number
             $field_name = $field->name;
             $id = uniqid('for_');
-            if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)))
+            if (isset($nugget_default[$field_name]))
             {
-                $useTitle = $item->get_sharable_property($field_name.'.useTitle');
-                $label = empty($useTitle) ? __('Use default') : $useTitle;
                 $checked = '';
                 if (!isset($nugget_db[$field_name]))
                 {
                     $checked = 'checked';
                     $field->set_attribute('disabled', true);
                 }
-                $template = str_replace('{default}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label>', $template);
+                $template = str_replace('{default}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.__('Use default settings').'</label>', $template);
             }
             else
             {
@@ -120,6 +118,10 @@
         <button type="submit" data-icon="check">
             <?= __('Save') ?>
         </button>
+        &nbsp; <?= __('or') ?> &nbsp;
+        <a href="#" onclick="return false;">
+            <?= __('Cancel') ?>
+        </a>
     </div>
     <?= $fieldset->close() ?>
 </div>

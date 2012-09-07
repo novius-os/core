@@ -37,11 +37,9 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 
             \Response::json(array(
                 'notify' => __('Operation completed successfully.'),
-                'default_nuggets' => (string) \View::forge('nos::admin/data_catcher/default_nuggets', array(
-                    'nugget' => $default_nuggets,
-                ), false),
                 'applications' => (string) \View::forge('nos::admin/data_catcher/applications', array(
                     'data_catchers' => $data_catchers,
+                    'item' => $item,
                     'model_id' => $model_id,
                     'model_name' => $model_name,
                     'nuggets' => $default_nuggets,

@@ -13,11 +13,12 @@
     foreach ($data_catchers as $catcher_name => $data_catcher) {
         if (isset($data_catcher['onDemand']) && $data_catcher['onDemand'] && !$onDemande) {
             $onDemande = true;
-            echo '<div>', htmlspecialchars(__('This item can be shared with the following applications.')) ,'</div>';
-            echo '<h4>', htmlspecialchars(__('Click to customise before share:')) ,'</h4>';
+            echo '<div>', htmlspecialchars(strtr(__('"{item}" can be shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
+            echo '<h4>', htmlspecialchars(__('Click to share:')) ,'</h4>';
+            echo '<small>', htmlspecialchars(__('(Don\'t worry, you\'ll get a preview first)')) ,'</small>';
         } elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto) {
-            echo '<div>', htmlspecialchars(__('This item is automatically shared with the following applications.')) ,'</div>';
-            echo '<h4>', htmlspecialchars(__('Click to customise what you share:')) ,'</h4>';
+            echo '<div>', htmlspecialchars(strtr(__('"{item}" is automatically shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
+            echo '<h4>', htmlspecialchars(__('No action required, click to customise:')) ,'</h4>';
             $auto = true;
         }
 

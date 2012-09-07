@@ -25,11 +25,9 @@ define('jquery-nos-datacatchers',
                 self.element.addClass('nos-datacatchers ui-widget-content');
 
                 self.uiApplications = self.element.find('.catchers div');
-                self.uiDefaultNuggets = self.element.find('.nos-datacatchers-default-nuggets-preview');
                 self.uiCatcherForm = self.element.find('.nos-datacatchers-catecherform');
                 self.uiForm = self.element.find('form');
                 self.uiSave = self.uiForm.find('.nos-datacatchers-buttons button');
-                self.uiCancel = self.uiForm.find('.nos-datacatchers-buttons a');
             },
 
             _init: function() {
@@ -43,22 +41,11 @@ define('jquery-nos-datacatchers',
                 self.uiForm.nosFormUI();
                 self._form(self.uiForm);
 
-                self._defaultNuggets();
-
                 self.uiForm.bind('ajax_success', function(e, json) {
                     self.uiApplications.html(json.applications);
                     self._applications();
-                    self.uiDefaultNuggets.html(json.default_nuggets);
-                    self._defaultNuggets();
-                    self.uiCancel.triggerHandler('click');
                     self.uiCatcherForm.empty();
                 });
-
-                self.uiCancel.click(function(e) {
-                        e.preventDefault();
-                        self.uiDefaultNuggets.show();
-                        $(self.uiForm).hide();
-                    });
 
                 self.element.nosListenEvent({
                         name : o.model_name,
@@ -73,24 +60,10 @@ define('jquery-nos-datacatchers',
                             },
                             success : function(data) {
                                 self.element.nosAjaxSuccess(data);
-                                self.element.replaceWith(data);
+                                self.element.remove();
                             }
                         })
                     });
-            },
-
-            _defaultNuggets : function() {
-                var self = this,
-                    o = self.options;
-
-                self.uiDefaultNuggets.find('button')
-                    .button()
-                    .click(function() {
-                        self.uiDefaultNuggets.hide();
-                        $(self.uiForm).show().nosOnShow('show');
-                    });
-
-                return self;
             },
 
             _applications : function() {
@@ -158,9 +131,19 @@ define('jquery-nos-datacatchers',
                 $container.find('.nos-datacatchers-nugget-checkbox').each(function() {
                     $(this).change(function() {
                         if ($(this).is(':checked')) {
-                            $(this).closest('td').find('.nos-datacatchers-nugget-value').hide();
+                            $(this).closest('tr').find('td:eq(0) .ui-widget').each(function() {
+                                var data = $(this).attr('disabled', true).data();
+                                if (data.wijtextbox) {
+                                    data.wijtextbox.disable();
+                                }
+                            });
                         } else {
-                            $(this).closest('td').find('.nos-datacatchers-nugget-value').show().nosOnShow();
+                            $(this).closest('tr').find('td:eq(0) .ui-widget').each(function() {
+                                var data = $(this).removeAttr('disabled').data();
+                                if (data.wijtextbox) {
+                                    data.wijtextbox.enable();
+                                }
+                            });
                         }
                     }).triggerHandler('change');
                 });

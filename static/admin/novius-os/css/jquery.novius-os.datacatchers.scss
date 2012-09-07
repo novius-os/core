@@ -18,17 +18,13 @@
         .ui-button {
             width: 100%;
             text-align: left;
-            margin-bottom: 0.5em;
+            margin: 0.2em 0 0.3em;
         }
     }
 
     .nos-datacatchers-buttons {
         text-align: right;
         margin: 2em;
-    }
-
-    th label {
-        font-variant: small-caps;
     }
 
     .nos-datacatchers-nugget-image {
@@ -79,11 +75,16 @@
         }
     }
 
-    .nos-datacatchers-default-nuggets form {
-        display: none;
-    }
-
     .nos-datacatchers-catecherform {
         margin-top : 1em;
+    }
+
+    td.use_default {
+        vertical-align: top;
+        padding-left: 0.5em;
+
+        label {
+            white-space: nowrap;
+        }
     }
 }

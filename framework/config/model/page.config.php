@@ -5,7 +5,7 @@ return array(
             'data' => array(
                 \Nos\DataCatcher::TYPE_TITLE => array(
                     'value' => 'page_title',
-                    'useTitle' => __('Title'),
+                    'useTitle' => __('Use page title'),
                 ),
                 \Nos\DataCatcher::TYPE_URL => array(
                     'value' => function($page) {
@@ -14,7 +14,6 @@ return array(
                     'options' => function($page) {
                         return array($page->get_href(array('absolute' => true)));
                     },
-                    'useTitle' => __('Url'),
                 ),
                 \Nos\DataCatcher::TYPE_IMAGE => array(
                     'value' => function($page) {

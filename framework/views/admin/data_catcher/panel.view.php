@@ -23,6 +23,7 @@
     <?php
                 echo \View::forge('nos::admin/data_catcher/applications', array(
                     'data_catchers' => $data_catchers,
+                    'item' => $item,
                     'model_id' => $model_id,
                     'model_name' => $model_name,
                     'nuggets' => $default_nuggets,
@@ -33,15 +34,8 @@
     </div>
     <div class="unit col c8 lastUnit">
         <div class="nos-datacatchers-default-nuggets accordion">
-            <h3><?= __('What is shared') ?></h3>
+            <h3><?= __('What is shared - Default settings') ?></h3>
             <div>
-                <div class="nos-datacatchers-default-nuggets-preview">
-                    <?php
-                    echo \View::forge('nos::admin/data_catcher/default_nuggets', array(
-                        'nugget' => $default_nuggets,
-                    ), false);
-                    ?>
-                </div>
                 <?php
                 echo \View::forge('nos::admin/data_catcher/form', array(
                     'action' => 'admin/nos/datacatcher/save',

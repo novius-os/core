@@ -15,8 +15,7 @@
             $(function () {
                 var actions = <?= \Format::forge($actions)->to_json(); ?>,
                     $container = $('#<?= $container_id ?>'),
-                    $toolbar = $container.nosToolbar('create'),
-                    $share = false;
+                    $toolbar = $container.nosToolbar('create');
 
                 $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                         'save_field' => $fieldset->field('save')
@@ -33,7 +32,8 @@
                     var button = this,
                         openShare = false;
                         $button = $('<button></button>').click(function() {
-                                var $button = $(this);
+                                var $button = $(this),
+                                    $share = $toolbar.nextAll('.nos-datacatchers');
                                 if (button.action.action === 'share') {
                                     $button.hover(function() {
                                         if (openShare) {
@@ -51,12 +51,12 @@
 
                                     };
 
-                                    if ($share) {
-                                        if ($share !== true) {
+                                    if ($share.size()) {
+                                        if ($share !== 'load') {
                                             open_close(!openShare);
                                         }
                                     } else {
-                                        $share = true;
+                                        $share = 'load';
                                         $.ajax({
                                             url : 'admin/nos/datacatcher/form',
                                             data : button.action.data,
