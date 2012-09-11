@@ -21,7 +21,7 @@ return array(
 
                         return Arr::get(array_keys($possible), 0, null);
                     },
-                    'possibles' => function($page) {
+                    'options' => function($page) {
                         return $page->possible_medias();
                     },
                 ),
