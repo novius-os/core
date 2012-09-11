@@ -39,7 +39,7 @@
         $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
         $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
             'type' => 'radio',
-            'value' => isset($possible[$value]) ? $value : 0,
+            'value' => in_array($value, $possible) ? $value : 0,
         ));
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_TEXT, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TEXT]))

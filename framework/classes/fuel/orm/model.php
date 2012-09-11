@@ -745,7 +745,7 @@ class Model extends \Orm\Model
 
 
 
-class Model_Media_Provider
+class Model_Media_Provider implements \Iterator
 {
     protected $parent;
     protected $iterator = array();

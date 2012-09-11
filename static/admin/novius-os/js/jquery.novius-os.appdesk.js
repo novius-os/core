@@ -151,11 +151,10 @@ define('jquery-nos-appdesk',
 
                 if (!$.isEmptyObject(o.locales)) {
 
-                    if (o.selectedLang && o.selectedLang.length) {
+                    if (!$.type(o.selectedLang) === 'string') {
                         o.selectedLang = null;
                     }
-
-                    if (o.selectedLang == null) {
+                    if (o.selectedLang === null || !o.locales[o.selectedLang]) {
                         o.selectedLang = Object.keys(o.locales)[0];
                     }
                 }
@@ -244,23 +243,10 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (o.hideLocales) {
+                if (o.hideLocales || !!$.isEmptyObject(o.locales)) {
                     return self;
                 }
-
-                if (o.selectedLang && o.selectedLang.length) {
-                    o.selectedLang = null;
-                }
-
-                if (o.selectedLang == null) {
-                    var first = true;
-                    $.each(o.locales, function(key, locale) {
-                        if (first) {
-                            o.selectedLang = key;
-                            first = false;
-                        }
-                    });
-                }
+                self.dispatcher.data('nosLang', o.selectedLang);
 
                 var date = new Date(),
                     uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
@@ -285,7 +271,8 @@ define('jquery-nos-appdesk',
 
                     select.nosSaveUserConfig(o.name + '.selectedLang', o.selectedLang);
 
-                    self.gridReload();
+                    self.uiResetSearch.click();
+
                     self.dispatcher.data('nosLang', o.selectedLang)
                         .trigger('langChange');
                 }).filter(function() {
@@ -306,13 +293,16 @@ define('jquery-nos-appdesk',
                     return self;
                 }
 
-                var $viewsDropDown = $('<select></select>');
+                var $viewsDropDown = $('<select></select>'),
+                    views_count = 0;
 
                 $.each(o.views, function(key, view) {
                     // Virtual views can't be switched to
                     if (view.virtual) {
                         return;
                     }
+
+                    views_count++;
                     $viewsDropDown.append(
                         $('<option></option>')
                             .attr({
@@ -322,8 +312,7 @@ define('jquery-nos-appdesk',
                             .append(view.name)
                     );
                 });
-
-                if ($viewsDropDown.empty()) {
+                if (views_count <= 1) {
                     return self;
                 }
 

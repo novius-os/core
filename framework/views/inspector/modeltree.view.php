@@ -17,7 +17,7 @@ require(
     function($) {
         $(function() {
             var inspector = $('#<?= $attributes['id'] ?>'),
-                connector = inspector.closest('.nos-inspector, body')
+                connector = inspector.closest('.nos-dispatcher, body')
                     .on('langChange', function() {
                         if (inspectorData.langChange) {
                             inspector.nostreegrid('option', 'treeOptions', {

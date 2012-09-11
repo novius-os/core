@@ -95,11 +95,22 @@
                     </thead>
                     <tbody>
                 <?php foreach ($others as $app) {
-                    $metadata = $app->metadata;
+                    $metadata = $app->get_real_metadata();
                     ?>
                         <tr>
                             <td><?= e($app->name) ?> </td>
-                            <td><a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
+                            <td>
+                            <?php
+                            if (empty($metadata)) {
+                                ?>
+                                <em><?php echo __('No metadata found') ?>.</em>
+                                <?php
+                            } else {
+                                ?>
+                                 <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
+                                <?php
+                            }
+                            ?>
                         </tr>
                         <?php } ?>
                     </tbody>

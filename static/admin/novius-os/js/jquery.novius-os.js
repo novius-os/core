@@ -209,9 +209,11 @@ define('jquery-nos',
                         var placeholderReplace = function (obj, data) {
                             if ($.type(obj) === 'string') {
                                 return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
-                                        return data[p1];
+                                        return data[p1] || '';
                                     }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
-                                        return data[p1];
+                                        return data[p1] || '';
+                                    }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
+                                        return encodeURIComponent(data[p1] || '');
                                     });
                             } else if ($.isPlainObject(obj)) {
                                 $.each(obj, function(key, value) {
@@ -403,6 +405,7 @@ define('jquery-nos',
                 var options = $.extend({
                     title: $input.attr('title') || 'File',
                     allowDelete : true,
+                    classes: data.mode,
                     choose: function() {
                         var $dialog = $input.nosDialog({
                                 destroyOnClose : true,

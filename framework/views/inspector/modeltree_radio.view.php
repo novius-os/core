@@ -23,7 +23,7 @@
                             width: params.width || ''
                         }),
                     table = container.find('table'),
-                    connector = container.closest('.nos-inspector, body')
+                    connector = container.closest('.nos-dispatcher, body')
                         .on('langChange', function() {
                             if (params.langChange) {
                                 table.nostreegrid('option', 'treeOptions', {

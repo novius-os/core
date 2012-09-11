@@ -14,6 +14,10 @@
 
     $data_catchers = $item->data_catchers();
     $default_nuggets = $item->get_default_nuggets();
+    $translatable = $model_name::behaviours('Nos\Orm_Behaviour_Translatable', false);
+    if ($translatable) {
+        $default_nuggets['lang'] = $item->{$translatable['lang_property']};
+    }
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">
     <a href="#" class="nos-datacatchers-close"><img src="static/novius-os/admin/novius-os/img/icons/close.png" /></a>
