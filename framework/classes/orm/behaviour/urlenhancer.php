@@ -20,7 +20,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     protected $_properties = array();
 
     /**
-     * Returns all available URL for this item. The array contains:
+     * Returns an array of all available URL for this item. The array contains:
      *
      *   page_id::item_slug => full_url (relative to base)
      *
@@ -31,11 +31,11 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      *
      * When retrieving only the first URL, we get only the first value (current full URL, without page_id).
      *
-     * If there's no result, the function will either return null or empty array()
+     * If there's no result, the function will return empty array()
      *
      * @param  \Nos\Model        $item
      * @param  array             $params
-     * @return null|string|array
+     * @return array
      */
     public function urls($item, $params = array())
     {
@@ -49,6 +49,15 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $urls;
     }
 
+    /**
+     * This is an alias for `$item->url(array('canonical' => true));`.
+     *
+     * If the item has Behaviour_Sharable, it will return the URL configured in the shared data (content nugget)
+     *
+     * @param type $item
+     * @param array $params
+     * @return  @see url()
+     */
     public function url_canonical($item, $params = array())
     {
         $params['canonical'] = true;
@@ -56,7 +65,13 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $this->url($item, $params);
     }
 
-    // @todo Figure out the appropriate method name : url() / url_item() / other()?
+    /**
+     * Returns a valid URL for the item.
+     *
+     * @param  \Nos\Model        $item
+     * @param  array             $params
+     * @return null|string       Full URL (relative to base). null if the item is not displayed.
+     */
     public function url($item, $params = array())
     {
         $canonical = \Arr::get($params, 'canonical', false);
