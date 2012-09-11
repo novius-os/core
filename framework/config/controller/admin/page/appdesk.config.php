@@ -196,7 +196,7 @@ return array(
                 ),
             ),
             'grid' => array(
-                'proxyUrl' => 'admin/nos/page/appdesk/json',
+                'urlJson' => 'admin/nos/page/appdesk/json',
                 'columns' => array(
                     'title' => array(
                         'headerText' => __('Title'),
@@ -220,7 +220,7 @@ return array(
                 ),
             ),
             'treeGrid' => array(
-                'proxyUrl' => 'admin/nos/page/appdesk/tree_json',
+                'urlJson' => 'admin/nos/page/appdesk/tree_json',
             ),
             'defaultView' => 'treeGrid',
         ),

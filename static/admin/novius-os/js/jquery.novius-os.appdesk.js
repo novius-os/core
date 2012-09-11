@@ -693,7 +693,7 @@ define('jquery-nos-appdesk',
                         data: new wijdatasource({
                             dynamic: true,
                             proxy: new wijhttpproxy({
-                                url: o.grid.proxyUrl,
+                                url: o.grid.urlJson,
                                 dataType: "json",
                                 error: function(jqXHR, textStatus, errorThrown) {
                                     log(jqXHR, textStatus, errorThrown);
@@ -806,7 +806,7 @@ define('jquery-nos-appdesk',
                         height : height,
                         width : '100%'
                     }).nostreegrid($.extend(true, { // True for recursive clone
-                        treeUrl : o.treeGrid.proxyUrl,
+                        treeUrl : o.treeGrid.urlJson,
                         treeOptions : {
                             lang : o.selectedLang || ''
                         },
@@ -892,7 +892,7 @@ define('jquery-nos-appdesk',
                 self.uiThumbnail.css('height', height)
                     .thumbnailsgrid($.extend({
                         pageIndex: 0,
-                        url: o.grid.proxyUrl,
+                        url: o.grid.urlJson,
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
                             self.pageIndex = r.pageIndex;
@@ -1395,7 +1395,7 @@ define('jquery-nos-appdesk',
                         appdesk : {
                             adds : {},
                             grid : {
-                                proxyUrl : '',
+                                urlJson : '',
                                 columns : {}
                             },
                             thumbnails : null,

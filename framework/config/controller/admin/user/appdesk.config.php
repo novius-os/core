@@ -116,7 +116,7 @@ return array(
                 ),
             ),
             'grid' => array(
-                'proxyUrl' => 'admin/nos/user/appdesk/json',
+                'urlJson' => 'admin/nos/user/appdesk/json',
                 'columns' => array(
                     'user' => array(
                         'headerText' => __('Name'),
