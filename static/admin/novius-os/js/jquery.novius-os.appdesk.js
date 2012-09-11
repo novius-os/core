@@ -285,7 +285,8 @@ define('jquery-nos-appdesk',
 
                     select.nosSaveUserConfig(o.name + '.selectedLang', o.selectedLang);
 
-                    self.gridReload();
+                    self.uiResetSearch.click();
+
                     self.dispatcher.data('nosLang', o.selectedLang)
                         .trigger('langChange');
                 }).filter(function() {
