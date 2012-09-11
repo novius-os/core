@@ -17,7 +17,7 @@ require(
     function( $, undefined ) {
         $(function() {
             var inspector = $('#<?= $id ?>').removeAttr('id'),
-                connector = inspector.closest('.nos-inspector, body')
+                connector = inspector.closest('.nos-dispatcher, body')
                     .on('langChange', function() {
                         if (inspectorData.langChange) {
                             inspector.noslistgrid('ensureControl', true);

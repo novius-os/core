@@ -246,6 +246,7 @@ define('jquery-nos-appdesk',
                 if (o.hideLocales || !!$.isEmptyObject(o.locales)) {
                     return self;
                 }
+                self.dispatcher.data('nosLang', o.selectedLang);
 
                 var date = new Date(),
                     uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
