@@ -151,11 +151,10 @@ define('jquery-nos-appdesk',
 
                 if (!$.isEmptyObject(o.locales)) {
 
-                    if (o.selectedLang && o.selectedLang.length) {
+                    if (!$.type(o.selectedLang) === 'string') {
                         o.selectedLang = null;
                     }
-
-                    if (o.selectedLang == null) {
+                    if (o.selectedLang === null || !o.locales[o.selectedLang]) {
                         o.selectedLang = Object.keys(o.locales)[0];
                     }
                 }
@@ -244,22 +243,8 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (o.hideLocales) {
+                if (o.hideLocales || !!$.isEmptyObject(o.locales)) {
                     return self;
-                }
-
-                if (o.selectedLang && o.selectedLang.length) {
-                    o.selectedLang = null;
-                }
-
-                if (o.selectedLang == null) {
-                    var first = true;
-                    $.each(o.locales, function(key, locale) {
-                        if (first) {
-                            o.selectedLang = key;
-                            first = false;
-                        }
-                    });
                 }
 
                 var date = new Date(),
