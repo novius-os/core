@@ -306,13 +306,16 @@ define('jquery-nos-appdesk',
                     return self;
                 }
 
-                var $viewsDropDown = $('<select></select>');
+                var $viewsDropDown = $('<select></select>'),
+                    views_count = 0;
 
                 $.each(o.views, function(key, view) {
                     // Virtual views can't be switched to
                     if (view.virtual) {
                         return;
                     }
+
+                    views_count++;
                     $viewsDropDown.append(
                         $('<option></option>')
                             .attr({
@@ -322,8 +325,7 @@ define('jquery-nos-appdesk',
                             .append(view.name)
                     );
                 });
-
-                if ($viewsDropDown.empty()) {
+                if (views_count <= 1) {
                     return self;
                 }
 

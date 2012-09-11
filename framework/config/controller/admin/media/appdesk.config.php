@@ -32,6 +32,13 @@ return array(
                 'static/novius-os/admin/config/media/media.js'
             ),
         ),
+        'wide' => array(
+            'name' => __('Wide view'),
+            'json' => array(
+                'static/novius-os/admin/config/media/common.js',
+                'static/novius-os/admin/config/media/wide.js'
+            ),
+        ),
         'image_pick' => array(
             'name' => __('Image'),
             'virtual' => true,
@@ -274,6 +281,7 @@ return array(
             ),
             'thumbnails' => array(
                 'actions' => array('edit', 'delete', 'visualise'),
+                'thumbnailSize' => 64,
             ),
             'defaultView' => 'thumbnails',
             'inspectorsOrder' => 'preview,folders,extensions',

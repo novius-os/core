@@ -51,6 +51,6 @@ define(
                     // Another solution is to remove the extensions inspector in the "Order" property
                     //inspectorsOrder : 'folders,preview'
                 }
-            }
-        }
+            };
+        };
     });

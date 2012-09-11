@@ -16,6 +16,6 @@ define([
             appdesk : {
                 inspectorsOrder : 'folders,extensions,preview'
             }
-        }
-    }
+        };
+    };
 });
