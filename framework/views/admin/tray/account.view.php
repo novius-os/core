@@ -15,8 +15,9 @@ $uniqid = uniqid('id_');
         'jquery-nos'
     ], function($) {
         $(function() {
-            $container = $('#<?= $uniqid ?>').nosToolbar('create');
-            $save = $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
+            var $container = $('#<?= $uniqid ?>');
+            $container.nosToolbar('create');
+            $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                 'save_field' => $fieldset_infos->field('save')
             ), false))->to_json() ?>)
                 .click(function() {
