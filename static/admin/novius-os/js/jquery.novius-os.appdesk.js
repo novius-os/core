@@ -14,7 +14,7 @@ define('jquery-nos-appdesk',
         var undefined = void(0);
         $.widget( "nos.appdesk", {
             options: {
-                adds : [],
+                buttons : [],
                 inspectors : [],
                 thumbnails : false,
                 defaultView : 'grid',
@@ -203,11 +203,11 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (!$.isArray(o.adds) || !o.adds.length) {
+                if (!$.isArray(o.buttons) || !o.buttons.length) {
                     return self;
                 }
 
-                var first = o.adds.shift(),
+                var first = o.buttons.shift(),
                     $button = $('<button></button>').text(first.label)
                         .data('icon', first.icon || 'plus')
                         .addClass('primary')
@@ -221,7 +221,7 @@ define('jquery-nos-appdesk',
 
                 self.element.nosToolbar('add', $button);
 
-                $.each(o.adds, function(i, add) {
+                $.each(o.buttons, function(i, add) {
                     var $a = $('<a href="#"></a>')
                         .addClass('nos-appdesk-action-secondary')
                         .text(this.label)
@@ -1382,7 +1382,7 @@ define('jquery-nos-appdesk',
                     self = {
                         tab : null,
                         appdesk : {
-                            adds : {},
+                            buttons : {},
                             grid : {
                                 urlJson : '',
                                 columns : {}
@@ -1428,7 +1428,7 @@ define('jquery-nos-appdesk',
                             if (params.appdesk.splittersHorizontal) {
                                 params.appdesk.splitters.horizontal = {splitterDistance : params.appdesk.splittersHorizontal};
                             }
-                            params.appdesk.adds = $.map(params.appdesk.adds, objectToArray);
+                            params.appdesk.buttons = $.map(params.appdesk.buttons, objectToArray);
 
 
                             params.appdesk.inspectors = keyToOrderedArray(params.appdesk, 'inspectors');

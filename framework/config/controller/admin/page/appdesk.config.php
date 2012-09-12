@@ -172,7 +172,7 @@ return array(
         ),
         'reloadEvent' => 'Nos\\Model_Page',
         'appdesk' => array(
-            'adds' => array(
+            'buttons' => array(
                 'page' => array(
                     'label' => __('Add a page'),
                     'action' => array(

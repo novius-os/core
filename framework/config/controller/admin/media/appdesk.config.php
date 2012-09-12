@@ -230,7 +230,7 @@ return array(
         ),
         'appdesk' => array(
             'splittersVertical' => 300,
-            'adds' => array(
+            'buttons' => array(
                 'media' => array(
                     'label' => __('Add a media'),
                     'action' => array(

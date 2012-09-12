@@ -102,7 +102,7 @@ return array(
         ),
         'reloadEvent' => 'Nos\\Model_User',
         'appdesk' => array(
-            'adds' => array(
+            'buttons' => array(
                 'user' => array(
                     'label' => __('Add a user'),
                     'action' => array(
