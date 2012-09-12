@@ -33,12 +33,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'item inexistent in lang yet' => 'This item has not been added in {lang} yet.',
             'visualise' => 'Visualise',
             'delete' => 'Delete',
-            'delete a item' => 'Delete a item',
+            'delete an item' => 'Delete an item',
             'confirm deletion ok' => 'Confirm the deletion',
             'confirm deletion or' => 'or',
             'confirm deletion cancel' => 'Cancel',
             'confirm deletion wrong_confirmation' => 'Wrong confirmation',
-            'add a item in lang' => 'Add a new item in {lang}',
+            'add an item in lang' => 'Add a new item in {lang}',
         ),
         'context_relation' => null,
         'tab' => array(
@@ -437,7 +437,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                        'title' => $this->config['messages']['delete a item'],
+                        'title' => $this->config['messages']['delete an item'],
                     ),
                 ),
                 'icon' => 'trash',
@@ -482,7 +482,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_lang = $this->item->find_lang($locale);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? $this->config['messages']['add a item in lang'] : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $label = empty($main_lang) ? $this->config['messages']['add an item in lang'] : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
             $actions[$locale] = array(
                 'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),

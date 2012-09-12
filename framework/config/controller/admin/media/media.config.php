@@ -17,6 +17,7 @@ return array(
         'successfully deleted' => __('The media has successfully been deleted!'),
         'item deleted' => __('This media has been deleted.'),
         'not found' => __('Media not found'),
+        'delete an item' => __('Delete a media'),
     ),
     'context_relation' => 'folder',
     'tab' => array(
