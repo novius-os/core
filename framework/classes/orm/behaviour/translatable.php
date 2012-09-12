@@ -104,20 +104,15 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         $common_property = $this->_properties['common_id_property'];
         $single_property = $this->_properties['single_id_property'];
 
-        $new_common_id = null;
-        // Reassign common_id & single_id for other languages
-        foreach ($this->find_lang($item, 'all') as $item) {
-            if (empty($new_common_id)) {
-                $new_common_id = $item->id;
-                // This item becomes the new main language
-                $item->set($common_property, $new_common_id);
-                $item->set($single_property, $new_common_id);
-                $item->save();
-            } else {
-                // This item still is a secondary langauge, but the common_id has been changed
-                $item->set($common_property, $new_common_id);
-                // single_id is already null
-                $item->save();
+        $available_langs = $item->get_all_lang();
+
+        // Set the single_id property for one of the lang
+        foreach (\Config::get('locales') as $code => $name) {
+            if (in_array($code, $available_langs)) {
+                $new_main_item = $this->find_lang($item, $code);
+                $new_main_item->set($single_property, $new_main_item->get($common_property));
+                $new_main_item->save();
+                break;
             }
         }
     }

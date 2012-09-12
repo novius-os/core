@@ -260,7 +260,7 @@ return array(
             ),
             'grid' => array(
                 'id' => 'nos_media_grid',
-                'proxyUrl' => 'admin/nos/media/appdesk/json',
+                'urlJson' => 'admin/nos/media/appdesk/json',
                 'columns' => array(
                     'extension' => array(
                         'headerText' => __('Ext.'),
