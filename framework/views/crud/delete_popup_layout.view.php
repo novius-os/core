@@ -10,11 +10,11 @@
 $id = $uniqid = uniqid('form_');
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
-<?= \View::forge($view_params['config']['views']['delete'], array('view_params' => $view_params), false) ?>
+<?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
 <p>
-    <button type="submit" class="primary ui-state-error"><?= $view_params['config']['messages']['confirm deletion ok'] ?></button>
-    <span><?= $view_params['config']['messages']['confirm deletion or'] ?></span>
-    <a href="#"><?= $view_params['config']['messages']['confirm deletion cancel'] ?></a>
+    <button type="submit" class="primary ui-state-error"><?= $crud['config']['messages']['confirm deletion ok'] ?></button>
+    <span><?= $crud['config']['messages']['confirm deletion or'] ?></span>
+    <a href="#"><?= $crud['config']['messages']['confirm deletion cancel'] ?></a>
 </p>
 </form>
 <script type="text/javascript">
@@ -39,13 +39,13 @@ $id = $uniqid = uniqid('form_');
                     });
                     if (allVerificationPassed) {
                         $form.nosAjax({
-                            url : <?= \Format::forge($view_params['config']['controller_url'].'/delete')->to_json() ?>,
+                            url : <?= \Format::forge($crud['config']['controller_url'].'/delete')->to_json() ?>,
                             method : 'POST',
                             data : $form.serialize()
                         });
                         $form.nosDialog('close');
                     } else {
-                        $.nosNotify(<?= \Format::forge($view_params['config']['messages']['confirm deletion wrong_confirmation'])->to_json() ?>, 'error');
+                        $.nosNotify(<?= \Format::forge($crud['config']['messages']['confirm deletion wrong_confirmation'])->to_json() ?>, 'error');
                     }
 
                 });

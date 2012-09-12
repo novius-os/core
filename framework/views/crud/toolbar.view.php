@@ -13,8 +13,8 @@
     require(['jquery-nos'],
         function ($) {
             $(function () {
-                var actions = <?= \Format::forge($actions)->to_json(); ?>,
-                    $container = $('#<?= $container_id ?>'),
+                var actions = <?= \Format::forge($crud['actions'])->to_json(); ?>,
+                    $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>'),
                     $toolbar = $container.nosToolbar('create');
 
                 $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(

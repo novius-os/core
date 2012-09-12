@@ -13,7 +13,7 @@
     <div style="overflow:visible;<?= !empty($nomargin) ? 'margin:0;padding:0;' : '' ?>">
 <?php
     if (is_array($content) && !empty($content['view'])) {
-        echo View::forge($content['view'], array('fieldset' => $fieldset, 'item' => $item) + $content['params'], false);
+        echo View::forge($content['view'], $view_params + $content['params'], false);
     } else {
         echo is_callable($content) ? $content() : $content;
     }

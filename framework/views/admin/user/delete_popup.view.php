@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 ?>
-<input type="hidden" name="id" value="<?= $view_params['item']->{$view_params['pk']} ?>" />
+<input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <p>
     <p><?= __('Deleting a user is permanent, there is no undo.') ?></p>
     <p><?= __('Please confirm the deletion:'); ?></p>

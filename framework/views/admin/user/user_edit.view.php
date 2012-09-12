@@ -10,22 +10,11 @@
 
 $uniqid = uniqid('id_');
 
-echo View::forge('nos::crud/tab', array(
-    'model' => $view_params['model'],
-    'pk' => $view_params['pk'],
-    'item' => $view_params['item'],
-    'config' => $view_params['config'],
-    'container_id' => $view_params['fieldset']->form()->get_attribute('id'),
-    'tab_params' => $view_params['tab_params'],
-), false);
+echo View::forge('nos::crud/tab', $view_params, false);
 
-echo View::forge('nos::crud/toolbar', array(
-    'container_id' => $uniqid,
-    'config' => $view_params['config'],
-    'actions' => $view_params['actions'],
-    'fieldset' => $view_params['fieldset'],
-    'item' => $view_params['item'],
-), false);
+$view_params['container_id'] = $uniqid;
+
+echo View::forge('nos::crud/toolbar', $view_params, false);
 ?>
 <style type="text/css">
 /* ? */
@@ -36,9 +25,9 @@ echo View::forge('nos::crud/toolbar', array(
 </style>
 
 <?php
-$view_params['fieldset']->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+$fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 
-foreach ($view_params['fieldset']->field() as $field) {
+foreach ($fieldset->field() as $field) {
     if ($field->type == 'checkbox') {
         $field->set_template('{field} {label}');
     }
@@ -51,11 +40,11 @@ foreach ($view_params['fieldset']->field() as $field) {
         <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
     </ul>
     <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
-        <?= render('admin/user/user_details_edit', array('fieldset' => $view_params['fieldset'], 'user' => $view_params['item']), false) ?>
+        <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false) ?>
     </div>
     <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
 <?php
-        $role = reset($view_params['item']->roles);
+        $role = reset($item->roles);
 
         \Config::load('nos::admin/permissions', 'permissions');
         \Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
@@ -69,7 +58,7 @@ foreach ($view_params['fieldset']->field() as $field) {
         unset($apps['nos']);
 
         echo \View::forge('nos::admin/user/permission', array(
-            'user' => $view_params['item'],
+            'user' => $item,
             'role' => $role,
             'apps' => $apps,
         ), false);

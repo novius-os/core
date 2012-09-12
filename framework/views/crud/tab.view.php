@@ -11,7 +11,7 @@ $uniqid_close = uniqid('close_');
 if (!$item->is_new()) {
 ?>
 <div id="<?= $uniqid_close ?>" style="display:none;">
-    <p><?= $config['messages']['item deleted'] ?></p>
+    <p><?= $crud['config']['messages']['item deleted'] ?></p>
     <p>&nbsp;</p>
     <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
 </div>
@@ -23,16 +23,16 @@ if (!$item->is_new()) {
         ['jquery-nos-ostabs'],
         function ($) {
             $(function () {
-                var tabInfos = <?= \Format::forge()->to_json($tab_params) ?>,
+                var tabInfos = <?= \Format::forge()->to_json($crud['tab_params']) ?>,
                     isNew = <?= \Format::forge()->to_json($item->is_new()) ?>;
 
-                var $container = $('#<?= $container_id ?>');
+                var $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>');
                 $container.nosTabs('update', tabInfos);
                 if (!isNew) {
                     $container.nosListenEvent({
-                            name: <?= \Format::forge()->to_json($model) ?>,
+                            name: <?= \Format::forge()->to_json($crud['model']) ?>,
                             action: 'delete',
-                            id: <?= (int) $item->{$pk} ?>
+                            id: <?= (int) $item->{$crud['pk']} ?>
                         }, function() {
                             var $close = $('#<?= $uniqid_close ?>');
                             $close.show().nosFormUI();

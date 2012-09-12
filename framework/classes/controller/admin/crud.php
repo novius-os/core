@@ -116,19 +116,28 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function view_params()
     {
-        $params = array(
-            'model' => $this->config['model'],
-            'behaviours' => $this->behaviours,
-            'pk' => $this->pk,
+        $view_params = array(
+            'crud' => array(
+                'model' => $this->config['model'],
+                'behaviours' => $this->behaviours,
+                'pk' => $this->pk,
+                'context' => $this->item_context,
+                'config' => $this->config,
+                'url_form'  => $this->config['controller_url'].'/form',
+                'url_insert_update'  => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
+                'is_new' => $this->is_new,
+                'actions' => $this->get_actions(),
+                'tab_params' => $this->get_tab_params(),
+            ),
             'item' => $this->item,
-            'context' => $this->item_context,
-            'config' => $this->config,
         );
         if ($this->behaviours['translatable']) {
-            $params['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
+            $view_params['crud']['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
         }
 
-        return $params;
+        $view_params['view_params'] = &$view_params;
+
+        return $view_params;
     }
 
     public function action_form($id = null)
@@ -144,15 +153,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
             $fieldset = $this->fieldset($fieldset);
 
-            $params = array_merge($this->view_params(), array(
-                'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
-                'is_new' => $this->is_new,
-                'fieldset' => $fieldset,
-                'actions' => $this->get_actions(),
-                'tab_params' => $this->get_tab_params(),
-            ));
+            $view_params = $this->view_params();
+            $view_params['fieldset'] = $fieldset;
 
-            return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], array('view_params' => $params), false);
+            // We can't do this form inside the view_params() method, because additional vars (added
+            // after the reference was created) won't be available from the reference
+            $view_params['view_params'] = &$view_params;
+
+            return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], $view_params, false);
         } catch (\Exception $e) {
             $this->send_error($e);
         }
@@ -331,17 +339,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         // insert_update/ID?lang=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that language)
 
         $this->item = $this->crud_item($id);
+        $this->is_new = $this->item->is_new();
 
         if (empty($this->item)) {
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
 
-        if ($this->item->is_new() || !$this->behaviours['translatable']) {
+        if ($this->is_new || !$this->behaviours['translatable']) {
             return $this->action_form($id);
         }
 
         if ($this->behaviours['translatable']) {
-            $selected_lang = \Input::get('lang', $this->item->is_new() ? null : $this->item->get_lang());
+            $selected_lang = \Input::get('lang', $this->is_new ? null : $this->item->get_lang());
 
             foreach ($this->item->get_all_lang() as $lang_id => $lang) {
                 if ($selected_lang == $lang) {
@@ -357,23 +366,23 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function blank_slate($id, $lang)
     {
         $this->item = $this->crud_item($id);
+        $this->is_new = true;
         if (empty($lang)) {
             $lang = \Input::get('lang', key(\Config::get('locales')));
         }
 
-        $tabInfos = $this->get_tab_params();
-        $tabInfos['url'] .= '?lang='.$lang;
-        $tabInfos = \Arr::merge($tabInfos, array('label' => $this->config['tab']['labels']['blankSlate']));
-
-        $viewData = array_merge($this->view_params(), array(
+        $view_params = array_merge($this->view_params(), array(
             'lang'      => $lang,
             'common_id' => \Input::get('common_id', ''),
-            'url_form'  => $this->config['controller_url'].'/form',
-            'url_insert_update'  => $this->config['controller_url'].'/insert_update',
-            'tab_params'  => $tabInfos,
         ));
+        $view_params['crud']['tab_params']['url'] .= '?lang='.$lang;
+        $view_params['crud']['tab_params']['label'] = $this->config['tab']['labels']['blankSlate'];
 
-        return \View::forge('nos::crud/blank_slate', $viewData, false);
+        // We can't do this form inside the view_params() method, because additional vars (added
+        // after the reference was created) won't be available from the reference
+        $view_params['view_params'] = &$view_params;
+
+        return \View::forge('nos::crud/blank_slate', $view_params, false);
     }
 
     protected function get_tab_params()
@@ -504,9 +513,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->delete_confirm();
             } else {
                 $this->item = $this->crud_item($id);
+                $this->is_new = $this->item->is_new();
                 $this->check_permission('delete');
 
-                return \View::forge('nos::crud/delete_popup_layout', array('view_params' => $this->view_params()), false);
+                return \View::forge('nos::crud/delete_popup_layout', $this->view_params(), false);
             }
         } catch (\Exception $e) {
             $this->send_error($e);
@@ -522,6 +532,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $this->item = $this->crud_item($id);
+        $this->is_new = $this->item->is_new();
         $this->check_permission('delete');
 
         $dispatchEvent = array(

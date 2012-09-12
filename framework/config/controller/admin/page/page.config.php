@@ -35,6 +35,7 @@ return array(
         'error added in lang' => __('This page cannot be added {lang}.'),
         'item inexistent in lang yet' => __('This page has not been added in {lang} yet.'),
         'add a item in lang' => __('Add a new page in {lang}'),
+        'delete a item' => __('Delete a page'),
     ),
     'context_relation' => 'parent',
     'tab' => array(
@@ -64,9 +65,9 @@ return array(
         }
     ),
     'layout' => array(
-        array(
+        'form' => array(
             'view' => 'nos::form/layout_standard',
-            'view_params' => array(
+            'params' => array(
                 'title' => 'page_title',
                 'medias' => array(),
                 'large' => true,
@@ -129,7 +130,7 @@ return array(
                 ),
             ),
         ),
-        array(
+        'js' => array(
             'view' => 'nos::admin/page/page_form',
         ),
     ),
