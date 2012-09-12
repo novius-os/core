@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-$usage_count = count($view_params['item']->link);
+$usage_count = count($item->link);
 ?>
-<input type="hidden" name="id" value="<?= $view_params['item']->{$view_params['pk']} ?>" />
+<input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
     <p><?php
     if ($usage_count == 0) {

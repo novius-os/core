@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-$media_count = $view_params['item']->count_media();
+$media_count = $item->count_media();
 ?>
-<input type="hidden" name="id" value="<?= $view_params['item']->{$view_params['pk']} ?>" />
+<input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
 <p><?php
     if ($media_count == 0) {

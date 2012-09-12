@@ -132,7 +132,7 @@ $large = !empty($large) && $large == true;
 <?php
     foreach ($contents as $content) {
         if (is_array($content) && !empty($content['view'])) {
-            echo View::forge($content['view'], array('fieldset' => $fieldset, 'item' => $item) + $content['params'], false);
+            echo View::forge($content['view'], $view_params + $content['params'], false);
         } elseif (is_callable($content)) {
             echo $content();
         } else {
@@ -166,7 +166,7 @@ $large = !empty($large) && $large == true;
         }
         foreach ($menus as $view) {
             if (!empty($view['view'])) {
-                echo View::forge($view['view'], array('fieldset' => $fieldset, 'item' => $item) + $view['params'], false);
+                echo View::forge($view['view'], $view_params + $view['params'], false);
             }
         }
 ?>

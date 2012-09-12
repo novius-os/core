@@ -15,14 +15,9 @@ $possible = $item->get_possible_lang();
 $main_lang = $item->find_main_lang();
 $common_id = $main_lang ? $main_lang->id : false;
 
-echo View::forge('nos::crud/tab', array(
-    'model' => $model,
-    'pk' => $pk,
-    'item' => $item,
-    'config' => $config,
-    'container_id' => $uniqid,
-    'tab_params' => $tab_params,
-), false);
+$view_params['container_id'] = $uniqid;
+
+echo View::forge('nos::crud/tab', $view_params, false);
 ?>
 <div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
@@ -32,7 +27,7 @@ echo View::forge('nos::crud/tab', array(
             $parent = $item->get_parent();
             if (!empty($parent)) {
                 $uniqid_parent = uniqid('parent_');
-                echo strtr($config['messages']['error added in lang not parent'], array(
+                echo strtr($crud['config']['messages']['error added in lang not parent'], array(
                     '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
                     '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
                 ));
@@ -46,7 +41,7 @@ echo View::forge('nos::crud/tab', array(
                 </script>
                 <?php
             } else {
-                echo strtr($config['messages']['error added in lang'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
+                echo strtr($crud['config']['messages']['error added in lang'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
             }
         } else {
             foreach ($possible as $locale) {
@@ -57,7 +52,7 @@ echo View::forge('nos::crud/tab', array(
             }
             ?>
             <p><?=
-            strtr($config['messages']['item inexistent in lang yet'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)))
+            strtr($crud['config']['messages']['item inexistent in lang yet'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)))
             ?></p>
 
             <p>&nbsp;</p>
@@ -69,7 +64,7 @@ echo View::forge('nos::crud/tab', array(
             <ul style="margin-left:1em;">
                 <li>
                     <span style="display:inline-block; width:2em;"></span>
-                    <form action="<?= $url_form ?>" style="display:inline-block;">
+                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
                         <?= Form::hidden('lang', $lang) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
                         <button type="submit" class="primary" data-icon="plus"><?= __('Start from scratch ') ?></button>
@@ -78,7 +73,7 @@ echo View::forge('nos::crud/tab', array(
                 </li>
                 <li>
                     <span class="faded" style="display:inline-block; width:2em;"><?= __('OR') ?></span>
-                    <form action="<?= $url_form ?>" style="display:inline-block;">
+                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
                         <?= Form::hidden('lang', $lang) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
                         <?php
