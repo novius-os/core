@@ -32,11 +32,11 @@ return array(
                 'static/novius-os/admin/config/media/media.js'
             ),
         ),
-        'wide' => array(
-            'name' => __('Wide view'),
+        'flick_through' => array(
+            'name' => __('Flick through view'),
             'json' => array(
                 'static/novius-os/admin/config/media/common.js',
-                'static/novius-os/admin/config/media/wide.js'
+                'static/novius-os/admin/config/media/flick_through.js'
             ),
         ),
         'image_pick' => array(
