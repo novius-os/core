@@ -51,7 +51,7 @@ class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk
             $this->send_error($e);
         }
         \Response::json(array(
-            'notify' => 'Cache has been renewed.',
+            'notify' => __('Cache has been renewed.'),
         ));
     }
 

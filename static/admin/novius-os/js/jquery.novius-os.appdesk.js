@@ -43,7 +43,8 @@ define('jquery-nos-appdesk',
                     viewGrid : 'Grid',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
-                    loading : 'Loading...'
+                    loading : 'Loading...',
+                    languages: 'Languages'
                 },
                 values: {},
                 //callbabks
@@ -1272,6 +1273,7 @@ define('jquery-nos-appdesk',
 
             appdeskSetup : function(config) {
                 var configToUse = $.extend({}, true, config);
+                var i18n = config.i18n || {};
 
                 var self = {},
                     objectToArray = function(val, i) {
@@ -1319,7 +1321,7 @@ define('jquery-nos-appdesk',
                                             continue;
                                         }
                                         object[key][i] = {
-                                            headerText : 'Languages',
+                                            headerText : i18n.languages || 'Languages',
                                             dataKey    : 'lang',
                                             setupkey   : 'lang',
                                             showFilter : false,
@@ -1717,7 +1719,7 @@ define('jquery-nos-appdesk',
                             allowPaging : true,
                             columns : [
                                 {
-                                    headerText : 'Actions',
+                                    headerText : '',
                                     cellFormatter : function(args) {
                                         if ($.isPlainObject(args.row.data)) {
 

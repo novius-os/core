@@ -10,8 +10,6 @@
 
 use Nos\I18n;
 
-I18n::load('page', 'nos_page');
-
 $dataset = array(
     'id' => 'page_id',
     'title' => 'page_title',
@@ -92,9 +90,11 @@ return array(
         'showAll' => __('Show all pages'),
         'views' => __('Views'),
         'viewGrid' => __('Grid'),
+        'viewTreeGrid' => __('Tree grid'),
         'viewThumbnails' => __('Thumbnails'),
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
+        'languages' => __('Languages'),
     ),
     'dataset' => $dataset,
     'appdesk' => array(
