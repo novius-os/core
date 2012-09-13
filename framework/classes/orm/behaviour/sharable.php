@@ -80,6 +80,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
         \Config::load(APPPATH.'metadata'.DS.'data_catchers.php', 'data::data_catchers');
         $data_catchers = \Config::get('data::data_catchers', array());
         $catchers = array();
+        $default_nugget = $this->get_default_nuggets($item);
         foreach ($data_catchers as $id => $config) {
             if (isset($config['specified_models']) &&
                 ((is_bool($config['specified_models']) && $config['specified_models'] === true))
@@ -89,8 +90,9 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             if (!is_array($config['required_data'])) {
                 $config['required_data'] = array();
             }
+            // Don't add catchers if required data is missing
             foreach ($config['required_data'] as $type_data) {
-                if (!isset($this->_properties['data'][$type_data])) {
+                if (!isset($this->_properties['data'][$type_data]) && empty($default_nugget[$type_data])) {
                     break 2;
                 }
             }

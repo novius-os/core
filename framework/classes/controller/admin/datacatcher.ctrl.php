@@ -40,7 +40,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
             }
 
             \Response::json(array(
-                'notify' => __('Operation completed successfully.'),
+                'notify' => __('Shared data successfully saved.'),
                 'applications' => (string) \View::forge('nos::admin/data_catcher/applications', array(
                     'data_catchers' => $data_catchers,
                     'item' => $item,
@@ -153,7 +153,13 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
         $nugget = $item->get_catcher_nuggets($catcher_name);
 
         $data = array();
-        $sharable_properties = $item->get_sharable_property();
+        // Save all properties
+        $sharable_properties = array(
+            DataCatcher::TYPE_TITLE => true,
+            DataCatcher::TYPE_URL => true,
+            DataCatcher::TYPE_IMAGE => true,
+            DataCatcher::TYPE_TEXT => true,
+        );
         if (!empty($params['filter'])) {
             $sharable_properties = array_intersect_key($sharable_properties, array_flip($params['filter']));
         }

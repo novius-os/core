@@ -54,13 +54,13 @@
             {
                 $template = $field->fieldset->form()->get_config('field_template');
             }
-            // Actually, field_name is an number
             $field_name = $field->name;
             $id = uniqid('for_');
-            if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)) && array_key_exists($field_name, $nugget))
+            $sharable_property = $item->get_sharable_property($field_name);
+            // Don't show 'Use default' if the property has no default (= $sharable_property is empty)
+            if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)) && array_key_exists($field_name, $nugget) && !empty($sharable_property))
             {
-                $useTitle = $item->get_sharable_property($field_name.'.useTitle');
-                $label = empty($useTitle) ? __('Use default') : $useTitle;
+                $label = \Arr::get($sharable_property, 'useTitle', __('Use default'));
                 $checked = '';
                 if (!isset($nugget_db[$field_name]))
                 {
@@ -78,7 +78,7 @@
             if ($field->name == \Nos\DataCatcher::TYPE_IMAGE)
             {
                 $field->set_template('{field}');
-                $options = $item->get_sharable_property($field_name.'.options');
+                $options = $item->get_sharable_property($field_name.'.options', array());
                 foreach ($options as $media_id => $idk)
                 {
                     $media = \Nos\Model_Media::find($media_id);
