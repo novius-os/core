@@ -13,17 +13,13 @@
     $fieldset = \Fieldset::forge(uniqid());
     $fieldset->add('model_id', '', array('value' => $item->id, 'type' => 'hidden'));
     $fieldset->add('model_name', '', array('value' => get_class($item), 'type' => 'hidden'));
-    $fieldset->add('catcher_name', '', array('value' => $catcher_name, 'type' => 'hidden'));
+    $fieldset->add('catcher_name', '', array('value' => \Nos\Model_Content_Nuggets::DEFAULT_CATCHER, 'type' => 'hidden'));
     $fields = array();
-    $data_catcher = \Arr::get($item->data_catchers(), $catcher_name, array());
-    $filter = empty($filter) ? array_merge(\Arr::get($data_catcher, 'required_data', array()), \Arr::get($data_catcher, 'optional_data', array())) : array();
-    $filter = array_flip($filter);
-    if (array_key_exists(\Nos\DataCatcher::TYPE_TITLE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE]))
-    {
-        $fields[] = \Nos\DataCatcher::TYPE_TITLE;
-        $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Title:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TITLE, '')));
-    }
-    if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_URL]))
+
+    $fields[] = \Nos\DataCatcher::TYPE_TITLE;
+    $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Title:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TITLE, '')));
+
+    if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget))
     {
         $fields[] = \Nos\DataCatcher::TYPE_URL;
         $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('URL:'), array(
@@ -32,21 +28,17 @@
             'value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_URL, ''),
         ));
     }
-    if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_IMAGE]))
-    {
-        $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
-        $options = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
-        $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
-        $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
-            'type' => 'radio',
-            'value' => in_array($value, $options) ? $value : 0,
-        ));
-    }
-    if (array_key_exists(\Nos\DataCatcher::TYPE_TEXT, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TEXT]))
-    {
-        $fields[] = \Nos\DataCatcher::TYPE_TEXT;
-        $fieldset->add(\Nos\DataCatcher::TYPE_TEXT, __('Description:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TEXT, ''), 'type' => 'textarea'));
-    }
+
+    $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
+    $options = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
+    $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
+    $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
+        'type' => 'radio',
+        'value' => in_array($value, $options) ? $value : 0,
+    ));
+
+    $fields[] = \Nos\DataCatcher::TYPE_TEXT;
+    $fieldset->add(\Nos\DataCatcher::TYPE_TEXT, __('Description:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TEXT, ''), 'type' => 'textarea'));
 ?>
 <div id="<?= $id ?>">
 <?php
@@ -56,7 +48,7 @@
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
         'fields' => $fields,
-        'callback' => function($field) use ($item, $nugget_db) {
+        'callback' => function($field) use ($item, $nugget_db, $nugget) {
             $template = $field->template;
             if (empty($template))
             {
@@ -65,7 +57,7 @@
             // Actually, field_name is an number
             $field_name = $field->name;
             $id = uniqid('for_');
-            if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)))
+            if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)) && array_key_exists($field_name, $nugget))
             {
                 $useTitle = $item->get_sharable_property($field_name.'.useTitle');
                 $label = empty($useTitle) ? __('Use default') : $useTitle;

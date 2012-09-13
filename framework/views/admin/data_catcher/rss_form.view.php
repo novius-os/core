@@ -16,7 +16,7 @@
     $fieldset->add('catcher_name', '', array('value' => $catcher_name, 'type' => 'hidden'));
     $fields = array();
     $data_catcher = \Arr::get($item->data_catchers(), $catcher_name, array());
-    $filter = empty($filter) ? array_merge(\Arr::get($data_catcher, 'required_data', array()), \Arr::get($data_catcher, 'optional_data', array())) : array();
+    $filter = array_merge(\Arr::get($data_catcher, 'required_data', array()), \Arr::get($data_catcher, 'optional_data', array()));
     $filter = array_flip($filter);
     if (array_key_exists(\Nos\DataCatcher::TYPE_TITLE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TITLE]))
     {
@@ -56,7 +56,7 @@
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
         'fields' => $fields,
-        'callback' => function($field) use ($item, $nugget_db, $nugget_default) {
+        'callback' => function($field) use ($item, $nugget_db) {
             $template = $field->template;
             if (empty($template))
             {
@@ -65,20 +65,14 @@
             // Actually, field_name is an number
             $field_name = $field->name;
             $id = uniqid('for_');
-            if (isset($nugget_default[$field_name]))
+
+            $checked = '';
+            if (!isset($nugget_db[$field_name]))
             {
-                $checked = '';
-                if (!isset($nugget_db[$field_name]))
-                {
-                    $checked = 'checked';
-                    $field->set_attribute('disabled', true);
-                }
-                $template = str_replace('{default}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.__('Use default settings').'</label>', $template);
+                $checked = 'checked';
+                $field->set_attribute('disabled', true);
             }
-            else
-            {
-                $template = str_replace('{default}', '', $template);
-            }
+            $template = str_replace('{default}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.__('Use default settings').'</label>', $template);
 
             // Image field displays a bit differently: radio button with several options
             if ($field->name == \Nos\DataCatcher::TYPE_IMAGE)
