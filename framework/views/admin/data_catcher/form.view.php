@@ -35,11 +35,11 @@
     if (array_key_exists(\Nos\DataCatcher::TYPE_IMAGE, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_IMAGE]))
     {
         $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
-        $possible = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.possible'));
+        $options = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
         $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
         $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
             'type' => 'radio',
-            'value' => in_array($value, $possible) ? $value : 0,
+            'value' => in_array($value, $options) ? $value : 0,
         ));
     }
     if (array_key_exists(\Nos\DataCatcher::TYPE_TEXT, $nugget) && empty($filter) || isset($filter[\Nos\DataCatcher::TYPE_TEXT]))
@@ -86,8 +86,8 @@
             if ($field->name == \Nos\DataCatcher::TYPE_IMAGE)
             {
                 $field->set_template('{field}');
-                $possibles = $item->get_sharable_property($field_name.'.possibles');
-                foreach ($possibles as $media_id => $idk)
+                $options = $item->get_sharable_property($field_name.'.options');
+                foreach ($options as $media_id => $idk)
                 {
                     $media = \Nos\Model_Media::find($media_id);
                     $field->set_options(array(
@@ -98,7 +98,7 @@
                 $field->set_options(array(
                     0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(array(
                         'name' => 'custom_image',
-                        'value' => isset($possibles[$value]) ? 0 : $value,
+                        'value' => isset($options[$value]) ? 0 : $value,
                         'widget_options' => array(
                             'inputFileThumb' => array(
                                 'title' => __('Pick a custom image'),
