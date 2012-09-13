@@ -15,7 +15,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     /**
      * lang_property
      * common_id_property
-     * single_id_property
+     * is_main_property
      * invariant_fields
      * default_lang
      */
@@ -48,17 +48,17 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     public function after_insert(\Nos\Orm\Model $item)
     {
         $common_id_property = $this->_properties['common_id_property'];
-        $single_id_property = $this->_properties['single_id_property'];
+        $is_main_property = $this->_properties['is_main_property'];
 
         // It's a new main language
         if ($item->get($common_id_property) == 0) {
             // __get() magic method will retrieve $_primary_key[0]
             $item->set($common_id_property, $item->id);
-            $item->set($single_id_property, $item->id);
+            $item->set($is_main_property, true);
 
             $update = \DB::update($item->table())->set(array(
                 $common_id_property => $item->id,
-                $single_id_property => $item->id,
+                $is_main_property => true,
             ));
             foreach ($item->primary_key() as $pk) {
                 $update->where($pk, $item->get($pk));
@@ -66,7 +66,6 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
             $update->execute();
 
             // Database were updated using DB directly, because save() triggers all the observers, and we don't need that
-            // $item->update() would be better here, because save() triggers all the observers, and we don't need that
             // $item->save();
         }
     }
@@ -85,8 +84,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
 
         // No main language found => we just created a new main item :)
         if (empty($obj_main)) {
-            $single_property = $this->_properties['single_id_property'];
-            $item->set($single_property, $item->id);
+            $item->set($this->_properties['is_main_property'], true);
         } else {
             // The main language exists => update the common properties
             foreach ($this->_properties['invariant_fields'] as $invariant) {
@@ -101,16 +99,13 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
             return;
         }
 
-        $common_property = $this->_properties['common_id_property'];
-        $single_property = $this->_properties['single_id_property'];
-
         $available_langs = $item->get_all_lang();
 
-        // Set the single_id property for one of the lang
+        // Set the is_main property for one of the lang
         foreach (\Config::get('locales') as $code => $name) {
             if (in_array($code, $available_langs)) {
                 $new_main_item = $this->find_lang($item, $code);
-                $new_main_item->set($single_property, $new_main_item->get($common_property));
+                $new_main_item->set($this->_properties['is_main_property'], true);
                 $new_main_item->save();
                 break;
             }
@@ -179,11 +174,10 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      */
     public function delete_all_lang($item)
     {
-        $single_id_property = $this->_properties['common_id_property'];
         foreach ($item->find_lang('all') as $item) {
             // This is to trick the is_main_lang() method
-            // This way, the 'after_delete' observer won't reassign single_id & common_id
-            $item->set($single_id_property, $item->id);
+            // This way, the 'after_delete' observer won't reassign is_main
+            $item->set($this->_properties['is_main_property'], false);
             $item->delete();
         }
     }
@@ -195,7 +189,8 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      */
     public function is_main_lang($item)
     {
-        return $item->get($this->_properties['single_id_property']) !== null;
+        // use !! for cast to boolean
+        return !!$item->get($this->_properties['is_main_property']);
     }
 
     /**
@@ -232,7 +227,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         return $item->find('first', array(
             'where' => array(
                 array($common_id_property, $common_id),
-                $lang === 'main' ? array($this->_properties['single_id_property'], $common_id) : array($this->_properties['lang_property'], $lang),
+                $lang === 'main' ? array($this->_properties['is_main_property'], true) : array($this->_properties['lang_property'], $lang),
             )));
     }
 
@@ -292,7 +287,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
      * Returns all available languages for the requested items
      *
      * @param  array $where
-     * @return array List of available languages for each single_id
+     * @return array List of available languages for each is_main
      */
     public function languages($where)
     {
@@ -331,9 +326,9 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
             foreach ($where as $k => $w) {
                 if ($w[0] == 'lang_main') {
                     if ($w[1] == true) {
-                        $where[$k] = array($this->_properties['single_id_property'], 'IS NOT', null);
+                        $where[$k] = array($this->_properties['is_main_property'], true);
                     } elseif ($w[1] == false) {
-                        $where[$k] = array($this->_properties['single_id_property'], 'IS', null);
+                        $where[$k] = array($this->_properties['is_main_property'], false);
                     }
                 }
                 if ($w[0] == 'lang') {

@@ -56,7 +56,7 @@ class Model_Page extends \Nos\Orm\Model
             'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'change_parent'),
             'lang_property'      => 'page_lang',
             'common_id_property' => 'page_lang_common_id',
-            'single_id_property' => 'page_lang_single_id',
+            'is_main_property' => 'page_lang_is_main',
             'invariant_fields'   => array(
                 //'page_parent_id', // Depends on the lang, cannot be updated automagically
                 //'page_template',
