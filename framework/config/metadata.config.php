@@ -31,6 +31,27 @@ return array(
             'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
             'application' => 'nos_user',
         ),
+        'nos_help' => array(
+            'name' => 'Help',
+            'url' => 'admin/nos/tray/help',
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+            'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
+            'application' => 'nos',
+        ),
+        'nos_account' => array(
+            'name' => 'Account',
+            'url' => 'admin/nos/tray/account',
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+            'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
+            'application' => 'nos',
+        ),
+        'nos_appmanager' => array(
+            'name' => 'Application manager',
+            'url' => 'admin/nos/tray/appmanager',
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+            'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
+            'application' => 'nos',
+        ),
     ),
     'data_catchers' => array(
         'rss_channel' => array(
