@@ -72,9 +72,14 @@ if (!MBSTRING) {
     'Nos\Tasks\Migrate' => FUEL_EXTEND_PATH.'tasks'.DIRECTORY_SEPARATOR.'migrate.php',
 ));
 
-function __($_message, $default = null)
+function __($message, $default = null)
 {
-    return \Nos\I18n::get($_message, $default);
+    return \Nos\I18n::get($message, $default);
+}
+
+function ___($group, $message, $default = null)
+{
+    return \Nos\I18n::gget($group, $message, $default);
 }
 
 // Register the autoloader

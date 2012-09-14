@@ -29,6 +29,46 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, $this->config);
+
+        $this->config['i18n'] = array(
+            'addDropDown' => $this->i18n('Select an action'),
+            'columns' => $this->i18n('Columns'),
+            'showFiltersColumns' => $this->i18n('Filters column header'),
+            'visibility' => $this->i18n('Visibility'),
+            'settings' => $this->i18n('Settings'),
+            'vertical' => $this->i18n('Vertical'),
+            'horizontal' => $this->i18n('Horizontal'),
+            'hidden' => $this->i18n('Hidden'),
+            'item' => $this->i18n('page'),
+            'items' => $this->i18n('pages'),
+            'showNbItems' => $this->i18n('Showing {{x}} pages out of {{y}}'),
+            'showOneItem' => $this->i18n('Show 1 page'),
+            'showNoItem' => $this->i18n('No page'),
+            'showAll' => $this->i18n('Show all pages'),
+            'views' => $this->i18n('Views'),
+            'viewGrid' => $this->i18n('Grid'),
+            'viewTreeGrid' => $this->i18n('Tree grid'),
+            'viewThumbnails' => $this->i18n('Thumbnails'),
+            'preview' => $this->i18n('Preview'),
+            'loading' => $this->i18n('Loading...'),
+            'languages' => $this->i18n('Languages'),
+            'search' => $this->i18n('Search'),
+        );
+
+        I18n::group('nos::admin/appdesk');
+    }
+
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        I18n::load('nos::admin/appdesk');
+        if (empty($this->config['i18n_file'])) {
+            $this->config['i18n_file'] = 'nos::admin/appdesk';
+        }
+    }
+
+    public function i18n($message) {
+        return ___($this->config['i18n_file'], $message, ___('nos::admin/appdesk', $message));
     }
 
     public function action_index($view = null)

@@ -14,32 +14,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 {
     protected $config = array(
         'model' => '',
-        'messages' => array(
-            'successfully added' => 'Item successfully added.',
-            'successfully saved' => 'Item successfully saved.',
-            'successfully deleted' => 'The item has successfully been deleted!',
-            'you are about to delete, confim' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?',
-            'you are about to delete' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>.',
-            'exists in multiple lang' => 'This item exists in <strong>{count} languages</strong>.',
-            'delete in the following languages' => 'Delete this item in the following languages:',
-            'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
-            'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
-            'confirm deletion, enter number' => 'To confirm the deletion, you need to enter this number in the field below',
-            'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
-            'item deleted' => 'This item has been deleted.',
-            'not found' => 'Item not found',
-            'error added in lang not parent' => 'This item cannot be added {lang} because its {parent} is not available in this language yet.',
-            'error added in lang' => 'This item cannot be added {lang}.',
-            'item inexistent in lang yet' => 'This item has not been added in {lang} yet.',
-            'visualise' => 'Visualise',
-            'delete' => 'Delete',
-            'delete an item' => 'Delete an item',
-            'confirm deletion ok' => 'Confirm the deletion',
-            'confirm deletion or' => 'or',
-            'confirm deletion cancel' => 'Cancel',
-            'confirm deletion wrong_confirmation' => 'Wrong confirmation',
-            'add an item in lang' => 'Add a new item in {lang}',
-        ),
         'context_relation' => null,
         'tab' => array(
             'iconUrl' => '',
@@ -75,6 +49,20 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         parent::before();
         $this->config_build();
+        I18n::group('nos::admin/crud');
+        if (empty($this->config['i18n_file'])) {
+            $this->config['i18n_file'] = 'nos::admin/crud';
+        }
+    }
+
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        I18n::load('nos::admin/crud');
+    }
+
+    public function i18n($message) {
+        return ___($this->config['i18n_file'], $message, ___('nos::admin/crud', $message));
     }
 
     protected function config_build()
@@ -116,6 +104,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function view_params()
     {
+        $self = $this;
         $view_params = array(
             'crud' => array(
                 'model' => $this->config['model'],
@@ -130,6 +119,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'tab_params' => $this->get_tab_params(),
             ),
             'item' => $this->item,
+            'i18n' => function($message) use ($self) {
+                return $self->i18n($message);
+            },
         );
         if ($this->behaviours['translatable']) {
             $view_params['crud']['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
@@ -248,7 +240,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fields = \Arr::merge($fields, array(
                 'save' => array(
                     'form' => array(
-                        'value' => __('Add'),
+                        'value' => static::i18n('Add'),
                     ),
                 ),
             ));
@@ -293,7 +285,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $return = array(
-            'notify' =>  $this->is_new ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
+            'notify' =>  $this->is_new ? $this->i18n('successfully added') : $this->i18n('successfully saved'),
             'closeDialog' => true,
             'dispatchEvent' => $dispatchEvent,
         );
@@ -311,7 +303,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $item_lang = $this->item->get_lang();
             $existing = $this->item->find_lang($item_lang);
             if (!empty($existing)) {
-                $message = strtr(__('This item already exists in {lang}. Therefore your item cannot be added.'), array(
+                $message = strtr(static::i18n('This item already exists in {lang}. Therefore your item cannot be added.'), array(
                     '{lang}' => \Arr::get(\Config::get('locales'), $item_lang, $item_lang),
                 ));
                 $this->send_error(new \Exception($message));
@@ -342,7 +334,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->is_new = $this->item->is_new();
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+            return $this->send_error(new \Exception($this->i18n('item deleted')));
         }
 
         if ($this->is_new || !$this->behaviours['translatable']) {
@@ -422,7 +414,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $url = $this->item->url_canonical(array('preview' => true));
                 if ($url !== null) {
                     $actions[] = array(
-                        'label' => $this->config['messages']['visualise'],
+                        'label' => $this->i18n('visualise'),
                         'iconClasses' => 'nos-icon16 nos-icon16-eye',
                         'action' => array(
                             'action' => 'window.open',
@@ -432,12 +424,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 }
             }
             $actions[] = array(
-                'label' => $this->config['messages']['delete'],
+                'label' => $this->i18n('Delete'),
                 'action' => array(
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                        'title' => $this->config['messages']['delete an item'],
+                        'title' => $this->i18n('delete an item'),
                     ),
                 ),
                 'icon' => 'trash',
@@ -451,7 +443,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if (!$this->is_new) {
             if ($this->behaviours['sharable']) {
                 $actions[] = array(
-                    'label' => __('Share'),
+                    'label' => $this->i18n('Share'),
                     'iconClasses' => 'nos-icon16 nos-icon16-share',
                     'action' => array(
                         'action' => 'share',
@@ -482,7 +474,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_lang = $this->item->find_lang($locale);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? $this->config['messages']['add an item in lang'] : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $label = empty($main_lang) ? $this->i18n('add an item in lang') : (empty($item_lang) ? static::i18n('Translate in {lang}') : static::i18n('Edit in {lang}'));
             $actions[$locale] = array(
                 'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
@@ -502,7 +494,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function check_permission($action)
     {
         if ($action === 'delete' && $this->item->is_new()) {
-            throw new \Exception($this->config['messages']['not found']);
+            throw new \Exception($this->i18n('not found'));
         }
     }
 
@@ -599,7 +591,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $this->response(array(
-            'notify' => $this->config['messages']['successfully deleted'],
+            'notify' => $this->i18n('successfully deleted'),
             'dispatchEvent' => $dispatchEvent,
         ));
     }

@@ -15,8 +15,8 @@ class Controller_Admin_Auth extends Controller
 
     public function before()
     {
-        parent::before();
-
+        // Exceptionally, we run the parent::before() after our own routine.
+        // Because our routine doesn't need anything from the parent, and we define the language, which may affect the parent too (config file).
         if (!\Nos\Auth::check()) {
             if (\Input::is_ajax()) {
                 $this->response(array(
@@ -29,5 +29,13 @@ class Controller_Admin_Auth extends Controller
                 exit();
             }
         }
+        $this->prepare_i18n();
+        parent::before();
+    }
+
+    public function prepare_i18n()
+    {
+        I18n::setLocale(\Session::get('lang', 'en_GB'));
+        I18n::load('nos::admin/global');
     }
 }

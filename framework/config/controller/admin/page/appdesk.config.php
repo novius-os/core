@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-use Nos\I18n;
+Nos\I18n::load('nos::admin/page/appdesk');
 
 $dataset = array(
     'id' => 'page_id',
@@ -73,29 +73,7 @@ return array(
             ),
         ),
     ),
-    'i18n' => array(
-        'addDropDown' => __('Select an action'),
-        'columns' => __('Columns'),
-        'showFiltersColumns' => __('Filters column header'),
-        'visibility' => __('Visibility'),
-        'settings' => __('Settings'),
-        'vertical' => __('Vertical'),
-        'horizontal' => __('Horizontal'),
-        'hidden' => __('Hidden'),
-        'item' => __('page'),
-        'items' => __('pages'),
-        'showNbItems' => __('Showing {{x}} pages out of {{y}}'),
-        'showOneItem' => __('Show 1 page'),
-        'showNoItem' => __('No page'),
-        'showAll' => __('Show all pages'),
-        'views' => __('Views'),
-        'viewGrid' => __('Grid'),
-        'viewTreeGrid' => __('Tree grid'),
-        'viewThumbnails' => __('Thumbnails'),
-        'preview' => __('Preview'),
-        'loading' => __('Loading...'),
-        'languages' => __('Languages'),
-    ),
+    'i18n_file' => 'nos::admin/page/appdesk',
     'dataset' => $dataset,
     'appdesk' => array(
         'tab' => array(
@@ -104,7 +82,7 @@ return array(
         ),
         'actions' => array(
             'edit' => array(
-                'label' => __('Edit'),
+                'label' => ___('nos::admin/appdesk', 'Edit'),
                 'name' => 'edit',
                 'primary' => true,
                 'icon' => 'pencil',
@@ -131,7 +109,7 @@ return array(
                 ),
             ),
             'delete' => array(
-                'label' => __('Delete'),
+                'label' => ___('nos::admin/appdesk', 'Delete'),
                 'name' => 'delete',
                 'primary' => false,
                 'icon' => 'trash',
@@ -144,7 +122,7 @@ return array(
                 ),
             ),
             'visualise' => array(
-                'label' => __('Visualise'),
+                'label' => ___('nos::admin/appdesk', 'Visualise'),
                 'name' => 'visualise',
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',

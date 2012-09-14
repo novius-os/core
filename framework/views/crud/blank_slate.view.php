@@ -27,7 +27,7 @@ echo View::forge('nos::crud/tab', $view_params, false);
             $parent = $item->get_parent();
             if (!empty($parent)) {
                 $uniqid_parent = uniqid('parent_');
-                echo strtr($crud['config']['messages']['error added in lang not parent'], array(
+                echo strtr($i18n('error added in lang not parent'), array(
                     '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
                     '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
                 ));
@@ -41,7 +41,7 @@ echo View::forge('nos::crud/tab', $view_params, false);
                 </script>
                 <?php
             } else {
-                echo strtr($crud['config']['messages']['error added in lang'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
+                echo strtr($i18n('error added in lang'), array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
             }
         } else {
             foreach ($possible as $locale) {
@@ -52,7 +52,7 @@ echo View::forge('nos::crud/tab', $view_params, false);
             }
             ?>
             <p><?=
-            strtr($crud['config']['messages']['item inexistent in lang yet'], array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)))
+            strtr($i18n('item inexistent in lang yet'), array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)))
             ?></p>
 
             <p>&nbsp;</p>

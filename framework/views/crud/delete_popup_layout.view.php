@@ -12,9 +12,9 @@ $id = $uniqid = uniqid('form_');
 <form class="fieldset standalone" id="<?= $id ?>">
 <?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
 <p>
-    <button type="submit" class="primary ui-state-error"><?= $crud['config']['messages']['confirm deletion ok'] ?></button>
-    <span><?= $crud['config']['messages']['confirm deletion or'] ?></span>
-    <a href="#"><?= $crud['config']['messages']['confirm deletion cancel'] ?></a>
+    <button type="submit" class="primary ui-state-error"><?= $i18n('confirm deletion ok') ?></button>
+    <span><?= $i18n('confirm deletion or') ?></span>
+    <a href="#"><?= $i18n('confirm deletion cancel') ?></a>
 </p>
 </form>
 <script type="text/javascript">
@@ -45,7 +45,7 @@ $id = $uniqid = uniqid('form_');
                         });
                         $form.nosDialog('close');
                     } else {
-                        $.nosNotify(<?= \Format::forge($crud['config']['messages']['confirm deletion wrong_confirmation'])->to_json() ?>, 'error');
+                        $.nosNotify(<?= \Format::forge($i18n('confirm deletion wrong_confirmation'))->to_json() ?>, 'error');
                     }
 
                 });

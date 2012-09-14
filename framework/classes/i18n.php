@@ -100,10 +100,19 @@ class I18n
         return static::gget(static::$_group, $_message, $default);
     }
 
+    public static function group($group)
+    {
+        static::$_group = $group;
+    }
+
     public static function gget($group, $_message, $default = null)
     {
         $result = isset(static::$_messages[static::$_locale][$group][$_message]) ? static::$_messages[static::$_locale][$group][$_message] : $default;
         $result = $result ? : $_message;
+
+        if ($debug = true && $result != $default) {
+            //$result = $group.'('.$result.')';
+        }
 
         return $result;
     }

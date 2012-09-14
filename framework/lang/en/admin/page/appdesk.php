@@ -9,5 +9,10 @@
  */
 
 return array(
-    'Pages' => 'Pages',
+    'item' => __('page'),
+    'items' => __('pages'),
+    'showNbItems' => __('Showing {{x}} pages out of {{y}}'),
+    'showOneItem' => __('Show 1 page'),
+    'showNoItem' => __('No page'),
+    'showAll' => __('Show all pages'),
 );

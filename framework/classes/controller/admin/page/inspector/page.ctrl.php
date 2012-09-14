@@ -33,7 +33,7 @@ class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltre
                     'id' => '0',
                     //'lang' => '',
                     //'publication_status' => '',
-                    'title' => __('Root'),
+                    'title' => ___('nos::admin/global', 'Root'),
                     'treeChilds' => $json['items'],
                 ),
             );

@@ -44,7 +44,8 @@ define('jquery-nos-appdesk',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
                     loading : 'Loading...',
-                    languages: 'Languages'
+                    languages: 'Languages',
+                    search: 'Search'
                 },
                 values: {},
                 //callbabks
@@ -114,7 +115,7 @@ define('jquery-nos-appdesk',
 
                 self.uiSearchIcon = $('<div></div>').addClass('nos-appdesk-search-icon ui-icon ui-icon-search')
                     .appendTo(self.uiInputContainer);
-                self.uiSearchInput = $('<input type="search" name="search" placeholder="Search" value="" />')
+                self.uiSearchInput = $('<input type="search" name="search" placeholder="' + o.texts['search'] + '" value="" />')
                     .addClass('nos-appdesk-search-input ui-helper-reset')
                     .appendTo(self.uiInputContainer);
                 self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
