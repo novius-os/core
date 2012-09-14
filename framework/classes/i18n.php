@@ -65,33 +65,31 @@ class I18n
 
     public static function load($file, $group = null)
     {
-        $languages = static::$fallback;
-        array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
+        $group = ($group === null) ? $file : $group;
+        static::$_group = $group;
 
         $_messages = array();
-        foreach ($languages as $lang) {
-            if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
-                foreach ($path as $p) {
-                    if (array_key_exists($p, static::$_loaded_files)) {
-                        break;
-                    }
-                    $_messages = \Arr::merge(\Fuel::load($p), $_messages);
-                }
-                static::$_loaded_files[$p] = true;
-                break;
-            }
-        }
+        if (empty(static::$_loaded_files[static::$_locale][$file])) {
 
-        if (count($_messages)) {
             if ( ! isset(static::$_messages[static::$_locale])) {
                 static::$_messages[static::$_locale] = array();
             }
-            $group = ($group === null) ? $file : $group;
-            static::$_group = $group;
-            if ( ! isset(static::$_messages[$group])) {
+
+            if ( ! isset(static::$_messages[static::$_locale][$group])) {
                 static::$_messages[static::$_locale][$group] = array();
             }
-            static::$_messages[static::$_locale][$group] = \Arr::merge($_messages, static::$_messages[static::$_locale][$group]);
+
+            $languages = static::$fallback;
+            array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
+
+            foreach ($languages as $lang) {
+                if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
+                    foreach ($path as $p) {
+                        static::$_messages[static::$_locale][$group] = \Arr::merge(static::$_messages[static::$_locale][$group], \Fuel::load($p));
+                    }
+                }
+            }
+            static::$_loaded_files[static::$_locale] = true;
         }
     }
 
@@ -105,15 +103,43 @@ class I18n
         static::$_group = $group;
     }
 
-    public static function gget($group, $_message, $default = null)
+    public static function gget($group, $message, $default = null)
     {
-        $result = isset(static::$_messages[static::$_locale][$group][$_message]) ? static::$_messages[static::$_locale][$group][$_message] : $default;
-        $result = $result ? : $_message;
+        $result = \Arr::get(static::$_messages, static::$_locale.'.'.$group.'.'.$message, false);
+
+        if (false === $result) {
+            $result = $default ?: $message;
+        }
 
         if ($debug = true && $result != $default) {
             //$result = $group.'('.$result.')';
         }
 
         return $result;
+    }
+
+    public static function dictionnary()
+    {
+        $groups = func_get_args();
+
+        foreach ($groups as $group) {
+            static::load($group);
+        }
+
+        $messages = static::$_messages[static::$_locale];
+
+        return function($message, $default = null) use ($groups, $messages) {
+            foreach ($groups as $group) {
+                $result = \Arr::get($messages, $group.'.'.$message, false);
+
+                if (false !== $result) {
+                    break;
+                }
+            }
+            if (false === $result) {
+                $result = $default ?: $message;
+            }
+            return $result;
+        };
     }
 }
