@@ -38,12 +38,26 @@ $uniqid = uniqid('id_');
         <ul style="width: 15%;">
             <li><a href="#infos"><?= __('Your account') ?></a></li>
             <li><a href="#display"><?= __('Theme') ?></a></li>
+            <li><a href="#lang"><?= __('Language') ?></a></li>
         </ul>
         <div id="infos">
             <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
         </div>
         <div id="display">
             <?= $fieldset_display ?>
+        </div>
+        <div id="lang">
+            <?php
+            foreach (array('en_GB' => 'English', 'fr_FR' => 'Français') as $code => $text) {
+                ?>
+                <form action="admin/nos/tray/account/lang/<?= $code ?>">
+                    <button class="primary" data-icon-url="<?= Nos\Helper::flag_url($code) ?>"><?= strtr(__('Switch to {lang}'), array(
+                        '{lang}' => $text,
+                    )); ?></button>
+                </form>
+                <?php
+            }
+            ?>
         </div>
     </div>
 </div>
@@ -57,6 +71,7 @@ $uniqid = uniqid('id_');
         ],
         function($) {
             $(function() {
+                $('#lang').nosFormAjax();
                 var $container = $('#<?= $uniqid ?>');
                 $container.nosFormUI();
                 $('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {

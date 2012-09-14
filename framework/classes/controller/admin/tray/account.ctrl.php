@@ -41,6 +41,17 @@ class Controller_Admin_Tray_Account extends \Controller
         exit();
     }
 
+    public function action_lang($lang)
+    {
+        if (in_array($lang, array('en_GB', 'fr_FR'))) {
+            \Session::set('lang', $lang);
+            \Response::json(array(
+                'notify' => 'Language has been set to '.$lang.', please refresh to see changes.',
+            ));
+        }
+        $this->send_error('Invalid lang '.$lang);
+    }
+
     public static function fieldset_display($user)
     {
         $configuration = $user->getConfiguration();
