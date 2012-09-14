@@ -49,20 +49,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         parent::before();
         $this->config_build();
-        I18n::group('nos::admin/crud');
-        if (empty($this->config['i18n_file'])) {
-            $this->config['i18n_file'] = 'nos::admin/crud';
-        }
     }
 
     public function prepare_i18n()
     {
         parent::prepare_i18n();
-        I18n::load('nos::admin/crud');
+        if (!empty($this->config['i18n_file'])) {
+            $this->dictionnary = I18n::dictionnary($this->config['i18n_file'], 'nos::admin/crud', 'nos::admin/global');
+        } else {
+            $this->dictionnary = I18n::dictionnary('nos::admin/crud', 'nos::admin/global');
+        }
     }
 
-    public function i18n($message) {
-        return ___($this->config['i18n_file'], $message, ___('nos::admin/crud', $message));
+    public function i18n($message, $default = null)
+    {
+        return call_user_func($this->dictionnary, $message, $default);
     }
 
     protected function config_build()

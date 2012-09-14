@@ -14,7 +14,7 @@ foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
     $templates[$tpl_key] = $template['title'];
 }
 
-Nos\I18n::load('nos::admin/page/page');
+$i18n = Nos\I18n::dictionnary('nos::admin/page/page', 'nos::admin/crud');
 
 return array(
     'controller_url'  => 'admin/nos/page/page',
@@ -24,16 +24,16 @@ return array(
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
         'labels' => array(
-            'insert' => __('Add a page'),
-            'blankSlate' => __('Translate a page'),
+            'insert' => $i18n('Add a page'),
+            'blankSlate' => $i18n('Translate a page'),
         ),
     ),
     'actions' => array(
-        'visualise' => function($item) {
+        'visualise' => function($item) use($i18n) {
             if (!$item->is_new())
             {
                 return array(
-                    'label' => ___('nos::admin/crud', 'Visualise'),
+                    'label' => $i18n('Visualise'),
                     'iconClasses' => 'nos-icon16 nos-icon16-eye',
                     'action' => array(
                         'action' => 'window.open',
@@ -60,7 +60,7 @@ return array(
                     'content' => array(
                         'view' => 'nos::form/expander',
                         'params' => array(
-                            'title'   => __('Content'),
+                            'title'   => $i18n('Content'),
                             'nomargin' => true,
                             'options' => array(
                                 'allowExpand' => false,
@@ -90,19 +90,19 @@ return array(
                         'params' => array(
                             'accordions' => array(
                                 'menu' => array(
-                                    'title' => __('Menu'),
+                                    'title' => $i18n('Menu'),
                                     'fields' => array('page_parent_id', 'page_menu', 'page_menu_title'),
                                 ),
                                 'url' => array(
-                                    'title' => __('URL (page address)'),
+                                    'title' => $i18n('URL (page address)'),
                                     'fields' => array('page_virtual_name'),
                                 ),
                                 'seo' => array(
-                                    'title' => __('SEO'),
+                                    'title' => $i18n('SEO'),
                                     'fields' => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
                                 ),
                                 'admin' => array(
-                                    'title' => __('Admin'),
+                                    'title' => $i18n('Admin'),
                                     'header_class'  => 'faded',
                                     'content_class' => 'faded',
                                     'fields'        => array('page_cache_duration', 'page_lock'),
@@ -119,13 +119,13 @@ return array(
     ),
     'fields' => array(
         'page_id' => array (
-            'label' => __('ID: '),
+            'label' => $i18n('ID: '),
             'form' => array(
                 'type' => 'hidden',
             ),
         ),
         'page_title' => array(
-            'label' => __('Title'),
+            'label' => $i18n('Title'),
             'form' => array(
                 'type' => 'text',
             ),
@@ -140,19 +140,19 @@ return array(
                 'width' => '250px',
                 'height' => '250px',
             ),
-            'label' => __('Location: '),
+            'label' => $i18n('Location: '),
             'form' => array(
             ),
         ),
         'page_template' => array(
-            'label' => __('Template: '),
+            'label' => $i18n('Template: '),
             'form' => array(
                 'type' => 'select',
                 'options' => $templates,
             ),
         ),
         'page_virtual_name' => array(
-            'label' => __('URL: '),
+            'label' => $i18n('URL: '),
             'widget' => 'Nos\Widget_Virtualname',
             'validation' => array(
                 'required',
@@ -160,27 +160,27 @@ return array(
             ),
         ),
         'page_meta_title' => array(
-            'label' => __('SEO title: '),
+            'label' => $i18n('SEO title: '),
             'form' => array(
                 'type' => 'text',
             ),
         ),
         'page_meta_description' => array(
-            'label' => __('Description: '),
+            'label' => $i18n('Description: '),
             'form' => array(
                 'type' => 'textarea',
                 'rows' => 6,
             ),
         ),
         'page_meta_keywords' => array(
-            'label' => __('Keywords: '),
+            'label' => $i18n('Keywords: '),
             'form' => array(
                 'type' => 'textarea',
                 'rows' => 3,
             ),
         ),
         'page_meta_noindex' => array(
-            'label' => __("Don't index on search engines"),
+            'label' => $i18n("Don't index on search engines"),
             'form' => array(
                 'type' => 'checkbox',
                 'value' => '1',
@@ -188,7 +188,7 @@ return array(
             ),
         ),
         'page_menu' => array(
-            'label' => __("Shows in the menu"),
+            'label' => $i18n("Shows in the menu"),
             'form' => array(
                 'type' => 'checkbox',
                 'value' => '1',
@@ -196,53 +196,53 @@ return array(
             ),
         ),
         'page_menu_title' => array(
-            'label' => __('What\'s the page called in the menu: '),
+            'label' => $i18n('What\'s the page called in the menu: '),
             'form' => array(
                 'type' => 'text',
             ),
         ),
         'page_external_link' => array(
-            'label' => __('URL: '),
+            'label' => $i18n('URL: '),
             'form' => array(
                 'type' => 'text',
             ),
         ),
         'page_external_link_type' => array(
-            'label' => __('Target: '),
+            'label' => $i18n('Target: '),
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::EXTERNAL_TARGET_NEW   => __('New window'),
-                    Nos\Model_Page::EXTERNAL_TARGET_POPUP => __('Popup'),
-                    Nos\Model_Page::EXTERNAL_TARGET_SAME  => __('Same window'),
+                    Nos\Model_Page::EXTERNAL_TARGET_NEW   => $i18n('New window'),
+                    Nos\Model_Page::EXTERNAL_TARGET_POPUP => $i18n('Popup'),
+                    Nos\Model_Page::EXTERNAL_TARGET_SAME  => $i18n('Same window'),
                 ),
             ),
         ),
         'page_type' => array(
-            'label' => __('Type: '),
+            'label' => $i18n('Type: '),
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::TYPE_CLASSIC => __('Page'),
-                    /*Nos\Model_Page::TYPE_FOLDER => __('Folder / Chapter'),
-                 Nos\Model_Page::TYPE_INTERNAL_LINK => __('Internal link'),*/
-                    Nos\Model_Page::TYPE_EXTERNAL_LINK => __('External link'),
+                    Nos\Model_Page::TYPE_CLASSIC => $i18n('Page'),
+                    //Nos\Model_Page::TYPE_FOLDER => $i18n('Folder / Chapter'),
+                    //Nos\Model_Page::TYPE_INTERNAL_LINK => $i18n('Internal link'),
+                    Nos\Model_Page::TYPE_EXTERNAL_LINK => $i18n('External link'),
                 ),
             ),
         ),
         'page_lock' => array(
-            'label' => __('Lock status: '),
+            'label' => $i18n('Lock status: '),
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::LOCK_UNLOCKED => __('Unlocked'),
-                    Nos\Model_Page::LOCK_DELETION => __('Deletion'),
-                    Nos\Model_Page::LOCK_EDITION  => __('Modification'),
+                    Nos\Model_Page::LOCK_UNLOCKED => $i18n('Unlocked'),
+                    Nos\Model_Page::LOCK_DELETION => $i18n('Deletion'),
+                    Nos\Model_Page::LOCK_EDITION  => $i18n('Modification'),
                 ),
             ),
         ),
         'page_cache_duration' => array(
-            'label' => __('Regenerate every {duration} seconds'),
+            'label' => $i18n('Regenerate every {duration} seconds'),
             'form' => array(
                 'type' => 'text',
                 'size' => 4,
@@ -253,7 +253,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
-                'value' => ___('nos::admin/crud', 'Save'),
+                'value' => $i18n('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',
             ),

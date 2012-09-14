@@ -54,21 +54,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             'languages' => $this->i18n('Languages'),
             'search' => $this->i18n('Search'),
         );
-
-        I18n::group('nos::admin/appdesk');
     }
 
     public function prepare_i18n()
     {
         parent::prepare_i18n();
-        I18n::load('nos::admin/appdesk');
-        if (empty($this->config['i18n_file'])) {
-            $this->config['i18n_file'] = 'nos::admin/appdesk';
+        if (!empty($this->config['i18n_file'])) {
+            $this->dictionnary = I18n::dictionnary($this->config['i18n_file'], 'nos::admin/appdesk', 'nos::admin/global');
+        } else {
+            $this->dictionnary = I18n::dictionnary('nos::admin/appdesk', 'nos::admin/global');
         }
     }
 
-    public function i18n($message) {
-        return ___($this->config['i18n_file'], $message, ___('nos::admin/appdesk', $message));
+    public function i18n($message, $default = null)
+    {
+        return call_user_func($this->dictionnary, $message, $default);
     }
 
     public function action_index($view = null)

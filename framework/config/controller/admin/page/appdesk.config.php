@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-Nos\I18n::load('nos::admin/page/appdesk');
+$i18n = Nos\I18n::dictionnary('nos::admin/page/appdesk', 'nos::admin/appdesk');
 
 $dataset = array(
     'id' => 'page_id',
@@ -61,11 +61,11 @@ return array(
     'selectedView' => 'default',
     'views' => array(
         'default' => array(
-            'name' => __('Default view'),
+            'name' => $i18n('Default view'),
             'json' => array('static/novius-os/admin/config/page/page.js'),
         ),
         'link_pick' => array(
-            'name' => __('Link'),
+            'name' => $i18n('Link'),
             'virtual' => true,
             'json' => array(
                 'static/novius-os/admin/config/page/page.js',
@@ -77,12 +77,12 @@ return array(
     'dataset' => $dataset,
     'appdesk' => array(
         'tab' => array(
-            'label' => __('Pages'),
+            'label' => $i18n('Pages'),
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
         ),
         'actions' => array(
             'edit' => array(
-                'label' => ___('nos::admin/appdesk', 'Edit'),
+                'label' => $i18n('Edit'),
                 'name' => 'edit',
                 'primary' => true,
                 'icon' => 'pencil',
@@ -97,19 +97,19 @@ return array(
             ),
             'add_subpage' => array(
                 'name' => 'add_page',
-                'label' => __('Add a sub-page to this page'),
+                'label' => $i18n('Add a sub-page to this page'),
                 'icon' => 'plus',
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
                         'url' => 'admin/nos/page/page/insert_update?context_id={{id}}',
-                        'label' => __('Add a page'),
+                        'label' => $i18n('Add a page'),
                         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
                     ),
                 ),
             ),
             'delete' => array(
-                'label' => ___('nos::admin/appdesk', 'Delete'),
+                'label' => $i18n('Delete'),
                 'name' => 'delete',
                 'primary' => false,
                 'icon' => 'trash',
@@ -117,12 +117,12 @@ return array(
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => 'admin/nos/page/page/delete/{{id}}',
-                        'title' => __('Delete a page')
+                        'title' => $i18n('Delete a page')
                     ),
                 ),
             ),
             'visualise' => array(
-                'label' => ___('nos::admin/appdesk', 'Visualise'),
+                'label' => $i18n('Visualise'),
                 'name' => 'visualise',
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
@@ -132,7 +132,7 @@ return array(
                 ),
             ),
             'set_homepage' => array(
-                'label' => __('Set as homepage'),
+                'label' => $i18n('Set as homepage'),
                 'name' => 'set_homepage',
                 'primary' => false,
                 'icon' => 'home',
@@ -152,19 +152,19 @@ return array(
         'appdesk' => array(
             'buttons' => array(
                 'page' => array(
-                    'label' => __('Add a page'),
+                    'label' => $i18n('Add a page'),
                     'action' => array(
                         'action' => 'nosTabs',
                         'method' => 'add',
                         'tab' => array(
                             'url' => 'admin/nos/page/page/insert_update?lang={{lang}}',
-                            'label' => __('Add a page'),
+                            'label' => $i18n('Add a page'),
                             'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
                         ),
                     ),
                 ),
                 'renew_cache' => array(
-                    'label' => __('Renew pages\' cache'),
+                    'label' => $i18n('Renew pages\' cache'),
                     'action' => array(
                         'action' => 'nosAjax',
                         'params' => array(
@@ -177,19 +177,19 @@ return array(
                 'urlJson' => 'admin/nos/page/appdesk/json',
                 'columns' => array(
                     'title' => array(
-                        'headerText' => __('Title'),
+                        'headerText' => $i18n('Title'),
                         'sortDirection' => 'ascending',
                     ),
                     'lang' => array(
                         'lang' => true
                     ),
                     'url' => array(
-                        'headerText' => __('Virtual url'),
+                        'headerText' => $i18n('Virtual url'),
                         'visible' => false,
                         'dataKey' => 'url'
                     ),
                     'published' => array(
-                        'headerText' => __('Status'),
+                        'headerText' => $i18n('Status'),
                         'dataKey' => 'publication_status',
                     ),
                     'actions' => array(
