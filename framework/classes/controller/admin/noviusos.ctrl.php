@@ -51,33 +51,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             'label' => 'Novius OS',
         );
 
-        /*
-        $trayTabs = array(
-            array(
-                'url' => 'admin/nos/tray/help',
-                'iconClasses' => 'nos-icon24 nos-icon24-help',
-                'label' => __('Help'),
-                'iconSize' => 24,
-            ),
-            array(
-                'url' => 'admin/nos/tray/account',
-                'iconClasses' => 'nos-icon24 nos-icon24-account',
-                'label' => __('Account'),
-                'iconSize' => 24,
-            ),
-        );
-        if ($user->check_permission('nos_tray', 'access')) {
-            array_unshift($trayTabs, array(
-                'url' => 'admin/nos/tray/appmanager',
-                'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
-                'label' => __('Applications manager'),
-                'iconSize' => 24,
-            ));
-        }
-        /*/
-        //$trayTabs = array();
-        //$count_trayTabs = count($trayTabs);
-
         if (!empty($deep_linking_url)) {
             if (!isset($user_configuration['tabs'])) {
                 $user_configuration['tabs']  = array();
@@ -89,8 +62,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             $found = false;
 
             // Native = OS + tray
-            $nativeTabs = array();
-            array_unshift($nativeTabs, $osTabs);
+            $nativeTabs = array($osTabs);
 
             // Search native tabs
             foreach ($nativeTabs as $i => $tab) {
