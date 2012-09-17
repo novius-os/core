@@ -148,6 +148,31 @@ body {
 		ul.nos-ostabs-tray {
 			right : 0px;
 			top : 0px;
+            font-size: 0.8em;
+            color: white;
+
+            .button {
+                overflow: hidden;
+                margin-top: 2px;
+                vertical-align: 8px;
+                display: inline-block;
+            }
+
+            .wijmo-wijmenu {
+                cursor: default;
+                display: inline-block;
+                size: 1em;
+                .wijmo-wijmenu-link {
+                    font-size: 15px;
+                    height: 30px;
+                    margin-top: -17px;
+                    line-height: 30px;
+
+                    .ui-icon {
+                        margin-top: 7px;
+                    }
+                }
+            }
 		}
 
 		div.nos-ostabs-tabs {
