@@ -14,5 +14,5 @@ before_script:
   - phpenv rehash
 
 script:
-  - phpcs -p -s --standard=ci/phpcs/ruleset.xml --report-gitblame framework/
+  - phpcs -p -s --standard=ci/phpcs/ruleset.xml framework/
 
