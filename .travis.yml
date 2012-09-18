@@ -12,7 +12,7 @@ before_install:
 before_script:
   - pyrus install pear/PHP_CodeSniffer
   - phpenv rehash
-  - sudo cd /usr/share/php/PHP/CodeSniffer/Standards
+  - cd /usr/share/php/PHP/CodeSniffer/Standards
   - sudo git clone https://github.com/klaussilveira/phpcs-psr PSR
 
 script:
