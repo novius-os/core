@@ -28,7 +28,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         parent::before();
 
         list($application, $file_name) = \Config::configFile(get_called_class());
-        $this->config = \Config::mergeWithUser($application.'::'.$file_name, $this->config);
+        $this->config = static::process_config(\Config::mergeWithUser($application.'::'.$file_name, $this->config));
     }
 
     public function action_index($view = null)
@@ -51,6 +51,10 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $view->set('appdesk', \Format::forge(array_merge(array('locales' => $locales), $this->config))->to_json(), false);
 
         return $view;
+    }
+
+    public static function process_config($config) {
+        return $config;
     }
 
     public function action_json()
