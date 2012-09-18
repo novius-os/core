@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-ostabs',
-    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel'],
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'wijmo.wijmenu'],
     function( $ ) {
         "use strict";
         var undefined = void(0);
@@ -151,7 +151,7 @@ define('jquery-nos-ostabs',
                     }
                     self.uiOstabsTray.prependTo(self.uiOstabsHeader);
 
-                    $(self.uiOstabsTray).nosFormUI();
+                    self.uiOstabsTray.find("#menu").wijmenu();
 
                     if ( $.isPlainObject(o.appsTab) ) {
                         self.uiOstabsAppsTab = $( '<ul></ul>' )
@@ -267,7 +267,8 @@ define('jquery-nos-ostabs',
 
                     self.tabsWidth = self.uiOstabsSuperPanelContent.width();
                     self.labelWidth = o.labelMaxWidth;
-                    self.uiOstabsTabs.width( self.tabsWidth );
+                    //self.uiOstabsTabs.width( self.tabsWidth );
+                    console.log(self.uiOstabsSuperPanelContent, self.uiOstabsTabs, self.tabsWidth, self.uiOstabsTabs.width());
                 }
 
                 var tabOpenRank = [];

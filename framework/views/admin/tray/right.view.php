@@ -9,12 +9,3 @@
         </ul>
     </li>
 </ul>
-<script type="text/javascript">
-    require(
-        ['jquery-nos', 'wijmo.wijmenu'],
-        function( $ ) {
-            $(function() {
-                $("#menu").wijmenu();
-            });
-        });
-</script>

@@ -151,6 +151,7 @@ body {
             font-size: 0.8em;
             color: white;
             z-index: 3;
+            padding-left: 36px;
 
             .button {
                 overflow: hidden;
@@ -188,6 +189,7 @@ body {
 			position : absolute;
 			top : 0px;
 			height : 46px;
+            z-index: 4;
 
 			.wijmo-wijsuperpanel-statecontainer {
 				overflow: visible;
