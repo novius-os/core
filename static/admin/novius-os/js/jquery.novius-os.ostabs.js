@@ -267,8 +267,7 @@ define('jquery-nos-ostabs',
 
                     self.tabsWidth = self.uiOstabsSuperPanelContent.width();
                     self.labelWidth = o.labelMaxWidth;
-                    //self.uiOstabsTabs.width( self.tabsWidth );
-                    console.log(self.uiOstabsSuperPanelContent, self.uiOstabsTabs, self.tabsWidth, self.uiOstabsTabs.width());
+                    self.uiOstabsTabs.width( self.tabsWidth );
                 }
 
                 var tabOpenRank = [];
