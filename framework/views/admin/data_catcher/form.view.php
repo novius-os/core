@@ -30,7 +30,7 @@
     }
 
     $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
-    $options = array_keys($item->possible_medias(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
+    $options = array_keys($item->get_sharable_property(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
     $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
     $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
         'type' => 'radio',
