@@ -8,6 +8,17 @@
  * @link http://www.novius-os.org
  */
 
+    if (isset($nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
+        $nuggets['media_url'] = Uri::base(false).\Nos\Model_Media::find($nuggets[\Nos\DataCatcher::TYPE_IMAGE])->get_public_path();
+    }
+    if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
+        list($page_id, $path) = preg_split("/\:\:/", $nuggets[\Nos\DataCatcher::TYPE_URL]);
+        if (!empty($path)) {
+            $page_path = preg_replace('`'.preg_quote('.html').'$`iUu', '', \Nos\Model_Page::find($page_id)->get_href(array('absolute' => true)));
+            $nuggets['absolute_url'] = rtrim($page_path, '/').'/'.$path;
+        }
+    }
+
     $onDemande = false;
     $auto = false;
     $one = false;
