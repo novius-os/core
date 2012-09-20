@@ -65,6 +65,7 @@ if (!MBSTRING) {
     'Response'          => FUEL_EXTEND_PATH.'response.php',
     'Session'           => FUEL_EXTEND_PATH.'session.php',
     'Str'               => FUEL_EXTEND_PATH.'str.php',
+    'Validation_Error'  => FUEL_EXTEND_PATH.'validation_error.php',
     'View'              => FUEL_EXTEND_PATH.'view.php',
     'Nos\Oil\Console'   => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'console.php',
     'Nos\Orm\Model'     => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'model.php',
