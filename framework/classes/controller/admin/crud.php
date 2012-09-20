@@ -49,15 +49,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         parent::before();
         $this->config_build();
-    }
-
-    public function prepare_i18n()
-    {
-        parent::prepare_i18n();
         if (!empty($this->config['i18n_file'])) {
-            $this->dictionnary = I18n::dictionnary($this->config['i18n_file'], 'nos::admin/crud', 'nos::admin/global');
+            $this->dictionnary = I18n::dictionnary($this->config['i18n_file'], 'nos::application', 'nos::generic');
         } else {
-            $this->dictionnary = I18n::dictionnary('nos::admin/crud', 'nos::admin/global');
+            $this->dictionnary = I18n::dictionnary('nos::application', 'nos::generic');
         }
     }
 
@@ -241,6 +236,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fields = \Arr::merge($fields, array(
                 'save' => array(
                     'form' => array(
+                        // Commentaire
                         'value' => static::i18n('Add'),
                     ),
                 ),

@@ -30,22 +30,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, $this->config);
 
+        if (!empty($this->config['i18n_file'])) {
+            $this->dictionnary = I18n::dictionnary($this->config['i18n_file'], 'nos::application', 'nos::generic');
+        } else {
+            $this->dictionnary = I18n::dictionnary('nos::application', 'nos::generic');
+        }
+
         $this->config['i18n'] = array(
-            'addDropDown' => $this->i18n('Select an action'),
-            'columns' => $this->i18n('Columns'),
-            'showFiltersColumns' => $this->i18n('Filters column header'),
-            'visibility' => $this->i18n('Visibility'),
-            'settings' => $this->i18n('Settings'),
-            'vertical' => $this->i18n('Vertical'),
-            'horizontal' => $this->i18n('Horizontal'),
-            'hidden' => $this->i18n('Hidden'),
+            // Appdesk: allLanguages
+            'allLanguages' => $this->i18n('All'),
             'item' => $this->i18n('page'),
             'items' => $this->i18n('pages'),
             'showNbItems' => $this->i18n('Showing {{x}} pages out of {{y}}'),
             'showOneItem' => $this->i18n('Show 1 page'),
             'showNoItem' => $this->i18n('No page'),
             'showAll' => $this->i18n('Show all pages'),
-            'views' => $this->i18n('Views'),
             'viewGrid' => $this->i18n('Grid'),
             'viewTreeGrid' => $this->i18n('Tree grid'),
             'viewThumbnails' => $this->i18n('Thumbnails'),
@@ -54,16 +53,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             'languages' => $this->i18n('Languages'),
             'search' => $this->i18n('Search'),
         );
-    }
-
-    public function prepare_i18n()
-    {
-        parent::prepare_i18n();
-        if (!empty($this->config['i18n_file'])) {
-            $this->dictionnary = I18n::dictionnary($this->config['i18n_file'], 'nos::admin/appdesk', 'nos::admin/global');
-        } else {
-            $this->dictionnary = I18n::dictionnary('nos::admin/appdesk', 'nos::admin/global');
-        }
     }
 
     public function i18n($message, $default = null)

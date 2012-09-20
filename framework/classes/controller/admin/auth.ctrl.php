@@ -35,7 +35,10 @@ class Controller_Admin_Auth extends Controller
 
     public function prepare_i18n()
     {
-        I18n::setLocale(\Session::get('lang', 'en_GB'));
-        I18n::load('nos::admin/global');
+        $locale = \Session::get('lang', 'en_GB');
+        I18n::setLocale($locale);
+        // Also configure Fuel to use appropriate locale settings
+        \Config::set('language', substr($locale, 0, 2));
+        I18n::load('nos::generic');
     }
 }
