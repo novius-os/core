@@ -11,7 +11,7 @@
 return array(
     'launchers' => array(
         'nos_page' => array(
-            'name' => 'Page',
+            'name' => 'Pages',
             'url' => 'admin/nos/page/appdesk/index',
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
