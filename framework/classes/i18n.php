@@ -105,9 +105,9 @@ class I18n
 
     public static function gget($group, $message, $default = null)
     {
-        $result = \Arr::get(static::$_messages, static::$_locale.'.'.$group.'.'.$message, false);
+        $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
 
-        if (false === $result) {
+        if (empty($result)) {
             $result = $default ?: $message;
         }
 
@@ -122,21 +122,24 @@ class I18n
     {
         $groups = func_get_args();
 
+        $active_group = static::$_group;
         foreach ($groups as $group) {
             static::load($group);
         }
+        static::$_group = $active_group;
 
         $messages = static::$_messages[static::$_locale];
 
         return function($message, $default = null) use ($groups, $messages) {
             foreach ($groups as $group) {
-                $result = \Arr::get($messages, $group.'.'.$message, false);
+                $result = isset($messages[$group][$message]) ? $messages[$group][$message] : false;
 
-                if (false !== $result) {
+                // If translation exists, but is empty, then it's not translated
+                if (!empty($result)) {
                     break;
                 }
             }
-            if (false === $result) {
+            if (empty($result)) {
                 $result = $default ?: $message;
             }
             return $result;
