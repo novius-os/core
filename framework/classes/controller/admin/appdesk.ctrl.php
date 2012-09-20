@@ -26,9 +26,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     public function before()
     {
         parent::before();
+        $this->load_config();
+    }
 
+    public function load_config() {
         list($application, $file_name) = \Config::configFile(get_called_class());
-        $this->config = static::process_config(\Config::mergeWithUser($application.'::'.$file_name, $this->config));
+        $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($this->config));
+        return $this->config;
     }
 
     public function action_index($view = null)
@@ -54,6 +58,161 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     }
 
     public static function process_config($config) {
+        if (isset($config['model'])) {
+            list($application, $file_name) = \Config::configFile($config['model']);
+            $appdesk_path = static::get_path();
+            $inspectors_class_prefix = get_called_class();
+            $inspectors_class_prefix = explode('_', $inspectors_class_prefix);
+            $inspectors_class_prefix[count($inspectors_class_prefix) - 1] = 'Inspector';
+            $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
+            $config_application = \Config::application($application);
+
+            $admin_config = $config['model']::admin_config();
+
+            if (!isset($config['query'])) {
+                $config['query'] = $admin_config['query'];
+            }
+
+            if (!isset($config['search_text'])) {
+                $config['search_text'] = $admin_config['search_text'];
+            }
+
+            if (!isset($config['dataset'])) {
+
+                $config['dataset'] = array('id' => 'id');
+                foreach ($admin_config['dataset'] as $key => $value) {
+                    if (isset($value['column'])) {
+                        $config['dataset'][$key] = $value['column'];
+                    }
+                    if (isset($value['value'])) {
+                        $config['dataset'][$key] = array('value' => $value['value']);
+                    }
+                }
+
+                $config['dataset']['actions'] = array();
+                $monkey_item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'item'));
+                foreach ($monkey_item_actions as $action_key => $action_value) {
+                    if (isset($action_value['enabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    }
+                }
+            }
+
+            if (!isset($config['selectedView'])) {
+                $config['selectedView'] = isset($admin_config['selectedView']) ? $admin_config['selectedView'] : 'default';
+            }
+
+            if (!isset($config['views'])) {
+                $config['views'] = isset($admin_config['views']) ? $admin_config['views'] : array(
+                    'default' => array(
+                        'name' => __('Default view'),
+                    )
+                );
+            }
+
+            if (!isset($config['inspectors'])) {
+                $config['inspectors'] = array();
+            }
+
+            $inspectors = array();
+            foreach ($config['inspectors'] as $key => $value) {
+                if (is_array($value)) {
+                    // @todo: extended inspectors
+                } else {
+                    $inspector_name = $inspectors_class_prefix.ucfirst($value);
+                    list($application, $file_name) = \Config::configFile($inspector_name);
+                    $inspector_config = \Config::loadConfiguration($application, $file_name);
+                    $inspector_config = $inspector_name::process_config($inspector_config);
+                    $inspectors[$value] = $inspector_config;
+                }
+            }
+            $config['inspectors'] = $inspectors;
+
+            if (!isset($config['inputs'])) {
+                $config['inputs'] = array();
+            }
+
+            foreach ($config['inspectors'] as $key => $inspector_config) {
+                if ($inspector_config['input'] && !isset($config['inputs'][$inspector_config['input']['key']])) {
+                    $config['inputs'][$inspector_config['input']['key']] = $inspector_config['input']['query'];
+                }
+            }
+
+            if (!isset($config['appdesk'])) {
+                $config['appdesk'] = array();
+            }
+
+            if (!isset($config['appdesk']['tab'])) {
+                $config['appdesk'] = array();
+            }
+
+            if (!isset($config['appdesk']['reloadEvent'])) {
+                $config['appdesk']['reloadEvent'] = isset($admin_config['reloadEvent']) ? $admin_config['reloadEvent'] : $config['model'];
+            }
+
+            if (!isset($config['appdesk']['actions'])) {
+                $config['appdesk']['actions'] = \Config::actions($application, array('model' => $config['model'], 'type' => 'item'));
+            }
+
+            if (!isset($config['appdesk']['appdesk'])) {
+                $config['appdesk']['appdesk'] = array();
+            }
+
+            if (!isset($config['appdesk']['appdesk']['buttons'])) {
+                $config['appdesk']['appdesk']['buttons'] = \Config::actions($application, array('type' => 'add'));
+            }
+
+            if (!isset($config['appdesk']['appdesk']['splittersVertical'])) {
+                if (isset($config['splittersVertical'])) {
+                    $config['appdesk']['appdesk']['splittersVertical'] = $config['splittersVertical'];
+                } else {
+                    $config['appdesk']['appdesk']['splittersVertical'] = 250; //@todo could it be done via javascript
+                }
+            }
+
+            if (!isset($config['appdesk']['appdesk']['inspectors'])) {
+                $config['appdesk']['appdesk']['inspectors'] = $config['inspectors'];
+            }
+
+            $new_inspectors = array();
+            foreach ($config['appdesk']['appdesk']['inspectors'] as $key => $inspector_config) {
+                $new_inspectors[$key] = $inspector_config['appdesk'];
+            }
+            $config['appdesk']['appdesk']['inspectors'] = $new_inspectors;
+
+
+            if (!isset($config['appdesk']['appdesk']['grid'])) {
+                $config['appdesk']['appdesk']['grid'] = array();
+            }
+
+            if (!isset($config['appdesk']['appdesk']['grid']['urlJson'])) {
+                $config['appdesk']['appdesk']['grid']['urlJson'] = $appdesk_path.'/json';
+            }
+
+            if (!isset($config['appdesk']['appdesk']['grid']['columns'])) {
+                $config['appdesk']['appdesk']['grid']['columns'] = array();
+                foreach ($admin_config['dataset'] as $key => $value) {
+                    if ($key == 'lang') {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key] = array('lang' => true);
+                    } else if ($key == 'published') {
+                        $config['appdesk']['appdesk']['grid']['columns']['published'] = array(
+                            'headerText' => __('Status'),
+                            'dataKey' => 'publication_status'
+                        );
+                    } else {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = $value['headerText'];
+                        $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
+                    }
+
+                }
+
+                $config['appdesk']['appdesk']['grid']['columns']['actions'] = array('actions' => array());
+                foreach ($config['appdesk']['actions'] as $action_key => $action_value) {
+                    $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'][] = $action_key;
+                }
+            }
+        }
+
         return $config;
     }
 

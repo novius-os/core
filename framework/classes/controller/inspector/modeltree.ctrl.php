@@ -14,7 +14,7 @@ use \Input;
 use \View;
 use \Config;
 
-class Controller_Inspector_Modeltree extends Controller_Admin_Application
+class Controller_Inspector_Modeltree extends Controller_Inspector
 {
     protected $config = array();
 

@@ -128,9 +128,147 @@ class Config extends \Fuel\Core\Config
         return $config;
     }
 
-    public static function application($module_name)
+    public static function application($application_name)
     {
-        return static::extendable_load($module_name, 'config');
+        return static::extendable_load($application_name, 'config');
+    }
+
+    public static function actions($application_name, $filter = array())
+    {
+        $actions = static::application($application_name);
+        $actions = static::process_actions($application_name, $actions['application']['actions']);
+        $selected_actions = array();
+        foreach ($actions as $key => $action) {
+            $select = true;
+            if (isset($filter['model'])) {
+                $select = false;
+                $models = explode('.', $key);
+                for ($i = 0; $i < count($models) - 1; $i++) {
+                    if ($filter['model'] == $models[$i]) {
+                        $select = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($select && isset($filter['type'])) {
+                $select = $action['type'] == $filter['type'];
+            }
+
+            if ($select) {
+                $selected_actions[$key] = $action;
+            }
+        }
+
+        return $selected_actions;
+    }
+
+    public static function process_actions($application_name, $actions) {
+        $urls = array(
+            'add' => 'action.tab.url',
+            'edit' => 'action.tab.url',
+            'delete' => 'action.dialog.contentUrl',
+        );
+
+        $actions_template = array(
+            'add' => array(
+                'label' => __('Add :model_label'),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'method' => 'add',
+                    'tab' => array(
+                        'url' => 'insert_update?lang={{lang}}',
+                        'label' => __('Add a new monkey'),
+                    ),
+                ),
+
+                'type' => 'add'
+            ),
+            'edit' => array(
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => "insert_update/{{id}}",
+                        'label' => __('Edit'),
+                    ),
+                ),
+                'label' => __('Edit'),
+                'primary' => true,
+                'icon' => 'pencil',
+                'type' => 'item'
+            ),
+            'delete' => array(
+                'action' => array(
+                    'action' => 'confirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => 'delete/{{id}}',
+                        'title' => __('Delete'),
+                    ),
+                ),
+                'label' => __('Delete'),
+                'primary' => true,
+                'icon' => 'trash',
+                'type' => 'item'
+            ),
+            'visualise' => array(
+                'label' => 'Visualise',
+                'primary' => true,
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                'action' => array(
+                    'action' => 'window.open',
+                    'url' => '{{url}}?_preview=1'
+                ),
+                'enabled' =>  function($item, $context = array()) {
+                    $url = $item->url_canonical(array('preview' => true));
+
+                    return !empty($url);
+                },
+                'type' => 'item'
+            ),
+        );
+
+
+
+        if (isset($actions['crud'])) {
+            foreach ($actions['crud'] as $model => $config) {
+                if (!is_array($config)) {
+                    $model = $config;
+                    $config = array();
+                }
+                $model_label = explode('/', $model);
+                $model_label = $model_label[count($model_label) - 1];
+                $model_label = explode('_', $model_label);
+                $model_label = $model_label[count($model_label) - 1];
+
+                if (!isset($config['controller'])) {
+                    $config['controller'] = strtolower($model_label);
+                }
+
+                if (!isset($config['labels'])) {
+                    $config['labels'] = array();
+                }
+
+                foreach ($actions_template as $name => $template) {
+                    if (!isset($actions[$model.'.'.$name])) {
+                        $actions[$model.'.'.$name] = $template;
+
+                        if (isset($urls[$name])) {
+                            \Arr::set($actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($actions[$model.'.'.$name], $urls[$name]));
+                        }
+
+                        if (isset($config['labels'][$name])) {
+                            $actions[$model.'.'.$name]['label'] = $config['labels'][$name];
+                        }
+                        $actions[$model.'.'.$name]['label'] = Str::tr($actions[$model.'.'.$name]['label'], array('model_label' => $model_label));
+                    }
+                }
+            }
+        }
+
+        unset($actions['crud']);
+
+
+        return $actions;
     }
 
 }

@@ -29,8 +29,15 @@ class Model extends \Orm\Model
      */
     protected static $_title_property_cached = array();
 
+    protected static $_prefix = null;
+
     public $medias;
     public $wysiwygs;
+
+    public static function prefix() {
+        // @todo: add cache
+        return static::get_prefix();
+    }
 
     /**
      * Get the class's title property
@@ -506,17 +513,25 @@ class Model extends \Orm\Model
      */
     public function pick()
     {
-        $prefix_length = mb_strlen(static::get_prefix());
+        $prefix_length = mb_strlen(static::prefix());
 
         foreach (func_get_args() as $property) {
             //if (mb_substr($property, 0, $prefix_length) != $prefix) {
-                $property = static::get_prefix().$property;
+                $property = static::prefix().$property;
             //}
             if (!empty($this->{$property})) {
                 return $this->{$property};
             }
         }
         return null;
+    }
+
+    public function set($name, $value = null) {
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
+            $name = static::prefix().$name;
+        }
+
+        return parent::set($name, $value);
     }
 
     public function __set($name, $value)
@@ -595,8 +610,17 @@ class Model extends \Orm\Model
         return parent::__set($name, $value);
     }
 
+    public function & get($name) {
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
+            $name = static::prefix().$name;
+        }
+
+        return parent::get($name);
+    }
+
     public function & __get($name)
     {
+
         $arr_name = explode('->', $name);
         if (count($arr_name) > 1) {
             $class = get_called_class();
@@ -641,11 +665,6 @@ class Model extends \Orm\Model
                 $obj = $obj->{$arr_name[$i]};
             }
             return $obj;
-        }
-
-        // Special getter for ID without prefix
-        if ($name == 'id') {
-            $name = static::$_primary_key[0];
         }
 
         return parent::__get($name);
@@ -740,6 +759,15 @@ class Model extends \Orm\Model
     {
         $this->medias   = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
+    }
+
+    public static function admin_config() {
+        list($application, $file) = \Config::configFile(get_called_class());
+        $file = explode('/', $file);
+        array_splice($file, count($file) - 1, 0, array('admin'));
+        $file = implode('/', $file);
+
+        return \Config::loadConfiguration($application, $file);
     }
 }
 
