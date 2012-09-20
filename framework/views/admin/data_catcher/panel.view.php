@@ -48,7 +48,7 @@ if ($translatable) {
                     'catcher_name' => \Nos\Model_Content_Nuggets::DEFAULT_CATCHER,
                     'nugget' => $default_nuggets,
                     'nugget_db' => $item->get_catcher_nuggets(\Nos\Model_Content_Nuggets::DEFAULT_CATCHER)->content_data,
-                ));
+                ), false);
                 ?>
             </div>
         </div>

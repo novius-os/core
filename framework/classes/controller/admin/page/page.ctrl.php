@@ -112,7 +112,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
                 'action' => 'update',
                 'id' => array_merge(array_keys($pages_lang), array_keys($pages_old)),
                 'lang_common_id' => array($this->item->page_lang_common_id),
-                'lang' => $langs,
+                'lang' => array_values($langs),
             );
 
             $body = array(

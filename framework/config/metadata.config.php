@@ -11,7 +11,7 @@
 return array(
     'launchers' => array(
         'nos_page' => array(
-            'name' => 'Page',
+            'name' => 'Pages',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(

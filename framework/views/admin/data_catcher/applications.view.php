@@ -8,6 +8,27 @@
  * @link http://www.novius-os.org
  */
 
+if (isset($nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
+    $image = \Nos\Model_Media::find($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
+    if (empty($image)) {
+        unset($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
+    } else {
+        $nuggets['media_url'] = Uri::base(false).$image->get_public_path();
+    }
+}
+if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
+    list($page_id, $path) = preg_split("/\:\:/", $nuggets[\Nos\DataCatcher::TYPE_URL]);
+    if (!empty($path)) {
+        $page = \Nos\Model_Page::find($page_id);
+        if (empty($page)) {
+            unset($nuggets[\Nos\DataCatcher::TYPE_URL]);
+        } else {
+            $page_path = preg_replace('`'.preg_quote('.html').'$`iUu', '', $page->get_href(array('absolute' => true)));
+            $nuggets['absolute_url'] = rtrim($page_path, '/').'/'.$path;
+        }
+    }
+}
+
 $onDemande = false;
 $auto = false;
 $one = false;
@@ -42,10 +63,10 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
 
     if ($auto) {
         $data_catcher['url'] .= '?'.http_build_query(array(
-            'model' => $model_name,
-            'id'    => $model_id,
-            'catcher' => $catcher_name,
-         ), '', '&');
+                'model' => $model_name,
+                'id'    => $model_id,
+                'catcher' => $catcher_name,
+            ), '', '&');
     }
 
     echo '<button class="catcher" data-params="', htmlspecialchars(\Format::forge($data_catcher)->to_json()) ,'" data-nuggets="', htmlspecialchars(\Format::forge($nuggets)->to_json()) ,'">', htmlspecialchars($data_catcher['title']),'</button>';
