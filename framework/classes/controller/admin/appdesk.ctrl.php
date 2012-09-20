@@ -65,7 +65,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             $inspectors_class_prefix = explode('_', $inspectors_class_prefix);
             $inspectors_class_prefix[count($inspectors_class_prefix) - 1] = 'Inspector';
             $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
-            $config_application = \Config::application($application);
+            $application_config = \Config::application($application);
 
             $admin_config = $config['model']::admin_config();
 
@@ -143,7 +143,10 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['tab'])) {
-                $config['appdesk'] = array();
+                $config['appdesk']['tab'] = array(
+                    'label' => $application_config['application']['name'],
+                    'iconUrl' => $application_config['application']['icons']['medium'],
+                );
             }
 
             if (!isset($config['appdesk']['reloadEvent'])) {

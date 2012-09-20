@@ -387,6 +387,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_tab_params()
     {
+        list($application_name) = \Config::configFile(get_called_class());
+        $application_config = \Config::application($application_name);
         $labelUpdate = $this->config['tab']['labels']['update'];
         $url = $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->id);
         if ($this->is_new) {
@@ -406,7 +408,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $tabInfos = array(
-            'iconUrl' => $this->config['tab']['iconUrl'],
+            'iconUrl' => empty($this->config['tab']['iconUrl']) ? $application_config['application']['icons']['small'] : $this->config['tab']['iconUrl'],
             'label' => $this->is_new ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
             'url' => $url,
         );
