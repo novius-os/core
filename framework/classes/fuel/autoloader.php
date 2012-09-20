@@ -17,48 +17,6 @@ class Autoloader extends Fuel\Core\Autoloader
         'controller' => 'ctrl'
     );
 
-/*
-    public static function load($class)
-    {
-        if ($class == 'Nos\Controller_Front.controller') {
-            print_r(debug_backtrace());
-        }
-
-        $namespace_path = explode('\\', $class);
-        $removed_path = $namespace_path[count($namespace_path) - 1];
-        $part_name = explode('_', $removed_path);
-        $suffix = '';
-
-        for ($i = 0; $i < count($part_name) - 1; $i++) {
-            if (isset(static::$suffixed[$part_name[$i]])) {
-                $suffix = static::$suffixed[$part_name[$i]];
-                break;
-            }
-        }
-
-        if ($suffix == '') {
-            echo 'Load directly: '.$class."\n";
-
-            return parent::load($class);
-        }
-        $loaded = false;
-        try {
-            echo $class.$suffix."\n";
-            $loaded = parent::load($class.$suffix);
-        } catch (\Exception $e) {
-
-        }
-        if (!$loaded) {
-            //\Log::error(print_r($loaded, true));
-            echo $class."\n";
-            //print_r(debug_backtrace());
-            $loaded = parent::load($class);
-        }
-
-        return $loaded;
-    }
-*/
-
     public static function load($class)
     {
         // deal with funny is_callable('static::classname') side-effect
@@ -80,7 +38,7 @@ class Autoloader extends Fuel\Core\Autoloader
             static::init_class($class);
             $loaded = true;
         } elseif ($full_class = static::find_core_class($class)) {
-            if ( ! class_exists($full_class, false) and ! interface_exists($full_class, false)) {
+            if (!class_exists($full_class, false) and !interface_exists($full_class, false)) {
                 include static::prep_path(static::$classes[$full_class]);
             }
             class_alias($full_class, $class);
@@ -109,7 +67,7 @@ class Autoloader extends Fuel\Core\Autoloader
                 }
             }
 
-            if (! $loaded) {
+            if (!$loaded) {
                 $path = static::get_valid_class_path(APPPATH.'classes/'.static::class_to_path($class));
 
                 if ($path) {

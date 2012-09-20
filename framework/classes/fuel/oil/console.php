@@ -17,12 +17,12 @@ class Console extends \Oil\Console
     {
         error_reporting(E_ALL | E_STRICT);
 
-        ini_set("error_log", NULL);
+        ini_set("error_log", null);
         ini_set("log_errors", 1);
         ini_set("html_errors", 0);
         ini_set("display_errors", 0);
 
-        while (ob_get_level ()) {
+        while (ob_get_level()) {
             ob_end_clean();
         }
 
@@ -34,22 +34,24 @@ class Console extends \Oil\Console
 
     private function main()
     {
-        \Cli::write(sprintf(
-            'Fuel %s - PHP %s (%s) (%s) [%s]',
-            \Fuel::VERSION,
-            phpversion(),
-            php_sapi_name(),
-            self::build_date(),
-            PHP_OS
-        ));
+        \Cli::write(
+            sprintf(
+                'Fuel %s - PHP %s (%s) (%s) [%s]',
+                \Fuel::VERSION,
+                phpversion(),
+                php_sapi_name(),
+                self::build_date(),
+                PHP_OS
+            )
+        );
 
         // Loop until they break it
-        while (TRUE) {
+        while (true) {
             if (\Cli::$readline_support) {
                 readline_completion_function(array(__CLASS__, 'tab_complete'));
             }
 
-            if ( ! $__line = rtrim(trim(trim(\Cli::input('>>> ')), PHP_EOL), ';')) {
+            if (!$__line = rtrim(trim(trim(\Cli::input('>>> ')), PHP_EOL), ';')) {
                 continue;
             }
 
@@ -79,7 +81,7 @@ class Console extends \Oil\Console
 
             // Error was returned
             if ($ret === false) {
-                \Cli::error('Parse Error - ' . $__line);
+                \Cli::error('Parse Error - '.$__line);
                 \Cli::beep();
             }
 
@@ -88,7 +90,7 @@ class Console extends \Oil\Console
                     echo $ret ? 'true' : 'false';
                 } elseif (is_string($ret)) {
                     echo addcslashes($ret, "\0..\37\177..\377");
-                } elseif ( ! is_null($ret)) {
+                } elseif (!is_null($ret)) {
                     var_dump($ret);
                 }
             }
@@ -109,10 +111,26 @@ class Console extends \Oil\Console
     private static function is_immediate($line)
     {
         $skip = array(
-            'class', 'declare', 'die', 'echo', 'exit', 'for',
-            'foreach', 'function', 'global', 'if', 'include',
-            'include_once', 'print', 'require', 'require_once',
-            'return', 'static', 'switch', 'unset', 'while'
+            'class',
+            'declare',
+            'die',
+            'echo',
+            'exit',
+            'for',
+            'foreach',
+            'function',
+            'global',
+            'if',
+            'include',
+            'include_once',
+            'print',
+            'require',
+            'require_once',
+            'return',
+            'static',
+            'switch',
+            'unset',
+            'while'
         );
 
         $okeq = array('===', '!==', '==', '!=', '<=', '>=');
@@ -127,7 +145,7 @@ class Console extends \Oil\Console
                 $sq = !$sq;
             } elseif ($c == '"') {
                 $dq = !$dq;
-            } elseif ( ($sq) || ($dq) && $c == "\\") {
+            } elseif (($sq) || ($dq) && $c == "\\") {
                 ++$i;
             } else {
                 $code .= $c;

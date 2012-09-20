@@ -10,8 +10,13 @@
 
 namespace Nos;
 
-class CacheNotFoundException extends \Exception {}
-class CacheExpiredException extends \Exception {}
+class CacheNotFoundException extends \Exception
+{
+}
+
+class CacheExpiredException extends \Exception
+{
+}
 
 class FrontCache
 {
@@ -69,11 +74,14 @@ class FrontCache
             return;
         }
 
-        $params = \Arr::merge($params, array(
-            'callback_args' => array(),
-            'duration'      => CACHE_DURATION_FUNCTION,
-            'controller'    => null,
-        ));
+        $params = \Arr::merge(
+            $params,
+            array(
+                'callback_args' => array(),
+                'duration' => CACHE_DURATION_FUNCTION,
+                'controller' => null,
+            )
+        );
 
         $cache = new static($path);
         try {
@@ -85,7 +93,7 @@ class FrontCache
         }
     }
 
-    protected $_path  = null;
+    protected $_path = null;
     protected $_level = null;
     protected $_content = '';
     protected $_lock_fp = null;
@@ -101,10 +109,10 @@ class FrontCache
 
     public function execute($controller = null)
     {
-         // Get an exclusive lock
-         //$this->_lock_fp = fopen($this->_path, 'c');
-         //flock($this->_lock_fp, LOCK_EX);
-         if (!empty($this->_path) && is_file($this->_path)) {
+        // Get an exclusive lock
+        //$this->_lock_fp = fopen($this->_path, 'c');
+        //flock($this->_lock_fp, LOCK_EX);
+        if (!empty($this->_path) && is_file($this->_path)) {
             try {
                 ob_start();
                 include $this->_path;
@@ -187,9 +195,9 @@ class FrontCache
         $dir = dirname($this->_path);
         // check if specified subdir exists
         if (!@is_dir($dir)) {
-          // create non existing dir
+            // create non existing dir
             if (!@mkdir($dir, 0755, true)) {
-              return false;
+                return false;
             }
         }
         file_put_contents($this->_path, $this->_content);

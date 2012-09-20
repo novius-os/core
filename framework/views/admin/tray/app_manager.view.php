@@ -24,26 +24,26 @@
         <div class="line" style="overflow:visible;">
             <h1 class="title"><?= __('Novius OS framework configuration'); ?></h1>
             <p>
-                <?php
-                if ($nos->is_dirty()) {
-                    echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'nos', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
-                } else {
-                    echo __('Up to date!');
-                }
-                ?>
+<?php
+if ($nos->is_dirty()) {
+    echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'nos', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
+} else {
+    echo __('Up to date!');
+}
+?>
             </p>
         </div>
         <p>&nbsp;</p>
         <div class="line" style="overflow:visible;">
             <h1 class="title"><?= __('Local configuration'); ?></h1>
             <p>
-            <?php
-            if ($local->is_dirty()) {
-                echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
-            } else {
-                echo __('Up to date!');
-            }
-            ?>
+<?php
+if ($local->is_dirty()) {
+    echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
+} else {
+    echo __('Up to date!');
+}
+?>
             </p>
         </div>
         <p>&nbsp;</p>
@@ -59,22 +59,26 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($installed as $app) {
-                            $metadata = $app->metadata;
-                            ?>
+<?php
+foreach ($installed as $app) {
+    $metadata = $app->metadata;
+    ?>
                         <tr>
                             <td>&nbsp;<img src="<?= isset($metadata['icon16']) ? $metadata['icon16'] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e($app->name) ?></td>
                             <td>
                                 <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
-                                <?php
-                                if ($app->is_dirty()) {
-                                    ?>
+    <?php
+    if ($app->is_dirty()) {
+        ?>
                                     <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Update') ?></button></a>
-                                    <?php
-                                } ?>
+        <?php
+    }
+    ?>
                             </td>
                         </tr>
-                        <?php } ?>
+    <?php
+}
+?>
                     </tbody>
                 </table>
 
@@ -94,25 +98,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                <?php foreach ($others as $app) {
-                    $metadata = $app->get_real_metadata();
-                    ?>
+<?php
+foreach ($others as $app) {
+    $metadata = $app->get_real_metadata();
+    ?>
                         <tr>
                             <td><?= e($app->name) ?> </td>
                             <td>
-                            <?php
-                            if (empty($metadata)) {
-                                ?>
+    <?php
+    if (empty($metadata)) {
+        ?>
                                 <em><?php echo __('No metadata found') ?>.</em>
-                                <?php
-                            } else {
-                                ?>
+        <?php
+    } else {
+        ?>
                                  <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
-                                <?php
-                            }
-                            ?>
+        <?php
+    }
+    ?>
                         </tr>
-                        <?php } ?>
+    <?php
+}
+?>
                     </tbody>
                 </table>
 
@@ -168,12 +175,12 @@
                     })
 
 <?php
-    $flash = \Session::get_flash('notification.plugins');
-    if (!empty($flash)) {
-?>
+$flash = \Session::get_flash('notification.plugins');
+if (!empty($flash)) {
+    ?>
                     $.nosNotify(<?= \Format::forge()->to_json($flash); ?>);
-<?php
-    }
+    <?php
+}
 ?>
                 });
             });

@@ -18,12 +18,12 @@ $filename = $pathinfo['filename'];
     <?= $fieldset->build_hidden_fields(); ?>
     <div class="unit col c1" ></div>
     <div class="unit col c2" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
-        <?php
-        if ($item->is_image()) {
-            list($src, $width, $height, $ratio) = $item->get_img_infos(128, null);
-            printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
-        }
-        ?>
+<?php
+if ($item->is_image()) {
+    list($src, $width, $height, $ratio) = $item->get_img_infos(128, null);
+    printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
+}
+?>
     </div>
     <div class="unit col c6" style="z-index:99;">
         <div class="line" style="margin-bottom:1em;">

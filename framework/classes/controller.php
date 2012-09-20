@@ -25,12 +25,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
     public function before()
     {
-        if ( ! empty($this->template) and is_string($this->template)) {
+        if (!empty($this->template) and is_string($this->template)) {
             // Load the template
             $this->template = \View::forge($this->template);
         }
 
-        if (is_null($this->format) or ! array_key_exists($this->format, $this->_supported_formats)) {
+        if (is_null($this->format) or !array_key_exists($this->format, $this->_supported_formats)) {
             // auto-detect the format
             $this->format = array_key_exists(\Input::extension(), $this->_supported_formats) ? \Input::extension() : 'json';
         }
@@ -78,12 +78,9 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }*/
 
 
-
-
-
         // @todo; this is a quick fix to allow html loading via ajax by returning a view.
         // -->
-        if ( \Input::is_ajax() && $this->response !== null) {
+        if (\Input::is_ajax() && $this->response !== null) {
             // If nothing was returned default to the template
             if (empty($response)) {
                 $response = $this->template;
@@ -92,13 +89,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             // If the response isn't a Response object, embed in the available one for BC
             // @deprecated  can be removed when $this->response is removed
-            if (! $response instanceof Response && $this->response->body == null) {
+            if (!$response instanceof Response && $this->response->body == null) {
                 $this->response->body = $response;
                 $response = $this->response;
             }
         }
 
-        if (! $response instanceof \Response && $this->response->body !== null) {
+        if (!$response instanceof \Response && $this->response->body !== null) {
             $response = $this->response;
         }
 
@@ -144,14 +141,17 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
     protected function items(array $config, $only_count = false)
     {
-        $config = array_merge(array(
-            'related' => array(),
-            'callback' => array(),
-            'lang' => null,
-            'limit' => null,
-            'offset' => null,
-            'dataset' => array(),
-        ), $config);
+        $config = array_merge(
+            array(
+                'related' => array(),
+                'callback' => array(),
+                'lang' => null,
+                'limit' => null,
+                'offset' => null,
+                'dataset' => array(),
+            ),
+            $config
+        );
 
         $items = array();
 
@@ -184,7 +184,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
 
         $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
-        $tree         = $model::behaviours('Nos\Orm_Behaviour_Tree');
+        $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
         if ($translatable) {
             if (empty($config['lang'])) {
                 // No inspector, we only search items in their primary language
@@ -193,7 +193,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 // Multiple langs
                 $query->where($translatable['lang_property'], 'IN', $config['lang']);
             } else {
-                $query->where($translatable['lang_property'],  '=', $config['lang']);
+                $query->where($translatable['lang_property'], '=', $config['lang']);
             }
             $common_ids = array();
             $keys = array();
@@ -218,7 +218,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         // Set from table
         $new_query->from(array($model::table(), $query->alias()));
 
-        $tmp   = $query->build_query($new_query, $columns, 'select');
+        $tmp = $query->build_query($new_query, $columns, 'select');
         $new_query = $tmp['query'];
         $new_query->group_by('group_by_pk');
         if ($config['limit']) {
@@ -331,7 +331,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
     protected function build_tree($tree)
     {
-        $list_models  = array();
+        $list_models = array();
         foreach ($tree['models'] as $model) {
             if (!is_array($model)) {
                 $model = array('model' => $model);
@@ -358,15 +358,15 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     if (!isset($list_models[$child])) {
                         continue;
                     }
-                    $class     = $list_models[$child]['model'];
+                    $class = $list_models[$child]['model'];
                     $relations = $class::relations();
                     foreach ($relations as $relation) {
                         if ($relation->model_to == $model['model']) {
                             $foreignkey = $relation->key_from;
                             $childs[] = array(
-                                'relation'  => $relation->name,
-                                'model'      => $child,
-                                'fk'        => $foreignkey[0],
+                                'relation' => $relation->name,
+                                'model' => $child,
+                                'fk' => $foreignkey[0],
                             );
                             break;
                         }
@@ -417,12 +417,15 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
         if ($deep === -1) {
             \Session::set('tree.'.$tree_config['id'].'.'.$model.'|'.$id, false);
-            $count = $this->tree_items($tree_config, array(
-                'countProcess' => true,
-                'model' => $model,
-                'id' => $id,
-                'lang' => $lang,
-            ));
+            $count = $this->tree_items(
+                $tree_config,
+                array(
+                    'countProcess' => true,
+                    'model' => $model,
+                    'id' => $id,
+                    'lang' => $lang,
+                )
+            );
 
             $json = array(
                 'items' => array(),
@@ -430,13 +433,16 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             );
         } else {
             if (\Input::get('move') === 'true') {
-                return $this->tree_move($tree_config, array(
-                    'itemModel' => \Input::get('itemModel'),
-                    'itemId' => \Input::get('itemId'),
-                    'targetModel' => \Input::get('targetModel'),
-                    'targetId' => \Input::get('targetId'),
-                    'targetType' => \Input::get('targetType'),
-                ));
+                return $this->tree_move(
+                    $tree_config,
+                    array(
+                        'itemModel' => \Input::get('itemModel'),
+                        'itemId' => \Input::get('itemId'),
+                        'targetModel' => \Input::get('targetModel'),
+                        'targetId' => \Input::get('targetId'),
+                        'targetType' => \Input::get('targetType'),
+                    )
+                );
             }
 
             if (is_array($selected) && !empty($selected['id']) && !empty($selected['model'])) {
@@ -445,22 +451,28 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 }
                 foreach ($selected as $sel) {
                     if (!empty($sel['id']) && !empty($sel['model'])) {
-                        $this->tree_selected($tree_config, array(
-                            'model' => $sel['model'],
-                            'id' => $sel['id'],
-                        ));
+                        $this->tree_selected(
+                            $tree_config,
+                            array(
+                                'model' => $sel['model'],
+                                'id' => $sel['id'],
+                            )
+                        );
                     }
                 }
             }
             if ($id && $model) {
                 \Session::set('tree.'.$tree_config['id'].'.'.$model.'|'.$id, true);
             }
-            $items = $this->tree_items($tree_config, array(
-                'model' => $model,
-                'id' => $id,
-                'deep' => $deep,
-                'lang' => $lang,
-            ));
+            $items = $this->tree_items(
+                $tree_config,
+                array(
+                    'model' => $model,
+                    'id' => $id,
+                    'deep' => $deep,
+                    'lang' => $lang,
+                )
+            );
 
             $json = array(
                 'items' => $items,
@@ -473,13 +485,16 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
     protected function tree_move(array $tree_config, array $params)
     {
-        $params = array_merge(array(
-            'itemModel' => null,
-            'itemId' => null,
-            'targetModel' => null,
-            'targetId' => null,
-            'targetType' => 'in',
-        ), $params);
+        $params = array_merge(
+            array(
+                'itemModel' => null,
+                'itemId' => null,
+                'targetModel' => null,
+                'targetId' => null,
+                'targetType' => 'in',
+            ),
+            $params
+        );
 
         if (empty($params['itemModel']) || empty($params['itemId']) || empty($params['targetModel']) || empty($params['targetId'])) {
             return;
@@ -536,22 +551,29 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             }
             $from->save();
         } catch (\Exception $e) {
-            \Response::json(array(
-                'error' => $e->getMessage(),
-            ));
+            \Response::json(
+                array(
+                    'error' => $e->getMessage(),
+                )
+            );
         }
 
-        \Response::json(array(
-            'success' => true,
-        ));
+        \Response::json(
+            array(
+                'success' => true,
+            )
+        );
     }
 
     public function tree_selected(array $tree_config, array $params)
     {
-        $params = array_merge(array(
-            'model' => null,
-            'id' => null,
-        ), $params);
+        $params = array_merge(
+            array(
+                'model' => null,
+                'id' => null,
+            ),
+            $params
+        );
 
         $model = $params['model'];
 
@@ -570,21 +592,27 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
         \Session::set('tree.'.$tree_config['id'].'.'.$tree_model_parent['model'].'|'.$parent->{$pk}, true);
 
-        return $this->tree_selected($tree_config, array(
-            'model' => $tree_model_parent['model'],
-            'id' => $parent->{$pk},
-        ));
+        return $this->tree_selected(
+            $tree_config,
+            array(
+                'model' => $tree_model_parent['model'],
+                'id' => $parent->{$pk},
+            )
+        );
     }
 
     public function tree_items(array $tree_config, array $params)
     {
-        $params = array_merge(array(
-            'countProcess' => false,
-            'model' => null,
-            'id' => null,
-            'deep' => 1,
-            'lang' => null,
-        ), $params);
+        $params = array_merge(
+            array(
+                'countProcess' => false,
+                'model' => null,
+                'id' => null,
+                'deep' => 1,
+                'lang' => null,
+            ),
+            $params
+        );
 
         $childs = array();
         if (!$params['model']) {
@@ -611,41 +639,57 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $pk = $tree_model['pk'];
             $controller = $this;
 
-            $config = array_merge($tree_model, array(
-                'lang' => $params['lang'],
-                'callback' => array(function($query) use ($child, $tree_model) {
-                    foreach ($child['where'] as $where) {
-                        $query->where($where);
-                    }
-                    foreach ($tree_model['order_by'] as $order_by) {
-                        $query->order_by(is_array($order_by) ? $order_by : array($order_by));
-                    }
+            $config = array_merge(
+                $tree_model,
+                array(
+                    'lang' => $params['lang'],
+                    'callback' => array(
+                        function ($query) use ($child, $tree_model) {
+                            foreach ($child['where'] as $where) {
+                                $query->where($where);
+                            }
+                            foreach ($tree_model['order_by'] as $order_by) {
+                                $query->order_by(is_array($order_by) ? $order_by : array($order_by));
+                            }
 
-                    return $query;
-                }),
-                'dataset' => array_merge($tree_model['dataset'], array(
-                    'treeChilds' => function($item) use ($controller, $tree_config, $params, $child, $pk) {
-                        $open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$item->{$pk}, null);
-                        if ($open === true || ($params['deep'] > 1 && $open !== false)) {
-                            $items = $controller->tree_items($tree_config, array(
-                                'model' => $child['model'],
-                                'id' => $item->{$pk},
-                                'deep' => $params['deep'] - 1,
-                                'lang' => $params['lang'],
-                            ));
-
-                            return count($items) ? $items : 0;
-                        } else {
-                            return $controller->tree_items($tree_config, array(
-                                'countProcess' => true,
-                                'model' => $child['model'],
-                                'id' => $item->{$pk},
-                                'lang' => $params['lang'],
-                            ));
+                            return $query;
                         }
-                    },
-                )),
-            ));
+                    ),
+                    'dataset' => array_merge(
+                        $tree_model['dataset'],
+                        array(
+                            'treeChilds' =>
+                                function ($item) use ($controller, $tree_config, $params, $child, $pk)
+                                {
+                                    $open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$item->{$pk}, null);
+                                    if ($open === true || ($params['deep'] > 1 && $open !== false)) {
+                                        $items = $controller->tree_items(
+                                            $tree_config,
+                                            array(
+                                                'model' => $child['model'],
+                                                'id' => $item->{$pk},
+                                                'deep' => $params['deep'] - 1,
+                                                'lang' => $params['lang'],
+                                            )
+                                        );
+
+                                        return count($items) ? $items : 0;
+                                    } else {
+                                        return $controller->tree_items(
+                                            $tree_config,
+                                            array(
+                                                'countProcess' => true,
+                                                'model' => $child['model'],
+                                                'id' => $item->{$pk},
+                                                'lang' => $params['lang'],
+                                            )
+                                        );
+                                    }
+                                },
+                        )
+                    ),
+                )
+            );
 
             if ($params['countProcess']) {
                 $return = $this->items($config, true);

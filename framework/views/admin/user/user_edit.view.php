@@ -44,24 +44,24 @@ foreach ($fieldset->field() as $field) {
     </div>
     <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
 <?php
-        $role = reset($item->roles);
+$role = reset($item->roles);
 
-        \Config::load('nos::admin/permissions', 'permissions');
-        \Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
-        $applications = array_merge(\Config::get('data::app_installed', array()), \Config::get('permissions', array()));
-        foreach ($applications as $app => $params) {
-            if (isset($params['permission'])) {
-                $apps[$app] = array_merge($params, $params['permission']);
-            }
-        }
-        unset($apps['local']);
-        unset($apps['nos']);
+\Config::load('nos::admin/permissions', 'permissions');
+\Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
+$applications = array_merge(\Config::get('data::app_installed', array()), \Config::get('permissions', array()));
+foreach ($applications as $app => $params) {
+    if (isset($params['permission'])) {
+        $apps[$app] = array_merge($params, $params['permission']);
+    }
+}
+unset($apps['local']);
+unset($apps['nos']);
 
-        echo \View::forge('nos::admin/user/permission', array(
-            'user' => $item,
-            'role' => $role,
-            'apps' => $apps,
-        ), false);
+echo \View::forge('nos::admin/user/permission', array(
+    'user' => $item,
+    'role' => $role,
+    'apps' => $apps,
+), false);
 ?>
     </div>
 </div>

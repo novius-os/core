@@ -7,17 +7,17 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-    $id = uniqid('temp_');
+$id = uniqid('temp_');
 
-    $model_name = get_class($item);
-    $model_id   = $item->id;
+$model_name = get_class($item);
+$model_id   = $item->id;
 
-    $data_catchers = $item->data_catchers();
-    $default_nuggets = $item->get_default_nuggets();
-    $translatable = $model_name::behaviours('Nos\Orm_Behaviour_Translatable', false);
-    if ($translatable) {
-        $default_nuggets['lang'] = $item->{$translatable['lang_property']};
-    }
+$data_catchers = $item->data_catchers();
+$default_nuggets = $item->get_default_nuggets();
+$translatable = $model_name::behaviours('Nos\Orm_Behaviour_Translatable', false);
+if ($translatable) {
+    $default_nuggets['lang'] = $item->{$translatable['lang_property']};
+}
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">
     <a href="#" class="nos-datacatchers-close"><img src="static/novius-os/admin/novius-os/img/icons/close.png" /></a>
