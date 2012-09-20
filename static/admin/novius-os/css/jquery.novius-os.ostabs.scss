@@ -152,35 +152,64 @@ body {
             color: white;
             z-index: 3;
             padding-left: 36px;
+            padding-top: 0px;
+
 
             .button {
                 overflow: hidden;
                 margin-top: 2px;
-                vertical-align: 8px;
+                vertical-align: 15px;
                 display: inline-block;
             }
 
-            .wijmo-wijmenu {
-                cursor: default;
+            .menu {
                 display: inline-block;
-                size: 1em;
-                vertical-align: 14px;
-                margin-right: 2px;
-                margin-left: 4px;
+                color: #DDD;
+                font-size: 14px;
+                font-weight: bold;
+                height: 33px;
+                vertical-align: 28px;
+                padding: 0px 10px;
+                padding-top: 13px;
+                cursor: pointer;
 
-                .wijmo-wijmenu-link {
-                    font-size: 15px;
-                    height: 30px;
-                    margin-top: -17px;
-                    line-height: 30px;
-
-                    .ui-icon {
-                        margin-top: 7px;
-                    }
+                &:hover {
+                    color: white;
                 }
 
-                .wijmo-wijmenu-list {
+                &.active {
+                    background: white;
+                    color: black;
+                }
+            }
 
+            .menu_dropdown {
+                display: none;
+                position: absolute;
+                right: 0px;
+                top: 46px;
+                background-color: white;
+                min-width: 150px;
+                border-left: 1px solid #CCC;
+                border-bottom: 1px solid #CCC;
+                @include box-shadow(#CCC 2px 2px 2px);
+
+                &.active {
+                    display: block;
+                }
+
+                a.menu_item {
+                    display: block;
+                    padding: 10px;
+                    font-size: 14px;
+                    text-align: left;
+                    cursor: pointer;
+                    color: #777;
+
+                    &:hover {
+                        background-color: #EEE;
+                        color: black;
+                    }
                 }
             }
 		}

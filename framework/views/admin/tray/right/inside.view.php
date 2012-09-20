@@ -1,0 +1,2 @@
+<a class="menu_item" onclick="$(this).nosTabs('open', {url: 'admin/nos/tray/account', app: true, iconSize: 32, labelDisplay: false, iconUrl: 'static/novius-os/admin/novius-os/img/32/myaccount.png'});"><?= __('My account') ?></a>
+<a class="menu_item" onclick="document.location = 'admin/nos/tray/account/disconnect';"><?= __('Log out') ?></a>
