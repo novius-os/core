@@ -48,7 +48,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             'lang' => $this->item->page_lang,
         ));
 
-        $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
+        $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.$this->i18n('Use title').'</label>';
 
         $cache_duration = $fieldset->field('page_cache_duration');
         $cache_duration->set_template(str_replace('{duration}', '{field} {required}', $cache_duration->label));
@@ -116,7 +116,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             );
 
             $body = array(
-                'notify' => 'Homepage successfully changed.',
+                'notify' => $this->i18n('Homepage successfully changed.'),
                 'dispatchEvent' => $dispatchEvent,
             );
 

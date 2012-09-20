@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-$i18n = Nos\I18n::dictionnary('nos::admin/page/appdesk', 'nos::admin/appdesk');
+$i18n = Nos\I18n::dictionnary('nos::page', 'nos::application');
 
 $dataset = array(
     'id' => 'page_id',
@@ -73,7 +73,7 @@ return array(
             ),
         ),
     ),
-    'i18n_file' => 'nos::admin/page/appdesk',
+    'i18n_file' => 'nos::page',
     'dataset' => $dataset,
     'appdesk' => array(
         'tab' => array(

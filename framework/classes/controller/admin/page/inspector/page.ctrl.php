@@ -12,6 +12,11 @@ namespace Nos;
 
 class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltree
 {
+    public function prepare_i18n() {
+
+        parent::prepare_i18n();
+        I18n::dictionnary('nos::page');
+    }
 
     protected function tree(array $tree_config)
     {
@@ -29,11 +34,8 @@ class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltre
                 array(
                     '_id' => '0',
                     '_model' => 'Nos\Model_Page',
-                    //'actions' => array(),
                     'id' => '0',
-                    //'lang' => '',
-                    //'publication_status' => '',
-                    'title' => ___('nos::admin/global', 'Root'),
+                    'title' => ___('nos::page', 'Root'),
                     'treeChilds' => $json['items'],
                 ),
             );

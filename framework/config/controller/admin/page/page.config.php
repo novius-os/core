@@ -14,12 +14,12 @@ foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
     $templates[$tpl_key] = $template['title'];
 }
 
-$i18n = Nos\I18n::dictionnary('nos::admin/page/page', 'nos::admin/crud');
+$i18n = Nos\I18n::dictionnary('nos::page', 'nos::application');
 
 return array(
     'controller_url'  => 'admin/nos/page/page',
     'model' => 'Nos\\Model_Page',
-    'i18n_file' => 'nos::admin/page/page',
+    'i18n_file' => 'nos::page',
     'context_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',

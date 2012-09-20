@@ -38,16 +38,16 @@ require(
 ?>
         var labels = {
             'undefined' : {
-                0 : <?= $formatter->to_json(___('nos::admin/global', 'Will not be published')) ?>,
-                1 : <?= $formatter->to_json(___('nos::admin/global', 'Will be published')) ?>
+                0 : <?= $formatter->to_json(___('nos::generic', 'Will not be published')) ?>,
+                1 : <?= $formatter->to_json(___('nos::generic', 'Will be published')) ?>
             },
             'no' : {
-                0 : <?= $formatter->to_json(___('nos::admin/global', 'Not published')) ?>,
-                1 : <?= $formatter->to_json(___('nos::admin/global', 'Will be published')) ?>
+                0 : <?= $formatter->to_json(___('nos::generic', 'Not published')) ?>,
+                1 : <?= $formatter->to_json(___('nos::generic', 'Will be published')) ?>
             },
             'yes' : {
-                0 : <?= $formatter->to_json(___('nos::admin/global', 'Will be unpublished')) ?>,
-                1 : <?= $formatter->to_json(___('nos::admin/global', 'Published')) ?>
+                0 : <?= $formatter->to_json(___('nos::generic', 'Will be unpublished')) ?>,
+                1 : <?= $formatter->to_json(___('nos::generic', 'Published')) ?>
             }
         };
 

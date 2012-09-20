@@ -22,24 +22,12 @@ define('jquery-nos-appdesk',
                 hideLocales : false,
                 texts : {
                     allLanguages : 'All',
-                    addDropDown : 'Select an action',
-                    columns : 'Columns',
-                    showFiltersColumns : 'Filters column header',
-                    visibility : 'Visibility',
-                    settings : 'Settings',
-                    vertical : 'Vertical',
-                    horizontal : 'Horizontal',
-                    hidden : 'Hidden',
-                    save : 'Save',
-                    cancel: 'Cancel',
-                    mainView: 'Main view',
                     item : 'item',
                     items : 'items',
                     showNbItems : 'Showing {{x}} items out of {{y}}',
                     showOneItem : 'Show 1 item',
                     showNoItem : 'No item',
                     showAll : 'Show all items',
-                    views : 'Views',
                     viewGrid : 'Grid',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
@@ -671,6 +659,7 @@ define('jquery-nos-appdesk',
                         width : '100%'
                     })
                     .noslistgrid($.extend({
+                        loadingText: o.texts.loading,
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
                         showFilter: self.showFilter,
@@ -797,6 +786,7 @@ define('jquery-nos-appdesk',
                         height : height,
                         width : '100%'
                     }).nostreegrid($.extend(true, { // True for recursive clone
+                        loadingText: o.texts.loading,
                         treeUrl : o.treeGrid.urlJson,
                         treeOptions : {
                             lang : o.selectedLang || ''
@@ -882,6 +872,9 @@ define('jquery-nos-appdesk',
 
                 self.uiThumbnail.css('height', height)
                     .thumbnailsgrid($.extend({
+                        texts: {
+                            loading: o.texts.loading
+                        },
                         pageIndex: 0,
                         url: o.grid.urlJson,
                         loading: function (dataSource, userData) {
