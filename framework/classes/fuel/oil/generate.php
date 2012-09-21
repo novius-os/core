@@ -37,9 +37,7 @@ class Generate extends \Oil\Generate
             // Override the (most recent) migration with the same name by using its number
             if (\Cli::option('f', \Cli::option('force')) === true) {
                 list($number) = explode('_', $file_name);
-            }
-
-            // Name clashes but this is done by hand. Assume they know what they're doing and just increment the file
+            } // Name clashes but this is done by hand. Assume they know what they're doing and just increment the file
             elseif (static::$scaffolding === false) {
                 // Increment the name of this
                 $migration_name = \Str::increment(mb_substr($file_name, 4), 2);
@@ -57,59 +55,55 @@ class Generate extends \Oil\Generate
             // If the miration name starts with the name of the action method
             if (mb_substr($migration_name, 0, mb_strlen($method_name)) === $method_name) {
                 /**
-                 *	Create an array of the subject the migration is about
+                 *    Create an array of the subject the migration is about
                  *
-                 *	- In a migration named 'create_users' the subject is 'users' since thats what we want to create
-                 *		So it would be the second object in the array
-                 *			array(false, 'users')
+                 *    - In a migration named 'create_users' the subject is 'users' since thats what we want to create
+                 *        So it would be the second object in the array
+                 *            array(false, 'users')
                  *
-                 *	- In a migration named 'add_name_to_users' the object is 'name' and the subject is 'users'.
-                 *		So again 'users' would be the second object, but 'name' would be the first
-                 *			array('name', 'users')
+                 *    - In a migration named 'add_name_to_users' the object is 'name' and the subject is 'users'.
+                 *        So again 'users' would be the second object, but 'name' would be the first
+                 *            array('name', 'users')
                  *
                  */
                 $subjects = array(false, false);
-                $matches = explode('_', str_replace($method_name . '_', '', $migration_name));
+                $matches = explode('_', str_replace($method_name.'_', '', $migration_name));
 
                 // create_{table}
                 if (count($matches) == 1) {
                     $subjects = array(false, $matches[0]);
-                }
-
-                // add_{field}_to_{table}
+                } // add_{field}_to_{table}
                 elseif (count($matches) == 3 && $matches[1] == 'to') {
                     $subjects = array($matches[0], $matches[2]);
-                }
+                } // rename_field_{field}_to_{field}_in_{table} (with underscores in field names)
+                else {
+                    if (count($matches) >= 5 && in_array('to', $matches) && in_array('in', $matches)) {
+                        $subjects = array(
+                            implode('_', array_slice($matches, array_search('in', $matches) + 1)),
+                            implode('_', array_slice($matches, 0, array_search('to', $matches))),
+                            implode('_', array_slice($matches, array_search('to', $matches) + 1, array_search('in', $matches) - 2))
+                        );
+                    } // create_{table} or drop_{table} (with underscores in table name)
+                    else {
+                        if (count($matches) !== 0) {
+                            $name = str_replace(array('create_', 'add_', '_to_'), array('create-', 'add-', '-to-'), $migration_name);
 
-                // rename_field_{field}_to_{field}_in_{table} (with underscores in field names)
-                else if (count($matches) >= 5 && in_array('to', $matches) && in_array('in', $matches)) {
-                    $subjects = array(
-                        implode('_', array_slice($matches, array_search('in', $matches)+1)),
-                        implode('_', array_slice($matches, 0, array_search('to', $matches))),
-                        implode('_', array_slice($matches, array_search('to', $matches)+1, array_search('in', $matches)-2))
-                    );
-                }
+                            if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/iu', $name, $deep_matches)) {
+                                switch ($deep_matches[1]) {
+                                    case 'create' :
+                                        $subjects = array(false, $deep_matches[2]);
+                                        break;
 
-                // create_{table} or drop_{table} (with underscores in table name)
-                else if (count($matches) !== 0) {
-                    $name = str_replace(array('create_', 'add_', '_to_'), array('create-', 'add-', '-to-'), $migration_name);
-
-                    if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/iu', $name, $deep_matches)) {
-                        switch ($deep_matches[1]) {
-                            case 'create' :
-                                $subjects = array(false, $deep_matches[2]);
-                                break;
-
-                            case 'add' :
-                                $subjects = array($deep_matches[2], $deep_matches[4]);
-                                break;
+                                    case 'add' :
+                                        $subjects = array($deep_matches[2], $deep_matches[4]);
+                                        break;
+                                }
+                            }
+                        } // There is no subject here so just carry on with a normal empty migration
+                        else {
+                            break;
                         }
                     }
-                }
-
-                // There is no subject here so just carry on with a normal empty migration
-                else {
-                    break;
                 }
 
                 // We always pass in fields to a migration, so lets sort them out here.
@@ -145,8 +139,8 @@ class Generate extends \Oil\Generate
                                     $type = 'int';
                                 }
 
-                                if ( ! in_array($type, array('text', 'blob', 'datetime', 'date', 'timestamp', 'time'))) {
-                                    if ( ! isset($option[1]) || $option[1] == NULL) {
+                                if (!in_array($type, array('text', 'blob', 'datetime', 'date', 'timestamp', 'time'))) {
+                                    if (!isset($option[1]) || $option[1] == null) {
                                         if (isset(self::$_default_constraints[$type])) {
                                             $field_array['constraint'] = self::$_default_constraints[$type];
                                         }
@@ -157,8 +151,7 @@ class Generate extends \Oil\Generate
                                             $option[1] = '"'.implode('","', $values).'"';
 
                                             $field_array['constraint'] = $option[1];
-                                        }
-                                        // should support field_name:decimal[10,2]
+                                        } // should support field_name:decimal[10,2]
                                         elseif (in_array($type, array('decimal', 'float'))) {
                                             $field_array['constraint'] = $option[1];
                                         } else {
@@ -190,12 +183,12 @@ class Generate extends \Oil\Generate
                 }
 
                 // Call the magic action which returns an array($up, $down) for the migration
-                $migration = call_user_func(__NAMESPACE__ . "\Generate_Migration_Actions::{$method_name}", $subjects, $fields);
+                $migration = call_user_func(__NAMESPACE__."\Generate_Migration_Actions::{$method_name}", $subjects, $fields);
             }
         }
 
         // Build the migration
-        list($up, $down)=$migration;
+        list($up, $down) = $migration;
 
         $migration_name = ucfirst(mb_strtolower($migration_name));
 
@@ -219,7 +212,7 @@ class {$migration_name}
 MIGRATION;
 
         $number = isset($number) ? $number : static::_find_migration_number();
-        $filepath = $working_path . 'migrations/'.$number.'_' . mb_strtolower($migration_name) . '.php';
+        $filepath = $working_path.'migrations/'.$number.'_'.mb_strtolower($migration_name).'.php';
 
         static::create($filepath, $migration, 'migration');
 
@@ -268,8 +261,8 @@ HELP;
         $module = \Cli::option('module', \Cli::option('m'));
         if ($module) {
             foreach (\Config::get('module_paths') as $m) {
-                if (is_dir($m .$module)) {
-                    return $m .$module .DS;
+                if (is_dir($m.$module)) {
+                    return $m.$module.DS;
                 }
             }
         }
@@ -279,7 +272,7 @@ HELP;
 
     private static function _find_migration_number()
     {
-        $glob = glob(static::_working_path() .'migrations/*_*.php');
+        $glob = glob(static::_working_path().'migrations/*_*.php');
         list($last) = explode('_', basename(end($glob)));
 
         return str_pad($last + 1, 3, '0', STR_PAD_LEFT);

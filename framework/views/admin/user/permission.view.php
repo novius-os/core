@@ -32,17 +32,17 @@ foreach ($apps as $app => $perms) {
     \Config::load("$app::permissions", true);
     ?>
 
-<input type="hidden" name="applications[]" value="<?= $app ?>" />
+    <input type="hidden" name="applications[]" value="<?= $app ?>" />
     <div class="application item">
         <div class="maincheck">
             <input type="checkbox" name="access[<?= $app ?>]" value="1" <?= $role->check_permission($app, 'access') ? 'checked' : '' ?> />
         </div>
         <div class="icon">
-            <?php
-            if (!empty($apps[$app]['icon64'])) {
-                echo '<img src="'.$apps[$app]['icon64'].'" />';
-            }
-            ?>
+    <?php
+    if (!empty($apps[$app]['icon64'])) {
+        echo '<img src="'.$apps[$app]['icon64'].'" />';
+    }
+    ?>
         </div>
         <div class="infos" title="<?= strtr(__('Application provided by {provider_name}'), array(
                 '{provider_name}' => $apps[$app]['provider']['name'],
@@ -53,24 +53,8 @@ foreach ($apps as $app => $perms) {
 
     <div style="margin-left: 30px;">
 
-    <?php
-    /*
-    $keys = \Config::get("$app::permissions", array());
-    if (!empty($keys)) {
-        foreach ($keys as $key => $value) {
-            $driver = $role->get_permission_driver($app, $key);
-            ?>
-            <h2><?= $value['label']; ?></h2>
-            <?php
-            //\Debug::dump($driver);
-            echo $driver->display($role);
-        }
-    }
-    */
-    ?>
-
     </div>
-<?php
+    <?php
 }
 ?>
     </div>

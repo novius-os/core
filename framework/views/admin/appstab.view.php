@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-    $id = uniqid('temp_');
+$id = uniqid('temp_');
 ?>
 <div id="<?= $id ?>">
     <div align="center">
@@ -19,17 +19,18 @@
     </div>
     <div id="apps">
 <?php
-    foreach ($apps as $app) {
-?>
-        <a class="app" href="<?= $app['url'] ?>" data-launcher="<?= htmlspecialchars(\Format::forge($app)->to_json()) ?>">
+foreach ($apps as $app) {
+    ?>
+        <a class="app" href="#" data-launcher="<?= htmlspecialchars(\Format::forge($app)->to_json()) ?>">
             <span class="icon">
                 <img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />
                 <img width="64" src="<?= $app['icon64'] ?>" />
             </span>
             <span class="text"><?= $app['name'] ?></span>
         </a>
-<?php
-    }
+
+    <?php
+}
 ?>
     </div>
 </div>
@@ -55,18 +56,27 @@ require(
                             $(apps).nosSaveUserConfig('misc.apps', orders);
                         }
                     });
-<?php if ($background) { ?>
+<?php
+if ($background) {
+    ?>
             $('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
-<?php } ?>
+    <?php
+}
+?>
             $panel.find('a.app').click(function(e) {
                 e.preventDefault();
                 var $launcher = $(this),
                     tab = $launcher.data('launcher');
-                $launcher.nosTabs($.extend({
-                    app: true,
-                    iconSize: 32,
-                    labelDisplay: false
-                }, tab));
+
+                if (tab.action.tab) {
+                    tab.action.tab = $.extend({
+                        app: true,
+                        iconSize: 32,
+                        labelDisplay: false
+                    }, tab.action.tab);
+                }
+
+                $launcher.nosAction(tab.action);
             });
         });
     });

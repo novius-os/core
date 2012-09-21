@@ -31,13 +31,17 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         }
 
         $view = View::forge('admin/tray/app_manager');
-        $view->set(array(
-            'nos'     => Application::forge('nos'),
-            'local'     => Application::forge('local'),
-            'installed' => $app_installed,
-            'others'    => $app_others,
-            'allow_upload' => \Config::get('allow_plugin_upload'),
-        ), false, false);
+        $view->set(
+            array(
+                'nos' => Application::forge('nos'),
+                'local' => Application::forge('local'),
+                'installed' => $app_installed,
+                'others' => $app_others,
+                'allow_upload' => \Config::get('allow_plugin_upload'),
+            ),
+            false,
+            false
+        );
 
         return $view;
     }
@@ -50,16 +54,20 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
             $application = Application::forge($app_name);
             $application->install();
         } catch (\Exception $e) {
-            $this->response(array(
-                'error' => $e->getMessage(),
-            ));
+            $this->response(
+                array(
+                    'error' => $e->getMessage(),
+                )
+            );
 
             return;
         }
-        $this->response(array(
-            'notify' => __('Installation successful'),
-            // The tab will be refreshed by the javaScript within the view
-        ));
+        $this->response(
+            array(
+                'notify' => __('Installation successful'),
+                // The tab will be refreshed by the javaScript within the view
+            )
+        );
     }
 
     public function action_remove($app_name)
@@ -73,17 +81,21 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
                 \Config::save(APPPATH.'metadata/app_installed.php', $app_installed);
             }
         } catch (\Exception $e) {
-            $this->response(array(
-                'error' => $e->getMessage(),
-            ));
+            $this->response(
+                array(
+                    'error' => $e->getMessage(),
+                )
+            );
 
             return;
         }
 
-        $this->response(array(
-            'notify' => __('Uninstallation successful'),
-            // The tab will be refreshed by the javaScript within the view
-        ));
+        $this->response(
+            array(
+                'notify' => __('Uninstallation successful'),
+                // The tab will be refreshed by the javaScript within the view
+            )
+        );
     }
 
     public function action_upload()
@@ -97,18 +109,24 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         }
 
         if (!is_uploaded_file($_FILES['zip']['tmp_name'])) {
-            \Session::forge()->set_flash('notification.plugins', array(
-                'title' => 'Upload error.',
-                'type' => 'error',
-            ));
+            \Session::forge()->set_flash(
+                'notification.plugins',
+                array(
+                    'title' => 'Upload error.',
+                    'type' => 'error',
+                )
+            );
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
         if ($_FILES['zip']['error'] != UPLOAD_ERR_OK) {
-            \Session::forge()->set_flash('notification.plugins', array(
-                'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
-                'type' => 'error',
-            ));
+            \Session::forge()->set_flash(
+                'notification.plugins',
+                array(
+                    'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
+                    'type' => 'error',
+                )
+            );
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
@@ -129,10 +147,13 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
 
         $count = count($root_files);
         if ($count == 0) {
-            \Session::forge()->set_flash('notification.plugins', array(
-                'title' => $name.' already exists in you module directory.',
-                'type' => 'error',
-            ));
+            \Session::forge()->set_flash(
+                'notification.plugins',
+                array(
+                    'title' => $name.' already exists in you module directory.',
+                    'type' => 'error',
+                )
+            );
             \Response::redirect('admin/nos/tray/appmanager');
         }
         $root = ($count == 1 ? $root_files[0] : '');
@@ -141,25 +162,34 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
         $metadata = \Fuel::load('zip://'.$zip_file.'#'.$metadata_file);
 
         if (empty($metadata['install_folder'])) {
-            \Session::forge()->set_flash('notification.plugins', array(
-                'title' => 'This is not a valid application archive.',
-                'type' => 'error',
-            ));
+            \Session::forge()->set_flash(
+                'notification.plugins',
+                array(
+                    'title' => 'This is not a valid application archive.',
+                    'type' => 'error',
+                )
+            );
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
         $path = APPPATH.'applications'.DS.$metadata['install_folder'];
         if (is_dir($path.$name)) {
-            \Session::forge()->set_flash('notification.plugins', array(
-                'title' => $metadata['install_folder'].' already exists in you module directory.',
-                'type' => 'error',
-            ));
+            \Session::forge()->set_flash(
+                'notification.plugins',
+                array(
+                    'title' => $metadata['install_folder'].' already exists in you module directory.',
+                    'type' => 'error',
+                )
+            );
             \Response::redirect('admin/nos/tray/appmanager');
         }
 
-        usort($files, function($a, $b) {
-                    return mb_strlen($a) > mb_strlen($b);
-                });
+        usort(
+            $files,
+            function ($a, $b) {
+                return mb_strlen($a) > mb_strlen($b);
+            }
+        );
 
         // @todo better error handling ?
         // @todo skip stupid files ?
@@ -188,20 +218,23 @@ class Controller_Admin_Tray_Appmanager extends Controller_Admin_Application
     public function after($response)
     {
         foreach (array(
-    'title' => 'Administration',
-    'base' => \Uri::base(false),
-    'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
-        ) as $var => $default)
-        {
+                     'title' => 'Administration',
+                     'base' => \Uri::base(false),
+                     'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
+                 ) as $var => $default) {
             if (empty($this->template->$var)) {
                 $this->template->$var = $default;
             }
         }
         $ret = parent::after($response);
-        $this->template->set(array(
-            'css' => \Asset::render('css'),
-            'js' => \Asset::render('js'),
-                ), false, false);
+        $this->template->set(
+            array(
+                'css' => \Asset::render('css'),
+                'js' => \Asset::render('js'),
+            ),
+            false,
+            false
+        );
 
         return $ret;
     }

@@ -17,7 +17,7 @@ foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
 $i18n = Nos\I18n::dictionnary('nos::page', 'nos::application');
 
 return array(
-    'controller_url'  => 'admin/nos/page/page',
+    'controller_url' => 'admin/nos/page/page',
     'model' => 'Nos\\Model_Page',
     'i18n_file' => 'nos::page',
     'context_relation' => 'parent',
@@ -29,23 +29,25 @@ return array(
         ),
     ),
     'actions' => array(
-        'visualise' => function($item) use($i18n) {
-            if (!$item->is_new())
+        'visualise' =>
+            function($item) use($i18n)
             {
-                return array(
-                    'label' => $i18n('Visualise'),
-                    'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                    'action' => array(
-                        'action' => 'window.open',
-                        'url' => $item->get_href() . '?_preview=1',
-                    ),
-                );
+                if (!$item->is_new())
+                {
+                    return array(
+                        'label' => $i18n('Visualise'),
+                        'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                        'action' => array(
+                            'action' => 'window.open',
+                            'url' => $item->get_href().'?_preview=1',
+                        ),
+                    );
+                }
+                else
+                {
+                    return array();
+                }
             }
-            else
-            {
-                return array();
-            }
-        }
     ),
     'layout' => array(
         'form' => array(
@@ -60,7 +62,7 @@ return array(
                     'content' => array(
                         'view' => 'nos::form/expander',
                         'params' => array(
-                            'title'   => $i18n('Content'),
+                            'title' => $i18n('Content'),
                             'nomargin' => true,
                             'options' => array(
                                 'allowExpand' => false,
@@ -103,9 +105,9 @@ return array(
                                 ),
                                 'admin' => array(
                                     'title' => $i18n('Admin'),
-                                    'header_class'  => 'faded',
+                                    'header_class' => 'faded',
                                     'content_class' => 'faded',
-                                    'fields'        => array('page_cache_duration', 'page_lock'),
+                                    'fields' => array('page_cache_duration', 'page_lock'),
                                 ),
                             ),
                         ),
@@ -118,8 +120,8 @@ return array(
         ),
     ),
     'fields' => array(
-        'page_id' => array (
-            'label' => $i18n('ID: '),
+        'page_id' => array(
+            'label' => __('ID: '),
             'form' => array(
                 'type' => 'hidden',
             ),
@@ -141,8 +143,7 @@ return array(
                 'height' => '250px',
             ),
             'label' => $i18n('Location: '),
-            'form' => array(
-            ),
+            'form' => array(),
         ),
         'page_template' => array(
             'label' => $i18n('Template: '),
@@ -212,9 +213,9 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::EXTERNAL_TARGET_NEW   => $i18n('New window'),
+                    Nos\Model_Page::EXTERNAL_TARGET_NEW => $i18n('New window'),
                     Nos\Model_Page::EXTERNAL_TARGET_POPUP => $i18n('Popup'),
-                    Nos\Model_Page::EXTERNAL_TARGET_SAME  => $i18n('Same window'),
+                    Nos\Model_Page::EXTERNAL_TARGET_SAME => $i18n('Same window'),
                 ),
             ),
         ),
@@ -237,7 +238,7 @@ return array(
                 'options' => array(
                     Nos\Model_Page::LOCK_UNLOCKED => $i18n('Unlocked'),
                     Nos\Model_Page::LOCK_DELETION => $i18n('Deletion'),
-                    Nos\Model_Page::LOCK_EDITION  => $i18n('Modification'),
+                    Nos\Model_Page::LOCK_EDITION => $i18n('Modification'),
                 ),
             ),
         ),

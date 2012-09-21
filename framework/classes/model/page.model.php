@@ -93,6 +93,8 @@ class Model_Page extends \Nos\Orm\Model
         ),
     );
 
+    protected $_page_id_for_delete = null;
+
     const TYPE_CLASSIC       = 0;
     const TYPE_POPUP         = 1;
     const TYPE_FOLDER        = 2;
@@ -231,10 +233,16 @@ class Model_Page extends \Nos\Orm\Model
         }
     }
 
+    public function _event_before_delete()
+    {
+        $this->_page_id_for_delete = $this->page_id;
+    }
+
     public function _event_after_delete()
     {
-        static::_remove_url_enhanced($this->page_id);
-        static::_remove_page_enhanced($this->page_id);
+        static::_remove_url_enhanced($this->_page_id_for_delete);
+        static::_remove_page_enhanced($this->_page_id_for_delete);
+        $this->_page_id_for_delete = null;
     }
 
     protected static function _remove_url_enhanced($id)
@@ -242,7 +250,6 @@ class Model_Page extends \Nos\Orm\Model
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
         $url_enhanced = \Config::get("data::url_enhanced", array());
-
         foreach (array_keys($url_enhanced, $id) as $url) {
             unset($url_enhanced[$url]);
         }

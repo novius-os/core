@@ -21,36 +21,36 @@ echo View::forge('nos::crud/tab', $view_params, false);
 ?>
 <div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
+<?php
+if (!in_array($lang, $possible)) {
+    echo '<p>&nbsp;</p>';
+    $parent = $item->get_parent();
+    if (!empty($parent)) {
+        $uniqid_parent = uniqid('parent_');
+        echo strtr($i18n('error added in lang not parent'), array(
+            '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
+            '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
+        ));
+        ?>
+        <script type="text/javascript">
+            require(['jquery-nos'], function($nos) {
+               $nos('#<?= $uniqid_parent ?>').click(function() {
+                   $nos(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_insert_update.'/'.$parent->id.'?lang='.$lang)) ?>);
+               });
+            });
+        </script>
         <?php
-        if (!in_array($lang, $possible)) {
-            echo '<p>&nbsp;</p>';
-            $parent = $item->get_parent();
-            if (!empty($parent)) {
-                $uniqid_parent = uniqid('parent_');
-                echo strtr($i18n('error added in lang not parent'), array(
-                    '{lang}' => Arr::get(Config::get('locales'), $lang, $lang),
-                    '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
-                ));
-                ?>
-                <script type="text/javascript">
-                    require(['jquery-nos'], function($nos) {
-                       $nos('#<?= $uniqid_parent ?>').click(function() {
-                           $nos(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_insert_update.'/'.$parent->id.'?lang='.$lang)) ?>);
-                       });
-                    });
-                </script>
-                <?php
-            } else {
-                echo strtr($i18n('error added in lang'), array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
-            }
-        } else {
-            foreach ($possible as $locale) {
-                $item_lang = $item->find_lang($locale);
-                if (!empty($item_lang)) {
-                    $labels[$item_lang->id] = \Config::get("locales.$locale", $locale);
-                }
-            }
-            ?>
+    } else {
+        echo strtr($i18n('error added in lang'), array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)));
+    }
+} else {
+    foreach ($possible as $locale) {
+        $item_lang = $item->find_lang($locale);
+        if (!empty($item_lang)) {
+            $labels[$item_lang->id] = \Config::get("locales.$locale", $locale);
+        }
+    }
+    ?>
             <p><?=
             strtr($i18n('item inexistent in lang yet'), array('{lang}' => Arr::get(Config::get('locales'), $lang, $lang)))
             ?></p>
@@ -76,26 +76,26 @@ echo View::forge('nos::crud/tab', $view_params, false);
                     <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
                         <?= Form::hidden('lang', $lang) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
-                        <?php
-                        if (count($labels) == 1) {
-                            echo Form::hidden('create_from_id', key($labels));
-                            $selected_lang = current($labels);
-                        } else {
-                            $selected_lang = Form::select('create_from_id', null, $labels);
-                        }
+    <?php
+    if (count($labels) == 1) {
+        echo Form::hidden('create_from_id', key($labels));
+        $selected_lang = current($labels);
+    } else {
+        $selected_lang = Form::select('create_from_id', null, $labels);
+    }
 
-                        echo strtr(__('{translate} the {lang} version'), array(
-                            '{translate}' => '<button type="submit" class="primary" data-icon="plus">'.__('Translate').'</button>',
-                            '{lang}' => $selected_lang,
-                        ));
-                        ?>
+    echo strtr(__('{translate} the {lang} version'), array(
+        '{translate}' => '<button type="submit" class="primary" data-icon="plus">'.__('Translate').'</button>',
+        '{lang}' => $selected_lang,
+    ));
+    ?>
                     </form>
                     <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Form filled with the content from the original version)') ?></p>
                 </li>
             </ul>
-        <?php
-        }
-        ?>
+    <?php
+}
+?>
     </div>
 </div>
 <script type="text/javascript">

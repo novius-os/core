@@ -16,7 +16,7 @@ JAVA_CMD='java'
 export JAVA_CMD
 
 CSS_COMBINED_FILE="nos.min.css"
-CSS_FILES=( laGrid novius-os jquery.novius-os.appdesk jquery.novius-os.listgrid jquery.novius-os.ostabs jquery.novius-os.treegrid jquery.novius-os.preview jquery.novius-os.thumbnailsgrid )
+CSS_FILES=( laGrid novius-os jquery.novius-os.appdesk jquery.novius-os.listgrid jquery.novius-os.ostabs jquery.novius-os.treegrid jquery.novius-os.preview jquery.novius-os.thumbnailsgrid jquery.novius-os.datacatchers )
 
 #clear the files
 > $CSS_COMBINED_FILE
