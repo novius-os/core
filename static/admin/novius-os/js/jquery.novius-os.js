@@ -813,7 +813,7 @@ define('jquery-nos',
                                     }
                                 });
                                 if (sel !== false) {
-                                    return noviusos().ostabs('select', sel + 4); // Add 4 because appstab and tray are before and not return by tabs
+                                    return noviusos().ostabs('select', sel + 1);
                                 } else {
                                     self.nosTabs('add', tab);
                                 }

@@ -47,6 +47,48 @@ return array(
             'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
             'application' => 'nos_user',
         ),
+        'nos_help' => array(
+            'name' => 'Help',
+            'action' => array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'label' => __('Help'),
+                    'url' => 'admin/nos/tray/help',
+                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+                ),
+            ),
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/help.png',
+            'icon64' => 'static/novius-os/admin/novius-os/img/64/help.png',
+            'application' => 'nos',
+        ),
+        'nos_account' => array(
+            'name' => 'My account',
+            'action' => array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'label' => __('Account'),
+                    'url' => 'admin/nos/tray/account',
+                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+                ),
+            ),
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/myaccount.png',
+            'icon64' => 'static/novius-os/admin/novius-os/img/64/myaccount.png',
+            'application' => 'nos',
+        ),
+        'nos_appmanager' => array(
+            'name' => 'Application manager',
+            'action' => array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'label' => __('Application manager'),
+                    'url' => 'admin/nos/tray/appmanager',
+                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+                ),
+            ),
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/app-manager.png',
+            'icon64' => 'static/novius-os/admin/novius-os/img/64/app-manager.png',
+            'application' => 'nos',
+        ),
     ),
     'data_catchers' => array(
         'rss_channel' => array(
