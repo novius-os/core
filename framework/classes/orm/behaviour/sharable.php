@@ -18,10 +18,13 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
     {
         parent::__construct($class);
 
-        $this->_properties = array_merge(array(
-            'data' => array(),
-            'data_catchers' => array(),
-        ), $this->_properties);
+        $this->_properties = array_merge(
+            array(
+                'data' => array(),
+                'data_catchers' => array(),
+            ),
+            $this->_properties
+        );
     }
 
     public function get_default_nuggets($item)
@@ -43,13 +46,16 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
     public function get_catcher_nuggets($item, $catcher = Model_Content_Nuggets::DEFAULT_CATCHER)
     {
-        $default_nuggets = Model_Content_Nuggets::find('first', array(
-            'where' => array(
-                'content_catcher' => $catcher,
-                'content_model_name' => get_class($item),
-                'content_model_id' => $item->get(\Arr::get($item->primary_key(), 0)),
-            ),
-        ));
+        $default_nuggets = Model_Content_Nuggets::find(
+            'first',
+            array(
+                'where' => array(
+                    'content_catcher' => $catcher,
+                    'content_model_name' => get_class($item),
+                    'content_model_id' => $item->get(\Arr::get($item->primary_key(), 0)),
+                ),
+            )
+        );
         if (empty($default_nuggets)) {
             $default_nuggets = Model_Content_Nuggets::forge();
             $default_nuggets->content_catcher = $catcher;
@@ -99,7 +105,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             $catchers[$id] = $config;
         }
 
-        $set_data_catcher = function($data_catcher, $id) use ($data_catchers, &$catchers) {
+        $set_data_catcher = function ($data_catcher, $id) use ($data_catchers, &$catchers) {
             if (is_array($data_catcher) && $data_catcher['data_catcher'] && !empty($data_catchers[$data_catcher['data_catcher']])) {
                 $id = is_int($id) ? $data_catcher['data_catcher'] : $id;
                 $catchers[$id] = array_merge($data_catchers[$data_catcher['data_catcher']], $data_catcher);
@@ -117,16 +123,19 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
         \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
         foreach ($item->wysiwygs as $wysiwyg) {
-            \Nos\Nos::parse_enhancers($wysiwyg, function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
-                $params = \Config::get('data::enhancers.'.$enhancer, false);
-                if ($params !== false) {
-                    if (isset($params['data_catchers_added']) && is_array($params['data_catchers_added'])) {
-                        foreach ($params['data_catchers_added'] as $id => $data_catcher) {
-                            $set_data_catcher($data_catcher, $id);
+            \Nos\Nos::parse_enhancers(
+                $wysiwyg,
+                function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
+                    $params = \Config::get('data::enhancers.'.$enhancer, false);
+                    if ($params !== false) {
+                        if (isset($params['data_catchers_added']) && is_array($params['data_catchers_added'])) {
+                            foreach ($params['data_catchers_added'] as $id => $data_catcher) {
+                                $set_data_catcher($data_catcher, $id);
+                            }
                         }
                     }
                 }
-            });
+            );
         }
 
         return $catchers;
@@ -139,11 +148,14 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             $medias[$media->media_id] = $media;
         }
         foreach ($item->wysiwygs as $wysiwyg) {
-            \Nos\Tools_Wysiwyg::parse_medias($wysiwyg, function($media) use (&$medias) {
-                if (!empty($media)) {
-                    $medias[$media->media_id] = $media;
+            \Nos\Tools_Wysiwyg::parse_medias(
+                $wysiwyg,
+                function ($media) use (&$medias) {
+                    if (!empty($media)) {
+                        $medias[$media->media_id] = $media;
+                    }
                 }
-            });
+            );
         }
 
         return $medias;

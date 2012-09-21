@@ -17,20 +17,23 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
     public function after($response)
     {
         foreach (array(
-            'title' => 'Administration',
-            'base' => \Uri::base(false),
-            'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
-        ) as $var => $default)
-        {
+                     'title' => 'Administration',
+                     'base' => \Uri::base(false),
+                     'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
+                 ) as $var => $default) {
             if (empty($this->template->$var)) {
                 $this->template->$var = $default;
             }
         }
         $ret = parent::after($response);
-        $this->template->set(array(
-            'css' => \Asset::render('css'),
-            'js' => \Asset::render('js'),
-        ), false, false);
+        $this->template->set(
+            array(
+                'css' => \Asset::render('css'),
+                'js' => \Asset::render('js'),
+            ),
+            false,
+            false
+        );
 
         return $ret;
     }
@@ -50,43 +53,19 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             'iconSize' => 32,
             'label' => 'Novius OS',
         );
-        $trayTabs = array(
-            array(
-                'url' => 'admin/nos/tray/help',
-                'iconClasses' => 'nos-icon24 nos-icon24-help',
-                'label' => __('Help'),
-                'iconSize' => 24,
-            ),
-            array(
-                'url' => 'admin/nos/tray/account',
-                'iconClasses' => 'nos-icon24 nos-icon24-account',
-                'label' => __('Account'),
-                'iconSize' => 24,
-            ),
-        );
-        if ($user->check_permission('nos_tray', 'access')) {
-            array_unshift($trayTabs, array(
-                'url' => 'admin/nos/tray/appmanager',
-                'iconClasses' => 'nos-icon24 nos-icon24-noviusstore',
-                'label' => __('Applications manager'),
-                'iconSize' => 24,
-            ));
-        }
-        $count_trayTabs = count($trayTabs);
 
         if (!empty($deep_linking_url)) {
             if (!isset($user_configuration['tabs'])) {
-                $user_configuration['tabs']  = array();
+                $user_configuration['tabs'] = array();
             }
             if (!isset($user_configuration['tabs']['tabs'])) {
-                $user_configuration['tabs']['tabs']  = array();
+                $user_configuration['tabs']['tabs'] = array();
             }
             $openRank = null;
             $found = false;
 
             // Native = OS + tray
-            $nativeTabs = $trayTabs;
-            array_unshift($nativeTabs, $osTabs);
+            $nativeTabs = array($osTabs);
 
             // Search native tabs
             foreach ($nativeTabs as $i => $tab) {
@@ -102,7 +81,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                     if ($tab['url'] == $deep_linking_url) {
                         $openRank = $tab['openRank'];
                         $tab['openRank'] = 0;
-                        $user_configuration['tabs']['selected'] = $i + $count_trayTabs + 1;
+                        $user_configuration['tabs']['selected'] = $i + 1;
                         $found = true;
                     }
                 }
@@ -111,7 +90,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
             // Tab was not found found, add it
             if (!$found) {
-                $user_configuration['tabs']['selected'] = count($user_configuration['tabs']['tabs']) + 1 + $count_trayTabs;
+                $user_configuration['tabs']['selected'] = count($user_configuration['tabs']['tabs']) + 1;
                 $openRank = 1;
                 $user_configuration['tabs']['tabs'][] = array(
                     'url' => $deep_linking_url,
@@ -130,7 +109,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $ostabs = array(
             'initTabs' => array(),
-            'trayTabs' => $trayTabs,
+            'trayView' => (string)\View::forge('admin/tray/right'),
             'appsTab' => $osTabs,
             'newTab' => array(
                 'panelId' => 'noviusospanel',
@@ -155,9 +134,10 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $apps = array();
         foreach ($launchers as $key => $app) {
-            if (!empty($app['action']) && !empty($app['icon64'])) { // do we have to display the application?
-                //\Debug::dump($app['application'], Permission::check($app['application'], 'access'));
-                if (!isset($app['application']) || Permission::check($app['application'], 'access')) { // do we have the rights to access the application?
+            if (!empty($app['action']) && !empty($app['icon64'])) {
+                // do we have to display the application?
+                if (!isset($app['application']) || Permission::check($app['application'], 'access')) {
+                    // do we have the rights to access the application?
                     $app['key'] = $key;
                     $apps[] = $app;
                 }
@@ -171,9 +151,12 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
         $background = $background_id ? Model_Media::find($background_id) : false;
 
-        $view = \View::forge('admin/appstab', array(
-            'apps' => $apps,
-        ));
+        $view = \View::forge(
+            'admin/appstab',
+            array(
+                'apps' => $apps,
+            )
+        );
         $view->set('background', $background, false);
 
         return $view;

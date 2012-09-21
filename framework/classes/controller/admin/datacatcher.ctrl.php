@@ -174,7 +174,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
                 }
             }
         }
-        if (isset($sharable_properties[\Nos\DataCatcher::TYPE_IMAGE]) && !\Input::post('default.'.$type, false) && \Input::post(\Nos\DataCatcher::TYPE_IMAGE, 0) == 0) {
+        if (\Input::post(\Nos\DataCatcher::TYPE_IMAGE, 0) == 0) {
             $data[\Nos\DataCatcher::TYPE_IMAGE] = \Input::post('custom_image', 0);
             if (empty($data[\Nos\DataCatcher::TYPE_IMAGE])) {
                 unset($data[\Nos\DataCatcher::TYPE_IMAGE]);

@@ -38,80 +38,80 @@ $large = !empty($large) && $large == true;
                 <table class="title-fields" style="margin-bottom:1em;">
                     <tr>
 <?php
-    if (!empty($medias)) {
-        $medias = (array) $medias;
-        echo '<td style="width:'.(75 * count($medias)).'px;">';
-        foreach ($medias as $name) {
-            echo $fieldset->field($name)->set_template('{field}')->build();
-        }
-        echo '</td>';
+if (!empty($medias)) {
+    $medias = (array) $medias;
+    echo '<td style="width:'.(75 * count($medias)).'px;">';
+    foreach ($medias as $name) {
+        echo $fieldset->field($name)->set_template('{field}')->build();
     }
+    echo '</td>';
+}
 
-    $locales = array_keys(\Config::get('locales'));
-    if (!empty($item) && count($locales) > 1) {
-        $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-        if ($translatable) {
-            echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_lang()).'</td>';
-        }
+$locales = array_keys(\Config::get('locales'));
+if (!empty($item) && count($locales) > 1) {
+    $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
+    if ($translatable) {
+        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_lang()).'</td>';
     }
+}
 ?>
                         <td class="table-field">
 <?php
-    if (!empty($title)) {
-        $title = (array) $title;
-        $size  = min(6, floor(6 / count($title)));
-        $first = true;
-        foreach ($title as $name) {
-            if ($first) {
-                $first = false;
-            } else {
-                echo '</td><td>';
-            }
-            $field = $fieldset->field($name);
-            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-            echo ' '.$field
-                    ->set_attribute('placeholder',$placeholder)
-                    ->set_attribute('title', $placeholder)
-                    ->set_attribute('class', 'title')
-                    ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
-                    ->build();
+if (!empty($title)) {
+    $title = (array) $title;
+    $size  = min(6, floor(6 / count($title)));
+    $first = true;
+    foreach ($title as $name) {
+        if ($first) {
+            $first = false;
+        } else {
+            echo '</td><td>';
         }
+        $field = $fieldset->field($name);
+        $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+        echo ' '.$field
+                ->set_attribute('placeholder',$placeholder)
+                ->set_attribute('title', $placeholder)
+                ->set_attribute('class', 'title')
+                ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
+                ->build();
     }
+}
 ?>
                         </td>
                     </tr>
                 </table>
 <?php
-    $publishable = (string) \View::forge('form/publishable', array(
-        'item' => !empty($item) ? $item : null,
-    ), false);
+$publishable = (string) \View::forge('form/publishable', array(
+    'item' => !empty($item) ? $item : null,
+), false);
 
-    if (!empty($subtitle) || !empty($publishable)) {
-?>
+if (!empty($subtitle) || !empty($publishable)) {
+    ?>
                     <div class="line" style="overflow:visible;">
                         <table style="width:100%;margin-bottom:1em;">
                             <tr>
-<?php
-        if (!empty($publishable)) {
-            echo $publishable;
+    <?php
+    if (!empty($publishable)) {
+        echo $publishable;
+    }
+    if (!empty($subtitle)) {
+        $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+        foreach ((array) $subtitle as $name) {
+            $field = $fieldset->field($name);
+            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+            echo $field
+                 ->set_attribute('placeholder',$placeholder)
+                 ->set_attribute('title', $placeholder)
+                 ->build();
         }
-        if (!empty($subtitle)) {
-            $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
-            foreach ((array) $subtitle as $name) {
-                $field = $fieldset->field($name);
-                $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-                echo $field
-                     ->set_attribute('placeholder',$placeholder)
-                     ->set_attribute('title', $placeholder)
-                     ->build();
-            }
-            $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-        }
-?>
+        $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+    }
+    ?>
                             </tr>
                         </table>
                     </div>
-<?php
+    <?php
     }
 ?>
             </div>
@@ -130,49 +130,48 @@ $large = !empty($large) && $large == true;
             <?= $large ? '' : '<div class="unit col c1"></div>' ?>
             <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
 <?php
-    foreach ($contents as $content) {
-        if (is_array($content) && !empty($content['view'])) {
-            echo View::forge($content['view'], $view_params + $content['params'], false);
-        } elseif (is_callable($content)) {
-            echo $content();
-        } else {
-            echo $content;
-        }
+foreach ($contents as $content) {
+    if (is_array($content) && !empty($content['view'])) {
+        echo View::forge($content['view'], $view_params + $content['params'], false);
+    } elseif (is_callable($content)) {
+        echo $content();
+    } else {
+        echo $content;
     }
+}
 ?>
             </div>
 <?php
-    if (!empty($menus)) {
-
-?>
+if (!empty($menus)) {
+    ?>
                 <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
-<?php
-        $menu = current($menus);
-        if (empty($menu['view'])) {
-            $accordions = array();
-            foreach ($menus as $key => $menu) {
-                if (isset($menu['fields'])) {
-                    $accordions[$key] = array_merge(array('title' => $key), $menu);
-                } else {
-                    $accordions[$key] = array('title' => $key, 'fields' => $menu);
-                }
-            }
-            $menus = array(
-                array(
-                    'view' => 'nos::form/accordion',
-                    'params' => array('accordions' => $accordions),
-                ),
-            );
-        }
-        foreach ($menus as $view) {
-            if (!empty($view['view'])) {
-                echo View::forge($view['view'], $view_params + $view['params'], false);
+    <?php
+    $menu = current($menus);
+    if (empty($menu['view'])) {
+        $accordions = array();
+        foreach ($menus as $key => $menu) {
+            if (isset($menu['fields'])) {
+                $accordions[$key] = array_merge(array('title' => $key), $menu);
+            } else {
+                $accordions[$key] = array('title' => $key, 'fields' => $menu);
             }
         }
-?>
-                 </div>
-<?php
+        $menus = array(
+            array(
+                'view' => 'nos::form/accordion',
+                'params' => array('accordions' => $accordions),
+            ),
+        );
     }
+    foreach ($menus as $view) {
+        if (!empty($view['view'])) {
+            echo View::forge($view['view'], $view_params + $view['params'], false);
+        }
+    }
+    ?>
+                 </div>
+    <?php
+}
 ?>
             <?= $large ? '' : '<div class="unit lastUnit"></div>' ?>
         </div>

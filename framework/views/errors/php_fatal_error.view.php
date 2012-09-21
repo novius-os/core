@@ -36,16 +36,16 @@ if (\Input::is_ajax()) {
 <?php echo $filepath; ?> @ line <?php echo $error_line; ?>
 
 <?php
-    foreach ($backtrace as $trace) {
-        $debug_lines = \Debug::file_lines($trace['file'], $trace['line'], false, 0);
-        $line = reset($debug_lines);
-        $line = trim($line, "\n\r\t ");
-        printf("%30s @ line %s\n  %s\n", $trace['file'], $trace['line'], $line);
-    }
+foreach ($backtrace as $trace) {
+    $debug_lines = \Debug::file_lines($trace['file'], $trace['line'], false, 0);
+    $line = reset($debug_lines);
+    $line = trim($line, "\n\r\t ");
+    printf("%30s @ line %s\n  %s\n", $trace['file'], $trace['line'], $line);
+}
 ?>
 -->
 <?php
-        ob_start();
+ob_start();
 ?>
     <style type="text/css">
         * { margin: 0; padding: 0; }
@@ -72,9 +72,9 @@ if (\Input::is_ajax()) {
         .wip img { vertical-align: middle; }
     </style>
 <?php
-        $css = ob_get_contents();
-        ob_end_clean();
-        ob_start();
+$css = ob_get_contents();
+ob_end_clean();
+ob_start();
 ?>
     <script type="text/javascript">
     function fuel_toggle(elem){elem = document.getElementById(elem);if (elem.style && elem.style['display']) {var disp = elem.style['display'];} else if (elem.currentStyle) {var disp = elem.currentStyle['display'];}else if (window.getComputedStyle) {var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');}elem.style.display = disp == 'block' ? 'none' : 'block';return false;};
@@ -91,9 +91,9 @@ if (\Input::is_ajax()) {
         });
     </script>
 <?php
-        $js = ob_get_contents();
-        ob_end_clean();
-        ob_start();
+$js = ob_get_contents();
+ob_end_clean();
+ob_start();
 ?>
     <div id="wrapper">
         <h1>Oops, I'm hurt</h1>
@@ -114,56 +114,75 @@ if (\Input::is_ajax()) {
 
         <h2 class="first"><?php echo $filepath; ?> @ line <?php echo $error_line; ?></h2>
 
-<?php if (is_array($debug_lines)): ?>
-<pre class="fuel_debug_source"><?php foreach ($debug_lines as $line_num => $line_content): ?>
-<span<?php echo ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
-</span></span><?php endforeach; ?></pre>
-<?php endif; ?>
+<?php
+if (is_array($debug_lines)) {
+    ?>
+    <pre class="fuel_debug_source"><?php
+    foreach ($debug_lines as $line_num => $line_content) { ?>
+        <span<?php echo ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
+        </span></span><?php
+    } ?></pre>
+    <?php
+}
+?>
         <h2>Backtrace</h2>
         <ol>
-        <?php
-            $id = 0;
-            foreach($backtrace as $trace):
-                $id++;
-                $debug_lines = \Debug::file_lines($trace['file'], $trace['line']);
-        ?>
+<?php
+$id = 0;
+foreach ($backtrace as $trace) {
+    $id++;
+    $debug_lines = \Debug::file_lines($trace['file'], $trace['line']);
+    ?>
             <li>
                 <a href="#" onclick="javascript:fuel_toggle('backtrace_<?php echo $id; ?>');return false;"><?php echo \Fuel::clean_path($trace['file']).' @ line '.$trace['line']; ?></a>
                 <div id="backtrace_<?php echo $id; ?>" class="backtrace_block">
-<pre class="fuel_debug_source"><?php foreach ($debug_lines as $line_num => $line_content): ?>
-<span<?php echo ($line_num == $trace['line']) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
-</span></span><?php endforeach; ?></pre>
+                <pre class="fuel_debug_source"><?php
+    foreach ($debug_lines as $line_num => $line_content) { ?>
+                <span<?php echo ($line_num == $trace['line']) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
+                </span></span><?php
+    } ?></pre>
                 </div>
             </li>
-        <?php endforeach; ?>
+        <?php
+} ?>
         </ol>
 
-<?php if (count($non_fatal) > 0): ?>
+<?php
+if (count($non_fatal) > 0) {
+    ?>
         <h2>Prior Non-Fatal Errors</h2>
         <ol>
-        <?php
-        $id = 0;
-        foreach($non_fatal as $err):
-            $id++;
-            extract($err);
-            $debug_lines = \Debug::file_lines($orig_filepath, $error_line);
+    <?php
+    $id = 0;
+    foreach ($non_fatal as $err) {
+        $id++;
+        extract($err);
+        $debug_lines = \Debug::file_lines($orig_filepath, $error_line);
         ?>
             <li>
                 <a href="#" onclick="javascript:fuel_toggle('non_fatal_<?php echo $id; ?>');return false;"><?php echo $severity; ?>: <?php echo $message; ?> in <?php echo $filepath; ?> @ line <?php echo $error_line; ?></a>
                 <div id="non_fatal_<?php echo $id; ?>" class="backtrace_block">
-<pre class="fuel_debug_source"><?php foreach ($debug_lines as $line_num => $line_content): ?>
-<span<?php echo ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
-</span></span><?php endforeach; ?></pre>
+                <pre class="fuel_debug_source"><?php
+        foreach ($debug_lines as $line_num => $line_content) { ?>
+                <span<?php echo ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
+                </span></span><?php
+        } ?></pre>
                 </div>
             </li>
-        <?php endforeach; ?>
+        <?php } ?>
         </ol>
-<?php endif; ?>
+    <?php
+}
+?>
 
-<?php if ( ! empty($contents)): ?>
+<?php
+if ( ! empty($contents)) {
+    ?>
         <h2>Prior Contents (<a href="#" onclick="javascript:fuel_toggle('prior_contents');return false;">show</a>)</h2>
         <pre id="prior_contents" class="fuel_debug_source" style="display: none;""><?php echo e($contents); ?></pre>
-<?php endif; ?>
+    <?php
+}
+?>
 
         <p class="footer">
             <a href="http://fuelphp.com">Fuel PHP</a> is released under the MIT license.
@@ -171,19 +190,19 @@ if (\Input::is_ajax()) {
     </div>
     </div>
 <?php
-    $body = ob_get_contents();
-    ob_end_clean();
-    ob_start();
+$body = ob_get_contents();
+ob_end_clean();
+ob_start();
 
-    if (!$ajax = Input::is_ajax()) {
-        $view = \View::forge('nos::admin/html');
-        $view->set('title', 'Novius OS error page');
-        $view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
-        $view->set('require', 'static/novius-os/admin/vendor/requirejs/require.js', false);
-        $view->set('css', $css, false);
-        $view->set('js', $js, false);
-        $view->set('body', $body, false);
-        echo $view;
-    } else {
-        echo $body;
-    }
+if (!$ajax = Input::is_ajax()) {
+    $view = \View::forge('nos::admin/html');
+    $view->set('title', 'Novius OS error page');
+    $view->set('base', Uri::base(false) ?: 'http'.(Input::server('HTTPS') ? 's' : '').'://'.Input::server('HTTP_HOST'), false);
+    $view->set('require', 'static/novius-os/admin/vendor/requirejs/require.js', false);
+    $view->set('css', $css, false);
+    $view->set('js', $js, false);
+    $view->set('body', $body, false);
+    echo $view;
+} else {
+    echo $body;
+}

@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-    $id = uniqid('temp_');
+$id = uniqid('temp_');
 ?>
 <div id="<?= $id ?>">
     <div align="center">
@@ -19,8 +19,8 @@
     </div>
     <div id="apps">
 <?php
-    foreach ($apps as $app) {
-?>
+foreach ($apps as $app) {
+    ?>
         <a class="app" href="#" data-launcher="<?= htmlspecialchars(\Format::forge($app)->to_json()) ?>">
             <span class="icon">
                 <img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />
@@ -28,8 +28,9 @@
             </span>
             <span class="text"><?= $app['name'] ?></span>
         </a>
-<?php
-    }
+
+    <?php
+}
 ?>
     </div>
 </div>
@@ -55,9 +56,13 @@ require(
                             $(apps).nosSaveUserConfig('misc.apps', orders);
                         }
                     });
-<?php if ($background) { ?>
-            $('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');<?php } ?>
-
+<?php
+if ($background) {
+    ?>
+            $('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
+    <?php
+}
+?>
             $panel.find('a.app').click(function(e) {
                 e.preventDefault();
                 var $launcher = $(this),

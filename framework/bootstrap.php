@@ -16,18 +16,18 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 if (isset($_SERVER['NOS_ROOT'])) {
     define('DOCROOT', $_SERVER['NOS_ROOT'].'/public'.DIRECTORY_SEPARATOR);
 
-    define('APPPATH',  $_SERVER['NOS_ROOT'].'/local/');
-    define('PKGPATH',  $_SERVER['NOS_ROOT'].'/novius-os/packages/');
+    define('APPPATH', $_SERVER['NOS_ROOT'].'/local/');
+    define('PKGPATH', $_SERVER['NOS_ROOT'].'/novius-os/packages/');
     define('COREPATH', $_SERVER['NOS_ROOT'].'/novius-os/fuel-core/');
-    define('NOSPATH',  $_SERVER['NOS_ROOT'].'/novius-os/framework/');
+    define('NOSPATH', $_SERVER['NOS_ROOT'].'/novius-os/framework/');
 } else {
 
     define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
 
-    define('APPPATH',  realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
-    define('PKGPATH',  realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
+    define('APPPATH', realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
+    define('PKGPATH', realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
     define('COREPATH', realpath(DOCROOT.'../novius-os/fuel-core/').DIRECTORY_SEPARATOR);
-    define('NOSPATH',  realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
+    define('NOSPATH', realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
 }
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
@@ -42,35 +42,37 @@ if (!MBSTRING) {
     require_once NOSPATH.'mb_string.php';
 }
 
-\Autoloader::add_classes(array(
-    // Add classes you want to override here
-    // Example: 'View' => APPPATH.'classes/view.php',
-    'Arr'               => FUEL_EXTEND_PATH.'arr.php',
-    'Command'           => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'command.php',
-    'Config'            => FUEL_EXTEND_PATH.'config.php',
-    'Config_File'       => FUEL_EXTEND_PATH.'config_file.php',
-    'Date'              => FUEL_EXTEND_PATH.'date.php',
-    'Debug'             => FUEL_EXTEND_PATH.'debug.php',
-    'Event'             => FUEL_EXTEND_PATH.'event.php',
-    'Fuel'              => FUEL_EXTEND_PATH.'fuel.php',
-    'Finder'            => FUEL_EXTEND_PATH.'finder.php',
-    'Fieldset'          => FUEL_EXTEND_PATH.'fieldset.php',
-    'Fieldset_Field'    => FUEL_EXTEND_PATH.'fieldset_field.php',
-    'Generate'          => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'generate.php',
-    'Migrate'           => FUEL_EXTEND_PATH.'migrate.php',
-    'Module'            => FUEL_EXTEND_PATH.'module.php',
-    'ModuleNotFoundException' => FUEL_EXTEND_PATH.'module.php',
-    'Profiler'          => FUEL_EXTEND_PATH.'profiler.php',
-    'Refine'            => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'refine.php',
-    'Response'          => FUEL_EXTEND_PATH.'response.php',
-    'Session'           => FUEL_EXTEND_PATH.'session.php',
-    'Str'               => FUEL_EXTEND_PATH.'str.php',
-    'View'              => FUEL_EXTEND_PATH.'view.php',
-    'Nos\Oil\Console'   => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'console.php',
-    'Nos\Orm\Model'     => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'model.php',
-    'Nos\Orm\Query'     => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'query.php',
-    'Nos\Tasks\Migrate' => FUEL_EXTEND_PATH.'tasks'.DIRECTORY_SEPARATOR.'migrate.php',
-));
+\Autoloader::add_classes(
+    array(
+        // Add classes you want to override here
+        // Example: 'View' => APPPATH.'classes/view.php',
+        'Arr' => FUEL_EXTEND_PATH.'arr.php',
+        'Command' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'command.php',
+        'Config' => FUEL_EXTEND_PATH.'config.php',
+        'Config_File' => FUEL_EXTEND_PATH.'config_file.php',
+        'Date' => FUEL_EXTEND_PATH.'date.php',
+        'Debug' => FUEL_EXTEND_PATH.'debug.php',
+        'Event' => FUEL_EXTEND_PATH.'event.php',
+        'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
+        'Finder' => FUEL_EXTEND_PATH.'finder.php',
+        'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
+        'Fieldset_Field' => FUEL_EXTEND_PATH.'fieldset_field.php',
+        'Generate' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'generate.php',
+        'Migrate' => FUEL_EXTEND_PATH.'migrate.php',
+        'Module' => FUEL_EXTEND_PATH.'module.php',
+        'ModuleNotFoundException' => FUEL_EXTEND_PATH.'module.php',
+        'Profiler' => FUEL_EXTEND_PATH.'profiler.php',
+        'Refine' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'refine.php',
+        'Response' => FUEL_EXTEND_PATH.'response.php',
+        'Session' => FUEL_EXTEND_PATH.'session.php',
+        'Str' => FUEL_EXTEND_PATH.'str.php',
+        'View' => FUEL_EXTEND_PATH.'view.php',
+        'Nos\Oil\Console' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'console.php',
+        'Nos\Orm\Model' => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'model.php',
+        'Nos\Orm\Query' => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'query.php',
+        'Nos\Tasks\Migrate' => FUEL_EXTEND_PATH.'tasks'.DIRECTORY_SEPARATOR.'migrate.php',
+    )
+);
 
 function __($_message, $default = null)
 {
@@ -99,41 +101,45 @@ if (Fuel::$env != FUEL::PRODUCTION) {
 }
 
 //* Register application autoloader
-spl_autoload_register(function($class) {
+spl_autoload_register(
+    function ($class) {
 
-    $class = ltrim($class, '\\');
-    $parts = explode('\\', $class);
-    $class = array_pop($parts);
-    $namespace = implode('\\', $parts);
+        $class = ltrim($class, '\\');
+        $parts = explode('\\', $class);
+        $class = array_pop($parts);
+        $namespace = implode('\\', $parts);
 
-    // We can't load classes inside those namespaces
-    if ($namespace == '' || $namespace == 'Fuel\\Core') {
+        // We can't load classes inside those namespaces
+        if ($namespace == '' || $namespace == 'Fuel\\Core') {
+            return false;
+        }
+
+        // Computes this after the above lines, as the Inflector class will be autoloaded
+        $namespace_upper_words = Inflector::words_to_upper($namespace);
+
+        // An application can be put inside any namespace when properly configured
+        if (!empty(Fuel::$namespace_aliases[$namespace_upper_words])) {
+            if (class_exists(Fuel::$namespace_aliases[$namespace_upper_words].'\\'.$class)) {
+                class_alias(Fuel::$namespace_aliases[$namespace_upper_words].'\\'.$class, $namespace.'\\'.$class);
+            }
+            if (class_exists($namespace.'\\'.$class, false)) {
+                return true;
+            }
+        }
+
+        // Try to load the application
+        \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
+        $namespaces = \Config::get('data::app_namespaces');
+        $application = array_search($namespace, $namespaces);
+        if (false !== $application) {
+            \Module::load($application);
+        }
+
         return false;
-    }
-
-    // Computes this after the above lines, as the Inflector class will be autoloaded
-    $namespace_upper_words = Inflector::words_to_upper($namespace);
-
-    // An application can be put inside any namespace when properly configured
-    if (!empty(Fuel::$namespace_aliases[$namespace_upper_words])) {
-        if (class_exists(Fuel::$namespace_aliases[$namespace_upper_words].'\\'.$class)) {
-            class_alias(Fuel::$namespace_aliases[$namespace_upper_words].'\\'.$class, $namespace.'\\'.$class);
-        }
-        if (class_exists($namespace.'\\'.$class, false)) {
-            return true;
-        }
-    }
-
-    // Try to load the application
-    \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
-    $namespaces = \Config::get('data::app_namespaces');
-    $application = array_search($namespace, $namespaces);
-    if (false !== $application) {
-        \Module::load($application);
-    }
-
-    return false;
-}, true, true);
+    },
+    true,
+    true
+);
 //*/
 
 // Initialize the framework with the config file.
@@ -166,5 +172,5 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 
 chdir(DOCROOT);
 
-define('CACHE_DURATION_PAGE',     5);
+define('CACHE_DURATION_PAGE', 5);
 define('CACHE_DURATION_FUNCTION', 10);

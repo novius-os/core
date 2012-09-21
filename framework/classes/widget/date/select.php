@@ -50,22 +50,25 @@ class Widget_Date_Select extends \Fieldset_Field
     {
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
 
-        $attributes = \Arr::merge($attributes, array(
-            'day' => array(
-                'size' => '2',
-                'style' => 'width: 20px;'
-            ),
-            'month' => array(
-                'type'    => 'select',
-            ),
-            'year' => array(
-                'size' => '6',
-                'style' => 'width: 40px;'
-            ),
-            'time' => array(
-                'type' => 'hidden',
-            ),
-        ));
+        $attributes = \Arr::merge(
+            $attributes,
+            array(
+                'day' => array(
+                    'size' => '2',
+                    'style' => 'width: 20px;'
+                ),
+                'month' => array(
+                    'type' => 'select',
+                ),
+                'year' => array(
+                    'size' => '6',
+                    'style' => 'width: 40px;'
+                ),
+                'time' => array(
+                    'type' => 'hidden',
+                ),
+            )
+        );
 
         // Can't merge this key without messing up
         if (empty($attributes['month']['options'])) {
@@ -75,35 +78,41 @@ class Widget_Date_Select extends \Fieldset_Field
         // Build the fields used by the widget
         $this->parts = \Fieldset::forge($name.uniqid());
 
-        $this->day   = $this->parts->add($name.'_day',   '', $attributes['day']);
+        $this->day = $this->parts->add($name.'_day', '', $attributes['day']);
         $this->month = $this->parts->add($name.'_month', '', $attributes['month']);
-        $this->year  = $this->parts->add($name.'_year',  '', $attributes['year']);
-        $this->time  = $this->parts->add($name.'_time',  '', $attributes['time']);
+        $this->year = $this->parts->add($name.'_year', '', $attributes['year']);
+        $this->time = $this->parts->add($name.'_time', '', $attributes['time']);
 
-        $this->add_rule(array('valid_date' => function($value) {
-            list($date, $time) = explode(' ', $value.' ');
-            $date = explode('-', $date);
-            if (count($date) >= 3) {
-                list($year, $month ,$day) = $date;
-            }
+        $this->add_rule(
+            array(
+                'valid_date' =>
+                    function ($value)
+                    {
+                        list($date, $time) = explode(' ', $value.' ');
+                        $date = explode('-', $date);
+                        if (count($date) >= 3) {
+                            list($year, $month, $day) = $date;
+                        }
 
-            return empty($value) or !empty($year) and !empty($month) and !empty($day) and checkdate((int) $month, (int) $day, (int) $year);
-        }));
+                        return empty($value) or !empty($year) and !empty($month) and !empty($day) and checkdate((int) $month, (int) $day, (int) $year);
+                    }
+            )
+        );
     }
 
     protected static function _get_month_names()
     {
         static $months = null;
         empty($months) and $months = array(
-            1  => \Date::create_from_string('01/01/2011', 'eu')->format('%B'),
-            2  => \Date::create_from_string('01/02/2011', 'eu')->format('%B'),
-            3  => \Date::create_from_string('01/03/2011', 'eu')->format('%B'),
-            4  => \Date::create_from_string('01/04/2011', 'eu')->format('%B'),
-            5  => \Date::create_from_string('01/05/2011', 'eu')->format('%B'),
-            6  => \Date::create_from_string('01/06/2011', 'eu')->format('%B'),
-            7  => \Date::create_from_string('01/07/2011', 'eu')->format('%B'),
-            8  => \Date::create_from_string('01/08/2011', 'eu')->format('%B'),
-            9  => \Date::create_from_string('01/09/2011', 'eu')->format('%B'),
+            1 => \Date::create_from_string('01/01/2011', 'eu')->format('%B'),
+            2 => \Date::create_from_string('01/02/2011', 'eu')->format('%B'),
+            3 => \Date::create_from_string('01/03/2011', 'eu')->format('%B'),
+            4 => \Date::create_from_string('01/04/2011', 'eu')->format('%B'),
+            5 => \Date::create_from_string('01/05/2011', 'eu')->format('%B'),
+            6 => \Date::create_from_string('01/06/2011', 'eu')->format('%B'),
+            7 => \Date::create_from_string('01/07/2011', 'eu')->format('%B'),
+            8 => \Date::create_from_string('01/08/2011', 'eu')->format('%B'),
+            9 => \Date::create_from_string('01/09/2011', 'eu')->format('%B'),
             10 => \Date::create_from_string('01/10/2011', 'eu')->format('%B'),
             11 => \Date::create_from_string('01/11/2011', 'eu')->format('%B'),
             12 => \Date::create_from_string('01/12/2011', 'eu')->format('%B'),
@@ -120,7 +129,7 @@ class Widget_Date_Select extends \Fieldset_Field
     public function set_value($value, $repopulate = false)
     {
         list($date, $time) = explode(' ', $value.' ');
-        list($year, $month ,$day) = explode('-', $date);
+        list($year, $month, $day) = explode('-', $date);
 
         $this->year->set_value($year, $repopulate);
         $this->month->set_value($month, $repopulate);
@@ -149,41 +158,44 @@ class Widget_Date_Select extends \Fieldset_Field
             }
         } else {
             $this->parts->set_config('field_template', '{label} {field}');
-            $html = (string) $this->day . (string) $this->month . (string) $this->year . (string) $this->time;
+            $html = (string) $this->day.(string) $this->month.(string) $this->year.(string) $this->time;
         }
         return $this->template($html);
     }
 
     public static function field($args = array())
     {
-        $args = \Arr::merge(array(
-            'name' => 'date',
-            'readonly' => false,
-            'date_format' => 'eu_full',
-            'value' => '',
-            'day' => array(
-                'attributes' => array(
-                    'size' => '2',
-                    'style' => 'width: 20px;'
+        $args = \Arr::merge(
+            array(
+                'name' => 'date',
+                'readonly' => false,
+                'date_format' => 'eu_full',
+                'value' => '',
+                'day' => array(
+                    'attributes' => array(
+                        'size' => '2',
+                        'style' => 'width: 20px;'
+                    ),
+                ),
+                'month' => array(
+                    'attributes' => array(
+                        'type' => 'select',
+                    ),
+                ),
+                'year' => array(
+                    'attributes' => array(
+                        'size' => '6',
+                        'style' => 'width: 40px;'
+                    ),
+                ),
+                'time' => array(
+                    'attributes' => array(
+                        'type' => 'hidden',
+                    ),
                 ),
             ),
-            'month' => array(
-                'attributes' => array(
-                    'type'    => 'select',
-                ),
-            ),
-            'year' => array(
-                'attributes' => array(
-                    'size' => '6',
-                    'style' => 'width: 40px;'
-                ),
-            ),
-            'time' => array(
-                'attributes' => array(
-                    'type' => 'hidden',
-                ),
-            ),
-        ), $args);
+            $args
+        );
 
 
         // Can't merge this key without messing up
@@ -192,10 +204,10 @@ class Widget_Date_Select extends \Fieldset_Field
         }
 
         $fields = array(
-            \Form::input($name.'_day',    '', $args['day']['attributes']),
+            \Form::input($name.'_day', '', $args['day']['attributes']),
             \Form::select($name.'_month', '', $args['month']['attributes']['options']),
-            \Form::input($name.'_year',   '', $args['year']['attributes']),
-            \Form::input($name.'_time',   '', $args['time']['attributes']),
+            \Form::input($name.'_year', '', $args['year']['attributes']),
+            \Form::input($name.'_time', '', $args['time']['attributes']),
         );
         return implode('', $fields);
     }
@@ -207,10 +219,10 @@ class Widget_Date_Select extends \Fieldset_Field
     public function repopulate(array $input)
     {
         list($year, $month, $day, $time) = array(
-            isset($input[$this->name.'_year'])  ? $input[$this->name.'_year']  : null,
+            isset($input[$this->name.'_year']) ? $input[$this->name.'_year'] : null,
             isset($input[$this->name.'_month']) ? $input[$this->name.'_month'] : null,
-            isset($input[$this->name.'_day'])   ? $input[$this->name.'_day']   : null,
-            isset($input[$this->name.'_time'])  ? $input[$this->name.'_time']  : null
+            isset($input[$this->name.'_day']) ? $input[$this->name.'_day'] : null,
+            isset($input[$this->name.'_time']) ? $input[$this->name.'_time'] : null
         );
 
         // Remember previous entered values

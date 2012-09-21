@@ -8,7 +8,7 @@ JAVA_CMD='java'
 export JAVA_CMD
 
 JS_COMBINED_FILE="../../bundle/nos.min.js"
-JS_FILES=( jquery.novius-os.validate jquery.novius-os.wysiwyg jquery.novius-os jquery.novius-os.loadspinner jquery.novius-os.ostabs jquery.novius-os.preview jquery.novius-os.listgrid jquery.novius-os.treegrid jquery.novius-os.thumbnailsgrid jquery.novius-os.appdesk )
+JS_FILES=( jquery.novius-os.validate jquery.novius-os.wysiwyg jquery.novius-os jquery.novius-os.loadspinner jquery.novius-os.ostabs jquery.novius-os.preview jquery.novius-os.listgrid jquery.novius-os.treegrid jquery.novius-os.thumbnailsgrid jquery.novius-os.appdesk jquery.novius-os.datacatchers )
 
 #clear the files
 > $JS_COMBINED_FILE

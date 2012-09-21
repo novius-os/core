@@ -15,7 +15,7 @@ foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
 }
 
 return array(
-    'controller_url'  => 'admin/nos/page/page',
+    'controller_url' => 'admin/nos/page/page',
     'model' => 'Nos\\Model_Page',
     'messages' => array(
         'successfully added' => __('Page successfully added.'),
@@ -47,23 +47,22 @@ return array(
         ),
     ),
     'actions' => array(
-        'visualise' => function($item) {
-            if (!$item->is_new())
+        'visualise' =>
+            function ($item)
             {
-                return array(
-                    'label' => __('Visualise'),
-                    'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                    'action' => array(
-                        'action' => 'window.open',
-                        'url' => $item->get_href() . '?_preview=1',
-                    ),
-                );
+                if (!$item->is_new()) {
+                    return array(
+                        'label' => __('Visualise'),
+                        'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                        'action' => array(
+                            'action' => 'window.open',
+                            'url' => $item->get_href().'?_preview=1',
+                        ),
+                    );
+                } else {
+                    return array();
+                }
             }
-            else
-            {
-                return array();
-            }
-        }
     ),
     'layout' => array(
         'form' => array(
@@ -78,7 +77,7 @@ return array(
                     'content' => array(
                         'view' => 'nos::form/expander',
                         'params' => array(
-                            'title'   => __('Content'),
+                            'title' => __('Content'),
                             'nomargin' => true,
                             'options' => array(
                                 'allowExpand' => false,
@@ -121,9 +120,9 @@ return array(
                                 ),
                                 'admin' => array(
                                     'title' => __('Admin'),
-                                    'header_class'  => 'faded',
+                                    'header_class' => 'faded',
                                     'content_class' => 'faded',
-                                    'fields'        => array('page_cache_duration', 'page_lock'),
+                                    'fields' => array('page_cache_duration', 'page_lock'),
                                 ),
                             ),
                         ),
@@ -136,7 +135,7 @@ return array(
         ),
     ),
     'fields' => array(
-        'page_id' => array (
+        'page_id' => array(
             'label' => __('ID: '),
             'form' => array(
                 'type' => 'hidden',
@@ -159,8 +158,7 @@ return array(
                 'height' => '250px',
             ),
             'label' => __('Location: '),
-            'form' => array(
-            ),
+            'form' => array(),
         ),
         'page_template' => array(
             'label' => __('Template: '),
@@ -230,9 +228,9 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::EXTERNAL_TARGET_NEW   => __('New window'),
+                    Nos\Model_Page::EXTERNAL_TARGET_NEW => __('New window'),
                     Nos\Model_Page::EXTERNAL_TARGET_POPUP => __('Popup'),
-                    Nos\Model_Page::EXTERNAL_TARGET_SAME  => __('Same window'),
+                    Nos\Model_Page::EXTERNAL_TARGET_SAME => __('Same window'),
                 ),
             ),
         ),
@@ -255,7 +253,7 @@ return array(
                 'options' => array(
                     Nos\Model_Page::LOCK_UNLOCKED => __('Unlocked'),
                     Nos\Model_Page::LOCK_DELETION => __('Deletion'),
-                    Nos\Model_Page::LOCK_EDITION  => __('Modification'),
+                    Nos\Model_Page::LOCK_EDITION => __('Modification'),
                 ),
             ),
         ),

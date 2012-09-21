@@ -84,9 +84,12 @@ class Nos
         static::_parse_medias($content);
         static::_parse_internals($content);
 
-        $content = strtr($content, array(
-            'nos://anchor/' => static::main_controller()->getUrl(),
-        ));
+        $content = strtr(
+            $content,
+            array(
+                'nos://anchor/' => static::main_controller()->getUrl(),
+            )
+        );
 
         foreach (\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
             is_callable($c) && call_user_func_array($c, array(&$content));
@@ -103,10 +106,13 @@ class Nos
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
         $callback = array(get_called_class(), 'get_enhancer_content');
-        static::parse_enhancers($content, function ($enhancer, $config, $tag) use (&$content, $controller, $callback) {
-            $function_content = call_user_func($callback, $enhancer, $config, $controller);
-            $content = str_replace($tag, $function_content, $content);
-        });
+        static::parse_enhancers(
+            $content,
+            function ($enhancer, $config, $tag) use (&$content, $controller, $callback) {
+                $function_content = call_user_func($callback, $enhancer, $config, $controller);
+                $content = str_replace($tag, $function_content, $content);
+            }
+        );
     }
 
     public static function parse_enhancers($content, $closure)
@@ -124,23 +130,34 @@ class Nos
 
     public static function get_enhancer_content($enhancer, $args, $controller)
     {
-        $args = json_decode(strtr($args, array(
-            '&quot;' => '"',
-        )), true);
+        $args = json_decode(
+            strtr(
+                $args,
+                array(
+                    '&quot;' => '"',
+                )
+            ),
+            true
+        );
 
         $config = \Config::get("data::enhancers.$enhancer", false);
 
-        $found  = $config !== false;
+        $found = $config !== false;
 
-        false && \Fuel::$profiling && \Profiler::console(array(
-            'enhancer' => $enhancer,
-            'controller'    => get_class($controller),
-        ));
+        false && \Fuel::$profiling && \Profiler::console(
+            array(
+                'enhancer' => $enhancer,
+                'controller' => get_class($controller),
+            )
+        );
 
         if ($found) {
-            $function_content = self::hmvc((!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']), array(
-                'args'        => array($args),
-            ));
+            $function_content = self::hmvc(
+                (!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']),
+                array(
+                    'args' => array($args),
+                )
+            );
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
                 $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
             }
@@ -154,18 +171,21 @@ class Nos
 
     protected static function _parse_medias(&$content)
     {
-        Tools_Wysiwyg::parse_medias($content, function($media, $params) use (&$content) {
-            if (empty($media)) {
-                $content = str_replace($params['tag'], '', $content);
-            } else {
-                if (!empty($params['height'])) {
-                    $media_url = $media->get_public_path_resized($params['width'], $params['height']);
+        Tools_Wysiwyg::parse_medias(
+            $content,
+            function ($media, $params) use (&$content) {
+                if (empty($media)) {
+                    $content = str_replace($params['tag'], '', $content);
                 } else {
-                    $media_url = $media->get_public_path();
+                    if (!empty($params['height'])) {
+                        $media_url = $media->get_public_path_resized($params['width'], $params['height']);
+                    } else {
+                        $media_url = $media->get_public_path();
+                    }
+                    $content = str_replace($params['src'], $media_url, $content);
                 }
-                $content = str_replace($params['src'], $media_url, $content);
             }
-        });
+        );
     }
 
     protected static function _parse_internals(&$content)

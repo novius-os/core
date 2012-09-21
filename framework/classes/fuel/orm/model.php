@@ -10,8 +10,13 @@
 
 namespace Nos\Orm;
 
-class UnknownBehaviourException extends \Exception {};
-class UnknownMethodBehaviourException extends \Exception {};
+class UnknownBehaviourException extends \Exception
+{
+}
+
+class UnknownMethodBehaviourException extends \Exception
+{
+}
 
 use Arr;
 
@@ -48,7 +53,7 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
 
-        if ( ! array_key_exists($class, static::$_title_property_cached)) {
+        if (!array_key_exists($class, static::$_title_property_cached)) {
             $_title_property = null;
 
             if (property_exists($class, '_title_property')) {
@@ -90,14 +95,14 @@ class Model extends \Orm\Model
     }
 
     /**
-     *  @see \Orm\Model::table()
+     * @see \Orm\Model::table()
      */
     public static function table()
     {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_table_names_cached);
 
-        if (! $init) {
+        if (!$init) {
             $config = static::_config();
             if (!empty($config) && !empty($config['table_name'])) {
                 static::$_table_names_cached[$class] = $config['table_name'];
@@ -110,7 +115,7 @@ class Model extends \Orm\Model
     }
 
     /**
-     *  @see \Orm\Model::properties()
+     * @see \Orm\Model::properties()
      */
     public static function properties()
     {
@@ -150,7 +155,7 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
 
-        if ( ! array_key_exists($class, static::$_relations_cached)) {
+        if (!array_key_exists($class, static::$_relations_cached)) {
             // unset potential's relations stored in Nos\Orm\Model
             unset(static::$_has_many['linked_wysiwygs']);
             unset(static::$_has_many['linked_medias']);
@@ -161,7 +166,7 @@ class Model extends \Orm\Model
                     'key_to' => 'wysiwyg_foreign_id',
                     'cascade_save' => true,
                     'cascade_delete' => false,
-                    'conditions'     => array(
+                    'conditions' => array(
                         'where' => array(
                             array('wysiwyg_join_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
                         ),
@@ -176,7 +181,7 @@ class Model extends \Orm\Model
                     'key_to' => 'medil_foreign_id',
                     'cascade_save' => true,
                     'cascade_delete' => false,
-                    'conditions'     => array(
+                    'conditions' => array(
                         'where' => array(
                             array('medil_from_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
                         ),
@@ -251,7 +256,7 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
 
-        if ( ! array_key_exists($class, static::$_behaviours_cached)) {
+        if (!array_key_exists($class, static::$_behaviours_cached)) {
             $behaviours = array();
             $_behaviours = array();
 
@@ -314,7 +319,12 @@ class Model extends \Orm\Model
                     $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
                 }
             }
-            static::$_configs[$class] = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+            static::$_configs[$class] = \Arr::recursive_filter(
+                $config,
+                function ($var) {
+                    return $var !== null;
+                }
+            );
         }
 
         return static::$_configs[$class];
@@ -323,7 +333,7 @@ class Model extends \Orm\Model
     public function get_possible_lang()
     {
         $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
-        $tree         = static::behaviours('Nos\Orm_Behaviour_Tree');
+        $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
         if (!$translatable || !$tree) {
             return array_keys(\Config::get('locales'));
@@ -351,7 +361,8 @@ class Model extends \Orm\Model
     {
         try {
             return static::_callBehaviour($this, $method, $args);
-        } catch (\Nos\Orm\UnknownBehaviourException $e) {}
+        } catch (\Nos\Orm\UnknownBehaviourException $e) {
+        }
 
         return parent::__call($method, $args);
     }
@@ -360,7 +371,8 @@ class Model extends \Orm\Model
     {
         try {
             return static::_callBehaviour(get_called_class(), $method, $args);
-        } catch (\Nos\Orm\UnknownBehaviourException $e) {}
+        } catch (\Nos\Orm\UnknownBehaviourException $e) {
+        }
 
         return parent::__callStatic($method, $args);
     }
@@ -368,12 +380,13 @@ class Model extends \Orm\Model
     private static function _callBehaviour($context, $method, $args)
     {
         foreach (static::behaviours() as $behaviour => $settings) {
-            if ( ! class_exists($behaviour)) {
+            if (!class_exists($behaviour)) {
                 throw new \UnexpectedValueException($behaviour);
             }
             try {
                 return call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {}
+            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {
+            }
         }
         throw new \Nos\Orm\UnknownBehaviourException();
     }
@@ -381,13 +394,14 @@ class Model extends \Orm\Model
     public static function _callAllBehaviours($context, $method, $args)
     {
         foreach (static::behaviours() as $behaviour => $settings) {
-            if ( ! class_exists($behaviour)) {
+            if (!class_exists($behaviour)) {
                 throw new \UnexpectedValueException($behaviour);
             }
 
             try {
                 call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {}
+            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {
+            }
         }
     }
 
@@ -459,21 +473,24 @@ class Model extends \Orm\Model
     {
         try {
             static::_callAllBehaviours(get_called_class(), 'dataset', array(&$dataset, $this));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
     }
 
     public function form_processing_behaviours($data, &$json_response)
     {
         try {
             static::_callAllBehaviours($this, 'form_processing', array($data, &$json_response));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
     }
 
     public function form_fieldset_fields(&$fieldset)
     {
         try {
             static::_callAllBehaviours($this, 'form_fieldset_fields', array(&$fieldset));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
     }
 
     public static function query($options = array())
@@ -517,7 +534,9 @@ class Model extends \Orm\Model
 
         foreach (func_get_args() as $property) {
             //if (mb_substr($property, 0, $prefix_length) != $prefix) {
-                $property = static::prefix().$property;
+
+            $property = static::prefix().$property;
+
             //}
             if (!empty($this->{$property})) {
                 return $this->{$property};
@@ -546,7 +565,7 @@ class Model extends \Orm\Model
                 for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
                     $i = $w_keys[$j];
                     if ($this->linked_wysiwygs[$i]->wysiwyg_key == $key) {
-                        array_splice ($arr_name, 0, 2);
+                        array_splice($arr_name, 0, 2);
                         if (empty($arr_name)) {
                             return $this->linked_wysiwygs[$i];
                         }
@@ -555,11 +574,11 @@ class Model extends \Orm\Model
                     }
                 }
                 // Create a new relation if it doesn't exist yet
-                $wysiwyg                        = new \Nos\Model_Wysiwyg();
-                $wysiwyg->wysiwyg_text          = $value;
-                $wysiwyg->wysiwyg_join_table    = static::$_table_name;
-                $wysiwyg->wysiwyg_key           = $key;
-                $wysiwyg->wysiwyg_foreign_id    = $this->id;
+                $wysiwyg = new \Nos\Model_Wysiwyg();
+                $wysiwyg->wysiwyg_text = $value;
+                $wysiwyg->wysiwyg_join_table = static::$_table_name;
+                $wysiwyg->wysiwyg_key = $key;
+                $wysiwyg->wysiwyg_foreign_id = $this->id;
                 // Don't save the link here, it's done with cascade_save = true
                 //$wysiwyg->save();
                 $this->linked_wysiwygs[] = $wysiwyg;
@@ -573,7 +592,7 @@ class Model extends \Orm\Model
                 for ($j = 0; $j < count($this->linked_medias); $j++) {
                     $i = $w_keys[$j];
                     if ($this->linked_medias[$i]->medil_key == $key) {
-                        array_splice ($arr_name, 0, 2);
+                        array_splice($arr_name, 0, 2);
                         if (empty($arr_name)) {
                             return $this->linked_medias[$i];
                         }
@@ -583,11 +602,11 @@ class Model extends \Orm\Model
                 }
 
                 // Create a new relation if it doesn't exist yet
-                $medil                   = new \Nos\Model_Media_Link();
+                $medil = new \Nos\Model_Media_Link();
                 $medil->medil_from_table = static::$_table_name;
-                $medil->medil_key        = $key;
+                $medil->medil_key = $key;
                 $medil->medil_foreign_id = $this->id;
-                $medil->medil_media_id   = $value;
+                $medil->medil_media_id = $value;
                 // Don't save the link here, it's done with cascade_save = true
                 $this->linked_medias[] = $medil;
 
@@ -630,7 +649,7 @@ class Model extends \Orm\Model
                 for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
                     $i = $w_keys[$j];
                     if ($this->linked_wysiwygs[$i]->wysiwyg_key == $key) {
-                        array_splice ($arr_name, 0, 2);
+                        array_splice($arr_name, 0, 2);
                         if (empty($arr_name)) {
                             return $this->linked_wysiwygs[$i];
                         }
@@ -648,7 +667,7 @@ class Model extends \Orm\Model
                 for ($j = 0; $j < count($this->linked_medias); $j++) {
                     $i = $w_keys[$j];
                     if ($this->linked_medias[$i]->medil_key == $key) {
-                        array_splice ($arr_name, 0, 2);
+                        array_splice($arr_name, 0, 2);
                         if (empty($arr_name)) {
                             return $this->linked_medias[$i];
                         }
@@ -705,10 +724,10 @@ class Model extends \Orm\Model
             $rel = static::relations($key);
             if ($rel->singular) {
                 if (empty($this->_original_relations[$key]) !== empty($val)
-                    or ( ! empty($this->_original_relations[$key])
+                    or (!empty($this->_original_relations[$key])
                         and $new_pk = $val->implode_pk($val)
-                        and $this->_original_relations[$key] !== $new_pk))
-                {
+                            and $this->_original_relations[$key] !== $new_pk)
+                ) {
                     $diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
                     $diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
                 }
@@ -716,13 +735,13 @@ class Model extends \Orm\Model
                 $original_pks = $this->_original_relations[$key];
                 $new_pks = array();
                 foreach ($val as $v) {
-                    if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
+                    if (!in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
                         $new_pks[] = $new_pk;
                     } else {
                         $original_pks = array_diff($original_pks, array($new_pk));
                     }
                 }
-                if ( ! empty($original_pks) or ! empty($new_pks)) {
+                if (!empty($original_pks) or !empty($new_pks)) {
                     $diff[0][$key] = empty($original_pks) ? null : $original_pks;
                     $diff[1][$key] = empty($new_pks) ? null : $new_pks;
                 }
@@ -757,7 +776,7 @@ class Model extends \Orm\Model
 
     protected function initProviders()
     {
-        $this->medias   = new Model_Media_Provider($this);
+        $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
 
@@ -770,7 +789,6 @@ class Model extends \Orm\Model
         return \Config::loadConfiguration($application, $file);
     }
 }
-
 
 
 class Model_Media_Provider implements \Iterator
@@ -801,7 +819,9 @@ class Model_Media_Provider implements \Iterator
         $media = \Nos\Model_Media::find($media_id);
         if (is_null($media)) {
             $pk = $this->parent->primary_key();
-            throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(get_class($this->parent))."(".$this->parent->{$pk[0]}.")");
+            throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
+                get_class($this->parent)
+            )."(".$this->parent->{$pk[0]}.")");
         }
 
         // Reuse the getter
@@ -860,7 +880,6 @@ class Model_Media_Provider implements \Iterator
         $this->parent = $obj;
     }
 }
-
 
 
 class Model_Wysiwyg_Provider implements \Iterator

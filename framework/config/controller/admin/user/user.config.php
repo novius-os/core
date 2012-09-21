@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 return array(
-    'controller_url'  => 'admin/nos/user/user',
+    'controller_url' => 'admin/nos/user/user',
     'model' => 'Nos\\Model_User',
     'messages' => array(
         'successfully added' => __('User successfully added.'),
@@ -34,18 +34,18 @@ return array(
         'delete' => 'nos::admin/user/delete_popup',
     ),
     'fields' => array(
-        'user_id' => array (
+        'user_id' => array(
             'label' => __('ID: '),
             'widget' => 'Nos\Widget_Text',
         ),
-        'user_name' => array (
+        'user_name' => array(
             'label' => __('Family name'),
             'widget' => '',
             'validation' => array(
                 'required',
             ),
         ),
-        'user_firstname' => array (
+        'user_firstname' => array(
             'label' => __('First name'),
             'widget' => '',
             'validation' => array(
@@ -60,7 +60,7 @@ return array(
                 'valid_email',
             ),
         ),
-        'user_last_connection' => array (
+        'user_last_connection' => array(
             'label' => __('Last login: '),
             'add' => false,
             'widget' => 'Nos\Widget_Date_Select',
@@ -69,7 +69,7 @@ return array(
                 'date_format' => 'eu_full',
             ),
         ),
-        'user_password' => array (
+        'user_password' => array(
             'label' => __('Password: '),
             'form' => array(
                 'type' => 'password',
@@ -79,30 +79,34 @@ return array(
                 'min_length' => array(6),
             ),
         ),
-        'password_reset' => array (
+        'password_reset' => array(
             'label' => __('Password: '),
             'form' => array(
                 'type' => 'password',
                 'size' => 20,
                 'value' => '',
             ),
-            'before_save' => function($item, $data) {
-                if (!empty($data['password_reset'])) {
-                    $item->user_password = $data['password_reset'];
-                }
-            },
+            'before_save' =>
+                function ($item, $data)
+                {
+                    if (!empty($data['password_reset'])) {
+                        $item->user_password = $data['password_reset'];
+                    }
+                },
             'validation' => array(
                 'min_length' => array(6),
             ),
         ),
-        'password_confirmation' => array (
+        'password_confirmation' => array(
             'label' => 'Password (confirmation)',
             'form' => array(
                 'type' => 'password',
                 'size' => 20,
             ),
-            'before_save' => function($item, $data) {
-            },
+            'before_save' =>
+                function ($item, $data)
+                {
+                },
             'validation' => array(
                 'match_field' => array('user_password'),
             ),

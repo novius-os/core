@@ -15,17 +15,23 @@ class Tools_Wysiwyg
     public static function prepare_widget($content)
     {
         $replaces = array();
-        static::parse_medias($content, function($media, $params) use (&$replaces) {
-            if (empty($media)) {
-                $replaces[$params['tag']] = '';
-            } else {
-                if (!empty($params['width']) && !empty($params['height']) && ($params['width'] != $media->media_width || $params['height'] != $media->media_height)) {
-                    $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path_resized($params['width'], $params['height']).'" width="'.$params['width'].'" height="'.$params['height'].'" data-media-id="'.$media->id.'"';
+        static::parse_medias(
+            $content,
+            function ($media, $params) use (&$replaces) {
+                if (empty($media)) {
+                    $replaces[$params['tag']] = '';
                 } else {
-                    $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path().'" data-media-id="'.$media->id.'"';
+                    if (!empty($params['width']) && !empty($params['height']) && ($params['width'] != $media->media_width || $params['height'] != $media->media_height)) {
+                        $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path_resized(
+                            $params['width'],
+                            $params['height']
+                        ).'" width="'.$params['width'].'" height="'.$params['height'].'" data-media-id="'.$media->id.'"';
+                    } else {
+                        $replaces[$params['src'].'"'] = \Uri::base(true).$media->get_public_path().'" data-media-id="'.$media->id.'"';
+                    }
                 }
             }
-        });
+        );
 
         return strtr($content, $replaces);
     }
@@ -41,12 +47,15 @@ class Tools_Wysiwyg
             }
             $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
             foreach ($matches[2] as $match_id => $media_id) {
-                $closure(\Arr::get($medias, $media_id, null), array(
-                    'tag' => $matches[0][$match_id],
-                    'src' => $matches[1][$match_id],
-                    'width' => \Arr::get($matches[3], $match_id, null),
-                    'height' => \Arr::get($matches[4], $match_id, null),
-                ));
+                $closure(
+                    \Arr::get($medias, $media_id, null),
+                    array(
+                        'tag' => $matches[0][$match_id],
+                        'src' => $matches[1][$match_id],
+                        'width' => \Arr::get($matches[3], $match_id, null),
+                        'height' => \Arr::get($matches[4], $match_id, null),
+                    )
+                );
             }
         }
     }

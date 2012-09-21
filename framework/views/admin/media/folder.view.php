@@ -12,24 +12,24 @@ $uniqid_radio = uniqid('radio_');
 ?>
 <div class="page" id="<?= $uniqid = uniqid('id_') ?>">
 <?php
-    $basename = pathinfo($item->medif_path, PATHINFO_BASENAME);
-    $checked = $basename === \Nos\Orm_Behaviour_Virtualname::friendly_slug($item->medif_title);
+$basename = pathinfo($item->medif_path, PATHINFO_BASENAME);
+$checked = $basename === \Nos\Orm_Behaviour_Virtualname::friendly_slug($item->medif_title);
 
-    $fieldset->set_config('field_template', '{field}');
+$fieldset->set_config('field_template', '{field}');
 
-    foreach ($fieldset->field() as $field) {
-        if ($field->type == 'submit') {
-            $field->set_template('{field}');
-        }
-        if ($field->type == 'file') {
-            $form_attributes = $fieldset->get_config('form_attributes', array());
-            $form_attributes['enctype'] = 'multipart/form-data';
-            $fieldset->set_config('form_attributes', $form_attributes);
-        }
+foreach ($fieldset->field() as $field) {
+    if ($field->type == 'submit') {
+        $field->set_template('{field}');
     }
-    if (!$item->is_new()) {
-        echo $fieldset->field('medif_id')->build();
+    if ($field->type == 'file') {
+        $form_attributes = $fieldset->get_config('form_attributes', array());
+        $form_attributes['enctype'] = 'multipart/form-data';
+        $fieldset->set_config('form_attributes', $form_attributes);
     }
+}
+if (!$item->is_new()) {
+    echo $fieldset->field('medif_id')->build();
+}
 ?>
     <table class="fieldset">
         <tr>
@@ -47,14 +47,14 @@ $uniqid_radio = uniqid('radio_');
             </td>
         </tr>
 <?php
-    if ($item->is_new()) {
-?>
+if ($item->is_new()) {
+    ?>
         <tr>
             <th><?= !empty($crud['context']) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
             <td id="<?= $uniqid_radio ?>"><?= $fieldset->field('medif_parent_id')->build(); ?></td>
         </tr>
-<?php
-    }
+    <?php
+}
 ?>
     </table>
 </div>

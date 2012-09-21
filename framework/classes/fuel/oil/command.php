@@ -14,14 +14,14 @@ class Command extends \Oil\Command
     {
         //set up the environment
         if (($env = \Cli::option('env'))) {
-            \Fuel::$env = constant('\Fuel::'. mb_strtoupper($env)) ?: \Fuel::DEVELOPMENT;
+            \Fuel::$env = constant('\Fuel::'.mb_strtoupper($env)) ? : \Fuel::DEVELOPMENT;
         }
 
         // Remove flag options from the main argument list
         $args = self::_clear_args($args);
 
         try {
-            if ( ! isset($args[1])) {
+            if (!isset($args[1])) {
                 if (\Cli::option('v', \Cli::option('version'))) {
                     \Cli::write('Fuel: '.\Fuel::VERSION);
 
@@ -37,11 +37,11 @@ class Command extends \Oil\Command
                 case 'g':
                 case 'generate':
 
-                    $action = isset($args[2]) ? $args[2]: 'help';
+                    $action = isset($args[2]) ? $args[2] : 'help';
 
                     $subfolder = 'orm';
                     if (is_int(mb_strpos($action, '/'))) {
-                        list($action, $subfolder)=explode('/', $action);
+                        list($action, $subfolder) = explode('/', $action);
                     }
 
                     switch ($action) {
@@ -78,13 +78,17 @@ class Command extends \Oil\Command
                 case 'refine':
 
                     // Developers of third-party tasks may not be displaying PHP errors. Report any error and quit
-                    set_error_handler(function($errno, $errstr, $errfile, $errline) {
-                        if (!error_reporting()) return; // If the error was supressed with an @ then we ignore it!
+                    set_error_handler(
+                        function ($errno, $errstr, $errfile, $errline) {
+                            if (!error_reporting()) {
+                                return;
+                            } // If the error was supressed with an @ then we ignore it!
 
-                        \Cli::error("Error: {$errstr} in $errfile on $errline");
-                        \Cli::beep();
-                        exit;
-                    });
+                            \Cli::error("Error: {$errstr} in $errfile on $errline");
+                            \Cli::beep();
+                            exit;
+                        }
+                    );
 
                     $task = isset($args[2]) ? $args[2] : null;
 
@@ -94,7 +98,7 @@ class Command extends \Oil\Command
                 case 'cell':
                 case 'cells':
 
-                    $action = isset($args[2]) ? $args[2]: 'help';
+                    $action = isset($args[2]) ? $args[2] : 'help';
 
                     switch ($action) {
                         case 'list':
@@ -127,7 +131,7 @@ class Command extends \Oil\Command
                     @include_once('PHPUnit/Autoload.php');
 
                     // Attempt to load PHUnit.  If it fails, we are done.
-                    if ( ! class_exists('PHPUnit_Framework_TestCase')) {
+                    if (!class_exists('PHPUnit_Framework_TestCase')) {
                         throw new Exception('PHPUnit does not appear to be installed.'.PHP_EOL.PHP_EOL."\tPlease visit http://phpunit.de and install.");
                     }
 

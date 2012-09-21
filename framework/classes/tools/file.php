@@ -81,7 +81,9 @@ class Tools_File
         $parts = explode(DS, $path);
         $path = array();
         foreach ($parts as $part) {
-            if ('.'  == $part) continue;
+            if ('.' == $part) {
+                continue;
+            }
             if ('..' == $part) {
                 array_pop($path);
             } else {
