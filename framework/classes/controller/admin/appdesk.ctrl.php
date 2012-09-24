@@ -90,7 +90,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
 
                 $config['dataset']['actions'] = array();
-                $monkey_item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'item'));
+                $monkey_item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
                 foreach ($monkey_item_actions as $action_key => $action_value) {
                     if (isset($action_value['enabled'])) {
                         $config['dataset']['actions'][$action_key] = $action_value['enabled'];
@@ -154,7 +154,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['actions'])) {
-                $config['appdesk']['actions'] = \Config::actions($application, array('model' => $config['model'], 'type' => 'item'));
+                $config['appdesk']['actions'] = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
             }
 
             if (!isset($config['appdesk']['appdesk'])) {
@@ -162,7 +162,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
-                $config['appdesk']['appdesk']['buttons'] = \Config::actions($application, array('type' => 'add'));
+                $config['appdesk']['appdesk']['buttons'] = \Config::actions($application, array('type' => 'appdeskTop'));
             }
 
             if (!isset($config['appdesk']['appdesk']['splittersVertical'])) {
@@ -202,8 +202,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                             'headerText' => __('Status'),
                             'dataKey' => 'publication_status'
                         );
-                    } else {
-                        $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = $value['headerText'];
+                    } else if (!isset($value['visible']) || $value['visible']) {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = isset($value['headerText']) ? $value['headerText'] : '';
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
 

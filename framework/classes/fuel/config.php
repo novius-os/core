@@ -133,31 +133,36 @@ class Config extends \Fuel\Core\Config
         return static::extendable_load($application_name, 'config');
     }
 
-    public static function actions($application_name, $filter = array())
+    public static function actions($application_name, $context = array())
     {
         $actions = static::application($application_name);
         $actions = static::process_actions($application_name, $actions['application']['actions']);
         $selected_actions = array();
         foreach ($actions as $key => $action) {
+            $action['name'] = $key;
             $select = true;
-            if (isset($filter['model'])) {
+            if (isset($context['model'])) {
                 $select = false;
                 $models = explode('.', $key);
                 for ($i = 0; $i < count($models) - 1; $i++) {
-                    if ($filter['model'] == $models[$i]) {
+                    if ($context['model'] == $models[$i]) {
                         $select = true;
                         break;
                     }
                 }
             }
 
-            if ($select && isset($filter['type'])) {
-                $select = $action['type'] == $filter['type'];
+            if ($select && isset($context['type'])) {
+                $select = isset($action['context']) && isset($action['context'][$context['type']]) && $action['context'][$context['type']];
             }
 
             if ($select) {
                 $selected_actions[$key] = $action;
             }
+        }
+
+        if (isset($context['item'])) {
+            $selected_actions = static::placeholder_replace($selected_actions, $context['item']);
         }
 
         return $selected_actions;
@@ -181,8 +186,9 @@ class Config extends \Fuel\Core\Config
                         'label' => __('Add a new monkey'),
                     ),
                 ),
-
-                'type' => 'add'
+                'context' => array(
+                    'appdeskTop' => true
+                ),
             ),
             'edit' => array(
                 'action' => array(
@@ -195,7 +201,9 @@ class Config extends \Fuel\Core\Config
                 'label' => __('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',
-                'type' => 'item'
+                'context' => array(
+                    'list' => true
+                ),
             ),
             'delete' => array(
                 'action' => array(
@@ -208,7 +216,13 @@ class Config extends \Fuel\Core\Config
                 'label' => __('Delete'),
                 'primary' => true,
                 'icon' => 'trash',
-                'type' => 'item'
+                'context' => array(
+                    'item' => true,
+                    'list' => true
+                ),
+                'enabled' =>  function($item) {
+                    return !$item->is_new();
+                },
             ),
             'visualise' => array(
                 'label' => 'Visualise',
@@ -216,15 +230,35 @@ class Config extends \Fuel\Core\Config
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
                 'action' => array(
                     'action' => 'window.open',
-                    'url' => '{{url}}?_preview=1'
+                    'url' => '{{preview_url}}?_preview=1'
                 ),
-                'enabled' =>  function($item, $context = array()) {
+                'context' => array(
+                    'item' => true,
+                    'list' => true
+                ),
+                'enabled' =>  function($item) {
                     $url = $item->url_canonical(array('preview' => true));
 
-                    return !empty($url);
+                    return !$item->is_new() && !empty($url);
                 },
-                'type' => 'item'
             ),
+            'share' => array(
+                'label' => __('Share'),
+                'iconClasses' => 'nos-icon16 nos-icon16-share',
+                'action' => array(
+                    'action' => 'share',
+                    'data' => array(
+                        'model_id' => '{{id}}',
+                        'model_name' => '',
+                    ),
+                ),
+                'context' => array(
+                    'item' => true
+                ),
+                'enabled' =>  function($item) {
+                    return !$item->is_new();
+                },
+            )
         );
 
 
@@ -260,6 +294,10 @@ class Config extends \Fuel\Core\Config
                             $actions[$model.'.'.$name]['label'] = $config['labels'][$name];
                         }
                         $actions[$model.'.'.$name]['label'] = Str::tr($actions[$model.'.'.$name]['label'], array('model_label' => $model_label));
+
+                        if ($name == 'share') {
+                            $actions[$model.'.'.$name]['action']['data']['model_name'] = $model;
+                        }
                     }
                 }
             }
@@ -269,6 +307,36 @@ class Config extends \Fuel\Core\Config
 
 
         return $actions;
+    }
+
+    static function placeholder_replace($obj, $data) {
+        $retrieveFromData = function($arg, $data) {
+            if (isset($data->{$arg})) {
+                return $data->{$arg};
+            }
+            try {
+                return $data->{$arg}();
+            } catch (\Exception $e) {
+                return '';
+            }
+        };
+
+        if (is_string($obj)) {
+            $obj = preg_replace_callback('/\[\:([\w]+)\]/', function($matches) use($data, $retrieveFromData) {
+                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
+            }, $obj);
+            $obj = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
+                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
+            }, $obj);
+            $obj = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
+                return urlencode(isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '');
+            }, $obj);
+        } else if (is_array($obj)) {
+            foreach ($obj as $key => $value) {
+                $obj[$key] = static::placeholder_replace($value, $data);
+            }
+        }
+        return $obj;
     }
 
 }

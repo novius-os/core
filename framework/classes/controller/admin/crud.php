@@ -418,51 +418,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_actions()
     {
+        list($application_name) = \Config::configFile(get_called_class());
+        $applicationActions = \Config::actions($application_name, array('model' => get_class($this->item), 'type' => 'item', 'item' => $this->item));
+
         $actions = array_values($this->get_actions_lang());
-        if (!$this->is_new) {
-            if ($this->behaviours['url'] !== false) {
-                $url = $this->item->url_canonical(array('preview' => true));
-                if ($url !== null) {
-                    $actions[] = array(
-                        'label' => $this->config['messages']['visualise'],
-                        'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                        'action' => array(
-                            'action' => 'window.open',
-                            'url' => $url . '?_preview=1',
-                        ),
-                    );
-                }
+        foreach ($applicationActions as $action) {
+            if (!isset($action['enabled']) || $action['enabled']($this->item)) {
+                $actions[] = $action;
             }
-            $actions[] = array(
-                'label' => $this->config['messages']['delete'],
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                        'title' => $this->config['messages']['delete an item'],
-                    ),
-                ),
-                'icon' => 'trash',
-            );
         }
         foreach ($this->config['actions'] as $actionClosure) {
             if ($action = $actionClosure($this->item)) {
                 $actions[] = $action;
-            }
-        }
-        if (!$this->is_new) {
-            if ($this->behaviours['sharable']) {
-                $actions[] = array(
-                    'label' => __('Share'),
-                    'iconClasses' => 'nos-icon16 nos-icon16-share',
-                    'action' => array(
-                        'action' => 'share',
-                        'data' => array(
-                            'model_id' => $this->item->{$this->pk},
-                            'model_name' => $this->config['model'],
-                        ),
-                    ),
-                );
             }
         }
 
