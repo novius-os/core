@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-ostabs',
-    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel'],
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'wijmo.wijmenu'],
     function( $ ) {
         "use strict";
         var undefined = void(0);
@@ -15,7 +15,7 @@ define('jquery-nos-ostabs',
             options: {
                 initTabs: [], // e.g. [{"url":"http://www.google.com","iconUrl":"img/google-32.png","label":"Google","iconSize":32,"labelDisplay":false},{"url":"http://www.twitter.com","iconClasses":"ui-icon ui-icon-signal-diag","label":"Twitter"}]
                 newTab: 'appsTab', // e.g. {"url":"applications.htm","label":"Open a new tab","iframe":true} or "appsTab" or false
-                trayTabs: [], // e.g. [{"url":"account.php","iconClasses":"ui-icon ui-icon-contact","label":"Account"},{"url":"customize.htm","iconClasses":"ui-icon ui-icon-gear","label":"Customization"}]
+                trayView: [], // e.g. [{"url":"account.php","iconClasses":"ui-icon ui-icon-contact","label":"Account"},{"url":"customize.htm","iconClasses":"ui-icon ui-icon-gear","label":"Customization"}]
                 appsTab: {}, // e.g. {"panelId":"ospanel","url":"applications.htm","iconUrl":"os.png","label":"My OS","iframe":true} or false
                 fx: null, // e.g. { height: 'toggle', opacity: 'toggle', duration: 200 }
                 labelMinWidth: 100,
@@ -146,15 +146,12 @@ define('jquery-nos-ostabs',
 
                     self.uiOstabsTray = $( '<ul></ul>' )
                         .addClass( 'nos-ostabs-tray nos-ostabs-nav' );
-                    if ( $.isArray( o.trayTabs ) ) {
-                        $.each( o.trayTabs, function(i, el) {
-                            if ( $.isPlainObject(el) ) {
-                                self._add( el, self.uiOstabsTray )
-                                    .addClass( 'nos-ostabs-tray' );
-                            }
-                        } );
+                    if ( o.trayView !== null ) {
+                        self.uiOstabsTray.html(o.trayView);
                     }
                     self.uiOstabsTray.prependTo(self.uiOstabsHeader);
+
+                    self.uiOstabsTray.find("#menu").wijmenu();
 
                     if ( $.isPlainObject(o.appsTab) ) {
                         self.uiOstabsAppsTab = $( '<ul></ul>' )
@@ -266,6 +263,7 @@ define('jquery-nos-ostabs',
                             self._tabsWidth();
                         }
                     });
+
 
                     self.tabsWidth = self.uiOstabsSuperPanelContent.width();
                     self.labelWidth = o.labelMaxWidth;
