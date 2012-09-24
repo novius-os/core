@@ -8,7 +8,8 @@
  * @link http://www.novius-os.org
  */
 
-class ModuleNotFoundException extends \FuelException { }
+class ModuleNotFoundException extends \FuelException {
+}
 
 class Module extends Fuel\Core\Module
 {

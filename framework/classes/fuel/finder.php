@@ -14,7 +14,7 @@ class Finder extends Fuel\Core\Finder
 
     public static function instance()
     {
-        if (! static::$instance) {
+        if (!static::$instance) {
             static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
         }
 
@@ -23,9 +23,15 @@ class Finder extends Fuel\Core\Finder
 
     public static function normalize_namespace($name)
     {
-        return implode('\\', array_map(function($a) {
-            return Inflector::words_to_upper($a);
-        }, explode('\\', $name)));
+        return implode(
+            '\\',
+            array_map(
+                function ($a) {
+                    return Inflector::words_to_upper($a);
+                },
+                explode('\\', $name)
+            )
+        );
     }
 
     /**
@@ -57,7 +63,7 @@ class Finder extends Fuel\Core\Finder
             }
         }
 
-        list($section,) = explode('/', $directory,  2);
+        list($section,) = explode('/', $directory, 2);
 
         // Do we need to override the default behaviour?
         if ($file[0] === '/' or (isset($file[1]) and $file[1] === ':') or !in_array($section, array('views', 'config', 'lang'))) {
@@ -79,25 +85,25 @@ class Finder extends Fuel\Core\Finder
         }
 
         $search = array();
-        $found  = array();
+        $found = array();
 
         // Init namespace and active module
         $is_namespaced = mb_strripos($file, '::');
 
         if (false === $is_namespaced) {
-            $request        = class_exists('Request', false) ? $request = Request::active() : false;
-            $namespace      = false;
-            $file_no_ns     = $file;
-            $active_module  = $request ? $request->module : false;
+            $request = class_exists('Request', false) ? $request = Request::active() : false;
+            $namespace = false;
+            $file_no_ns = $file;
+            $active_module = $request ? $request->module : false;
             if ($active_module) {
                 $namespace_path = Module::exists($active_module);
             }
         } else {
-            $namespace         = self::normalize_namespace(mb_substr($file, 0, $is_namespaced));
-            $file_no_ns        = mb_substr($file, $is_namespaced + 2);
-            $active_module     = false;
+            $namespace = self::normalize_namespace(mb_substr($file, 0, $is_namespaced));
+            $file_no_ns = mb_substr($file, $is_namespaced + 2);
+            $active_module = false;
             Module::load(mb_strtolower($namespace));
-            $namespace_path    = Module::exists(mb_strtolower($namespace));
+            $namespace_path = Module::exists(mb_strtolower($namespace));
         }
 
         $local_config_path = APPPATH.$directory.DS;

@@ -14,13 +14,17 @@ require(
     function($) {
         $(function() {
             $('#login').nosFormUI();
-            <?php if (!empty($error)) { ?>
+<?php
+if (!empty($error)) {
+    ?>
             $.nosNotify(<?= json_encode(array(
                 'title' => $error,
                 'type' => 'error',
                 'addclass' => 'nos-login-error',
             )) ?>);
-            <?php } ?>
+    <?php
+}
+?>
             var $email = $('#email');
             $email.select();
         });

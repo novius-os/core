@@ -14,7 +14,7 @@
 foreach ($choices as $key => $choice) {
     $checked = $driver->check($role, $key);
     ?>
-    <li><label><input type="checkbox" name="permission[<?= $application ?>][<?= $identifier ?>][]" value="<?= $key; ?>" <?= $checked ? 'checked' : ''; ?> /> <?= $choice['title']; ?></label></li>
+    <li><label><input type="checkbox" name="permission[<?= $application ?>][<?= $identifier ?>][]" value="<?= $key ?>" <?= $checked ? 'checked' : '' ?> /> <?= $choice['title'] ?></label></li>
     <?php
 }
 ?>

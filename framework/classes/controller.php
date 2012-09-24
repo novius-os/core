@@ -659,8 +659,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                         $tree_model['dataset'],
                         array(
                             'treeChilds' =>
-                                function ($item) use ($controller, $tree_config, $params, $child, $pk)
-                                {
+                                function ($item) use ($controller, $tree_config, $params, $child, $pk) {
                                     $open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$item->{$pk}, null);
                                     if ($open === true || ($params['deep'] > 1 && $open !== false)) {
                                         $items = $controller->tree_items(

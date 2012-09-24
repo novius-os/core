@@ -26,7 +26,7 @@ require(
 <?php
 echo $fieldset->build_hidden_fields();
 
-$fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+$fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 $large = !empty($large) && $large == true;
 ?>
 
@@ -70,7 +70,7 @@ if (!empty($title)) {
         $field = $fieldset->field($name);
         $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
         echo ' '.$field
-                ->set_attribute('placeholder',$placeholder)
+                ->set_attribute('placeholder', $placeholder)
                 ->set_attribute('title', $placeholder)
                 ->set_attribute('class', 'title')
                 ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
@@ -96,23 +96,23 @@ if (!empty($subtitle) || !empty($publishable)) {
         echo $publishable;
     }
     if (!empty($subtitle)) {
-        $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+        $fieldset->form()->set_config('field_template', "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
             $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
             echo $field
-                 ->set_attribute('placeholder',$placeholder)
+                 ->set_attribute('placeholder', $placeholder)
                  ->set_attribute('title', $placeholder)
                  ->build();
         }
-        $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+        $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
     }
     ?>
                             </tr>
                         </table>
                     </div>
     <?php
-    }
+}
 ?>
             </div>
         </div>

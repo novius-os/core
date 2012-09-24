@@ -83,7 +83,7 @@ class Model_Media_Folder extends \Nos\Orm\Model
         $path_thumbnails = str_replace(DOCROOT.'media/', DOCROOT.'cache/media/', $path_public);
         try {
             // delete_dir($path, $recursive, $delete_top)
-            is_dir($path_public)     and \File::delete_dir($path_public,     true, true);
+            is_dir($path_public) and \File::delete_dir($path_public, true, true);
             is_dir($path_thumbnails) and \File::delete_dir($path_thumbnails, true, true);
 
             return true;

@@ -110,5 +110,5 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud
                 medif_id IN ($escaped_folder_ids)")->execute();
 
         \DB::commit_transaction();
-}
+    }
 }

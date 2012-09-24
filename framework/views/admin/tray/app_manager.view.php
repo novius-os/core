@@ -82,9 +82,13 @@ foreach ($installed as $app) {
                     </tbody>
                 </table>
 
-                <?php if (empty($installed)) { ?>
+<?php
+if (empty($installed)) {
+    ?>
                 <em><?php echo __('No applications found') ?>.</em>
-                <?php } ?>
+    <?php
+}
+?>
             </div>
 
             <p>&nbsp;</p>
@@ -123,13 +127,19 @@ foreach ($others as $app) {
                     </tbody>
                 </table>
 
-                <?php if (empty($others)) { ?>
+<?php
+if (empty($others)) {
+    ?>
                 <em><?= __('No applications found') ?></em>
-                <?php } ?>
+    <?php
+}
+?>
 
             </div>
 
-            <?php if ($allow_upload) { ?>
+<?php
+if ($allow_upload) {
+    ?>
                 <p>&nbsp;</p>
                 <h1 class="title"><?= __('Install from a .zip file') ?></h1>
 
@@ -137,7 +147,9 @@ foreach ($others as $app) {
                     <input type="file" name="zip" />
                     <input type="submit" value="<?= __('Upload the application') ?>" />
                 </form>
-            <?php } ?>
+    <?php
+}
+?>
         </div>
     </div>
     <div class="unit lastUnit"></div>

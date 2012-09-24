@@ -13,7 +13,7 @@ namespace Nos;
 class Controller_Admin_Application extends Controller_Admin_Auth
 {
     public $template = 'nos::admin/html';
-    public $bypass   = false;
+    public $bypass = false;
 
     public function before()
     {
@@ -25,7 +25,7 @@ class Controller_Admin_Application extends Controller_Admin_Auth
             if ($application == 'nos' && isset($location[2])) {
                 $submodule = explode('_', \Inflector::denamespace(get_called_class()));
                 if ($submodule[0] == 'Controller' && $submodule[1] == 'Admin' && count($submodule) > 2) {
-                    $application = 'nos_'.mb_strtolower($submodule[2]);; // this hack should be temporary until we figure out how to correctly implement native applications...
+                    $application = 'nos_'.mb_strtolower($submodule[2]); // this hack should be temporary until we figure out how to correctly implement native applications...
                 }
             }
             if ($application != 'nos' && !Permission::check($application, 'access')) {
@@ -39,17 +39,21 @@ class Controller_Admin_Application extends Controller_Admin_Auth
         foreach (array(
                      'title' => 'Administration',
                      'base' => \Uri::base(false),
-                     'require'  => 'static/novius-os/admin/vendor/requirejs/require.js',
+                     'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
                  ) as $var => $default) {
             if (empty($this->template->$var)) {
                 $this->template->$var = $default;
             }
         }
         $ret = parent::after($response);
-        $this->template->set(array(
-            'css' => \Asset::render('css'),
-            'js'  => \Asset::render('js'),
-        ), false, false);
+        $this->template->set(
+            array(
+                'css' => \Asset::render('css'),
+                'js' => \Asset::render('js'),
+            ),
+            false,
+            false
+        );
 
         return $ret;
     }

@@ -97,7 +97,12 @@ class Config extends \Fuel\Core\Config
                 $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
             }
         }
-        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+        $config = \Arr::recursive_filter(
+            $config,
+            function($var) {
+                return $var !== null;
+            }
+        );
 
         return $config;
     }
@@ -123,7 +128,12 @@ class Config extends \Fuel\Core\Config
                 $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name, array()));
             }
         }
-        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+        $config = \Arr::recursive_filter(
+            $config,
+            function($var) {
+                return $var !== null;
+            }
+        );
 
         return $config;
     }
