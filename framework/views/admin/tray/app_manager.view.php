@@ -161,6 +161,16 @@ if ($allow_upload) {
                 $(function() {
                     var $container = $('#<?= $uniqid ?>');
                     $container.nosFormUI();
+
+                    $container.nosTabs('update', {
+                        label: <?= \Format::forge(__('Application manager'))->to_json() ?>,
+                        url:  'admin/nos/tray/appmanager',
+                        iconUrl: 'static/novius-os/admin/novius-os/img/32/app-manager.png',
+                        app: true,
+                        iconSize: 32,
+                        labelDisplay: false
+                    })
+
                     $(".app_list table").wijgrid({
                         columns: [
                             {  },
