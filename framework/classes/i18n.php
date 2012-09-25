@@ -79,9 +79,9 @@ class I18n
                 static::$_messages[static::$_locale][$group] = array();
             }
 
-            $languages = static::$fallback;
-            array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
+            $languages = array(static::$_locale, mb_substr(static::$_locale, 0, 2), static::$fallback);
 
+            // Priority == 'en_GB', then 'en', then 'fallback'
             foreach ($languages as $lang) {
                 if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
                     foreach ($path as $p) {
@@ -109,10 +109,6 @@ class I18n
 
         if (empty($result)) {
             $result = $default ?: $message;
-        }
-
-        if ($debug = true && $result != $default) {
-            //$result = $group.'('.$result.')';
         }
 
         return $result;

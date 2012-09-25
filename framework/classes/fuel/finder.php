@@ -10,7 +10,7 @@
 
 class Finder extends Fuel\Core\Finder
 {
-    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view');
+    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view', 'lang' => 'lang');
 
     public static function instance()
     {
@@ -132,7 +132,7 @@ class Finder extends Fuel\Core\Finder
 
         $files_to_search = array();
         foreach (static::$_suffixed_directories as $suffixed_directory => $suffix) {
-            if ($directory == $suffixed_directory) {
+            if ($section == $suffixed_directory) {
                 $dots = explode('.', $file_no_ns);
                 array_splice($dots, count($dots) - 1, 0, array($suffix));
                 $files_to_search[] = implode('.', $dots);
