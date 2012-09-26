@@ -329,7 +329,7 @@ class Model extends \Orm\Model
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
         if (!$translatable || !$tree) {
-            return array_keys(\Config::get('locales'));
+            return array_keys(\Config::get('sites'));
         }
 
         // Return sites from parent if available
@@ -338,7 +338,7 @@ class Model extends \Orm\Model
             return $parent->get_all_site();
         }
 
-        return array_keys(\Config::get('locales'));
+        return array_keys(\Config::get('sites'));
     }
 
     /**

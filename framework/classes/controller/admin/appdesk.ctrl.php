@@ -46,9 +46,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view = View::forge('admin/appdesk');
 
-        $locales = \Config::get('locales', array());
+        $sites = \Config::get('sites', array());
 
-        $view->set('appdesk', \Format::forge(array_merge(array('locales' => $locales), $this->config))->to_json(), false);
+        $view->set('appdesk', \Format::forge(array_merge(array('sites' => $sites), $this->config))->to_json(), false);
 
         return $view;
     }

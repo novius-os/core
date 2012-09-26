@@ -18,7 +18,7 @@ define('jquery-nos-appdesk',
                 inspectors : [],
                 thumbnails : false,
                 defaultView : 'grid',
-                locales : {},
+                sites : {},
                 hideLocales : false,
                 texts : {
                     allSites : 'All',
@@ -150,13 +150,13 @@ define('jquery-nos-appdesk',
                     }, o.thumbnails);
                 }
 
-                if (!$.isEmptyObject(o.locales)) {
+                if (!$.isEmptyObject(o.sites)) {
 
                     if (!$.type(o.selectedSite) === 'string') {
                         o.selectedSite = null;
                     }
-                    if (o.selectedSite === null || !o.locales[o.selectedSite]) {
-                        o.selectedSite = Object.keys(o.locales)[0];
+                    if (o.selectedSite === null || !o.sites[o.selectedSite]) {
+                        o.selectedSite = Object.keys(o.sites)[0];
                     }
                 }
 
@@ -244,7 +244,7 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (o.hideLocales || !!$.isEmptyObject(o.locales)) {
+                if (o.hideLocales || !!$.isEmptyObject(o.sites)) {
                     return self;
                 }
                 self.dispatcher.data('nosSite', o.selectedSite);
@@ -253,7 +253,7 @@ define('jquery-nos-appdesk',
                     uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
                     $uiSites = $('<div></div>').addClass('nos-appdesk-dropdownsite');
 
-                $.each(o.locales, function(key, locale) {
+                $.each(o.sites, function(key, locale) {
                     var flag = key.split('_')[1].toLowerCase();
                     $uiSites.append(
                         $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedSite == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
@@ -1170,10 +1170,10 @@ define('jquery-nos-appdesk',
 
                 var init = function() {
                     // If the property is set explicitely, use it, else display only if there's more than 1 site
-                    var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.locales).length <= 1);
+                    var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.sites).length <= 1);
 
                     $.extend(true, appdesk.appdesk, {
-                        locales : config.locales,
+                        sites : config.sites,
                         hideLocales : hideLocales,
                         views : config.views,
                         name  : config.configuration_id,

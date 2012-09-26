@@ -183,7 +183,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};
             }
             if ($this->behaviours['translatable']) {
-                $this->item->{$this->behaviours['translatable']['site_property']} = \Input::get('site', false) ? : key(\Config::get('locales'));
+                $this->item->{$this->behaviours['translatable']['site_property']} = \Input::get('site', false) ? : key(\Config::get('sites'));
             }
             if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
                 // New page: no parent
@@ -323,7 +323,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $message = strtr(
                     __('This item already exists in {site}. Therefore your item cannot be added.'),
                     array(
-                        '{site}' => \Arr::get(\Config::get('locales'), $item_site, $item_site),
+                        '{site}' => \Arr::get(\Config::get('sites'), $item_site, $item_site),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -380,7 +380,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
         $this->is_new = true;
         if (empty($site)) {
-            $site = \Input::get('site', key(\Config::get('locales')));
+            $site = \Input::get('site', key(\Config::get('sites')));
         }
 
         $view_params = array_merge(
@@ -489,9 +489,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $actions = array();
-        $locales = array_keys(\Config::get('locales'));
+        $sites = array_keys(\Config::get('sites'));
         $main_site = $this->item->find_main_site();
-        foreach ($locales as $locale) {
+        foreach ($sites as $locale) {
             if ($this->item->{$this->behaviours['translatable']['site_property']} === $locale) {
                 continue;
             }
@@ -499,7 +499,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_site) ? (empty($main_site) ? '' : '/'.$main_site->id).'?site='.$locale : '/'.$item_site->id);
             $label = empty($main_site) ? $this->config['messages']['add an item in site'] : (empty($item_site) ? __('Translate in {site}') : __('Edit in {site}'));
             $actions[$locale] = array(
-                'label' => strtr($label, array('{site}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
+                'label' => strtr($label, array('{site}' => \Arr::get(\Config::get('sites'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',

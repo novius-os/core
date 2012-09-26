@@ -31,10 +31,10 @@ if ($crud['behaviours']['translatable']) {
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
             <?php
             if ($site_count > 1) {
-                $locales = \Config::get('locales', array());
+                $sites = \Config::get('sites', array());
                 $sites_list = array();
                 foreach ($item_sites as $item_site) {
-                    $sites_list[] = \Arr::get($locales, $item_site->get_site(), $item_site->get_site());
+                    $sites_list[] = \Arr::get($sites, $item_site->get_site(), $item_site->get_site());
                 }
                 ?>
                 <p><?= strtr($crud['config']['messages']['exists in multiple site'], array(
@@ -47,7 +47,7 @@ if ($crud['behaviours']['translatable']) {
                 <?php
                 foreach ($item_sites as $item_site) {
                     ?>
-                    <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($locales, $item_site->get_site(), $item_site->get_site()); ?></option>
+                    <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($sites, $item_site->get_site(), $item_site->get_site()); ?></option>
                     <?php
                 }
                 ?>
@@ -68,10 +68,10 @@ if ($crud['behaviours']['translatable']) {
         if ($site_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
-            $locales = \Config::get('locales', array());
+            $sites = \Config::get('sites', array());
             $sites_list = array();
             foreach ($item_sites as $item_site) {
-                $sites_list[] = \Arr::get($locales, $item_site->get_site(), $item_site->get_site());
+                $sites_list[] = \Arr::get($sites, $item_site->get_site(), $item_site->get_site());
             }
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
@@ -85,7 +85,7 @@ if ($crud['behaviours']['translatable']) {
             <?php
             foreach ($item_sites as $item_site) {
                 ?>
-                <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($locales, $item_site->get_site(), $item_site->get_site()); ?></option>
+                <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($sites, $item_site->get_site(), $item_site->get_site()); ?></option>
                 <?php
             }
             ?>

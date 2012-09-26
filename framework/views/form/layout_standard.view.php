@@ -47,8 +47,8 @@ if (!empty($medias)) {
     echo '</td>';
 }
 
-$locales = array_keys(\Config::get('locales'));
-if (!empty($item) && count($locales) > 1) {
+$sites = array_keys(\Config::get('sites'));
+if (!empty($item) && count($sites) > 1) {
     $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
     if ($translatable) {
         echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_site()).'</td>';

@@ -28,7 +28,7 @@ if (!in_array($site, $possible)) {
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
         echo strtr($crud['config']['messages']['error added in site not parent'], array(
-            '{site}' => Arr::get(Config::get('locales'), $site, $site),
+            '{site}' => Arr::get(Config::get('sites'), $site, $site),
             '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
         ));
         ?>
@@ -41,18 +41,18 @@ if (!in_array($site, $possible)) {
         </script>
         <?php
     } else {
-        echo strtr($crud['config']['messages']['error added in site'], array('{site}' => Arr::get(Config::get('locales'), $site, $site)));
+        echo strtr($crud['config']['messages']['error added in site'], array('{site}' => Arr::get(Config::get('sites'), $site, $site)));
     }
 } else {
     foreach ($possible as $locale) {
         $item_site = $item->find_site($locale);
         if (!empty($item_site)) {
-            $labels[$item_site->id] = \Config::get("locales.$locale", $locale);
+            $labels[$item_site->id] = \Config::get("sites.$locale", $locale);
         }
     }
     ?>
             <p><?=
-            strtr($crud['config']['messages']['item inexistent in site yet'], array('{site}' => Arr::get(Config::get('locales'), $site, $site)))
+            strtr($crud['config']['messages']['item inexistent in site yet'], array('{site}' => Arr::get(Config::get('sites'), $site, $site)))
             ?></p>
 
             <p>&nbsp;</p>

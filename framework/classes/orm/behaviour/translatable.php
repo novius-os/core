@@ -102,7 +102,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         $available_sites = $item->get_all_site();
 
         // Set the is_main property for one of the site
-        foreach (\Config::get('locales') as $code => $name) {
+        foreach (\Config::get('sites') as $code => $name) {
             if (in_array($code, $available_sites)) {
                 $new_main_item = $this->find_site($item, $code);
                 $new_main_item->set($this->_properties['is_main_property'], true);
