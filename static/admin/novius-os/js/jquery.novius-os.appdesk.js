@@ -19,7 +19,7 @@ define('jquery-nos-appdesk',
                 thumbnails : false,
                 defaultView : 'grid',
                 sites : {},
-                hideLocales : false,
+                hideSites : false,
                 texts : {
                     allSites : 'All',
                     addDropDown : 'Select an action',
@@ -244,7 +244,7 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (o.hideLocales || !!$.isEmptyObject(o.sites)) {
+                if (o.hideSites || !!$.isEmptyObject(o.sites)) {
                     return self;
                 }
                 self.dispatcher.data('nosSite', o.selectedSite);
@@ -1170,11 +1170,11 @@ define('jquery-nos-appdesk',
 
                 var init = function() {
                     // If the property is set explicitely, use it, else display only if there's more than 1 site
-                    var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.sites).length <= 1);
+                    var hideSites = (typeof config.hideSites != 'undefined' ? config.hideSites : Object.keys(config.sites).length <= 1);
 
                     $.extend(true, appdesk.appdesk, {
                         sites : config.sites,
-                        hideLocales : hideLocales,
+                        hideSites : hideSites,
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
@@ -1316,7 +1316,7 @@ define('jquery-nos-appdesk',
                                 object[key] = keyToOrderedArray(object, key);
                                 for (var i = 0; i < object[key].length; i++) {
                                     if (object[key][i].site) {
-                                        if (configToUse.hideLocales) {
+                                        if (configToUse.hideSites) {
                                             object[key].splice(i, 1);
                                             continue;
                                         }
