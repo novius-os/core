@@ -796,7 +796,7 @@ define('jquery-nos-appdesk',
                         height : height,
                         width : '100%'
                     }).nostreegrid($.extend(true, { // True for recursive clone
-                        treeUrl : o.treeGrid.urlJson,
+                        urlJson : o.treeGrid.urlJson,
                         treeOptions : {
                             lang : o.selectedLang || ''
                         },

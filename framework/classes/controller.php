@@ -267,8 +267,14 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                         $data = $data['value'];
                     }
 
+                    if ($data === true) {
+                        continue;
+                    }
+
                     if (is_callable($data)) {
                         $item[$key] = call_user_func($data, $object);
+                    } else if (is_array($data)) {
+                        $item[$key] = $object->get($data['column']);
                     } else {
                         $item[$key] = $object->get($data);
                     }

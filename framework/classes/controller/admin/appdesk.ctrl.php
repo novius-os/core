@@ -31,7 +31,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public function load_config() {
         list($application, $file_name) = \Config::configFile(get_called_class());
-        $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($this->config));
+        $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
         return $this->config;
     }
 
@@ -57,14 +57,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         return $view;
     }
 
-    public static function process_config($config) {
+    public static function process_config($application, $config) {
         if (isset($config['model'])) {
-            list($application, $file_name) = \Config::configFile($config['model']);
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();
             $inspectors_class_prefix = explode('_', $inspectors_class_prefix);
             $inspectors_class_prefix[count($inspectors_class_prefix) - 1] = 'Inspector';
             $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
+
             $application_config = \Config::application($application);
 
             $admin_config = $config['model']::admin_config();
@@ -78,20 +78,15 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['dataset'])) {
-
-                $config['dataset'] = array('id' => 'id');
-                foreach ($admin_config['dataset'] as $key => $value) {
-                    if (isset($value['column'])) {
-                        $config['dataset'][$key] = $value['column'];
-                    }
-                    if (isset($value['value'])) {
-                        $config['dataset'][$key] = array('value' => $value['value']);
-                    }
-                }
+                $config['dataset'] = $admin_config['dataset'];
+                $config['dataset']['id'] = array(
+                    'column' => 'id',
+                    'visible' => false
+                );
 
                 $config['dataset']['actions'] = array();
-                $monkey_item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
-                foreach ($monkey_item_actions as $action_key => $action_value) {
+                $item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
+                foreach ($item_actions as $action_key => $action_value) {
                     if (isset($action_value['enabled'])) {
                         $config['dataset']['actions'][$action_key] = $action_value['enabled'];
                     }
@@ -122,7 +117,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                     $inspector_name = $inspectors_class_prefix.ucfirst($value);
                     list($application, $file_name) = \Config::configFile($inspector_name);
                     $inspector_config = \Config::loadConfiguration($application, $file_name);
-                    $inspector_config = $inspector_name::process_config($inspector_config);
+                    $inspector_config = $inspector_name::process_config($application, $inspector_config);
                     $inspectors[$value] = $inspector_config;
                 }
             }
@@ -194,7 +189,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             if (!isset($config['appdesk']['appdesk']['grid']['columns'])) {
                 $config['appdesk']['appdesk']['grid']['columns'] = array();
-                foreach ($admin_config['dataset'] as $key => $value) {
+                foreach ($config['dataset'] as $key => $value) {
                     if ($key == 'lang') {
                         $config['appdesk']['appdesk']['grid']['columns'][$key] = array('lang' => true);
                     } else if ($key == 'published') {

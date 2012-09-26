@@ -237,9 +237,12 @@ class Config extends \Fuel\Core\Config
                     'list' => true
                 ),
                 'enabled' =>  function($item) {
-                    $url = $item->url_canonical(array('preview' => true));
+                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        $url = $item->url_canonical(array('preview' => true));
 
-                    return !$item->is_new() && !empty($url);
+                        return !$item->is_new() && !empty($url);
+                    }
+                    return false;
                 },
             ),
             'share' => array(
@@ -311,6 +314,9 @@ class Config extends \Fuel\Core\Config
 
     static function placeholder_replace($obj, $data) {
         $retrieveFromData = function($arg, $data) {
+            if (isset($data[$arg])) {
+                return $data[$arg];
+            }
             if (isset($data->{$arg})) {
                 return $data->{$arg};
             }

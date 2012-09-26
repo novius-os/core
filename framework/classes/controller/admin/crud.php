@@ -142,7 +142,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function action_form($id = null)
     {
-        try {
+        //try {
             $this->item = $this->crud_item($id);
             $this->clone = clone $this->item;
             $this->is_new = $this->item->is_new();
@@ -161,9 +161,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $view_params['view_params'] = &$view_params;
 
             return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], $view_params, false);
-        } catch (\Exception $e) {
+        /*} catch (\Exception $e) {
             $this->send_error($e);
-        }
+        }*/
     }
 
     protected function form_item()

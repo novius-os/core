@@ -49,7 +49,7 @@
                         table.nostreegrid({
                                 sortable : false,
                                 movable : false,
-                                treeUrl : params.treeUrl,
+                                urlJson : params.urlJson,
                                 treeColumnIndex : 1,
                                 treeOptions : $.extend(true, {
                                     lang : connector.data('nosLang') || ''
