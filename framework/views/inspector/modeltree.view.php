@@ -18,10 +18,10 @@ require(
         $(function() {
             var inspector = $('#<?= $attributes['id'] ?>'),
                 connector = inspector.closest('.nos-dispatcher, body')
-                    .on('langChange', function() {
-                        if (inspectorData.langChange) {
+                    .on('siteChange', function() {
+                        if (inspectorData.siteChange) {
                             inspector.nostreegrid('option', 'treeOptions', {
-                                lang : connector.data('nosLang') || ''
+                                site : connector.data('nosSite') || ''
                             });
                         }
                     }),
@@ -41,8 +41,8 @@ require(
                 var match = {
                         name : inspectorData.reloadEvent
                     };
-                if (connector.data('nosLang')) {
-                    match['lang'] = connector.data('nosLang');
+                if (connector.data('nosSite')) {
+                    match['site'] = connector.data('nosSite');
                 }
                 inspector.nosListenEvent(match, function() {
                         parent.trigger('widgetReload');
@@ -55,7 +55,7 @@ require(
                 })
                 .nostreegrid($.extend({
                     treeOptions : {
-                        lang : connector.data('nosLang') || ''
+                        site : connector.data('nosSite') || ''
                     },
                     columnsAutogenerationMode : 'none',
                     scrollMode : 'auto',

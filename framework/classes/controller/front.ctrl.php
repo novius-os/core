@@ -438,7 +438,7 @@ class Controller_Front extends Controller
         }
         if (empty($this->_page_url)) {
             $where[] = array('page_entrance', 1);
-            $where[] = array('page_lang', key(\Config::get('locales')));
+            $where[] = array('page_site', key(\Config::get('locales')));
         } else {
             $where[] = array('page_virtual_url', $this->_page_url);
             //$where[] = array('page_parent_id', 'IS NOT', null);
@@ -457,7 +457,7 @@ class Controller_Front extends Controller
         // Get the first page
         reset($pages);
         $this->_page = current($pages);
-        \Nos\I18n::setLocale($this->_page->get_lang());
+        \Nos\I18n::setLocale($this->_page->get_site());
     }
 
     protected function _find_template()

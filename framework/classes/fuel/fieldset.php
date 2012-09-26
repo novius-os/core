@@ -404,13 +404,13 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $fieldset;
     }
 
-    public function readonly_lang($instance)
+    public function readonly_site($instance)
     {
         if (empty($instance)) {
             return;
         }
         $behaviour_translatable = $instance->behaviours('Nos\Orm_Behaviour_Translatable');
-        if (empty($behaviour_translatable) || $instance->is_main_lang()) {
+        if (empty($behaviour_translatable) || $instance->is_main_site()) {
             return;
         }
         foreach ($behaviour_translatable['invariant_fields'] as $f) {
@@ -456,7 +456,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
                 continue;
             }
-            // Don't populate some fields (for example, the lang)
+            // Don't populate some fields (for example, the site)
             if (\Arr::get($this->config_used, "$k.dont_populate", false) == true) {
                 continue;
             }

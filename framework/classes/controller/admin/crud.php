@@ -20,17 +20,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'successfully deleted' => 'The item has successfully been deleted!',
             'you are about to delete, confim' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?',
             'you are about to delete' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>.',
-            'exists in multiple lang' => 'This item exists in <strong>{count} languages</strong>.',
-            'delete in the following languages' => 'Delete this item in the following languages:',
+            'exists in multiple site' => 'This item exists in <strong>{count} sites</strong>.',
+            'delete in the following sites' => 'Delete this item in the following sites:',
             'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
             'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
             'confirm deletion, enter number' => 'To confirm the deletion, you need to enter this number in the field below',
             'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
             'item deleted' => 'This item has been deleted.',
             'not found' => 'Item not found',
-            'error added in lang not parent' => 'This item cannot be added {lang} because its {parent} is not available in this language yet.',
-            'error added in lang' => 'This item cannot be added {lang}.',
-            'item inexistent in lang yet' => 'This item has not been added in {lang} yet.',
+            'error added in site not parent' => 'This item cannot be added {site} because its {parent} is not available in this site yet.',
+            'error added in site' => 'This item cannot be added {site}.',
+            'item inexistent in site yet' => 'This item has not been added in {site} yet.',
             'visualise' => 'Visualise',
             'delete' => 'Delete',
             'delete an item' => 'Delete an item',
@@ -38,7 +38,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'confirm deletion or' => 'or',
             'confirm deletion cancel' => 'Cancel',
             'confirm deletion wrong_confirmation' => 'Wrong confirmation',
-            'add an item in lang' => 'Add a new item in {lang}',
+            'add an item in site' => 'Add a new item in {site}',
         ),
         'context_relation' => null,
         'tab' => array(
@@ -132,7 +132,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'item' => $this->item,
         );
         if ($this->behaviours['translatable']) {
-            $view_params['crud']['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
+            $view_params['crud']['site'] = $this->item->{$this->behaviours['translatable']['site_property']};
         }
 
         $view_params['view_params'] = &$view_params;
@@ -183,19 +183,19 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};
             }
             if ($this->behaviours['translatable']) {
-                $this->item->{$this->behaviours['translatable']['lang_property']} = \Input::get('lang', false) ? : key(\Config::get('locales'));
+                $this->item->{$this->behaviours['translatable']['site_property']} = \Input::get('site', false) ? : key(\Config::get('locales'));
             }
             if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
                 // New page: no parent
                 // Translation: we have a common_id and can determine the parent
                 if (!empty($this->item->{$this->behaviours['translatable']['common_id_property']})) {
                     $model = $this->config['model'];
-                    $item_lang_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
-                    $item_parent = $item_lang_common->get_parent();
+                    $item_site_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
+                    $item_parent = $item_site_common->get_parent();
 
-                    // Fetch in the appropriate lang
+                    // Fetch in the appropriate site
                     if (!empty($item_parent)) {
-                        $item_parent = $item_parent->find_lang($this->item->{$this->behaviours['translatable']['lang_property']});
+                        $item_parent = $item_parent->find_site($this->item->{$this->behaviours['translatable']['site_property']});
                     }
 
                     // Set manually, because set_parent doesn't handle new items
@@ -221,10 +221,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fields = \Arr::merge(
                 $fields,
                 array(
-                    $this->behaviours['translatable']['lang_property'] => array(
+                    $this->behaviours['translatable']['site_property'] => array(
                         'form' => array(
                             'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['translatable']['lang_property']},
+                            'value' => $this->item->{$this->behaviours['translatable']['site_property']},
                         ),
                     ),
                     $this->behaviours['translatable']['common_id_property'] => array(
@@ -244,7 +244,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     array(
                         $parent_id => array(
                             'widget_options' => array(
-                                'lang' => $this->item->{$this->behaviours['translatable']['lang_property']},
+                                'site' => $this->item->{$this->behaviours['translatable']['site_property']},
                             ),
                         ),
                     )
@@ -297,8 +297,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'id' => (int) $item->{$this->pk},
         );
         if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = (int) $item->{$this->behaviours['translatable']['common_id_property']};
-            $dispatchEvent['lang'] = $item->{$this->behaviours['translatable']['lang_property']};
+            $dispatchEvent['site_common_id'] = (int) $item->{$this->behaviours['translatable']['common_id_property']};
+            $dispatchEvent['site'] = $item->{$this->behaviours['translatable']['site_property']};
         }
 
         $return = array(
@@ -317,13 +317,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         if ($this->behaviours['translatable'] && $this->is_new) {
 
-            $item_lang = $this->item->get_lang();
-            $existing = $this->item->find_lang($item_lang);
+            $item_site = $this->item->get_site();
+            $existing = $this->item->find_site($item_site);
             if (!empty($existing)) {
                 $message = strtr(
-                    __('This item already exists in {lang}. Therefore your item cannot be added.'),
+                    __('This item already exists in {site}. Therefore your item cannot be added.'),
                     array(
-                        '{lang}' => \Arr::get(\Config::get('locales'), $item_lang, $item_lang),
+                        '{site}' => \Arr::get(\Config::get('locales'), $item_site, $item_site),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -339,7 +339,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             // Model::find(null) returns an Orm\Query. We don't want that.
             $parent = empty($item->{$item->parent_relation()->key_from[0]}) ? null : $item::find($item->{$item->parent_relation()->key_from[0]});
 
-            // Event 'change_parent' will set the appropriate lang
+            // Event 'change_parent' will set the appropriate site
             $item->set_parent($parent);
         }
     }
@@ -348,7 +348,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         // insert_update               : add a new item
         // insert_update/ID            : edit an existing item
-        // insert_update/ID?lang=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that language)
+        // insert_update/ID?site=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that site)
 
         $this->item = $this->crud_item($id);
         $this->is_new = $this->item->is_new();
@@ -362,35 +362,35 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         if ($this->behaviours['translatable']) {
-            $selected_lang = \Input::get('lang', $this->is_new ? null : $this->item->get_lang());
+            $selected_site = \Input::get('site', $this->is_new ? null : $this->item->get_site());
 
-            foreach ($this->item->get_all_lang() as $lang_id => $lang) {
-                if ($selected_lang == $lang) {
-                    return $this->action_form($lang_id);
+            foreach ($this->item->get_all_site() as $site_id => $site) {
+                if ($selected_site == $site) {
+                    return $this->action_form($site_id);
                 }
             }
 
             $_GET['common_id'] = $id;
-            return $this->blank_slate($id, $selected_lang);
+            return $this->blank_slate($id, $selected_site);
         }
     }
 
-    public function blank_slate($id, $lang)
+    public function blank_slate($id, $site)
     {
         $this->item = $this->crud_item($id);
         $this->is_new = true;
-        if (empty($lang)) {
-            $lang = \Input::get('lang', key(\Config::get('locales')));
+        if (empty($site)) {
+            $site = \Input::get('site', key(\Config::get('locales')));
         }
 
         $view_params = array_merge(
             $this->view_params(),
             array(
-                'lang' => $lang,
+                'site' => $site,
                 'common_id' => \Input::get('common_id', ''),
             )
         );
-        $view_params['crud']['tab_params']['url'] .= '?lang='.$lang;
+        $view_params['crud']['tab_params']['url'] .= '?site='.$site;
         $view_params['crud']['tab_params']['label'] = $this->config['tab']['labels']['blankSlate'];
 
         // We can't do this form inside the view_params() method, because additional vars (added
@@ -413,7 +413,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 }
             }
             if ($this->behaviours['translatable']) {
-                $params['lang'] = $this->item->get_lang();
+                $params['site'] = $this->item->get_site();
             }
             if (count($params)) {
                 $url .= '?'.http_build_query($params);
@@ -431,7 +431,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_actions()
     {
-        $actions = array_values($this->get_actions_lang());
+        $actions = array_values($this->get_actions_site());
         if (!$this->is_new) {
             if ($this->behaviours['url'] !== false) {
                 $url = $this->item->url_canonical(array('preview' => true));
@@ -482,7 +482,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $actions;
     }
 
-    protected function get_actions_lang()
+    protected function get_actions_site()
     {
         if (!$this->behaviours['translatable']) {
             return array();
@@ -490,20 +490,20 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $actions = array();
         $locales = array_keys(\Config::get('locales'));
-        $main_lang = $this->item->find_main_lang();
+        $main_site = $this->item->find_main_site();
         foreach ($locales as $locale) {
-            if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale) {
+            if ($this->item->{$this->behaviours['translatable']['site_property']} === $locale) {
                 continue;
             }
-            $item_lang = $this->item->find_lang($locale);
-            $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? $this->config['messages']['add an item in lang'] : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $item_site = $this->item->find_site($locale);
+            $url = $this->config['controller_url'].'/insert_update'.(empty($item_site) ? (empty($main_site) ? '' : '/'.$main_site->id).'?site='.$locale : '/'.$item_site->id);
+            $label = empty($main_site) ? $this->config['messages']['add an item in site'] : (empty($item_site) ? __('Translate in {site}') : __('Edit in {site}'));
             $actions[$locale] = array(
-                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
+                'label' => strtr($label, array('{site}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',
-                    'method' => empty($main_lang) ? 'add' : 'open',
+                    'method' => empty($main_site) ? 'add' : 'open',
                     'tab' => array(
                         'url' => $url
                     ),
@@ -559,46 +559,46 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->delete();
 
         if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
+            $dispatchEvent['site_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
             $dispatchEvent['id'] = array();
-            $dispatchEvent['lang'] = array();
+            $dispatchEvent['site'] = array();
 
-            // Delete all languages by default
-            $lang = \Input::post('lang', 'all');
+            // Delete all sites by default
+            $site = \Input::post('site', 'all');
 
-            // Delete children for all languages
-            if ($lang === 'all') {
-                foreach ($this->item->find_lang('all') as $item_lang) {
-                    $dispatchEvent['id'][] = (int) $item_lang->{$this->pk};
-                    $dispatchEvent['lang'][] = $item_lang->{$this->behaviours['translatable']['lang_property']};
+            // Delete children for all sites
+            if ($site === 'all') {
+                foreach ($this->item->find_site('all') as $item_site) {
+                    $dispatchEvent['id'][] = (int) $item_site->{$this->pk};
+                    $dispatchEvent['site'][] = $item_site->{$this->behaviours['translatable']['site_property']};
 
                     if ($this->behaviours['tree']) {
-                        foreach ($item_lang->get_ids_children(false) as $item_id) {
+                        foreach ($item_site->get_ids_children(false) as $item_id) {
                             $dispatchEvent['id'][] = (int) $item_id;
                         }
                     }
                 }
 
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                // Optimised operation for deleting all languages
-                $this->item->delete_all_lang();
+                // Optimised operation for deleting all sites
+                $this->item->delete_all_site();
 
             } else {
                 // Search for the appropriate page
-                if ($this->item->get_lang() != $lang) {
-                    $this->item = $this->item->find_lang($lang);
+                if ($this->item->get_site() != $site) {
+                    $this->item = $this->item->find_site($site);
                 }
                 $this->check_permission('delete');
 
                 $dispatchEvent['id'][] = $this->item->{$this->pk};
-                $dispatchEvent['lang'][] = $this->item->{$this->behaviours['translatable']['lang_property']};
+                $dispatchEvent['site'][] = $this->item->{$this->behaviours['translatable']['site_property']};
                 if ($this->behaviours['tree']) {
                     foreach ($this->item->get_ids_children(false) as $item_id) {
                         $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
 
-                // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
+                // Reassigns common_id if this item is the main site (with the 'after_delete' event from the Translatable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 $this->item->delete();
             }

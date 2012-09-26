@@ -74,7 +74,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     /**
      * Delete all the children of the item.
-     * (will only affect the current language, by design)
+     * (will only affect the current site, by design)
      *
      * @param type $item
      */

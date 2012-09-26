@@ -145,7 +145,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             array(
                 'related' => array(),
                 'callback' => array(),
-                'lang' => null,
+                'site' => null,
                 'limit' => null,
                 'offset' => null,
                 'dataset' => array(),
@@ -186,14 +186,14 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
         $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
         if ($translatable) {
-            if (empty($config['lang'])) {
-                // No inspector, we only search items in their primary language
+            if (empty($config['site'])) {
+                // No inspector, we only search items in their primary site
                 $query->where($translatable['is_main_property'], 1);
-            } elseif (is_array($config['lang'])) {
-                // Multiple langs
-                $query->where($translatable['lang_property'], 'IN', $config['lang']);
+            } elseif (is_array($config['site'])) {
+                // Multiple sites
+                $query->where($translatable['site_property'], 'IN', $config['site']);
             } else {
-                $query->where($translatable['lang_property'], '=', $config['lang']);
+                $query->where($translatable['site_property'], '=', $config['site']);
             }
             $common_ids = array();
             $keys = array();
@@ -287,34 +287,34 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 }
             }
             if ($translatable) {
-                $langs = $model::languages($common_ids);
-                foreach ($langs as $common_id => $list) {
-                    $langs[$common_id] = explode(',', $list);
+                $sites = $model::sites($common_ids);
+                foreach ($sites as $common_id => $list) {
+                    $sites[$common_id] = explode(',', $list);
                 }
                 foreach ($keys as $key => $common_id) {
-                    $items[$key]['lang'] = $langs[$common_id];
+                    $items[$key]['site'] = $sites[$common_id];
                 }
                 if ($tree) {
                     $root = reset($objects)->find_root();
                     if (!empty($root)) {
-                        $all_langs = $root->get_all_lang();
+                        $all_sites = $root->get_all_site();
                     } else {
-                        $all_langs = array_unique(\Arr::flatten($langs));
+                        $all_sites = array_unique(\Arr::flatten($sites));
                     }
                 } else {
-                    $all_langs = array_unique(\Arr::flatten($langs));
+                    $all_sites = array_unique(\Arr::flatten($sites));
                 }
                 foreach ($items as &$item) {
                     $flags = '';
-                    $langs = $item['lang'];
-                    foreach ($all_langs as $lang) {
-                        if (in_array($lang, $langs)) {
-                            $flags .= \Nos\Helper::flag($lang);
+                    $sites = $item['site'];
+                    foreach ($all_sites as $site) {
+                        if (in_array($site, $sites)) {
+                            $flags .= \Nos\Helper::flag($site);
                         } else {
                             $flags .= \Nos\Helper::flag_empty();
                         }
                     }
-                    $item['lang'] = $flags;
+                    $item['site'] = $flags;
                 }
             }
         }
@@ -407,7 +407,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $model = \Input::get('model');
         $selected = \Input::get('selected');
         $deep = intval(\Input::get('deep', 1));
-        $lang = \Input::get('lang');
+        $site = \Input::get('site');
 
         if (empty($tree_config['id'])) {
             $tree_config['id'] = \Config::getDbName(join('::', \Config::configFile(get_called_class())));
@@ -423,7 +423,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     'countProcess' => true,
                     'model' => $model,
                     'id' => $id,
-                    'lang' => $lang,
+                    'site' => $site,
                 )
             );
 
@@ -470,7 +470,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     'model' => $model,
                     'id' => $id,
                     'deep' => $deep,
-                    'lang' => $lang,
+                    'site' => $site,
                 )
             );
 
@@ -609,7 +609,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 'model' => null,
                 'id' => null,
                 'deep' => 1,
-                'lang' => null,
+                'site' => null,
             ),
             $params
         );
@@ -621,10 +621,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['lang']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
+                if (empty($params['site']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
                     $item = $model::find($params['id']);
-                    $langs = $item->get_all_lang();
-                    $child['where'] = array(array($child['fk'], 'IN', array_keys($langs)));
+                    $sites = $item->get_all_site();
+                    $child['where'] = array(array($child['fk'], 'IN', array_keys($sites)));
                 } else {
                     $child['where'] = array(array($child['fk'] => $params['id']));
                 }
@@ -642,7 +642,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $config = array_merge(
                 $tree_model,
                 array(
-                    'lang' => $params['lang'],
+                    'site' => $params['site'],
                     'callback' => array(
                         function ($query) use ($child, $tree_model) {
                             foreach ($child['where'] as $where) {
@@ -668,7 +668,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
                                                 'deep' => $params['deep'] - 1,
-                                                'lang' => $params['lang'],
+                                                'site' => $params['site'],
                                             )
                                         );
 
@@ -680,7 +680,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                                 'countProcess' => true,
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
-                                                'lang' => $params['lang'],
+                                                'site' => $params['site'],
                                             )
                                         );
                                     }

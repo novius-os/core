@@ -89,7 +89,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 array(
                     'callback' => array_merge(\Arr::get($this->config['query'], 'callback', array()), array($where)),
                     'dataset' => $this->config['dataset'],
-                    'lang' => Input::get('lang', null),
+                    'site' => Input::get('site', null),
                     'limit' => intval(Input::get('limit', \Arr::get($this->config['query'], 'limit'))),
                     'offset' => intval(Input::get('offset', 0)),
                 )

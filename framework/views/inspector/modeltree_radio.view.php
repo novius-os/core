@@ -24,10 +24,10 @@
                         }),
                     table = container.find('table'),
                     connector = container.closest('.nos-dispatcher, body')
-                        .on('langChange', function() {
-                            if (params.langChange) {
+                        .on('siteChange', function() {
+                            if (params.siteChange) {
                                 table.nostreegrid('option', 'treeOptions', {
-                                    lang : connector.data('nosLang') || ''
+                                    site : connector.data('nosSite') || ''
                                 });
                             }
                         }),
@@ -37,8 +37,8 @@
                             var match = {
                                     name : params.reloadEvent
                                 };
-                            if (connector.data('nosLang')) {
-                                match['lang'] = connector.data('nosLang');
+                            if (connector.data('nosSite')) {
+                                match['site'] = connector.data('nosSite');
                             }
                             container.nosListenEvent(match, function(json) {
                                     table.nostreegrid('reload');
@@ -52,7 +52,7 @@
                                 treeUrl : params.treeUrl,
                                 treeColumnIndex : 1,
                                 treeOptions : $.extend(true, {
-                                    lang : connector.data('nosLang') || ''
+                                    site : connector.data('nosSite') || ''
                                 }, params.treeOptions || {}),
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',

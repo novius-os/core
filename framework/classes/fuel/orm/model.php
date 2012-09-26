@@ -323,7 +323,7 @@ class Model extends \Orm\Model
         return static::$_configs[$class];
     }
 
-    public function get_possible_lang()
+    public function get_possible_site()
     {
         $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
@@ -332,10 +332,10 @@ class Model extends \Orm\Model
             return array_keys(\Config::get('locales'));
         }
 
-        // Return langs from parent if available
+        // Return sites from parent if available
         $parent = $this->get_parent();
         if (!empty($parent)) {
-            return $parent->get_all_lang();
+            return $parent->get_all_site();
         }
 
         return array_keys(\Config::get('locales'));

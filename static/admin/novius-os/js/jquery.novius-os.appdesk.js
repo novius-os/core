@@ -21,7 +21,7 @@ define('jquery-nos-appdesk',
                 locales : {},
                 hideLocales : false,
                 texts : {
-                    allLanguages : 'All',
+                    allSites : 'All',
                     addDropDown : 'Select an action',
                     columns : 'Columns',
                     showFiltersColumns : 'Filters column header',
@@ -44,7 +44,7 @@ define('jquery-nos-appdesk',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
                     loading : 'Loading...',
-                    languages: 'Languages'
+                    sites: 'Sites'
                 },
                 values: {},
                 //callbabks
@@ -56,7 +56,7 @@ define('jquery-nos-appdesk',
                 },
                 views: {},
                 selectedView: null,
-                selectedLang : null,
+                selectedSite : null,
                 fromView: null,
                 name: null,
                 grid: {}
@@ -152,11 +152,11 @@ define('jquery-nos-appdesk',
 
                 if (!$.isEmptyObject(o.locales)) {
 
-                    if (!$.type(o.selectedLang) === 'string') {
-                        o.selectedLang = null;
+                    if (!$.type(o.selectedSite) === 'string') {
+                        o.selectedSite = null;
                     }
-                    if (o.selectedLang === null || !o.locales[o.selectedLang]) {
-                        o.selectedLang = Object.keys(o.locales)[0];
+                    if (o.selectedSite === null || !o.locales[o.selectedSite]) {
+                        o.selectedSite = Object.keys(o.locales)[0];
                     }
                 }
 
@@ -166,7 +166,7 @@ define('jquery-nos-appdesk',
                     ._uiInspectors()
                     ._uiSearchBar()
                     ._uiList()
-                    ._uiLangsDropDown()
+                    ._uiSitesDropDown()
                     ._uiViewsDropDown();
 
                 self.init = true;
@@ -216,7 +216,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(first.action, {
-                                    lang: o.selectedLang
+                                    site: o.selectedSite
                                 });
                         });
 
@@ -230,7 +230,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(add.action, {
-                                    lang: o.selectedLang
+                                    site: o.selectedSite
                                 });
                         });
 
@@ -240,47 +240,47 @@ define('jquery-nos-appdesk',
                 return self;
             },
 
-            _uiLangsDropDown : function() {
+            _uiSitesDropDown : function() {
                 var self = this,
                     o = self.options;
 
                 if (o.hideLocales || !!$.isEmptyObject(o.locales)) {
                     return self;
                 }
-                self.dispatcher.data('nosLang', o.selectedLang);
+                self.dispatcher.data('nosSite', o.selectedSite);
 
                 var date = new Date(),
                     uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
-                    $uiLangs = $('<div></div>').addClass('nos-appdesk-dropdownlang');
+                    $uiSites = $('<div></div>').addClass('nos-appdesk-dropdownsite');
 
                 $.each(o.locales, function(key, locale) {
                     var flag = key.split('_')[1].toLowerCase();
-                    $uiLangs.append(
-                        $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedLang == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
+                    $uiSites.append(
+                        $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedSite == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
                     );
                 });
 
-                $uiLangs.append(
-                    $('<input type="radio" class="notransform" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedLang == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allLanguages + '</label>')
+                $uiSites.append(
+                    $('<input type="radio" class="notransform" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedSite == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allSites + '</label>')
                 );
-                $uiLangs.buttonset();
+                $uiSites.buttonset();
 
-                $uiLangs.find('input[name=' + uniqid + ']').change(function() {
+                $uiSites.find('input[name=' + uniqid + ']').change(function() {
                     var select = $(this);
 
-                    o.selectedLang = select.val();
+                    o.selectedSite = select.val();
 
-                    select.nosSaveUserConfig(o.name + '.selectedLang', o.selectedLang);
+                    select.nosSaveUserConfig(o.name + '.selectedSite', o.selectedSite);
 
                     self.uiResetSearch.click();
 
-                    self.dispatcher.data('nosLang', o.selectedLang)
-                        .trigger('langChange');
+                    self.dispatcher.data('nosSite', o.selectedSite)
+                        .trigger('siteChange');
                 }).filter(function() {
-                    return $(this).val() == o.selectedlang;
+                    return $(this).val() == o.selectedsite;
                 });
 
-                self.element.nosToolbar('add', $uiLangs, true);
+                self.element.nosToolbar('add', $uiSites, true);
 
                 return self;
             },
@@ -696,7 +696,7 @@ define('jquery-nos-appdesk',
                                 if (self.gridRendered) {
                                     self.uiGrid.noslistgrid("currentCell", -1, -1);
                                 }
-                                dataSource.proxy.options.data.lang = o.selectedLang || '';
+                                dataSource.proxy.options.data.site = o.selectedSite || '';
                                 dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                                 dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                                 dataSource.proxy.options.data.limit = r.pageSize;
@@ -798,7 +798,7 @@ define('jquery-nos-appdesk',
                     }).nostreegrid($.extend(true, { // True for recursive clone
                         treeUrl : o.treeGrid.urlJson,
                         treeOptions : {
-                            lang : o.selectedLang || ''
+                            site : o.selectedSite || ''
                         },
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
@@ -886,7 +886,7 @@ define('jquery-nos-appdesk',
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
                             self.pageIndex = r.pageIndex;
-                            dataSource.proxy.options.data.lang = o.selectedLang || '';
+                            dataSource.proxy.options.data.site = o.selectedSite || '';
                             dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                             dataSource.proxy.options.data.limit = r.pageSize;
@@ -1169,7 +1169,7 @@ define('jquery-nos-appdesk',
                 }
 
                 var init = function() {
-                    // If the property is set explicitely, use it, else display only if there's more than 1 lang
+                    // If the property is set explicitely, use it, else display only if there's more than 1 site
                     var hideLocales = (typeof config.hideLocales != 'undefined' ? config.hideLocales : Object.keys(config.locales).length <= 1);
 
                     $.extend(true, appdesk.appdesk, {
@@ -1178,7 +1178,7 @@ define('jquery-nos-appdesk',
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
-                        selectedLang : config.selectedLang
+                        selectedSite : config.selectedSite
                     });
                     if (onCustom) {
                         $.extend(true, appdesk.appdesk, {
@@ -1223,12 +1223,12 @@ define('jquery-nos-appdesk',
                         var match = [];
                         $.each(params.reloadEvent, function(i, reloadEvent) {
                             if ($.type(reloadEvent) === 'string') {
-                                // Reload the grid if a action on a same language's item occurs
-                                // Or if a update or a insert on a other language's item occurs
-                                if (dispatcher.data('nosLang')) {
+                                // Reload the grid if a action on a same site's item occurs
+                                // Or if a update or a insert on a other site's item occurs
+                                if (dispatcher.data('nosSite')) {
                                     match.push({
                                         name : reloadEvent,
-                                        lang : dispatcher.data('nosLang')
+                                        site : dispatcher.data('nosSite')
                                     });
                                     match.push({
                                         name : reloadEvent,
@@ -1315,19 +1315,19 @@ define('jquery-nos-appdesk',
                             if (key === 'columns') {
                                 object[key] = keyToOrderedArray(object, key);
                                 for (var i = 0; i < object[key].length; i++) {
-                                    if (object[key][i].lang) {
+                                    if (object[key][i].site) {
                                         if (configToUse.hideLocales) {
                                             object[key].splice(i, 1);
                                             continue;
                                         }
                                         object[key][i] = {
-                                            headerText : i18n.languages || 'Languages',
-                                            dataKey    : 'lang',
-                                            setupkey   : 'lang',
+                                            headerText : i18n.sites || 'Sites',
+                                            dataKey    : 'site',
+                                            setupkey   : 'site',
                                             showFilter : false,
                                             cellFormatter : function(args) {
                                                 if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                    args.$container.css("text-align", "center").html(args.row.data.lang);
+                                                    args.$container.css("text-align", "center").html(args.row.data.site);
                                                     return true;
                                                 }
                                             },

@@ -36,7 +36,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
             $default_nuggets = $item->get_default_nuggets();
             $translatable = $model_name::behaviours('Nos\Orm_Behaviour_Translatable', false);
             if ($translatable) {
-                $default_nuggets['lang'] = $item->{$translatable['lang_property']};
+                $default_nuggets['site'] = $item->{$translatable['site_property']};
             }
 
             \Response::json(array(

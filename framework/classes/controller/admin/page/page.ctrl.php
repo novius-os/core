@@ -19,15 +19,15 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
         parent::form_item();
         if ($this->item->is_new()) {
             // The first page we create is a homepage
-            $lang_has_home = (int) (bool) Model_Page::count(array(
+            $site_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
                     array('page_home', '=', 1),
-                    array('page_lang', $this->item->page_lang),
+                    array('page_site', $this->item->page_site),
                 ),
             ));
-            // $lang_has_home is either 0 or 1 with the double cast
-            $this->item->page_home     = 1 - $lang_has_home;
-            $this->item->page_entrance = 1 - $lang_has_home;
+            // $site_has_home is either 0 or 1 with the double cast
+            $this->item->page_home     = 1 - $site_has_home;
+            $this->item->page_entrance = 1 - $site_has_home;
         }
     }
 
@@ -45,7 +45,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
         $fieldset = parent::fieldset($fieldset);
 
         $fieldset->field('page_parent_id')->set_widget_options(array(
-            'lang' => $this->item->page_lang,
+            'site' => $this->item->page_site,
         ));
 
         $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
@@ -85,20 +85,20 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             $this->item = $this->crud_item($id);
             $this->check_permission('homepage');
 
-            $langs = $this->item->get_all_lang();
-            $pages_lang = $this->item->find_lang('all');
+            $sites = $this->item->get_all_site();
+            $pages_site = $this->item->find_site('all');
             $pages_old = Model_Page::find('all', array(
                 'where' => array(
                     array('page_home', '=', 1),
-                    array('page_lang', 'IN', $langs),
-                    array('page_id', 'NOT IN', array_keys($pages_lang)),
+                    array('page_site', 'IN', $sites),
+                    array('page_id', 'NOT IN', array_keys($pages_site)),
                 ),
             ));
 
-            foreach ($pages_lang as $page_lang) {
-                $page_lang->page_home = 1;
-                $page_lang->page_entrance = 1;
-                $page_lang->save();
+            foreach ($pages_site as $page_site) {
+                $page_site->page_home = 1;
+                $page_site->page_entrance = 1;
+                $page_site->save();
             }
 
             foreach ($pages_old as $page_old) {
@@ -110,9 +110,9 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             $dispatchEvent = array(
                 'name' => get_class($this->item),
                 'action' => 'update',
-                'id' => array_merge(array_keys($pages_lang), array_keys($pages_old)),
-                'lang_common_id' => array($this->item->page_lang_common_id),
-                'lang' => array_values($langs),
+                'id' => array_merge(array_keys($pages_site), array_keys($pages_old)),
+                'site_common_id' => array($this->item->page_site_common_id),
+                'site' => array_values($sites),
             );
 
             $body = array(

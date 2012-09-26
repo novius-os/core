@@ -12,42 +12,42 @@
 <p>
 <?php
 if ($crud['behaviours']['translatable']) {
-    $item_langs = $item->find_lang('all');
-    $lang_count = count($item_langs);
+    $item_sites = $item->find_site('all');
+    $site_count = count($item_sites);
 
     if ($crud['behaviours']['tree']) {
         $children = array();
-        // Count all children in the primary lang
-        foreach ($item_langs as $item_lang) {
-            foreach ($item_lang->find_children_recursive(false) as $child) {
+        // Count all children in the primary site
+        foreach ($item_sites as $item_site) {
+            foreach ($item_site->find_children_recursive(false) as $child) {
                 $children[$child->{$crud['behaviours']['translatable']['common_id_property']}] = true;
             }
         }
         $children_count = count($children);
-        if ($children_count == 0 && $lang_count == 1) {
+        if ($children_count == 0 && $site_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
             <?php
-            if ($lang_count > 1) {
+            if ($site_count > 1) {
                 $locales = \Config::get('locales', array());
-                $languages_list = array();
-                foreach ($item_langs as $item_lang) {
-                    $languages_list[] = \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang());
+                $sites_list = array();
+                foreach ($item_sites as $item_site) {
+                    $sites_list[] = \Arr::get($locales, $item_site->get_site(), $item_site->get_site());
                 }
                 ?>
-                <p><?= strtr($crud['config']['messages']['exists in multiple lang'], array(
-                    '<strong>' => '<strong title="'.implode(', ', $languages_list).'">',
-                    '{count}' => $lang_count,
+                <p><?= strtr($crud['config']['messages']['exists in multiple site'], array(
+                    '<strong>' => '<strong title="'.implode(', ', $sites_list).'">',
+                    '{count}' => $site_count,
                 )) ?></p>
-                    <?= $crud['config']['messages']['delete in the following languages'] ?>
-                <select name="lang">
-                    <option value="all"><?= __('All languages') ?></option>
+                    <?= $crud['config']['messages']['delete in the following sites'] ?>
+                <select name="site">
+                    <option value="all"><?= __('All sites') ?></option>
                 <?php
-                foreach ($item_langs as $item_lang) {
+                foreach ($item_sites as $item_site) {
                     ?>
-                    <option value="<?= $item_lang->get_lang() ?>"><?= \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang()); ?></option>
+                    <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($locales, $item_site->get_site(), $item_site->get_site()); ?></option>
                     <?php
                 }
                 ?>
@@ -65,27 +65,27 @@ if ($crud['behaviours']['translatable']) {
             }
         }
     } else {
-        if ($lang_count == 1) {
+        if ($site_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
             $locales = \Config::get('locales', array());
-            $languages_list = array();
-            foreach ($item_langs as $item_lang) {
-                $languages_list[] = \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang());
+            $sites_list = array();
+            foreach ($item_sites as $item_site) {
+                $sites_list[] = \Arr::get($locales, $item_site->get_site(), $item_site->get_site());
             }
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
-            <p><?= strtr($crud['config']['messages']['exists in multiple lang'], array(
-                    '<strong>' => '<strong title="'.implode(', ', $languages_list).'">',
-                    '{count}' => $lang_count,
+            <p><?= strtr($crud['config']['messages']['exists in multiple site'], array(
+                    '<strong>' => '<strong title="'.implode(', ', $sites_list).'">',
+                    '{count}' => $site_count,
                 )) ?></p>
-                    <?= $crud['config']['messages']['delete in the following languages'] ?>
-                <select name="lang">
-                    <option value="all"><?= __('All languages') ?></option>
+                    <?= $crud['config']['messages']['delete in the following sites'] ?>
+                <select name="site">
+                    <option value="all"><?= __('All sites') ?></option>
             <?php
-            foreach ($item_langs as $item_lang) {
+            foreach ($item_sites as $item_site) {
                 ?>
-                <option value="<?= $item_lang->get_lang() ?>"><?= \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang()); ?></option>
+                <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($locales, $item_site->get_site(), $item_site->get_site()); ?></option>
                 <?php
             }
             ?>
