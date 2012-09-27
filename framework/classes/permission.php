@@ -39,6 +39,9 @@ class Permission
     public static function add($app, $key)
     {
         $user = \Session::user();
+        if (empty($user)) {
+            return false;
+        }
         $role = reset($user->roles);
         try {
             $access = new Model_User_Permission();
