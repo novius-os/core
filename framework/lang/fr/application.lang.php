@@ -1,53 +1,52 @@
 <?php
 
-// Generated on 20/09/2012 15:49:49
+// Generated on 27/09/2012 16:31:59
 
-// 50 out of 76 messages are translated (65%).
-// 114 out of 190 words are translated (65%).
+// 42 out of 69 messages are translated (60%).
+// 106 out of 184 words are translated (60%).
 
 return array(
-	#. Commentaire
-	#: classes/controller/admin/crud.php:240
+	#: classes/controller/admin/crud.php:239
 	'Add' => 'Ajouter',
 
-	#: classes/controller/admin/crud.php:285
+	#: classes/controller/admin/crud.php:284
 	'successfully added' => 'Item ajouté.',
 
-	#: classes/controller/admin/crud.php:285
+	#: classes/controller/admin/crud.php:284
 	'successfully saved' => 'Item enregistré.',
 
-	#: classes/controller/admin/crud.php:303
+	#: classes/controller/admin/crud.php:302
 	'This item already exists in {lang}. Therefore your item cannot be added.' => '',
 
-	#: classes/controller/admin/crud.php:334
+	#: classes/controller/admin/crud.php:333
 	#: views/crud/tab.view.php:14
 	'item deleted' => 'Cet item a été supprimé.',
 
-	#: classes/controller/admin/crud.php:414
+	#: classes/controller/admin/crud.php:413
 	'visualise' => '',
 
-	#: classes/controller/admin/crud.php:424
+	#: classes/controller/admin/crud.php:423
 	'Delete' => 'Supprimer',
 
-	#: classes/controller/admin/crud.php:429
+	#: classes/controller/admin/crud.php:428
 	'delete an item' => 'Supprimer un item',
 
-	#: classes/controller/admin/crud.php:443
+	#: classes/controller/admin/crud.php:442
 	'Share' => 'Partager',
 
-	#: classes/controller/admin/crud.php:474
+	#: classes/controller/admin/crud.php:473
 	'add an item in lang' => 'Ajouter un item en {lang}',
 
-	#: classes/controller/admin/crud.php:474
+	#: classes/controller/admin/crud.php:473
 	'Translate in {lang}' => 'Traduire en {lang}',
 
-	#: classes/controller/admin/crud.php:474
+	#: classes/controller/admin/crud.php:473
 	'Edit in {lang}' => 'Modifier en {lang}',
 
-	#: classes/controller/admin/crud.php:494
+	#: classes/controller/admin/crud.php:493
 	'not found' => 'Item non trouvé',
 
-	#: classes/controller/admin/crud.php:591
+	#: classes/controller/admin/crud.php:590
 	'successfully deleted' => 'Item supprimé!',
 
 	#. Appdesk: allLanguages
@@ -67,7 +66,7 @@ return array(
 	'Show 1 item' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:46
-	'No item' => '',
+	'No items' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:47
 	'Show all items' => '',
@@ -224,4 +223,5 @@ return array(
 
 	#. Overwritten
 	'Cancel' => 'Annuler',
+
 );

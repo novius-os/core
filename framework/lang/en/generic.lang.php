@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 20/09/2012 17:15:42
+// Generated on 27/09/2012 16:27:39
 
-// 24 out of 99 messages are translated (24%).
-// 82 out of 326 words are translated (24%).
+// 31 out of 115 messages are translated (26%).
+// 90 out of 356 words are translated (26%).
 
 return array(
 	#: classes/tools/image.php:33
@@ -25,7 +25,7 @@ return array(
 	#: classes/fuel/validation_error.php:50
 	'Validation rule {rule} failed for {field}' => '',
 
-	#: classes/fuel/fieldset_field.php:64
+	#: classes/fuel/fieldset_field.php:54
 	'Mandatory' => '',
 
 	#: classes/fuel/fieldset.php:551
@@ -44,29 +44,19 @@ return array(
 	#: classes/controller/admin/datacatcher.ctrl.php:129
 	'Can\'t find catcher {catcher} on {item}' => '',
 
-	#: classes/controller/admin/noviusos.ctrl.php:57
-	'Help' => '',
-
-	#: classes/controller/admin/noviusos.ctrl.php:63
-	'Account' => '',
-
-	#: classes/controller/admin/noviusos.ctrl.php:71
-	#: config/admin/permissions.config.php:40
-	'Applications manager' => '',
-
-	#: classes/controller/admin/tray/appmanager.ctrl.php:60
+	#: classes/controller/admin/tray/appmanager.ctrl.php:67
 	'Installation successful' => '',
 
-	#: classes/controller/admin/tray/appmanager.ctrl.php:84
+	#: classes/controller/admin/tray/appmanager.ctrl.php:95
 	'Uninstallation successful' => '',
 
-	#: classes/controller/admin/tray/account.ctrl.php:80
+	#: classes/controller/admin/tray/account.ctrl.php:96
 	'Your wallpaper is now \"{title}\"' => '',
 
-	#: classes/controller/admin/tray/account.ctrl.php:86
+	#: classes/controller/admin/tray/account.ctrl.php:104
 	'The selected image does not exists.' => '',
 
-	#: classes/controller/admin/tray/account.ctrl.php:91
+	#: classes/controller/admin/tray/account.ctrl.php:109
 	'Your wallpaper has been removed.' => '',
 
 	#: classes/widget/media.php:69
@@ -93,17 +83,17 @@ return array(
 
 	#: views/form/layout_save.view.php:17
 	#: views/form/action_or_cancel.view.php:14
-	#: views/admin/data_catcher/rss_form.view.php:115
+	#: views/admin/data_catcher/rss_form.view.php:109
 	'or' => '',
 
 	#: views/form/layout_save.view.php:17
 	#: views/form/action_or_cancel.view.php:16
-	#: views/admin/data_catcher/rss_form.view.php:117
+	#: views/admin/data_catcher/rss_form.view.php:111
 	'Cancel' => '',
 
 	#: views/form/action_or_cancel.view.php:12
-	#: views/admin/data_catcher/form.view.php:113
-	#: views/admin/data_catcher/rss_form.view.php:113
+	#: views/admin/data_catcher/form.view.php:134
+	#: views/admin/data_catcher/rss_form.view.php:107
 	'Save' => '',
 
 	#: views/admin/login.view.php:42
@@ -135,33 +125,43 @@ return array(
 	'Installed and ready to use' => '',
 
 	#: views/admin/tray/app_manager.view.php:58
-	#: views/admin/tray/app_manager.view.php:93
+	#: views/admin/tray/app_manager.view.php:97
 	'Actions' => '',
 
-	#: views/admin/tray/app_manager.view.php:68
+	#: views/admin/tray/app_manager.view.php:69
 	'Uninstall' => '',
 
-	#: views/admin/tray/app_manager.view.php:72
+	#: views/admin/tray/app_manager.view.php:73
 	'Update' => '',
 
-	#: views/admin/tray/app_manager.view.php:82
-	#: views/admin/tray/app_manager.view.php:120
+	#: views/admin/tray/app_manager.view.php:86
+	#: views/admin/tray/app_manager.view.php:127
 	'No applications found' => '',
 
-	#: views/admin/tray/app_manager.view.php:92
+	#: views/admin/tray/app_manager.view.php:96
 	'Available for installation' => '',
 
-	#: views/admin/tray/app_manager.view.php:106
+	#: views/admin/tray/app_manager.view.php:111
 	'No metadata found' => '',
 
-	#: views/admin/tray/app_manager.view.php:110
+	#: views/admin/tray/app_manager.view.php:115
 	'Install' => '',
 
-	#: views/admin/tray/app_manager.view.php:127
+	#: views/admin/tray/app_manager.view.php:134
 	'Install from a .zip file' => '',
 
-	#: views/admin/tray/app_manager.view.php:131
+	#: views/admin/tray/app_manager.view.php:138
 	'Upload the application' => '',
+
+	#: views/admin/tray/right.view.php:1
+	#: config/metadata.config.php:55
+	'Help' => '',
+
+	#: views/admin/tray/right/inside.view.php:1
+	'My account' => '',
+
+	#: views/admin/tray/right/inside.view.php:2
+	'Log out' => '',
 
 	#: views/admin/tray/account.view.php:27
 	'Disconnect' => '',
@@ -196,52 +196,58 @@ return array(
 	#: views/admin/appstab.view.php:17
 	'Search' => '',
 
-	#: views/admin/data_catcher/applications.view.php:37
+	#: views/admin/data_catcher/applications.view.php:57
 	'\"{item}\" can be shared with the following applications.' => '',
 
-	#: views/admin/data_catcher/applications.view.php:38
+	#: views/admin/data_catcher/applications.view.php:58
 	'Click to share:' => '',
 
-	#: views/admin/data_catcher/applications.view.php:39
+	#: views/admin/data_catcher/applications.view.php:59
 	'(Don\'t worry, you\'ll get a preview first)' => '',
 
-	#: views/admin/data_catcher/applications.view.php:43
+	#: views/admin/data_catcher/applications.view.php:63
 	'\"{item}\" is automatically shared with the following applications.' => '',
 
-	#: views/admin/data_catcher/applications.view.php:44
+	#: views/admin/data_catcher/applications.view.php:64
 	'No action required, click to customise:' => '',
 
-	#: views/admin/data_catcher/applications.view.php:62
+	#: views/admin/data_catcher/applications.view.php:80
 	'How sad! \"{item}\" cannot be shared with any application yet. Ask your developer to set you up some nice sharing applications.' => '',
 
 	#: views/admin/data_catcher/form.view.php:20
-	#: views/admin/data_catcher/rss_form.view.php:24
+	#: views/admin/data_catcher/rss_form.view.php:23
 	'Title:' => '',
 
-	#: views/admin/data_catcher/form.view.php:25
-	#: views/admin/data_catcher/rss_form.view.php:29
+	#: views/admin/data_catcher/form.view.php:26
+	#: views/admin/data_catcher/rss_form.view.php:27
 	'URL:' => '',
 
-	#: views/admin/data_catcher/form.view.php:35
-	#: views/admin/data_catcher/rss_form.view.php:40
+	#: views/admin/data_catcher/form.view.php:40
+	#: views/admin/data_catcher/rss_form.view.php:37
 	'Image:' => '',
 
-	#: views/admin/data_catcher/form.view.php:41
-	#: views/admin/data_catcher/rss_form.view.php:48
+	#: views/admin/data_catcher/form.view.php:48
+	#: views/admin/data_catcher/rss_form.view.php:44
 	'Description:' => '',
 
-	#: views/admin/data_catcher/form.view.php:63
+	#: views/admin/data_catcher/form.view.php:74
 	'Use default' => '',
 
-	#: views/admin/data_catcher/form.view.php:96
-	#: views/admin/data_catcher/rss_form.view.php:96
+	#: views/admin/data_catcher/form.view.php:110
+	#: views/admin/data_catcher/rss_form.view.php:90
 	'Pick a custom image' => '',
 
-	#: views/admin/data_catcher/rss_form.view.php:75
+	#: views/admin/data_catcher/rss_form.view.php:71
 	'Use default settings' => '',
 
 	#: views/admin/data_catcher/panel.view.php:42
 	'What is shared - Default settings' => '',
+
+	#: config/metadata.config.php:69
+	'Account' => '',
+
+	#: config/metadata.config.php:83
+	'Application manager' => '',
 
 	#: config/admin/permissions.config.php:13
 	'Pages' => '',
@@ -251,6 +257,9 @@ return array(
 
 	#: config/admin/permissions.config.php:31
 	'Users' => '',
+
+	#: config/admin/permissions.config.php:40
+	'Applications manager' => '',
 
 	#. Overwritten
 	'successfully added' => 'Item successfully added.',
@@ -324,26 +333,23 @@ return array(
 	#. Overwritten
 	'add an item in lang' => 'Add a new item in {lang}',
 
-	# Overwritten
+	#. Overwritten
 	'item' => '',
 
-	# Overwritten
+	#. Overwritten
 	'items' => '',
 
-	# Overwritten
+	#. Overwritten
 	'Showing {{x}} items out of {{y}}' => '',
 
-	# Overwritten
+	#. Overwritten
 	'Show 1 item' => '',
 
-	# Overwritten
-	'No item' => '',
-
-	# Overwritten
-	'Show all items' => '',
+	#. Overwritten
+	'No items' => '',
 
 	#. Overwritten
-	'This field has to contain at least :param:1 characters.' => 'Au moins :param:1 caractères.',
+	'Show all items' => '',
 
 	#. Overwritten
 	'From {date}' => 'À partir du {date}',
@@ -352,19 +358,18 @@ return array(
 	'Root' => 'Racine',
 
 	#. Overwritten
-	'required' => 'Ce champ est obligatoire.',
+	'required' => 'This field is required.',
 
 	#. Overwritten
-	'min_length' => 'Ce champ doit contenir au moins :param:1 caractères.',
+	'min_length' => 'This field has to contain at least :param:1 characters.',
 
 	#. Overwritten
-	'max_length' => 'Ce champ ne doit pas contenir plus que :param:1 caractères.',
+	'max_length' => 'This field may not contain more than :param:1 characters.',
 
 	#. Overwritten
-	'valid_date' => 'Cette date n\'existe pas.',
+	'valid_date' => 'The entered date is invalid.',
 
 	#. Overwritten
-	'check_old_password' => 'L\'ancien mot passe est invalide.',
-
+	'check_old_password' => 'The old password is incorrect.',
 
 );

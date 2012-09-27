@@ -1,53 +1,52 @@
 <?php
 
-// Generated on 20/09/2012 17:15:42
+// Generated on 27/09/2012 16:27:39
 
-// 0 out of 54 messages are translated (0%).
-// 0 out of 164 words are translated (0%).
+// 6 out of 69 messages are translated (8%).
+// 6 out of 185 words are translated (8%).
 
 return array(
-	#. Commentaire
-	#: classes/controller/admin/crud.php:240
+	#: classes/controller/admin/crud.php:239
 	'Add' => '',
 
-	#: classes/controller/admin/crud.php:285
+	#: classes/controller/admin/crud.php:284
 	'successfully added' => '',
 
-	#: classes/controller/admin/crud.php:285
+	#: classes/controller/admin/crud.php:284
 	'successfully saved' => '',
 
-	#: classes/controller/admin/crud.php:303
+	#: classes/controller/admin/crud.php:302
 	'This item already exists in {lang}. Therefore your item cannot be added.' => '',
 
-	#: classes/controller/admin/crud.php:334
+	#: classes/controller/admin/crud.php:333
 	#: views/crud/tab.view.php:14
 	'item deleted' => '',
 
-	#: classes/controller/admin/crud.php:414
+	#: classes/controller/admin/crud.php:413
 	'visualise' => '',
 
-	#: classes/controller/admin/crud.php:424
+	#: classes/controller/admin/crud.php:423
 	'Delete' => '',
 
-	#: classes/controller/admin/crud.php:429
+	#: classes/controller/admin/crud.php:428
 	'delete an item' => '',
 
-	#: classes/controller/admin/crud.php:443
+	#: classes/controller/admin/crud.php:442
 	'Share' => '',
 
-	#: classes/controller/admin/crud.php:474
+	#: classes/controller/admin/crud.php:473
 	'add an item in lang' => '',
 
-	#: classes/controller/admin/crud.php:474
+	#: classes/controller/admin/crud.php:473
 	'Translate in {lang}' => '',
 
-	#: classes/controller/admin/crud.php:474
+	#: classes/controller/admin/crud.php:473
 	'Edit in {lang}' => '',
 
-	#: classes/controller/admin/crud.php:494
+	#: classes/controller/admin/crud.php:493
 	'not found' => '',
 
-	#: classes/controller/admin/crud.php:591
+	#: classes/controller/admin/crud.php:590
 	'successfully deleted' => '',
 
 	#. Appdesk: allLanguages
@@ -182,6 +181,7 @@ return array(
 
 	#: views/crud/blank_slate.view.php:93
 	'(Form filled with the content from the original version)' => '',
+
 	#. Overwritten
 	'Select an action' => '',
 

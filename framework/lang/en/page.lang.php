@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 20/09/2012 17:15:42
+// Generated on 27/09/2012 16:27:39
 
-// 19 out of 92 messages are translated (20%).
-// 69 out of 247 words are translated (20%).
+// 18 out of 97 messages are translated (18%).
+// 68 out of 262 words are translated (18%).
 
 return array(
 	#: classes/controller/admin/page/inspector/page.ctrl.php:38
@@ -50,7 +50,7 @@ return array(
 	'Internal link' => '',
 
 	#: views/admin/page/wysiwyg_link.view.php:40
-	#: config/controller/admin/page/page.config.php:229
+	#: config/controller/admin/page/page.config.php:230
 	'External link' => '',
 
 	#: views/admin/page/wysiwyg_link.view.php:41
@@ -87,11 +87,11 @@ return array(
 	'Opening type:' => '',
 
 	#: views/admin/page/wysiwyg_link.view.php:79
-	#: config/controller/admin/page/page.config.php:215
+	#: config/controller/admin/page/page.config.php:216
 	'New window' => '',
 
 	#: views/admin/page/wysiwyg_link.view.php:80
-	#: config/controller/admin/page/page.config.php:217
+	#: config/controller/admin/page/page.config.php:218
 	'Same window' => '',
 
 	#: views/admin/page/wysiwyg_link.view.php:84
@@ -115,88 +115,88 @@ return array(
 	#: config/controller/admin/page/page.config.php:28
 	'Translate a page' => '',
 
-	#: config/controller/admin/page/page.config.php:36
+	#: config/controller/admin/page/page.config.php:38
 	#: config/controller/admin/page/appdesk.config.php:125
 	'Visualise' => '',
 
-	#: config/controller/admin/page/page.config.php:63
+	#: config/controller/admin/page/page.config.php:65
 	'Content' => '',
 
-	#: config/controller/admin/page/page.config.php:93
+	#: config/controller/admin/page/page.config.php:95
 	'Menu' => '',
 
-	#: config/controller/admin/page/page.config.php:97
+	#: config/controller/admin/page/page.config.php:99
 	'URL (page address)' => '',
 
-	#: config/controller/admin/page/page.config.php:101
+	#: config/controller/admin/page/page.config.php:103
 	'SEO' => '',
 
-	#: config/controller/admin/page/page.config.php:105
+	#: config/controller/admin/page/page.config.php:107
 	'Admin' => '',
 
-	#: config/controller/admin/page/page.config.php:122
+	#: config/controller/admin/page/page.config.php:124
 	'ID: ' => '',
 
-	#: config/controller/admin/page/page.config.php:128
+	#: config/controller/admin/page/page.config.php:130
 	#: config/controller/admin/page/appdesk.config.php:180
 	'Title' => '',
 
-	#: config/controller/admin/page/page.config.php:143
+	#: config/controller/admin/page/page.config.php:145
 	'Location: ' => '',
 
-	#: config/controller/admin/page/page.config.php:148
+	#: config/controller/admin/page/page.config.php:149
 	'Template: ' => '',
 
-	#: config/controller/admin/page/page.config.php:155
-	#: config/controller/admin/page/page.config.php:205
+	#: config/controller/admin/page/page.config.php:156
+	#: config/controller/admin/page/page.config.php:206
 	'URL: ' => '',
 
-	#: config/controller/admin/page/page.config.php:163
+	#: config/controller/admin/page/page.config.php:164
 	'SEO title: ' => '',
 
-	#: config/controller/admin/page/page.config.php:169
+	#: config/controller/admin/page/page.config.php:170
 	'Description: ' => '',
 
-	#: config/controller/admin/page/page.config.php:176
+	#: config/controller/admin/page/page.config.php:177
 	'Keywords: ' => '',
 
-	#: config/controller/admin/page/page.config.php:183
+	#: config/controller/admin/page/page.config.php:184
 	'Don\'t index on search engines' => '',
 
-	#: config/controller/admin/page/page.config.php:191
+	#: config/controller/admin/page/page.config.php:192
 	'Shows in the menu' => '',
 
-	#: config/controller/admin/page/page.config.php:199
+	#: config/controller/admin/page/page.config.php:200
 	'What\'s the page called in the menu: ' => '',
 
-	#: config/controller/admin/page/page.config.php:211
+	#: config/controller/admin/page/page.config.php:212
 	'Target: ' => '',
 
-	#: config/controller/admin/page/page.config.php:216
+	#: config/controller/admin/page/page.config.php:217
 	'Popup' => '',
 
-	#: config/controller/admin/page/page.config.php:222
+	#: config/controller/admin/page/page.config.php:223
 	'Type: ' => '',
 
-	#: config/controller/admin/page/page.config.php:226
+	#: config/controller/admin/page/page.config.php:227
 	'Page' => '',
 
-	#: config/controller/admin/page/page.config.php:234
+	#: config/controller/admin/page/page.config.php:235
 	'Lock status: ' => '',
 
-	#: config/controller/admin/page/page.config.php:238
+	#: config/controller/admin/page/page.config.php:239
 	'Unlocked' => '',
 
-	#: config/controller/admin/page/page.config.php:239
+	#: config/controller/admin/page/page.config.php:240
 	'Deletion' => '',
 
-	#: config/controller/admin/page/page.config.php:240
+	#: config/controller/admin/page/page.config.php:241
 	'Modification' => '',
 
-	#: config/controller/admin/page/page.config.php:245
+	#: config/controller/admin/page/page.config.php:246
 	'Regenerate every {duration} seconds' => '',
 
-	#: config/controller/admin/page/page.config.php:256
+	#: config/controller/admin/page/page.config.php:257
 	'Save' => '',
 
 	#: config/controller/admin/page/appdesk.config.php:64
@@ -289,22 +289,22 @@ return array(
 	#. Overwritten
 	'delete an item' => 'Delete a page',
 
-	# Overwritten
-	'item' => '',
+	#. Overwritten
+	'item' => 'page',
 
-	# Overwritten
-	'items' => '',
+	#. Overwritten
+	'items' => 'pages',
 
-	# Overwritten
+	#. Overwritten
 	'Showing {{x}} items out of {{y}}' => '',
 
-	# Overwritten
+	#. Overwritten
 	'Show 1 item' => '',
 
-	# Overwritten
-	'No item' => '',
+	#. Overwritten
+	'No items' => '',
 
-	# Overwritten
+	#. Overwritten
 	'Show all items' => '',
 
 );

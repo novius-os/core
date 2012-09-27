@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 20/09/2012 15:49:49
+// Generated on 27/09/2012 16:31:59
 
-// 0 out of 52 messages are translated (0%).
-// 0 out of 116 words are translated (0%).
+// 0 out of 61 messages are translated (0%).
+// 0 out of 134 words are translated (0%).
 
 return array(
 	#: classes/controller/admin/user/user.ctrl.php:50
@@ -22,24 +22,25 @@ return array(
 	#: config/controller/admin/user/appdesk.config.php:36
 	'Permissions' => '',
 
-	#: views/admin/user/user_edit.view.php:99
-	#: views/admin/user/user_add.view.php:74
-	'Insufficient' => '',
-
+	#. Password strength
 	#: views/admin/user/user_edit.view.php:100
 	#: views/admin/user/user_add.view.php:75
-	'Weak' => '',
+	'Insufficient' => '',
 
 	#: views/admin/user/user_edit.view.php:101
 	#: views/admin/user/user_add.view.php:76
-	'Average' => '',
+	'Weak' => '',
 
 	#: views/admin/user/user_edit.view.php:102
 	#: views/admin/user/user_add.view.php:77
-	'Strong' => '',
+	'Average' => '',
 
 	#: views/admin/user/user_edit.view.php:103
 	#: views/admin/user/user_add.view.php:78
+	'Strong' => '',
+
+	#: views/admin/user/user_edit.view.php:104
+	#: views/admin/user/user_add.view.php:79
 	'Outstanding' => '',
 
 	#: views/admin/user/delete_popup.view.php:13
@@ -48,61 +49,46 @@ return array(
 	#: views/admin/user/delete_popup.view.php:14
 	'Please confirm the deletion:' => '',
 
-	#: config/controller/admin/user/user.config.php:14
-	'User successfully added.' => '',
-
-	#: config/controller/admin/user/user.config.php:15
-	'User successfully saved.' => '',
-
-	#: config/controller/admin/user/user.config.php:16
-	'The user has successfully been deleted!' => '',
-
 	#: config/controller/admin/user/user.config.php:17
-	'This user has been deleted.' => '',
-
-	#: config/controller/admin/user/user.config.php:18
-	'User not found' => '',
-
-	#: config/controller/admin/user/user.config.php:19
-	'Delete an user' => '',
-
-	#: config/controller/admin/user/user.config.php:24
 	#: config/controller/admin/user/appdesk.config.php:33
-	#: config/controller/admin/user/appdesk.config.php:107
-	#: config/controller/admin/user/appdesk.config.php:113
+	#: config/controller/admin/user/appdesk.config.php:108
+	#: config/controller/admin/user/appdesk.config.php:114
 	'Add a user' => '',
 
-	#: config/controller/admin/user/user.config.php:38
+	#: config/controller/admin/user/user.config.php:31
 	'ID: ' => '',
 
-	#: config/controller/admin/user/user.config.php:42
+	#: config/controller/admin/user/user.config.php:35
 	'Family name' => '',
 
-	#: config/controller/admin/user/user.config.php:49
+	#: config/controller/admin/user/user.config.php:42
 	'First name' => '',
 
-	#: config/controller/admin/user/user.config.php:56
+	#: config/controller/admin/user/user.config.php:49
 	'Email: ' => '',
 
-	#: config/controller/admin/user/user.config.php:64
+	#: config/controller/admin/user/user.config.php:57
 	'Last login: ' => '',
 
-	#: config/controller/admin/user/user.config.php:73
-	#: config/controller/admin/user/user.config.php:83
+	#: config/controller/admin/user/user.config.php:66
+	#: config/controller/admin/user/user.config.php:76
 	'Password: ' => '',
+
+	#: config/controller/admin/user/user.config.php:114
+	'Save' => '',
 
 	#: config/controller/admin/user/appdesk.config.php:28
 	'Default view' => '',
 
 	#: config/controller/admin/user/appdesk.config.php:32
-	#: config/controller/admin/user/appdesk.config.php:74
+	#: config/controller/admin/user/appdesk.config.php:75
 	'Users' => '',
 
 	#: config/controller/admin/user/appdesk.config.php:34
 	'User' => '',
 
 	#: config/controller/admin/user/appdesk.config.php:35
-	#: config/controller/admin/user/appdesk.config.php:127
+	#: config/controller/admin/user/appdesk.config.php:128
 	'Email' => '',
 
 	#: config/controller/admin/user/appdesk.config.php:38
@@ -162,16 +148,16 @@ return array(
 	#: config/controller/admin/user/appdesk.config.php:56
 	'Loading...' => '',
 
-	#: config/controller/admin/user/appdesk.config.php:79
+	#: config/controller/admin/user/appdesk.config.php:80
 	'Edit' => '',
 
-	#: config/controller/admin/user/appdesk.config.php:91
+	#: config/controller/admin/user/appdesk.config.php:92
 	'Delete' => '',
 
-	#: config/controller/admin/user/appdesk.config.php:98
+	#: config/controller/admin/user/appdesk.config.php:99
 	'Delete a user' => '',
 
-	#: config/controller/admin/user/appdesk.config.php:122
+	#: config/controller/admin/user/appdesk.config.php:123
 	'Name' => '',
 
 	#. Overwritten
@@ -197,5 +183,23 @@ return array(
 
 	#. Overwritten
 	'delete an item' => '',
+
+	#. Overwritten
+	'item' => 'Utilisateur',
+
+	#. Overwritten
+	'items' => 'Utilisateurs',
+
+	#. Overwritten
+	'Showing {{x}} items out of {{y}}' => '',
+
+	#. Overwritten
+	'Show 1 item' => '',
+
+	#. Overwritten
+	'No items' => '',
+
+	#. Overwritten
+	'Show all items' => '',
 
 );

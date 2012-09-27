@@ -1,69 +1,72 @@
 <?php
 
-// Generated on 20/09/2012 15:49:49
+// Generated on 27/09/2012 16:31:59
 
-// 20 out of 20 messages are translated (100%).
-// 28 out of 28 words are translated (100%).
+// 20 out of 21 messages are translated (95%).
+// 29 out of 30 words are translated (95%).
 
 return array(
 	#: page
-	'item' => 'page',
+	'No items' => 'Aucune page',
 
-	#: page
-	'items' => 'pages',
-
-	#: page
+	#: unused
 	'showNbItems' => 'Showing {{x}} pages out of {{y}}',
 
-	#: page
+	#: unused
 	'showOneItem' => 'Show 1 page',
 
-	#: page
+	#: unused
 	'showNoItem' => 'No page',
 
-	#: page
+	#: unused
 	'showAll' => 'Show all pages',
 
-	#: generic
+	#: unused
 	'This field has to contain at least :param:1 characters.' => 'Au moins :param:1 caractères.',
 
-	#: generic
+	#: unused
 	'required' => 'Ce champ est obligatoire.',
 
-	#: generic
+	#: unused
 	'min_length' => 'Ce champ doit contenir au moins :param:1 caractères.',
 
-	#: generic
+	#: unused
 	'max_length' => 'Ce champ ne doit pas contenir plus que :param:1 caractères.',
 
-	#: generic
+	#: unused
 	'valid_date' => 'Cette date n\'existe pas.',
 
-	#: generic
+	#: unused
 	'check_old_password' => 'L\'ancien mot passe est invalide.',
 
-	#: application
+	#: unused
 	'addDropDown' => 'Choisissez une action',
 
-	#: application
+	#: unused
 	'columns' => 'Colonnes',
 
-	#: application
+	#: unused
 	'showFiltersColumns' => 'Filtrer les en-têtes',
 
-	#: application
+	#: unused
 	'visibility' => 'Visibilité',
 
-	#: application
+	#: unused
 	'settings' => 'Paramètres',
 
-	#: application
+	#: unused
 	'vertical' => 'Vertical',
 
-	#: application
+	#: unused
 	'horizontal' => 'Horizontal',
 
-	#: application
+	#: unused
 	'hidden' => 'Caché',
+
+	#: media
+	'Pick' => '',
+
+	#: generic
+	'delete' => 'Delete',
 
 );
