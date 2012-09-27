@@ -7,47 +7,91 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-    $id = uniqid('temp_');
+    $uniqid = uniqid('container_');
 
     (!isset($nugget_db) || !is_array($nugget_db)) && $nugget_db = $item->get_default_nuggets();
-    $fieldset = \Fieldset::forge(uniqid());
-    $fieldset->add('model_id', '', array('value' => $item->id, 'type' => 'hidden'));
-    $fieldset->add('model_name', '', array('value' => get_class($item), 'type' => 'hidden'));
-    $fieldset->add('catcher_name', '', array('value' => \Nos\Model_Content_Nuggets::DEFAULT_CATCHER, 'type' => 'hidden'));
-    $fields = array();
 
-    $fields[] = \Nos\DataCatcher::TYPE_TITLE;
-    $fieldset->add(\Nos\DataCatcher::TYPE_TITLE, __('Title:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TITLE, '')));
+    $fields = array(
+        'model_id' => array(
+            'form' => array(
+                'type' => 'hidden',
+                'value' => $item->id,
+            ),
+        ),
+        'model_name' => array(
+            'form' => array(
+                'type' => 'hidden',
+                'value' => get_class($item),
+            ),
+        ),
+        'catcher_name' => array(
+            'form' => array(
+                'type' => 'hidden',
+                'value' => \Nos\Model_Content_Nuggets::DEFAULT_CATCHER,
+            ),
+        ),
+    );
+
+    $fields[\Nos\DataCatcher::TYPE_TITLE] = array(
+        'label' => __('Title:'),
+    );
 
     if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget))
     {
-        $fields[] = \Nos\DataCatcher::TYPE_URL;
-        $fieldset->add(\Nos\DataCatcher::TYPE_URL, __('URL:'), array(
-            'type' => 'select',
-            'options' => $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.options'),
-            'value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_URL, ''),
-        ));
+        $fields[\Nos\DataCatcher::TYPE_URL] = array(
+            'label' => __('URL:'),
+            'form' => array(
+                'type' => 'select',
+                'options' => $item->get_sharable_property(\Nos\DataCatcher::TYPE_URL.'.options'),
+            ),
+        );
     }
 
-    $fields[] = \Nos\DataCatcher::TYPE_IMAGE;
+    $image_id = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
     $options = array_keys($item->get_sharable_property(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
-    $value = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
-    $fieldset->add(\Nos\DataCatcher::TYPE_IMAGE, __('Image:'), array(
-        'type' => 'radio',
-        'value' => in_array($value, $options) ? $value : 0,
-    ));
 
-    $fields[] = \Nos\DataCatcher::TYPE_TEXT;
-    $fieldset->add(\Nos\DataCatcher::TYPE_TEXT, __('Description:'), array('value' => \Arr::get($nugget, \Nos\DataCatcher::TYPE_TEXT, ''), 'type' => 'textarea'));
+    $fields[\Nos\DataCatcher::TYPE_IMAGE] = array(
+        'label' => __('Image:'),
+        'form' => array(
+            'type' => 'radio',
+            'value' => in_array($image_id, $options) ? $image_id : 0,
+        ),
+    );
+
+    $fields[\Nos\DataCatcher::TYPE_TEXT] = array(
+        'label' => __('Description:'),
+        'form' => array(
+            'type' => 'textarea',
+            'rows' => 5,
+         ),
+    );
+
+    $values = $nugget;
+    unset($values[\Nos\DataCatcher::TYPE_IMAGE]);
+
+    $fieldset = \Fieldset::build_from_config($fields);
+    $fieldset->populate($values);
+
 ?>
-<div id="<?= $id ?>">
+<div id="<?= $uniqid ?>">
 <?php
     echo $fieldset->open($action);
-    $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td><td class=\"use_default\">{default}</td></tr>\n");
+
+    $fieldset->form()->set_config('field_template',
+        "\t\t".'<tr>
+            <th>{label}</th>
+            <td>{field}</td>
+            <td class="use_default">{default}</td>
+        </tr>'."\n");
     echo $fieldset->build_hidden_fields();
     echo \View::forge('form/fields', array(
         'fieldset' => $fieldset,
-        'fields' => $fields,
+        'fields' => array(
+            \Nos\DataCatcher::TYPE_TITLE,
+            \Nos\DataCatcher::TYPE_URL,
+            \Nos\DataCatcher::TYPE_IMAGE,
+            \Nos\DataCatcher::TYPE_TEXT,
+        ),
         'callback' => function($field) use ($item, $nugget_db, $nugget) {
             $template = $field->template;
             if (empty($template))
