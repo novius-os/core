@@ -236,8 +236,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fields = \Arr::merge($fields, array(
                 'save' => array(
                     'form' => array(
-                        // Commentaire
-                        'value' => static::i18n('Add'),
+                        'value' => $this->i18n('Add'),
                     ),
                 ),
             ));
@@ -300,7 +299,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $item_lang = $this->item->get_lang();
             $existing = $this->item->find_lang($item_lang);
             if (!empty($existing)) {
-                $message = strtr(static::i18n('This item already exists in {lang}. Therefore your item cannot be added.'), array(
+                $message = strtr($this->i18n('This item already exists in {lang}. Therefore your item cannot be added.'), array(
                     '{lang}' => \Arr::get(\Config::get('locales'), $item_lang, $item_lang),
                 ));
                 $this->send_error(new \Exception($message));
@@ -471,7 +470,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_lang = $this->item->find_lang($locale);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? $this->i18n('add an item in lang') : (empty($item_lang) ? static::i18n('Translate in {lang}') : static::i18n('Edit in {lang}'));
+            $label = empty($main_lang) ? $this->i18n('add an item in lang') : (empty($item_lang) ? $this->i18n('Translate in {lang}') : $this->i18n('Edit in {lang}'));
             $actions[$locale] = array(
                 'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),

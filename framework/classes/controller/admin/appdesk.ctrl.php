@@ -44,7 +44,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             'showNbItems' => $this->i18n('Showing {{x}} items out of {{y}}'),
             'showOneItem' => $this->i18n('Show 1 item'),
             'showNoItem' => $this->i18n('No items'),
-            'showAll' => $this->i18n('Show all item'),
+            'showAll' => $this->i18n('Show all items'),
             'viewGrid' => $this->i18n('Grid'),
             'viewTreeGrid' => $this->i18n('Tree grid'),
             'viewThumbnails' => $this->i18n('Thumbnails'),
