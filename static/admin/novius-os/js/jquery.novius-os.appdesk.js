@@ -18,10 +18,10 @@ define('jquery-nos-appdesk',
                 inspectors : [],
                 thumbnails : false,
                 defaultView : 'grid',
-                sites : {},
-                hideSites : false,
+                contexts : {},
+                hideContexts : false,
                 texts : {
-                    allSites : 'All',
+                    allContexts : 'All',
                     addDropDown : 'Select an action',
                     columns : 'Columns',
                     showFiltersColumns : 'Filters column header',
@@ -44,7 +44,7 @@ define('jquery-nos-appdesk',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
                     loading : 'Loading...',
-                    sites: 'Sites'
+                    contexts: 'Contexts'
                 },
                 values: {},
                 //callbabks
@@ -56,7 +56,7 @@ define('jquery-nos-appdesk',
                 },
                 views: {},
                 selectedView: null,
-                selectedSite : null,
+                selectedContext : null,
                 fromView: null,
                 name: null,
                 grid: {}
@@ -150,13 +150,13 @@ define('jquery-nos-appdesk',
                     }, o.thumbnails);
                 }
 
-                if (!$.isEmptyObject(o.sites)) {
+                if (!$.isEmptyObject(o.contexts)) {
 
-                    if (!$.type(o.selectedSite) === 'string') {
-                        o.selectedSite = null;
+                    if (!$.type(o.selectedContext) === 'string') {
+                        o.selectedContext = null;
                     }
-                    if (o.selectedSite === null || !o.sites[o.selectedSite]) {
-                        o.selectedSite = Object.keys(o.sites)[0];
+                    if (o.selectedContext === null || !o.contexts[o.selectedContext]) {
+                        o.selectedContext = Object.keys(o.contexts)[0];
                     }
                 }
 
@@ -166,7 +166,7 @@ define('jquery-nos-appdesk',
                     ._uiInspectors()
                     ._uiSearchBar()
                     ._uiList()
-                    ._uiSitesDropDown()
+                    ._uiContextsDropDown()
                     ._uiViewsDropDown();
 
                 self.init = true;
@@ -216,7 +216,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(first.action, {
-                                    site: o.selectedSite
+                                    context: o.selectedContext
                                 });
                         });
 
@@ -230,7 +230,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(add.action, {
-                                    site: o.selectedSite
+                                    context: o.selectedContext
                                 });
                         });
 
@@ -240,47 +240,47 @@ define('jquery-nos-appdesk',
                 return self;
             },
 
-            _uiSitesDropDown : function() {
+            _uiContextsDropDown : function() {
                 var self = this,
                     o = self.options;
 
-                if (o.hideSites || !!$.isEmptyObject(o.sites)) {
+                if (o.hideContexts || !!$.isEmptyObject(o.contexts)) {
                     return self;
                 }
-                self.dispatcher.data('nosSite', o.selectedSite);
+                self.dispatcher.data('nosContext', o.selectedContext);
 
                 var date = new Date(),
                     uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
-                    $uiSites = $('<div></div>').addClass('nos-appdesk-dropdownsite');
+                    $uiContexts = $('<div></div>').addClass('nos-appdesk-dropdowncontext');
 
-                $.each(o.sites, function(key, locale) {
+                $.each(o.contexts, function(key, locale) {
                     var flag = key.split('_')[1].toLowerCase();
-                    $uiSites.append(
-                        $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedSite == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
+                    $uiContexts.append(
+                        $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedContext == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
                     );
                 });
 
-                $uiSites.append(
-                    $('<input type="radio" class="notransform" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedSite == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allSites + '</label>')
+                $uiContexts.append(
+                    $('<input type="radio" class="notransform" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedContext == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allContexts + '</label>')
                 );
-                $uiSites.buttonset();
+                $uiContexts.buttonset();
 
-                $uiSites.find('input[name=' + uniqid + ']').change(function() {
+                $uiContexts.find('input[name=' + uniqid + ']').change(function() {
                     var select = $(this);
 
-                    o.selectedSite = select.val();
+                    o.selectedContext = select.val();
 
-                    select.nosSaveUserConfig(o.name + '.selectedSite', o.selectedSite);
+                    select.nosSaveUserConfig(o.name + '.selectedContext', o.selectedContext);
 
                     self.uiResetSearch.click();
 
-                    self.dispatcher.data('nosSite', o.selectedSite)
-                        .trigger('siteChange');
+                    self.dispatcher.data('nosContext', o.selectedContext)
+                        .trigger('contextChange');
                 }).filter(function() {
-                    return $(this).val() == o.selectedsite;
+                    return $(this).val() == o.selectedcontext;
                 });
 
-                self.element.nosToolbar('add', $uiSites, true);
+                self.element.nosToolbar('add', $uiContexts, true);
 
                 return self;
             },
@@ -696,7 +696,7 @@ define('jquery-nos-appdesk',
                                 if (self.gridRendered) {
                                     self.uiGrid.noslistgrid("currentCell", -1, -1);
                                 }
-                                dataSource.proxy.options.data.site = o.selectedSite || '';
+                                dataSource.proxy.options.data.context = o.selectedContext || '';
                                 dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                                 dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                                 dataSource.proxy.options.data.limit = r.pageSize;
@@ -798,7 +798,7 @@ define('jquery-nos-appdesk',
                     }).nostreegrid($.extend(true, { // True for recursive clone
                         treeUrl : o.treeGrid.urlJson,
                         treeOptions : {
-                            site : o.selectedSite || ''
+                            context : o.selectedContext || ''
                         },
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
@@ -886,7 +886,7 @@ define('jquery-nos-appdesk',
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
                             self.pageIndex = r.pageIndex;
-                            dataSource.proxy.options.data.site = o.selectedSite || '';
+                            dataSource.proxy.options.data.context = o.selectedContext || '';
                             dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                             dataSource.proxy.options.data.limit = r.pageSize;
@@ -1169,16 +1169,16 @@ define('jquery-nos-appdesk',
                 }
 
                 var init = function() {
-                    // If the property is set explicitely, use it, else display only if there's more than 1 site
-                    var hideSites = (typeof config.hideSites != 'undefined' ? config.hideSites : Object.keys(config.sites).length <= 1);
+                    // If the property is set explicitely, use it, else display only if there's more than 1 context
+                    var hideContexts = (typeof config.hideContexts != 'undefined' ? config.hideContexts : Object.keys(config.contexts).length <= 1);
 
                     $.extend(true, appdesk.appdesk, {
-                        sites : config.sites,
-                        hideSites : hideSites,
+                        contexts : config.contexts,
+                        hideContexts : hideContexts,
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
-                        selectedSite : config.selectedSite
+                        selectedContext : config.selectedContext
                     });
                     if (onCustom) {
                         $.extend(true, appdesk.appdesk, {
@@ -1223,12 +1223,12 @@ define('jquery-nos-appdesk',
                         var match = [];
                         $.each(params.reloadEvent, function(i, reloadEvent) {
                             if ($.type(reloadEvent) === 'string') {
-                                // Reload the grid if a action on a same site's item occurs
-                                // Or if a update or a insert on a other site's item occurs
-                                if (dispatcher.data('nosSite')) {
+                                // Reload the grid if a action on a same context's item occurs
+                                // Or if a update or a insert on a other context's item occurs
+                                if (dispatcher.data('nosContext')) {
                                     match.push({
                                         name : reloadEvent,
-                                        site : dispatcher.data('nosSite')
+                                        context : dispatcher.data('nosContext')
                                     });
                                     match.push({
                                         name : reloadEvent,
@@ -1315,19 +1315,19 @@ define('jquery-nos-appdesk',
                             if (key === 'columns') {
                                 object[key] = keyToOrderedArray(object, key);
                                 for (var i = 0; i < object[key].length; i++) {
-                                    if (object[key][i].site) {
-                                        if (configToUse.hideSites) {
+                                    if (object[key][i].context) {
+                                        if (configToUse.hideContexts) {
                                             object[key].splice(i, 1);
                                             continue;
                                         }
                                         object[key][i] = {
-                                            headerText : i18n.sites || 'Sites',
-                                            dataKey    : 'site',
-                                            setupkey   : 'site',
+                                            headerText : i18n.contexts || 'Contexts',
+                                            dataKey    : 'context',
+                                            setupkey   : 'context',
                                             showFilter : false,
                                             cellFormatter : function(args) {
                                                 if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                    args.$container.css("text-align", "center").html(args.row.data.site);
+                                                    args.$container.css("text-align", "center").html(args.row.data.context);
                                                     return true;
                                                 }
                                             },

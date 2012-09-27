@@ -29,7 +29,7 @@ class Widget_Media_Folder extends \Nos\Widget_Selector
                 'id' => $this->value,
             ),
             'treeOptions' => array(
-                'site' => \Arr::get($this->widget_options, 'site', null),
+                'context' => \Arr::get($this->widget_options, 'context', null),
             ),
             'height' => \Arr::get($this->widget_options, 'height', '150px'),
             'width' => \Arr::get($this->widget_options, 'width', null),
@@ -60,7 +60,7 @@ class Widget_Media_Folder extends \Nos\Widget_Selector
                 )
             ),
             'treeOptions' => array(
-                'site' => null
+                'context' => null
             ),
             'height' => '150px',
             'width' => null,

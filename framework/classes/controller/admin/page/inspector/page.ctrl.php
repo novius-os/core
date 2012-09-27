@@ -31,7 +31,7 @@ class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltre
                     '_model' => 'Nos\Model_Page',
                     //'actions' => array(),
                     'id' => '0',
-                    //'site' => '',
+                    //'context' => '',
                     //'publication_status' => '',
                     'title' => __('Root'),
                     'treeChilds' => $json['items'],

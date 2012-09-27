@@ -12,42 +12,42 @@
 <p>
 <?php
 if ($crud['behaviours']['translatable']) {
-    $item_sites = $item->find_site('all');
-    $site_count = count($item_sites);
+    $item_situations = $item->find_context('all');
+    $context_count = count($item_situations);
 
     if ($crud['behaviours']['tree']) {
         $children = array();
-        // Count all children in the primary site
-        foreach ($item_sites as $item_site) {
-            foreach ($item_site->find_children_recursive(false) as $child) {
+        // Count all children in the primary context
+        foreach ($item_situations as $item_context) {
+            foreach ($item_context->find_children_recursive(false) as $child) {
                 $children[$child->{$crud['behaviours']['translatable']['common_id_property']}] = true;
             }
         }
         $children_count = count($children);
-        if ($children_count == 0 && $site_count == 1) {
+        if ($children_count == 0 && $context_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
             <?php
-            if ($site_count > 1) {
-                $sites = \Config::get('sites', array());
-                $sites_list = array();
-                foreach ($item_sites as $item_site) {
-                    $sites_list[] = \Arr::get($sites, $item_site->get_site(), $item_site->get_site());
+            if ($context_count > 1) {
+                $contexts = \Config::get('contexts', array());
+                $contexts_list = array();
+                foreach ($item_situations as $item_context) {
+                    $contexts_list[] = \Arr::get($contexts, $item_context->get_context(), $item_context->get_context());
                 }
                 ?>
-                <p><?= strtr($crud['config']['messages']['exists in multiple site'], array(
-                    '<strong>' => '<strong title="'.implode(', ', $sites_list).'">',
-                    '{count}' => $site_count,
+                <p><?= strtr($crud['config']['messages']['exists in multiple context'], array(
+                    '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
+                    '{count}' => $context_count,
                 )) ?></p>
-                    <?= $crud['config']['messages']['delete in the following sites'] ?>
-                <select name="site">
-                    <option value="all"><?= __('All sites') ?></option>
+                    <?= $crud['config']['messages']['delete in the following contexts'] ?>
+                <select name="context">
+                    <option value="all"><?= __('All contexts') ?></option>
                 <?php
-                foreach ($item_sites as $item_site) {
+                foreach ($item_situations as $item_context) {
                     ?>
-                    <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($sites, $item_site->get_site(), $item_site->get_site()); ?></option>
+                    <option value="<?= $item_context->get_context() ?>"><?= \Arr::get($contexts, $item_context->get_context(), $item_context->get_context()); ?></option>
                     <?php
                 }
                 ?>
@@ -65,27 +65,27 @@ if ($crud['behaviours']['translatable']) {
             }
         }
     } else {
-        if ($site_count == 1) {
+        if ($context_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
-            $sites = \Config::get('sites', array());
-            $sites_list = array();
-            foreach ($item_sites as $item_site) {
-                $sites_list[] = \Arr::get($sites, $item_site->get_site(), $item_site->get_site());
+            $contexts = \Config::get('contexts', array());
+            $contexts_list = array();
+            foreach ($item_situations as $item_context) {
+                $contexts_list[] = \Arr::get($contexts, $item_context->get_context(), $item_context->get_context());
             }
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
-            <p><?= strtr($crud['config']['messages']['exists in multiple site'], array(
-                    '<strong>' => '<strong title="'.implode(', ', $sites_list).'">',
-                    '{count}' => $site_count,
+            <p><?= strtr($crud['config']['messages']['exists in multiple context'], array(
+                    '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
+                    '{count}' => $context_count,
                 )) ?></p>
-                    <?= $crud['config']['messages']['delete in the following sites'] ?>
-                <select name="site">
-                    <option value="all"><?= __('All sites') ?></option>
+                    <?= $crud['config']['messages']['delete in the following contexts'] ?>
+                <select name="context">
+                    <option value="all"><?= __('All contexts') ?></option>
             <?php
-            foreach ($item_sites as $item_site) {
+            foreach ($item_situations as $item_context) {
                 ?>
-                <option value="<?= $item_site->get_site() ?>"><?= \Arr::get($sites, $item_site->get_site(), $item_site->get_site()); ?></option>
+                <option value="<?= $item_context->get_context() ?>"><?= \Arr::get($contexts, $item_context->get_context(), $item_context->get_context()); ?></option>
                 <?php
             }
             ?>

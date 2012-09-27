@@ -24,10 +24,10 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                         }),
                     table = container.find('table'),
                     connector = container.closest('.nos-dispatcher, body')
-                        .on('siteChange', function() {
-                            if (params.siteChange) {
+                        .on('contextChange', function() {
+                            if (params.contextChange) {
                                 table.nostreegrid('option', 'treeOptions', {
-                                    site : connector.data('nosSite') || ''
+                                    context : connector.data('nosContext') || ''
                                 });
                             }
                         }),
@@ -37,8 +37,8 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                             var match = {
                                     name : params.reloadEvent
                                 };
-                            if (connector.data('nosSite')) {
-                                match['site'] = connector.data('nosSite');
+                            if (connector.data('nosContext')) {
+                                match['context'] = connector.data('nosContext');
                             }
                             container.nosListenEvent(match, function() {
                                     table.nostreegrid('reload');
@@ -52,7 +52,7 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                                 treeUrl : params.treeUrl,
                                 treeColumnIndex : 1,
                                 treeOptions : $.extend(true, {
-                                    site : connector.data('nosSite') || ''
+                                    context : connector.data('nosContext') || ''
                                 }, params.treeOptions || {}),
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',

@@ -18,8 +18,8 @@ require(
         $(function() {
             var inspector = $('#<?= $id ?>').removeAttr('id'),
                 connector = inspector.closest('.nos-dispatcher, body')
-                    .on('siteChange', function() {
-                        if (inspectorData.siteChange) {
+                    .on('contextChange', function() {
+                        if (inspectorData.contextChange) {
                             inspector.noslistgrid('ensureControl', true);
                         }
                     }),
@@ -48,8 +48,8 @@ require(
                 var match = {
                         name : inspectorData.reloadEvent
                     };
-                if (connector.data('nosSite')) {
-                    match['site'] = connector.data('nosSite');
+                if (connector.data('nosContext')) {
+                    match['context'] = connector.data('nosContext');
                 }
                 inspector.nosListenEvent(match, function() {
                         parent.trigger('widgetReload');
@@ -83,7 +83,7 @@ require(
                         }),
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
-                            dataSource.proxy.options.data.site = connector.data('nosSite') || '';
+                            dataSource.proxy.options.data.context = connector.data('nosContext') || '';
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                             dataSource.proxy.options.data.limit = r.pageSize;
                         },

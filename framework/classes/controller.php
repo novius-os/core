@@ -145,7 +145,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             array(
                 'related' => array(),
                 'callback' => array(),
-                'site' => null,
+                'context' => null,
                 'limit' => null,
                 'offset' => null,
                 'dataset' => array(),
@@ -186,14 +186,14 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
         $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
         if ($translatable) {
-            if (empty($config['site'])) {
-                // No inspector, we only search items in their primary site
+            if (empty($config['context'])) {
+                // No inspector, we only search items in their primary context
                 $query->where($translatable['is_main_property'], 1);
-            } elseif (is_array($config['site'])) {
-                // Multiple sites
-                $query->where($translatable['site_property'], 'IN', $config['site']);
+            } elseif (is_array($config['context'])) {
+                // Multiple contexts
+                $query->where($translatable['context_property'], 'IN', $config['context']);
             } else {
-                $query->where($translatable['site_property'], '=', $config['site']);
+                $query->where($translatable['context_property'], '=', $config['context']);
             }
             $common_ids = array();
             $keys = array();
@@ -287,34 +287,34 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 }
             }
             if ($translatable) {
-                $sites = $model::sites($common_ids);
-                foreach ($sites as $common_id => $list) {
-                    $sites[$common_id] = explode(',', $list);
+                $contexts = $model::contexts($common_ids);
+                foreach ($contexts as $common_id => $list) {
+                    $contexts[$common_id] = explode(',', $list);
                 }
                 foreach ($keys as $key => $common_id) {
-                    $items[$key]['site'] = $sites[$common_id];
+                    $items[$key]['context'] = $contexts[$common_id];
                 }
                 if ($tree) {
                     $root = reset($objects)->find_root();
                     if (!empty($root)) {
-                        $all_sites = $root->get_all_site();
+                        $all_contexts = $root->get_all_context();
                     } else {
-                        $all_sites = array_unique(\Arr::flatten($sites));
+                        $all_contexts = array_unique(\Arr::flatten($contexts));
                     }
                 } else {
-                    $all_sites = array_unique(\Arr::flatten($sites));
+                    $all_contexts = array_unique(\Arr::flatten($contexts));
                 }
                 foreach ($items as &$item) {
                     $flags = '';
-                    $sites = $item['site'];
-                    foreach ($all_sites as $site) {
-                        if (in_array($site, $sites)) {
-                            $flags .= \Nos\Helper::flag($site);
+                    $contexts = $item['context'];
+                    foreach ($all_contexts as $context) {
+                        if (in_array($context, $contexts)) {
+                            $flags .= \Nos\Helper::flag($context);
                         } else {
                             $flags .= \Nos\Helper::flag_empty();
                         }
                     }
-                    $item['site'] = $flags;
+                    $item['context'] = $flags;
                 }
             }
         }
@@ -407,7 +407,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $model = \Input::get('model');
         $selected = \Input::get('selected');
         $deep = intval(\Input::get('deep', 1));
-        $site = \Input::get('site');
+        $context = \Input::get('context');
 
         if (empty($tree_config['id'])) {
             $tree_config['id'] = \Config::getDbName(join('::', \Config::configFile(get_called_class())));
@@ -423,7 +423,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     'countProcess' => true,
                     'model' => $model,
                     'id' => $id,
-                    'site' => $site,
+                    'context' => $context,
                 )
             );
 
@@ -470,7 +470,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     'model' => $model,
                     'id' => $id,
                     'deep' => $deep,
-                    'site' => $site,
+                    'context' => $context,
                 )
             );
 
@@ -609,7 +609,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 'model' => null,
                 'id' => null,
                 'deep' => 1,
-                'site' => null,
+                'context' => null,
             ),
             $params
         );
@@ -621,10 +621,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['site']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
+                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
                     $item = $model::find($params['id']);
-                    $sites = $item->get_all_site();
-                    $child['where'] = array(array($child['fk'], 'IN', array_keys($sites)));
+                    $contexts = $item->get_all_context();
+                    $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));
                 } else {
                     $child['where'] = array(array($child['fk'] => $params['id']));
                 }
@@ -642,7 +642,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $config = array_merge(
                 $tree_model,
                 array(
-                    'site' => $params['site'],
+                    'context' => $params['context'],
                     'callback' => array(
                         function ($query) use ($child, $tree_model) {
                             foreach ($child['where'] as $where) {
@@ -668,7 +668,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
                                                 'deep' => $params['deep'] - 1,
-                                                'site' => $params['site'],
+                                                'context' => $params['context'],
                                             )
                                         );
 
@@ -680,7 +680,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                                 'countProcess' => true,
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
-                                                'site' => $params['site'],
+                                                'context' => $params['context'],
                                             )
                                         );
                                     }

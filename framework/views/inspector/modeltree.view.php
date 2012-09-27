@@ -18,10 +18,10 @@ require(
         $(function() {
             var inspector = $('#<?= $attributes['id'] ?>'),
                 connector = inspector.closest('.nos-dispatcher, body')
-                    .on('siteChange', function() {
-                        if (inspectorData.siteChange) {
+                    .on('contextChange', function() {
+                        if (inspectorData.contextChange) {
                             inspector.nostreegrid('option', 'treeOptions', {
-                                site : connector.data('nosSite') || ''
+                                context : connector.data('nosContext') || ''
                             });
                         }
                     }),
@@ -41,8 +41,8 @@ require(
                 var match = {
                         name : inspectorData.reloadEvent
                     };
-                if (connector.data('nosSite')) {
-                    match['site'] = connector.data('nosSite');
+                if (connector.data('nosContext')) {
+                    match['context'] = connector.data('nosContext');
                 }
                 inspector.nosListenEvent(match, function() {
                         parent.trigger('widgetReload');
@@ -55,7 +55,7 @@ require(
                 })
                 .nostreegrid($.extend({
                     treeOptions : {
-                        site : connector.data('nosSite') || ''
+                        context : connector.data('nosContext') || ''
                     },
                     columnsAutogenerationMode : 'none',
                     scrollMode : 'auto',

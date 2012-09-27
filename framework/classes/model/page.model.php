@@ -54,11 +54,11 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_behaviours = array(
         'Nos\Orm_Behaviour_Translatable' => array(
             'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'change_parent'),
-            'site_property'      => 'page_site',
-            'common_id_property' => 'page_site_common_id',
-            'is_main_property' => 'page_site_is_main',
+            'context_property'      => 'page_context',
+            'common_id_property' => 'page_context_common_id',
+            'is_main_property' => 'page_context_is_main',
             'invariant_fields'   => array(
-                //'page_parent_id', // Depends on the site, cannot be updated automagically
+                //'page_parent_id', // Depends on the context, cannot be updated automagically
                 //'page_template',
                 'page_level',
                 //'page_raw_html',
@@ -167,8 +167,8 @@ class Model_Page extends \Nos\Orm\Model
     {
         if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
             $page_external_link = $this->page_external_link;
-            if (empty($page_external_link) && !$this->is_main_site()) {
-                $page_external_link = $this->find_main_site()->page_external_link;
+            if (empty($page_external_link) && !$this->is_main_context()) {
+                $page_external_link = $this->find_main_context()->page_external_link;
             }
 
             return $page_external_link;
@@ -176,7 +176,7 @@ class Model_Page extends \Nos\Orm\Model
 
         $url = !empty($params['absolute']) ? Uri::base(false) : '';
 
-        if (!($this->page_home && $this->get_site() == key(\Config::get('sites')))) {
+        if (!($this->page_home && $this->get_context() == key(\Config::get('contexts')))) {
             $url .= $this->virtual_path();
         }
         if (!empty($params['preview'])) {
@@ -211,7 +211,7 @@ class Model_Page extends \Nos\Orm\Model
                     \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
                     $url_enhanced = \Config::get("data::url_enhanced", array());
-                    $url = $this->page_entrance && $this->get_site() == key(\Config::get('sites')) ? '' : $this->virtual_path(true);
+                    $url = $this->page_entrance && $this->get_context() == key(\Config::get('contexts')) ? '' : $this->virtual_path(true);
                     $url_enhanced[$url] = $this->page_id;
                     \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
                     \Config::set('data::url_enhanced', $url_enhanced);
@@ -221,7 +221,7 @@ class Model_Page extends \Nos\Orm\Model
                     $page_enhanced = \Config::get("data::page_enhanced", array());
                     $page_enhanced[$name][$this->page_id] = array(
                         'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
-                        'site' => $this->page_site,
+                        'context' => $this->page_context,
                         'published' => $this->published(),
                     );
 

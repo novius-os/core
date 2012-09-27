@@ -19,15 +19,15 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
         parent::form_item();
         if ($this->item->is_new()) {
             // The first page we create is a homepage
-            $site_has_home = (int) (bool) Model_Page::count(array(
+            $context_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
                     array('page_home', '=', 1),
-                    array('page_site', $this->item->page_site),
+                    array('page_context', $this->item->page_context),
                 ),
             ));
-            // $site_has_home is either 0 or 1 with the double cast
-            $this->item->page_home     = 1 - $site_has_home;
-            $this->item->page_entrance = 1 - $site_has_home;
+            // $context_has_home is either 0 or 1 with the double cast
+            $this->item->page_home     = 1 - $context_has_home;
+            $this->item->page_entrance = 1 - $context_has_home;
         }
     }
 
@@ -45,7 +45,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
         $fieldset = parent::fieldset($fieldset);
 
         $fieldset->field('page_parent_id')->set_widget_options(array(
-            'site' => $this->item->page_site,
+            'context' => $this->item->page_context,
         ));
 
         $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
@@ -85,20 +85,20 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             $this->item = $this->crud_item($id);
             $this->check_permission('homepage');
 
-            $sites = $this->item->get_all_site();
-            $pages_site = $this->item->find_site('all');
+            $contexts = $this->item->get_all_context();
+            $pages_context = $this->item->find_context('all');
             $pages_old = Model_Page::find('all', array(
                 'where' => array(
                     array('page_home', '=', 1),
-                    array('page_site', 'IN', $sites),
-                    array('page_id', 'NOT IN', array_keys($pages_site)),
+                    array('page_context', 'IN', $contexts),
+                    array('page_id', 'NOT IN', array_keys($pages_context)),
                 ),
             ));
 
-            foreach ($pages_site as $page_site) {
-                $page_site->page_home = 1;
-                $page_site->page_entrance = 1;
-                $page_site->save();
+            foreach ($pages_context as $page_context) {
+                $page_context->page_home = 1;
+                $page_context->page_entrance = 1;
+                $page_context->save();
             }
 
             foreach ($pages_old as $page_old) {
@@ -110,9 +110,9 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             $dispatchEvent = array(
                 'name' => get_class($this->item),
                 'action' => 'update',
-                'id' => array_merge(array_keys($pages_site), array_keys($pages_old)),
-                'site_common_id' => array($this->item->page_site_common_id),
-                'site' => array_values($sites),
+                'id' => array_merge(array_keys($pages_context), array_keys($pages_old)),
+                'context_common_id' => array($this->item->page_context_common_id),
+                'context' => array_values($contexts),
             );
 
             $body = array(

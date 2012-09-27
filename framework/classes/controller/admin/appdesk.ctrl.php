@@ -46,9 +46,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view = View::forge('admin/appdesk');
 
-        $sites = \Config::get('sites', array());
+        $contexts = \Config::get('contexts', array());
 
-        $view->set('appdesk', \Format::forge(array_merge(array('sites' => $sites), $this->config))->to_json(), false);
+        $view->set('appdesk', \Format::forge(array_merge(array('contexts' => $contexts), $this->config))->to_json(), false);
 
         return $view;
     }
@@ -89,7 +89,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 array(
                     'callback' => array_merge(\Arr::get($this->config['query'], 'callback', array()), array($where)),
                     'dataset' => $this->config['dataset'],
-                    'site' => Input::get('site', null),
+                    'context' => Input::get('context', null),
                     'limit' => intval(Input::get('limit', \Arr::get($this->config['query'], 'limit'))),
                     'offset' => intval(Input::get('offset', 0)),
                 )

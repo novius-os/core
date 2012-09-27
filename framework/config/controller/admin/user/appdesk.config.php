@@ -21,7 +21,7 @@ return array(
         'user_name',
         'user_email',
     ),
-    'hideSites' => true,
+    'hideContexts' => true,
     'selectedView' => 'default',
     'views' => array(
         'default' => array(

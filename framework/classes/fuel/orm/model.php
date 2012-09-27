@@ -323,22 +323,22 @@ class Model extends \Orm\Model
         return static::$_configs[$class];
     }
 
-    public function get_possible_site()
+    public function get_possible_context()
     {
         $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
         if (!$translatable || !$tree) {
-            return array_keys(\Config::get('sites'));
+            return array_keys(\Config::get('contexts'));
         }
 
-        // Return sites from parent if available
+        // Return contexts from parent if available
         $parent = $this->get_parent();
         if (!empty($parent)) {
-            return $parent->get_all_site();
+            return $parent->get_all_context();
         }
 
-        return array_keys(\Config::get('sites'));
+        return array_keys(\Config::get('contexts'));
     }
 
     /**
