@@ -138,6 +138,7 @@ class I18n
             if (empty($result)) {
                 $result = $default ?: $message;
             }
+            $result = sprintf('%s(%s)', $group, $result);
             return $result;
         };
     }

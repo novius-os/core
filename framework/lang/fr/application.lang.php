@@ -11,7 +11,7 @@ return array(
 	'Add' => 'Ajouter',
 
 	#: classes/controller/admin/crud.php:285
-	'successfully added' => 'Item ajoutée.',
+	'successfully added' => 'Item ajouté.',
 
 	#: classes/controller/admin/crud.php:285
 	'successfully saved' => 'Item enregistré.',
@@ -21,7 +21,7 @@ return array(
 
 	#: classes/controller/admin/crud.php:334
 	#: views/crud/tab.view.php:14
-	'item deleted' => 'Cet item a été supprimée.',
+	'item deleted' => 'Cet item a été supprimé.',
 
 	#: classes/controller/admin/crud.php:414
 	'visualise' => '',
@@ -45,7 +45,7 @@ return array(
 	'Edit in {lang}' => 'Modifier en {lang}',
 
 	#: classes/controller/admin/crud.php:494
-	'not found' => 'Item non trouvée',
+	'not found' => 'Item non trouvé',
 
 	#: classes/controller/admin/crud.php:591
 	'successfully deleted' => 'Item supprimé!',
@@ -55,22 +55,22 @@ return array(
 	'All' => 'Toutes',
 
 	#: classes/controller/admin/appdesk.ctrl.php:42
-	'page' => '',
+	'item' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:43
-	'pages' => '',
+	'items' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:44
-	'Showing {{x}} pages out of {{y}}' => '',
+	'Showing {{x}} items out of {{y}}' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:45
-	'Show 1 page' => '',
+	'Show 1 item' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:46
-	'No page' => '',
+	'No item' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:47
-	'Show all pages' => '',
+	'Show all items' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:48
 	'Grid' => 'Grille',
@@ -160,7 +160,7 @@ return array(
 	'error added in lang' => 'Cet item ne peut pas être ajouté en {lang}.',
 
 	#: views/crud/blank_slate.view.php:55
-	'item inexistent in lang yet' => 'Cet item n\'a pas encore été ajoutée en {lang}.',
+	'item inexistent in lang yet' => 'Cet item n\'a pas encore été ajouté en {lang}.',
 
 	#: views/crud/blank_slate.view.php:60
 	'To add this version, you have two options: ' => '',
@@ -224,29 +224,4 @@ return array(
 
 	#. Overwritten
 	'Cancel' => 'Annuler',
-
-	#. Overwritten
-	'addDropDown' => 'Choisissez une action',
-
-	#. Overwritten
-	'columns' => 'Colonnes',
-
-	#. Overwritten
-	'showFiltersColumns' => 'Filtrer les en-têtes',
-
-	#. Overwritten
-	'visibility' => 'Visibilité',
-
-	#. Overwritten
-	'settings' => 'Paramètres',
-
-	#. Overwritten
-	'vertical' => 'Vertical',
-
-	#. Overwritten
-	'horizontal' => 'Horizontal',
-
-	#. Overwritten
-	'hidden' => 'Caché',
-
 );

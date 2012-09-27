@@ -7,9 +7,6 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-use Nos\I18n;
-
-I18n::load('media', 'nos_media');
 
 return array(
     'query' => array(
@@ -58,28 +55,7 @@ return array(
             ),
         )
     ),
-    'i18n' => array(
-        'Pick' => __('Pick'),
-        'addDropDown' => __('Select an action'),
-        'columns' => __('Columns'),
-        'showFiltersColumns' => __('Filters column header'),
-        'visibility' => __('Visibility'),
-        'settings' => __('Settings'),
-        'vertical' => __('Vertical'),
-        'horizontal' => __('Horizontal'),
-        'hidden' => __('Hidden'),
-        'item' => __('media'),
-        'items' => __('medias'),
-        'showNbItems' => __('Showing {{x}} medias out of {{y}}'),
-        'showOneItem' => __('Show 1 media'),
-        'showNoItem' => __('No media'),
-        'showAll' => __('Show all medias'),
-        'views' => __('Views'),
-        'viewGrid' => __('Grid'),
-        'viewThumbnails' => __('Thumbnails'),
-        'preview' => __('Preview'),
-        'loading' => __('Loading...'),
-    ),
+    'i18n_file' => 'nos::media',
     'dataset' => array(
         'id' => 'media_id',
         'title' => 'media_title',

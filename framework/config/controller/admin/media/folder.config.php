@@ -11,13 +11,7 @@
 return array(
     'controller_url'  => 'admin/nos/media/folder',
     'model' => 'Nos\\Model_Media_Folder',
-    'messages' => array(
-        'successfully added' => __('Folder successfully added.'),
-        'successfully saved' => __('Folder successfully saved.'),
-        'successfully deleted' => __('The folder has successfully been deleted!'),
-        'item deleted' => __('This folder has been deleted.'),
-        'not found' => __('Folder not found'),
-    ),
+    'i18n_file' => 'nos::media_folder',
     'context_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/media.png',
@@ -72,7 +66,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
-                'value' => 'Save',
+                'value' => __('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',
             ),

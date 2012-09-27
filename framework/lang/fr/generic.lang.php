@@ -94,7 +94,7 @@ return array(
 	#: views/form/layout_save.view.php:17
 	#: views/form/action_or_cancel.view.php:14
 	#: views/admin/data_catcher/rss_form.view.php:115
-	'or' => '',
+	'or' => 'ou',
 
 	#: views/form/layout_save.view.php:17
 	#: views/form/action_or_cancel.view.php:16
@@ -251,6 +251,96 @@ return array(
 
 	#: config/admin/permissions.config.php:31
 	'Users' => '',
+
+	#. Overwritten
+	'successfully added' => 'Item successfully added.',
+
+	#. Overwritten
+	'successfully saved' => 'Item successfully saved.',
+
+	#. Overwritten
+	'successfully deleted' => 'The item has successfully been deleted!',
+
+	#. Overwritten
+	'you are about to delete, confim' => 'You are about to delete the item <span style=\"font-weight: bold;\">\":title\"</span>. Are you sure you want to continue?',
+
+	#. Overwritten
+	'you are about to delete' => 'You are about to delete the item <span style=\"font-weight: bold;\">\":title\"</span>.',
+
+	#. Overwritten
+	'exists in multiple lang' => 'This item exists in <strong>{count} languages</strong>.',
+
+	#. Overwritten
+	'delete in the following languages' => 'Delete this item in the following languages:',
+
+	#. Overwritten
+	'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
+
+	#. Overwritten
+	'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
+
+	#. Overwritten
+	'confirm deletion, enter number' => 'To confirm the deletion, you need to enter this number in the field below',
+
+	#. Overwritten
+	'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
+
+	#. Overwritten
+	'item deleted' => 'This item has been deleted.',
+
+	#. Overwritten
+	'not found' => 'Item not found',
+
+	#. Overwritten
+	'error added in lang not parent' => 'This item cannot be added {lang} because its {parent} is not available in this language yet.',
+
+	#. Overwritten
+	'error added in lang' => 'This item cannot be added {lang}.',
+
+	#. Overwritten
+	'item inexistent in lang yet' => 'This item has not been added in {lang} yet.',
+
+	#. Overwritten
+	'visualise' => 'Visualise',
+
+	#. Overwritten
+	'delete' => 'Delete',
+
+	#. Overwritten
+	'delete an item' => 'Delete an item',
+
+	#. Overwritten
+	'confirm deletion ok' => 'Confirm the deletion',
+
+	#. Overwritten
+	'confirm deletion or' => 'or',
+
+	#. Overwritten
+	'confirm deletion cancel' => 'Cancel',
+
+	#. Overwritten
+	'confirm deletion wrong_confirmation' => 'Wrong confirmation',
+
+	#. Overwritten
+	'add an item in lang' => 'Add a new item in {lang}',
+
+	# Overwritten
+	'item' => '',
+
+	# Overwritten
+	'items' => '',
+
+	# Overwritten
+	'Showing {{x}} items out of {{y}}' => '',
+
+	# Overwritten
+	'Show 1 item' => '',
+
+	# Overwritten
+	'No item' => '',
+
+	# Overwritten
+	'Show all items' => '',
 
 	#. Overwritten
 	'This field has to contain at least :param:1 characters.' => 'Au moins :param:1 caractères.',

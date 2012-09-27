@@ -55,6 +55,7 @@ return array(
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
     ),
+    'i18n_file' => 'nos::user',
     'dataset' => array(
         'id' => 'user_id',
         'fullname' => array(

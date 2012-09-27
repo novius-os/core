@@ -39,12 +39,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $this->config['i18n'] = array(
             // Appdesk: allLanguages
             'allLanguages' => $this->i18n('All'),
-            'item' => $this->i18n('page'),
-            'items' => $this->i18n('pages'),
-            'showNbItems' => $this->i18n('Showing {{x}} pages out of {{y}}'),
-            'showOneItem' => $this->i18n('Show 1 page'),
-            'showNoItem' => $this->i18n('No page'),
-            'showAll' => $this->i18n('Show all pages'),
+            'item' => $this->i18n('item'),
+            'items' => $this->i18n('items'),
+            'showNbItems' => $this->i18n('Showing {{x}} items out of {{y}}'),
+            'showOneItem' => $this->i18n('Show 1 item'),
+            'showNoItem' => $this->i18n('No items'),
+            'showAll' => $this->i18n('Show all item'),
             'viewGrid' => $this->i18n('Grid'),
             'viewTreeGrid' => $this->i18n('Tree grid'),
             'viewThumbnails' => $this->i18n('Thumbnails'),

@@ -289,34 +289,22 @@ return array(
 	#. Overwritten
 	'delete an item' => 'Supprimer une page',
 
-	#. Overwritten
-	'item' => 'page',
+	# Overwritten
+	'item' => '',
+
+	# Overwritten
+	'items' => '',
 
 	#. Overwritten
-	'items' => 'pages',
+	'Showing {{x}} items out of {{y}}' => 'Affichage de {{x}} pages sur total de {{y}}',
 
 	#. Overwritten
-	'showNbItems' => 'Showing {{x}} pages out of {{y}}',
+	'Show 1 item' => 'Affichage d\'une page',
 
 	#. Overwritten
-	'showOneItem' => 'Show 1 page',
+	'No item' => 'Aucune page',
 
 	#. Overwritten
-	'showNoItem' => 'No page',
-
-	#. Overwritten
-	'showAll' => 'Show all pages',
-
-	#. Overwritten
-	'Showing {{x}} pages out of {{y}}' => 'Affichage de {{x}} pages sur total de {{y}}',
-
-	#. Overwritten
-	'Show 1 page' => 'Affichage d\'une page',
-
-	#. Overwritten
-	'No page' => 'Aucune page',
-
-	#. Overwritten
-	'Show all pages' => 'Affichage de toutes les pages',
+	'Show all items' => 'Affichage de toutes les pages',
 
 );

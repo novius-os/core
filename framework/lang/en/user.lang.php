@@ -105,63 +105,6 @@ return array(
 	#: config/controller/admin/user/appdesk.config.php:127
 	'Email' => '',
 
-	#: config/controller/admin/user/appdesk.config.php:38
-	'Select an action' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:39
-	'Columns' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:40
-	'Filters column header' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:41
-	'Visibility' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:42
-	'Settings' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:43
-	'Vertical' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:44
-	'Horizontal' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:45
-	'Hidden' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:46
-	'user' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:47
-	'users' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:48
-	'Showing {{x}} users out of {{y}}' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:49
-	'Show 1 user' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:50
-	'No user' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:51
-	'Show all users' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:52
-	'Views' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:53
-	'Grid' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:54
-	'Thumbnails' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:55
-	'Preview' => '',
-
-	#: config/controller/admin/user/appdesk.config.php:56
-	'Loading...' => '',
-
 	#: config/controller/admin/user/appdesk.config.php:79
 	'Edit' => '',
 
@@ -173,5 +116,47 @@ return array(
 
 	#: config/controller/admin/user/appdesk.config.php:122
 	'Name' => '',
+
+	#. Overwritten
+	'successfully added' => '',
+
+	#. Overwritten
+	'successfully saved' => '',
+
+	#. Overwritten
+	'successfully deleted' => '',
+
+	#. Overwritten
+	'you are about to delete, confim' => '',
+
+	#. Overwritten
+	'you are about to delete' => '',
+
+	#. Overwritten
+	'item deleted' => '',
+
+	#. Overwritten
+	'not found' => '',
+
+	#. Overwritten
+	'delete an item' => '',
+
+	# Overwritten
+	'item' => '',
+
+	# Overwritten
+	'items' => '',
+
+	# Overwritten
+	'Showing {{x}} items out of {{y}}' => '',
+
+	# Overwritten
+	'Show 1 item' => '',
+
+	# Overwritten
+	'No item' => '',
+
+	# Overwritten
+	'Show all items' => '',
 
 );

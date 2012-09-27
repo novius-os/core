@@ -10,14 +10,7 @@
 return array(
     'controller_url' => 'admin/nos/user/user',
     'model' => 'Nos\\Model_User',
-    'messages' => array(
-        'successfully added' => __('User successfully added.'),
-        'successfully saved' => __('User successfully saved.'),
-        'successfully deleted' => __('The user has successfully been deleted!'),
-        'item deleted' => __('This user has been deleted.'),
-        'not found' => __('User not found'),
-        'delete an item' => __('Delete an user'),
-    ),
+    'i18n_file' => 'nos::user',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/user.png',
         'labels' => array(
@@ -118,7 +111,7 @@ return array(
                 'tag' => 'button',
                 'data-icon' => 'check',
                 'class' => 'primary',
-                'value' => 'Save',
+                'value' => __('Save'),
             ),
         ),
     ),

@@ -11,6 +11,7 @@
 return array(
     'controller_url'  => 'admin/nos/media/media',
     'model' => 'Nos\\Model_Media',
+    'i18n_file' => 'nos::media',
     'messages' => array(
         'successfully added' => __('Media successfully added.'),
         'successfully saved' => __('Media successfully saved.'),
@@ -75,7 +76,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
-                'value' => 'Save',
+                'value' => __('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',
             ),

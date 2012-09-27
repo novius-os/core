@@ -55,22 +55,22 @@ return array(
 	'All' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:42
-	'page' => '',
+	'item' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:43
-	'pages' => '',
+	'items' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:44
-	'Showing {{x}} pages out of {{y}}' => '',
+	'Showing {{x}} items out of {{y}}' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:45
-	'Show 1 page' => '',
+	'Show 1 item' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:46
-	'No page' => '',
+	'No items' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:47
-	'Show all pages' => '',
+	'Show all items' => '',
 
 	#: classes/controller/admin/appdesk.ctrl.php:48
 	'Grid' => '',
@@ -182,5 +182,46 @@ return array(
 
 	#: views/crud/blank_slate.view.php:93
 	'(Form filled with the content from the original version)' => '',
+	#. Overwritten
+	'Select an action' => '',
+
+	#. Overwritten
+	'Columns' => '',
+
+	#. Overwritten
+	'Filters column header' => '',
+
+	#. Overwritten
+	'Visibility' => '',
+
+	#. Overwritten
+	'Settings' => '',
+
+	#. Overwritten
+	'Vertical' => '',
+
+	#. Overwritten
+	'Horizontal' => '',
+
+	#. Overwritten
+	'Hidden' => '',
+
+	#. Overwritten
+	'Views' => 'Vues',
+
+	#. Overwritten
+	'Edit' => 'Modifier',
+
+	#. Overwritten
+	'Visualise' => 'Visualiser',
+
+	#. Overwritten
+	'Save' => 'Enregistrer',
+
+	#. Overwritten
+	'or' => 'ou',
+
+	#. Overwritten
+	'Cancel' => 'Annuler',
 
 );

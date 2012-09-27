@@ -12,37 +12,37 @@ return array(
     'data' => array(
         array(
             'id' => 'image',
-            'title' => 'Images',
+            'title' => __('Images'),
             'icon' => 'image.png',
         ),
         array(
             'id' => 'document',
-            'title' => 'Documents',
+            'title' => __('Documents'),
             'icon' => 'document-office.png',
         ),
         array(
             'id' => 'music',
-            'title' => 'Music',
+            'title' => __('Music'),
             'icon' => 'music-beam.png',
         ),
         array(
             'id' => 'video',
-            'title' => 'Videos',
+            'title' => __('Videos'),
             'icon' => 'film.png',
         ),
         array(
             'id' => 'archive',
-            'title' => 'Compressed archive',
+            'title' => __('Compressed archive'),
             'icon' => 'folder-zipper.png',
         ),
         array(
             'id' => 'text',
-            'title' => 'Textual content',
+            'title' => __('Textual content'),
             'icon' => 'document-text.png',
         ),
         array(
             'id' => 'other',
-            'title' => 'Other',
+            'title' => __('Other'),
             'icon' => 'book-question.png',
         ),
     ),

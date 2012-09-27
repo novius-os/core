@@ -289,7 +289,22 @@ return array(
 	#. Overwritten
 	'delete an item' => 'Delete a page',
 
-	#. Overwritten
-	'delete' => 'Delete',
+	# Overwritten
+	'item' => '',
+
+	# Overwritten
+	'items' => '',
+
+	# Overwritten
+	'Showing {{x}} items out of {{y}}' => '',
+
+	# Overwritten
+	'Show 1 item' => '',
+
+	# Overwritten
+	'No item' => '',
+
+	# Overwritten
+	'Show all items' => '',
 
 );

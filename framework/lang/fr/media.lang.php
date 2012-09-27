@@ -185,58 +185,6 @@ return array(
 	#: config/controller/admin/media/appdesk.config.php:62
 	'Pick' => '',
 
-	#: config/controller/admin/media/appdesk.config.php:64
-	'Select an action' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:65
-	'Columns' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:66
-	'Filters column header' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:67
-	'Visibility' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:68
-	'Settings' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:69
-	'Vertical' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:70
-	'Horizontal' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:71
-	'Hidden' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:72
-	'media' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:73
-	'medias' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:74
-	'Showing {{x}} medias out of {{y}}' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:75
-	'Show 1 media' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:76
-	'No media' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:77
-	'Show all medias' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:78
-	'Views' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:79
-	'Grid' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:80
-	'Thumbnails' => '',
-
-	#: config/controller/admin/media/appdesk.config.php:81
 	#: config/controller/admin/media/appdesk.config.php:390
 	'Preview' => '',
 
@@ -295,4 +243,45 @@ return array(
 	#: config/controller/admin/media/appdesk.config.php:398
 	'Path:' => '',
 
+	#. Overwritten
+	'successfully added' => '',
+
+	#. Overwritten
+	'successfully saved' => '',
+
+	#. Overwritten
+	'successfully deleted' => '',
+
+	#. Overwritten
+	'you are about to delete, confim' => '',
+
+	#. Overwritten
+	'you are about to delete' => '',
+
+	#. Overwritten
+	'item deleted' => '',
+
+	#. Overwritten
+	'not found' => '',
+
+	#. Overwritten
+	'delete an item' => 'Supprimer un média',
+
+	# Overwritten
+	'item' => '',
+
+	# Overwritten
+	'items' => '',
+
+	# Overwritten
+	'Showing {{x}} items out of {{y}}' => '',
+
+	# Overwritten
+	'Show 1 item' => '',
+
+	# Overwritten
+	'No item' => '',
+
+	# Overwritten
+	'Show all items' => '',
 );

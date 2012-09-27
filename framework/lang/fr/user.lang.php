@@ -174,4 +174,28 @@ return array(
 	#: config/controller/admin/user/appdesk.config.php:122
 	'Name' => '',
 
+	#. Overwritten
+	'successfully added' => '',
+
+	#. Overwritten
+	'successfully saved' => '',
+
+	#. Overwritten
+	'successfully deleted' => '',
+
+	#. Overwritten
+	'you are about to delete, confim' => '',
+
+	#. Overwritten
+	'you are about to delete' => '',
+
+	#. Overwritten
+	'item deleted' => '',
+
+	#. Overwritten
+	'not found' => '',
+
+	#. Overwritten
+	'delete an item' => '',
+
 );

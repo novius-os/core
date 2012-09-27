@@ -324,4 +324,47 @@ return array(
 	#. Overwritten
 	'add an item in lang' => 'Add a new item in {lang}',
 
+	# Overwritten
+	'item' => '',
+
+	# Overwritten
+	'items' => '',
+
+	# Overwritten
+	'Showing {{x}} items out of {{y}}' => '',
+
+	# Overwritten
+	'Show 1 item' => '',
+
+	# Overwritten
+	'No item' => '',
+
+	# Overwritten
+	'Show all items' => '',
+
+	#. Overwritten
+	'This field has to contain at least :param:1 characters.' => 'Au moins :param:1 caractères.',
+
+	#. Overwritten
+	'From {date}' => 'À partir du {date}',
+
+	#. Overwritten
+	'Root' => 'Racine',
+
+	#. Overwritten
+	'required' => 'Ce champ est obligatoire.',
+
+	#. Overwritten
+	'min_length' => 'Ce champ doit contenir au moins :param:1 caractères.',
+
+	#. Overwritten
+	'max_length' => 'Ce champ ne doit pas contenir plus que :param:1 caractères.',
+
+	#. Overwritten
+	'valid_date' => 'Cette date n\'existe pas.',
+
+	#. Overwritten
+	'check_old_password' => 'L\'ancien mot passe est invalide.',
+
+
 );
