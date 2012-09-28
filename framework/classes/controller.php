@@ -183,17 +183,17 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             }
         }
 
-        $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
+        $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable');
         $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
-        if ($translatable) {
+        if ($contextable) {
             if (empty($config['context'])) {
                 // No inspector, we only search items in their primary context
-                $query->where($translatable['is_main_property'], 1);
+                $query->where($contextable['is_main_property'], 1);
             } elseif (is_array($config['context'])) {
                 // Multiple contexts
-                $query->where($translatable['context_property'], 'IN', $config['context']);
+                $query->where($contextable['context_property'], 'IN', $config['context']);
             } else {
-                $query->where($translatable['context_property'], '=', $config['context']);
+                $query->where($contextable['context_property'], '=', $config['context']);
             }
             $common_ids = array();
             $keys = array();
@@ -280,13 +280,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $item['_id'] = $object->{$pk};
                 $item['_model'] = $model;
                 $items[] = $item;
-                if ($translatable) {
-                    $common_id = $object->{$translatable['common_id_property']};
+                if ($contextable) {
+                    $common_id = $object->{$contextable['common_id_property']};
                     $keys[] = $common_id;
-                    $common_ids[$translatable['common_id_property']][] = $common_id;
+                    $common_ids[$contextable['common_id_property']][] = $common_id;
                 }
             }
-            if ($translatable) {
+            if ($contextable) {
                 $contexts = $model::contexts($common_ids);
                 foreach ($contexts as $common_id => $list) {
                     $contexts[$common_id] = explode(',', $list);
@@ -621,7 +621,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
+                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Contextable')) {
                     $item = $model::find($params['id']);
                     $contexts = $item->get_all_context();
                     $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));

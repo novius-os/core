@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Orm_Behaviour_Translatable extends Orm_Behaviour
+class Orm_Behaviour_Contextable extends Orm_Behaviour
 {
     /**
      * context_property
@@ -183,7 +183,7 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
     }
 
     /**
-     * Returns null if the Model is not translatable. Returns true or false whether the object is in the main context.
+     * Returns null if the Model is not contextable. Returns true or false whether the object is in the main context.
      *
      * @return bool
      */

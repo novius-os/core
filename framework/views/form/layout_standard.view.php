@@ -49,8 +49,8 @@ if (!empty($medias)) {
 
 $contexts = array_keys(\Config::get('contexts'));
 if (!empty($item) && count($contexts) > 1) {
-    $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-    if ($translatable) {
+    $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
+    if ($contextable) {
         echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_context()).'</td>';
     }
 }

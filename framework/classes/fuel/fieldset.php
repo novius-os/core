@@ -409,11 +409,11 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($instance)) {
             return;
         }
-        $behaviour_translatable = $instance->behaviours('Nos\Orm_Behaviour_Translatable');
-        if (empty($behaviour_translatable) || $instance->is_main_context()) {
+        $behaviour_contextable = $instance->behaviours('Nos\Orm_Behaviour_Contextable');
+        if (empty($behaviour_contextable) || $instance->is_main_context()) {
             return;
         }
-        foreach ($behaviour_translatable['invariant_fields'] as $f) {
+        foreach ($behaviour_contextable['invariant_fields'] as $f) {
             $field = $this->field($f);
             if (!empty($field)) {
                 $field->set_attribute('readonly', true);

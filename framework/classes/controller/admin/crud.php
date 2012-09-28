@@ -99,7 +99,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $this->behaviours = array(
-            'translatable' => $model::behaviours('Nos\Orm_Behaviour_Translatable', false),
+            'contextable' => $model::behaviours('Nos\Orm_Behaviour_Contextable', false),
             'sharable' => $model::behaviours('Nos\Orm_Behaviour_Sharable', false),
             'tree' => $model::behaviours('Nos\Orm_Behaviour_Tree', false),
             'url' => $model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false),
@@ -131,8 +131,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             ),
             'item' => $this->item,
         );
-        if ($this->behaviours['translatable']) {
-            $view_params['crud']['context'] = $this->item->{$this->behaviours['translatable']['context_property']};
+        if ($this->behaviours['contextable']) {
+            $view_params['crud']['context'] = $this->item->{$this->behaviours['contextable']['context_property']};
         }
 
         $view_params['view_params'] = &$view_params;
@@ -175,27 +175,27 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if (!empty($create_from_id)) {
                 $this->item_from = $this->crud_item($create_from_id);
                 $this->item = clone $this->item_from;
-            } elseif (!empty($common_id) && $this->behaviours['translatable']) {
-                $this->item->{$this->behaviours['translatable']['common_id_property']} = $common_id;
+            } elseif (!empty($common_id) && $this->behaviours['contextable']) {
+                $this->item->{$this->behaviours['contextable']['common_id_property']} = $common_id;
             } elseif (!empty($context_id) && !empty($this->config['situation_relation'])) {
                 $model_context = $this->config['situation_relation']->model_to;
                 $this->item_situation = $model_context::find($context_id);
                 $this->item->{$this->config['situation_relation']->key_from[0]} = $this->item_situation->{$this->config['situation_relation']->key_to[0]};
             }
-            if ($this->behaviours['translatable']) {
-                $this->item->{$this->behaviours['translatable']['context_property']} = \Input::get('context', false) ? : key(\Config::get('contexts'));
+            if ($this->behaviours['contextable']) {
+                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(\Config::get('contexts'));
             }
-            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
+            if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
                 // New page: no parent
                 // Translation: we have a common_id and can determine the parent
-                if (!empty($this->item->{$this->behaviours['translatable']['common_id_property']})) {
+                if (!empty($this->item->{$this->behaviours['contextable']['common_id_property']})) {
                     $model = $this->config['model'];
-                    $item_context_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
+                    $item_context_common = $model::find($this->item->{$this->behaviours['contextable']['common_id_property']});
                     $item_parent = $item_context_common->get_parent();
 
                     // Fetch in the appropriate context
                     if (!empty($item_parent)) {
-                        $item_parent = $item_parent->find_context($this->item->{$this->behaviours['translatable']['context_property']});
+                        $item_parent = $item_parent->find_context($this->item->{$this->behaviours['contextable']['context_property']});
                     }
 
                     // Set manually, because set_parent doesn't handle new items
@@ -217,34 +217,34 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             );
         }
-        if ($this->behaviours['translatable']) {
+        if ($this->behaviours['contextable']) {
             $fields = \Arr::merge(
                 $fields,
                 array(
-                    $this->behaviours['translatable']['context_property'] => array(
+                    $this->behaviours['contextable']['context_property'] => array(
                         'form' => array(
                             'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['translatable']['context_property']},
+                            'value' => $this->item->{$this->behaviours['contextable']['context_property']},
                         ),
                     ),
-                    $this->behaviours['translatable']['common_id_property'] => array(
+                    $this->behaviours['contextable']['common_id_property'] => array(
                         'form' => array(
                             'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['translatable']['common_id_property']},
+                            'value' => $this->item->{$this->behaviours['contextable']['common_id_property']},
                         ),
                     ),
                 )
             );
         }
         if ($this->is_new) {
-            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
+            if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
                 $parent_id = $this->item->parent_relation()->key_from[0];
                 $fields = \Arr::merge(
                     $fields,
                     array(
                         $parent_id => array(
                             'widget_options' => array(
-                                'context' => $this->item->{$this->behaviours['translatable']['context_property']},
+                                'context' => $this->item->{$this->behaviours['contextable']['context_property']},
                             ),
                         ),
                     )
@@ -296,9 +296,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'action' => $this->is_new ? 'insert' : 'update',
             'id' => (int) $item->{$this->pk},
         );
-        if ($this->behaviours['translatable']) {
-            $dispatchEvent['context_common_id'] = (int) $item->{$this->behaviours['translatable']['common_id_property']};
-            $dispatchEvent['context'] = $item->{$this->behaviours['translatable']['context_property']};
+        if ($this->behaviours['contextable']) {
+            $dispatchEvent['context_common_id'] = (int) $item->{$this->behaviours['contextable']['common_id_property']};
+            $dispatchEvent['context'] = $item->{$this->behaviours['contextable']['context_property']};
         }
 
         $return = array(
@@ -315,7 +315,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function before_save($item, $data)
     {
-        if ($this->behaviours['translatable'] && $this->is_new) {
+        if ($this->behaviours['contextable'] && $this->is_new) {
 
             $item_context = $this->item->get_context();
             $existing = $this->item->find_context($item_context);
@@ -357,11 +357,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
 
-        if ($this->is_new || !$this->behaviours['translatable']) {
+        if ($this->is_new || !$this->behaviours['contextable']) {
             return $this->action_form($id);
         }
 
-        if ($this->behaviours['translatable']) {
+        if ($this->behaviours['contextable']) {
             $selected_context = \Input::get('context', $this->is_new ? null : $this->item->get_context());
 
             foreach ($this->item->get_all_context() as $context_id => $context) {
@@ -412,7 +412,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $params[$key] = $value;
                 }
             }
-            if ($this->behaviours['translatable']) {
+            if ($this->behaviours['contextable']) {
                 $params['context'] = $this->item->get_context();
             }
             if (count($params)) {
@@ -484,7 +484,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_actions_context()
     {
-        if (!$this->behaviours['translatable']) {
+        if (!$this->behaviours['contextable']) {
             return array();
         }
 
@@ -492,7 +492,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $contexts = array_keys(\Config::get('contexts'));
         $main_context = $this->item->find_main_context();
         foreach ($contexts as $locale) {
-            if ($this->item->{$this->behaviours['translatable']['context_property']} === $locale) {
+            if ($this->item->{$this->behaviours['contextable']['context_property']} === $locale) {
                 continue;
             }
             $item_context = $this->item->find_context($locale);
@@ -558,8 +558,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->delete();
 
-        if ($this->behaviours['translatable']) {
-            $dispatchEvent['context_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
+        if ($this->behaviours['contextable']) {
+            $dispatchEvent['context_common_id'] = $this->item->{$this->behaviours['contextable']['common_id_property']};
             $dispatchEvent['id'] = array();
             $dispatchEvent['context'] = array();
 
@@ -570,7 +570,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($context === 'all') {
                 foreach ($this->item->find_context('all') as $item_context) {
                     $dispatchEvent['id'][] = (int) $item_context->{$this->pk};
-                    $dispatchEvent['context'][] = $item_context->{$this->behaviours['translatable']['context_property']};
+                    $dispatchEvent['context'][] = $item_context->{$this->behaviours['contextable']['context_property']};
 
                     if ($this->behaviours['tree']) {
                         foreach ($item_context->get_ids_children(false) as $item_id) {
@@ -591,14 +591,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->check_permission('delete');
 
                 $dispatchEvent['id'][] = $this->item->{$this->pk};
-                $dispatchEvent['context'][] = $this->item->{$this->behaviours['translatable']['context_property']};
+                $dispatchEvent['context'][] = $this->item->{$this->behaviours['contextable']['context_property']};
                 if ($this->behaviours['tree']) {
                     foreach ($this->item->get_ids_children(false) as $item_id) {
                         $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
 
-                // Reassigns common_id if this item is the main context (with the 'after_delete' event from the Translatable behaviour)
+                // Reassigns common_id if this item is the main context (with the 'after_delete' event from the Contextable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 $this->item->delete();
             }

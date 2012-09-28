@@ -325,10 +325,10 @@ class Model extends \Orm\Model
 
     public function get_possible_context()
     {
-        $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
+        $contextable = static::behaviours('Nos\Orm_Behaviour_Contextable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
-        if (!$translatable || !$tree) {
+        if (!$contextable || !$tree) {
             return array_keys(\Config::get('contexts'));
         }
 

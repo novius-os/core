@@ -11,7 +11,7 @@
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <p>
 <?php
-if ($crud['behaviours']['translatable']) {
+if ($crud['behaviours']['contextable']) {
     $item_situations = $item->find_context('all');
     $context_count = count($item_situations);
 
@@ -20,7 +20,7 @@ if ($crud['behaviours']['translatable']) {
         // Count all children in the primary context
         foreach ($item_situations as $item_context) {
             foreach ($item_context->find_children_recursive(false) as $child) {
-                $children[$child->{$crud['behaviours']['translatable']['common_id_property']}] = true;
+                $children[$child->{$crud['behaviours']['contextable']['common_id_property']}] = true;
             }
         }
         $children_count = count($children);
