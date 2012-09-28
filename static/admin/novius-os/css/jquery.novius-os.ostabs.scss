@@ -157,9 +157,12 @@ body {
 
             .button {
                 overflow: hidden;
-                margin-top: 2px;
-                vertical-align: 15px;
                 display: inline-block;
+                line-height: 46px;
+
+                img {
+                    vertical-align: middle;
+                }
             }
 
             .menu {
@@ -168,9 +171,8 @@ body {
                 font-size: 14px;
                 font-weight: bold;
                 height: 33px;
-                vertical-align: 28px;
-                padding: 0px 10px;
-                padding-top: 13px;
+                vertical-align: top;
+                padding: 13px 10px 0;
                 cursor: pointer;
 
                 &:hover {
