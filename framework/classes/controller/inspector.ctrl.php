@@ -18,7 +18,7 @@ class Controller_Inspector extends Controller_Admin_Application {
         if (isset($config['model'])) {
             $inspector_path = static::get_path();
 
-            $item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
 
             if (!isset($config['appdesk']['inputName'])) {
                 $config['appdesk']['inputName'] = $config['input']['key'].'[]';
@@ -79,6 +79,8 @@ class Controller_Inspector extends Controller_Admin_Application {
                 if (!isset($config['appdesk'][$gridKey]['columns']['actions']['actions'])) {
                     $config['appdesk'][$gridKey]['columns']['actions']['actions'] = $item_actions;
                 }
+
+
             }
         }
         return $config;

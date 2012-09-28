@@ -84,7 +84,7 @@ class Controller_Inspector_Model extends Controller_Inspector
                 'visible' => false
             );
 
-            $item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
 
             if (!isset($config['dataset']['actions'])) {
                 $config['dataset']['actions'] = array();
@@ -119,6 +119,8 @@ class Controller_Inspector_Model extends Controller_Inspector
 
 
         }
+
+
         return parent::process_config($application, $config, $item_actions, $gridKey);
     }
 }

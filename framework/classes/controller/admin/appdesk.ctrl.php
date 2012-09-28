@@ -83,11 +83,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                     'column' => 'id',
                     'visible' => false
                 );
+            }
 
-                $config['dataset']['actions'] = array();
-                $item_actions = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
+            if (!isset($config['dataset']['actions'])) {
+                $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
                 foreach ($item_actions as $action_key => $action_value) {
+
                     if (isset($action_value['enabled'])) {
+
                         $config['dataset']['actions'][$action_key] = $action_value['enabled'];
                     }
                 }
@@ -109,6 +112,18 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['inspectors'] = array();
             }
 
+            if (!isset($config['toolbar'])) {
+                $config['toolbar'] = array();
+            }
+
+            if (!isset($config['toolbar']['models'])) {
+                $config['toolbar']['models'] = array($config['model']);
+            }
+
+            if (!isset($config['toolbar']['actions'])) {
+                $config['toolbar']['actions'] = array();
+            }
+
             $inspectors = array();
             foreach ($config['inspectors'] as $key => $value) {
                 if (is_array($value)) {
@@ -119,9 +134,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                     $inspector_config = \Config::loadConfiguration($application, $file_name);
                     $inspector_config = $inspector_name::process_config($application, $inspector_config);
                     $inspectors[$value] = $inspector_config;
+                    if (isset($inspector_config['model'])) {
+                        $config['toolbar']['models'][] = $inspector_config['model'];
+                    }
                 }
-
             }
+
             $config['inspectors'] = $inspectors;
 
             if (!isset($config['inputs'])) {
@@ -150,7 +168,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['actions'])) {
-                $config['appdesk']['actions'] = \Config::actions($application, array('model' => $config['model'], 'type' => 'list'));
+                $config['appdesk']['actions'] = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
             }
 
             if (!isset($config['appdesk']['appdesk'])) {
@@ -158,7 +176,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
-                $config['appdesk']['appdesk']['buttons'] = \Config::actions($application, array('type' => 'appdeskTop'));
+                $config['appdesk']['appdesk']['buttons'] = array();
+                $actions = \Arr::merge(\Config::actions(array('models' => $config['toolbar']['models'], 'type' => 'appdeskToolbar')), $config['toolbar']['actions']);
+                foreach ($actions as $key => $action) {
+                    if ($action !== false) {
+                        $config['appdesk']['appdesk']['buttons'][$key] = $action;
+                    }
+                }
             }
 
             if (!isset($config['appdesk']['appdesk']['splittersVertical'])) {

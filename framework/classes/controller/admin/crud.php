@@ -434,10 +434,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function get_actions()
     {
         list($application_name) = \Config::configFile(get_called_class());
-        $applicationActions = \Config::actions($application_name, array('model' => get_class($this->item), 'type' => 'item', 'item' => $this->item));
+        $applicationActions = \Config::actions(array('models' => array(get_class($this->item)), 'type' => 'item', 'item' => $this->item));
 
         $actions = array_values($this->get_actions_lang());
-        
+
         foreach ($applicationActions as $action) {
             if (!isset($action['enabled']) || $action['enabled']($this->item)) {
                 $actions[] = $action;
