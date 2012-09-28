@@ -108,9 +108,9 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             if (!isset($config['input']['query'])) {
                 $input_key = $config['input']['key'];
                 $config['input']['query'] = function($value, $query) use ($input_key) {
-                    \Debug::dump(isset($_REQUEST['inspectors'][$input_key]) ? $_REQUEST['inspectors'][$input_key] : false, $input_key, $value);
+                    //\Debug::dump(isset($_REQUEST['inspectors'][$input_key]) ? $_REQUEST['inspectors'][$input_key] : false, $input_key, $value);
                     if (is_array($value) && count($value) && $value[0]) {
-                        \Debug::dump('here');
+                        //\Debug::dump('here');
                         $table = explode('.', $input_key);
                         if (count($table) == 1) {
                             $query->where(array($input_key, 'in', $value));

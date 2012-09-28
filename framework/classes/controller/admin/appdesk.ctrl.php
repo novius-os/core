@@ -120,6 +120,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                     $inspector_config = $inspector_name::process_config($application, $inspector_config);
                     $inspectors[$value] = $inspector_config;
                 }
+
             }
             $config['inspectors'] = $inspectors;
 
@@ -211,6 +212,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
         }
 
+
+
         return $config;
     }
 
@@ -219,9 +222,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $config = $this->config;
         $where = function($query) use ($config) {
             foreach (\Arr::get($config, 'inputs', array()) as $input => $condition) {
-                $value = Input::get('inspectors.'.$input);
-                if (is_callable($condition)) {
-                    $query = $condition($value, $query);
+                $value = Input::get('inspectors');
+                if (isset($value[$input])) {
+                    $value = $value[$input];
+                    if (is_callable($condition)) {
+                        $query = $condition($value, $query);
+                    }
                 }
             }
 
