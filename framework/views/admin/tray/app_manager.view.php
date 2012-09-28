@@ -163,7 +163,7 @@ if ($allow_upload) {
                     $container.nosFormUI();
 
                     $container.nosTabs('update', {
-                        label: <?= \Format::forge(__('Application manager'))->to_json() ?>,
+                        label: <?= \Format::forge(__('Applications manager'))->to_json() ?>,
                         url:  'admin/nos/tray/appmanager',
                         iconUrl: 'static/novius-os/admin/novius-os/img/32/app-manager.png',
                         app: true,
