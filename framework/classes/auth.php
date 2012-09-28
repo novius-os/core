@@ -16,11 +16,14 @@ class Auth
 
     public static function login($login, $password, $remember_me = true)
     {
-        $user = Model_User::find('all', array(
-            'where' => array(
-                'user_email' => $login,
-            ),
-        ));
+        $user = Model_User::find(
+            'all',
+            array(
+                'where' => array(
+                    'user_email' => $login,
+                ),
+            )
+        );
         if (empty($user)) {
             return false;
         }

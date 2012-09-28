@@ -14,7 +14,9 @@ use Fuel\Core\Cache;
 use Fuel\Core\Config;
 use View;
 
-class NotFoundException extends \Exception {}
+class NotFoundException extends \Exception
+{
+}
 
 class Controller_Front extends Controller
 {

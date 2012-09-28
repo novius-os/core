@@ -54,12 +54,12 @@ return array(
                 'tab' => array(
                     'label' => __('Help'),
                     'url' => 'admin/nos/tray/help',
-                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/help.png',
                 ),
             ),
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/help.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/help.png',
-            'application' => 'nos',
+            'application' => 'nos_tray',
         ),
         'nos_account' => array(
             'name' => 'My account',
@@ -68,12 +68,12 @@ return array(
                 'tab' => array(
                     'label' => __('Account'),
                     'url' => 'admin/nos/tray/account',
-                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/myaccount.png',
                 ),
             ),
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/myaccount.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/myaccount.png',
-            'application' => 'nos',
+            'application' => 'nos_tray',
         ),
         'nos_appmanager' => array(
             'name' => 'Application manager',
@@ -82,12 +82,12 @@ return array(
                 'tab' => array(
                     'label' => __('Application manager'),
                     'url' => 'admin/nos/tray/appmanager',
-                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
+                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/app-manager.png',
                 ),
             ),
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/app-manager.png',
             'icon64' => 'static/novius-os/admin/novius-os/img/64/app-manager.png',
-            'application' => 'nos',
+            'application' => 'nos_tray',
         ),
     ),
     'data_catchers' => array(

@@ -220,7 +220,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     public function action_json()
     {
         $config = $this->config;
-        $where = function($query) use ($config) {
+        $where = function ($query) use ($config) {
             foreach (\Arr::get($config, 'inputs', array()) as $input => $condition) {
                 $value = Input::get('inspectors');
                 if (isset($value[$input])) {
@@ -250,18 +250,23 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             return $query;
         };
 
-        $return = $this->items(array_merge($this->config['query'], array(
-            'callback' => array_merge(\Arr::get($this->config['query'], 'callback', array()), array($where)),
-            'dataset' => $this->config['dataset'],
-            'lang' => Input::get('lang', null),
-            'limit' => intval(Input::get('limit', \Arr::get($this->config['query'], 'limit'))),
-            'offset' => intval(Input::get('offset', 0)),
-        )));
+        $return = $this->items(
+            array_merge(
+                $this->config['query'],
+                array(
+                    'callback' => array_merge(\Arr::get($this->config['query'], 'callback', array()), array($where)),
+                    'dataset' => $this->config['dataset'],
+                    'lang' => Input::get('lang', null),
+                    'limit' => intval(Input::get('limit', \Arr::get($this->config['query'], 'limit'))),
+                    'offset' => intval(Input::get('offset', 0)),
+                )
+            )
+        );
 
         $json = array(
             'get' => '',
-            'query' =>  '',
-            'query2' =>  '',
+            'query' => '',
+            'query2' => '',
             'offset' => $return['offset'],
             'items' => $return['items'],
             'total' => $return['total'],
@@ -283,7 +288,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     public function action_tree_json()
     {
         $tree_config = $this->config['tree'];
-        $tree_config['id'] =  $this->config['configuration_id'];
+        $tree_config['id'] = $this->config['configuration_id'];
 
         $json = $this->tree($tree_config);
 

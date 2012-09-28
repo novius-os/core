@@ -49,7 +49,7 @@ if ($crud['behaviours']['translatable']) {
                     ?>
                     <option value="<?= $item_lang->get_lang() ?>"><?= \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang()); ?></option>
                     <?php
-                    }
+                }
                 ?>
                 </select>
                 <?php

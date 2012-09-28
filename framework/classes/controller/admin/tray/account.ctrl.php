@@ -71,8 +71,7 @@ class Controller_Admin_Tray_Account extends \Controller
             array(
                 'form_name' => 'edit_user_display',
                 'complete' =>
-                    function ($data) use ($user)
-                    {
+                    function ($data) use ($user) {
                         $body = array();
 
                         try {

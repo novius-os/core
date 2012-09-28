@@ -47,7 +47,7 @@ if (array_key_exists(\Nos\DataCatcher::TYPE_TEXT, $nugget) && empty($filter) || 
 <div id="<?= $id ?>">
 <?php
 echo $fieldset->open($action);
-$fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td><td class=\"use_default\">{default}</td></tr>\n");
+$fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td><td class=\"use_default\">{default}</td></tr>\n");
 echo $fieldset->build_hidden_fields();
 echo \View::forge('form/fields', array(
     'fieldset' => $fieldset,

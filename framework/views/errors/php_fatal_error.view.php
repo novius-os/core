@@ -32,8 +32,8 @@ if (\Input::is_ajax()) {
 ?>
 
 <!--
-<?php echo $type; ?> [ <?php echo $severity; ?> ]: <?php echo $message; ?>
-<?php echo $filepath; ?> @ line <?php echo $error_line; ?>
+<?= $type ?> [ <?= $severity ?> ]: <?= $message ?>
+<?= $filepath ?> @ line <?= $error_line ?>
 
 <?php
 foreach ($backtrace as $trace) {
@@ -110,16 +110,16 @@ ob_start();
 
         <div id="error" style="display:none;">
 
-        <p class="intro"><?php echo $type; ?> [ <?php echo $severity; ?> ]: <?php echo $message; ?></p>
+        <p class="intro"><?= $type ?> [ <?= $severity ?> ]: <?= $message ?></p>
 
-        <h2 class="first"><?php echo $filepath; ?> @ line <?php echo $error_line; ?></h2>
+        <h2 class="first"><?= $filepath ?> @ line <?= $error_line ?></h2>
 
 <?php
 if (is_array($debug_lines)) {
     ?>
     <pre class="fuel_debug_source"><?php
     foreach ($debug_lines as $line_num => $line_content) { ?>
-        <span<?php echo ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
+        <span<?= ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content . PHP_EOL ?>
         </span></span><?php
     } ?></pre>
     <?php
@@ -134,11 +134,11 @@ foreach ($backtrace as $trace) {
     $debug_lines = \Debug::file_lines($trace['file'], $trace['line']);
     ?>
             <li>
-                <a href="#" onclick="javascript:fuel_toggle('backtrace_<?php echo $id; ?>');return false;"><?php echo \Fuel::clean_path($trace['file']).' @ line '.$trace['line']; ?></a>
+                <a href="#" onclick="javascript:fuel_toggle('backtrace_<?= $id ?>');return false;"><?= \Fuel::clean_path($trace['file']).' @ line '.$trace['line'] ?></a>
                 <div id="backtrace_<?php echo $id; ?>" class="backtrace_block">
                 <pre class="fuel_debug_source"><?php
     foreach ($debug_lines as $line_num => $line_content) { ?>
-                <span<?php echo ($line_num == $trace['line']) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
+                <span<?= ($line_num == $trace['line']) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content . PHP_EOL ?>
                 </span></span><?php
     } ?></pre>
                 </div>
@@ -160,16 +160,19 @@ if (count($non_fatal) > 0) {
         $debug_lines = \Debug::file_lines($orig_filepath, $error_line);
         ?>
             <li>
-                <a href="#" onclick="javascript:fuel_toggle('non_fatal_<?php echo $id; ?>');return false;"><?php echo $severity; ?>: <?php echo $message; ?> in <?php echo $filepath; ?> @ line <?php echo $error_line; ?></a>
+                <a href="#" onclick="javascript:fuel_toggle('non_fatal_<?= $id ?>');return false;"><?= $severity ?>: <?= $message ?> in <?= $filepath ?> @ line <?= $error_line ?></a>
                 <div id="non_fatal_<?php echo $id; ?>" class="backtrace_block">
                 <pre class="fuel_debug_source"><?php
         foreach ($debug_lines as $line_num => $line_content) { ?>
-                <span<?php echo ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"'; ?>><span class="fuel_line_number"><?php echo str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT); ?></span><span class="fuel_line_content"><?php echo $line_content . PHP_EOL; ?>
+                <span<?= ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content . PHP_EOL ?>
                 </span></span><?php
         } ?></pre>
                 </div>
             </li>
-        <?php } ?>
+
+        <?php
+    }
+    ?>
         </ol>
     <?php
 }
