@@ -777,7 +777,7 @@ define('jquery-nos-ostabs',
                     self.openRank = tab.openRank + 1;
                 }
 
-                var a = $( '<a href="' + tab.url + '"></a>' );
+                var a = $( '<a href="' + tab.url + '" onclick="return false;"></a>' );
                 if (tab.iframe) {
                     a.data( "iframe.tabs", true );
                 }
