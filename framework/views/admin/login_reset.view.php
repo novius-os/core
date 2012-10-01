@@ -9,14 +9,15 @@
  */
 
 ?>
+<html>
+<head></head>
+<body>
 <script type="text/javascript">
-require(
-    ['jquery-nos'],
-    function($) {
-        var top = window;
-        while (top.parent != top) {
-            top = top.parent;
-        }
-        top.location = 'admin/nos/login';
-    });
+    var top = window;
+    while (top.parent != top) {
+        top = top.parent;
+    }
+    top.location = '/admin/nos/login';
 </script>
+</body>
+</html>

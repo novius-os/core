@@ -99,6 +99,11 @@ $large = !empty($large) && $large == true;
             $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
             foreach ((array) $subtitle as $name) {
                 $field = $fieldset->field($name);
+                $field_template = $field->template;
+                if (!empty($field_template)) {
+                    $field_template = str_replace(array('<tr>', '</tr>', '<td>', '</td>'), '', $field_template);
+                    $field->set_template($field_template);
+                }
                 $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
                 echo "\t\t<td>",
                     $field

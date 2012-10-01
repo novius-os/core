@@ -44,6 +44,12 @@ body {
     vertical-align: middle;
     padding: 0 2em 0 1em;
 }
+a {
+    color: #555;
+}
+a:hover {
+    color: #6EA4D3;
+}
 </style>
 
 </head>
@@ -54,11 +60,11 @@ body {
 
         <h2>I want a <strong>website</strong></h2>
         <p>Novius OS is a CMS: you can create pages and manage your content. Once set up, your website will show here.</p>
-        <p><a href="https://github.com/novius-os/novius-os/wiki/Front-office" target="_blank">Check out our guide</a> to get started.</p>
+        <p><a href="https://github.com/novius-os/novius-os/wiki/%28EN%29-How-to-set-up-the-front-office" target="_blank">Check out our guide</a> to get started.</p>
 
         <h2>I want an <strong>application</strong></h2>
-        <p>Novius OS is a web OS and framework: you can create applications that fits your business logic.         </p>
-        <p>A guide will be available in the near future to explain how to create your first application.         </p>
+        <p>Novius OS is a web OS and framework: you can create custom applications which fit your business logic.</p>
+        <p><a href="https://github.com/novius-os/novius-os/wiki/%28EN%29-Applications" target="_blank">Have a look at the documentation</a> and <a href="https://github.com/novius-os/noviusos_monkey" target="_blank">copy the sample application</a> to get started.</p>
 
         <h2>I don't know</h2>
         <p><a href="admin">Go to the administration panel</a>, it's a good place to start.</p>

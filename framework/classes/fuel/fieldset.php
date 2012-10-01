@@ -266,7 +266,6 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (!empty($settings['widget'])) {
                  $class = $settings['widget'];
                  $attributes['widget_options'] = \Arr::get($settings, 'widget_options', array());
-                 $attributes['widget_options']['instance'] = \Arr::get($options, 'instance', null);
                  $field = new $class($p, $label, $attributes, array(), $this);
                  $this->add_field($field);
             } else {

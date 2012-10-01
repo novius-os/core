@@ -46,9 +46,8 @@ class Controller_Admin_Login extends Controller
 
     public function action_reset()
     {
-        $this->template->body = \View::forge('admin/login_reset');
-
-        return $this->template;
+        // Bypass the template
+        return \Response::forge(\View::forge('admin/login_reset'));
     }
 
     public function after($response)

@@ -18,7 +18,6 @@
                     $toolbar = $container.nosToolbar('create'),
                     $buttons = [],
                     is_new = <?= \Format::forge($crud['is_new'])->to_json(); ?>,
-                    common_id = <?= \Format::forge($crud['behaviours']['translatable'] ? $item->{$crud['behaviours']['translatable']['common_id_property']} : false)->to_json(); ?>,
                     addButtons = function(actions) {
                         $.each(actions, function() {
                             var button = this,
@@ -88,17 +87,17 @@
                         }
                     });
 
-                if (!is_new || !!common_id) {
+                if (!is_new) {
                     $container.nosListenEvent({
                             name: <?= \Format::forge($crud['model'])->to_json(); ?>
                         }, function() {
                             $container.nosAjax({
                                 url: <?= \Format::forge($crud['url_actions'])->to_json(); ?>,
                                 type: 'GET',
-                                data: {
-                                    common_id: common_id,
-                                    lang: <?= \Format::forge($crud['lang'])->to_json(); ?>
-                                },
+                                data: <?= \Format::forge($crud['behaviours']['translatable'] ? array(
+                                    'common_id' => $item->{$crud['behaviours']['translatable']['common_id_property']},
+                                    'lang' => $crud['lang'],
+                                ) : '')->to_json(); ?>,
                                 success: function(json) {
                                     $.each($buttons, function() {
                                         $(this).remove();
