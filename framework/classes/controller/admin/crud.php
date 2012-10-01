@@ -125,6 +125,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'config' => $this->config,
                 'url_form'  => $this->config['controller_url'].'/form',
                 'url_insert_update'  => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
+                'url_actions'  => $this->config['controller_url'].'/json_actions'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
                 'actions' => $this->get_actions(),
                 'tab_params' => $this->get_tab_params(),
@@ -383,6 +384,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $view_params['view_params'] = &$view_params;
 
         return \View::forge('nos::crud/blank_slate', $view_params, false);
+    }
+
+    public function action_json_actions($id = null)
+    {
+        $this->item = $this->crud_item($id);
+        $this->is_new = $this->item->is_new();
+
+        if (empty($this->item)) {
+            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+        }
+
+        \Response::json($this->get_actions());
     }
 
     protected function get_tab_params()
