@@ -15,6 +15,7 @@ define('jquery-nos-validate',
             if (!self.counter) {
                 self.counter = 1;
             }
+            var $element = $(element);
 
             var label = this.errorsFor( element );
             if ( label.length ) {
@@ -80,7 +81,7 @@ define('jquery-nos-validate',
                 tooltip.find('.wijmo-wijtooltip-container').addClass('ui-state-error ui-corner-all');
 
                 label.click(function() {
-                    if (tooltip.is(':hidden')) {
+                    if (tooltip.is(':hidden') && !$element.is('.media')) {
                         label.data('wijtooltip-manuallyclosed', false);
                         label.wijtooltip('show');
                     } else {
@@ -90,6 +91,15 @@ define('jquery-nos-validate',
                 });
 
                 var accordion_header = $(element).closest('.ui-accordion-content').prev().addClass( this.settings.errorClass ).removeClass( this.settings.validClass );
+
+                if ($element.hasClass('media')) {
+                    label.insertAfter($element.closest('.ui-inputfilethumb'));
+                    $element.closest('.ui-inputfilethumb').find('.ui-inputfilethumb-thumb').addClass( this.settings.errorClass ).removeClass( this.settings.validClass );
+                    $element.bind('change.validation', function() {
+                        // Re-run validation to hide the label if necessary
+                        $(this).valid();
+                    });
+                }
 
                 accordion_header.closest('.ui-accordion').unbind('wijaccordionselectedindexchanged').bind('wijaccordionselectedindexchanged', function(e, args) {
                     var contents = $(this).find('.ui-accordion-content');
@@ -118,6 +128,11 @@ define('jquery-nos-validate',
                 label.wijtooltip('hide');
                 label.wijtooltip('destroy');
                 label.closest('.ui-accordion-content').prev().addClass( this.settings.validClass ).removeClass( this.settings.errorClass );
+
+                if ($element.hasClass('media')) {
+                    $element.closest('.ui-inputfilethumb').find('.ui-inputfilethumb-thumb').addClass( this.settings.validClass ).removeClass( this.settings.errorClass );
+                    $element.unbind('change.validation');
+                }
                 label.removeClass( this.settings.errorClass ).addClass( this.settings.validClass );
                 label.remove();
             }
