@@ -824,7 +824,10 @@ define('jquery-nos-appdesk',
                     position = self.uiGrid.offset(),
                     positionContainer = self.element.offset(),
                     height = self.element.height() - position.top + positionContainer.top,
-                    heights = $.grid.getHeights();
+                    heights = $.grid.getHeights(),
+                    grid = $.extend(true, {}, o.grid);
+
+                self._columnsMultiContext(grid.columns);
 
                 self.uiGrid.css({
                         height : height,
@@ -938,7 +941,7 @@ define('jquery-nos-appdesk',
                         loaded: function() {
                             self.uiSplitterHorizontalBottom.find('.wijmo-wijgrid-footer').prepend(self.uiPaginationLabel);
                         }
-                    }, o.grid));
+                    }, grid));
 
                 return self;
             },
@@ -949,9 +952,12 @@ define('jquery-nos-appdesk',
                     position = self.uiTreeGrid.offset(),
                     positionContainer = self.element.offset(),
                     height = self.element.height() - position.top + positionContainer.top,
-                    grid = $.extend(true, {}, o.grid);
+                    grid = $.extend(true, {}, o.grid),
+                    columns = $.extend({}, o.treeGrid.columns || o.grid.columns);
 
                 delete grid.columns;
+
+                self._columnsMultiContext(columns);
 
                 self.uiTreeGrid.css({
                         height : height,
@@ -1107,6 +1113,23 @@ define('jquery-nos-appdesk',
                             }
                         }
                     }, o.thumbnails));
+
+                return self;
+            },
+
+            _columnsMultiContext : function(columns) {
+                var self = this,
+                    o = self.options;
+
+                if (Object.keys(o.contexts).length > 1 && !o.hideContexts) {
+                    $.each(columns, function(i, column) {
+                        if (column.dataKey === 'context') {
+                            column.visible = o.selectedContexts.length > 1;
+                        } else if (column.multiContextHide && o.selectedContexts.length > 1) {
+                            column.visible = false;
+                        }
+                    });
+                }
 
                 return self;
             },
