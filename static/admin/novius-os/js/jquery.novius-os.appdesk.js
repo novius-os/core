@@ -35,6 +35,8 @@ define('jquery-nos-appdesk',
                     viewGrid : 'Grid',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
+                    contextsPopinTitle : 'Select sites / locales displayed',
+                    contextsPopinOk : 'Ok'
                 },
                 values: {},
                 //callbabks
@@ -216,7 +218,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(first.action, {
-                                    context: o.selectedContexts
+                                    context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
                         });
 
@@ -230,7 +232,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(add.action, {
-                                    context: o.selectedContexts
+                                    context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
                         });
 
@@ -278,11 +280,11 @@ define('jquery-nos-appdesk',
                     });
                 });
                 self.uiToolbarContextsDialog.wijdialog({
-                        title: 'Select sites / locales displayed',
+                        title:o.texts.contextsPopinTitle,
                         autoOpen: false,
                         buttons: [
                             {
-                                text: 'Ok',
+                                text:o.texts.contextsPopinOk,
                                 click: function(){
                                     o.selectedContexts = [];
                                     self.uiToolbarContextsDialog.find(':checked').each(function() {

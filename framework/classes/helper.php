@@ -12,34 +12,36 @@ namespace Nos;
 
 class Helper
 {
-    public static $contexts = array();
-
-    public static function _init()
+    public static function flag_url($context)
     {
-
-        \Config::load('contexts', true);
-        static::$contexts = \Config::get('contexts', array());
-    }
-
-    public static function flag_url($locale)
-    {
-        // Convert lang_LOCALE to locale
-        list($lang, $country) = explode('_', $locale.'_');
-        if (!empty($country)) {
-            $lang = mb_strtolower($country);
-        }
-        switch ($lang) {
-            case 'en':
-                $lang = 'gb';
-                break;
+        $site_locale = self::site_locale($context);
+        if (!empty($site_locale['locale']) && !empty($site_locale['locale']['flag'])) {
+            $lang = $site_locale['locale']['flag'];
+        } else {
+            $site_locale = self::site_locale_code($context);
+            $locale = $site_locale['locale'];
+            if (empty($locale)) {
+                $locale = $site_locale['site'];
+            }
+            // Convert lang_LOCALE to locale
+            list($lang, $country) = explode('_', $locale.'_');
+            if (!empty($country)) {
+                $lang = mb_strtolower($country);
+            }
+            switch ($lang) {
+                case 'en':
+                    $lang = 'gb';
+                    break;
+            }
         }
 
         return 'static/novius-os/admin/novius-os/img/flags/'.$lang.'.png';
     }
 
-    public static function flag($locale)
+    public static function flag($context)
     {
-        return '<img src="'.static::flag_url($locale).'" title="'.\Arr::get(static::$contexts, $locale, $locale).'" /> ';
+        $site_locale = self::site_locale($context);
+        return '<img src="'.static::flag_url($context).'" title="'.(!empty($site_locale['locale']) && !empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $site_locale['locale']).'" /> ';
     }
 
     public static function flag_empty()
@@ -47,4 +49,25 @@ class Helper
         return '<span style="display:inline-block; width:16px;"></span> ';
     }
 
+    public static function site_locale_code($context)
+    {
+        list($site, $locale) = explode('::', $context, 2);
+
+        return array(
+            'site' => $site,
+            'locale' => $locale,
+        );
+    }
+
+    public static function site_locale($context)
+    {
+        $locales = \Config::get('locales', array());
+        $sites = \Config::get('sites', array());
+        $site_locale = self::site_locale_code($context);
+
+        return array(
+            'site' => $sites[$site_locale['site']],
+            'locale' => $locales[$site_locale['locale']],
+        );
+    }
 }

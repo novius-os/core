@@ -51,7 +51,10 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $sites = \Config::get('sites', array());
 
         foreach ($contexts as $context => $params) {
-            list($site, $locale) = explode('::', $context, 2);
+            $site = null;
+            $locale = null;
+            // Create 2 variables, $site and $locale
+            extract(Helper::site_locale_code($context));
 
             if (!isset($sites[$site]['locales'])) {
                 $sites[$site]['locales'] = array();
