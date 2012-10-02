@@ -191,7 +191,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $query->where($contextable['is_main_property'], 1);
             } elseif (is_array($config['context'])) {
                 // Multiple contexts
-                $query->where($contextable['context_property'], 'IN', $config['context']);
+                $query->where($contextable['is_main_property'], 1);
+                $query->where($contextable['common_id_property'], 'IN', \DB::select($contextable['common_id_property'])->from($model::table())->where($contextable['context_property'], 'IN', $config['context']));
             } else {
                 $query->where($contextable['context_property'], '=', $config['context']);
             }

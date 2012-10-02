@@ -47,8 +47,33 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $view = View::forge('admin/appdesk');
 
         $contexts = \Config::get('contexts', array());
+        $locales = \Config::get('locales', array());
+        $sites = \Config::get('sites', array());
 
-        $view->set('appdesk', \Format::forge(array_merge(array('contexts' => $contexts), $this->config))->to_json(), false);
+        foreach ($contexts as $context => $params) {
+            list($site, $locale) = explode('::', $context, 2);
+
+            if (!isset($sites[$site]['locales'])) {
+                $sites[$site]['locales'] = array();
+            }
+            $sites[$site]['locales'][] = $locale;
+
+            if (!isset($locales[$locale]['sites'])) {
+                $locales[$locale]['sites'] = array();
+            }
+            $locales[$locale]['sites'][] = $site;
+        }
+
+        $params = array_merge(
+            array(
+                'contexts' => $contexts,
+                'locales' => $locales,
+                'sites' => $sites,
+            ),
+            $this->config
+        );
+
+        $view->set('appdesk', \Format::forge($params)->to_json(), false);
 
         return $view;
     }
