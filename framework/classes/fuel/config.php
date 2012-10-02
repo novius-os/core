@@ -138,6 +138,12 @@ class Config extends \Fuel\Core\Config
         return $config;
     }
 
+    public static function metadata($application_name)
+    {
+        \Config::load($application_name.'::metadata', true);
+        return \Config::get($application_name.'::metadata');
+    }
+
     public static function application($application_name)
     {
         return static::extendable_load($application_name, 'config');
@@ -207,6 +213,12 @@ class Config extends \Fuel\Core\Config
             }
         }
         return $obj;
+    }
+
+    public static function icon($application_name, $icon_key) {
+        \Config::load($application_name.'::metadata', true);
+        $metadata = \Config::get($application_name.'::metadata');
+        return $metadata['icons'][$icon_key];
     }
 
 }

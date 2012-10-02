@@ -76,6 +76,10 @@ class Controller_Inspector_Model extends Controller_Inspector
                 $config['query'] = $admin_config['query'];
             }
 
+            if (!isset($config['query']['model'])) {
+                $config['query']['model'] = $config['model'];
+            }
+
             if (!isset($config['dataset'])) {
                 $config['dataset']  = $admin_config['dataset'];
             }

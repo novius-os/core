@@ -65,12 +65,16 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             $inspectors_class_prefix[count($inspectors_class_prefix) - 1] = 'Inspector';
             $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
 
-            $application_config = \Config::application($application);
+            $application_config = \Config::metadata($application);
 
             $admin_config = $config['model']::admin_config();
 
             if (!isset($config['query'])) {
                 $config['query'] = $admin_config['query'];
+            }
+
+            if (!isset($config['query']['model'])) {
+                $config['query']['model'] = $config['model'];
             }
 
             if (!isset($config['search_text'])) {
@@ -79,11 +83,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             if (!isset($config['dataset'])) {
                 $config['dataset'] = $admin_config['dataset'];
-                $config['dataset']['id'] = array(
-                    'column' => 'id',
-                    'visible' => false
-                );
             }
+            $config['dataset']['id'] = array(
+                'column' => 'id',
+                'visible' => false
+            );
 
             if (!isset($config['dataset']['actions'])) {
                 $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
@@ -158,8 +162,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             if (!isset($config['appdesk']['tab'])) {
                 $config['appdesk']['tab'] = array(
-                    'label' => $application_config['application']['name'],
-                    'iconUrl' => $application_config['application']['icons']['medium'],
+                    'label' => $application_config['name'],
+                    'iconUrl' => \Config::icon($application, 32),
                 );
             }
 
@@ -189,7 +193,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 if (isset($config['splittersVertical'])) {
                     $config['appdesk']['appdesk']['splittersVertical'] = $config['splittersVertical'];
                 } else {
-                    $config['appdesk']['appdesk']['splittersVertical'] = 250; //@todo could it be done via javascript
+                    $config['appdesk']['appdesk']['splittersVertical'] = 250; // @todo could it be done via javascript
                 }
             }
 
