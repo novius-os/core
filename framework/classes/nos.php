@@ -156,14 +156,14 @@ class Nos
     {
         Tools_Wysiwyg::parse_medias($content, function($media, $params) use (&$content) {
             if (empty($media)) {
-                $content = str_replace($params['tag'], '', $content);
+                $content = str_replace($params['content'], '', $content);
             } else {
                 if (!empty($params['height'])) {
                     $media_url = $media->get_public_path_resized($params['width'], $params['height']);
                 } else {
                     $media_url = $media->get_public_path();
                 }
-                $content = str_replace($params['src'], $media_url, $content);
+                $content = str_replace($params['url'], $media_url, $content);
             }
         });
     }
