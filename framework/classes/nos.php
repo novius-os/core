@@ -156,7 +156,14 @@ class Nos
     {
         Tools_Wysiwyg::parse_medias($content, function($media, $params) use (&$content) {
             if (empty($media)) {
-                $content = str_replace($params['content'], '', $content);
+                if ($params['tag'] == 'img') {
+                    // Remove dead images
+                    $content = str_replace($params['content'], '', $content);
+                } elseif ($params['tag'] == 'a') {
+                    // Remove href for links (they become anchor)?
+                    // http://stackoverflow.com/questions/11144653/a-script-links-without-href
+                    //$content = str_replace('href="'.$params['url'].'"', '', $content);
+                }
             } else {
                 if (!empty($params['height'])) {
                     $media_url = $media->get_public_path_resized($params['width'], $params['height']);
