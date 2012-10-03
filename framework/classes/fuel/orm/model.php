@@ -931,7 +931,6 @@ class Model extends \Orm\Model
             }
         }
 
-
         $actions = \Arr::merge($generated_actions, $actions);
 
         foreach ($actions as $key => $action) {
