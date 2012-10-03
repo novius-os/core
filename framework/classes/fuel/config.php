@@ -30,9 +30,13 @@ class Config extends \Fuel\Core\Config
     public static function get($item, $default = null)
     {
         $item = static::convertFileName($item, 'get');
-        //print_r($item."\n");
-        //print_r(parent::get($item, $default));
         return parent::get($item, $default);
+    }
+
+    public static function load_and_get($item, $default = null) {
+        $config_file = substr($item, 0, strpos($item, '.'));
+        static::load($config_file, true);
+        return static::get($item, $default);
     }
 
     public static function save($file, $config)

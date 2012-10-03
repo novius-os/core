@@ -183,7 +183,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->item->{$this->config['situation_relation']->key_from[0]} = $this->item_situation->{$this->config['situation_relation']->key_to[0]};
             }
             if ($this->behaviours['contextable']) {
-                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(\Config::get('contexts'));
+                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(\Config::get('contexts', array()));
             }
             if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
                 // New page: no parent
