@@ -240,8 +240,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
         }
 
-
-
         return $config;
     }
 

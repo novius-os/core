@@ -296,7 +296,7 @@ return array(
                     'inputName' => 'folder_id',
                     'reloadEvent' => 'Nos\\Model_Media_Folder',
                     'treeGrid' => array(
-                        'treeUrl' => 'admin/nos/media/inspector/folder/json',
+                        'urlJson' => 'admin/nos/media/inspector/folder/json',
                         'sortable' => false,
                         'columns' => array(
                             'title' => array(
