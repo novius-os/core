@@ -18,10 +18,10 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     {
         parent::__construct($class);
         if (!isset($this->_properties['unique'])) {
-            $this->_properties['unique'] = 'lang';
+            $this->_properties['unique'] = 'context';
         }
-        if ($this->_properties['unique'] === 'lang') {
-            $this->_properties['unique'] = $class::behaviours('Nos\Orm_Behaviour_Translatable', true);
+        if ($this->_properties['unique'] === 'context') {
+            $this->_properties['unique'] = $class::behaviours('Nos\Orm_Behaviour_Contextable', true);
         }
     }
 
@@ -42,8 +42,8 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
                 $where = array(
                     array($this->_properties['virtual_name_property'], $item->{$this->_properties['virtual_name_property']})
                 );
-                if (is_array($this->_properties['unique']) && !empty($this->_properties['unique']['lang_property'])) {
-                    $where[] = array($this->_properties['unique']['lang_property'], '=', $item->{$this->_properties['unique']['lang_property']});
+                if (is_array($this->_properties['unique']) && !empty($this->_properties['unique']['context_property'])) {
+                    $where[] = array($this->_properties['unique']['context_property'], '=', $item->{$this->_properties['unique']['context_property']});
                 }
                 if (!$item->is_new()) {
                     $pk = \Arr::get($item::primary_key(), 0);

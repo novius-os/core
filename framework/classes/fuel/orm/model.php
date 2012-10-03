@@ -330,22 +330,22 @@ class Model extends \Orm\Model
         return static::$_configs[$class];
     }
 
-    public function get_possible_lang()
+    public function get_possible_context()
     {
-        $translatable = static::behaviours('Nos\Orm_Behaviour_Translatable');
+        $contextable = static::behaviours('Nos\Orm_Behaviour_Contextable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
-        if (!$translatable || !$tree) {
-            return array_keys(\Config::get('locales'));
+        if (!$contextable || !$tree) {
+            return array_keys(\Config::get('contexts'));
         }
 
-        // Return langs from parent if available
+        // Return contexts from parent if available
         $parent = $this->get_parent();
         if (!empty($parent)) {
-            return $parent->get_all_lang();
+            return $parent->get_all_context();
         }
 
-        return array_keys(\Config::get('locales'));
+        return array_keys(\Config::get('contexts'));
     }
 
     /**

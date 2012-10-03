@@ -47,11 +47,11 @@ if (!empty($medias)) {
     echo '</td>';
 }
 
-$locales = array_keys(\Config::get('locales'));
-if (!empty($item) && count($locales) > 1) {
-    $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-    if ($translatable) {
-        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_lang()).'</td>';
+$contexts = array_keys(\Config::get('contexts'));
+if (!empty($item) && count($contexts) > 1) {
+    $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
+    if ($contextable) {
+        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_context()).'</td>';
     }
 }
 ?>

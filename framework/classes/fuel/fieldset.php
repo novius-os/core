@@ -404,16 +404,16 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $fieldset;
     }
 
-    public function readonly_lang($instance)
+    public function readonly_context($instance)
     {
         if (empty($instance)) {
             return;
         }
-        $behaviour_translatable = $instance->behaviours('Nos\Orm_Behaviour_Translatable');
-        if (empty($behaviour_translatable) || $instance->is_main_lang()) {
+        $behaviour_contextable = $instance->behaviours('Nos\Orm_Behaviour_Contextable');
+        if (empty($behaviour_contextable) || $instance->is_main_context()) {
             return;
         }
-        foreach ($behaviour_translatable['invariant_fields'] as $f) {
+        foreach ($behaviour_contextable['invariant_fields'] as $f) {
             $field = $this->field($f);
             if (!empty($field)) {
                 $field->set_attribute('readonly', true);
@@ -456,7 +456,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
                 continue;
             }
-            // Don't populate some fields (for example, the lang)
+            // Don't populate some fields (for example, the context)
             if (\Arr::get($this->config_used, "$k.dont_populate", false) == true) {
                 continue;
             }

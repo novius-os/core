@@ -11,43 +11,43 @@
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <p>
 <?php
-if ($crud['behaviours']['translatable']) {
-    $item_langs = $item->find_lang('all');
-    $lang_count = count($item_langs);
+if ($crud['behaviours']['contextable']) {
+    $item_situations = $item->find_context('all');
+    $context_count = count($item_situations);
 
     if ($crud['behaviours']['tree']) {
         $children = array();
-        // Count all children in the primary lang
-        foreach ($item_langs as $item_lang) {
-            foreach ($item_lang->find_children_recursive(false) as $child) {
-                $children[$child->{$crud['behaviours']['translatable']['common_id_property']}] = true;
+        // Count all children in the primary context
+        foreach ($item_situations as $item_context) {
+            foreach ($item_context->find_children_recursive(false) as $child) {
+                $children[$child->{$crud['behaviours']['contextable']['common_id_property']}] = true;
             }
         }
         $children_count = count($children);
-        if ($children_count == 0 && $lang_count == 1) {
+        if ($children_count == 0 && $context_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
             <?php
-            if ($lang_count > 1) {
-                $locales = \Config::get('locales', array());
-                $languages_list = array();
-                foreach ($item_langs as $item_lang) {
-                    $languages_list[] = \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang());
+            if ($context_count > 1) {
+                $contexts = \Config::get('contexts', array());
+                $contexts_list = array();
+                foreach ($item_situations as $item_context) {
+                    $contexts_list[] = \Arr::get($contexts, $item_context->get_context(), $item_context->get_context());
                 }
                 ?>
-                <p><?= strtr($crud['config']['messages']['exists in multiple lang'], array(
-                    '<strong>' => '<strong title="'.implode(', ', $languages_list).'">',
-                    '{count}' => $lang_count,
+                <p><?= strtr($crud['config']['messages']['exists in multiple context'], array(
+                    '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
+                    '{count}' => $context_count,
                 )) ?></p>
-                    <?= $crud['config']['messages']['delete in the following languages'] ?>
-                <select name="lang">
-                    <option value="all"><?= __('All languages') ?></option>
+                    <?= $crud['config']['messages']['delete in the following contexts'] ?>
+                <select name="context">
+                    <option value="all"><?= __('All contexts') ?></option>
                 <?php
-                foreach ($item_langs as $item_lang) {
+                foreach ($item_situations as $item_context) {
                     ?>
-                    <option value="<?= $item_lang->get_lang() ?>"><?= \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang()); ?></option>
+                    <option value="<?= $item_context->get_context() ?>"><?= \Arr::get($contexts, $item_context->get_context(), $item_context->get_context()); ?></option>
                     <?php
                 }
                 ?>
@@ -65,27 +65,27 @@ if ($crud['behaviours']['translatable']) {
             }
         }
     } else {
-        if ($lang_count == 1) {
+        if ($context_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
-            $locales = \Config::get('locales', array());
-            $languages_list = array();
-            foreach ($item_langs as $item_lang) {
-                $languages_list[] = \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang());
+            $contexts = \Config::get('contexts', array());
+            $contexts_list = array();
+            foreach ($item_situations as $item_context) {
+                $contexts_list[] = \Arr::get($contexts, $item_context->get_context(), $item_context->get_context());
             }
             ?>
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
-            <p><?= strtr($crud['config']['messages']['exists in multiple lang'], array(
-                    '<strong>' => '<strong title="'.implode(', ', $languages_list).'">',
-                    '{count}' => $lang_count,
+            <p><?= strtr($crud['config']['messages']['exists in multiple context'], array(
+                    '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
+                    '{count}' => $context_count,
                 )) ?></p>
-                    <?= $crud['config']['messages']['delete in the following languages'] ?>
-                <select name="lang">
-                    <option value="all"><?= __('All languages') ?></option>
+                    <?= $crud['config']['messages']['delete in the following contexts'] ?>
+                <select name="context">
+                    <option value="all"><?= __('All contexts') ?></option>
             <?php
-            foreach ($item_langs as $item_lang) {
+            foreach ($item_situations as $item_context) {
                 ?>
-                <option value="<?= $item_lang->get_lang() ?>"><?= \Arr::get($locales, $item_lang->get_lang(), $item_lang->get_lang()); ?></option>
+                <option value="<?= $item_context->get_context() ?>"><?= \Arr::get($contexts, $item_context->get_context(), $item_context->get_context()); ?></option>
                 <?php
             }
             ?>

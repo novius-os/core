@@ -18,8 +18,8 @@ require(
         $(function() {
             var inspector = $('#<?= $id ?>').removeAttr('id'),
                 connector = inspector.closest('.nos-dispatcher, body')
-                    .on('langChange', function() {
-                        if (inspectorData.langChange) {
+                    .on('contextChange', function() {
+                        if (inspectorData.contextChange) {
                             inspector.noslistgrid('ensureControl', true);
                         }
                     }),
@@ -48,8 +48,8 @@ require(
                 var match = {
                         name : inspectorData.reloadEvent
                     };
-                if (connector.data('nosLang')) {
-                    match['lang'] = connector.data('nosLang');
+                if (connector.data('nosContext')) {
+                    match['context'] = connector.data('nosContext');
                 }
                 inspector.nosListenEvent(match, function() {
                         parent.trigger('widgetReload');
@@ -83,7 +83,7 @@ require(
                         }),
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
-                            dataSource.proxy.options.data.lang = connector.data('nosLang') || '';
+                            dataSource.proxy.options.data.context = connector.data('nosContext') || '';
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                             dataSource.proxy.options.data.limit = r.pageSize;
                         },

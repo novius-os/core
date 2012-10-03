@@ -41,7 +41,7 @@ class Controller_Inspector_Model extends Controller_Inspector
         $return = $this->items(array_merge($this->config['query'], array(
             'callback' => array($where),
             'dataset' => $this->config['dataset'],
-            'lang' => Input::get('lang', null),
+            'context' => Input::get('context', null),
             'limit' => intval(Input::get('limit', $this->config['limit'])),
             'offset' => intval(Input::get('offset', 0)),
         )));

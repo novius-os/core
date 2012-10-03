@@ -41,7 +41,7 @@ if (!$item->is_new()) {
             <td style="width:350px;vertical-align: top;">
                 <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Generate from title') ?></label> <br />
                 <span style="vertical-align:middle;">
-                    http://yoursite.com/media/<span data-id="path_prefix"><?= $item->is_new() ? (!empty($crud['context']) ? $crud['context']->medif_path : '') : $item->parent->medif_path ?></span>
+                    http://yoursite.com/media/<span data-id="path_prefix"><?= $item->is_new() ? (!empty($crud['situation']) ? $crud['situation']->medif_path : '') : $item->parent->medif_path ?></span>
                 </span>
                 <?= $fieldset->field('medif_dir_name')->build(); ?>
             </td>
@@ -50,7 +50,7 @@ if (!$item->is_new()) {
 if ($item->is_new()) {
     ?>
         <tr>
-            <th><?= !empty($crud['context']) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
+            <th><?= !empty($crud['situation']) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
             <td id="<?= $uniqid_radio ?>"><?= $fieldset->field('medif_parent_id')->build(); ?></td>
         </tr>
     <?php

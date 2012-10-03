@@ -14,9 +14,9 @@ $model_id   = $item->id;
 
 $data_catchers = $item->data_catchers();
 $default_nuggets = $item->get_default_nuggets();
-$translatable = $model_name::behaviours('Nos\Orm_Behaviour_Translatable', false);
-if ($translatable) {
-    $default_nuggets['lang'] = $item->{$translatable['lang_property']};
+$contextable = $model_name::behaviours('Nos\Orm_Behaviour_Contextable', false);
+if ($contextable) {
+    $default_nuggets['context'] = $item->{$contextable['context_property']};
 }
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">

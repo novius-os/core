@@ -94,7 +94,7 @@ return array(
         'viewThumbnails' => __('Thumbnails'),
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
-        'languages' => __('Languages'),
+        'contexts' => __('Contexts'),
     ),
     'dataset' => $dataset,
     'appdesk' => array(
@@ -179,7 +179,7 @@ return array(
                         'action' => 'nosTabs',
                         'method' => 'add',
                         'tab' => array(
-                            'url' => 'admin/nos/page/page/insert_update?lang={{lang}}',
+                            'url' => 'admin/nos/page/page/insert_update?context={{context}}',
                             'label' => __('Add a page'),
                             'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
                         ),
@@ -202,8 +202,8 @@ return array(
                         'headerText' => __('Title'),
                         'sortDirection' => 'ascending',
                     ),
-                    'lang' => array(
-                        'lang' => true
+                    'context' => array(
+                        'context' => true
                     ),
                     'url' => array(
                         'headerText' => __('Virtual url'),

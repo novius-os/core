@@ -22,7 +22,7 @@ return array(
         'media_ext',
         'media_file',
     ),
-    'hideLocales' => true,
+    'hideContexts' => true,
     'selectedView' => 'default',
     'views' => array(
         'default' => array(

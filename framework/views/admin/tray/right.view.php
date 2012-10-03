@@ -7,7 +7,7 @@
 <div class="menu_dropdown">
     <?= \View::forge('admin/tray/right/inside') ?>
 </div>
-<script language="JAVAScript">
+<script type="text/javascript">
     $('body').click(function(e) {
         var visible = false;
         if ($(e.target).closest('.menu_dropdown').length == 0) {

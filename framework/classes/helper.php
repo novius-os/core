@@ -12,13 +12,13 @@ namespace Nos;
 
 class Helper
 {
-    public static $locales = array();
+    public static $contexts = array();
 
     public static function _init()
     {
 
-        \Config::load('locales', true);
-        static::$locales = \Config::get('locales', array());
+        \Config::load('contexts', true);
+        static::$contexts = \Config::get('contexts', array());
     }
 
     public static function flag_url($locale)
@@ -39,7 +39,7 @@ class Helper
 
     public static function flag($locale)
     {
-        return '<img src="'.static::flag_url($locale).'" title="'.\Arr::get(static::$locales, $locale, $locale).'" /> ';
+        return '<img src="'.static::flag_url($locale).'" title="'.\Arr::get(static::$contexts, $locale, $locale).'" /> ';
     }
 
     public static function flag_empty()

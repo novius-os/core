@@ -145,7 +145,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             array(
                 'related' => array(),
                 'callback' => array(),
-                'lang' => null,
+                'context' => null,
                 'limit' => null,
                 'offset' => null,
                 'dataset' => array(),
@@ -183,17 +183,17 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             }
         }
 
-        $translatable = $model::behaviours('Nos\Orm_Behaviour_Translatable');
+        $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable');
         $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
-        if ($translatable) {
-            if (empty($config['lang'])) {
-                // No inspector, we only search items in their primary language
-                $query->where($translatable['is_main_property'], 1);
-            } elseif (is_array($config['lang'])) {
-                // Multiple langs
-                $query->where($translatable['lang_property'], 'IN', $config['lang']);
+        if ($contextable) {
+            if (empty($config['context'])) {
+                // No inspector, we only search items in their primary context
+                $query->where($contextable['is_main_property'], 1);
+            } elseif (is_array($config['context'])) {
+                // Multiple contexts
+                $query->where($contextable['context_property'], 'IN', $config['context']);
             } else {
-                $query->where($translatable['lang_property'], '=', $config['lang']);
+                $query->where($contextable['context_property'], '=', $config['context']);
             }
             $common_ids = array();
             $keys = array();
@@ -286,41 +286,41 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $item['_id'] = $object->{$pk};
                 $item['_model'] = $model;
                 $items[] = $item;
-                if ($translatable) {
-                    $common_id = $object->{$translatable['common_id_property']};
+                if ($contextable) {
+                    $common_id = $object->{$contextable['common_id_property']};
                     $keys[] = $common_id;
-                    $common_ids[$translatable['common_id_property']][] = $common_id;
+                    $common_ids[$contextable['common_id_property']][] = $common_id;
                 }
             }
-            if ($translatable) {
-                $langs = $model::languages($common_ids);
-                foreach ($langs as $common_id => $list) {
-                    $langs[$common_id] = explode(',', $list);
+            if ($contextable) {
+                $contexts = $model::contexts($common_ids);
+                foreach ($contexts as $common_id => $list) {
+                    $contexts[$common_id] = explode(',', $list);
                 }
                 foreach ($keys as $key => $common_id) {
-                    $items[$key]['lang'] = $langs[$common_id];
+                    $items[$key]['context'] = $contexts[$common_id];
                 }
                 if ($tree) {
                     $root = reset($objects)->find_root();
                     if (!empty($root)) {
-                        $all_langs = $root->get_all_lang();
+                        $all_contexts = $root->get_all_context();
                     } else {
-                        $all_langs = array_unique(\Arr::flatten($langs));
+                        $all_contexts = array_unique(\Arr::flatten($contexts));
                     }
                 } else {
-                    $all_langs = array_unique(\Arr::flatten($langs));
+                    $all_contexts = array_unique(\Arr::flatten($contexts));
                 }
                 foreach ($items as &$item) {
                     $flags = '';
-                    $langs = $item['lang'];
-                    foreach ($all_langs as $lang) {
-                        if (in_array($lang, $langs)) {
-                            $flags .= \Nos\Helper::flag($lang);
+                    $contexts = $item['context'];
+                    foreach ($all_contexts as $context) {
+                        if (in_array($context, $contexts)) {
+                            $flags .= \Nos\Helper::flag($context);
                         } else {
                             $flags .= \Nos\Helper::flag_empty();
                         }
                     }
-                    $item['lang'] = $flags;
+                    $item['context'] = $flags;
                 }
             }
         }
@@ -413,7 +413,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $model = \Input::get('model');
         $selected = \Input::get('selected');
         $deep = intval(\Input::get('deep', 1));
-        $lang = \Input::get('lang');
+        $context = \Input::get('context');
 
         if (empty($tree_config['id'])) {
             $tree_config['id'] = \Config::getDbName(join('::', \Config::configFile(get_called_class())));
@@ -429,7 +429,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     'countProcess' => true,
                     'model' => $model,
                     'id' => $id,
-                    'lang' => $lang,
+                    'context' => $context,
                 )
             );
 
@@ -476,7 +476,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     'model' => $model,
                     'id' => $id,
                     'deep' => $deep,
-                    'lang' => $lang,
+                    'context' => $context,
                 )
             );
 
@@ -615,7 +615,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 'model' => null,
                 'id' => null,
                 'deep' => 1,
-                'lang' => null,
+                'context' => null,
             ),
             $params
         );
@@ -627,10 +627,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['lang']) && $model::behaviours('Nos\Orm_Behaviour_Translatable')) {
+                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Contextable')) {
                     $item = $model::find($params['id']);
-                    $langs = $item->get_all_lang();
-                    $child['where'] = array(array($child['fk'], 'IN', array_keys($langs)));
+                    $contexts = $item->get_all_context();
+                    $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));
                 } else {
                     $child['where'] = array(array($child['fk'] => $params['id']));
                 }
@@ -648,7 +648,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $config = array_merge(
                 $tree_model,
                 array(
-                    'lang' => $params['lang'],
+                    'context' => $params['context'],
                     'callback' => array(
                         function ($query) use ($child, $tree_model) {
                             foreach ($child['where'] as $where) {
@@ -674,7 +674,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
                                                 'deep' => $params['deep'] - 1,
-                                                'lang' => $params['lang'],
+                                                'context' => $params['context'],
                                             )
                                         );
 
@@ -686,7 +686,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                                 'countProcess' => true,
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
-                                                'lang' => $params['lang'],
+                                                'context' => $params['context'],
                                             )
                                         );
                                     }

@@ -30,7 +30,7 @@ class Widget_Page_Selector extends \Nos\Widget_Selector
                 'id' => (string) (int) $this->value,
             ),
             'treeOptions' => array(
-                'lang' => \Arr::get($this->widget_options, 'lang', null),
+                'context' => \Arr::get($this->widget_options, 'context', null),
             ),
             'height' => \Arr::get($this->widget_options, 'height', '150px'),
             'width' => \Arr::get($this->widget_options, 'width', null),
@@ -58,7 +58,7 @@ class Widget_Page_Selector extends \Nos\Widget_Selector
                 )
             ),
             'treeOptions' => array(
-                'lang' => null
+                'context' => null
             ),
             'height' => '150px',
             'width' => null,

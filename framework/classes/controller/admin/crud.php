@@ -20,17 +20,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'successfully deleted' => 'The item has successfully been deleted!',
             'you are about to delete, confim' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?',
             'you are about to delete' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>.',
-            'exists in multiple lang' => 'This item exists in <strong>{count} languages</strong>.',
-            'delete in the following languages' => 'Delete this item in the following languages:',
+            'exists in multiple context' => 'This item exists in <strong>{count} contexts</strong>.',
+            'delete in the following contexts' => 'Delete this item in the following contexts:',
             'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
             'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
             'confirm deletion, enter number' => 'To confirm the deletion, you need to enter this number in the field below',
             'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
             'item deleted' => 'This item has been deleted.',
             'not found' => 'Item not found',
-            'error added in lang not parent' => 'This item cannot be added {lang} because its {parent} is not available in this language yet.',
-            'error added in lang' => 'This item cannot be added {lang}.',
-            'item inexistent in lang yet' => 'This item has not been added in {lang} yet.',
+            'error added in context not parent' => 'This item cannot be added {context} because its {parent} is not available in this context yet.',
+            'error added in context' => 'This item cannot be added {context}.',
+            'item inexistent in context yet' => 'This item has not been added in {context} yet.',
             'visualise' => 'Visualise',
             'delete' => 'Delete',
             'delete an item' => 'Delete an item',
@@ -38,9 +38,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'confirm deletion or' => 'or',
             'confirm deletion cancel' => 'Cancel',
             'confirm deletion wrong_confirmation' => 'Wrong confirmation',
-            'add an item in lang' => 'Add a new item in {lang}',
+            'add an item in context' => 'Add a new item in {context}',
         ),
-        'context_relation' => null,
+        'situation_relation' => null,
         'tab' => array(
             'iconUrl' => '',
             'labels' => array(
@@ -64,7 +64,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected $clone = null;
     protected $is_new = false;
     protected $item_from = null;
-    protected $item_context = null;
+    protected $item_situation = null;
 
     public function & __get($property)
     {
@@ -81,10 +81,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $model = $this->config['model'];
 
-        if (!empty($this->config['context_relation'])) {
-            $this->config['context_relation'] = $model::relations($this->config['context_relation']);
-            if (!is_a($this->config['context_relation'], 'Orm\\BelongsTo')) {
-                $this->config['context_relation'] = null;
+        if (!empty($this->config['situation_relation'])) {
+            $this->config['situation_relation'] = $model::relations($this->config['situation_relation']);
+            if (!is_a($this->config['situation_relation'], 'Orm\\BelongsTo')) {
+                $this->config['situation_relation'] = null;
             }
         }
 
@@ -99,7 +99,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $this->behaviours = array(
-            'translatable' => $model::behaviours('Nos\Orm_Behaviour_Translatable', false),
+            'contextable' => $model::behaviours('Nos\Orm_Behaviour_Contextable', false),
             'sharable' => $model::behaviours('Nos\Orm_Behaviour_Sharable', false),
             'tree' => $model::behaviours('Nos\Orm_Behaviour_Tree', false),
             'url' => $model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false),
@@ -121,7 +121,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'model' => $this->config['model'],
                 'behaviours' => $this->behaviours,
                 'pk' => $this->pk,
-                'context' => $this->item_context,
+                'context' => $this->item_situation,
                 'config' => $this->config,
                 'url_form' => $this->config['controller_url'].'/form',
                 'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
@@ -131,8 +131,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             ),
             'item' => $this->item,
         );
-        if ($this->behaviours['translatable']) {
-            $view_params['crud']['lang'] = $this->item->{$this->behaviours['translatable']['lang_property']};
+        if ($this->behaviours['contextable']) {
+            $view_params['crud']['context'] = $this->item->{$this->behaviours['contextable']['context_property']};
         }
 
         $view_params['view_params'] = &$view_params;
@@ -175,27 +175,27 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if (!empty($create_from_id)) {
                 $this->item_from = $this->crud_item($create_from_id);
                 $this->item = clone $this->item_from;
-            } elseif (!empty($common_id) && $this->behaviours['translatable']) {
-                $this->item->{$this->behaviours['translatable']['common_id_property']} = $common_id;
-            } elseif (!empty($context_id) && !empty($this->config['context_relation'])) {
-                $model_context = $this->config['context_relation']->model_to;
-                $this->item_context = $model_context::find($context_id);
-                $this->item->{$this->config['context_relation']->key_from[0]} = $this->item_context->{$this->config['context_relation']->key_to[0]};
+            } elseif (!empty($common_id) && $this->behaviours['contextable']) {
+                $this->item->{$this->behaviours['contextable']['common_id_property']} = $common_id;
+            } elseif (!empty($context_id) && !empty($this->config['situation_relation'])) {
+                $model_context = $this->config['situation_relation']->model_to;
+                $this->item_situation = $model_context::find($context_id);
+                $this->item->{$this->config['situation_relation']->key_from[0]} = $this->item_situation->{$this->config['situation_relation']->key_to[0]};
             }
-            if ($this->behaviours['translatable']) {
-                $this->item->{$this->behaviours['translatable']['lang_property']} = \Input::get('lang', false) ? : key(\Config::get('locales'));
+            if ($this->behaviours['contextable']) {
+                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(\Config::get('contexts'));
             }
-            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
+            if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
                 // New page: no parent
                 // Translation: we have a common_id and can determine the parent
-                if (!empty($this->item->{$this->behaviours['translatable']['common_id_property']})) {
+                if (!empty($this->item->{$this->behaviours['contextable']['common_id_property']})) {
                     $model = $this->config['model'];
-                    $item_lang_common = $model::find($this->item->{$this->behaviours['translatable']['common_id_property']});
-                    $item_parent = $item_lang_common->get_parent();
+                    $item_context_common = $model::find($this->item->{$this->behaviours['contextable']['common_id_property']});
+                    $item_parent = $item_context_common->get_parent();
 
-                    // Fetch in the appropriate lang
+                    // Fetch in the appropriate context
                     if (!empty($item_parent)) {
-                        $item_parent = $item_parent->find_lang($this->item->{$this->behaviours['translatable']['lang_property']});
+                        $item_parent = $item_parent->find_context($this->item->{$this->behaviours['contextable']['context_property']});
                     }
 
                     // Set manually, because set_parent doesn't handle new items
@@ -217,34 +217,34 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             );
         }
-        if ($this->behaviours['translatable']) {
+        if ($this->behaviours['contextable']) {
             $fields = \Arr::merge(
                 $fields,
                 array(
-                    $this->behaviours['translatable']['lang_property'] => array(
+                    $this->behaviours['contextable']['context_property'] => array(
                         'form' => array(
                             'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['translatable']['lang_property']},
+                            'value' => $this->item->{$this->behaviours['contextable']['context_property']},
                         ),
                     ),
-                    $this->behaviours['translatable']['common_id_property'] => array(
+                    $this->behaviours['contextable']['common_id_property'] => array(
                         'form' => array(
                             'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['translatable']['common_id_property']},
+                            'value' => $this->item->{$this->behaviours['contextable']['common_id_property']},
                         ),
                     ),
                 )
             );
         }
         if ($this->is_new) {
-            if ($this->behaviours['translatable'] && $this->behaviours['tree']) {
+            if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
                 $parent_id = $this->item->parent_relation()->key_from[0];
                 $fields = \Arr::merge(
                     $fields,
                     array(
                         $parent_id => array(
                             'widget_options' => array(
-                                'lang' => $this->item->{$this->behaviours['translatable']['lang_property']},
+                                'context' => $this->item->{$this->behaviours['contextable']['context_property']},
                             ),
                         ),
                     )
@@ -296,9 +296,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'action' => $this->is_new ? 'insert' : 'update',
             'id' => (int) $item->{$this->pk},
         );
-        if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = (int) $item->{$this->behaviours['translatable']['common_id_property']};
-            $dispatchEvent['lang'] = $item->{$this->behaviours['translatable']['lang_property']};
+        if ($this->behaviours['contextable']) {
+            $dispatchEvent['context_common_id'] = (int) $item->{$this->behaviours['contextable']['common_id_property']};
+            $dispatchEvent['context'] = $item->{$this->behaviours['contextable']['context_property']};
         }
 
         $return = array(
@@ -315,15 +315,15 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function before_save($item, $data)
     {
-        if ($this->behaviours['translatable'] && $this->is_new) {
+        if ($this->behaviours['contextable'] && $this->is_new) {
 
-            $item_lang = $this->item->get_lang();
-            $existing = $this->item->find_lang($item_lang);
+            $item_context = $this->item->get_context();
+            $existing = $this->item->find_context($item_context);
             if (!empty($existing)) {
                 $message = strtr(
-                    __('This item already exists in {lang}. Therefore your item cannot be added.'),
+                    __('This item already exists in {context}. Therefore your item cannot be added.'),
                     array(
-                        '{lang}' => \Arr::get(\Config::get('locales'), $item_lang, $item_lang),
+                        '{context}' => \Arr::get(\Config::get('contexts'), $item_context, $item_context),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -339,7 +339,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             // Model::find(null) returns an Orm\Query. We don't want that.
             $parent = empty($item->{$item->parent_relation()->key_from[0]}) ? null : $item::find($item->{$item->parent_relation()->key_from[0]});
 
-            // Event 'change_parent' will set the appropriate lang
+            // Event 'change_parent' will set the appropriate context
             $item->set_parent($parent);
         }
     }
@@ -348,7 +348,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         // insert_update               : add a new item
         // insert_update/ID            : edit an existing item
-        // insert_update/ID?lang=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that language)
+        // insert_update/ID?context=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that context)
 
         $this->item = $this->crud_item($id);
         $this->is_new = $this->item->is_new();
@@ -357,40 +357,40 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
 
-        if ($this->is_new || !$this->behaviours['translatable']) {
+        if ($this->is_new || !$this->behaviours['contextable']) {
             return $this->action_form($id);
         }
 
-        if ($this->behaviours['translatable']) {
-            $selected_lang = \Input::get('lang', $this->is_new ? null : $this->item->get_lang());
+        if ($this->behaviours['contextable']) {
+            $selected_context = \Input::get('context', $this->is_new ? null : $this->item->get_context());
 
-            foreach ($this->item->get_all_lang() as $lang_id => $lang) {
-                if ($selected_lang == $lang) {
-                    return $this->action_form($lang_id);
+            foreach ($this->item->get_all_context() as $context_id => $context) {
+                if ($selected_context == $context) {
+                    return $this->action_form($context_id);
                 }
             }
 
             $_GET['common_id'] = $id;
-            return $this->blank_slate($id, $selected_lang);
+            return $this->blank_slate($id, $selected_context);
         }
     }
 
-    public function blank_slate($id, $lang)
+    public function blank_slate($id, $context)
     {
         $this->item = $this->crud_item($id);
         $this->is_new = true;
-        if (empty($lang)) {
-            $lang = \Input::get('lang', key(\Config::get('locales')));
+        if (empty($context)) {
+            $context = \Input::get('context', key(\Config::get('contexts')));
         }
 
         $view_params = array_merge(
             $this->view_params(),
             array(
-                'lang' => $lang,
+                'context' => $context,
                 'common_id' => \Input::get('common_id', ''),
             )
         );
-        $view_params['crud']['tab_params']['url'] .= '?lang='.$lang;
+        $view_params['crud']['tab_params']['url'] .= '?context='.$context;
         $view_params['crud']['tab_params']['label'] = $this->config['tab']['labels']['blankSlate'];
 
         // We can't do this form inside the view_params() method, because additional vars (added
@@ -413,8 +413,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $params[$key] = $value;
                 }
             }
-            if ($this->behaviours['translatable']) {
-                $params['lang'] = $this->item->get_lang();
+            if ($this->behaviours['contextable']) {
+                $params['context'] = $this->item->get_context();
             }
             if (count($params)) {
                 $url .= '?'.http_build_query($params);
@@ -451,28 +451,28 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $actions;
     }
 
-    protected function get_actions_lang()
+    protected function get_actions_context()
     {
-        if (!$this->behaviours['translatable']) {
+        if (!$this->behaviours['contextable']) {
             return array();
         }
 
         $actions = array();
-        $locales = array_keys(\Config::get('locales'));
-        $main_lang = $this->item->find_main_lang();
-        foreach ($locales as $locale) {
-            if ($this->item->{$this->behaviours['translatable']['lang_property']} === $locale) {
+        $contexts = array_keys(\Config::get('contexts'));
+        $main_context = $this->item->find_main_context();
+        foreach ($contexts as $locale) {
+            if ($this->item->{$this->behaviours['contextable']['context_property']} === $locale) {
                 continue;
             }
-            $item_lang = $this->item->find_lang($locale);
-            $url = $this->config['controller_url'].'/insert_update'.(empty($item_lang) ? (empty($main_lang) ? '' : '/'.$main_lang->id).'?lang='.$locale : '/'.$item_lang->id);
-            $label = empty($main_lang) ? $this->config['messages']['add an item in lang'] : (empty($item_lang) ? __('Translate in {lang}') : __('Edit in {lang}'));
+            $item_context = $this->item->find_context($locale);
+            $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$locale : '/'.$item_context->id);
+            $label = empty($main_context) ? $this->config['messages']['add an item in context'] : (empty($item_context) ? __('Translate in {context}') : __('Edit in {context}'));
             $actions[$locale] = array(
-                'label' => strtr($label, array('{lang}' => \Arr::get(\Config::get('locales'), $locale, $locale))),
+                'label' => strtr($label, array('{context}' => \Arr::get(\Config::get('contexts'), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',
-                    'method' => empty($main_lang) ? 'add' : 'open',
+                    'method' => empty($main_context) ? 'add' : 'open',
                     'tab' => array(
                         'url' => $url
                     ),
@@ -527,47 +527,47 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->delete();
 
-        if ($this->behaviours['translatable']) {
-            $dispatchEvent['lang_common_id'] = $this->item->{$this->behaviours['translatable']['common_id_property']};
+        if ($this->behaviours['contextable']) {
+            $dispatchEvent['context_common_id'] = $this->item->{$this->behaviours['contextable']['common_id_property']};
             $dispatchEvent['id'] = array();
-            $dispatchEvent['lang'] = array();
+            $dispatchEvent['context'] = array();
 
-            // Delete all languages by default
-            $lang = \Input::post('lang', 'all');
+            // Delete all contexts by default
+            $context = \Input::post('context', 'all');
 
-            // Delete children for all languages
-            if ($lang === 'all') {
-                foreach ($this->item->find_lang('all') as $item_lang) {
-                    $dispatchEvent['id'][] = (int) $item_lang->{$this->pk};
-                    $dispatchEvent['lang'][] = $item_lang->{$this->behaviours['translatable']['lang_property']};
+            // Delete children for all contexts
+            if ($context === 'all') {
+                foreach ($this->item->find_context('all') as $item_context) {
+                    $dispatchEvent['id'][] = (int) $item_context->{$this->pk};
+                    $dispatchEvent['context'][] = $item_context->{$this->behaviours['contextable']['context_property']};
 
                     if ($this->behaviours['tree']) {
-                        foreach ($item_lang->get_ids_children(false) as $item_id) {
+                        foreach ($item_context->get_ids_children(false) as $item_id) {
                             $dispatchEvent['id'][] = (int) $item_id;
                         }
                     }
                 }
 
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                // Optimised operation for deleting all languages
-                $this->item->delete_all_lang();
+                // Optimised operation for deleting all contexts
+                $this->item->delete_all_context();
 
             } else {
                 // Search for the appropriate page
-                if ($this->item->get_lang() != $lang) {
-                    $this->item = $this->item->find_lang($lang);
+                if ($this->item->get_context() != $context) {
+                    $this->item = $this->item->find_context($context);
                 }
                 $this->check_permission('delete');
 
                 $dispatchEvent['id'][] = $this->item->{$this->pk};
-                $dispatchEvent['lang'][] = $this->item->{$this->behaviours['translatable']['lang_property']};
+                $dispatchEvent['context'][] = $this->item->{$this->behaviours['contextable']['context_property']};
                 if ($this->behaviours['tree']) {
                     foreach ($this->item->get_ids_children(false) as $item_id) {
                         $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
 
-                // Reassigns common_id if this item is the main language (with the 'after_delete' event from the Translatable behaviour)
+                // Reassigns common_id if this item is the main context (with the 'after_delete' event from the Contextable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 $this->item->delete();
             }
