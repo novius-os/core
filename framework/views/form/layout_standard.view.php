@@ -47,7 +47,7 @@ if (!empty($medias)) {
     echo '</td>';
 }
 
-$contexts = array_keys(\Config::get('contexts'));
+$contexts = array_keys(\Config::get('contexts', array()));
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
     if ($contextable) {

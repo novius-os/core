@@ -176,7 +176,7 @@ class Model_Page extends \Nos\Orm\Model
 
         $url = !empty($params['absolute']) ? Uri::base(false) : '';
 
-        if (!($this->page_home && $this->get_context() == key(\Config::get('contexts')))) {
+        if (!($this->page_home && $this->get_context() == key(\Config::get('contexts', array())))) {
             $url .= $this->virtual_path();
         }
         if (!empty($params['preview'])) {

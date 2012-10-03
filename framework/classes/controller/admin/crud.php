@@ -435,7 +435,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         list($application_name) = \Config::configFile(get_called_class());
         $applicationActions = \Config::actions(array('models' => array(get_class($this->item)), 'type' => 'item', 'item' => $this->item));
 
-        $actions = array_values($this->get_actions_lang());
+        $actions = array_values($this->get_actions_context());
 
         foreach ($applicationActions as $action) {
             if (!isset($action['enabled']) || $action['enabled']($this->item)) {
@@ -458,7 +458,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $actions = array();
-        $contexts = array_keys(\Config::get('contexts'));
+        $contexts = array_keys(\Config::get('contexts', array()));
         $main_context = $this->item->find_main_context();
         foreach ($contexts as $locale) {
             if ($this->item->{$this->behaviours['contextable']['context_property']} === $locale) {
@@ -468,7 +468,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$locale : '/'.$item_context->id);
             $label = empty($main_context) ? $this->config['messages']['add an item in context'] : (empty($item_context) ? __('Translate in {context}') : __('Edit in {context}'));
             $actions[$locale] = array(
-                'label' => strtr($label, array('{context}' => \Arr::get(\Config::get('contexts'), $locale, $locale))),
+                'label' => strtr($label, array('{context}' => \Arr::get(\Config::get('contexts', array()), $locale, $locale))),
                 'iconUrl' => \Nos\Helper::flag_url($locale),
                 'action' => array(
                     'action' => 'nosTabs',

@@ -29,7 +29,7 @@ class Controller_Inspector extends Controller_Admin_Application {
             }
 
             if (!isset($config['appdesk']['langChange'])) {
-                $config['appdesk']['langChange'] = isset($behaviours['Nos\Orm_Behaviour_Translatable']);
+                $config['appdesk']['langChange'] = isset($behaviours['Nos\Orm_Behaviour_Contextable']);
             }
 
             if (!isset($config['appdesk']['url'])) {
