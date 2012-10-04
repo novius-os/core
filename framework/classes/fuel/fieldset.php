@@ -265,15 +265,13 @@ class Fieldset extends \Fuel\Core\Fieldset
             $attributes = isset($settings['form']) ? $settings['form'] : array();
             if (!empty($settings['widget'])) {
                  $class = $settings['widget'];
-                 $attributes['widget_options'] = isset($settings['widget_options']) ? $settings['widget_options'] : array();
-                 $attributes['widget_options']['instance'] = $options['instance'];
+                 $attributes['widget_options'] = \Arr::get($settings, 'widget_options', array());
                  $field = new $class($p, $label, $attributes, array(), $this);
                  $this->add_field($field);
             } else {
                 if (\Arr::get($attributes, 'type', '') == 'checkbox') {
                     unset($attributes['empty']);
                 }
-                $attributes['widget_options'] = array('instance' => $options['instance']);
                 $field = $this->add($p, $label, $attributes);
             }
             if (isset($settings['template'])) {

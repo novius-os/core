@@ -106,8 +106,14 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
             'where' => $conditions,
             'order_by' => array('default_sort' => 'ASC')
         ));
+
+        $round_value = +0.25;
         foreach ($unsorted as $u) {
-            $u->set($sort_property, $i++);
+            $sort = $u->get($sort_property);
+            if (round($sort + 0.25) != round($sort - 0.25)) {
+                $round_value += 1;
+            }
+            $u->set($sort_property, round($sort + $round_value));
             $u->save();
             $updated[$u->get_sort()] = $u->id;
         }

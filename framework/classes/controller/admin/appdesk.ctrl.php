@@ -219,8 +219,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['appdesk']['appdesk']['grid']['columns'])) {
                 $config['appdesk']['appdesk']['grid']['columns'] = array();
                 foreach ($config['dataset'] as $key => $value) {
-                    if ($key == 'lang') {
-                        $config['appdesk']['appdesk']['grid']['columns'][$key] = array('lang' => true);
+                    if ($key == 'context') {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key] = array('context' => true);
                     } else if ($key == 'published') {
                         $config['appdesk']['appdesk']['grid']['columns']['published'] = array(
                             'headerText' => __('Status'),
