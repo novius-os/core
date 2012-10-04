@@ -19,7 +19,7 @@ return array(
         'media_ext',
         'media_file',
     ),
-    'hideLocales' => true,
+    'hideContexts' => true,
     'selectedView' => 'default',
     'views' => array(
         'default' => array(
@@ -56,6 +56,7 @@ return array(
         )
     ),
     'i18n_file' => 'nos::media',
+
     'dataset' => array(
         'id' => 'media_id',
         'title' => 'media_title',
@@ -272,7 +273,7 @@ return array(
                     'inputName' => 'folder_id',
                     'reloadEvent' => 'Nos\\Model_Media_Folder',
                     'treeGrid' => array(
-                        'treeUrl' => 'admin/nos/media/inspector/folder/json',
+                        'urlJson' => 'admin/nos/media/inspector/folder/json',
                         'sortable' => false,
                         'columns' => array(
                             'title' => array(

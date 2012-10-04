@@ -14,7 +14,9 @@ use Fuel\Core\Cache;
 use Fuel\Core\Config;
 use View;
 
-class NotFoundException extends \Exception {}
+class NotFoundException extends \Exception
+{
+}
 
 class Controller_Front extends Controller
 {
@@ -74,7 +76,15 @@ class Controller_Front extends Controller
 
             \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
             $url_enhanced = \Config::get('data::url_enhanced', array());
-            $url_enhanced[$url.'/'] = 0;
+            end($url_enhanced);
+            if (key($url_enhanced) === '') {
+                $last_entry = current($url_enhanced);
+                unset($url_enhanced['']);
+                $url_enhanced[$url.'/'] = 0;
+                $url_enhanced[''] = $last_entry;
+            } else {
+                $url_enhanced[$url.'/'] = 0;
+            }
 
             $_404 = true;
             foreach ($url_enhanced as $temp_url => $page_id) {
@@ -436,7 +446,7 @@ class Controller_Front extends Controller
         }
         if (empty($this->_page_url)) {
             $where[] = array('page_entrance', 1);
-            $where[] = array('page_lang', key(\Config::get('locales')));
+            $where[] = array('page_context', key(\Config::get('contexts')));
         } else {
             $where[] = array('page_virtual_url', $this->_page_url);
             //$where[] = array('page_parent_id', 'IS NOT', null);
@@ -455,7 +465,7 @@ class Controller_Front extends Controller
         // Get the first page
         reset($pages);
         $this->_page = current($pages);
-        \Nos\I18n::setLocale($this->_page->get_lang());
+        \Nos\I18n::setLocale($this->_page->get_context());
     }
 
     protected function _find_template()

@@ -157,7 +157,7 @@ return array(
                         'action' => 'nosTabs',
                         'method' => 'add',
                         'tab' => array(
-                            'url' => 'admin/nos/page/page/insert_update?lang={{lang}}',
+                            'url' => 'admin/nos/page/page/insert_update?context={{context}}',
                             'label' => $i18n('Add a page'),
                             'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
                         ),
@@ -180,8 +180,8 @@ return array(
                         'headerText' => $i18n('Title'),
                         'sortDirection' => 'ascending',
                     ),
-                    'lang' => array(
-                        'lang' => true
+                    'context' => array(
+                        'context' => true
                     ),
                     'url' => array(
                         'headerText' => $i18n('Virtual url'),

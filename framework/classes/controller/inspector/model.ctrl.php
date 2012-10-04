@@ -14,7 +14,7 @@ use \Input;
 use \View;
 use \Config;
 
-class Controller_Inspector_Model extends Controller_Admin_Application
+class Controller_Inspector_Model extends Controller_Inspector
 {
     protected $config = array(
         'model' => '',
@@ -41,7 +41,7 @@ class Controller_Inspector_Model extends Controller_Admin_Application
         $return = $this->items(array_merge($this->config['query'], array(
             'callback' => array($where),
             'dataset' => $this->config['dataset'],
-            'lang' => Input::get('lang', null),
+            'context' => Input::get('context', null),
             'limit' => intval(Input::get('limit', $this->config['limit'])),
             'offset' => intval(Input::get('offset', 0)),
         )));
@@ -66,5 +66,65 @@ class Controller_Inspector_Model extends Controller_Admin_Application
         }
 
         \Response::json($json);
+    }
+
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = 'grid') {
+        if (isset($config['model'])) {
+            $admin_config = $config['model']::admin_config();
+
+            if (!isset($config['query'])) {
+                $config['query'] = $admin_config['query'];
+            }
+
+            if (!isset($config['query']['model'])) {
+                $config['query']['model'] = $config['model'];
+            }
+
+            if (!isset($config['dataset'])) {
+                $config['dataset']  = $admin_config['dataset'];
+            }
+            $config['dataset']['id']       = array(
+                'column' => 'id',
+                'visible' => false
+            );
+
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
+
+            if (!isset($config['dataset']['actions'])) {
+                $config['dataset']['actions'] = array();
+                foreach ($item_actions as $action_key => $action_value) {
+                    if (isset($action_value['enabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    }
+                }
+            }
+
+            if (!isset($config['input']['query'])) {
+                $input_key = $config['input']['key'];
+                $config['input']['query'] = function($value, $query) use ($input_key) {
+                    if (is_array($value) && count($value) && $value[0]) {
+                        $table = explode('.', $input_key);
+                        if (count($table) == 1) {
+                            $query->where(array($input_key, 'in', $value));
+                        } else {
+                            $query->related(
+                                $table[0],
+                                array(
+                                    'where' => array(
+                                        array($input_key, 'in', $value),
+                                    ),
+                                )
+                            );
+                        }
+                    }
+                    return $query;
+                };
+            }
+
+
+        }
+
+
+        return parent::process_config($application, $config, $item_actions, $gridKey);
     }
 }

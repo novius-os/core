@@ -63,7 +63,6 @@ a:hover {
 .nos-icon32 {display: inline-block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; width: 32px; height: 32px; line-height: 32px; vertical-align: middle; border-radius: 0; background-position: center; }
 
 .nos-icon16-empty { background-image: none; }
-.nos-icon16-language { background-image: url(../img/16/language.png); }
 .nos-icon16-add { background-image: url(../img/16/tabs-add.png); }
 .nos-icon16-page { background-image: url(../img/16/page.png); }
 .nos-icon16-root { background-image: url(../img/16/root.png); }
@@ -76,7 +75,6 @@ a:hover {
 .nos-icon24-help { background-image: url(../img/24/tabs-help.png); }
 .nos-icon24-share { background-image: url(../img/24/share.png) !important; }
 
-.nos-icon32-language { background-image: url(../img/32/language.png); }
 .nos-icon32-page { background-image: url(../img/32/page.png); }
 .nos-icon32-root { background-image: url(../img/32/root.png); }
 .nos-icon32-media { background-image: url(../img/32/media.png) !important; }
@@ -196,12 +194,12 @@ a:hover {
     }
 }
 
-.wijmo-wijtabs.ui-tabs-left ul.nos-tabs-lang-header.ui-tabs-nav  {
+.wijmo-wijtabs.ui-tabs-left ul.nos-tabs-context-header.ui-tabs-nav  {
     padding: 50px 0 0 1%;
     width: 5%;
 }
 
-.ui-tabs-left div.nos-tabs-lang-content {
+.ui-tabs-left div.nos-tabs-context-content {
     left: 6%;
     width: 94%;
 }

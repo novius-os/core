@@ -15,6 +15,8 @@ class Model_Media_Folder extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media_folder';
     protected static $_primary_key = array('medif_id');
 
+    protected static $_title_property = 'medif_title';
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'medif_id',
@@ -83,7 +85,7 @@ class Model_Media_Folder extends \Nos\Orm\Model
         $path_thumbnails = str_replace(DOCROOT.'media/', DOCROOT.'cache/media/', $path_public);
         try {
             // delete_dir($path, $recursive, $delete_top)
-            is_dir($path_public)     and \File::delete_dir($path_public,     true, true);
+            is_dir($path_public) and \File::delete_dir($path_public, true, true);
             is_dir($path_thumbnails) and \File::delete_dir($path_thumbnails, true, true);
 
             return true;

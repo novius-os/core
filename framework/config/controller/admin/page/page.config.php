@@ -20,7 +20,7 @@ return array(
     'controller_url' => 'admin/nos/page/page',
     'model' => 'Nos\\Model_Page',
     'i18n_file' => 'nos::page',
-    'context_relation' => 'parent',
+    'situation_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
         'labels' => array(
@@ -32,8 +32,7 @@ return array(
         'visualise' =>
             function($item) use($i18n)
             {
-                if (!$item->is_new())
-                {
+                if (!$item->is_new()) {
                     return array(
                         'label' => $i18n('Visualise'),
                         'iconClasses' => 'nos-icon16 nos-icon16-eye',
@@ -42,9 +41,7 @@ return array(
                             'url' => $item->get_href().'?_preview=1',
                         ),
                     );
-                }
-                else
-                {
+                } else {
                     return array();
                 }
             }

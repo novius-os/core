@@ -24,10 +24,10 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                         }),
                     table = container.find('table'),
                     connector = container.closest('.nos-dispatcher, body')
-                        .on('langChange', function() {
-                            if (params.langChange) {
+                        .on('contextChange', function() {
+                            if (params.contextChange) {
                                 table.nostreegrid('option', 'treeOptions', {
-                                    lang : connector.data('nosLang') || ''
+                                    context : connector.data('nosContext') || ''
                                 });
                             }
                         }),
@@ -37,8 +37,8 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                             var match = {
                                     name : params.reloadEvent
                                 };
-                            if (connector.data('nosLang')) {
-                                match['lang'] = connector.data('nosLang');
+                            if (connector.data('nosContext')) {
+                                match['context'] = connector.data('nosContext');
                             }
                             container.nosListenEvent(match, function() {
                                     table.nostreegrid('reload');
@@ -49,10 +49,10 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                         table.nostreegrid({
                                 sortable : false,
                                 movable : false,
-                                treeUrl : params.treeUrl,
+                                urlJson : params.urlJson,
                                 treeColumnIndex : 1,
                                 treeOptions : $.extend(true, {
-                                    lang : connector.data('nosLang') || ''
+                                    context : connector.data('nosContext') || ''
                                 }, params.treeOptions || {}),
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',

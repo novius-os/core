@@ -12,7 +12,7 @@ return array(
     'controller_url'  => 'admin/nos/media/folder',
     'model' => 'Nos\\Model_Media_Folder',
     'i18n_file' => 'nos::media_folder',
-    'context_relation' => 'parent',
+    'situation_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/media.png',
         'labels' => array(

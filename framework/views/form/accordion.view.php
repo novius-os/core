@@ -8,7 +8,16 @@
  * @link http://www.novius-os.org
  */
 
-$fieldset->form()->set_config('field_template',  "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
+$fieldset->form()->set_config('field_template', "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
+
+foreach ($fieldset->field() as $field) {
+    if ($field->type == 'checkbox') {
+        $template = $field->template;
+        if (empty($template)) {
+            $field->set_template("\t\t<span class=\"{error_class}\">{field} {label}{required} {error_msg}</span>\n");
+        }
+    }
+}
 ?>
 <div class="accordion fieldset">
 <?php
@@ -42,8 +51,8 @@ foreach ((array) $accordions as $options) {
     }
     ?>
         </div>
-        <?php
-    }
-    ?>
+    <?php
+}
+?>
  </div>
 </div>

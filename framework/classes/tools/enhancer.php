@@ -55,9 +55,9 @@ class Tools_Enhancer
         $url_enhanced_flipped = array_flip($url_enhanced);
 
         $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
-        $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable', false);
-        if ($translatable) {
-            $item_lang = $item->get_lang();
+        $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable', false);
+        if ($contextable) {
+            $item_context = $item->get_context();
         }
         $urlItem   = call_user_func($callback, $item, $params);
         // Now fetch all the possible URLS
@@ -67,7 +67,7 @@ class Tools_Enhancer
         if ($urlPath === false) {
             foreach ($page_enhanced as $page_id => $params) {
                 $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
-                if ($urlPath !== false && (!$translatable || $params['lang'] == $item_lang) && ($preview || $params['published'])) {
+                if ($urlPath !== false && (!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
                     $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
                 }
             }
@@ -98,10 +98,10 @@ class Tools_Enhancer
         // Now fetch all the possible URLS
         $urls = array();
         $preview = \Arr::get($params, 'preview', false);
-        $lang    = \Arr::get($params, 'lang', false);
+        $context    = \Arr::get($params, 'context', false);
         foreach ($page_enhanced as $page_id => $params) {
             $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
-            if ($urlPath !== false && ($lang === false || $params['lang'] == $lang) && ($preview || $params['published'])) {
+            if ($urlPath !== false && ($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
                 $urls[$page_id] = $urlPath;
             }
         }

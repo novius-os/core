@@ -30,9 +30,13 @@ class Config extends \Fuel\Core\Config
     public static function get($item, $default = null)
     {
         $item = static::convertFileName($item, 'get');
-        //print_r($item."\n");
-        //print_r(parent::get($item, $default));
         return parent::get($item, $default);
+    }
+
+    public static function load_and_get($item, $default = null) {
+        $config_file = substr($item, 0, strpos($item, '.'));
+        static::load($config_file, true);
+        return static::get($item, $default);
     }
 
     public static function save($file, $config)
@@ -97,7 +101,12 @@ class Config extends \Fuel\Core\Config
                 $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
             }
         }
-        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+        $config = \Arr::recursive_filter(
+            $config,
+            function($var) {
+                return $var !== null;
+            }
+        );
 
         return $config;
     }
@@ -123,14 +132,97 @@ class Config extends \Fuel\Core\Config
                 $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name, array()));
             }
         }
-        $config = \Arr::recursive_filter($config, function($var) { return $var !== null; });
+        $config = \Arr::recursive_filter(
+            $config,
+            function($var) {
+                return $var !== null;
+            }
+        );
 
         return $config;
     }
 
-    public static function application($module_name)
+    public static function metadata($application_name)
     {
-        return static::extendable_load($module_name, 'config');
+        \Config::load($application_name.'::metadata', true);
+        return \Config::get($application_name.'::metadata');
+    }
+
+    public static function application($application_name)
+    {
+        return static::extendable_load($application_name, 'config');
+    }
+
+    public static function actions($context = array())
+    {
+        if (!isset($context['models'])) {
+            return array();
+        }
+
+        $selected_actions = array();
+        foreach ($context['models'] as $model) {
+            $actions = $model::admin_config();
+            $actions = $actions['actions'];
+
+            foreach ($actions as $key => $action) {
+                $action['name'] = $key;
+
+                if (isset($context['type']) && isset($action['context']) && isset($action['context'][$context['type']]) && $action['context'][$context['type']]) {
+                    $selected_actions[$key] = $action;
+                }
+            }
+
+            if (isset($context['item'])) {
+                $selected_actions = static::placeholder_replace($selected_actions, $context['item']);
+            }
+        }
+
+        return $selected_actions;
+    }
+
+
+
+    static function placeholder_replace($obj, $data) {
+        $retrieveFromData = function($arg, $data) {
+            if (isset($data[$arg])) {
+                return $data[$arg];
+            }
+            if (isset($data->{$arg})) {
+                return $data->{$arg};
+            }
+            try {
+                return $data->{$arg}();
+            } catch (\Exception $e) {
+                return '';
+            }
+        };
+
+        if (is_string($obj)) {
+            $obj = preg_replace_callback('/\[\:([\w]+)\]/', function($matches) use($data, $retrieveFromData) {
+                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
+            }, $obj);
+            $obj = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
+                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
+            }, $obj);
+            $obj = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
+                return urlencode(isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '');
+            }, $obj);
+        } else if (is_array($obj)) {
+            foreach ($obj as $key => $value) {
+                $new_key = static::placeholder_replace($key, $data);
+                $obj[$new_key] = static::placeholder_replace($value, $data);
+                if ($new_key !== $key) {
+                    unset($obj[$key]);
+                }
+            }
+        }
+        return $obj;
+    }
+
+    public static function icon($application_name, $icon_key) {
+        \Config::load($application_name.'::metadata', true);
+        $metadata = \Config::get($application_name.'::metadata');
+        return $metadata['icons'][$icon_key];
     }
 
 }

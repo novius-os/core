@@ -26,7 +26,7 @@ require(
 <?php
 echo $fieldset->build_hidden_fields();
 
-$fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+$fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
 $large = !empty($large) && $large == true;
 ?>
 
@@ -47,11 +47,11 @@ if (!empty($medias)) {
     echo '</td>';
 }
 
-$locales = array_keys(\Config::get('locales'));
-if (!empty($item) && count($locales) > 1) {
-    $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-    if ($translatable) {
-        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_lang()).'</td>';
+$contexts = array_keys(\Config::get('contexts', array()));
+if (!empty($item) && count($contexts) > 1) {
+    $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
+    if ($contextable) {
+        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_context()).'</td>';
     }
 }
 ?>
@@ -70,7 +70,7 @@ if (!empty($title)) {
         $field = $fieldset->field($name);
         $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
         echo ' '.$field
-                ->set_attribute('placeholder',$placeholder)
+                ->set_attribute('placeholder', $placeholder)
                 ->set_attribute('title', $placeholder)
                 ->set_attribute('class', 'title')
                 ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
@@ -96,23 +96,30 @@ if (!empty($subtitle) || !empty($publishable)) {
         echo $publishable;
     }
     if (!empty($subtitle)) {
-        $fieldset->form()->set_config('field_template',  "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+        $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
+            $field_template = $field->template;
+            if (!empty($field_template)) {
+                $field_template = str_replace(array('<tr>', '</tr>', '<td>', '</td>'), '', $field_template);
+                $field->set_template($field_template);
+            }
             $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-            echo $field
-                 ->set_attribute('placeholder',$placeholder)
-                 ->set_attribute('title', $placeholder)
-                 ->build();
+            echo "\t\t<td>",
+                $field
+                     ->set_attribute('placeholder',$placeholder)
+                     ->set_attribute('title', $placeholder)
+                     ->build(),
+                "</td>\n";
         }
-        $fieldset->form()->set_config('field_template',  "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
+        $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
     }
     ?>
                             </tr>
                         </table>
                     </div>
     <?php
-    }
+}
 ?>
             </div>
         </div>
