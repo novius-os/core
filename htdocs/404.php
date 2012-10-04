@@ -36,12 +36,12 @@ if ($is_media) {
     }
 
     $media = false;
-    $res = \DB::select()->from(\Nos\Model_Media::table())->where(array(
+    $res = \DB::select()->from(\Nos\Media\Model_Media::table())->where(array(
                 array('media_path', '=', '/'.$media_url),
             ))->execute()->as_array();
 
     if (!empty($res)) {
-        $media = \Nos\Model_Media::forge(reset($res));
+        $media = \Nos\Media\Model_Media::forge(reset($res));
     }
 
     if (false === $media) {

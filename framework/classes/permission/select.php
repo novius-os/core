@@ -42,7 +42,7 @@ class Permission_Select extends Permission_Driver
 
     public function save($role, $data)
     {
-        $perms = Model_User_Permission::find('all', array(
+        $perms = User\Model_Permission::find('all', array(
             'where' => array(
                 array('perm_role_id',     $role->role_id),
                 array('perm_application', $this->application),
@@ -57,7 +57,7 @@ class Permission_Select extends Permission_Driver
 
         // Add appropriates one
         foreach ($data as $permitted) {
-            $p = new Model_User_Permission();
+            $p = new User\Model_Permission();
             $p->perm_role_id     = $role->role_id;
             $p->perm_application = $this->application;
             $p->perm_identifier  = $this->identifier;
@@ -72,7 +72,7 @@ class Permission_Select extends Permission_Driver
             return;
         }
 
-        $data = Model_User_Permission::find('all', array(
+        $data = User\Model_Permission::find('all', array(
             'where' => array(
                 array('perm_role_id', $role->role_id),
             ),

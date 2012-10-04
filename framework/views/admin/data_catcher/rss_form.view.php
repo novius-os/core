@@ -75,7 +75,7 @@ echo \View::forge('form/fields', array(
                 $field->set_template('{field}');
                 $possibles = $item->get_sharable_property($field_name.'.possibles');
                 foreach ($possibles as $media_id => $idk) {
-                    $media = \Nos\Model_Media::find($media_id);
+                    $media = \Nos\Media\Model_Media::find($media_id);
                     $field->set_options(array(
                         $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
                     ));

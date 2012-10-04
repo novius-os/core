@@ -86,7 +86,7 @@ class Widget_Media extends \Fieldset_Field
     protected static function hydrate_options(&$options, $media_id = null)
     {
         if (!empty($media_id)) {
-            $media = \Nos\Model_Media::find($media_id);
+            $media = \Nos\Media\Model_Media::find($media_id);
             if (!empty($media)) {
                 $options['inputFileThumb']['file'] = $media->get_public_path_resized(64, 64);
             }

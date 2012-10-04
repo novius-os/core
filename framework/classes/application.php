@@ -12,11 +12,28 @@ namespace Nos;
 
 class Application
 {
+    static $repositories;
+
     public static function _init()
     {
         // @todo repair that
         //\Module::load('data', APPPATH.'data');
         \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
+
+        static::$repositories = array(
+            'local' => APPPATH.'applications'.DS,
+            'natives' => NOSPATH.'applications'.DS,
+        );
+    }
+
+    public static function get_application_path($application) {
+        foreach (static::$repositories as $repository) {
+            $path = $repository.$application;
+            if (is_dir($path)) {
+                return $path;
+            }
+        }
+        return false;
     }
 
     /**
@@ -35,15 +52,9 @@ class Application
      * @param  string[]    $repositories
      * @return Application
      */
-    public static function search_all($repositories = array())
+    public static function search_all()
     {
-        $repositories = array(
-            'local' => APPPATH.'applications'.DS,
-        );
-        // @todo use config.modules_path?
-
-        $applications = array();
-        foreach ($repositories as $where => $path) {
+        foreach (static::$repositories as $where => $path) {
             $list = \File::read_dir($path, 1);
 
             // idc = I don't care
@@ -124,7 +135,7 @@ class Application
 
     protected function check_install()
     {
-        return is_dir(APPPATH.'applications'.DS.$this->folder) && $this->is_link('static') && $this->is_link('htdocs');
+        return static::get_application_path($this->folder) !== false && $this->is_link('static') && $this->is_link('htdocs');
     }
 
     /**
@@ -353,7 +364,7 @@ class Application
     protected function symlink($folder)
     {
         if (!$this->is_link($folder)) {
-            $private = APPPATH.'applications'.DS.$this->folder.DS.$folder;
+            $private = static::get_application_path($this->folder).DS.$folder;
             if (is_dir($private)) {
                 $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
                 if (is_link($public)) {
@@ -380,7 +391,7 @@ class Application
 
     protected function is_link($folder)
     {
-        $private = APPPATH.'applications'.DS.$this->folder.DS.$folder;
+        $private =  static::get_application_path($this->folder).DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private)) {
             return is_link($public) && readlink($public) == Tools_File::relativePath(dirname($public), $private);

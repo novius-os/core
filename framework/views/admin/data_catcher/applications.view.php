@@ -9,7 +9,7 @@
  */
 
 if (isset($nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
-    $image = \Nos\Model_Media::find($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
+    $image = \Nos\Media\Model_Media::find($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
     if (empty($image)) {
         unset($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
     } else {

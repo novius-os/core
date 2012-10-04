@@ -23,30 +23,6 @@ return array(
             'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
             'application' => 'nos_page',
         ),
-        'nos_media' => array(
-            'name' => 'Media centre',
-            'action' => array(
-                'action' => 'nosTabs',
-                'tab' => array(
-                    'url' => 'admin/nos/media/appdesk/index',
-                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
-                ),
-            ),
-            'icon64' => 'static/novius-os/admin/novius-os/img/64/media.png',
-            'application' => 'nos_media',
-        ),
-        'nos_user' => array(
-            'name' => 'Users',
-            'action' => array(
-                'action' => 'nosTabs',
-                'tab' => array(
-                    'url' => 'admin/nos/user/appdesk/index',
-                    'iconUrl' => 'static/novius-os/admin/novius-os/img/32/user.png',
-                ),
-            ),
-            'icon64' => 'static/novius-os/admin/novius-os/img/64/user.png',
-            'application' => 'nos_user',
-        ),
         'nos_help' => array(
             'name' => 'Help',
             'action' => array(
