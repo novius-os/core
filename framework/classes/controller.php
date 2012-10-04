@@ -295,20 +295,24 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 foreach ($keys as $key => $common_id) {
                     $items[$key]['context'] = $contexts[$common_id];
                 }
-                if ($tree) {
-                    $root = reset($objects)->find_root();
-                    if (!empty($root)) {
-                        $all_contexts = $root->get_all_context();
-                    } else {
-                        $all_contexts = array_unique(\Arr::flatten($contexts));
-                    }
-                } else {
-                    $all_contexts = array_unique(\Arr::flatten($contexts));
-                }
+
+                $global_contexts = array_keys(\Config::get('contexts'));
                 foreach ($items as &$item) {
                     $flags = '';
                     $contexts = $item['context'];
-                    foreach ($all_contexts as $context) {
+
+                    $site = false;
+                    foreach ($global_contexts as $context) {
+                        if (is_array($config['context']) && !in_array($context, $config['context'])) {
+                            continue;
+                        }
+                        $site_locale_code = Helper::site_locale($context);
+                        $site_locale = Helper::site_locale($context);
+                        $site_alias = !empty($site_locale['site']['alias']) ? $site_locale['site']['alias'] : (!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_locale_code['site']);
+                        if ($site !== $site_alias) {
+                            $site = !empty($site_locale['site']['alias']) ? $site_locale['site']['alias'] : (!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_locale_code['site']);
+                            $flags .= ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.(!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : '').'">'.$site.'</span> ';
+                        }
                         if (in_array($context, $contexts)) {
                             $flags .= \Nos\Helper::flag($context);
                         } else {

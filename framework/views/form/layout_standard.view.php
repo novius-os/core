@@ -51,7 +51,7 @@ $contexts = array_keys(\Config::get('contexts'));
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
     if ($contextable) {
-        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_context()).'</td>';
+        echo '<td style="width:16px;text-align:center;">'.\Nos\Helper::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true)).'</td>';
     }
 }
 ?>

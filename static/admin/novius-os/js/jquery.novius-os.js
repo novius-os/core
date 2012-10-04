@@ -195,6 +195,88 @@ define('jquery-nos',
                     }
                     image.src = media.path;
                 });
+            },
+
+            nosUIElement : function(element) {
+                var $element;
+
+                element = $.extend({
+                    type: 'button',
+                    bind: {}
+                }, element);
+
+                if (element.action) {
+                    element.bind['click'] = $.extend(true, {}, element.action);
+                    delete element.action;
+                }
+
+                switch (element.type) {
+                    case 'button' :
+                        $element = $('<button></button>').data(element);
+                        if (element.label) {
+                            $element.text(element.label);
+                        }
+                        $.each(element.bind, function(event, action) {
+                            $element.bind(event, function() {
+                                $element.nosAction(action);
+                            });
+                        });
+
+                        break;
+                }
+
+                if (element.menu) {
+                    var date = new Date(),
+                        id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                    $element.attr('id', id)
+                        .nosOnShow('one', function() {
+                            var $ul = $('<ul></ul>');
+                            $.each(element.menu.menus, function() {
+                                var menu = this,
+                                    $a = $('<li><a></a></li>').data('action', menu.action)
+                                        .appendTo($ul)
+                                        .find('a');
+
+                                if (menu.content) {
+                                    $a.append(menu.content);
+                                } else {
+                                    if (menu.icon) {
+                                        $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
+                                            .appendTo($a);
+                                    } else if (menu.iconClasses) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
+                                            .appendTo($a);
+                                    } else if (menu.iconUrl) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
+                                            .css('backgroundImage', 'url(' + menu.iconUrl + ')')
+                                            .appendTo($a);
+                                    }
+                                    if (menu.label) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-text')
+                                            .text(menu.label)
+                                            .appendTo($a);
+                                    }
+                                }
+                            });
+
+                            $ul.insertAfter($element)
+                                .wijmenu($.extend({
+                                        orientation: 'vertical'
+                                    },
+                                    element.menu.options || {},
+                                    {
+                                        trigger: '#' + id,
+                                        select: function(e, data) {
+                                            var $li = $(data.item.element);
+                                            $li.nosAction($li.data('action'));
+                                        }
+                                    }
+                                ));
+                        });
+                }
+
+
+                return $element;
             }
         });
 

@@ -41,12 +41,38 @@ class Helper
     public static function flag($context)
     {
         $site_locale = self::site_locale($context);
-        return '<img src="'.static::flag_url($context).'" title="'.(!empty($site_locale['locale']) && !empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $site_locale['locale']).'" /> ';
+        return '<img src="'.static::flag_url($context).'" title="'.(!empty($site_locale['locale']) && !empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $site_locale['locale']).'" style="vertical-align:middle;" /> ';
     }
 
     public static function flag_empty()
     {
         return '<span style="display:inline-block; width:16px;"></span> ';
+    }
+
+    public static function context_label($context, array $options = array())
+    {
+        $options = array_merge(array(
+                'alias' => false,
+                'template' => '{locale} {site}',
+                'flag' => true,
+            ), $options);
+
+        $site_locale = self::site_locale($context);
+        $sites = \Config::get('sites');
+        $locales = \Config::get('locales');
+        $site_label = $options['alias'] && !empty($site_locale['site']['alias']) ? '<span title="'.(!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : '').'">'.$site_locale['site']['alias'].'</span>' : '';
+        $site_label = empty($site_label) && !empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_label;
+        $site_label = empty($site_label) ? $context : $site_label;
+
+        if (count($sites) === 1) {
+            $label = !empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $context;
+        } elseif (count($locales) === 1) {
+            $label = $site_label;
+        } else {
+            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? Helper::flag($context) : (!empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $context), '{site}' => $site_label));
+        }
+
+        return $label;
     }
 
     public static function site_locale_code($context)

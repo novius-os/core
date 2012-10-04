@@ -30,7 +30,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'not found' => 'Item not found',
             'error added in context not parent' => 'This item cannot be added {context} because its {parent} is not available in this context yet.',
             'error added in context' => 'This item cannot be added {context}.',
-            'item inexistent in context yet' => 'This item has not been added in {context} yet.',
             'visualise' => 'Visualise',
             'delete' => 'Delete',
             'delete an item' => 'Delete an item',
@@ -431,7 +430,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_actions()
     {
-        $actions = array_values($this->get_actions_context());
+        $actions = $this->get_actions_context();
         if (!$this->is_new) {
             if ($this->behaviours['url'] !== false) {
                 $url = $this->item->url_canonical(array('preview' => true));
@@ -490,6 +489,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $actions = array();
         $contexts = array_keys(\Config::get('contexts'));
+        $sites = \Config::get('sites');
+        $locales = \Config::get('locales');
+
         $main_context = $this->item->find_main_context();
         foreach ($contexts as $context) {
             if ($this->item->{$this->behaviours['contextable']['context_property']} === $context) {
@@ -497,11 +499,30 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_context = $this->item->find_context($context);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
-            $label = empty($main_context) ? $this->config['messages']['add an item in context'] : (empty($item_context) ? __('Translate in {context}') : __('Edit in {context}'));
-            $site_locale = Helper::site_locale($context);
-            $actions[$context] = array(
-                'label' => strtr($label, array('{context}' => !empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $context)),
-                'iconUrl' => \Nos\Helper::flag_url($context),
+            if (empty($main_context)) {
+                $label = $this->config['messages']['add an item in context'];
+            } else {
+                if (empty($item_context)) {
+                    if (count($sites) === 1) {
+                        $label = __('Translate in {context}');
+                    } elseif (count($locales) === 1) {
+                        $label = __('Add to {context}');
+                    } else {
+                        $site_locale_item = Helper::site_locale_code($this->item->get_context());
+                        $site_locale = Helper::site_locale_code($context);
+                        if ($site_locale_item['locale'] === $site_locale['locale']) {
+                            $label = __('Add to {context}');
+                        } else {
+                            $label = __('Translate into {context}');
+                        }
+                    }
+                } else {
+                    $label = __('Edit in {context}');
+                }
+            }
+            $label = strtr($label, array('{context}' => Helper::context_label($context)));
+            $actions[] = array(
+                'content' => $label,
                 'action' => array(
                     'action' => 'nosTabs',
                     'method' => empty($main_context) ? 'add' : 'open',
@@ -512,7 +533,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             );
         }
 
-        return $actions;
+        return array(
+            array(
+                'label' => __('Translate / Copy'),
+                'menu' => array(
+                    'options' => array(
+                        'orientation' => 'vertical',
+                    ),
+                    'menus' => $actions,
+                ),
+            ),
+        );
     }
 
     protected function check_permission($action)

@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-$uniqid = uniqid($context.'_');
+$uniqid = uniqid(str_replace(':', '_', $context).'_');
 
 $labels = array();
 $possible = $item->get_possible_context();
@@ -28,7 +28,7 @@ if (!in_array($context, $possible)) {
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
         echo strtr($crud['config']['messages']['error added in context not parent'], array(
-            '{context}' => Arr::get(Config::get('contexts'), $context, $context),
+            '{context}' => \Nos\Helper::context_label($context),
             '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
         ));
         ?>
@@ -41,24 +41,25 @@ if (!in_array($context, $possible)) {
         </script>
         <?php
     } else {
-        echo strtr($crud['config']['messages']['error added in context'], array('{context}' => Arr::get(Config::get('contexts'), $context, $context)));
+        echo strtr($crud['config']['messages']['error added in context'], array('{context}' => \Nos\Helper::context_label($context)));
     }
 } else {
-    foreach ($possible as $locale) {
-        $item_context = $item->find_context($locale);
+    foreach ($possible as $possible_context) {
+        $item_context = $item->find_context($possible_context);
         if (!empty($item_context)) {
-            $labels[$item_context->id] = \Config::get("contexts.$locale", $locale);
+            $labels[$item_context->id] = \Nos\Helper::context_label($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
         }
     }
+    $site_locale_item = \Nos\Helper::site_locale_code($item->get_context());
+    $site_locale_new = \Nos\Helper::site_locale_code($context);
+
+    if ($site_locale_item['locale'] === $site_locale_new['locale']) {
+        $label = __('Add "{item}" into {context}');
+    } else {
+        $label = __('Translate "{item}" into {context}');
+    }
+    echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Helper::context_label($context))), '</h1>';
     ?>
-            <p><?=
-            strtr($crud['config']['messages']['item inexistent in context yet'], array('{context}' => Arr::get(Config::get('contexts'), $context, $context)))
-            ?></p>
-
-            <p>&nbsp;</p>
-
-            <p><?= __('To add this version, you have two options: ') ?></p>
-
             <p>&nbsp;</p>
 
             <ul style="margin-left:1em;">
@@ -84,8 +85,9 @@ if (!in_array($context, $possible)) {
         $selected_context = Form::select('create_from_id', null, $labels);
     }
 
+    $button = '<button type="submit" class="primary" data-icon="plus">'.($site_locale_item['locale'] === $site_locale_new['locale'] ? __('Copy') : __('Translate')).'</button>';
     echo strtr(__('{translate} the {context} version'), array(
-        '{translate}' => '<button type="submit" class="primary" data-icon="plus">'.__('Translate').'</button>',
+        '{translate}' => $button,
         '{context}' => $selected_context,
     ));
     ?>

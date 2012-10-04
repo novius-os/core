@@ -428,11 +428,11 @@ define('jquery-nos-appdesk',
                     } else {
                         $.each(sites, function(site, locales) {
                             if (!$button.is(':empty')) {
-                                $button.append('<span>&nbsp;-&nbsp;</span>');
+                                $button.append('<span style="vertical-align:middle;">&nbsp;&nbsp;</span>');
                             }
-                            $button.append('<span>' + o.sites[site].title + '</span> ');
+                            $button.append('<span style="vertical-align:middle;" title="' + o.sites[site].title + '">' + (o.sites[site].alias ? o.sites[site].alias : o.sites[site].title) + '</span> ');
                             $.each(locales, function(i, locale) {
-                                $button.append('<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" /> ')
+                                $button.append('<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" style="vertical-align:middle;" /> ')
                             });
                         });
                     }

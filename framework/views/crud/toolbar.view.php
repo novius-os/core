@@ -29,59 +29,61 @@
                     });
 
                 $.each(actions, function() {
-                    var button = this,
-                        openShare = false;
-                        $button = $('<button></button>').click(function() {
-                                var $button = $(this),
-                                    $share = $toolbar.nextAll('.nos-datacatchers');
-                                if (button.action.action === 'share') {
-                                    $button.hover(function() {
-                                        if (openShare) {
-                                            $button.addClass('ui-state-active');
-                                        }
-                                    });
-                                    var open_close = function(state) {
-                                        $share[state ? 'show' : 'hide']();
-                                        $toolbar.find('.ui-button').not($button).each(function() {
-                                            $(this).button(state ? 'disable' : 'enable');
-                                        });
+                    var element = this,
+                        openShare = false,
+                        $element;
 
-                                        $button.blur()[state ? 'addClass' : 'removeClass']('ui-state-active');
-                                        openShare = state;
+                    if (element.action && element.action.action === 'share') {
+                        var action = $.extend(true, {}, element.action);
+                        delete element.action;
+                        element.bind = element.bind || {};
+                        element.bind.click = function() {
+                            var $share = $toolbar.nextAll('.nos-datacatchers');
 
-                                    };
-
-                                    if ($share.size()) {
-                                        if ($share !== 'load') {
-                                            open_close(!openShare);
-                                        }
-                                    } else {
-                                        $share = 'load';
-                                        $.ajax({
-                                            url : 'admin/nos/datacatcher/form',
-                                            data : button.action.data,
-                                            success : function(data) {
-                                                $share = $(data).insertAfter($container)
-                                                    .bind('close', function() {
-                                                        open_close(false);
-                                                    })
-                                                    .addClass('fill-parent nos-fixed-content')
-                                                    .css({
-                                                        top : $container.css('top'),
-                                                        bottom : $container.css('bottom')
-                                                    });
-                                                open_close(true);
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    $button.nosAction(button.action);
+                            $element.hover(function() {
+                                if (openShare) {
+                                    $element.addClass('ui-state-active');
                                 }
-                            })
-                            .text(button.label)
-                            .data(button);
+                            });
+                            var open_close = function(state) {
+                                $share[state ? 'show' : 'hide']();
+                                $toolbar.find('.ui-button').not($element).each(function() {
+                                    $(this).button(state ? 'disable' : 'enable');
+                                });
 
-                    $container.nosToolbar('add', $button, true);
+                                $element.blur()[state ? 'addClass' : 'removeClass']('ui-state-active');
+                                openShare = state;
+
+                            };
+
+                            if ($share.size()) {
+                                if ($share !== 'load') {
+                                    open_close(!openShare);
+                                }
+                            } else {
+                                $share = 'load';
+                                $.ajax({
+                                    url : 'admin/nos/datacatcher/form',
+                                    data : action.data,
+                                    success : function(data) {
+                                        $share = $(data).insertAfter($container)
+                                                .bind('close', function() {
+                                                    open_close(false);
+                                                })
+                                                .addClass('fill-parent nos-fixed-content')
+                                                .css({
+                                                    top : $container.css('top'),
+                                                    bottom : $container.css('bottom')
+                                                });
+                                        open_close(true);
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    $container.nosToolbar('add', $.nosUIElement(element), true)
+                        .nosOnShow('show');
                 });
             });
         });
