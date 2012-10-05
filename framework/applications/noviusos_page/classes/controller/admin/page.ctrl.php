@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Page;
 
-class Controller_Admin_Page_Page extends Controller_Admin_Crud
+class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 {
     protected $page_parent = false;
 

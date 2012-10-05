@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Page;
 
-class Controller_Admin_Page_Appdesk extends Controller_Admin_Appdesk
+class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
 {
     public function action_info($id)
     {

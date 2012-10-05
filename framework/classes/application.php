@@ -260,7 +260,7 @@ class Application
 
         if (!empty($removed['templates'])) {
             // Check template usage in the page
-            $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
+            $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
             if (count($pages) > 0) {
                 $usedTemplates = array();
                 $pageTitles = array();

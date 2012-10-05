@@ -15,8 +15,8 @@ foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
 }
 
 return array(
-    'controller_url' => 'admin/nos/page/page',
-    'model' => 'Nos\\Model_Page',
+    'controller_url' => 'admin/noviusos_page/page',
+    'model' => 'Nos\\Page\\Model_Page',
     'messages' => array(
         'successfully added' => __('Page successfully added.'),
         'successfully saved' => __('Page successfully saved.'),
@@ -40,7 +40,7 @@ return array(
     ),
     'situation_relation' => 'parent',
     'tab' => array(
-        'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+        'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
         'labels' => array(
             'insert' => __('Add a page'),
             'blankSlate' => __('Translate a page'),
@@ -131,7 +131,7 @@ return array(
             ),
         ),
         'js' => array(
-            'view' => 'nos::admin/page/page_form',
+            'view' => 'noviusos_page::admin/page_form',
         ),
     ),
     'fields' => array(
@@ -152,7 +152,7 @@ return array(
             ),
         ),
         'page_parent_id' => array(
-            'widget' => 'Nos\Widget_Page_Selector',
+            'widget' => 'Nos\Page\Widget_Selector',
             'widget_options' => array(
                 'width' => '250px',
                 'height' => '250px',
@@ -228,9 +228,9 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::EXTERNAL_TARGET_NEW => __('New window'),
-                    Nos\Model_Page::EXTERNAL_TARGET_POPUP => __('Popup'),
-                    Nos\Model_Page::EXTERNAL_TARGET_SAME => __('Same window'),
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_NEW => __('New window'),
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_POPUP => __('Popup'),
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_SAME => __('Same window'),
                 ),
             ),
         ),
@@ -239,10 +239,10 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::TYPE_CLASSIC => __('Page'),
+                    Nos\Page\Model_Page::TYPE_CLASSIC => __('Page'),
                     /*Nos\Model_Page::TYPE_FOLDER => __('Folder / Chapter'),
                  Nos\Model_Page::TYPE_INTERNAL_LINK => __('Internal link'),*/
-                    Nos\Model_Page::TYPE_EXTERNAL_LINK => __('External link'),
+                    Nos\Page\Model_Page::TYPE_EXTERNAL_LINK => __('External link'),
                 ),
             ),
         ),
@@ -251,9 +251,9 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Model_Page::LOCK_UNLOCKED => __('Unlocked'),
-                    Nos\Model_Page::LOCK_DELETION => __('Deletion'),
-                    Nos\Model_Page::LOCK_EDITION => __('Modification'),
+                    Nos\Page\Model_Page::LOCK_UNLOCKED => __('Unlocked'),
+                    Nos\Page\Model_Page::LOCK_DELETION => __('Deletion'),
+                    Nos\Page\Model_Page::LOCK_EDITION => __('Modification'),
                 ),
             ),
         ),

@@ -445,7 +445,7 @@ class Controller_Front extends Controller
         }
 
         // Liste toutes les pages ayant le bon nom
-        $pages = Model_Page::find('all', array(
+        $pages = \Nos\Page\Model_Page::find('all', array(
             'where' => $where,
         ));
 
@@ -503,7 +503,7 @@ class Controller_Front extends Controller
 
     public function rebuild_cache($cache)
     {
-        $this->_page = new Model_Page();
+        $this->_page = new \Nos\Page\Model_Page();
         foreach ($cache['page'] as $field => $value) {
             $this->_page->{'page_'.$field} = $value;
         }

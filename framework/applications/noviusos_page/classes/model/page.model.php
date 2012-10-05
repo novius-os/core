@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Page;
 
 use Fuel\Core\Uri;
 
@@ -20,7 +20,7 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'page_id',
-            'model_to'       => '\Nos\Model_Page',
+            'model_to'       => '\Nos\Page\Model_Page',
             'key_to'         => 'page_parent_id',
             'cascade_save'   => false,
             'cascade_delete' => false,
@@ -30,7 +30,7 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_belongs_to = array(
         'parent' => array(
             'key_from'       => 'page_parent_id',
-            'model_to'       => '\Nos\Model_Page',
+            'model_to'       => '\Nos\Page\Model_Page',
             'key_to'         => 'page_id',
             'cascade_save'   => false,
             'cascade_delete' => false,

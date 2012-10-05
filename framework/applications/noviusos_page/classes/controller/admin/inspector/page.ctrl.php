@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Page;
 
-class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltree
+class Controller_Admin_Inspector_Page extends \Nos\Controller_Inspector_Modeltree
 {
 
     protected function tree(array $tree_config)
@@ -28,7 +28,7 @@ class Controller_Admin_Page_Inspector_Page extends Controller_Inspector_Modeltre
             $json['items'] = array(
                 array(
                     '_id' => '0',
-                    '_model' => 'Nos\Model_Page',
+                    '_model' => 'Nos\Page\Model_Page',
                     //'actions' => array(),
                     'id' => '0',
                     //'context' => '',

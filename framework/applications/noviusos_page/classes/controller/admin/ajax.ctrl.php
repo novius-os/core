@@ -8,11 +8,11 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Page;
 
 use Fuel\Core\Config;
 
-class Controller_Admin_Page_Ajax extends \Controller
+class Controller_Admin_Ajax extends \Controller
 {
     public function before()
     {
@@ -30,7 +30,7 @@ class Controller_Admin_Page_Ajax extends \Controller
 
         $page = empty($page_id) ? null : Model_Page::find($page_id);
         foreach ($data['layout'] as $wysiwyg => $coords) {
-            $data['content'][$wysiwyg] = empty($page) ? '' : Tools_Wysiwyg::prepare_widget($page->wysiwygs->{$wysiwyg});
+            $data['content'][$wysiwyg] = empty($page) ? '' : \Nos\Tools_Wysiwyg::prepare_widget($page->wysiwygs->{$wysiwyg});
         }
 
         // @todo replace images

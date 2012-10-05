@@ -39,22 +39,22 @@ return array(
     'tree' => array(
         'models' => array(
             array(
-                'model' => 'Nos\Model_Page',
+                'model' => 'Nos\Page\Model_Page',
                 'order_by' => 'page_sort',
-                'childs' => array('Nos\Model_Page'),
+                'childs' => array('Nos\Page\Model_Page'),
                 'dataset' => $dataset,
             ),
         ),
         'roots' => array(
             array(
-                'model' => 'Nos\Model_Page',
+                'model' => 'Nos\Page\Model_Page',
                 'where' => array(array('page_parent_id', 'IS', \DB::expr('NULL'))),
                 'order_by' => 'page_sort',
             ),
         ),
     ),
     'query' => array(
-        'model' => 'Nos\Model_Page',
+        'model' => 'Nos\Page\Model_Page',
         'related' => array(),
     ),
     'search_text' => 'page_title',
@@ -62,14 +62,14 @@ return array(
     'views' => array(
         'default' => array(
             'name' => __('Default view'),
-            'json' => array('static/novius-os/admin/config/page/page.js'),
+            'json' => array('static/apps/noviusos_page/config/page.js'),
         ),
         'link_pick' => array(
             'name' => __('Link'),
             'virtual' => true,
             'json' => array(
-                'static/novius-os/admin/config/page/page.js',
-                'static/novius-os/admin/config/page/link_pick.js'
+                'static/apps/noviusos_page/config/page.js',
+                'static/apps/noviusos_page/config/link_pick.js'
             ),
         ),
     ),
@@ -98,10 +98,6 @@ return array(
     ),
     'dataset' => $dataset,
     'appdesk' => array(
-        'tab' => array(
-            'label' => __('Pages'),
-            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
-        ),
         'actions' => array(
             'edit' => array(
                 'label' => __('Edit'),
@@ -111,9 +107,9 @@ return array(
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => 'admin/nos/page/page/insert_update/{{id}}',
+                        'url' => 'admin/noviusos_page/page/insert_update/{{id}}',
                         'label' => '{{title}}',
-                        'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+                        'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                     ),
                 ),
             ),
@@ -124,9 +120,9 @@ return array(
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => 'admin/nos/page/page/insert_update?context_id={{id}}',
+                        'url' => 'admin/noviusos_page/page/insert_update?context_id={{id}}',
                         'label' => __('Add a page'),
-                        'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+                        'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                     ),
                 ),
             ),
@@ -138,7 +134,7 @@ return array(
                 'action' => array(
                     'action' => 'confirmationDialog',
                     'dialog' => array(
-                        'contentUrl' => 'admin/nos/page/page/delete/{{id}}',
+                        'contentUrl' => 'admin/noviusos_page/page/delete/{{id}}',
                         'title' => __('Delete a page')
                     ),
                 ),
@@ -161,7 +157,7 @@ return array(
                 'action' => array(
                     'action' => 'nosAjax',
                     'params' => array(
-                        'url' => 'admin/nos/page/page/set_homepage',
+                        'url' => 'admin/noviusos_page/page/set_homepage',
                         'method' => 'POST',
                         'data' => array(
                             'id' => '{{id}}',
@@ -170,7 +166,7 @@ return array(
                 ),
             ),
         ),
-        'reloadEvent' => 'Nos\\Model_Page',
+        'reloadEvent' => 'Nos\\Page\\Model_Page',
         'appdesk' => array(
             'buttons' => array(
                 'page' => array(
@@ -179,9 +175,9 @@ return array(
                         'action' => 'nosTabs',
                         'method' => 'add',
                         'tab' => array(
-                            'url' => 'admin/nos/page/page/insert_update?context={{context}}',
+                            'url' => 'admin/noviusos_page/page/insert_update?context={{context}}',
                             'label' => __('Add a page'),
-                            'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
+                            'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                         ),
                     ),
                 ),
@@ -190,13 +186,13 @@ return array(
                     'action' => array(
                         'action' => 'nosAjax',
                         'params' => array(
-                            'url' => 'admin/nos/page/appdesk/clear_cache',
+                            'url' => 'admin/noviusos_page/appdesk/clear_cache',
                         ),
                     ),
                 ),
             ),
             'grid' => array(
-                'urlJson' => 'admin/nos/page/appdesk/json',
+                'urlJson' => 'admin/noviusos_page/appdesk/json',
                 'columns' => array(
                     'title' => array(
                         'headerText' => __('Title'),
@@ -220,7 +216,7 @@ return array(
                 ),
             ),
             'treeGrid' => array(
-                'urlJson' => 'admin/nos/page/appdesk/tree_json',
+                'urlJson' => 'admin/noviusos_page/appdesk/tree_json',
             ),
             'defaultView' => 'treeGrid',
         ),

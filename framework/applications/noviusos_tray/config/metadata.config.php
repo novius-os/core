@@ -16,7 +16,7 @@ return array(
         'name'  => 'Novius OS',
     ),
     'permission' => array(
-        'icon64'  => 'static/apps/noviusos_media/img/media-64.png',
+        'icon64'  => 'static/apps/noviusos_tray/img/64/app-manager.png',
     ),
     'launchers' => array(
         'nos_help' => array(

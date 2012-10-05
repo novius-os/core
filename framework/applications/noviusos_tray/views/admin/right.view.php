@@ -1,6 +1,3 @@
-<a class="button" style="cursor: pointer;" title="<?= __('Help') ?>" onclick="$(this).nosTabs('open', {url: 'admin/nos/tray/help', app: true, iconSize: 32, labelDisplay: false, iconUrl: 'static/novius-os/admin/novius-os/img/32/help.png', label: <?= htmlentities(\Format::forge(__('Help'))->to_json()) ?>});">
-    <img src="static/novius-os/admin/novius-os/img/32/help.png" />
-</a>
 <div class="menu">
     <?= \Session::user()->user_firstname ?>
 </div>

@@ -20,7 +20,7 @@ if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
     if (strpos($nuggets[\Nos\DataCatcher::TYPE_URL], '::') !== false) {
         list($page_id, $path) = preg_split("/\:\:/", $nuggets[\Nos\DataCatcher::TYPE_URL]);
         if (!empty($path)) {
-            $page = \Nos\Model_Page::find($page_id);
+            $page = \Nos\Page\Model_Page::find($page_id);
             if (empty($page)) {
                 unset($nuggets[\Nos\DataCatcher::TYPE_URL]);
             } else {

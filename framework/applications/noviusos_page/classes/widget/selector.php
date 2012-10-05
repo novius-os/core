@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Page;
 
-class Widget_Page_Selector extends \Nos\Widget_Selector
+class Widget_Selector extends \Nos\Widget_Selector
 {
     public function before_construct(&$attributes, &$rules)
     {
@@ -45,12 +45,12 @@ class Widget_Page_Selector extends \Nos\Widget_Selector
     public static function widget($options = array())
     {
         $options = \Arr::merge(array(
-            'urlJson' => 'admin/nos/page/inspector/page/json',
-            'reloadEvent' => 'Nos\\Model_Page',
+            'urlJson' => 'admin/noviusos_page/inspector/page/json',
+            'reloadEvent' => 'Nos\\Page\\Model_Page',
             'input_name' => null,
             'selected' => array(
                 'id' => null,
-                'model' => 'Nos\\Model_Page',
+                'model' => 'Nos\\Page\\Model_Page',
             ),
             'columns' => array(
                 array(
@@ -64,7 +64,7 @@ class Widget_Page_Selector extends \Nos\Widget_Selector
             'width' => null,
         ), $options);
 
-        return (string) \Request::forge('nos/admin/page/inspector/page/list')->execute(
+        return (string) \Request::forge('admin/noviusos_page/inspector/page/list')->execute(
             array(
                 'inspector/modeltree_radio',
                 array(

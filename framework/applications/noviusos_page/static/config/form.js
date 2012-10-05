@@ -47,7 +47,7 @@ define(
                 $container.data('already-processed', true);
                 var $wysiwyg = $container.find('[data-id=wysiwyg]');
                 $.ajax({
-                    url: 'admin/nos/page/ajax/wysiwyg/' + from_id,
+                    url: 'admin/noviusos_page/ajax/wysiwyg/' + from_id,
                     data: {
                         template_id: $(this).val()
                     },
