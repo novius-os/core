@@ -21,19 +21,44 @@ class Application
         \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
 
         static::$repositories = array(
-            'local' => APPPATH.'applications'.DS,
-            'natives' => NOSPATH.'applications'.DS,
+            'local' => array(
+                'path' => APPPATH.'applications'.DS,
+                'visible' => true,
+                'native' => false,
+            ),
+            'natives' => array(
+                'path' => NOSPATH.'applications'.DS,
+                'visible' => false,
+                'native' => true,
+            ),
         );
     }
 
     public static function get_application_path($application) {
         foreach (static::$repositories as $repository) {
-            $path = $repository.$application;
+            $path = $repository['path'].$application;
             if (is_dir($path)) {
                 return $path;
             }
         }
         return false;
+    }
+
+    public static function install_native_applications() {
+        foreach (static::$repositories as $where => $repository) {
+            if ($repository['visible']) {
+                $list = \File::read_dir($repository['path'], 1);
+
+                // idc = I don't care
+                foreach ($list as $folder => $idc) {
+                    $app_name = trim($folder, '/\\');
+                    $application = static::forge($app_name);
+                    if (!$application->is_installed()) {
+                        $application->install();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -54,13 +79,15 @@ class Application
      */
     public static function search_all()
     {
-        foreach (static::$repositories as $where => $path) {
-            $list = \File::read_dir($path, 1);
+        foreach (static::$repositories as $where => $repository) {
+            if ($repository['visible']) {
+                $list = \File::read_dir($repository['path'], 1);
 
-            // idc = I don't care
-            foreach ($list as $folder => $idc) {
-                $app_name = trim($folder, '/\\');
-                $applications[$app_name] = static::forge($app_name);
+                // idc = I don't care
+                foreach ($list as $folder => $idc) {
+                    $app_name = trim($folder, '/\\');
+                    $applications[$app_name] = static::forge($app_name);
+                }
             }
         }
 
