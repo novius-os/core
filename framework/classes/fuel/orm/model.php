@@ -574,14 +574,16 @@ class Model extends \Orm\Model
                     }
                 }
                 // Create a new relation if it doesn't exist yet
-                $wysiwyg = new \Nos\Model_Wysiwyg();
-                $wysiwyg->wysiwyg_text = $value;
-                $wysiwyg->wysiwyg_join_table = static::$_table_name;
-                $wysiwyg->wysiwyg_key = $key;
-                $wysiwyg->wysiwyg_foreign_id = $this->id;
-                // Don't save the link here, it's done with cascade_save = true
-                //$wysiwyg->save();
-                $this->linked_wysiwygs[] = $wysiwyg;
+                if (!empty($value)) {
+                    $wysiwyg = new \Nos\Model_Wysiwyg();
+                    $wysiwyg->wysiwyg_text = $value;
+                    $wysiwyg->wysiwyg_join_table = static::$_table_name;
+                    $wysiwyg->wysiwyg_key = $key;
+                    $wysiwyg->wysiwyg_foreign_id = $this->id;
+                    // Don't save the link here, it's done with cascade_save = true
+                    //$wysiwyg->save();
+                    $this->linked_wysiwygs[] = $wysiwyg;
+                }
 
                 return $value;
             }
@@ -602,13 +604,15 @@ class Model extends \Orm\Model
                 }
 
                 // Create a new relation if it doesn't exist yet
-                $medil = new \Nos\Model_Media_Link();
-                $medil->medil_from_table = static::$_table_name;
-                $medil->medil_key = $key;
-                $medil->medil_foreign_id = $this->id;
-                $medil->medil_media_id = $value;
-                // Don't save the link here, it's done with cascade_save = true
-                $this->linked_medias[] = $medil;
+                if (!empty($value)) {
+                    $medil = new \Nos\Model_Media_Link();
+                    $medil->medil_from_table = static::$_table_name;
+                    $medil->medil_key = $key;
+                    $medil->medil_foreign_id = $this->id;
+                    $medil->medil_media_id = $value;
+                    // Don't save the link here, it's done with cascade_save = true
+                    $this->linked_medias[] = $medil;
+                }
 
                 return $value;
             }
@@ -759,11 +763,16 @@ class Model extends \Orm\Model
         parent::__clone();
         $wysiwygs = array();
         $medias = array();
+        // Don't copy empty wysiwygs and medias
         foreach ($this->wysiwygs as $key => $wysiwyg) {
-            $wysiwygs[$key] = $wysiwyg;
+            if (!empty($wysiwyg)) {
+                $wysiwygs[$key] = $wysiwyg;
+            }
         }
         foreach ($this->medias as $key => $media) {
-            $medias[$key] = $media;
+            if (!empty($media)) {
+                $medias[$key] = $media;
+            }
         }
         $this->initProviders();
         foreach ($wysiwygs as $key => $wysiwyg) {
