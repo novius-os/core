@@ -5,7 +5,7 @@
     <?= \Session::user()->user_firstname ?>
 </div>
 <div class="menu_dropdown">
-    <?= \View::forge('admin/tray/right/inside') ?>
+    <?= \View::forge('noviusos_tray::admin/right/inside') ?>
 </div>
 <script type="text/javascript">
     $('body').click(function(e) {

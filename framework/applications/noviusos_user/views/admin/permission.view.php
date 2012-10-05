@@ -12,7 +12,7 @@
 
 <div class="permissions fill-parent" id="<?= $uniqid = uniqid('id_') ?>" style="overflow:auto;">
 
-<form action="admin/nos/user/user/save_permissions" method="POST">
+<form action="admin/noviusos_user/user/save_permissions" method="POST">
 
     <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
 

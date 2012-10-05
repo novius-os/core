@@ -8,16 +8,16 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Tray;
 
 use View;
 
-class Controller_Admin_Tray_Account extends \Controller
+class Controller_Admin_Account extends \Controller
 {
     public function action_index()
     {
         $user = \Session::user();
-        $config_user = \Config::load('nos::controller/admin/user/user');
+        $config_user = \Config::load('noviusos_user::controller/admin/user');
         $fields = $config_user['fields'];
         $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
         // Form target is Controller_Admin_User_User, we only display the fieldset here
@@ -35,7 +35,7 @@ class Controller_Admin_Tray_Account extends \Controller
         $fieldset_display = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return View::forge(
-            'admin/tray/account',
+            'noviusos_tray::admin/account',
             array(
                 'logged_user' => $user,
                 'fieldset_infos' => $fieldset_infos,

@@ -40,7 +40,7 @@ foreach ($fieldset->field() as $field) {
         <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
     </ul>
     <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
-        <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false) ?>
+        <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false) ?>
     </div>
     <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
 <?php
@@ -57,7 +57,7 @@ foreach ($applications as $app => $params) {
 unset($apps['local']);
 unset($apps['nos']);
 
-echo \View::forge('nos::admin/user/permission', array(
+echo \View::forge('noviusos_user::admin/permission', array(
     'user' => $item,
     'role' => $role,
     'apps' => $apps,

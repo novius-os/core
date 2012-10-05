@@ -55,11 +55,11 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 
     public function action_save_permissions()
     {
-        $role = User\Model_Role::find(\Input::post('role_id'));
+        $role = Model_Role::find(\Input::post('role_id'));
 
         $applications = \Input::post('applications');
         foreach ($applications as $application) {
-            $access = User\Model_Permission::find('first', array('where' => array(
+            $access = Model_Permission::find('first', array('where' => array(
                 array('perm_role_id',     $role->role_id),
                 array('perm_application', 'access'),
                 array('perm_key',          $application),
@@ -71,7 +71,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             }
 
             if (!empty($_POST['access'][$application]) && empty($access)) {
-                $access = new User\Model_Permission();
+                $access = new Model_Permission();
                 $access->perm_role_id     = $role->role_id;
                 $access->perm_application = 'access';
                 $access->perm_identifier  = '';

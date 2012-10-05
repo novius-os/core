@@ -23,6 +23,7 @@ return array(
             'icon64' => 'static/novius-os/admin/novius-os/img/64/page.png',
             'application' => 'nos_page',
         ),
+        /*
         'nos_help' => array(
             'name' => 'Help',
             'action' => array(
@@ -65,6 +66,7 @@ return array(
             'icon64' => 'static/novius-os/admin/novius-os/img/64/app-manager.png',
             'application' => 'nos_tray',
         ),
+        */
     ),
     'data_catchers' => array(
         'rss_channel' => array(

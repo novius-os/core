@@ -8,12 +8,12 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Tray;
 
-class Controller_Admin_Tray_Help extends \Controller
+class Controller_Admin_Help extends \Controller
 {
     public function action_index()
     {
-        return \View::forge('nos::admin/tray/help');
+        return \View::forge('noviusos_tray::admin/help');
     }
 }

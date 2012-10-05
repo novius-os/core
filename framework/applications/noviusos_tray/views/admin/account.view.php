@@ -24,7 +24,7 @@ $uniqid = uniqid('id_');
                     $container.find('form:visible').submit();
                 });
 
-            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/nos/tray/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Disconnect'))->to_json() ?> + '</button></a>', true);
+            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_tray/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Disconnect'))->to_json() ?> + '</button></a>', true);
         });
     });
 </script>
@@ -40,7 +40,7 @@ $uniqid = uniqid('id_');
             <li><a href="#display"><?= __('Theme') ?></a></li>
         </ul>
         <div id="infos">
-            <?= render('admin/user/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
+            <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
         </div>
         <div id="display">
             <?= $fieldset_display ?>

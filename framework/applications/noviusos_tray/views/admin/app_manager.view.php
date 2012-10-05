@@ -143,7 +143,7 @@ if ($allow_upload) {
                 <p>&nbsp;</p>
                 <h1 class="title"><?= __('Install from a .zip file') ?></h1>
 
-                <form method="post" action="/admin/nos/tray/appmanager/upload" enctype="multipart/form-data">
+                <form method="post" action="/admin/noviusos_tray/appmanager/upload" enctype="multipart/form-data">
                     <input type="file" name="zip" />
                     <input type="submit" value="<?= __('Upload the application') ?>" />
                 </form>
@@ -164,7 +164,7 @@ if ($allow_upload) {
 
                     $container.nosTabs('update', {
                         label: <?= \Format::forge(__('Applications manager'))->to_json() ?>,
-                        url:  'admin/nos/tray/appmanager',
+                        url:  'admin/noviusos_tray/appmanager',
                         iconUrl: 'static/novius-os/admin/novius-os/img/32/app-manager.png',
                         app: true,
                         iconSize: 32,
@@ -182,9 +182,9 @@ if ($allow_upload) {
                         var data = $(this).data('app');
 
                         $container.nosAjax({
-                            url: 'admin/nos/tray/appmanager/' + data.action + '/' + data.name,
+                            url: 'admin/noviusos_tray/appmanager/' + data.action + '/' + data.name,
                             complete: function() {
-                                $container.load('admin/nos/tray/appmanager', function() {
+                                $container.load('admin/noviusos_tray/appmanager', function() {
                                     $container.find(':first').unwrap();
                                 });
                                 $.nosDispatchEvent({

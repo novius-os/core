@@ -24,8 +24,8 @@ return array(
         ),
     ),
     'views' => array(
-        'update' => 'nos::admin/user/user_edit',
-        'delete' => 'nos::admin/user/delete_popup',
+        'update' => 'noviusos_user::admin/user_edit',
+        'delete' => 'noviusos_user::admin/delete_popup',
     ),
     'fields' => array(
         'user_id' => array(
