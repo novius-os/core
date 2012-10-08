@@ -524,28 +524,46 @@ define('jquery-nos',
 
                 $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
                 $context.find(":input[type='submit'],button").each(function() {
-                    var options = {},
-                        data = $(this).data();
+                    var options = {
+                            icons : {}
+                        },
+                        data = $(this).data(),
+                        replace = {};
+
+                    data.icons = $.extend(true, {
+                            primary: null,
+                            secondary: null
+                        }, data.icons || {});
                     if (data.icon) {
-                        options.icons = {
-                            primary: 'ui-icon-' + data.icon
-                        }
+                        data.icons.primary = {icon: data.icon};
                     } else if (data.iconClasses) {
-                        options.icons = {
-                            primary: data.iconClasses
-                        }
+                        data.icons.primary = {iconClasses: data.iconClasses};
                     } else if (data.iconUrl) {
-                        options.icons = {
-                            primary: 'nos-icon16'
+                        data.icons.primary = {iconUrl: data.iconUrl};
+                    }
+                    $.each(data.icons, function(key, value) {
+                        if (!value) {
+                            return true;
                         }
-                    }
+                        if ($.type(value) === 'string') {
+                            options.icons[key] = 'ui-icon-' + value.replace('ui-icon-', '');
+                        } else if (value.icon) {
+                            options.icons[key] = 'ui-icon-' + value.icon.replace('ui-icon-', '');
+                        } else if (value.iconClasses) {
+                            options.icons[key] = value.iconClasses;
+                        } else if (value.iconUrl) {
+                            replace[key] = value.iconUrl;
+                            options.icons[key] = 'nos-icon16';
+                        }
+                    });
+
                     $(this).button(options);
-                    if (data.iconUrl) {
-                        $(this).find('span:first')
+                    $.each(replace, function(key, url) {
+                        $(this).find('span.ui-button-icon-' + key)
                             .css({
-                                backgroundImage: 'url(' + data.iconUrl + ')'
+                                backgroundImage: 'url(' + url + ')'
                             });
-                    }
+                    });
                 });
                 $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijdropdown();
