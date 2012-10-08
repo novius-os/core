@@ -508,8 +508,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     } elseif (count($locales) === 1) {
                         $label = __('Add to {context}');
                     } else {
-                        $site_locale_item = Helper::site_locale_code($this->item->get_context());
-                        $site_locale = Helper::site_locale_code($context);
+                        $site_locale_item = Tools_Context::site_locale_code($this->item->get_context());
+                        $site_locale = Tools_Context::site_locale_code($context);
                         if ($site_locale_item['locale'] === $site_locale['locale']) {
                             $label = __('Add to {context}');
                         } else {
@@ -520,7 +520,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $label = __('Edit in {context}');
                 }
             }
-            $label = strtr($label, array('{context}' => Helper::context_label($context)));
+            $label = strtr($label, array('{context}' => Tools_Context::context_label($context)));
             $actions[] = array(
                 'content' => $label,
                 'action' => array(

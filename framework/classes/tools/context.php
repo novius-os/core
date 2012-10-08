@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Helper
+class Tools_Context
 {
     public static function flag_url($context)
     {
@@ -69,7 +69,7 @@ class Helper
         } elseif (count($locales) === 1) {
             $label = $site_label;
         } else {
-            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? Helper::flag($context) : (!empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $context), '{site}' => $site_label));
+            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? static::flag($context) : (!empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $context), '{site}' => $site_label));
         }
 
         return $label;

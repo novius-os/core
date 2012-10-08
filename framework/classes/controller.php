@@ -306,17 +306,17 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                         if (is_array($config['context']) && !in_array($context, $config['context'])) {
                             continue;
                         }
-                        $site_locale_code = Helper::site_locale($context);
-                        $site_locale = Helper::site_locale($context);
+                        $site_locale_code = Tools_Context::site_locale($context);
+                        $site_locale = Tools_Context::site_locale($context);
                         $site_alias = !empty($site_locale['site']['alias']) ? $site_locale['site']['alias'] : (!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_locale_code['site']);
                         if ($site !== $site_alias) {
                             $site = !empty($site_locale['site']['alias']) ? $site_locale['site']['alias'] : (!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_locale_code['site']);
                             $flags .= ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.(!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : '').'">'.$site.'</span> ';
                         }
                         if (in_array($context, $contexts)) {
-                            $flags .= \Nos\Helper::flag($context);
+                            $flags .= \Nos\Tools_Context::flag($context);
                         } else {
-                            $flags .= \Nos\Helper::flag_empty();
+                            $flags .= \Nos\Tools_Context::flag_empty();
                         }
                     }
                     $item['context'] = $flags;

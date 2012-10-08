@@ -28,7 +28,7 @@ if (!in_array($context, $possible)) {
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
         echo strtr($crud['config']['messages']['error added in context not parent'], array(
-            '{context}' => \Nos\Helper::context_label($context),
+            '{context}' => \Nos\Tools_Context::context_label($context),
             '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
         ));
         ?>
@@ -41,24 +41,24 @@ if (!in_array($context, $possible)) {
         </script>
         <?php
     } else {
-        echo strtr($crud['config']['messages']['error added in context'], array('{context}' => \Nos\Helper::context_label($context)));
+        echo strtr($crud['config']['messages']['error added in context'], array('{context}' => \Nos\Tools_Context::context_label($context)));
     }
 } else {
     foreach ($possible as $possible_context) {
         $item_context = $item->find_context($possible_context);
         if (!empty($item_context)) {
-            $labels[$item_context->id] = \Nos\Helper::context_label($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
+            $labels[$item_context->id] = \Nos\Tools_Context::context_label($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
         }
     }
-    $site_locale_item = \Nos\Helper::site_locale_code($item->get_context());
-    $site_locale_new = \Nos\Helper::site_locale_code($context);
+    $site_locale_item = \Nos\Tools_Context::site_locale_code($item->get_context());
+    $site_locale_new = \Nos\Tools_Context::site_locale_code($context);
 
     if ($site_locale_item['locale'] === $site_locale_new['locale']) {
         $label = __('Add "{item}" into {context}');
     } else {
         $label = __('Translate "{item}" into {context}');
     }
-    echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Helper::context_label($context))), '</h1>';
+    echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Tools_Context::context_label($context))), '</h1>';
     ?>
             <p>&nbsp;</p>
 

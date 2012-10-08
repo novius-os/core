@@ -34,7 +34,7 @@ if ($crud['behaviours']['contextable']) {
                 $contexts = \Config::get('contexts', array());
                 $contexts_list = array();
                 foreach ($item_situations as $item_context) {
-                    $contexts_list[] = \Nos\Helper::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false));
+                    $contexts_list[] = \Nos\Tools_Context::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false));
                 }
                 ?>
                 <p><?= strtr($crud['config']['messages']['exists in multiple context'], array(
@@ -47,7 +47,7 @@ if ($crud['behaviours']['contextable']) {
                 <?php
                 foreach ($item_situations as $item_context) {
                     ?>
-                    <option value="<?= $item_context->get_context() ?>"><?= \Nos\Helper::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false)) ?></option>
+                    <option value="<?= $item_context->get_context() ?>"><?= \Nos\Tools_Context::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false)) ?></option>
                     <?php
                 }
                 ?>
