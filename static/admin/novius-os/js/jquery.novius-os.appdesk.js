@@ -384,7 +384,10 @@ define('jquery-nos-appdesk',
 
                 self.element.nosSaveUserConfig('selectedContexts', o.selectedContexts);
 
-                self.uiResetSearch.click();
+                self.uiSearchInput.val('');
+                self.uiInspectorsTags.wijsuperpanel('destroy');
+                self.uiInspectorsTags.empty();
+                self._uiList();
 
                 self.dispatcher.data('nosContext', o.selectedContexts)
                     .trigger('contextChange');
