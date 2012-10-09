@@ -19,7 +19,7 @@ return array(
         'not found' => __('Media not found'),
         'delete an item' => __('Delete a media'),
     ),
-    'situation_relation' => 'folder',
+    'environment_relation' => 'folder',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/media.png',
         'labels' => array(

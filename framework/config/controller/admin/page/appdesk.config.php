@@ -208,11 +208,13 @@ return array(
                     'url' => array(
                         'headerText' => __('Virtual url'),
                         'visible' => false,
-                        'dataKey' => 'url'
+                        'dataKey' => 'url',
+                        'multiContextHide' => true,
                     ),
                     'published' => array(
                         'headerText' => __('Status'),
                         'dataKey' => 'publication_status',
+                        'multiContextHide' => true,
                     ),
                     'actions' => array(
                         'actions' => array('edit', 'add_subpage', 'visualise', 'delete', 'set_homepage'),

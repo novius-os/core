@@ -29,7 +29,7 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud
     protected function form_item()
     {
         parent::form_item();
-        if ($this->item->is_new() && empty($this->item_situation)) {
+        if ($this->item->is_new() && empty($this->item_environment)) {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();

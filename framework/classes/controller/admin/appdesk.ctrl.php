@@ -32,6 +32,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     public function load_config() {
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
+
+        $user = Session::user();
+        $selectedContexts = \Arr::get($user->getConfiguration(), 'selectedContexts', array());
+        \Arr::set($this->config, 'selectedContexts', $selectedContexts);
+
         return $this->config;
     }
 
@@ -50,9 +55,35 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view = View::forge('admin/appdesk');
 
-        $contexts = \Config::get('contexts', array());
+        $contexts = Tools_Context::contexts();
+        $locales = Tools_Context::locales();
+        $sites = Tools_Context::sites();
 
-        $view->set('appdesk', \Format::forge(array_merge(array('contexts' => $contexts), $this->config))->to_json(), false);
+        foreach ($contexts as $context => $params) {
+            $site = Tools_Context::site_code($context);
+            $locale = Tools_Context::locale_code($context);
+
+            if (!isset($sites[$site]['locales'])) {
+                $sites[$site]['locales'] = array();
+            }
+            $sites[$site]['locales'][] = $locale;
+
+            if (!isset($locales[$locale]['sites'])) {
+                $locales[$locale]['sites'] = array();
+            }
+            $locales[$locale]['sites'][] = $site;
+        }
+
+        $params = array_merge(
+            array(
+                'contexts' => $contexts,
+                'locales' => $locales,
+                'sites' => $sites,
+            ),
+            $this->config
+        );
+
+        $view->set('appdesk', \Format::forge($params)->to_json(), false);
 
         return $view;
     }
@@ -150,7 +181,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['inputs'] = array();
             }
 
-            foreach ($config['inspectors'] as $key => $inspector_config) {
+            foreach ($config['inspectors'] as $inspector_config) {
                 if ($inspector_config['input'] && !isset($config['inputs'][$inspector_config['input']['key']])) {
                     $config['inputs'][$inspector_config['input']['key']] = $inspector_config['input']['query'];
                 }

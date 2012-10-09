@@ -249,7 +249,12 @@ input.ui-state-disabled {
 .ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text {
 	padding : 0.2em;
 }
-
+.ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text {
+    padding: .2em 2.1em .2em 1em;
+}
+.ui-button-text-only .ui-button-text {
+    padding: .2em 1em;
+}
 .ui-button-text .ui-button-text {
     padding : 0.2em 1em;
 }

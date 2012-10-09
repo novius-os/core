@@ -191,7 +191,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $query->where($contextable['is_main_property'], 1);
             } elseif (is_array($config['context'])) {
                 // Multiple contexts
-                $query->where($contextable['context_property'], 'IN', $config['context']);
+                $query->where($contextable['is_main_property'], 1);
+                $query->where($contextable['common_id_property'], 'IN', \DB::select($contextable['common_id_property'])->from($model::table())->where($contextable['context_property'], 'IN', $config['context']));
             } else {
                 $query->where($contextable['context_property'], '=', $config['context']);
             }
@@ -300,25 +301,36 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 foreach ($keys as $key => $common_id) {
                     $items[$key]['context'] = $contexts[$common_id];
                 }
-                if ($tree) {
-                    $root = reset($objects)->find_root();
-                    if (!empty($root)) {
-                        $all_contexts = $root->get_all_context();
-                    } else {
-                        $all_contexts = array_unique(\Arr::flatten($contexts));
-                    }
-                } else {
-                    $all_contexts = array_unique(\Arr::flatten($contexts));
-                }
+
+                $sites_count = count(Tools_Context::sites());
+                $locales_count = count(Tools_Context::locales());
+                $global_contexts = array_keys(Tools_Context::contexts());
                 foreach ($items as &$item) {
                     $flags = '';
+                    $site_flag = '';
                     $contexts = $item['context'];
-                    foreach ($all_contexts as $context) {
-                        if (in_array($context, $contexts)) {
-                            $flags .= \Nos\Helper::flag($context);
-                        } else {
-                            $flags .= \Nos\Helper::flag_empty();
+
+                    $site = false;
+                    foreach ($global_contexts as $context) {
+                        if (is_array($config['context']) && !in_array($context, $config['context'])) {
+                            continue;
                         }
+                        $site_params = Tools_Context::site($context);
+                        if ($sites_count > 1 && $site !== $site_params['alias']) {
+                            $flags .= $site_flag.(empty($site_flag) ? '' : '&nbsp;&nbsp;');
+                            $site = $site_params['alias'];
+                            $site_flag = ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
+                        }
+                        if ($locales_count > 1) {
+                            if (in_array($context, $contexts)) {
+                                $flags .= \Nos\Tools_Context::flag($context);
+                            } else {
+                                $flags .= '<span style="display:inline-block; width:16px;"></span> ';
+                            }
+                        }
+                    }
+                    if ($sites_count > 1) {
+                        $flags .= $site_flag;
                     }
                     $item['context'] = $flags;
                 }

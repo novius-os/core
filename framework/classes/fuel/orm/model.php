@@ -336,7 +336,7 @@ class Model extends \Orm\Model
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
         if (!$contextable || !$tree) {
-            return array_keys(\Config::get('contexts'));
+            return array_keys(Tools_Context::contexts());
         }
 
         // Return contexts from parent if available
@@ -345,7 +345,7 @@ class Model extends \Orm\Model
             return $parent->get_all_context();
         }
 
-        return array_keys(\Config::get('contexts'));
+        return array_keys(Tools_Context::contexts());
     }
 
     /**
@@ -803,12 +803,12 @@ class Model extends \Orm\Model
         if (!isset($config['actions'])) {
             $config['actions'] = array();
         }
-        $config['actions'] = static::process_actions($application_name, get_called_class(), $config['actions']);
+        $config['actions'] = static::process_actions($application_name, get_called_class(), $config);
 
         return $config;
     }
 
-    public static function process_actions($application_name, $model, $actions) {
+    public static function process_actions($application_name, $model, $config) {
         $urls = array(
             'add' => 'action.tab.url',
             'edit' => 'action.tab.url',
@@ -927,7 +927,7 @@ class Model extends \Orm\Model
             $generated_actions[$model.'.'.$name] = $template;
 
             if (isset($urls[$name])) {
-                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
+                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name],'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
             }
 
             if (isset($config['labels'][$name])) {
@@ -940,7 +940,7 @@ class Model extends \Orm\Model
             }
         }
 
-        $actions = \Arr::merge($generated_actions, $actions);
+        $actions = \Arr::merge($generated_actions, $config['actions']);
 
         foreach ($actions as $key => $action) {
             if ($action === false) {

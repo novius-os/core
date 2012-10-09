@@ -195,6 +195,88 @@ define('jquery-nos',
                     }
                     image.src = media.path;
                 });
+            },
+
+            nosUIElement : function(element) {
+                var $element;
+
+                element = $.extend({
+                    type: 'button',
+                    bind: {}
+                }, element);
+
+                if (element.action) {
+                    element.bind['click'] = $.extend(true, {}, element.action);
+                    delete element.action;
+                }
+
+                switch (element.type) {
+                    case 'button' :
+                        $element = $('<button></button>').data(element);
+                        if (element.label) {
+                            $element.text(element.label);
+                        }
+                        $.each(element.bind, function(event, action) {
+                            $element.bind(event, function() {
+                                $element.nosAction(action);
+                            });
+                        });
+
+                        break;
+                }
+
+                if (element.menu) {
+                    var date = new Date(),
+                        id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                    $element.attr('id', id)
+                        .nosOnShow('one', function() {
+                            var $ul = $('<ul></ul>');
+                            $.each(element.menu.menus, function() {
+                                var menu = this,
+                                    $a = $('<li><a></a></li>').data('action', menu.action)
+                                        .appendTo($ul)
+                                        .find('a');
+
+                                if (menu.content) {
+                                    $a.append(menu.content);
+                                } else {
+                                    if (menu.icon) {
+                                        $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
+                                            .appendTo($a);
+                                    } else if (menu.iconClasses) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
+                                            .appendTo($a);
+                                    } else if (menu.iconUrl) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
+                                            .css('backgroundImage', 'url(' + menu.iconUrl + ')')
+                                            .appendTo($a);
+                                    }
+                                    if (menu.label) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-text')
+                                            .text(menu.label)
+                                            .appendTo($a);
+                                    }
+                                }
+                            });
+
+                            $ul.insertAfter($element)
+                                .wijmenu($.extend(true, {
+                                        orientation: 'vertical'
+                                    },
+                                    element.menu.options || {},
+                                    {
+                                        trigger: '#' + id,
+                                        select: function(e, data) {
+                                            var $li = $(data.item.element);
+                                            $li.nosAction($li.data('action'));
+                                        }
+                                    }
+                                ));
+                        });
+                }
+
+
+                return $element;
             }
         });
 
@@ -442,28 +524,46 @@ define('jquery-nos',
 
                 $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
                 $context.find(":input[type='submit'],button").each(function() {
-                    var options = {},
-                        data = $(this).data();
+                    var data = $(this).data(),
+                        options = $.extend(true, {
+                            icons : {}
+                        }, data || {}),
+                        replace = {};
+
+                    data.icons = $.extend(true, {
+                            primary: null,
+                            secondary: null
+                        }, data.icons || {});
                     if (data.icon) {
-                        options.icons = {
-                            primary: 'ui-icon-' + data.icon
-                        }
+                        data.icons.primary = {icon: data.icon};
                     } else if (data.iconClasses) {
-                        options.icons = {
-                            primary: data.iconClasses
-                        }
+                        data.icons.primary = {iconClasses: data.iconClasses};
                     } else if (data.iconUrl) {
-                        options.icons = {
-                            primary: 'nos-icon16'
+                        data.icons.primary = {iconUrl: data.iconUrl};
+                    }
+                    $.each(data.icons, function(key, value) {
+                        if (!value) {
+                            return true;
                         }
-                    }
+                        if ($.type(value) === 'string') {
+                            options.icons[key] = 'ui-icon-' + value.replace('ui-icon-', '');
+                        } else if (value.icon) {
+                            options.icons[key] = 'ui-icon-' + value.icon.replace('ui-icon-', '');
+                        } else if (value.iconClasses) {
+                            options.icons[key] = value.iconClasses;
+                        } else if (value.iconUrl) {
+                            replace[key] = value.iconUrl;
+                            options.icons[key] = 'nos-icon16';
+                        }
+                    });
+
                     $(this).button(options);
-                    if (data.iconUrl) {
-                        $(this).find('span:first')
+                    $.each(replace, function(key, url) {
+                        $(this).find('span.ui-button-icon-' + key)
                             .css({
-                                backgroundImage: 'url(' + data.iconUrl + ')'
+                                backgroundImage: 'url(' + url + ')'
                             });
-                    }
+                    });
                 });
                 $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijdropdown();

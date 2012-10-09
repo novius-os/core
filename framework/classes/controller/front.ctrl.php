@@ -446,7 +446,7 @@ class Controller_Front extends Controller
         }
         if (empty($this->_page_url)) {
             $where[] = array('page_entrance', 1);
-            $where[] = array('page_context', key(\Config::get('contexts')));
+            $where[] = array('page_context', key(Tools_Context::contexts()));
         } else {
             $where[] = array('page_virtual_url', $this->_page_url);
             //$where[] = array('page_parent_id', 'IS NOT', null);

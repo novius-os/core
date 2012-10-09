@@ -47,11 +47,11 @@ if (!empty($medias)) {
     echo '</td>';
 }
 
-$contexts = array_keys(\Config::get('contexts', array()));
+$contexts = array_keys(\Nos\Tools_Context::contexts());
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
     if ($contextable) {
-        echo '<td style="width:16px;">'.\Nos\Helper::flag($item->get_context()).'</td>';
+        echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true)).'</td>';
     }
 }
 ?>
