@@ -346,11 +346,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         // insert_update/ID?context=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that context)
 
         $this->item = $this->crud_item($id);
-        $this->is_new = $this->item->is_new();
 
         if (empty($this->item)) {
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
+
+        $this->is_new = $this->item->is_new();
 
         if ($this->is_new || !$this->behaviours['contextable']) {
             return $this->action_form($id);
@@ -397,11 +398,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function action_json_actions($id = null)
     {
         $this->item = $this->crud_item($id);
-        $this->is_new = $this->item->is_new();
 
         if (empty($this->item)) {
             return $this->send_error(new \Exception($this->config['messages']['item deleted']));
         }
+
+        $this->is_new = $this->item->is_new();
 
         \Response::json($this->get_actions());
     }
