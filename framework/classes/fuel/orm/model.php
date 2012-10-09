@@ -329,7 +329,7 @@ class Model extends \Orm\Model
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
         if (!$contextable || !$tree) {
-            return array_keys(\Config::get('contexts'));
+            return array_keys(Tools_Context::contexts());
         }
 
         // Return contexts from parent if available
@@ -338,7 +338,7 @@ class Model extends \Orm\Model
             return $parent->get_all_context();
         }
 
-        return array_keys(\Config::get('contexts'));
+        return array_keys(Tools_Context::contexts());
     }
 
     /**

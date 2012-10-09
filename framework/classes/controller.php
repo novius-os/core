@@ -296,9 +296,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     $items[$key]['context'] = $contexts[$common_id];
                 }
 
-                $global_contexts = array_keys(\Config::get('contexts'));
+                $sites_count = count(Tools_Context::sites());
+                $locales_count = count(Tools_Context::locales());
+                $global_contexts = array_keys(Tools_Context::contexts());
                 foreach ($items as &$item) {
                     $flags = '';
+                    $site_flag = '';
                     $contexts = $item['context'];
 
                     $site = false;
@@ -306,18 +309,22 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                         if (is_array($config['context']) && !in_array($context, $config['context'])) {
                             continue;
                         }
-                        $site_locale_code = Tools_Context::site_locale($context);
-                        $site_locale = Tools_Context::site_locale($context);
-                        $site_alias = !empty($site_locale['site']['alias']) ? $site_locale['site']['alias'] : (!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_locale_code['site']);
-                        if ($site !== $site_alias) {
-                            $site = !empty($site_locale['site']['alias']) ? $site_locale['site']['alias'] : (!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_locale_code['site']);
-                            $flags .= ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.(!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : '').'">'.$site.'</span> ';
+                        $site_params = Tools_Context::site($context);
+                        if ($sites_count > 1 && $site !== $site_params['alias']) {
+                            $flags .= $site_flag.(empty($site_flag) ? '' : '&nbsp;&nbsp;');
+                            $site = $site_params['alias'];
+                            $site_flag = ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
                         }
-                        if (in_array($context, $contexts)) {
-                            $flags .= \Nos\Tools_Context::flag($context);
-                        } else {
-                            $flags .= \Nos\Tools_Context::flag_empty();
+                        if ($locales_count > 1) {
+                            if (in_array($context, $contexts)) {
+                                $flags .= \Nos\Tools_Context::flag($context);
+                            } else {
+                                $flags .= '<span style="display:inline-block; width:16px;"></span> ';
+                            }
                         }
+                    }
+                    if ($sites_count > 1) {
+                        $flags .= $site_flag;
                     }
                     $item['context'] = $flags;
                 }

@@ -18,7 +18,7 @@ return array(
         'item deleted' => __('This folder has been deleted.'),
         'not found' => __('Folder not found'),
     ),
-    'situation_relation' => 'parent',
+    'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/media.png',
         'labels' => array(

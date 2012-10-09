@@ -50,16 +50,20 @@ if (!in_array($context, $possible)) {
             $labels[$item_context->id] = \Nos\Tools_Context::context_label($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
         }
     }
-    $site_locale_item = \Nos\Tools_Context::site_locale_code($item->get_context());
-    $site_locale_new = \Nos\Tools_Context::site_locale_code($context);
+    $locale_item = \Nos\Tools_Context::locale_code($item->get_context());
+    $locale_new = \Nos\Tools_Context::locale_code($context);
 
-    if ($site_locale_item['locale'] === $site_locale_new['locale']) {
-        $label = __('Add "{item}" into {context}');
+    if ($locale_item === $locale_new) {
+        $label = __('Add "{item}" to {context}');
     } else {
         $label = __('Translate "{item}" into {context}');
     }
     echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Tools_Context::context_label($context))), '</h1>';
     ?>
+            <p>&nbsp;</p>
+
+            <p><?= __('You have two options: ') ?></p>
+
             <p>&nbsp;</p>
 
             <ul style="margin-left:1em;">
@@ -85,7 +89,7 @@ if (!in_array($context, $possible)) {
         $selected_context = Form::select('create_from_id', null, $labels);
     }
 
-    $button = '<button type="submit" class="primary" data-icon="plus">'.($site_locale_item['locale'] === $site_locale_new['locale'] ? __('Copy') : __('Translate')).'</button>';
+    $button = '<button type="submit" class="primary" data-icon="plus">'.($locale_item === $locale_new ? __('Copy') : __('Translate')).'</button>';
     echo strtr(__('{translate} the {context} version'), array(
         '{translate}' => $button,
         '{context}' => $selected_context,

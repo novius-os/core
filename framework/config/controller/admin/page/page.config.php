@@ -38,7 +38,7 @@ return array(
         'delete an item' => __('Delete a page'),
         'delete' => __('Delete'),
     ),
-    'situation_relation' => 'parent',
+    'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
         'labels' => array(

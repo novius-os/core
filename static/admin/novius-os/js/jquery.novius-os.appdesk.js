@@ -25,6 +25,7 @@ define('jquery-nos-appdesk',
                 texts : {
                     allSites : 'All sites',
                     allLanguages : 'All languages',
+                    allContexts : 'All contexts',
                     settings : 'Settings',
                     item : 'item',
                     items : 'items',
@@ -35,7 +36,9 @@ define('jquery-nos-appdesk',
                     viewGrid : 'Grid',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
-                    contextsPopinTitle : 'Select sites / locales displayed',
+                    selectContexts : 'Select the context(s) to work in',
+                    workInContext : 'Work in {{context}}',
+                    otherContexts : 'Other contexts',
                     contextsPopinOk : 'Ok'
                 },
                 values: {},
@@ -148,9 +151,9 @@ define('jquery-nos-appdesk',
                     }
                     $.each(o.selectedContexts, function(i, context) {
                         if (!o.contexts[context]) {
-                            delete o.contexts[context];
+                            delete o.selectedContexts[context];
                         }
-                    });
+                    })
                     if (o.selectedContexts.length === 0) {
                         o.selectedContexts.push(Object.keys(o.contexts)[0]);
                     }
@@ -280,7 +283,7 @@ define('jquery-nos-appdesk',
                     });
                 });
                 self.uiToolbarContextsDialog.wijdialog({
-                        title:o.texts.contextsPopinTitle,
+                        title:o.texts.selectContexts,
                         autoOpen: false,
                         buttons: [
                             {
@@ -291,15 +294,7 @@ define('jquery-nos-appdesk',
                                         o.selectedContexts.push($(this).val());
                                     });
 
-                                    self.uiToolbarContextsDialog.wijdialog('close');
-                                    self._uiToolbarContextsButton();
-
-                                    self.element.nosSaveUserConfig(o.name + '.selectedContexts', o.selectedContexts);
-
-                                    self.uiResetSearch.click();
-
-                                    self.dispatcher.data('nosContext', o.selectedContexts)
-                                        .trigger('contextChange');
+                                    self._selectContexts();
                                 }
                             }
                         ],
@@ -380,23 +375,118 @@ define('jquery-nos-appdesk',
                 return self;
             },
 
+            _selectContexts : function() {
+                var self = this,
+                    o = self.options;
+
+                self.uiToolbarContextsDialog.wijdialog('close');
+                self._uiToolbarContextsButtonLabel();
+
+                self.element.nosSaveUserConfig('selectedContexts', o.selectedContexts);
+
+                self.uiResetSearch.click();
+
+                self.dispatcher.data('nosContext', o.selectedContexts)
+                    .trigger('contextChange');
+
+                return self;
+            },
+
             _uiToolbarContextsButton : function() {
                 var self = this,
                     o = self.options;
 
-                if (self.uiToolbarContextsButton) {
-                    self.uiToolbarContextsButton.remove();
-                }
+                var $splitButton = $('<div><button></button><button></button></div>').addClass('nos-appdesk-buttoncontext'),
+                    date = new Date(),
+                    id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
+                    $ul = $('<ul></ul>'),
+                    count = 0;
 
-                var $button = $('<button></button>').addClass('nos-appdesk-buttoncontext');
+                $splitButton.find('button:first')
+                    .click(function(e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        self.uiToolbarContextsDialog.wijdialog('open');
+                    })
+                    .end()
+                    .find('button:last')
+                    .attr('id', id)
+                    .text(o.texts.selectContexts)
+                    .data({
+                        text: false,
+                        icons: {
+                            primary: 'triangle-1-s'
+                        }
+                    });
+
+                self.uiToolbarContextsButton = self.element.nosToolbar('add', $splitButton, true);
+                self.uiToolbarContextsButton.buttonset();
+                self._uiToolbarContextsButtonLabel();
+
+                $('<li><a></a></li>')
+                    .appendTo($ul)
+                    .find('a')
+                    .text(o.texts.selectContexts);
+
+                $('<li></li>')
+                    .appendTo($ul);
+
+                $.each(o.contexts, function(context) {
+                    var site_locale = context.split('::', 2),
+                        site = o.sites[site_locale[0]],
+                        locale = o.locales[site_locale[1]],
+                        content = o.texts.workInContext.replace('{{context}}', site.title + ' ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" />');
+
+                    count++;
+                    $('<li><a></a></li>')
+                        .data('context', context)
+                        .appendTo($ul)
+                        .find('a')
+                        .append(content);
+
+                    if (count > 10 && Object.key(o.contexts).length > 12) {
+                        $('<li><a></a></li>')
+                            .appendTo($ul)
+                            .find('a')
+                            .text(o.texts.otherContexts);
+
+                        return false
+                    }
+                });
+
+                $ul.insertAfter(self.uiToolbarContextsButton)
+                    .wijmenu({
+                            orientation: 'vertical',
+                            direction: 'rtl',
+                            trigger: '#' + id,
+                            select: function(e, data) {
+                                var $li = $(data.item.element),
+                                    context = $li.data('context');
+
+                                if (context) {
+                                    o.selectedContexts = [context];
+
+                                    self._selectContexts();
+                                } else {
+                                    self.uiToolbarContextsDialog.wijdialog('open');
+                                }
+                            }
+                        });
+
+                return self;
+            },
+
+            _uiToolbarContextsButtonLabel : function() {
+                var self = this,
+                    o = self.options,
+                    $button = self.uiToolbarContextsButton.find('button:first');
 
                 if (o.selectedContexts.length === 1) {
                     var site_locale = o.selectedContexts[0].split('::', 2),
                         site = o.sites[site_locale[0]],
                         locale = o.locales[site_locale[1]];
 
-                    $button.text(site.title)
-                        .data('iconUrl', 'static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png');
+                    $button.button('option', 'label', (Object.keys(o.sites).length > 1 ? '<span title="' + site.title + '">' + site.alias + '</span>' : '') + ' ' + (Object.keys(o.locales).length > 1 ? '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" />' : ''));
                 } else {
                     var nbSites = 0,
                         nbLocales = 0,
@@ -420,30 +510,34 @@ define('jquery-nos-appdesk',
                         locales[locale].push(site);
                     });
 
-                    if (nbSites === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
-                        $button.text(o.sites[Object.keys(sites)[0]].title + ' / ' + o.texts.allLanguages);
+                    if (Object.keys(o.contexts).length === o.selectedContexts.length) {
+                        $button.button('option', 'label', o.texts.allContexts);
+                    } else if (Object.keys(o.sites).length === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
+                        $button.button('option', 'label', o.texts.allLanguages);
+                    } else if (Object.keys(o.locales).length === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
+                        $button.button('option', 'label', o.texts.allSites);
+                    } else if (nbSites === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
+                        $button.button('option', 'label', '<span title="' + o.sites[Object.keys(sites)[0]].title + '">' + o.sites[Object.keys(sites)[0]].alias  + '</span>' + ', ' + o.texts.allLanguages);
                     } else if (nbLocales === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
-                        $button.text(o.texts.allSites)
-                            .data('iconUrl', 'static/novius-os/admin/novius-os/img/flags/' + o.locales[Object.keys(locales)[0]].flag + '.png');;
+                        $button.button('option', 'label', o.texts.allSites + ', ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[Object.keys(locales)[0]].flag + '.png" title="' + o.locales[Object.keys(locales)[0]].title + '" style="vertical-align:middle;" /> ')
                     } else {
+                        var label = '';
                         $.each(sites, function(site, locales) {
-                            if (!$button.is(':empty')) {
-                                $button.append('<span style="vertical-align:middle;">&nbsp;&nbsp;</span>');
+                            if (label !== '') {
+                                label += '&nbsp;&nbsp;';
                             }
-                            $button.append('<span style="vertical-align:middle;" title="' + o.sites[site].title + '">' + (o.sites[site].alias ? o.sites[site].alias : o.sites[site].title) + '</span> ');
-                            $.each(locales, function(i, locale) {
-                                $button.append('<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" style="vertical-align:middle;" /> ')
-                            });
+                            if (Object.keys(o.sites).length > 1) {
+                                label += '<span title="' + o.sites[site].title + '">' + o.sites[site].alias  + '</span> ';
+                            }
+                            if (Object.keys(o.locales).length > 1) {
+                                $.each(locales, function(i, locale) {
+                                    label += '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" /> ';
+                                });
+                            }
                         });
+                        $button.button('option', 'label', label);
                     }
                 }
-                $button.click(function(e) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    self.uiToolbarContextsDialog.wijdialog('open');
-                });
-
-                self.uiToolbarContextsButton = self.element.nosToolbar('add', $button, true);
 
                 return self;
             },

@@ -12,88 +12,209 @@ namespace Nos;
 
 class Tools_Context
 {
-    public static function flag_url($context)
+    static protected $_contexts = null;
+    static protected $_sites = null;
+    static protected $_locales = null;
+
+    /**
+     * get an array of all contexts Novius OS instance
+     * a context key is the concatenation of site_code and locale_code, separate by ::
+     *
+     * @return array context_code => array()
+     */
+    public static function contexts()
     {
-        $site_locale = self::site_locale($context);
-        if (!empty($site_locale['locale']) && !empty($site_locale['locale']['flag'])) {
-            $lang = $site_locale['locale']['flag'];
-        } else {
-            $site_locale = self::site_locale_code($context);
-            $locale = $site_locale['locale'];
-            if (empty($locale)) {
-                $locale = $site_locale['site'];
-            }
-            // Convert lang_LOCALE to locale
-            list($lang, $country) = explode('_', $locale.'_');
-            if (!empty($country)) {
-                $lang = mb_strtolower($country);
-            }
-            switch ($lang) {
-                case 'en':
-                    $lang = 'gb';
-                    break;
+        if (!is_array(static::$_contexts)) {
+            $sites = static::sites();
+            $locales = static::locales();
+            $contexts = \Config::get('contexts', array());
+            static::$_contexts = array();
+            foreach ($contexts as $context_code => $context_params) {
+                $site = static::site_code($context_code);
+                $locale = static::locale_code($context_code);
+                if (isset($sites[$site]) && isset($locales[$locale])) {
+                    static::$_contexts[$context_code] = $context_params;
+                }
             }
         }
 
-        return 'static/novius-os/admin/novius-os/img/flags/'.$lang.'.png';
+        return static::$_contexts;
     }
 
+    /**
+     * get an array of all sites Novius OS instance
+     *
+     * @return array site_code => array(title, alias)
+     */
+    public static function sites()
+    {
+        if (!is_array(static::$_sites)) {
+            static::$_sites = array();
+            $sites = \Config::get('sites', array());
+            foreach ($sites as $site_code => $site_params) {
+                if (!is_array($site_params)) {
+                    $site_params = array('title' => $site_params);
+                }
+                if (empty($site_params['title'])) {
+                    $site_params['title'] = $site_code;
+                }
+                if (empty($site_params['alias'])) {
+                    $site_params['alias'] = $site_params['title'];
+                }
+                static::$_sites[$site_code] = $site_params;
+            }
+        }
+
+        return static::$_sites;
+    }
+
+    /**
+     * get an array of all locales Novius OS instance
+     *
+     * @return array locales_code => array(title, flag)
+     */
+    public static function locales()
+    {
+        if (!is_array(static::$_locales)) {
+            static::$_locales = array();
+            $locales = \Config::get('locales', array());
+            foreach ($locales as $locale_code => $locale_params) {
+                if (!is_array($locale_params)) {
+                    $locale_params = array('title' => $locale_params);
+                }
+                if (empty($locale_params['title'])) {
+                    $locale_params['title'] = $locale_code;
+                }
+                if (empty($locale_params['flag'])) {
+                    // Convert lang_LOCALE to locale
+                    $lang = static::lang_locale_to_lang($locale_code);
+                    switch ($lang) {
+                        case 'en':
+                            $lang = 'gb';
+                            break;
+                    }
+
+                    $locale_params['flag'] = $lang;
+                }
+                static::$_locales[$locale_code] = $locale_params;
+            }
+        }
+
+        return static::$_locales;
+    }
+
+
+    /**
+     * @param $lang_locale
+     * @return string
+     */
+    public static function lang_locale_to_lang($lang_locale)
+    {
+        // Convert lang_LOCALE to locale
+        list($lang, $locale) = explode('_', $lang_locale.'_');
+        if (!empty($locale)) {
+            $lang = mb_strtolower($locale);
+        }
+
+        return mb_strtolower($lang);
+    }
+
+    /**
+     * @param $context
+     * @return string
+     */
     public static function flag($context)
     {
-        $site_locale = self::site_locale($context);
-        return '<img src="'.static::flag_url($context).'" title="'.(!empty($site_locale['locale']) && !empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $site_locale['locale']).'" style="vertical-align:middle;" /> ';
+        $locale = self::locale($context);
+        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" /> ';
     }
 
-    public static function flag_empty()
-    {
-        return '<span style="display:inline-block; width:16px;"></span> ';
-    }
-
+    /**
+     * @param $context
+     * @param array $options
+     * @return string
+     */
     public static function context_label($context, array $options = array())
     {
         $options = array_merge(array(
                 'alias' => false,
-                'template' => '{locale} {site}',
+                'template' => '{site} {locale}',
                 'flag' => true,
             ), $options);
 
-        $site_locale = self::site_locale($context);
-        $sites = \Config::get('sites');
-        $locales = \Config::get('locales');
-        $site_label = $options['alias'] && !empty($site_locale['site']['alias']) ? '<span title="'.(!empty($site_locale['site']['title']) ? $site_locale['site']['title'] : '').'">'.$site_locale['site']['alias'].'</span>' : '';
-        $site_label = empty($site_label) && !empty($site_locale['site']['title']) ? $site_locale['site']['title'] : $site_label;
-        $site_label = empty($site_label) ? $context : $site_label;
-
-        if (count($sites) === 1) {
-            $label = !empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $context;
-        } elseif (count($locales) === 1) {
+        $site = self::site($context);
+        $locale = self::locale($context);
+        $site_label = $options['alias'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : '';
+        $site_label = empty($site_label) ? $site['title'] : $site_label;
+        if (count(static::sites()) === 1) {
+            $label = $locale['title'];
+        } elseif (count(static::locales()) === 1) {
             $label = $site_label;
         } else {
-            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? static::flag($context) : (!empty($site_locale['locale']['title']) ? $site_locale['locale']['title'] : $context), '{site}' => $site_label));
+            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? static::flag($context) : $locale['title'], '{site}' => $site_label));
         }
 
         return $label;
     }
 
-    public static function site_locale_code($context)
+    /**
+     * @param $context
+     * @return mixed
+     */
+    public static function locale_code($context)
     {
-        list($site, $locale) = explode('::', $context, 2);
+        list(, $locale) = explode('::', $context, 2);
+        if (empty($locale)) {
+            $locale = $context;
+        }
 
-        return array(
-            'site' => $site,
-            'locale' => $locale,
-        );
+        return $locale;
     }
 
-    public static function site_locale($context)
+    /**
+     * @param $context
+     * @return array
+     */
+    public static function locale($context)
     {
-        $locales = \Config::get('locales', array());
-        $sites = \Config::get('sites', array());
-        $site_locale = self::site_locale_code($context);
+        $locales = static::locales();
+        $locale_code = self::locale_code($context);
+        if (empty($locales[$locale_code])) {
+            return array(
+                'title' => $locale_code,
+                'flag' => static::lang_locale_to_lang($locale_code),
+            );
+        } else {
+            return $locales[$locale_code];
+        }
+    }
 
-        return array(
-            'site' => $sites[$site_locale['site']],
-            'locale' => $locales[$site_locale['locale']],
-        );
+    /**
+     * @param $context
+     * @return mixed
+     */
+    public static function site_code($context)
+    {
+        list($site) = explode('::', $context, 2);
+
+        return $site;
+    }
+
+    /**
+     * @param $context
+     * @return array
+     */
+    public static function site($context)
+    {
+        $sites = static::sites();
+        $site_code = self::site_code($context);
+        if (empty($sites[$site_code])) {
+            return array(
+                'title' => $site_code,
+                'alias' => $site_code,
+            );
+        } else {
+            return $sites[$site_code];
+        }
     }
 }

@@ -12,13 +12,13 @@
 <p>
 <?php
 if ($crud['behaviours']['contextable']) {
-    $item_situations = $item->find_context('all');
-    $context_count = count($item_situations);
+    $item_contexts = $item->find_context('all');
+    $context_count = count($item_contexts);
 
     if ($crud['behaviours']['tree']) {
         $children = array();
         // Count all children in the primary context
-        foreach ($item_situations as $item_context) {
+        foreach ($item_contexts as $item_context) {
             foreach ($item_context->find_children_recursive(false) as $child) {
                 $children[$child->{$crud['behaviours']['contextable']['common_id_property']}] = true;
             }
@@ -31,9 +31,9 @@ if ($crud['behaviours']['contextable']) {
             <p><?= Str::tr($crud['config']['messages']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
             <?php
             if ($context_count > 1) {
-                $contexts = \Config::get('contexts', array());
+                $contexts = \Nos\Tools_Context::contexts();
                 $contexts_list = array();
-                foreach ($item_situations as $item_context) {
+                foreach ($item_contexts as $item_context) {
                     $contexts_list[] = \Nos\Tools_Context::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false));
                 }
                 ?>
@@ -45,7 +45,7 @@ if ($crud['behaviours']['contextable']) {
                 <select name="context">
                     <option value="all"><?= __('All contexts') ?></option>
                 <?php
-                foreach ($item_situations as $item_context) {
+                foreach ($item_contexts as $item_context) {
                     ?>
                     <option value="<?= $item_context->get_context() ?>"><?= \Nos\Tools_Context::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false)) ?></option>
                     <?php
@@ -68,9 +68,9 @@ if ($crud['behaviours']['contextable']) {
         if ($context_count == 1) {
             echo Str::tr($crud['config']['messages']['you are about to delete, confim'], array('title' =>  $item->title_item()));
         } else {
-            $contexts = \Config::get('contexts', array());
+            $contexts = \Nos\Tools_Context::contexts();
             $contexts_list = array();
-            foreach ($item_situations as $item_context) {
+            foreach ($item_contexts as $item_context) {
                 $contexts_list[] = \Arr::get($contexts, $item_context->get_context(), $item_context->get_context());
             }
             ?>
@@ -83,7 +83,7 @@ if ($crud['behaviours']['contextable']) {
                 <select name="context">
                     <option value="all"><?= __('All contexts') ?></option>
             <?php
-            foreach ($item_situations as $item_context) {
+            foreach ($item_contexts as $item_context) {
                 ?>
                 <option value="<?= $item_context->get_context() ?>"><?= \Arr::get($contexts, $item_context->get_context(), $item_context->get_context()); ?></option>
                 <?php

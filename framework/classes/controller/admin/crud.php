@@ -20,7 +20,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'successfully deleted' => 'The item has successfully been deleted!',
             'you are about to delete, confim' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?',
             'you are about to delete' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>.',
-            'exists in multiple context' => 'This item exists in <strong>{count} contexts</strong>.',
+            'exists in multiple context' => 'This item exists within <strong>{count} contexts</strong>.',
             'delete in the following contexts' => 'Delete this item in the following contexts:',
             'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
             'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
@@ -39,7 +39,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'confirm deletion wrong_confirmation' => 'Wrong confirmation',
             'add an item in context' => 'Add a new item in {context}',
         ),
-        'situation_relation' => null,
+        'environment_relation' => null,
         'tab' => array(
             'iconUrl' => '',
             'labels' => array(
@@ -63,7 +63,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected $clone = null;
     protected $is_new = false;
     protected $item_from = null;
-    protected $item_situation = null;
+    protected $item_environment = null;
 
     public function & __get($property)
     {
@@ -80,10 +80,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $model = $this->config['model'];
 
-        if (!empty($this->config['situation_relation'])) {
-            $this->config['situation_relation'] = $model::relations($this->config['situation_relation']);
-            if (!is_a($this->config['situation_relation'], 'Orm\\BelongsTo')) {
-                $this->config['situation_relation'] = null;
+        if (!empty($this->config['environment_relation'])) {
+            $this->config['environment_relation'] = $model::relations($this->config['environment_relation']);
+            if (!is_a($this->config['environment_relation'], 'Orm\\BelongsTo')) {
+                $this->config['environment_relation'] = null;
             }
         }
 
@@ -120,7 +120,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'model' => $this->config['model'],
                 'behaviours' => $this->behaviours,
                 'pk' => $this->pk,
-                'context' => $this->item_situation,
+                'context' => $this->item_environment,
                 'config' => $this->config,
                 'url_form' => $this->config['controller_url'].'/form',
                 'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
@@ -176,13 +176,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->item = clone $this->item_from;
             } elseif (!empty($common_id) && $this->behaviours['contextable']) {
                 $this->item->{$this->behaviours['contextable']['common_id_property']} = $common_id;
-            } elseif (!empty($context_id) && !empty($this->config['situation_relation'])) {
-                $model_context = $this->config['situation_relation']->model_to;
-                $this->item_situation = $model_context::find($context_id);
-                $this->item->{$this->config['situation_relation']->key_from[0]} = $this->item_situation->{$this->config['situation_relation']->key_to[0]};
+            } elseif (!empty($context_id) && !empty($this->config['environment_relation'])) {
+                $model_context = $this->config['environment_relation']->model_to;
+                $this->item_environment = $model_context::find($context_id);
+                $this->item->{$this->config['environment_relation']->key_from[0]} = $this->item_environment->{$this->config['environment_relation']->key_to[0]};
             }
             if ($this->behaviours['contextable']) {
-                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(\Config::get('contexts'));
+                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(Tools_Context::contexts());
             }
             if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
                 // New page: no parent
@@ -322,7 +322,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $message = strtr(
                     __('This item already exists in {context}. Therefore your item cannot be added.'),
                     array(
-                        '{context}' => \Arr::get(\Config::get('contexts'), $item_context, $item_context),
+                        '{context}' => \Arr::get(Tools_Context::contexts(), $item_context, $item_context),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -346,6 +346,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function action_insert_update($id = null)
     {
         // insert_update               : add a new item
+        // insert_update?context=fr_FR : add a new item in the specific context
         // insert_update/ID            : edit an existing item
         // insert_update/ID?context=fr_FR : translate an existing item (can be forbidden if the parent doesn't exists in that context)
 
@@ -369,7 +370,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 }
             }
 
-            $_GET['common_id'] = $id;
             return $this->blank_slate($id, $selected_context);
         }
     }
@@ -379,14 +379,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
         $this->is_new = true;
         if (empty($context)) {
-            $context = \Input::get('context', key(\Config::get('contexts')));
+            $context = \Input::get('context', key(Tools_Context::contexts()));
         }
 
         $view_params = array_merge(
             $this->view_params(),
             array(
                 'context' => $context,
-                'common_id' => \Input::get('common_id', ''),
+                'common_id' => $id,
             )
         );
         $view_params['crud']['tab_params']['url'] .= '?context='.$context;
@@ -402,7 +402,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function get_tab_params()
     {
         $labelUpdate = $this->config['tab']['labels']['update'];
-        $url = $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->id);
+        $url = $this->config['controller_url'].'/insert_update'.(empty($this->item->id) ? '' : '/'.$this->item->id);
         if ($this->is_new) {
             $params = array();
             foreach (array('create_from_id', 'common_id', 'context_id') as $key) {
@@ -411,7 +411,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $params[$key] = $value;
                 }
             }
-            if ($this->behaviours['contextable']) {
+            // Don't add context in blank slate case
+            if ($this->behaviours['contextable'] && empty($this->item->id)) {
                 $params['context'] = $this->item->get_context();
             }
             if (count($params)) {
@@ -488,9 +489,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $actions = array();
-        $contexts = array_keys(\Config::get('contexts'));
-        $sites = \Config::get('sites');
-        $locales = \Config::get('locales');
+        $contexts = array_keys(Tools_Context::contexts());
+        $sites = Tools_Context::sites();
+        $locales = Tools_Context::locales();
 
         $main_context = $this->item->find_main_context();
         foreach ($contexts as $context) {
@@ -508,16 +509,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     } elseif (count($locales) === 1) {
                         $label = __('Add to {context}');
                     } else {
-                        $site_locale_item = Tools_Context::site_locale_code($this->item->get_context());
-                        $site_locale = Tools_Context::site_locale_code($context);
-                        if ($site_locale_item['locale'] === $site_locale['locale']) {
+                        if (Tools_Context::locale_code($context) === Tools_Context::locale_code($this->item->get_context())) {
                             $label = __('Add to {context}');
                         } else {
                             $label = __('Translate into {context}');
                         }
                     }
                 } else {
-                    $label = __('Edit in {context}');
+                    $label = __('Edit {context}');
                 }
             }
             $label = strtr($label, array('{context}' => Tools_Context::context_label($context)));
@@ -535,12 +534,16 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         return array(
             array(
-                'label' => __('Translate / Copy'),
+                'label' => __('Translate / Add to another context'),
                 'menu' => array(
                     'options' => array(
                         'orientation' => 'vertical',
+                        'direction' => 'rtl',
                     ),
                     'menus' => $actions,
+                ),
+                'icons' => array(
+                    'secondary' => 'triangle-1-s'
                 ),
             ),
         );

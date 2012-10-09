@@ -260,7 +260,7 @@ define('jquery-nos',
                             });
 
                             $ul.insertAfter($element)
-                                .wijmenu($.extend({
+                                .wijmenu($.extend(true, {
                                         orientation: 'vertical'
                                     },
                                     element.menu.options || {},
@@ -524,10 +524,10 @@ define('jquery-nos',
 
                 $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
                 $context.find(":input[type='submit'],button").each(function() {
-                    var options = {
+                    var data = $(this).data(),
+                        options = $.extend(true, {
                             icons : {}
-                        },
-                        data = $(this).data(),
+                        }, data || {}),
                         replace = {};
 
                     data.icons = $.extend(true, {

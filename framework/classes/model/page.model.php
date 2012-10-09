@@ -176,7 +176,7 @@ class Model_Page extends \Nos\Orm\Model
 
         $url = !empty($params['absolute']) ? Uri::base(false) : '';
 
-        if (!($this->page_home && $this->get_context() == key(\Config::get('contexts')))) {
+        if (!($this->page_home && $this->get_context() == key(Tools_Context::contexts()))) {
             $url .= $this->virtual_path();
         }
         if (!empty($params['preview'])) {
@@ -211,7 +211,7 @@ class Model_Page extends \Nos\Orm\Model
                     \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
                     $url_enhanced = \Config::get("data::url_enhanced", array());
-                    $url = $this->page_entrance && $this->get_context() == key(\Config::get('contexts')) ? '' : $this->virtual_path(true);
+                    $url = $this->page_entrance && $this->get_context() == key(Tools_Context::contexts()) ? '' : $this->virtual_path(true);
                     $url_enhanced[$url] = $this->page_id;
                     \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
                     \Config::set('data::url_enhanced', $url_enhanced);

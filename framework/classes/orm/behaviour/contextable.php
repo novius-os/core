@@ -102,7 +102,7 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
         $available_contexts = $item->get_all_context();
 
         // Set the is_main property for one of the context
-        foreach (\Config::get('contexts') as $code => $name) {
+        foreach (Tools_Context::contexts() as $code => $name) {
             if (in_array($code, $available_contexts)) {
                 $new_main_item = $this->find_context($item, $code);
                 $new_main_item->set($this->_properties['is_main_property'], true);

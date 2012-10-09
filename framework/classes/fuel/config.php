@@ -52,11 +52,6 @@ class Config extends \Fuel\Core\Config
         return $file;
     }
 
-    public static function getFromUser($item, $default = null)
-    {
-        return static::mergeWithUser($item, static::get($item, $default));
-    }
-
     public static function mergeWithUser($item, $config)
     {
         $user = Session::user();

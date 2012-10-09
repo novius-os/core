@@ -29,6 +29,10 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, $this->config);
+
+        $user = Session::user();
+        $selectedContexts = \Arr::get($user->getConfiguration(), 'selectedContexts', array());
+        \Arr::set($this->config, 'selectedContexts', $selectedContexts);
     }
 
     public function action_index($view = null)
@@ -46,15 +50,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view = View::forge('admin/appdesk');
 
-        $contexts = \Config::get('contexts', array());
-        $locales = \Config::get('locales', array());
-        $sites = \Config::get('sites', array());
+        $contexts = Tools_Context::contexts();
+        $locales = Tools_Context::locales();
+        $sites = Tools_Context::sites();
 
         foreach ($contexts as $context => $params) {
-            $site = null;
-            $locale = null;
-            // Create 2 variables, $site and $locale
-            extract(Tools_Context::site_locale_code($context));
+            $site = Tools_Context::site_code($context);
+            $locale = Tools_Context::locale_code($context);
 
             if (!isset($sites[$site]['locales'])) {
                 $sites[$site]['locales'] = array();
