@@ -14,40 +14,8 @@ use View;
 use Fuel\Core\Config;
 use Date;
 
-class Controller_Inspector_Date extends Controller_Admin_Application
+class Controller_Inspector_Date extends Controller_Inspector
 {
-    protected $config = array(
-        'input_begin'           => 'date_begin',
-        'input_end'             => 'date_end',
-        'label_custom'          => 'Custom dates',
-        'label_custom_inputs'   => 'from xxxbeginxxx to xxxendxxx',
-        'options'               => array('custom', 'since', 'month', 'year'),
-        'since'                 => array(
-            'optgroup'  => 'Since',
-            'options'   => array(
-                '-3 day'            => '3 last days',
-                'previous monday'   => 'Week beginning',
-                '-1 week'           => 'Less than a week',
-                'current month'     => 'Month beginning',
-                '-1 month'          => 'Less than one month',
-                '-2 month'          => 'Less than two months',
-                '-3 month'          => 'Less than three months',
-                '-6 month'          => 'Less than six months',
-                '-1 year'           => 'Less than one year',
-            ),
-        ),
-        'month'                 => array(
-            'optgroup'      => 'Previous months',
-            'first_month'   => 'now',
-            'limit_type'    => 'year',
-            'limit_value'   => 1,
-        ),
-        'year'                  => array(
-            'optgroup'      => 'Years',
-            'first_year'    => 'now',
-            'limit'         => 4,
-        ),
-    );
 
     public function action_list()
     {
@@ -166,4 +134,71 @@ class Controller_Inspector_Date extends Controller_Admin_Application
 
         return $view;
     }
+
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = null) {
+        $inspector_path = static::get_path();
+
+        $default_config = array(
+            'input_begin'           => 'date_begin',
+            'input_end'             => 'date_end',
+            'label_custom'          => 'Custom dates',
+            'label_custom_inputs'   => 'from xxxbeginxxx to xxxendxxx',
+            'options'               => array('custom', 'since', 'month', 'year'),
+            'since'                 => array(
+                'optgroup'  => 'Since',
+                'options'   => array(
+                    '-3 day'            => '3 last days',
+                    'previous monday'   => 'Week beginning',
+                    '-1 week'           => 'Less than a week',
+                    'current month'     => 'Month beginning',
+                    '-1 month'          => 'Less than one month',
+                    '-2 month'          => 'Less than two months',
+                    '-3 month'          => 'Less than three months',
+                    '-6 month'          => 'Less than six months',
+                    '-1 year'           => 'Less than one year',
+                ),
+            ),
+            'month'                 => array(
+                'optgroup'      => 'Previous months',
+                'first_month'   => 'now',
+                'limit_type'    => 'year',
+                'limit_value'   => 1,
+            ),
+            'year'                  => array(
+                'optgroup'      => 'Years',
+                'first_year'    => 'now',
+                'limit'         => 4,
+            ),
+            'appdesk' => array(
+                'vertical'  => true,
+                'url'       => $inspector_path.'/list',
+                'inputName' => $config['input']['key']
+            )
+        );
+
+        $config = \Arr::merge($default_config, $config);
+
+        if (!isset($config['input']['query'])) {
+            $column = $config['input']['key'];
+            $config['input']['query'] = function($value, $query) use ($column) {
+                list($begin, $end) = explode('|', $value.'|');
+                if ($begin) {
+                    if ($begin = Date::create_from_string($begin, '%Y-%m-%d')) {
+                        $query->where(array($column, '>=', $begin->format('mysql')));
+                    }
+                }
+                if ($end) {
+                    if ($end = Date::create_from_string($end, '%Y-%m-%d')) {
+                        $query->where(array($column, '<=', $end->format('mysql')));
+                    }
+                }
+
+                return $query;
+            };
+        }
+
+        return $config;
+    }
+
+
 }

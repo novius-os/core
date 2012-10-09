@@ -69,4 +69,9 @@ class Controller_Admin_Application extends Controller_Admin_Auth
         );
         \Response::json($body);
     }
+
+    public static function get_path() {
+        list($application, $file_name) = \Config::configFile(get_called_class());
+        return 'admin/'.$application.'/'.substr($file_name, strlen('controller/admin/'));
+    }
 }

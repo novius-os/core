@@ -134,7 +134,13 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $apps = array();
         foreach ($launchers as $key => $app) {
+            if (empty($app['icon64']) && isset($app['application'])) {
+                $app['icon64'] = \Config::icon($app['application'], 64);
+            }
             if (!empty($app['action']) && !empty($app['icon64'])) {
+                if (isset($app['application']) && isset($app['action']['tab']) && !isset($app['action']['tab']['iconUrl'])) {
+                    $app['action']['tab']['iconUrl'] = \Config::icon($app['application'], 32);
+                }
                 // do we have to display the application?
                 if (!isset($app['application']) || Permission::check($app['application'], 'access')) {
                     // do we have the rights to access the application?

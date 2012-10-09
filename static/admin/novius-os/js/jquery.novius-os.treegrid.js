@@ -13,7 +13,7 @@ define('jquery-nos-treegrid',
         var undefined = void(0);
         $.widget( "nos.nostreegrid", $.nos.noslistgrid, {
             options: {
-                treeUrl : '',
+                urlJson : '',
                 treeOptions : null,
                 treeColumnIndex : 0,
                 sortable : true,
@@ -165,7 +165,7 @@ define('jquery-nos-treegrid',
                 self.treeDataSource = new wijdatasource({
                     dynamic: true,
                     proxy: new wijhttpproxy({
-                        url: o.treeUrl,
+                        url: o.urlJson,
                         dataType: "json",
                         error: function(jqXHR, textStatus, errorThrown) {
                             log(jqXHR, textStatus, errorThrown);
@@ -454,7 +454,7 @@ define('jquery-nos-treegrid',
 
                 $.ajax({
                     async : true,
-                    url : o.treeUrl,
+                    url : o.urlJson,
                     data : {
                         move : true,
                         itemModel : dragNode._model,

@@ -124,6 +124,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'config' => $this->config,
                 'url_form' => $this->config['controller_url'].'/form',
                 'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
+                'url_actions'  => $this->config['controller_url'].'/json_actions'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
                 'actions' => $this->get_actions(),
                 'tab_params' => $this->get_tab_params(),
@@ -141,7 +142,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function action_form($id = null)
     {
-        try {
+        //try {
             $this->item = $this->crud_item($id);
             $this->clone = clone $this->item;
             $this->is_new = $this->item->is_new();
@@ -160,9 +161,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $view_params['view_params'] = &$view_params;
 
             return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], $view_params, false);
-        } catch (\Exception $e) {
+        /*} catch (\Exception $e) {
             $this->send_error($e);
-        }
+        }*/
     }
 
     protected function form_item()
@@ -269,13 +270,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $fieldset->js_validation();
         $fieldset->populate_with_instance($this->item);
-        $fieldset->form()->set_config('field_template', \View::forge('nos::crud/field_template'));
-
-        foreach ($fieldset->field() as $field) {
-            if ($field->type == 'checkbox') {
-                $field->set_template(\View::forge('nos::crud/field_template', array('type' => 'checkbox')));
-            }
-        }
+        $fieldset->form()->set_config('field_template', '<tr><th class="{error_class}">{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return $fieldset;
     }
@@ -399,8 +394,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return \View::forge('nos::crud/blank_slate', $view_params, false);
     }
 
+    public function action_json_actions($id = null)
+    {
+        $this->item = $this->crud_item($id);
+        $this->is_new = $this->item->is_new();
+
+        if (empty($this->item)) {
+            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+        }
+
+        \Response::json($this->get_actions());
+    }
+
     protected function get_tab_params()
     {
+        list($application_name) = \Config::configFile(get_called_class());
         $labelUpdate = $this->config['tab']['labels']['update'];
         $url = $this->config['controller_url'].'/insert_update'.(empty($this->item->id) ? '' : '/'.$this->item->id);
         if ($this->is_new) {
@@ -421,7 +429,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $tabInfos = array(
-            'iconUrl' => $this->config['tab']['iconUrl'],
+            'iconUrl' => empty($this->config['tab']['iconUrl']) ? \Config::icon($application_name, 16) : $this->config['tab']['iconUrl'],
             'label' => $this->is_new ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
             'url' => $url,
         );
@@ -431,51 +439,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_actions()
     {
-        $actions = $this->get_actions_context();
-        if (!$this->is_new) {
-            if ($this->behaviours['url'] !== false) {
-                $url = $this->item->url_canonical(array('preview' => true));
-                if ($url !== null) {
-                    $actions[] = array(
-                        'label' => $this->config['messages']['visualise'],
-                        'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                        'action' => array(
-                            'action' => 'window.open',
-                            'url' => $url.'?_preview=1',
-                        ),
-                    );
-                }
+        $applicationActions = \Config::actions(array('models' => array(get_class($this->item)), 'type' => 'item', 'item' => $this->item));
+
+        $actions = array_values($this->get_actions_context());
+
+        foreach ($applicationActions as $action) {
+            if (!isset($action['enabled']) || $action['enabled']($this->item)) {
+                $actions[] = $action;
             }
-            $actions[] = array(
-                'label' => $this->config['messages']['delete'],
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                        'title' => $this->config['messages']['delete an item'],
-                    ),
-                ),
-                'icon' => 'trash',
-            );
         }
         foreach ($this->config['actions'] as $actionClosure) {
             if ($action = $actionClosure($this->item)) {
                 $actions[] = $action;
-            }
-        }
-        if (!$this->is_new) {
-            if ($this->behaviours['sharable']) {
-                $actions[] = array(
-                    'label' => __('Share'),
-                    'iconClasses' => 'nos-icon16 nos-icon16-share',
-                    'action' => array(
-                        'action' => 'share',
-                        'data' => array(
-                            'model_id' => $this->item->{$this->pk},
-                            'model_name' => $this->config['model'],
-                        ),
-                    ),
-                );
             }
         }
 
@@ -489,6 +464,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $actions = array();
+
         $contexts = array_keys(Tools_Context::contexts());
         $sites = Tools_Context::sites();
         $locales = Tools_Context::locales();

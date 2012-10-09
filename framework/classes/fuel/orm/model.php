@@ -34,8 +34,15 @@ class Model extends \Orm\Model
      */
     protected static $_title_property_cached = array();
 
+    protected static $_prefix = null;
+
     public $medias;
     public $wysiwygs;
+
+    public static function prefix() {
+        // @todo: add cache
+        return static::get_prefix();
+    }
 
     /**
      * Get the class's title property
@@ -523,17 +530,27 @@ class Model extends \Orm\Model
      */
     public function pick()
     {
-        $prefix_length = mb_strlen(static::get_prefix());
+        $prefix_length = mb_strlen(static::prefix());
 
         foreach (func_get_args() as $property) {
             //if (mb_substr($property, 0, $prefix_length) != $prefix) {
-            $property = static::get_prefix().$property;
+
+            $property = static::prefix().$property;
+
             //}
             if (!empty($this->{$property})) {
                 return $this->{$property};
             }
         }
         return null;
+    }
+
+    public function set($name, $value = null) {
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
+            $name = static::prefix().$name;
+        }
+
+        return parent::set($name, $value);
     }
 
     public function __set($name, $value)
@@ -612,8 +629,17 @@ class Model extends \Orm\Model
         return parent::__set($name, $value);
     }
 
+    public function & get($name) {
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
+            $name = static::prefix().$name;
+        }
+
+        return parent::get($name);
+    }
+
     public function & __get($name)
     {
+
         $arr_name = explode('->', $name);
         if (count($arr_name) > 1) {
             $class = get_called_class();
@@ -658,11 +684,6 @@ class Model extends \Orm\Model
                 $obj = $obj->{$arr_name[$i]};
             }
             return $obj;
-        }
-
-        // Special getter for ID without prefix
-        if ($name == 'id') {
-            $name = static::$_primary_key[0];
         }
 
         return parent::__get($name);
@@ -758,6 +779,170 @@ class Model extends \Orm\Model
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
+
+    public static function admin_config() {
+        list($application_name, $file) = \Config::configFile(get_called_class());
+        $file = explode('/', $file);
+
+        array_splice($file, count($file) - 1, 0, array('admin'));
+        $file = implode('/', $file);
+
+
+
+        $config = \Config::loadConfiguration($application_name, $file);
+
+        if (!isset($config['actions'])) {
+            $config['actions'] = array();
+        }
+        $config['actions'] = static::process_actions($application_name, get_called_class(), $config);
+
+        return $config;
+    }
+
+    public static function process_actions($application_name, $model, $config) {
+        $urls = array(
+            'add' => 'action.tab.url',
+            'edit' => 'action.tab.url',
+            'delete' => 'action.dialog.contentUrl',
+        );
+
+        $actions_template = array(
+            'add' => array(
+                'label' => __('Add :model_label'),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'method' => 'add',
+                    'tab' => array(
+                        'url' => 'insert_update?lang={{lang}}',
+                        'label' => __('Add a new monkey'),
+                    ),
+                ),
+                'context' => array(
+                    'appdeskToolbar' => true
+                ),
+            ),
+            'edit' => array(
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => "insert_update/{{id}}",
+                        'label' => __('Edit'),
+                    ),
+                ),
+                'label' => __('Edit'),
+                'primary' => true,
+                'icon' => 'pencil',
+                'context' => array(
+                    'list' => true
+                ),
+            ),
+            'delete' => array(
+                'action' => array(
+                    'action' => 'confirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => 'delete/{{id}}',
+                        'title' => __('Delete'),
+                    ),
+                ),
+                'label' => __('Delete'),
+                'primary' => true,
+                'icon' => 'trash',
+                'context' => array(
+                    'item' => true,
+                    'list' => true
+                ),
+                'enabled' =>  function($item) {
+                    return !$item->is_new();
+                },
+            ),
+            'visualise' => array(
+                'label' => 'Visualise',
+                'primary' => true,
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                'action' => array(
+                    'action' => 'window.open',
+                    'url' => '{{preview_url}}?_preview=1'
+                ),
+                'context' => array(
+                    'item' => true,
+                    'list' => true
+                ),
+                'enabled' =>  function($item) {
+                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        $url = $item->url_canonical(array('preview' => true));
+
+                        return !$item->is_new() && !empty($url);
+                    }
+                    return false;
+                },
+            ),
+            'share' => array(
+                'label' => __('Share'),
+                'iconClasses' => 'nos-icon16 nos-icon16-share',
+                'action' => array(
+                    'action' => 'share',
+                    'data' => array(
+                        'model_id' => '{{id}}',
+                        'model_name' => '',
+                    ),
+                ),
+                'context' => array(
+                    'item' => true
+                ),
+                'enabled' =>  function($item) {
+                    return !$item->is_new();
+                },
+            )
+        );
+
+
+        $model_label = explode('/', $model);
+        $model_label = $model_label[count($model_label) - 1];
+        $model_label = explode('_', $model_label);
+        $model_label = $model_label[count($model_label) - 1];
+
+        if (!isset($config['controller'])) {
+            $config['controller'] = strtolower($model_label);
+        }
+
+        if (!isset($config['labels'])) {
+            $config['labels'] = array();
+        }
+
+        if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
+            unset($actions_template['visualise']);
+        }
+
+        $generated_actions = array();
+        foreach ($actions_template as $name => $template) {
+            $generated_actions[$model.'.'.$name] = $template;
+
+            if (isset($urls[$name])) {
+                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name],'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
+            }
+
+            if (isset($config['labels'][$name])) {
+                $generated_actions[$model.'.'.$name]['label'] = $config['labels'][$name];
+            }
+            $generated_actions[$model.'.'.$name]['label'] = \Str::tr($generated_actions[$model.'.'.$name]['label'], array('model_label' => $model_label));
+
+            if ($name == 'share') {
+                $generated_actions[$model.'.'.$name]['action']['data']['model_name'] = $model;
+            }
+        }
+
+        $actions = \Arr::merge($generated_actions, $config['actions']);
+
+        foreach ($actions as $key => $action) {
+            if ($action === false) {
+                unset($actions[$key]);
+            }
+        }
+
+        return $actions;
+    }
+
+
 }
 
 

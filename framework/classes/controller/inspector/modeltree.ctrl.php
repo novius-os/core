@@ -14,7 +14,7 @@ use \Input;
 use \View;
 use \Config;
 
-class Controller_Inspector_Modeltree extends Controller_Admin_Application
+class Controller_Inspector_Modeltree extends Controller_Inspector
 {
     protected $config = array();
 
@@ -44,5 +44,93 @@ class Controller_Inspector_Modeltree extends Controller_Admin_Application
         }
 
         \Response::json($json);
+    }
+
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid') {
+        if (isset($config['model'])) {
+            $admin_config = $config['model']::admin_config();
+
+            if (!isset($config['dataset'])) {
+                $config['dataset']  = $admin_config['dataset'];
+            }
+            $config['dataset']['id']       = array(
+                'column' => 'id',
+                'visible' => false
+            );
+
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
+
+            if (!isset($config['dataset']['actions'])) {
+                $config['dataset']['actions'] = array();
+                foreach ($item_actions as $action_key => $action_value) {
+                    if (isset($action_value['enabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    }
+                }
+            }
+
+            if (!isset($config['models'])) {
+                $config['models'] = array(array());
+            }
+
+            if (!isset($config['models'][0]['model'])) {
+                $config['models'][0]['model'] = $config['model'];
+            }
+
+            if (!isset($config['models'][0]['order_by'])) {
+                $config['models'][0]['order_by'] = $config['model']::prefix().'sort';
+            }
+
+            if (!isset($config['models'][0]['childs'])) {
+                $config['models'][0]['childs'] = array($config['model']);
+            }
+
+            if (!isset($config['models'][0]['dataset'])) {
+                $config['models'][0]['dataset'] = $config['dataset'];
+            }
+
+            if (!isset($config['roots'])) {
+                $config['roots'] = array(array());
+            }
+
+            if (!isset($config['roots'][0]['model'])) {
+                $config['roots'][0]['model'] = $config['model'];
+            }
+
+            if (!isset($config['roots'][0]['where'])) {
+                $config['roots'][0]['where'] = array(array($config['model']::prefix().'parent_id', 'IS', \DB::expr('NULL')));
+            }
+
+            if (!isset($config['roots'][0]['order_by'])) {
+                $config['roots'][0]['order_by'] = $config['model']::prefix().'sort';
+            }
+
+            if (!isset($config['input']['query'])) {
+                $input_key = $config['input']['key'];
+                $config['input']['query'] = function($value, $query) use ($input_key) {
+                    //\Debug::dump(isset($_REQUEST['inspectors'][$input_key]) ? $_REQUEST['inspectors'][$input_key] : false, $input_key, $value);
+                    if (is_array($value) && count($value) && $value[0]) {
+                        //\Debug::dump('here');
+                        $table = explode('.', $input_key);
+                        if (count($table) == 1) {
+                            $query->where(array($input_key, 'in', $value));
+                        } else {
+                            $query->related(
+                                $table[0],
+                                array(
+                                    'where' => array(
+                                        array($input_key, 'in', $value),
+                                    ),
+                                )
+                            );
+                        }
+                    }
+
+                    return $query;
+                };
+            }
+
+        }
+        return parent::process_config($application, $config, $item_actions, $gridKey);
     }
 }

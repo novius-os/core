@@ -49,7 +49,7 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                         table.nostreegrid({
                                 sortable : false,
                                 movable : false,
-                                treeUrl : params.treeUrl,
+                                urlJson : params.urlJson,
                                 treeColumnIndex : 1,
                                 treeOptions : $.extend(true, {
                                     context : connector.data('nosContext') || ''

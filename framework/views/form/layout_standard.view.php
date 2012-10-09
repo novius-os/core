@@ -96,14 +96,21 @@ if (!empty($subtitle) || !empty($publishable)) {
         echo $publishable;
     }
     if (!empty($subtitle)) {
-        $fieldset->form()->set_config('field_template', "\t\t<td>{label}{required} {field} {error_msg}</td>\n");
+        $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
+            $field_template = $field->template;
+            if (!empty($field_template)) {
+                $field_template = str_replace(array('<tr>', '</tr>', '<td>', '</td>'), '', $field_template);
+                $field->set_template($field_template);
+            }
             $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
-            echo $field
-                 ->set_attribute('placeholder', $placeholder)
-                 ->set_attribute('title', $placeholder)
-                 ->build();
+            echo "\t\t<td>",
+                $field
+                     ->set_attribute('placeholder',$placeholder)
+                     ->set_attribute('title', $placeholder)
+                     ->build(),
+                "</td>\n";
         }
         $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
     }

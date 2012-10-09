@@ -56,54 +56,6 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
         }
     }
 
-    public function action_rss_item()
-    {
-        return self::catcher_form(array(
-            'view'  => 'nos::admin/data_catcher/rss_item',
-        ));
-    }
-
-    public function action_rss_item_save()
-    {
-        try {
-            list($item, $catcher_name) = self::save_catcher_nugget();
-
-            $this->response(array(
-                'notify' => strtr(__('Catcher "{catcher_name}" saved successfully.'), array(
-                    '{catcher_name}' => \Arr::get($item->data_catchers(), $catcher_name.'.title'),
-                )),
-            ));
-        } catch (\Exception $e) {
-            \Response::json(array(
-                'error' => $e->getMessage(),
-            ));
-        }
-    }
-
-    public function action_rss_channel()
-    {
-        return self::catcher_form(array(
-            'view'  => 'nos::admin/data_catcher/rss_channel',
-        ));
-    }
-
-    public function action_rss_channel_save()
-    {
-        try {
-            list($item, $catcher_name) = self::save_catcher_nugget();
-
-            $this->response(array(
-                'notify' => strtr(__('Catcher "{catcher_name}" saved successfully.'), array(
-                    '{catcher_name}' => \Arr::get($item->data_catchers(), $catcher_name.'.title'),
-                )),
-            ));
-        } catch (\Exception $e) {
-            \Response::json(array(
-                'error' => $e->getMessage(),
-            ));
-        }
-    }
-
     public static function catcher_form($params = array())
     {
         $params['model']        = \Arr::get($params, 'model', \Input::get('model', null));

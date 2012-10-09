@@ -76,7 +76,15 @@ class Controller_Front extends Controller
 
             \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
             $url_enhanced = \Config::get('data::url_enhanced', array());
-            $url_enhanced[$url.'/'] = 0;
+            end($url_enhanced);
+            if (key($url_enhanced) === '') {
+                $last_entry = current($url_enhanced);
+                unset($url_enhanced['']);
+                $url_enhanced[$url.'/'] = 0;
+                $url_enhanced[''] = $last_entry;
+            } else {
+                $url_enhanced[$url.'/'] = 0;
+            }
 
             $_404 = true;
             foreach ($url_enhanced as $temp_url => $page_id) {
