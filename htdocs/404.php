@@ -11,7 +11,9 @@
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
-$redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), 1);
+// Remove "public/" when DOCUMENT_ROOT is public parent's folder
+// Else remove leading /
+$redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), isset($_SERVER['SHARED_HOSTING']) ? 8 : 1);
 
 if (in_array($redirect_url, array(
     'favicon.ico',
