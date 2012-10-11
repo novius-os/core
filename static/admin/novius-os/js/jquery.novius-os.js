@@ -528,7 +528,12 @@ define('jquery-nos',
                         options = $.extend(true, {
                             icons : {}
                         }, data || {}),
-                        replace = {};
+                        replace = {},
+                        $button = $(this);
+
+                    if (data.red) {
+                        $button.addClass('ui-state-error');
+                    }
 
                     data.icons = $.extend(true, {
                             primary: null,
@@ -557,9 +562,9 @@ define('jquery-nos',
                         }
                     });
 
-                    $(this).button(options);
+                    $button.button(options);
                     $.each(replace, function(key, url) {
-                        $(this).find('span.ui-button-icon-' + key)
+                        $button.find('span.ui-button-icon-' + key)
                             .css({
                                 backgroundImage: 'url(' + url + ')'
                             });

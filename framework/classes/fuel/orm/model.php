@@ -847,6 +847,7 @@ class Model extends \Orm\Model
                 'label' => __('Delete'),
                 'primary' => true,
                 'icon' => 'trash',
+                'red' => true,
                 'context' => array(
                     'item' => true,
                     'list' => true

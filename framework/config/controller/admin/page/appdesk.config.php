@@ -134,6 +134,7 @@ return array(
                 'label' => __('Delete'),
                 'name' => 'delete',
                 'primary' => false,
+                'red' => true,
                 'icon' => 'trash',
                 'action' => array(
                     'action' => 'confirmationDialog',

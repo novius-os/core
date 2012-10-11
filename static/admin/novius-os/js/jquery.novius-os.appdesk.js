@@ -1820,7 +1820,7 @@ define('jquery-nos-appdesk',
                         }
                         var uiAction = $('<th></th>')
                             .css('white-space', 'nowrap')
-                            .addClass("ui-state-default")
+                            .addClass("ui-state-default" + (action.red ? ' ui-state-error' : ''))
                             .attr('title', action.label)
                             .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
 
@@ -1904,6 +1904,10 @@ define('jquery-nos-appdesk',
                                     .appendTo(ul)
                                     .find('a')
                                     .html(text);
+
+                                if (action.red) {
+                                    li.addClass('ui-state-error');
+                                }
 
                                 // Check whether action name is disabled
                                 if (action.name && noParseData.actions && noParseData.actions[action.name] == false) {
