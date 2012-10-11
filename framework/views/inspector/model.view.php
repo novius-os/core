@@ -45,15 +45,9 @@ require(
                 pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
 
             if (inspectorData.reloadEvent) {
-                var match = {
-                        name : inspectorData.reloadEvent
-                    };
-                if (connector.data('nosLang')) {
-                    match['lang'] = connector.data('nosLang');
-                }
-                inspector.nosListenEvent(match, function() {
-                        parent.trigger('widgetReload');
-                    });
+                inspector.nosListenEvent({name : inspectorData.reloadEvent}, function() {
+                    parent.trigger('widgetReload');
+                });
             }
 
             inspector.css({

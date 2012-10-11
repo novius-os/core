@@ -38,15 +38,9 @@ require(
                 rendered = false;
 
             if (inspectorData.reloadEvent) {
-                var match = {
-                        name : inspectorData.reloadEvent
-                    };
-                if (connector.data('nosLang')) {
-                    match['lang'] = connector.data('nosLang');
-                }
-                inspector.nosListenEvent(match, function() {
-                        parent.trigger('widgetReload');
-                    });
+                inspector.nosListenEvent({name : inspectorData.reloadEvent}, function() {
+                    parent.trigger('widgetReload');
+                });
             }
 
             inspector.css({

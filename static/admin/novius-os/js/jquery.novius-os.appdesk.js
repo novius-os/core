@@ -1223,22 +1223,9 @@ define('jquery-nos-appdesk',
                         var match = [];
                         $.each(params.reloadEvent, function(i, reloadEvent) {
                             if ($.type(reloadEvent) === 'string') {
-                                // Reload the grid if a action on a same language's item occurs
-                                // Or if a update or a insert on a other language's item occurs
-                                if (dispatcher.data('nosLang')) {
-                                    match.push({
-                                        name : reloadEvent,
-                                        lang : dispatcher.data('nosLang')
-                                    });
-                                    match.push({
-                                        name : reloadEvent,
-                                        action : ['delete', 'insert']
-                                    });
-                                } else {
-                                    match.push({
-                                        name : reloadEvent
-                                    });
-                                }
+                                match.push({
+                                    name : reloadEvent
+                                });
                             } else {
                                 match.push(reloadEvent);
                             }

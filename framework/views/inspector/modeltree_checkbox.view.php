@@ -34,15 +34,9 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                     rendered = false,
                     init = function() {
                         if (params.reloadEvent) {
-                            var match = {
-                                    name : params.reloadEvent
-                                };
-                            if (connector.data('nosLang')) {
-                                match['lang'] = connector.data('nosLang');
-                            }
-                            container.nosListenEvent(match, function() {
-                                    table.nostreegrid('reload');
-                                });
+                            container.nosListenEvent({name : params.reloadEvent}, function() {
+                                table.nostreegrid('reload');
+                            });
                         }
 
                         container.find('input[name="' + params.input_name + '[]"]').remove();
