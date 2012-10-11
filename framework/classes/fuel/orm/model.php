@@ -39,7 +39,8 @@ class Model extends \Orm\Model
     public $medias;
     public $wysiwygs;
 
-    public static function prefix() {
+    public static function prefix()
+    {
         // @todo: add cache
         return static::get_prefix();
     }
@@ -545,7 +546,8 @@ class Model extends \Orm\Model
         return null;
     }
 
-    public function set($name, $value = null) {
+    public function set($name, $value = null)
+    {
         if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
             $name = static::prefix().$name;
         }
@@ -629,7 +631,8 @@ class Model extends \Orm\Model
         return parent::__set($name, $value);
     }
 
-    public function & get($name) {
+    public function & get($name)
+    {
         if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
             $name = static::prefix().$name;
         }
@@ -780,7 +783,8 @@ class Model extends \Orm\Model
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
 
-    public static function admin_config() {
+    public static function admin_config()
+    {
         list($application_name, $file) = \Config::configFile(get_called_class());
         $file = explode('/', $file);
 
@@ -799,7 +803,8 @@ class Model extends \Orm\Model
         return $config;
     }
 
-    public static function process_actions($application_name, $model, $config) {
+    public static function process_actions($application_name, $model, $config)
+    {
         $urls = array(
             'add' => 'action.tab.url',
             'edit' => 'action.tab.url',
@@ -852,9 +857,10 @@ class Model extends \Orm\Model
                     'item' => true,
                     'list' => true
                 ),
-                'enabled' =>  function($item) {
-                    return !$item->is_new();
-                },
+                'enabled' =>
+                    function($item) {
+                        return !$item->is_new();
+                    },
             ),
             'visualise' => array(
                 'label' => 'Visualise',
@@ -868,14 +874,15 @@ class Model extends \Orm\Model
                     'item' => true,
                     'list' => true
                 ),
-                'enabled' =>  function($item) {
-                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        $url = $item->url_canonical(array('preview' => true));
+                'enabled' =>
+                    function($item) {
+                        if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                            $url = $item->url_canonical(array('preview' => true));
 
-                        return !$item->is_new() && !empty($url);
-                    }
-                    return false;
-                },
+                            return !$item->is_new() && !empty($url);
+                        }
+                        return false;
+                    },
             ),
             'share' => array(
                 'label' => __('Share'),
@@ -890,9 +897,10 @@ class Model extends \Orm\Model
                 'context' => array(
                     'item' => true
                 ),
-                'enabled' =>  function($item) {
-                    return !$item->is_new();
-                },
+                'enabled' =>
+                    function($item) {
+                        return !$item->is_new();
+                    },
             )
         );
 
@@ -919,7 +927,7 @@ class Model extends \Orm\Model
             $generated_actions[$model.'.'.$name] = $template;
 
             if (isset($urls[$name])) {
-                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name],'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
+                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
             }
 
             if (isset($config['labels'][$name])) {

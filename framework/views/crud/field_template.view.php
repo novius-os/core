@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 if ($type === 'checkbox') {
-?>
+    ?>
     <tr><th></th><td class="{error_class}">{field} {label}{required} {error_msg}</td></tr>
-<?php
+    <?php
 } else {
     ?>
     <tr><th class="{error_class}">{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>

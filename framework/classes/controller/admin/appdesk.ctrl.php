@@ -29,7 +29,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $this->load_config();
     }
 
-    public function load_config() {
+    public function load_config()
+    {
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
 
@@ -88,7 +89,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         return $view;
     }
 
-    public static function process_config($application, $config) {
+    public static function process_config($application, $config)
+    {
         if (isset($config['model'])) {
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();

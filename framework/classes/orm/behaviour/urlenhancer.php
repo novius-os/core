@@ -124,7 +124,8 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return reset($urls) ?: null;
     }
 
-    public function preview_url($item) {
+    public function preview_url($item)
+    {
         return $item->url_canonical(array('preview' => true));
     }
 }

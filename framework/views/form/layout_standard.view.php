@@ -107,7 +107,7 @@ if (!empty($subtitle) || !empty($publishable)) {
             $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
             echo "\t\t<td>",
                 $field
-                     ->set_attribute('placeholder',$placeholder)
+                     ->set_attribute('placeholder', $placeholder)
                      ->set_attribute('title', $placeholder)
                      ->build(),
                 "</td>\n";

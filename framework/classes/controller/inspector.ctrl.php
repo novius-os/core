@@ -1,20 +1,24 @@
 <?php
 namespace Nos;
 
-class Controller_Inspector extends Controller_Admin_Application {
+class Controller_Inspector extends Controller_Admin_Application
+{
 
-    public function before() {
+    public function before()
+    {
         parent::before();
         $this->load_config();
     }
 
-    public function load_config() {
+    public function load_config()
+    {
         list($application) = \Config::configFile(get_called_class());
         $this->config = static::process_config($application, $this->config);
         return $this->config;
     }
 
-    public static function process_config($application, $config, $item_actions = array(), $gridKey = null) {
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
+    {
         if (isset($config['model'])) {
             $inspector_path = static::get_path();
 
