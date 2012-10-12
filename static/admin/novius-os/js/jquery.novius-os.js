@@ -896,9 +896,10 @@ define('jquery-nos',
             nosUnlistenEvent : function(caller) {
                 var self = this,
                     $dispatcher = this.closest('.nos-dispatcher, body'),
-                    listens = $.extend(true, [], $dispatcher.data('noviusos-listens'));
+                    listens = $dispatcher.data('noviusos-listens');
 
                 if ($.isArray(listens)) {
+                    listens = $.extend(true, [], listens);
                     // Loop on original array, remove on clone : not change index inside the loop
                     $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
                         if (listen.caller === caller) {
