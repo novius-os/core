@@ -32,8 +32,8 @@ class Controller_Inspector extends Controller_Admin_Application
                 $config['appdesk']['vertical'] = true;
             }
 
-            if (!isset($config['appdesk']['langChange'])) {
-                $config['appdesk']['langChange'] = isset($behaviours['Nos\Orm_Behaviour_Contextable']);
+            if (!isset($config['appdesk']['contextChange'])) {
+                $config['appdesk']['contextChange'] = isset($behaviours['Nos\Orm_Behaviour_Contextable']);
             }
 
             if (!isset($config['appdesk']['url'])) {
@@ -56,8 +56,8 @@ class Controller_Inspector extends Controller_Admin_Application
                 $config['appdesk'][$gridKey]['columns'] = array();
                 foreach ($config['dataset'] as $key => $value) {
                     if ($key !== 'actions' && (!isset($value['visible']) || $value['visible'])) {
-                        if ($key == 'lang') {
-                            $config['appdesk'][$gridKey]['columns'][$key] = array('lang' => true);
+                        if ($key == 'context') {
+                            $config['appdesk'][$gridKey]['columns'][$key] = array('context' => true);
                         } else if ($key == 'published') {
                             $config['appdesk'][$gridKey]['columns']['published'] = array(
                                 'headerText' => __('Status'),

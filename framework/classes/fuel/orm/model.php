@@ -818,7 +818,7 @@ class Model extends \Orm\Model
                     'action' => 'nosTabs',
                     'method' => 'add',
                     'tab' => array(
-                        'url' => 'insert_update?lang={{lang}}',
+                        'url' => 'insert_update?context={{context}}',
                         'label' => __('Add a new monkey'),
                     ),
                 ),
