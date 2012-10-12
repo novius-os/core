@@ -27,9 +27,11 @@
                     connector = container.closest('.nos-dispatcher, body')
                         .on('contextChange', function() {
                             listenReloadEvent();
-                            table.nostreegrid('option', 'treeOptions', {
-                                context : connector.data('nosContext') || ''
-                            });
+                            if (params.contextChange) {
+                                table.nostreegrid('option', 'treeOptions', {
+                                    context : connector.data('nosContext') || ''
+                                });
+                            }
                         }),
                     rendered = false,
                     listenReloadEvent = function() {

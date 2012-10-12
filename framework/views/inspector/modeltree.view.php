@@ -21,9 +21,11 @@ require(
                 connector = inspector.closest('.nos-dispatcher, body')
                     .on('contextChange', function() {
                             listenReloadEvent();
-                            inspector.nostreegrid('option', 'treeOptions', {
-                                context : connector.data('nosContext') || ''
-                            });
+                            if (inspectorData.contextChange) {
+                                inspector.nostreegrid('option', 'treeOptions', {
+                                    context : connector.data('nosContext') || ''
+                                });
+                            }
                         }),
                 parent = inspector.parent()
                     .on({

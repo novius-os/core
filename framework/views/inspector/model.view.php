@@ -21,7 +21,9 @@ require(
                 connector = inspector.closest('.nos-dispatcher, body')
                     .on('contextChange', function() {
                         listenReloadEvent();
-                        inspector.noslistgrid('ensureControl', true);
+                        if (inspectorData.contextChange) {
+                            inspector.noslistgrid('ensureControl', true);
+                        }
                     }),
                 parent = inspector.parent()
                     .on({
