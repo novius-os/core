@@ -382,7 +382,7 @@ define('jquery-nos-appdesk',
                 self.uiToolbarContextsDialog.wijdialog('close');
                 self._uiToolbarContextsButtonLabel();
 
-                self.element.nosSaveUserConfig('selectedContexts', o.selectedContexts);
+                self.element.nosSaveUserConfig(o.name + '.selectedContexts', o.selectedContexts);
 
                 self.uiSearchInput.val('');
                 self.uiInspectorsTags.wijsuperpanel('destroy');

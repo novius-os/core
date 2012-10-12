@@ -34,10 +34,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
 
-        $user = Session::user();
-        $selectedContexts = \Arr::get($user->getConfiguration(), 'selectedContexts', array());
-        \Arr::set($this->config, 'selectedContexts', $selectedContexts);
-
         return $this->config;
     }
 
