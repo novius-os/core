@@ -36,7 +36,7 @@ $large = !empty($large) && $large == true;
         <div class="unit col <?= $large ? 'c12' : 'c10' ?>" style="">
             <div class="line ui-widget" style="margin:2em 2em 1em;">
                 <table class="title-fields" style="margin-bottom:1em;">
-                    <tr>
+                    <tr verti>
 <?php
 if (!empty($medias)) {
     $medias = (array) $medias;
@@ -51,11 +51,11 @@ $contexts = array_keys(\Nos\Tools_Context::contexts());
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
     if ($contextable) {
-        echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true)).'</td>';
+        echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
     }
 }
 ?>
-                        <td class="table-field">
+                        <td class="table-field" style="<?= !empty($medias) ? 'line-height:60px;' : '' ?>">
 <?php
 if (!empty($title)) {
     $title = (array) $title;

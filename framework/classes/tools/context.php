@@ -140,6 +140,7 @@ class Tools_Context
                 'alias' => false,
                 'template' => '{site} {locale}',
                 'flag' => true,
+                'force_flag' => false,
             ), $options);
 
         $site = self::site($context);
@@ -147,7 +148,7 @@ class Tools_Context
         $site_label = $options['alias'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : '';
         $site_label = empty($site_label) ? $site['title'] : $site_label;
         if (count(static::sites()) === 1) {
-            $label = $locale['title'];
+            $label = $options['force_flag'] ? static::flag($context) : $locale['title'];
         } elseif (count(static::locales()) === 1) {
             $label = $site_label;
         } else {
