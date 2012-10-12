@@ -24,6 +24,8 @@ class Controller_Front extends Controller
     protected $_page_url = '';
     protected $_enhancer_url = false;
     protected $_enhanced_url_path = false;
+    protected $_context = '';
+    protected $_contexts_possibles = array();
 
     protected $_template;
     protected $_view;
@@ -72,6 +74,15 @@ class Controller_Front extends Controller
         try {
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
+            foreach (Tools_Context::contexts() as $context => $domains) {
+                foreach ($domains as $domain) {
+                    if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
+                        $this->_contexts_possibles[$context] = $domain;
+                        break;
+                    }
+                }
+            }
+
             $cache->start();
 
             \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
@@ -107,7 +118,7 @@ class Controller_Front extends Controller
                         continue;
                     } catch (\Exception $e) {
                         // Cannot generate cache: fatal error...
-                        //@todo : cas de la page d'erreur
+                        //@todo : error page case
                         exit($e->getMessage());
                     }
 
@@ -440,31 +451,36 @@ class Controller_Front extends Controller
      */
     protected function _find_page()
     {
-        $where = array();
-        if (!$this->_is_preview) {
-            $where[] = array('page_published', 1);
-        }
-        if (empty($this->_page_url)) {
-            $where[] = array('page_entrance', 1);
-            $where[] = array('page_context', key(Tools_Context::contexts()));
-        } else {
-            $where[] = array('page_virtual_url', $this->_page_url);
-            //$where[] = array('page_parent_id', 'IS NOT', null);
+        foreach ($this->_contexts_possibles as $context => $domain) {
+            $url = mb_substr(\Uri::base(false).$this->_page_url, mb_strlen($domain));
+
+            $where = array(array('page_context', $context));
+            if (!$this->_is_preview) {
+                $where[] = array('page_published', 1);
+            }
+            if (empty($url)) {
+                $where[] = array('page_entrance', 1);
+            } else {
+                $where[] = array('page_virtual_url', $url);
+            }
+
+            $pages = Model_Page::find('all', array(
+                    'where' => $where,
+                ));
+
+            if (!empty($pages)) {
+                reset($pages);
+                $this->_page = current($pages);
+                $this->_page_url = $url;
+            }
         }
 
-        // Liste toutes les pages ayant le bon nom
-        $pages = Model_Page::find('all', array(
-            'where' => $where,
-        ));
-
-        if (empty($pages)) {
+        if (empty($this->_page)) {
             //var_dump($this->_url);
             throw new NotFoundException('The requested page was not found.');
         }
 
-        // Get the first page
-        reset($pages);
-        $this->_page = current($pages);
+        $this->_context = $this->_page->get_context();
         \Nos\I18n::setLocale($this->_page->get_context());
     }
 

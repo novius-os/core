@@ -25,15 +25,38 @@ class Tools_Context
     public static function contexts()
     {
         if (!is_array(static::$_contexts)) {
+            $all_domains = array();
+
             $sites = static::sites();
             $locales = static::locales();
             $contexts = \Config::get('contexts', array());
             static::$_contexts = array();
-            foreach ($contexts as $context_code => $context_params) {
+            foreach ($contexts as $context_code => $domains) {
                 $site = static::site_code($context_code);
                 $locale = static::locale_code($context_code);
                 if (isset($sites[$site]) && isset($locales[$locale])) {
-                    static::$_contexts[$context_code] = $context_params;
+                    if (empty($domains)) {
+                        if (!in_array(\Uri::base(false), $all_domains)) {
+                            $domains = array(\Uri::base(false));
+                        } else {
+                            $domains = array(\Uri::base(false).$site.'/'.$locale.'/');
+                        }
+                    }
+                    foreach ($domains as $i => $domain) {
+                        $domain = rtrim($domain, '/').'/';
+                        $domains[$i] = $domain;
+
+                        if (in_array($domain, $all_domains)) {
+                            unset($domains[$i]);
+                        } else {
+                            $all_domains[] = $domain;
+                        }
+                    }
+                    if (empty($domains)) {
+                        $domains = array(\Uri::base(false).$site.'/'.$locale.'/');
+                    }
+
+                    static::$_contexts[$context_code] = $domains;
                 }
             }
         }
