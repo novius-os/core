@@ -107,10 +107,10 @@
     right: -4px;
 }
 
-* + html .wijmo-wijsplitter-vertical .ui-resizable-e
+/** + html .wijmo-wijsplitter-vertical .ui-resizable-e
 {
     right: -4px;
-}
+}*/
 
 .wijmo-wijsplitter-v-expander
 {
@@ -232,10 +232,10 @@
     bottom: -4px;
 }
 
-* + html .wijmo-wijsplitter-horizontal .ui-resizable-s
+/** + html .wijmo-wijsplitter-horizontal .ui-resizable-s
 {
     bottom: -4px;
-}
+}*/
 
 .wijmo-wijsplitter-h-expander
 {
@@ -1680,6 +1680,8 @@ padding:0;
 	float: right;
 }
 
+
+
 .wijmo-wijmenu .wijmo-wijmenu-list .wijmo-wijmenu-item {
 background:none;
 border:none;
@@ -1730,6 +1732,10 @@ clear:both;
 float:left;
 width:98%;
 margin:1px 0;
+}
+
+.wijmo-wijmenu .wijmo-wijmenu-rtl .ui-widget-header {
+	float: right;
 }
 
 .wijmo-wijmenu-horizontal .wijmo-wijmenu-list .ui-widget-header
@@ -1799,6 +1805,9 @@ text-indent:-9999px;
 width:98%;
 margin:1px 0;
 padding:0;
+}
+.wijmo-wijmenu .wijmo-wijmenu-rtl .wijmo-wijmenu-separator {
+	float: right;
 }
 
 .wijmo-wijmenu .wijmo-wijmenu-group {
@@ -1920,6 +1929,12 @@ float:right;
     font-size: 12px;
     position: relative;
 }
+
+.wijmo-wijvideo .wijmo-wijvideo-timer
+{
+    font-size: 12px;
+}
+
 .wijmo-wijvideo .wijmo-wijvideo-controls
 {
     display: none;

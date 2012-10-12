@@ -10,10 +10,10 @@ amplify*/
 
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
@@ -232,6 +232,7 @@ amplify*/
 							this._triangleIconOpened).siblings(".ui-accordion-content")
 				.removeClass(
 "ui-accordion-content ui-helper-reset ui-widget-content ui-accordion-content-active");
+
 			this._initHeaders(newHeaderSelector);
 		},
 		_initHeaders: function (selector) {
@@ -265,7 +266,8 @@ amplify*/
 				})
 				.find("> .ui-icon").addClass(this._triangleIconOpened);
 				content.addClass("ui-accordion-content-active")
-					.addClass(this._contentCornerOpened);
+					.addClass(this._contentCornerOpened)
+					.wijTriggerVisibility();
 			} else {
 				header.addClass("ui-state-default ui-corner-all")
 				.attr({
@@ -315,11 +317,12 @@ amplify*/
 		///	</param>
 		activate: function (index) {
 			var nextHeader, o = this.options,
-				headers = this.element.children(".ui-accordion-header"),
-				prevHeader = this.element.find(".ui-accordion-header.ui-state-active"),
+				headers = this.element.find(o.header),
+				prevHeader, 
 				rightToLeft = this.element.data("rightToLeft"),
 				newIndex, prevIndex, nextContent, prevContent,
 				animOptions, proxied, proxiedDuration, animations, duration, easing;
+			prevHeader = $(jQuery.grep(headers, function (a) { return $(a).hasClass("ui-state-active"); }));
 			if (typeof index === "number") {
 				nextHeader = $(headers[index]);
 			} else if (typeof index === "string") {
@@ -328,6 +331,9 @@ amplify*/
 			} else {
 				nextHeader = $(index);
 				index = headers.index(index);
+			}
+			if (nextHeader.hasClass("ui-state-disabled")) {
+				return false;
 			}
 			if (nextHeader.hasClass("ui-state-active")) {
 				if (o.requireOpenedPane) {
@@ -388,7 +394,8 @@ amplify*/
 					toHide: prevContent,
 					complete: jQuery.proxy(function () {
 						prevContent.removeClass("ui-accordion-content-active");
-						nextContent.addClass("ui-accordion-content-active");
+						nextContent.addClass("ui-accordion-content-active")
+						.wijTriggerVisibility();
 						prevContent.css('display', '');
 						nextContent.css('display', '');
 						if ($.fn.wijlinechart) {
@@ -437,7 +444,8 @@ amplify*/
 				}
 				if (nextHeader.length > 0) {
 					nextContent.show().addClass("ui-accordion-content-active")
-									.addClass(this._contentCornerOpened);
+									.addClass(this._contentCornerOpened)
+                                    .wijTriggerVisibility();
 				}
 				if ($.fn.wijlinechart) {
 					prevContent.find(".wijmo-wijlinechart").wijlinechart("redraw"); //?

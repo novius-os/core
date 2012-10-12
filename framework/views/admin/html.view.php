@@ -355,7 +355,7 @@ if (hash.substr(0, 4) == 'tab=') {
 
 <link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.css">
-<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.1.4.min.css">
+<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.2.2.min.css">
 <?php
 if ($assets_minified) {
     ?>

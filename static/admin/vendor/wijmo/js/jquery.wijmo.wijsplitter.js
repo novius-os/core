@@ -1,10 +1,10 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
@@ -29,8 +29,8 @@
 		hSplitterCssPrefix = splitterCssPrefix + "h-",
 		vSplitterCssPrefix = splitterCssPrefix + "v-",
 		contentCssSuffix = "-content",
-		//pnl1Css = "panel1",
-		//pnl2Css = "panel2",
+	//pnl1Css = "panel1",
+	//pnl2Css = "panel2",
 		panelCss = {
 			panel1: {
 				n: "panel1",
@@ -41,8 +41,8 @@
 				content: "panel2" + contentCssSuffix
 			}
 		},
-		//pnl1ContentCss = pnl1Css + contentCssSuffix,
-		//pnl2ContentCss = pnl2Css + contentCssSuffix,
+	//pnl1ContentCss = pnl1Css + contentCssSuffix,
+	//pnl2ContentCss = pnl2Css + contentCssSuffix,
 		barCss = "bar",
 		expanderCss = "expander",
 		widgetHeaderCss = "ui-widget-header",
@@ -274,11 +274,11 @@
 			} else if ($.isPlainObject(o[key])) {
 				if (key === "panel1" &&
 					value.collapsed !== undefined) {
-					//if(value.collapsed�� { o.panel2.collapsed = false; }
+					//if(value.collapsed) { o.panel2.collapsed = false; }
 					self._setPanel1Collapsed(value.collapsed);
 				} else if (key === "panel2" &&
 					value.collapsed !== undefined) {
-					//if(value.collapsed�� { o.panel1.collapsed = false; }
+					//if(value.collapsed) { o.panel1.collapsed = false; }
 					self._setPanel2Collapsed(value.collapsed);
 				}
 				o[key] = $.extend(true, o[key], value);
@@ -318,6 +318,11 @@
 				element = self.element,
 				o = self.options;
 
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+
 			self._fields = {
 				width: element.width(),
 				height: element.height()
@@ -338,6 +343,17 @@
 				self.disable();
 			}
 			//end for disabled option
+
+			//fixed bug 28059
+			if (self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+					if (o.fullSplit) {
+						//self.refresh();
+						self._updateElements();
+						self._initResizer();
+					}
+				}, "wijsplitter");
+			}
 
 			self._trigger("load", null, self);
 		},
@@ -490,8 +506,8 @@
 				o = self.options,
 				fields = self._fields,
 				wrapper, bar, expander, icon,
-				pnl1 = { n: null, content: element.find(">div:eq(0)")},
-				pnl2 = { n: null, content: element.find(">div:eq(1)")};
+				pnl1 = { n: null, content: element.find(">div:eq(0)") },
+				pnl2 = { n: null, content: element.find(">div:eq(1)") };
 
 			fields.originalStyle = element.attr("style");
 
@@ -554,7 +570,7 @@
 				fields = self._fields,
 				wrapper = fields.wrapper,
 				collapsingPanel = o.collapsingPanel,
-				otherPanel = o.collapsingPanel === 'panel1' ? 'panel2': 'panel1',
+				otherPanel = o.collapsingPanel === 'panel1' ? 'panel2' : 'panel1',
 				bar = fields.bar,
 				expander = fields.expander,
 				icon = fields.icon;
@@ -630,14 +646,14 @@
 		_updateExpanderCss: function () {
 			var self = this,
 				o = self.options,
-				//element = self.element,
+			//element = self.element,
 				fields = self._fields,
 				expander = fields.expander,
 				icon = fields.icon,
 				isVertical = o.orientation === "vertical",
 				panel2IsCollapsing = o.collapsingPanel !== "panel1",
 				cssPrefix = isVertical ? vSplitterCssPrefix : hSplitterCssPrefix,
-				collapsedExpCorner1Css = ["bl", "tr", "tr", "bl"][isVertical * 2+ panel2IsCollapsing],
+				collapsedExpCorner1Css = ["bl", "tr", "tr", "bl"][isVertical * 2 + panel2IsCollapsing],
 				collapsedExpCorner2Css = ["br", "tl"][+panel2IsCollapsing],
 				collapsedIconCss = ["s", "n", "e", "w"][isVertical * 2 + panel2IsCollapsing],
 				expandedExpCorner1Css = ["tr", "bl", "bl", "tr"][isVertical * 2 + panel2IsCollapsing],
@@ -675,7 +691,7 @@
 				o = self.options,
 				distance = o.splitterDistance,
 				collapsingPanel = o.collapsingPanel,
-				otherPanel = o.collapsingPanel === 'panel1' ? 'panel2': 'panel1', fields = self._fields,
+				otherPanel = o.collapsingPanel === 'panel1' ? 'panel2' : 'panel1', fields = self._fields,
 				wrapper = fields.wrapper,
 				pnl1 = fields.panel1,
 				pnl2 = fields.panel2,
@@ -714,11 +730,11 @@
 
 				if (o.panel2.collapsed) {
 					if (collapsingPanel === "panel2") {
-						expander.addClass(vSplitterCssPrefix + "panel2" + "-" + collapsedCss); 
+						expander.addClass(vSplitterCssPrefix + "panel2" + "-" + collapsedCss);
 					}
 					fields.panel2.n.css("display", "none");
 					distance = (collapsingPanel === "panel1") ?
-							width - barW: width;
+							width - barW : width;
 				} else {
 					if (collapsingPanel === "panel2") {
 						expander.addClass(vSplitterCssPrefix + "panel2" + "-" + expandedCss);
@@ -773,7 +789,7 @@
 					}
 					fields.panel2.n.css("display", "none");
 					distance = (collapsingPanel === "panel1") ?
-							height - barH: height;
+							height - barH : height;
 				} else {
 					if (collapsingPanel === "panel2") {
 						expander.addClass(hSplitterCssPrefix + "panel2" + "-" + expandedCss);
@@ -963,7 +979,7 @@
 				if (o.disabled) {
 					return;
 				}
-				if (o.fullSplit) {
+				if (o.fullSplit && self.element.is(":visible")) {
 					//self.refresh();
 					self._updateElements();
 					self._initResizer();
@@ -978,7 +994,7 @@
 				fields = self._fields,
 				bar = fields.bar,
 				collapsingPanel = o.collapsingPanel,
-				otherPanel = o.collapsingPanel === 'panel1' ? 'panel2': 'panel1',
+				otherPanel = o.collapsingPanel === 'panel1' ? 'panel2' : 'panel1',
 				resizeSettings = o.resizeSettings,
 				animation = resizeSettings.animationOptions,
 				duration = animation.disabled ? 0 : animation.duration,

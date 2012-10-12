@@ -39,7 +39,14 @@
 {
     position: relative;
     display: inline-block;
+    /* 
+    *+display: inline;  uncomment for IE 9 Compatibility view */
 }
+.wijmo-wijcombobox:before, .wijmo-wijcombobox:after
+{
+    display: block;
+}
+
 .wijmo-wijcombobox-wrapper
 {
 }
@@ -76,6 +83,10 @@
     font-size: 0px;
     width: 22px;
     cursor: pointer;
+}
+.wijmo-wijcombobox .wijmo-wijcombobox-trigger .ui-icon
+{
+    top: auto;
 }
 /* dropdown list
 ----------------------------------*/
@@ -158,6 +169,8 @@
 }
 .wijmo-wijinput
 {
+    display: inline-block;
+    vertical-align: middle;
     position: relative;
     width: 150px;
 }
@@ -186,6 +199,7 @@
 {
     position: absolute;
     right: 0;
+    top: 0;
     width: 16px;
     cursor: pointer;
     padding: 0 3px;
@@ -236,8 +250,8 @@
 {
     position: absolute;
     right: 0;
-    top: 0;
-    width: 17px;
+    top: 0px;
+    width: 16px;
     cursor: pointer;
     height: 100%;
 }
@@ -296,6 +310,7 @@
 .wijmo-wijinput-numeric
 {
     text-align: right;
+    padding: 5px;
 }
 
 .wijmo-wijinput-date
@@ -364,10 +379,10 @@
     position: absolute;
     right: 0;
     top: 0;
-    height: 16px;
+    height: 100%;
     width: 16px;
     display: block;
-    padding: 5px 3px;
+    padding: 0 3px;
     border-top: none;
     border-right: none;
     border-bottom: none;
@@ -376,10 +391,14 @@
     border-radius: 0;
 }
 
+.wijmo-wijgrid .wijmo-wijgrid-table .wijmo-wijgrid-filter-trigger .ui-icon
+{
+    margin-top: 40%;
+}
+
 .wijmo-wijgrid .wijmo-wijgrid-table .wijmo-wijgrid-filter-input
 {
     width: auto;
-    height: 16px;
     border: none;
     padding: 5px 3px;
     overflow: visible; /* ie6 padding issue fix */
@@ -607,6 +626,11 @@
 .wijmo-wijgrid .wijmo-wijpager
 {
     display: block;
+    position: relative;
+}
+
+.wijmo-wijgrid .wijmo-wijsuperpanel-header
+{
     position: relative;
 }
 
@@ -1154,6 +1178,14 @@ wijmo-wijtree a.ui-state-default:link, wijmo-wijtree a.ui-state-default:visited,
     padding: 0;
     border: none;
 }
+
+.ui-widget div.wijmo-wijribbon
+{
+    font-size: 11px;
+    padding: 0;
+    border: none;
+}
+
 .wijmo-wijribbon-simple
 {
     padding: 3px;
@@ -2034,6 +2066,22 @@ border-bottom-left-radius: 0px;
     width: 80px;
     height: 26px;
 }
+
+.wijmo-wijeditor .wijmo-wijeditor-dialog-button.wijmo-wijeditor-dialog-uploadbutton
+{
+    width: 85px;
+}
+
+.wijmo-wijeditor .wijmo-wijeditor-dialog-button.wijmo-wijeditor-dialog-delbutton
+{
+    width: 135px;
+}
+
+.wijmo-wijeditor .wijmo-wijeditor-dialog-button.wijmo-wijeditor-previewdlg-printone
+{
+    width: 86px;
+    height: 26px;
+}
 /* --------------------end of common dialog css ---------------------- */
 
 /* -------------------------- image dialog ------------------------*/
@@ -2211,7 +2259,7 @@ border-bottom-left-radius: 0px;
 
 .wijmo-wijeditor .wijmo-wijeditor-templatedlg-save
 {
-    width: 200px;
+    width: 230px;
 }
 /* ------------------------ end of template dialog ----------------------*/
 /* ------------------------code dialog ----------------------*/
@@ -2302,6 +2350,7 @@ border-bottom-left-radius: 0px;
 {
     margin-top: 5px;
 }
+
 /* --------------------- end of link dialog css --------------------- */
 
 /* ------------------tag inspector dialog css ----------------------- */
@@ -2522,6 +2571,7 @@ border-bottom-left-radius: 0px;
 {
     font-weight: bold;
     float: none;
+    width: 132px;
 }
 
 .wijmo-wijeditor .wijmo-wijeditor-cleanupdlg-document textarea
@@ -2958,6 +3008,12 @@ border-bottom-left-radius: 0px;
 .wijmo-wijcarousel .wijmo-wijcarousel-slider-wrapper .wijmo-wijslider-horizontal
 {
 	margin: 5px 0;
+}
+
+.wijmo-wijcarousel .wijmo-wijcarousel-button-previous,.wijmo-wijcarousel .wijmo-wijcarousel-button-next 
+{
+    -webkit-user-select: none;
+    -khtml-user-select: none; /* webkit browsers */
 }
 
 .wijmo-wijcarousel-vertical .wijmo-wijcarousel-button-next,.wijmo-wijcarousel-vertical-multi .wijmo-wijcarousel-button-next
@@ -4889,4 +4945,66 @@ div.wijmo-wijev .ui-state-highlight
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: center;	
+}
+
+/*editcalendar*/
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content label 
+{
+	width: 150px;
+	display: inline-block;
+	clear: none;
+	float: left;
+	vertical-align: top;
+	margin-top: 5px;
+}
+
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content textarea
+{
+	width: 250px;
+	margin-top: 5px;	
+	height: 100px;
+}
+
+
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content .wijmo-wijtextbox
+{
+	position: relative;
+	top: 5px;
+	right: 5px;
+    width: 220px;
+    margin-top: 5px;
+}
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content .wijmo-wijtextbox.wijmo-wijev-name
+{
+    width: 180px;
+    padding-right: 44px;
+}
+
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content .wijmo-wijev-color-button
+{
+    position: absolute;
+    top: 12px;
+    left: 350px;
+	border: none;
+	background: none;
+	margin-top: 5px;
+}
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content .wijmo-wijev-color-button .ui-button-text
+{
+    padding: 6px 19px 6px 6px;
+}
+
+.wijmo-wijev-editcalendar-dialog.ui-dialog-content .wijmo-wijev-color-button .ui-icon
+{	
+    right: 4px;
+    left: auto;
+}
+
+.wijmo-wijev-editcalendar-dialog .wijmo-wijev-color
+{
+    cursor: pointer;
+}
+.wijmo-wijev.ui-state-disabled .wijmo-wijev-editcalendar-dialog .wijmo-wijev-color
+{
+	cursor: default;
 }

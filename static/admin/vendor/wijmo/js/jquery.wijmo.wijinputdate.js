@@ -8,10 +8,10 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
@@ -63,15 +63,15 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 	$.widget("wijmo.wijinputdate", $.extend(true, {}, wijinputcore, {
 		options: {
 			///	<summary>
-			///	Determines the default date value for a date input.
+			///	Determines the initial date value shown for the wijdateinput widget.
 			///	</summary>
 			date: null,
 			///	<summary>
-			///	Determines the minimal date that can be entered.
+			///	Determines the earliest, or minimum, date that can be entered.
 			///	</summary>
 			minDate: null,
 			///	<summary>
-			///	Determines the maximum date that can be entered.
+			///	Determines the latest, or maximum date, that can be entered.
 			///	</summary>
 			maxDate: null,
 			///	<summary>
@@ -140,6 +140,9 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 			startYear: 1950,
 			///	<summary>
 			///	Allows smart input behavior.
+			/// Remark:
+			/// If this option is true, if the date's year is start '00', 
+			/// user input a character, the year will auto calculate according the start year option.
 			///	</summary>
 			smartInputMode: true,
 			///	<summary>
@@ -149,15 +152,27 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 			///	<summary>
 			///	Determines the time span, in milliseconds, 
 			/// between two input intentions.
+			/// Remark:
+			/// when press a keyboard, and the widget will delay a time and then handle 
+			/// the next keyboard press. Use this option to control the speed of the key press.
 			///	</summary>
 			keyDelay: 800,
 			///	<summary>
 			///	Determines whether to automatically moves to the next field.
+			/// Remark:
+			/// For example, if user want input the '2012-9-20' in inputdate widget, 
+			/// if this option's value is true, when user type '2012' in textbox,  
+			/// it will auto focus in next field, user can type '9' in second field, 
+			/// if this option's value is false, user want to type '9' in second field, 
+			/// they should focus the second field by manual.
 			///	</summary>
 			autoNextField: true,
 			///	<summary>
-			///	Determines the calendar element for a date input.
-			///	Set to 'default' to use default calendar.
+			///	This option will supply a element to init the calendar widget, 
+			/// if the value is 'default', the widget will create a div and 
+			/// append it to body element, and using this element to init calendar.  
+			/// User can set this option' value to an element, 
+			/// and the widget will init the calendar using this element.
 			///	</summary>
 			calendar: 'default',
 			///	<summary>
@@ -357,6 +372,13 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 			case 'culture':
 				this._textProvider._setFormat(this.options.dateFormat);
 				this._updateText();
+
+				// update the calendar 's culture
+				var calendar = this.element.data('calendar', calendar);
+				if (calendar) {
+					calendar.wijcalendar("option", key, value);				
+				}
+
 				break;
 
 			case 'activeField':
@@ -365,6 +387,18 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 				this.options.activeField = value;
 				this._highLightField();
 				this._resetTimeStamp();
+				break;
+			//add for localization(calendar's tooltip)
+			case 'nextTooltip':
+			case 'prevTooltip':
+			case 'titleFormat':
+			case 'toolTipFormat':
+				// update the calendar 's tooltip
+				var calendar = this.element.data('calendar', calendar);
+				if (calendar) {
+					calendar.wijcalendar("option", key, value);
+				}
+
 				break;
 			}
 		},
@@ -395,6 +429,8 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 		getPostValue: function () {
 			/// <summary>
 			/// Gets the text value when the container form is posted back to server.
+			/// Code example:
+			/// $(".selector").wijinputdate("getPostValue")
 			/// </summary>
 			if (!this._isInitialized()) {
 				return this.element.val();
@@ -508,7 +544,8 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 					self._resetTimeStamp();
 				};
 
-			window.setTimeout(hc, 10);
+			// to fixed the issue 27522. remove this time out. by dail 2012-9-6
+			//window.setTimeout(hc, 10);
 		},
 
 		_keyDownPreview: function (e) {
@@ -562,6 +599,7 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 				if (this._allowEdit()) {
 					selRange = this.element.wijtextselection();
 					if (selRange.end - selRange.start === this.element.val().length) {
+						this.isDeleteAll = true;
 						this._setOption('date', new Date('1970/1/1'));
 					} else {
 						this._clearField();
@@ -669,7 +707,7 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 		},
 
 		_initCalendar: function () {
-			var c = this.options.calendar, self = this, calendar;
+			var self =this, o = self.options, c= o.calendar, calendar;
 			if (c === undefined || c === null) {
 				return;
 			}
@@ -683,8 +721,13 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 				return;
 			}
 
-			this.element.data('calendar', calendar);
-			calendar.wijcalendar({ popupMode: true, culture: this.options.culture,
+			self.element.data('calendar', calendar);
+			calendar.wijcalendar({ popupMode: true, culture: o.culture,
+				//add for localization(tooltip)
+				nextTooltip: o.nextTooltip || 'Next',
+				prevTooltip: o.prevTooltip || 'Previous',
+				titleFormat: o.titleFormat || 'MMMM yyyy',
+				toolTipFormat: o.toolTipFormat || 'dddd, MMMM dd, yyyy',
 				selectedDatesChanged: function () {
 					var selDate = $(this).wijcalendar("getSelectedDate");
 					$(this).wijcalendar("close");
@@ -694,7 +737,7 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 					self._trySetFocus();
 				}
 			});
-			this._syncCalendar();
+			self._syncCalendar();
 			// the bind event can't trigger.!!!
 			//            calendar.bind('wijcalendarselectedDatesChanged', function () {
 			//                var selDate = $(this).wijcalendar("getSelectedDate");
@@ -1836,7 +1879,13 @@ _dateDescriptor60 _dateDescriptor61 Globalize jQuery*/
 		removeAt: function (start, end, rh) {
 			try {
 				var desPos = this.desPostions[start], curInsertTxt, pos,
-					resultObj, result;
+					resultObj, result, widget = this.inputWidget,
+					element = widget.element,
+					dateLength = element.val().length;
+
+				if (dateLength === end + 1 && start === 0) {
+					widget.isDeleteAll = true;
+				}
 				if (desPos.desc.needAdjustInsertPos()) {
 					curInsertTxt = '0';
 					pos = start;

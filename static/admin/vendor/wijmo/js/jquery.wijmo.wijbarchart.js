@@ -1,10 +1,10 @@
 /*globals jQuery, Globalize*/
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
@@ -101,7 +101,7 @@
 			clusterSpacing: 0,
 			/// <summary>
 			/// A value that indicates whether to show animation 
-			///	and the duration for the animation.
+			///	and the duration and the easing for the animation.
 			/// Default: {enabled:true, duration:400, easing: ">"}.
 			/// Type: Object.
 			/// Code example:
@@ -125,7 +125,9 @@
 				/// </summary>
 				duration: 400,
 				/// <summary>
-				/// A value that indicates the easing for the animation.
+				/// An option that controls the speed of an animation..
+				/// Remark: The easing is defined in Raphael, the documentation is:
+				/// http://raphaeljs.com/reference.html#Raphael.easing_formulas
 				/// Default: ">".
 				/// Type: string.
 				/// </summary>
@@ -155,7 +157,9 @@
 				/// </summary>
 				duration: 400,
 				/// <summary>
-				/// A value that indicates the easing for the series transition.
+				/// An option that controls the speed of an animation.
+				/// Remark: The easing is defined in Raphael, the documentation is:
+				/// http://raphaeljs.com/reference.html#Raphael.easing_formulas
 				/// Default: ">".
 				/// Type: string.
 				/// </summary>
@@ -349,7 +353,6 @@
 				o.axis.x.compass = compass;
 			}
 
-
 			$.extend(true, {
 				compass: "east"
 			}, o.hint);
@@ -367,13 +370,13 @@
 		},
 
 		_setOption: function (key, value) {
-			if (key === "horizontal" && !value) {
+			if (key === "horizontal") {
 				$.extend(true, this.options.axis, {
 					x: {
-						compass: "south"
+						compass: value? "west" : "south"
 					},
 					y: {
-						compass: "west"
+						compass: value? "south" : "west"
 					}
 				});
 			}
@@ -528,7 +531,7 @@
 
 		_showSerieEles: function (seriesEle) {
 			$.each(seriesEle, function (i, bar) {
-				if (bar.bar) {
+				if (bar && bar.bar) {
 					bar.bar.show();
 					if (bar.bar.shadow) {
 						bar.bar.shadow.show();
@@ -537,11 +540,11 @@
 						bar.bar.tracker.show();
 					}
 				}
-				if (bar.dcl) {
+				if (bar && bar.dcl) {
 					bar.dcl.show();
 				}
 
-				if (bar.animatedBar && !bar.animatedBar.removed) {
+				if (bar && bar.animatedBar && !bar.animatedBar.removed) {
 					bar.animatedBar.show();
 				}
 			});
@@ -549,7 +552,7 @@
 
 		_hideSerieEles: function (seriesEle) {
 			$.each(seriesEle, function (i, bar) {
-				if (bar.bar) {
+				if (bar && bar.bar) {
 					bar.bar.hide();
 					if (bar.bar.shadow) {
 						bar.bar.shadow.hide();
@@ -558,11 +561,11 @@
 						bar.bar.tracker.hide();
 					}
 				}
-				if (bar.dcl) {
+				if (bar && bar.dcl) {
 					bar.dcl.hide();
 				}
 
-				if (bar.animatedBar && !bar.animatedBar.removed) {
+				if (bar && bar.animatedBar && !bar.animatedBar.removed) {
 					bar.animatedBar.hide();
 				}
 			});

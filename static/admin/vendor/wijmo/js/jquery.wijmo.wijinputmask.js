@@ -2,10 +2,10 @@
 
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
@@ -48,7 +48,7 @@
 			///	</summary>
 			mask: "",
 			///	<summary>
-			///	Determines the character used to represent the absence of user input.
+			///	Determines the character that appears when the widget has focus but no input has been entered.
 			///	</summary>
 			promptChar: '_',
 			///	<summary>

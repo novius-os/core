@@ -1,10 +1,10 @@
 /*globals window,document,jQuery,setTimeout*/
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
@@ -148,6 +148,11 @@
 			var self = this,
 				o = self.options;
 
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+
 			//Add support for jUICE!
 			if ($.isArray(o.buttons)) {
 				$.each(o.buttons, function (idx, value) {
@@ -187,10 +192,16 @@
 					self.disabledDiv = self._createDisabledDiv();
 				}
 				self.disabledDiv.appendTo("body");
+				if ($.browser.msie) {
+					self.uiDialog.draggable("disable");
+				}
 			}
 			else if (self.disabledDiv) {
 				self.disabledDiv.remove();
 				self.disabledDiv = null;
+				if ($.browser.msie) {
+					self.uiDialog.draggable("enable");
+				}
 			}
 		},
 
@@ -446,7 +457,18 @@
 			///	<summary>
 			///		Pins the wijdialog instance so that it could not be moved.
 			///	</summary>
-			var drag = this.isPin;
+			var drag = this.isPin, buttonIcon = this.pinButton.children("span");
+
+			if (!drag) {
+				if (buttonIcon.length) {
+					if (!buttonIcon.hasClass("ui-icon-pin-s")) {
+						buttonIcon.addClass("ui-icon-pin-s");
+					}
+				}
+			}
+			else {
+				buttonIcon.removeClass("ui-icon-pin-s");
+			}
 			this._enableDisableDragger(!drag);
 			this.isPin = !drag;
 		},
@@ -993,6 +1015,12 @@
 
 		open: function () {
 			var self = this, o = self.options;
+
+			if ((o.hide === "drop" || o.hide === "bounce") && $.browser.msie) {
+				//fixed bug when effect "drop" on IE
+				self.uiDialog.css("filter", "auto");
+			}
+
 			if (!self.innerFrame) {
 				if (!self.minimized) {
 					$.ui.dialog.prototype.open.apply(self, arguments);
@@ -1003,6 +1031,7 @@
 				else {
 					self.uiDialog.show();
 				}
+				self.uiDialog.wijTriggerVisibility();
 			}
 			else {
 				self.innerFrame.attr("src", o.contentUrl);
