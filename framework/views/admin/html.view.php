@@ -17,7 +17,7 @@ $config = array(
         'log' => 'static/novius-os/admin/bundle/vendor.min',
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
-        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.7.2.min',
+        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.8.2.min',
 
         'jquery.bgiframe' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
@@ -227,7 +227,7 @@ if (!$assets_minified) {
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
         'log' => 'static/novius-os/admin/vendor/log',
 
-        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.7.2',
+        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.8.2',
 
         'jquery.bgiframe' => 'static/novius-os/admin/vendor/jquery/bgiframe/jquery.bgiframe-2.1.3-pre',
         'jquery.cookie' => 'static/novius-os/admin/vendor/jquery/cookie/jquery.cookie',
