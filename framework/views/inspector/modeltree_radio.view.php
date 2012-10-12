@@ -17,7 +17,8 @@
         function( $ ) {
             $(function() {
                 var params = <?= \Format::forge()->to_json($params) ?>,
-                    container = $('#<?= $attributes['id'] ?>')
+                    id = <?= \Format::forge($attributes['id'])->to_json() ?>,
+                    container = $('#' + id)
                         .css({
                             height: params.height || '150px',
                             width: params.width || ''
@@ -25,26 +26,28 @@
                     table = container.find('table'),
                     connector = container.closest('.nos-dispatcher, body')
                         .on('contextChange', function() {
-                            if (params.contextChange) {
-                                table.nostreegrid('option', 'treeOptions', {
-                                    context : connector.data('nosContext') || ''
-                                });
-                            }
+                            listenReloadEvent();
+                            table.nostreegrid('option', 'treeOptions', {
+                                context : connector.data('nosContext') || ''
+                            });
                         }),
                     rendered = false,
-                    init = function() {
+                    listenReloadEvent = function() {
                         if (params.reloadEvent) {
+                            container.nosUnlistenEvent('inspector' + id);
                             var match = {
-                                    name : params.reloadEvent
-                                };
+                                name : params.reloadEvent
+                            };
                             if (connector.data('nosContext')) {
                                 match['context'] = connector.data('nosContext');
                             }
-                            container.nosListenEvent(match, function(json) {
-                                    table.nostreegrid('reload');
-                                });
-
+                            container.nosListenEvent(match, function() {
+                                table.nostreegrid('reload');
+                            }, 'inspector' + id);
                         }
+                    },
+                    init = function() {
+                        listenReloadEvent();
 
                         table.nostreegrid({
                                 sortable : false,

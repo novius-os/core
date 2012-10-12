@@ -835,43 +835,78 @@ define('jquery-nos',
                 return this;
             },
 
-            nosListenEvent : function(json_match, callback) {
-                var self = this;
-                json_match = $.isArray(json_match) ? json_match : [json_match];
+            nosListenEvent : function(json_match, callback, caller) {
+                var self = this,
+                    $dispatcher = this.closest('.nos-dispatcher, body'),
+                    listens = $dispatcher.data('noviusos-listens');
 
-                this.closest('.nos-dispatcher, body').on('noviusos', function(e) {
-                    var matched = false;
-                    e.noviusos = e.noviusos || {};
+                caller = caller || null;
 
-                    // Check if one of match_obj matched with event
-                    $.each(json_match, function(i, match_obj) {
-                        var matched_obj = true;
-                        $.each(match_obj, function(key, value) {
-                            if (!$.isArray(e.noviusos[key]) && !$.isArray(value)) {
-                                matched_obj = e.noviusos[key] === value;
-                            } else if ($.isArray(e.noviusos[key]) && !$.isArray(value)) {
-                                matched_obj = $.inArray(value, e.noviusos[key]) !== -1;
-                            } else if (!$.isArray(e.noviusos[key]) && $.isArray(value)) {
-                                matched_obj = $.inArray(e.noviusos[key], value) !== -1;
-                            } else if ($.isArray(e.noviusos[key]) && $.isArray(value)) {
-                                var matched_temp = false;
-                                $.each(value, function(i, val) {
-                                    matched_temp = $.inArray(val, e.noviusos[key]) !== -1;
-                                    return !matched_temp;
+                if (!$.isArray(listens)) {
+                    $dispatcher.on('noviusos', function(e) {
+                        e.noviusos = e.noviusos || {};
+
+                        $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
+                            var json_match = listen.json_match,
+                                callback = listen.callback,
+                                matched = false;
+
+                            // Check if one of match_obj matched with event
+                            $.each(json_match, function(i, match_obj) {
+                                var matched_obj = true;
+                                $.each(match_obj, function(key, value) {
+                                    if (!$.isArray(e.noviusos[key]) && !$.isArray(value)) {
+                                        matched_obj = e.noviusos[key] === value;
+                                    } else if ($.isArray(e.noviusos[key]) && !$.isArray(value)) {
+                                        matched_obj = $.inArray(value, e.noviusos[key]) !== -1;
+                                    } else if (!$.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                        matched_obj = $.inArray(e.noviusos[key], value) !== -1;
+                                    } else if ($.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                        var matched_temp = false;
+                                        $.each(value, function(i, val) {
+                                            matched_temp = $.inArray(val, e.noviusos[key]) !== -1;
+                                            return !matched_temp;
+                                        });
+                                        matched_obj = matched_temp;
+                                    }
+                                    return matched_obj;
                                 });
-                                matched_obj = matched_temp;
+                                if (matched_obj) {
+                                    matched = true;
+                                    return false;
+                                }
+                            });
+                            if (matched) {
+                                callback(e.noviusos);
                             }
-                            return matched_obj;
                         });
-                        if (matched_obj) {
-                            matched = true;
-                            return false;
+                    });
+                }
+                listens = $.isArray(listens) ? listens : [];
+                listens.push({
+                    caller: caller,
+                    json_match: $.isArray(json_match) ? json_match : [json_match],
+                    callback: callback
+                });
+                $dispatcher.data('noviusos-listens', listens);
+
+                return self;
+            },
+
+            nosUnlistenEvent : function(caller) {
+                var self = this,
+                    $dispatcher = this.closest('.nos-dispatcher, body'),
+                    listens = $.extend(true, [], $dispatcher.data('noviusos-listens'));
+
+                if ($.isArray(listens)) {
+                    // Loop on original array, remove on clone : not change index inside the loop
+                    $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
+                        if (listen.caller === caller) {
+                            listens.splice(index_listen, 1);
                         }
                     });
-                    if (matched) {
-                        callback(e.noviusos);
-                    }
-                });
+                    $dispatcher.data('noviusos-listens', listens);
+                }
 
                 return self;
             },

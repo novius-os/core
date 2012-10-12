@@ -16,15 +16,15 @@ require(
     ['jquery-nos-treegrid'],
     function($) {
         $(function() {
-            var inspector = $('#<?= $attributes['id'] ?>'),
+            var id = <?= \Format::forge($attributes['id'])->to_json() ?>,
+                inspector = $('#' + id),
                 connector = inspector.closest('.nos-dispatcher, body')
                     .on('contextChange', function() {
-                        if (inspectorData.contextChange) {
+                            listenReloadEvent();
                             inspector.nostreegrid('option', 'treeOptions', {
                                 context : connector.data('nosContext') || ''
                             });
-                        }
-                    }),
+                        }),
                 parent = inspector.parent()
                     .on({
                         widgetResize : function() {
@@ -35,19 +35,22 @@ require(
                         }
                     }),
                 inspectorData = parent.data('inspector'),
-                rendered = false;
-
-            if (inspectorData.reloadEvent) {
-                var match = {
-                        name : inspectorData.reloadEvent
-                    };
-                if (connector.data('nosContext')) {
-                    match['context'] = connector.data('nosContext');
-                }
-                inspector.nosListenEvent(match, function() {
-                        parent.trigger('widgetReload');
-                    });
-            }
+                rendered = false,
+                listenReloadEvent = function() {
+                    if (inspectorData.reloadEvent) {
+                        inspector.nosUnlistenEvent('inspector' + id);
+                        var match = {
+                            name : inspectorData.reloadEvent
+                        };
+                        if (connector.data('nosContext')) {
+                            match['context'] = connector.data('nosContext');
+                        }
+                        inspector.nosListenEvent(match, function() {
+                                parent.trigger('widgetReload');
+                            }, 'inspector' + id);
+                    }
+                };
+            listenReloadEvent();
 
             inspector.css({
                     height : '100%',

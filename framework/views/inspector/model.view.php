@@ -16,12 +16,12 @@ require(
     ['jquery-nos-listgrid'],
     function( $, undefined ) {
         $(function() {
-            var inspector = $('#<?= $id ?>').removeAttr('id'),
+            var id = <?= \Format::forge($id)->to_json() ?>,
+                inspector = $('#' + id).removeAttr('id'),
                 connector = inspector.closest('.nos-dispatcher, body')
                     .on('contextChange', function() {
-                        if (inspectorData.contextChange) {
-                            inspector.noslistgrid('ensureControl', true);
-                        }
+                        listenReloadEvent();
+                        inspector.noslistgrid('ensureControl', true);
                     }),
                 parent = inspector.parent()
                     .on({
@@ -42,19 +42,22 @@ require(
                 table_heights = $.grid.getHeights(),
                 showFilter = inspectorData.grid.showFilter || false,
                 rendered = false,
-                pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
-
-            if (inspectorData.reloadEvent) {
-                var match = {
-                        name : inspectorData.reloadEvent
-                    };
-                if (connector.data('nosContext')) {
-                    match['context'] = connector.data('nosContext');
-                }
-                inspector.nosListenEvent(match, function() {
-                        parent.trigger('widgetReload');
-                    });
-            }
+                pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row),
+                listenReloadEvent = function() {
+                    if (inspectorData.reloadEvent) {
+                        inspector.nosUnlistenEvent('inspector' + id);
+                        var match = {
+                            name : inspectorData.reloadEvent
+                        };
+                        if (connector.data('nosContext')) {
+                            match['context'] = connector.data('nosContext');
+                        }
+                        inspector.nosListenEvent(match, function() {
+                            parent.trigger('widgetReload');
+                        }, 'inspector' + id);
+                    }
+                };
+            listenReloadEvent();
 
             inspector.css({
                     height : '100%',

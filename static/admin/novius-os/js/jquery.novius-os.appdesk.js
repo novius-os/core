@@ -1505,31 +1505,34 @@ define('jquery-nos-appdesk',
                         if (!$.isArray(params.reloadEvent)) {
                             params.reloadEvent = [params.reloadEvent];
                         }
-                        var match = [];
-                        $.each(params.reloadEvent, function(i, reloadEvent) {
-                            if ($.type(reloadEvent) === 'string') {
-                                // Reload the grid if a action on a same context's item occurs
-                                // Or if a update or a insert on a other context's item occurs
-                                if (dispatcher.data('nosContext')) {
-                                    match.push({
-                                        name : reloadEvent,
-                                        context : dispatcher.data('nosContext')
-                                    });
-                                    match.push({
-                                        name : reloadEvent,
-                                        action : ['delete', 'insert']
-                                    });
+                        var listenEvent = function() {
+                            var match = [];
+                            $.each(params.reloadEvent, function(i, reloadEvent) {
+                                if ($.type(reloadEvent) === 'string') {
+                                    // Reload the grid if a action on a same language's item occurs
+                                    // Or if a update or a insert on a other language's item occurs
+                                    if (dispatcher.data('nosContext')) {
+                                        match.push({
+                                            name : reloadEvent,
+                                            context : dispatcher.data('nosContext')
+                                        });
+                                    } else {
+                                        match.push({
+                                            name : reloadEvent
+                                        });
+                                    }
                                 } else {
-                                    match.push({
-                                        name : reloadEvent
-                                    });
+                                    match.push(reloadEvent);
                                 }
-                            } else {
-                                match.push(reloadEvent);
-                            }
-                        });
-                        dispatcher.nosListenEvent(match, function() {
-                            div.appdesk('gridReload');
+                            });
+                            dispatcher.nosListenEvent(match, function() {
+                                    div.appdesk('gridReload');
+                                }, 'appdeskContext');
+                        };
+                        listenEvent();
+                        dispatcher.on('contextChange', function() {
+                            dispatcher.nosUnlistenEvent('appdeskContext');
+                            listenEvent();
                         });
                     }
 
