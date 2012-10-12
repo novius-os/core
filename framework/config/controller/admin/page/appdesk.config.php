@@ -124,7 +124,7 @@ return array(
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => 'admin/nos/page/page/insert_update?context_id={{id}}',
+                        'url' => 'admin/nos/page/page/insert_update?environment_id={{id}}',
                         'label' => __('Add a page'),
                         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
                     ),
