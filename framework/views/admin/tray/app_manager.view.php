@@ -126,7 +126,7 @@
                 <p>&nbsp;</p>
                 <h1 class="title"><?= __('Install from a .zip file') ?></h1>
 
-                <form method="post" action="/admin/nos/tray/appmanager/upload" enctype="multipart/form-data">
+                <form method="post" action="admin/nos/tray/appmanager/upload" enctype="multipart/form-data">
                     <input type="file" name="zip" />
                     <input type="submit" value="<?= __('Upload the application') ?>" />
                 </form>

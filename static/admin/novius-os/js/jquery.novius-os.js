@@ -383,7 +383,7 @@ define('jquery-nos',
 
             nosSaveUserConfig : function(key, configuration) {
                 this.nosAjax({
-                    url: '/admin/nos/noviusos/save_user_configuration',
+                    url: 'admin/nos/noviusos/save_user_configuration',
                     data: {
                         key: key,
                         configuration: configuration
@@ -397,8 +397,8 @@ define('jquery-nos',
 
                 data = data || {};
                 var contentUrls = {
-                        'all'   : '/admin/nos/media/appdesk',
-                        'image' : '/admin/nos/media/appdesk?view=image_pick'
+                        'all'   : 'admin/nos/media/appdesk',
+                        'image' : 'admin/nos/media/appdesk?view=image_pick'
                     },
                     $input = this;
 

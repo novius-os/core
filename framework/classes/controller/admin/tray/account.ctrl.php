@@ -37,7 +37,7 @@ class Controller_Admin_Tray_Account extends \Controller
     public function action_disconnect()
     {
         Auth::disconnect();
-        \Response::redirect('/admin/nos/login/reset');
+        \Response::redirect('admin/nos/login/reset');
         exit();
     }
 

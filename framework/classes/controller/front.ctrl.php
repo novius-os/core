@@ -46,7 +46,7 @@ class Controller_Front extends Controller
         $this->_base_href = \URI::base();
 
         // Strip out leading / and trailing .html
-        $this->_url = mb_substr($_SERVER['REDIRECT_URL'], 1);
+        $this->_url = mb_substr(\Input::server('REDIRECT_URL'), isset($_SERVER['NOS_RELATIVE_DIR']) ? 1 + mb_strlen($_SERVER['NOS_RELATIVE_DIR']) : 1);
         $url = str_replace('.html', '', $this->_url);
 
         $this->_is_preview = \Input::get('_preview', false);
