@@ -22,9 +22,9 @@ if (isset($_SERVER['NOS_ROOT'])) {
     define('NOSPATH', $_SERVER['NOS_ROOT'].'/novius-os/framework/');
 } else {
 
-    // When SHARED_HOSTING is set, DOCUMENT_ROOT is public parent's folder
-    if (isset($_SERVER['SHARED_HOSTING'])) {
-        define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR);
+    // When NOS_RELATIVE_DIR is set, DOCUMENT_ROOT is public parent's folder
+    if (isset($_SERVER['NOS_RELATIVE_DIR'])) {
+        define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT'].(empty($_SERVER['NOS_RELATIVE_DIR']) ? '' : DIRECTORY_SEPARATOR.trim($_SERVER['NOS_RELATIVE_DIR'], '/'))).DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR);
     } else {
         define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
     }

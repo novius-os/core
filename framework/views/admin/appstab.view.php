@@ -40,7 +40,7 @@ require(
         $(function() {
             var $panel = $('#<?= $id ?>').nosListenEvent({name : 'Nos\\Application'} ,function(json) {
                         $.ajax({
-                            url: '/admin/nos/noviusos/appstab',
+                            url: 'admin/nos/noviusos/appstab',
                             success: function(data) {
                                 $panel.parent().empty().append(data);
                             }

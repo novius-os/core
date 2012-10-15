@@ -23,8 +23,8 @@ class Controller_Admin_Auth extends Controller
                     'login_page' => \Uri::base(false).'admin/nos/login',
                 ), 403);
             } else {
-                \Response::redirect('/admin/nos/login?'.http_build_query(array(
-                    'redirect' => \Input::server('REDIRECT_SCRIPT_URL', \Input::server('REDIRECT_URL', '/admin/')).'?tab='.\Input::get('tab', ''),
+                \Response::redirect('admin/nos/login?'.http_build_query(array(
+                    'redirect' => mb_substr(\Input::server('REDIRECT_SCRIPT_URL', \Input::server('REDIRECT_URL', 'admin/')), isset($_SERVER['NOS_RELATIVE_DIR']) ?  mb_strlen($_SERVER['NOS_RELATIVE_DIR']) : 0).'?tab='.\Input::get('tab', ''),
                 ), '', '&'));
                 exit();
             }
