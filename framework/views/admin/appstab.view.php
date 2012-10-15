@@ -46,8 +46,26 @@ require(
                             }
                         });
                     }),
+                click = function(e) {
+                        e.preventDefault();
+                        var $launcher = $(this),
+                            tab = $launcher.data('launcher');
+                        $launcher.nosTabs($.extend({
+                            app: true,
+                            iconSize: 32,
+                            labelDisplay: false
+                        }, tab));
+                    },
                 apps = $panel.find('#apps').sortable({
-                        update: function() {
+                        update: function(e, ui) {
+                            ui.item.unbind("click");
+                            ui.item.one("click", function (event) {
+                                event.preventDefault();
+                                event.stopImmediatePropagation();
+                                $(this).click(function(e) {
+                                    click.call(this, e);
+                                });
+                            });
                             var orders = {};
                             $('.app').each(function(i) {
                                 orders[$(this).data('launcher').key] = {order: i};
@@ -59,14 +77,7 @@ require(
             $('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
 <?php } ?>
             $panel.find('a.app').click(function(e) {
-                e.preventDefault();
-                var $launcher = $(this),
-                    tab = $launcher.data('launcher');
-                $launcher.nosTabs($.extend({
-                    app: true,
-                    iconSize: 32,
-                    labelDisplay: false
-                }, tab));
+                click.call(this, e);
             });
         });
     });
