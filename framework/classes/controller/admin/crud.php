@@ -171,15 +171,15 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if ($this->is_new) {
             $create_from_id = \Input::get('create_from_id', 0);
             $common_id = \Input::get('common_id', null);
-            $context_id = \Input::get('context_id', null);
+            $environment_id = \Input::get('environment_id', null);
             if (!empty($create_from_id)) {
                 $this->item_from = $this->crud_item($create_from_id);
                 $this->item = clone $this->item_from;
             } elseif (!empty($common_id) && $this->behaviours['contextable']) {
                 $this->item->{$this->behaviours['contextable']['common_id_property']} = $common_id;
-            } elseif (!empty($context_id) && !empty($this->config['environment_relation'])) {
+            } elseif (!empty($environment_id) && !empty($this->config['environment_relation'])) {
                 $model_context = $this->config['environment_relation']->model_to;
-                $this->item_environment = $model_context::find($context_id);
+                $this->item_environment = $model_context::find($environment_id);
                 $this->item->{$this->config['environment_relation']->key_from[0]} = $this->item_environment->{$this->config['environment_relation']->key_to[0]};
             }
             if ($this->behaviours['contextable']) {
@@ -415,7 +415,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $url = $this->config['controller_url'].'/insert_update'.(empty($this->item->id) ? '' : '/'.$this->item->id);
         if ($this->is_new) {
             $params = array();
-            foreach (array('create_from_id', 'common_id', 'context_id') as $key) {
+            foreach (array('create_from_id', 'common_id', 'environment_id') as $key) {
                 $value = \Input::get($key, false);
                 if ($value !== false) {
                     $params[$key] = $value;

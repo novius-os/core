@@ -790,7 +790,7 @@ define('jquery-nos',
                                     // Store the response as specified by the jqXHR object
                                     responseText = jqXHR.responseText;
                                     // If successful, inject the HTML into all the matched elements
-                                    if ( jqXHR.isResolved() ) {
+                                    if ( jqXHR.state() === 'resolved' ) {
                                         // #4825: Get the actual response in case
                                         // a dataFilter is present in ajaxSettings
                                         jqXHR.done(function( r ) {
@@ -896,9 +896,10 @@ define('jquery-nos',
             nosUnlistenEvent : function(caller) {
                 var self = this,
                     $dispatcher = this.closest('.nos-dispatcher, body'),
-                    listens = $.extend(true, [], $dispatcher.data('noviusos-listens'));
+                    listens = $dispatcher.data('noviusos-listens');
 
                 if ($.isArray(listens)) {
+                    listens = $.extend(true, [], listens);
                     // Loop on original array, remove on clone : not change index inside the loop
                     $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
                         if (listen.caller === caller) {
