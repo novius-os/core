@@ -254,8 +254,8 @@ class Model_Page extends \Nos\Orm\Model
 
         $url_enhanced = \Config::get("data::url_enhanced", array());
         $matches = array_filter($url_enhanced, function ($v) use ($id) {
-                return $v['page_id'] === $id;
-            });
+            return $v['page_id'] === $id;
+        });
         foreach ($matches as $url => $params) {
             unset($url_enhanced[$url]);
         }

@@ -67,8 +67,8 @@ class Tools_Enhancer
             foreach ($page_enhanced as $page_id => $params) {
                 if ((!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
                     $matches = array_filter($url_enhanced, function ($v) use ($page_id, $item_context) {
-                            return $v['page_id'] === $page_id && $v['context'] === $item_context;
-                        });
+                        return $v['page_id'] === $page_id && $v['context'] === $item_context;
+                    });
 
                     if (count($matches) > 0) {
                         list($urlPath) = $matches;
@@ -107,8 +107,8 @@ class Tools_Enhancer
         foreach ($page_enhanced as $page_id => $params) {
             if (($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
                 $matches = array_filter($url_enhanced, function ($v) use ($page_id, $context) {
-                        return $v['page_id'] === $page_id && $v['context'] === $context;
-                    });
+                    return $v['page_id'] === $page_id && $v['context'] === $context;
+                });
 
                 if (count($matches) > 0) {
                     list($urlPath) = $matches;
@@ -131,8 +131,8 @@ class Tools_Enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
         $matches = array_filter($url_enhanced, function ($v) use ($page_id) {
-                return $v['page_id'] === $page_id;
-            });
+            return $v['page_id'] === $page_id;
+        });
         if (count($matches) > 0) {
             list($url) = $matches;
             return $url;

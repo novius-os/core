@@ -90,8 +90,8 @@ class Controller_Front extends Controller
             \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
             $url_enhanced = \Config::get('data::url_enhanced', array());
             $url_enhanced = array_filter($url_enhanced, function ($v) use ($contexts_possibles) {
-                    return in_array($v['context'], array_keys($contexts_possibles));
-                });
+                return in_array($v['context'], array_keys($contexts_possibles));
+            });
             end($url_enhanced);
             if (key($url_enhanced) === '') {
                 $last_entry = current($url_enhanced);
