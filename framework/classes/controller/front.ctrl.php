@@ -44,6 +44,7 @@ class Controller_Front extends Controller
     protected $_metas = array();
 
     protected $_page;
+    protected $_page_id;
 
     public function router($action, array $params, $status = 200)
     {
@@ -74,10 +75,11 @@ class Controller_Front extends Controller
         try {
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
+            $contexts_possibles = array();
             foreach (Tools_Context::contexts() as $context => $domains) {
                 foreach ($domains as $domain) {
                     if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
-                        $this->_contexts_possibles[$context] = $domain;
+                        $contexts_possibles[$context] = $domain;
                         break;
                     }
                 }
@@ -87,32 +89,47 @@ class Controller_Front extends Controller
 
             \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
             $url_enhanced = \Config::get('data::url_enhanced', array());
+            $url_enhanced = array_filter($url_enhanced, function ($v) use ($contexts_possibles) {
+                    return in_array($v['context'], array_keys($contexts_possibles));
+                });
             end($url_enhanced);
             if (key($url_enhanced) === '') {
                 $last_entry = current($url_enhanced);
                 unset($url_enhanced['']);
-                $url_enhanced[$url.'/'] = 0;
+                $url_enhanced[$url.'/'] = array();
                 $url_enhanced[''] = $last_entry;
             } else {
-                $url_enhanced[$url.'/'] = 0;
+                $url_enhanced[$url.'/'] = array();
             }
 
             $_404 = true;
-            foreach ($url_enhanced as $temp_url => $page_id) {
+            foreach ($url_enhanced as $temp_url => $page_id_context) {
                 if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-                    $_404 = false;
-                    if (!in_array($temp_url, array('', '/'))) {
-                        $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
-                        $this->_enhanced_url_path = $temp_url;
+                    if (isset($page_id_context['context'])) {
+                        $this->_contexts_possibles = array($page_id_context['context']);
+                        $this->_page_id = $page_id_context['page_id'];
+
+                        $temp_url = mb_substr(\Uri::base(false).$temp_url, mb_strlen($contexts_possibles[$page_id_context['context']]));
+                        if (!in_array($temp_url, array('', '/'))) {
+                            $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
+                            $this->_enhanced_url_path = $temp_url;
+                        } else {
+                            $this->_page_url = '';
+                            $this->_enhanced_url_path = '';
+                        }
+                        $this->_enhancer_url = mb_substr(ltrim($url, '/'), mb_strlen($temp_url));
                     } else {
-                        $this->_page_url = '';
-                        $this->_enhanced_url_path = '';
+                        $this->_contexts_possibles = $contexts_possibles;
+                        $this->_page_id = null;
+                        $this->_page_url = $temp_url;
                     }
-                    $this->_enhancer_url = mb_substr(ltrim($url, '/'), mb_strlen($temp_url));
+
+                    $_404 = false;
                     try {
                         $this->_generate_cache();
                     } catch (NotFoundException $e) {
                         $_404 = true;
+                        $this->_page = null;
                         $this->_enhanced_url_path = false;
                         $this->_enhancer_url = false;
                         continue;
@@ -451,27 +468,48 @@ class Controller_Front extends Controller
      */
     protected function _find_page()
     {
-        foreach ($this->_contexts_possibles as $context => $domain) {
-            $url = mb_substr(\Uri::base(false).$this->_page_url, mb_strlen($domain));
-
-            $where = array(array('page_context', $context));
+        if (!empty($this->_page_id)) {
+            $where = array(array('page_id', $this->_page_id));
             if (!$this->_is_preview) {
                 $where[] = array('page_published', 1);
             }
-            if (empty($url)) {
-                $where[] = array('page_entrance', 1);
-            } else {
-                $where[] = array('page_virtual_url', $url);
-            }
 
-            $pages = Model_Page::find('all', array(
+            $page = Model_Page::find('first', array(
                     'where' => $where,
                 ));
 
-            if (!empty($pages)) {
-                reset($pages);
-                $this->_page = current($pages);
-                $this->_page_url = $url;
+            if (!empty($page)) {
+                $this->_page = $page;
+            }
+        } else {
+            foreach ($this->_contexts_possibles as $context => $domain) {
+                $url = mb_substr(\Uri::base(false).$this->_page_url, mb_strlen($domain));
+
+                if (!in_array($url, array('', '/'))) {
+                    $url = mb_substr($url, 0, -1).'.html';
+                } else {
+                    $url = '';
+                }
+
+                $where = array(array('page_context', $context));
+                if (!$this->_is_preview) {
+                    $where[] = array('page_published', 1);
+                }
+                if (empty($url)) {
+                    $where[] = array('page_entrance', 1);
+                } else {
+                    $where[] = array('page_virtual_url', $url);
+                }
+
+                $page = Model_Page::find('first', array(
+                        'where' => $where,
+                    ));
+
+                if (!empty($page)) {
+                    $this->_page = $page;
+                    $this->_page_url = $url;
+                    break;
+                }
             }
         }
 

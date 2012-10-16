@@ -200,8 +200,8 @@ class Model_Page extends \Nos\Orm\Model
 
         $urlEnhancer = false;
         $regexps = array(
-            '`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u' => 2,
-            '`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u' => 3,
+            '`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u' => 2,
+            '`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u' => 3,
         );
         foreach ($regexps as $regexp => $name_index) {
             preg_match_all($regexp, $content, $matches);
@@ -212,7 +212,10 @@ class Model_Page extends \Nos\Orm\Model
 
                     $url_enhanced = \Config::get("data::url_enhanced", array());
                     $url = $this->page_entrance && $this->get_context() == key(Tools_Context::contexts()) ? '' : $this->virtual_path(true);
-                    $url_enhanced[$url] = $this->page_id;
+                    $url_enhanced[$url] = array(
+                        'page_id' => $this->page_id,
+                        'context' => $this->page_context,
+                    );
                     \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
                     \Config::set('data::url_enhanced', $url_enhanced);
 
@@ -250,7 +253,10 @@ class Model_Page extends \Nos\Orm\Model
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
         $url_enhanced = \Config::get("data::url_enhanced", array());
-        foreach (array_keys($url_enhanced, $id) as $url) {
+        $matches = array_filter($url_enhanced, function ($v) use ($id) {
+                return $v['page_id'] === $id;
+            });
+        foreach ($matches as $url => $params) {
             unset($url_enhanced[$url]);
         }
 

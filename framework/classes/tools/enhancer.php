@@ -52,7 +52,6 @@ class Tools_Enhancer
         // This files contains all the urlPath for the pages containing an URL enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
-        $url_enhanced_flipped = array_flip($url_enhanced);
 
         $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
         $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable', false);
@@ -66,9 +65,15 @@ class Tools_Enhancer
         $preview = \Arr::get($params, 'preview', false);
         if ($urlPath === false) {
             foreach ($page_enhanced as $page_id => $params) {
-                $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
-                if ($urlPath !== false && (!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
-                    $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
+                if ((!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
+                    $matches = array_filter($url_enhanced, function ($v) use ($page_id, $item_context) {
+                            return $v['page_id'] === $page_id && $v['context'] === $item_context;
+                        });
+
+                    if (count($matches) > 0) {
+                        list($urlPath) = $matches;
+                        $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
+                    }
                 }
             }
         } else {
@@ -100,9 +105,15 @@ class Tools_Enhancer
         $preview = \Arr::get($params, 'preview', false);
         $context    = \Arr::get($params, 'context', false);
         foreach ($page_enhanced as $page_id => $params) {
-            $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
-            if ($urlPath !== false && ($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
-                $urls[$page_id] = $urlPath;
+            if (($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
+                $matches = array_filter($url_enhanced, function ($v) use ($page_id, $context) {
+                        return $v['page_id'] === $page_id && $v['context'] === $context;
+                    });
+
+                if (count($matches) > 0) {
+                    list($urlPath) = $matches;
+                    $urls[$page_id] = $urlPath;
+                }
             }
         }
 
@@ -119,9 +130,15 @@ class Tools_Enhancer
     {
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
-        $url_enhanced = array_flip($url_enhanced);
-
-        return \Arr::get($url_enhanced, $page_id, false);
+        $matches = array_filter($url_enhanced, function ($v) use ($page_id) {
+                return $v['page_id'] === $page_id;
+            });
+        if (count($matches) > 0) {
+            list($url) = $matches;
+            return $url;
+        } else {
+            return false;
+        }
     }
 
 }
