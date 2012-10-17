@@ -26,9 +26,9 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud
         }
     }
 
-    protected function form_item()
+    protected function from_item()
     {
-        parent::form_item();
+        parent::from_item();
         if ($this->item->is_new() && empty($this->item_context)) {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
