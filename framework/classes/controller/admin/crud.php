@@ -169,7 +169,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $this->item = $this->crud_item($id);
             $this->clone = clone $this->item;
             $this->is_new = $this->item->is_new();
-            $this->form_item();
+            $this->from_item();
             $this->check_permission($this->is_new ? 'insert' : 'update');
 
             $fields = $this->fields($this->config['fields']);
@@ -192,7 +192,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     /**
      * from_item() is used to pre-configure an object based on a related other object.
      */
-    protected function form_item()
+    protected function from_item()
     {
         if ($this->is_new) {
             $create_from_id = \Input::get('create_from_id', 0);
