@@ -71,7 +71,7 @@ class Tools_Enhancer
                     });
 
                     if (count($matches) > 0) {
-                        list($urlPath) = $matches;
+                        list($urlPath) = array_values($matches);
                         $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
                     }
                 }
@@ -111,7 +111,7 @@ class Tools_Enhancer
                 });
 
                 if (count($matches) > 0) {
-                    list($urlPath) = $matches;
+                    list($urlPath) = array_values($matches);
                     $urls[$page_id] = $urlPath;
                 }
             }
@@ -134,7 +134,7 @@ class Tools_Enhancer
             return $v['page_id'] === $page_id;
         });
         if (count($matches) > 0) {
-            list($url) = $matches;
+            list($url) = array_values($matches);
             return $url;
         } else {
             return false;
