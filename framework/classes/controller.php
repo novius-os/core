@@ -189,12 +189,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             if (empty($config['context'])) {
                 // No inspector, we only search items in their primary context
                 $query->where($contextable['is_main_property'], 1);
-            } elseif (is_array($config['context'])) {
+            } elseif (is_array($config['context']) && count($config['context']) > 1) {
                 // Multiple contexts
                 $query->where($contextable['is_main_property'], 1);
                 $query->where($contextable['common_id_property'], 'IN', \DB::select($contextable['common_id_property'])->from($model::table())->where($contextable['context_property'], 'IN', $config['context']));
             } else {
-                $query->where($contextable['context_property'], '=', $config['context']);
+                $query->where($contextable['context_property'], '=', is_array($config['context']) ? $config['context'][0] : $config['context']);
             }
             $common_ids = array();
             $keys = array();
