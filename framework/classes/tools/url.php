@@ -48,8 +48,8 @@ class Tools_Url
         $contexts = Tools_Context::contexts();
         if (!empty($contexts[$context])) {
             $base_urls = $contexts[$context];
-            if (count($base_urls) > 1 && is_a(Nos::main_controller(), 'Nos\Controller_Front') && in_array(Nos::main_controller()->getDomainUrl(), $base_urls)) {
-                return Nos::main_controller()->getDomainUrl();
+            if (count($base_urls) > 1 && is_a(Nos::main_controller(), 'Nos\Controller_Front') && in_array(Nos::main_controller()->getContextUrl(), $base_urls)) {
+                return Nos::main_controller()->getContextUrl();
             } else {
                 return $base_urls[0];
             }

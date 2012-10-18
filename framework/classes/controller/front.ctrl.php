@@ -37,7 +37,7 @@ class Controller_Front extends Controller
     protected $_js_footer = array();
 
     protected $_base_href = '';
-    protected $_domain_url = '';
+    protected $_context_url = '';
     protected $_title = '';
     protected $_meta_description = '';
     protected $_meta_keywords = '';
@@ -50,7 +50,7 @@ class Controller_Front extends Controller
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
-        $this->_domain_url = \URI::base(false);
+        $this->_context_url = \URI::base(false);
 
         // Strip out leading / and trailing .html
         $this->_url = mb_substr($_SERVER['REDIRECT_URL'], 1);
@@ -125,7 +125,7 @@ class Controller_Front extends Controller
                     $_404 = false;
                     try {
                         $this->_generate_cache();
-                        $this->_domain_url = $contexts_possibles[$this->_context];
+                        $this->_context_url = $contexts_possibles[$this->_context];
                     } catch (NotFoundException $e) {
                         $_404 = true;
                         $this->_page = null;
@@ -175,9 +175,9 @@ class Controller_Front extends Controller
     /**
      * @return string
      */
-    public function getDomainUrl()
+    public function getContextUrl()
     {
-        return $this->_domain_url;
+        return $this->_context_url;
     }
 
     /**
