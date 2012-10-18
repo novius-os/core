@@ -452,10 +452,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'icon' => 'trash',
             );
         }
-        foreach ($this->config['actions'] as $actionClosure) {
-            if ($action = $actionClosure($this->item)) {
-                $actions[] = $action;
-            }
+        foreach ($this->config['actions'] as $action) {
+            $actions[] = is_callable($action) ? $action($this->item) : $action;
         }
         if (!$this->is_new) {
             if ($this->behaviours['sharable']) {
