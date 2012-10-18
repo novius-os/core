@@ -82,22 +82,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 
         // Front-office (enhancer context) = calculate urlPath based on current page, except if canonical URL was asked for
         if (!$canonical && ($main_controller = \Nos\Nos::main_controller()) instanceof \Nos\Controller_Front) {
-
             $page_id = $main_controller->getPage()->page_id;
-
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-            $page_enhanced = \Config::get('data::page_enhanced', array());
-
-            // The page should contain a valid enhancer for the current item
-            foreach ($this->_properties['enhancers'] as $enhancer_name) {
-                $page_contains_enhancer = !empty($page_enhanced[$enhancer_name][$page_id]);
-                if ($page_contains_enhancer) {
-                    break;
-                }
-            }
-            if (!$page_contains_enhancer) {
-                $page_id = false;
-            }
         }
 
         // Real canonical URL can only be computed using default sharable data
@@ -111,12 +96,23 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         }
 
         if (!empty($page_id)) {
+            \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
+            $page_enhanced = \Config::get('data::page_enhanced', array());
 
-            $urlPath = \Nos\Tools_Enhancer::url_page($page_id);
-            if ($urlPath !== false) {
-                $params['urlPath'] = $urlPath;
-            } else {
-                // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
+            // The page should contain a valid enhancer for the current item
+            foreach ($this->_properties['enhancers'] as $enhancer_name) {
+                $page_contains_enhancer = !empty($page_enhanced[$enhancer_name][$page_id]);
+                if ($page_contains_enhancer) {
+                    break;
+                }
+            }
+            if ($page_contains_enhancer) {
+                $urlPath = Tools_Url::page($page_id);
+                if ($urlPath !== null) {
+                    $params['urlPath'] = $urlPath;
+                } else {
+                    // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
+                }
             }
         }
 

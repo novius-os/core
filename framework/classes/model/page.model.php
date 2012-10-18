@@ -123,10 +123,10 @@ class Model_Page extends \Nos\Orm\Model
      *
      * @return string
      */
-    public function get_link()
+    public function link()
     {
         $attr = array(
-            'href' => $this->get_href(),
+            'href' => $this->url(),
         );
         if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
             if ($this->page_external_link_type == self::EXTERNAL_TARGET_NEW) {
@@ -139,31 +139,10 @@ class Model_Page extends \Nos\Orm\Model
 
     /**
      *
-     * @param  int  $params Id of the page
-     * @return type
-     */
-    public static function get_url($params)
-    {
-        if (is_numeric($params)) {
-            return static::find($params)->get_href();
-        }
-    }
-
-    public static function get_url_absolute($params)
-    {
-        if (is_numeric($params)) {
-            return static::find($params)->get_href(array(
-                'absolute' => true,
-            ));
-        }
-    }
-
-    /**
-     *
      * @param   array   params
      * @return string the href of the page (external link or virtual URL)
      */
-    public function get_href($params = array())
+    public function url($params = array())
     {
         if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
             $page_external_link = $this->page_external_link;
@@ -173,10 +152,8 @@ class Model_Page extends \Nos\Orm\Model
 
             return $page_external_link;
         }
-
-        $url = !empty($params['absolute']) ? Uri::base(false) : '';
-
-        if (!($this->page_home && $this->get_context() == key(Tools_Context::contexts()))) {
+        $url = Tools_Url::context($this->page_context);
+        if (!($this->page_entrance)) {
             $url .= $this->virtual_path();
         }
         if (!empty($params['preview'])) {
@@ -198,7 +175,6 @@ class Model_Page extends \Nos\Orm\Model
         static::_remove_url_enhanced($this->page_id);
         static::_remove_page_enhanced($this->page_id);
 
-        $urlEnhancer = false;
         $regexps = array(
             '`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u' => 2,
             '`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u' => 3,
@@ -211,9 +187,9 @@ class Model_Page extends \Nos\Orm\Model
                     \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
                     $url_enhanced = \Config::get("data::url_enhanced", array());
-                    $url = $this->page_entrance && $this->get_context() == key(Tools_Context::contexts()) ? '' : $this->virtual_path(true);
-                    $url_enhanced[$url] = array(
-                        'page_id' => $this->page_id,
+                    $url = $this->page_entrance ? '' : $this->virtual_path(true);
+                    $url_enhanced[$this->page_id] = array(
+                        'url' => $url,
                         'context' => $this->page_context,
                     );
                     \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
@@ -253,11 +229,8 @@ class Model_Page extends \Nos\Orm\Model
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
 
         $url_enhanced = \Config::get("data::url_enhanced", array());
-        $matches = array_filter($url_enhanced, function ($v) use ($id) {
-            return $v['page_id'] === $id;
-        });
-        foreach ($matches as $url => $params) {
-            unset($url_enhanced[$url]);
+        if (isset($url_enhanced[$id])) {
+            unset($url_enhanced[$id]);
         }
 
         \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);

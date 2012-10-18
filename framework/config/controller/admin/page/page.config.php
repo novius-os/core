@@ -56,7 +56,7 @@ return array(
                         'iconClasses' => 'nos-icon16 nos-icon16-eye',
                         'action' => array(
                             'action' => 'window.open',
-                            'url' => $item->get_href().'?_preview=1',
+                            'url' => $item->url(array('preview'  => true)),
                         ),
                     );
                 } else {

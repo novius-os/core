@@ -37,6 +37,7 @@ class Controller_Front extends Controller
     protected $_js_footer = array();
 
     protected $_base_href = '';
+    protected $_domain_url = '';
     protected $_title = '';
     protected $_meta_description = '';
     protected $_meta_keywords = '';
@@ -49,6 +50,7 @@ class Controller_Front extends Controller
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
+        $this->_domain_url = \URI::base(false);
 
         // Strip out leading / and trailing .html
         $this->_url = mb_substr($_SERVER['REDIRECT_URL'], 1);
@@ -92,24 +94,20 @@ class Controller_Front extends Controller
             $url_enhanced = array_filter($url_enhanced, function ($v) use ($contexts_possibles) {
                 return in_array($v['context'], array_keys($contexts_possibles));
             });
-            end($url_enhanced);
-            if (key($url_enhanced) === '') {
-                $last_entry = current($url_enhanced);
-                unset($url_enhanced['']);
-                $url_enhanced[$url.'/'] = array();
-                $url_enhanced[''] = $last_entry;
-            } else {
-                $url_enhanced[$url.'/'] = array();
-            }
+
+            $url_enhanced['current'] = array(
+                'url' => $url.'/',
+            );
 
             $_404 = true;
-            foreach ($url_enhanced as $temp_url => $page_id_context) {
+            foreach ($url_enhanced as $page_id => $page_params) {
+                $temp_url = $page_params['url'];
                 if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-                    if (isset($page_id_context['context'])) {
-                        $this->_contexts_possibles = array($page_id_context['context']);
-                        $this->_page_id = $page_id_context['page_id'];
+                    if ($page_id != 'current') {
+                        $this->_contexts_possibles = array($page_params['context']);
+                        $this->_page_id = $page_id;
 
-                        $temp_url = mb_substr(\Uri::base(false).$temp_url, mb_strlen($contexts_possibles[$page_id_context['context']]));
+                        $temp_url = mb_substr(\Uri::base(false).$temp_url, mb_strlen($contexts_possibles[$page_params['context']]));
                         if (!in_array($temp_url, array('', '/'))) {
                             $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
                             $this->_enhanced_url_path = $temp_url;
@@ -117,7 +115,7 @@ class Controller_Front extends Controller
                             $this->_page_url = '';
                             $this->_enhanced_url_path = '';
                         }
-                        $this->_enhancer_url = mb_substr(ltrim($url, '/'), mb_strlen($temp_url));
+                        $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($contexts_possibles[$page_params['context']].$temp_url));
                     } else {
                         $this->_contexts_possibles = $contexts_possibles;
                         $this->_page_id = null;
@@ -127,6 +125,7 @@ class Controller_Front extends Controller
                     $_404 = false;
                     try {
                         $this->_generate_cache();
+                        $this->_domain_url = $contexts_possibles[$this->_context];
                     } catch (NotFoundException $e) {
                         $_404 = true;
                         $this->_page = null;
@@ -171,6 +170,14 @@ class Controller_Front extends Controller
         }
 
         return \Response::forge($content, $status);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomainUrl()
+    {
+        return $this->_domain_url;
     }
 
     /**
@@ -508,6 +515,10 @@ class Controller_Front extends Controller
                 if (!empty($page)) {
                     $this->_page = $page;
                     $this->_page_url = $url;
+                    if ($page->page_entrance && !empty($url)) {
+                        \Response::redirect($domain, 'location', 301);
+                        exit();
+                    }
                     break;
                 }
             }

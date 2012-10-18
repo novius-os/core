@@ -24,7 +24,7 @@ if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
             if (empty($page)) {
                 unset($nuggets[\Nos\DataCatcher::TYPE_URL]);
             } else {
-                $page_path = preg_replace('`'.preg_quote('.html').'$`iUu', '', $page->get_href(array('absolute' => true)));
+                $page_path = preg_replace('`'.preg_quote('.html').'$`iUu', '', $page->url());
                 $nuggets['absolute_url'] = rtrim($page_path, '/').'/'.$path;
             }
         }

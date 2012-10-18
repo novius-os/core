@@ -66,13 +66,9 @@ class Tools_Enhancer
         if ($urlPath === false) {
             foreach ($page_enhanced as $page_id => $params) {
                 if ((!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
-                    $matches = array_filter($url_enhanced, function ($v) use ($page_id, $item_context) {
-                        return $v['page_id'] === $page_id && $v['context'] === $item_context;
-                    });
-
-                    if (count($matches) > 0) {
-                        list($urlPath) = array_values($matches);
-                        $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
+                    $page_params = \Arr::get($url_enhanced, $page_id, false);
+                    if ($page_params) {
+                        $urls[$page_id.'::'.$urlItem] = $page_params['url'].$urlItem;
                     }
                 }
             }
@@ -98,7 +94,6 @@ class Tools_Enhancer
         // This files contains all the urlPath for the pages containing an URL enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
-        $url_enhanced_flipped = array_flip($url_enhanced);
 
         // Now fetch all the possible URLS
         $urls = array();
@@ -106,13 +101,9 @@ class Tools_Enhancer
         $context    = \Arr::get($params, 'context', false);
         foreach ($page_enhanced as $page_id => $params) {
             if (($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
-                $matches = array_filter($url_enhanced, function ($v) use ($page_id, $context) {
-                    return $v['page_id'] === $page_id && $v['context'] === $context;
-                });
-
-                if (count($matches) > 0) {
-                    list($urlPath) = array_values($matches);
-                    $urls[$page_id] = $urlPath;
+                $page_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($page_params) {
+                    $urls[$page_id] = $page_params['url'];
                 }
             }
         }
@@ -125,20 +116,4 @@ class Tools_Enhancer
         $urls = static::urls($enhancer_name, $params);
         return reset($urls) ?: null;
     }
-
-    public static function url_page($page_id)
-    {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-        $url_enhanced = \Config::get('data::url_enhanced', array());
-        $matches = array_filter($url_enhanced, function ($v) use ($page_id) {
-            return $v['page_id'] === $page_id;
-        });
-        if (count($matches) > 0) {
-            list($url) = array_values($matches);
-            return $url;
-        } else {
-            return false;
-        }
-    }
-
 }

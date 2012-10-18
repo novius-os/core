@@ -14,23 +14,20 @@ $dataset = array(
     'id' => 'page_id',
     'title' => 'page_title',
     'url' => function($page) {
-        return $page->get_href();
+        return $page->url();
     },
     'previewUrl' => function($page) {
-        return $page->get_href(array(
-            'preview'  => true,
-            'absolute' => true,
-        ));
+        return $page->url(array('preview'  => true));
     },
     'is_home' => function($page) {
-        return (bool) (int) $page->page_home;
+        return (bool) (int) $page->page_entrance;
     },
     'actions' => array(
         'delete' => function($page) {
             return $page->page_lock != $page::LOCK_DELETION;
         },
         'set_homepage' => function($page) {
-            return !$page->page_home;
+            return !$page->page_entrance;
         },
     ),
 );
