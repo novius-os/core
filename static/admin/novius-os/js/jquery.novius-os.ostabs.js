@@ -904,7 +904,7 @@ define('jquery-nos-ostabs',
 
                 if (replaceTab) {
                     delete tab.reload;
-                    this.remove(index, false);
+                    this.remove(index, true);
                     this.add(tab, index);
                     this.select(index);
                 } else {
