@@ -76,11 +76,11 @@ return array(
             'application' => 'nos_tray',
         ),
         'nos_appmanager' => array(
-            'name' => 'Application manager',
+            'name' => 'Applications manager',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'label' => __('Application manager'),
+                    'label' => __('Applications manager'),
                     'url' => 'admin/nos/tray/appmanager',
                     'iconUrl' => 'static/novius-os/admin/novius-os/img/32/app-manager.png',
                 ),
