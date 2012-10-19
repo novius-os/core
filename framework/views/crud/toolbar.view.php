@@ -95,7 +95,10 @@
                     $container.nosListenEvent({
                             name: <?= \Format::forge($crud['model'])->to_json(); ?>
                         }, function(event) {
-                            if ($.inArray(<?= \Format::forge($item->{$crud['pk']})->to_json(); ?>, event.id) !== -1 && event.action === 'delete') {
+                            if (!$.isArray(event.id)) {
+                                event.id = [event.id];
+                            }
+                            if ($.inArray(<?= \Format::forge((int) $item->{$crud['pk']})->to_json(); ?>, event.id) !== -1 && event.action === 'delete') {
                                 return false;
                             }
                             $container.nosAjax({
