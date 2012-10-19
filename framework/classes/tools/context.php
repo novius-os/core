@@ -186,6 +186,16 @@ class Tools_Context
     }
 
     /**
+     * @return string
+     */
+    public static function default_context()
+    {
+        $contexts = static::contexts();
+
+        return current($contexts);
+    }
+
+    /**
      * @param $context
      * @return mixed
      */

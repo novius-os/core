@@ -101,8 +101,8 @@
                             $container.nosAjax({
                                 url: <?= \Format::forge($crud['url_actions'])->to_json(); ?>,
                                 type: 'GET',
-                                data: <?= \Format::forge($crud['behaviours']['contextable'] ? array(
-                                    'common_id' => $item->{$crud['behaviours']['contextable']['common_id_property']},
+                                data: <?= \Format::forge($crud['behaviours']['contextableAndTwinnable'] ? array(
+                                    'common_id' => $item->{$crud['behaviours']['contextableAndTwinnable']['common_id_property']},
                                     'context' => $crud['context'],
                                 ) : '')->to_json(); ?>,
                                 success: function(json) {

@@ -184,15 +184,24 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
 
         $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable');
-        $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
-        if ($contextable) {
+        $contextableAndTwinnable = $model::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
+        if ($contextableAndTwinnable || $contextable) {
+            if (!$contextable) {
+                $contextable = $contextableAndTwinnable;
+            }
             if (empty($config['context'])) {
-                // No inspector, we only search items in their primary context
-                $query->where($contextable['is_main_property'], 1);
+                if ($contextableAndTwinnable) {
+                    // No inspector, we only search items in their primary context
+                    $query->where($contextableAndTwinnable['is_main_property'], 1);
+                }
             } elseif (is_array($config['context']) && count($config['context']) > 1) {
                 // Multiple contexts
-                $query->where($contextable['is_main_property'], 1);
-                $query->where($contextable['common_id_property'], 'IN', \DB::select($contextable['common_id_property'])->from($model::table())->where($contextable['context_property'], 'IN', $config['context']));
+                if ($contextableAndTwinnable) {
+                    $query->where($contextableAndTwinnable['is_main_property'], 1);
+                    $query->where($contextableAndTwinnable['common_id_property'], 'IN', \DB::select($contextableAndTwinnable['common_id_property'])->from($model::table())->where($contextableAndTwinnable['context_property'], 'IN', $config['context']));
+                } else {
+                    $query->where($contextable['context_property'], 'IN', $config['context']);
+                }
             } else {
                 $query->where($contextable['context_property'], '=', is_array($config['context']) ? $config['context'][0] : $config['context']);
             }
@@ -286,14 +295,17 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 }
                 $item['_id'] = $object->{$pk};
                 $item['_model'] = $model;
+                if ($contextable && !$contextableAndTwinnable) {
+                    $item['context'] = Tools_Context::context_label($object->{$contextable['context_property']}, array('force_flag' => true));
+                }
                 $items[] = $item;
-                if ($contextable) {
-                    $common_id = $object->{$contextable['common_id_property']};
+                if ($contextableAndTwinnable) {
+                    $common_id = $object->{$contextableAndTwinnable['common_id_property']};
                     $keys[] = $common_id;
-                    $common_ids[$contextable['common_id_property']][] = $common_id;
+                    $common_ids[$contextableAndTwinnable['common_id_property']][] = $common_id;
                 }
             }
-            if ($contextable) {
+            if ($contextableAndTwinnable) {
                 $contexts = $model::contexts($common_ids);
                 foreach ($contexts as $common_id => $list) {
                     $contexts[$common_id] = explode(',', $list);
@@ -639,7 +651,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Contextable')) {
+                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable')) {
                     $item = $model::find($params['id']);
                     $contexts = $item->get_all_context();
                     $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));

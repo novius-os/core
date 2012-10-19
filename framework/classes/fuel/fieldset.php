@@ -407,11 +407,11 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($instance)) {
             return;
         }
-        $behaviour_contextable = $instance->behaviours('Nos\Orm_Behaviour_Contextable');
-        if (empty($behaviour_contextable) || $instance->is_main_context()) {
+        $behaviour_contextableAndTwinnable = $instance->behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
+        if (empty($behaviour_contextableAndTwinnable) || $instance->is_main_context()) {
             return;
         }
-        foreach ($behaviour_contextable['invariant_fields'] as $f) {
+        foreach ($behaviour_contextableAndTwinnable['invariant_fields'] as $f) {
             $field = $this->field($f);
             if (!empty($field)) {
                 $field->set_attribute('readonly', true);

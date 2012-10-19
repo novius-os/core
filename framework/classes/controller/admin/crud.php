@@ -99,10 +99,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->behaviours = array(
             'contextable' => $model::behaviours('Nos\Orm_Behaviour_Contextable', false),
+            'contextableAndTwinnable' => $model::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false),
             'sharable' => $model::behaviours('Nos\Orm_Behaviour_Sharable', false),
             'tree' => $model::behaviours('Nos\Orm_Behaviour_Tree', false),
             'url' => $model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false),
         );
+        if (!$this->behaviours['contextable'] && $this->behaviours['contextableAndTwinnable']) {
+            $this->behaviours['contextable'] = $this->behaviours['contextableAndTwinnable'];
+        }
         $this->pk = \Arr::get($model::primary_key(), 0);
     }
 
@@ -175,8 +179,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if (!empty($create_from_id)) {
                 $this->item_from = $this->crud_item($create_from_id);
                 $this->item = clone $this->item_from;
-            } elseif (!empty($common_id) && $this->behaviours['contextable']) {
-                $this->item->{$this->behaviours['contextable']['common_id_property']} = $common_id;
+            } elseif (!empty($common_id) && $this->behaviours['contextableAndTwinnable']) {
+                $this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']} = $common_id;
             } elseif (!empty($environment_id) && !empty($this->config['environment_relation'])) {
                 $model_context = $this->config['environment_relation']->model_to;
                 $this->item_environment = $model_context::find($environment_id);
@@ -185,17 +189,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($this->behaviours['contextable']) {
                 $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(Tools_Context::contexts());
             }
-            if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
+            if ($this->behaviours['contextableAndTwinnable'] && $this->behaviours['tree']) {
                 // New page: no parent
                 // Translation: we have a common_id and can determine the parent
-                if (!empty($this->item->{$this->behaviours['contextable']['common_id_property']})) {
+                if (!empty($this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']})) {
                     $model = $this->config['model'];
-                    $item_context_common = $model::find($this->item->{$this->behaviours['contextable']['common_id_property']});
+                    $item_context_common = $model::find($this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']});
                     $item_parent = $item_context_common->get_parent();
 
                     // Fetch in the appropriate context
                     if (!empty($item_parent)) {
-                        $item_parent = $item_parent->find_context($this->item->{$this->behaviours['contextable']['context_property']});
+                        $item_parent = $item_parent->find_context($this->item->{$this->behaviours['contextableAndTwinnable']['context_property']});
                     }
 
                     // Set manually, because set_parent doesn't handle new items
@@ -227,10 +231,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                             'value' => $this->item->{$this->behaviours['contextable']['context_property']},
                         ),
                     ),
-                    $this->behaviours['contextable']['common_id_property'] => array(
+                )
+            );
+        }
+        if ($this->behaviours['contextableAndTwinnable']) {
+            $fields = \Arr::merge(
+                $fields,
+                array(
+                    $this->behaviours['contextableAndTwinnable']['common_id_property'] => array(
                         'form' => array(
                             'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['contextable']['common_id_property']},
+                            'value' => $this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']},
                         ),
                     ),
                 )
@@ -291,8 +302,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'id' => (int) $item->{$this->pk},
         );
         if ($this->behaviours['contextable']) {
-            $dispatchEvent['context_common_id'] = (int) $item->{$this->behaviours['contextable']['common_id_property']};
             $dispatchEvent['context'] = $item->{$this->behaviours['contextable']['context_property']};
+        }
+        if ($this->behaviours['contextableAndTwinnable']) {
+            $dispatchEvent['context_common_id'] = (int) $item->{$this->behaviours['contextableAndTwinnable']['common_id_property']};
         }
 
         $return = array(
@@ -309,7 +322,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function before_save($item, $data)
     {
-        if ($this->behaviours['contextable'] && $this->is_new) {
+        if ($this->behaviours['contextableAndTwinnable'] && $this->is_new) {
 
             $item_context = $this->item->get_context();
             $existing = $this->item->find_context($item_context);
@@ -353,11 +366,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->is_new = $this->item->is_new();
 
-        if ($this->is_new || !$this->behaviours['contextable']) {
+        if ($this->is_new || !$this->behaviours['contextableAndTwinnable']) {
             return $this->action_form($id);
         }
 
-        if ($this->behaviours['contextable']) {
+        if ($this->behaviours['contextableAndTwinnable']) {
             $selected_context = \Input::get('context', $this->is_new ? null : $this->item->get_context());
 
             foreach ($this->item->get_all_context() as $context_id => $context) {
@@ -461,7 +474,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     protected function get_actions_context()
     {
-        if (!$this->behaviours['contextable']) {
+        if (!$this->behaviours['contextableAndTwinnable']) {
             return array();
         }
 
@@ -473,7 +486,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $main_context = $this->item->find_main_context();
         foreach ($contexts as $context) {
-            if ($this->item->{$this->behaviours['contextable']['context_property']} === $context) {
+            if ($this->item->{$this->behaviours['contextableAndTwinnable']['context_property']} === $context) {
                 continue;
             }
             $item_context = $this->item->find_context($context);
@@ -571,8 +584,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->delete();
 
-        if ($this->behaviours['contextable']) {
-            $dispatchEvent['context_common_id'] = $this->item->{$this->behaviours['contextable']['common_id_property']};
+        if ($this->behaviours['contextableAndTwinnable']) {
+            $dispatchEvent['context_common_id'] = $this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']};
             $dispatchEvent['id'] = array();
             $dispatchEvent['context'] = array();
 
@@ -583,7 +596,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($context === 'all') {
                 foreach ($this->item->find_context('all') as $item_context) {
                     $dispatchEvent['id'][] = (int) $item_context->{$this->pk};
-                    $dispatchEvent['context'][] = $item_context->{$this->behaviours['contextable']['context_property']};
+                    $dispatchEvent['context'][] = $item_context->{$this->behaviours['contextableAndTwinnable']['context_property']};
 
                     if ($this->behaviours['tree']) {
                         foreach ($item_context->get_ids_children(false) as $item_id) {
@@ -604,14 +617,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $this->check_permission('delete');
 
                 $dispatchEvent['id'][] = $this->item->{$this->pk};
-                $dispatchEvent['context'][] = $this->item->{$this->behaviours['contextable']['context_property']};
+                $dispatchEvent['context'][] = $this->item->{$this->behaviours['contextableAndTwinnable']['context_property']};
                 if ($this->behaviours['tree']) {
                     foreach ($this->item->get_ids_children(false) as $item_id) {
                         $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
 
-                // Reassigns common_id if this item is the main context (with the 'after_delete' event from the Contextable behaviour)
+                // Reassigns common_id if this item is the main context (with the 'after_delete' event from the ContextableAndTwinnable behaviour)
                 // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
                 $this->item->delete();
             }

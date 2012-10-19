@@ -52,7 +52,7 @@ class Model_Page extends \Nos\Orm\Model
     );
 
     protected static $_behaviours = array(
-        'Nos\Orm_Behaviour_Contextable' => array(
+        'Nos\Orm_Behaviour_ContextableAndTwinnable' => array(
             'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'change_parent'),
             'context_property'      => 'page_context',
             'common_id_property' => 'page_context_common_id',

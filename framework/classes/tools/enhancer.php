@@ -54,8 +54,8 @@ class Tools_Enhancer
         $url_enhanced = \Config::get('data::url_enhanced', array());
 
         $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
-        $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable', false);
-        if ($contextable) {
+        $contextableAndTwinnable = $item->behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
+        if ($contextableAndTwinnable) {
             $item_context = $item->get_context();
         }
         $urlItem   = call_user_func($callback, $item, $params);
@@ -65,7 +65,7 @@ class Tools_Enhancer
         $preview = \Arr::get($params, 'preview', false);
         if ($urlPath === false) {
             foreach ($page_enhanced as $page_id => $params) {
-                if ((!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
+                if ((!$contextableAndTwinnable || $params['context'] == $item_context) && ($preview || $params['published'])) {
                     $page_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($page_params) {
                         $urls[$page_id.'::'.$urlItem] = $page_params['url'].$urlItem;

@@ -14,9 +14,9 @@ $model_id   = $item->id;
 
 $data_catchers = $item->data_catchers();
 $default_nuggets = $item->get_default_nuggets();
-$contextable = $model_name::behaviours('Nos\Orm_Behaviour_Contextable', false);
-if ($contextable) {
-    $default_nuggets['context'] = $item->{$contextable['context_property']};
+$contextableAndTwinnable = $model_name::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
+if ($contextableAndTwinnable) {
+    $default_nuggets['context'] = $item->{$contextableAndTwinnable['context_property']};
 }
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">

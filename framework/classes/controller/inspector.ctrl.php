@@ -33,7 +33,7 @@ class Controller_Inspector extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['contextChange'])) {
-                $config['appdesk']['contextChange'] = isset($behaviours['Nos\Orm_Behaviour_Contextable']);
+                $config['appdesk']['contextChange'] = isset($behaviours['Nos\Orm_Behaviour_ContextableAndTwinnable']);
             }
 
             if (!isset($config['appdesk']['url'])) {

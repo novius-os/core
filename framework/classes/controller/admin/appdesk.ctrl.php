@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-use Asset, Format, Input, Session, View, Uri;
+use Format, Input, View;
 
 /**
  * The cloud Controller.
