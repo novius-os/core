@@ -10,6 +10,10 @@
 
 namespace Nos;
 
+/**
+ * The Tools_Context class allows you to work with contexts,
+ * locales and sites of your Novius OS instance.
+ */
 class Tools_Context
 {
     static protected $_contexts = null;
