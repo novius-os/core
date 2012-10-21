@@ -77,6 +77,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->config_build();
     }
 
+    /**
+     * Set properties from the config
+     */
     protected function config_build()
     {
         $model = $this->config['model'];
@@ -107,6 +110,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->pk = \Arr::get($model::primary_key(), 0);
     }
 
+    /**
+     * Generic method to get an instance wether it's been already created or not
+     * @param type $id : the id of the instance you want to edit (or create from)
+     * @return type : instance of the model
+     */
     protected function crud_item($id)
     {
         $model = $this->config['model'];
@@ -114,6 +122,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $id === null ? $model::forge() : $model::find($id);
     }
 
+    /**
+     * Set params used in view
+     * WARNING : As views can forge other views, it is necessary to add view_params in view_params...
+     * --> every time view_params is changed, $view_params['view_params'] = &$view_params; must be written.
+     * @return Array : params for views and the array itself
+     */
     protected function view_params()
     {
         $view_params = array(
@@ -140,14 +154,22 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         return $view_params;
     }
-
+    
+    /**
+     * Called before displaying the form to 
+     * - call from_item
+     * - check permission
+     * - build fields
+     * @param type $id
+     * @return View
+     */
     public function action_form($id = null)
     {
         try {
             $this->item = $this->crud_item($id);
             $this->clone = clone $this->item;
             $this->is_new = $this->item->is_new();
-            $this->form_item();
+            $this->from_item();
             $this->check_permission($this->is_new ? 'insert' : 'update');
 
             $fields = $this->fields($this->config['fields']);
@@ -167,7 +189,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
-    protected function form_item()
+    /**
+     * from_item() is used to pre-configure an object based on a related other object.
+     */
+    protected function from_item()
     {
         if ($this->is_new) {
             $create_from_id = \Input::get('create_from_id', 0);
@@ -208,6 +233,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
+    /**
+     * If necessary, add specific fields to those already specified through config.
+     * @return Array : merged fields;
+     */
     protected function fields($fields)
     {
         if (!empty($this->item_from)) {
@@ -258,6 +287,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $fields;
     }
 
+    /**
+     * Set and apply validation, populate fieldset  and modify template to show errors from validation
+     * @param type Fieldset
+     * @return type Fieldset
+     */
     protected function fieldset($fieldset)
     {
         $fieldset->js_validation();
@@ -267,6 +301,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $fieldset;
     }
 
+    /**
+     * Default config for building the fieldset with \Fieldset::build_from_config.
+     * @return Array : config
+     */
     protected function build_from_config()
     {
         return array(
@@ -275,6 +313,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
     }
 
+    /**
+     * Default method 'save' called when building fieldset :
+     * Create the dispatched event.
+     * @return Array : config needed in the dispatched event.
+     */
     public function save($item, $data)
     {
         $dispatchEvent = array(
@@ -299,6 +342,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $return;
     }
 
+    /**
+     * Default method 'before_save' called when building fieldset.
+     */
     public function before_save($item, $data)
     {
         if ($this->behaviours['translatable'] && $this->is_new) {
@@ -327,6 +373,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
+    /**
+     * Determine wether the item is udpated or added and if it's creating from a different language
+     * @param type $id of the item
+     * @return View resulting from the call of a method (either action_form or blank_slate)
+     */
     public function action_insert_update($id = null)
     {
         // insert_update               : add a new item
@@ -359,6 +410,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
+    /**
+     * Display a blank slate to create a new item from an another one in a different language
+     * @param type $id : orignal item's id
+     * @param type $lang : chosen language
+     * @return type View : blank_slate
+     */
     public function blank_slate($id, $lang)
     {
         $this->item = $this->crud_item($id);
@@ -381,6 +438,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return \View::forge('nos::crud/blank_slate', $view_params, false);
     }
 
+    /**
+     * Return possible actions from the config and transform them into json to display them
+     * @param type $id : id of the item on which the actions call be applied
+     * @return type : json
+     */
     public function action_json_actions($id = null)
     {
         $this->item = $this->crud_item($id);
@@ -394,6 +456,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         \Response::json($this->get_actions());
     }
 
+    /**
+     * Return the config for setting the url of the novius-os tab
+     * @return Array
+     */
     protected function get_tab_params()
     {
         $labelUpdate = $this->config['tab']['labels']['update'];
@@ -423,6 +489,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $tabInfos;
     }
 
+    /**
+     * Get possible actions in the appdesk from the config
+     * @return array
+     */
     protected function get_actions()
     {
         $actions = array_values($this->get_actions_lang());
@@ -474,6 +544,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $actions;
     }
 
+    /**
+     * get standard actions to translate an item
+     * @return type
+     */
     protected function get_actions_lang()
     {
         if (!$this->behaviours['translatable']) {
@@ -506,6 +580,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         return $actions;
     }
 
+    /**
+     * Check if it's possible to delete an item, i.e. if it's not a new one.
+     * @param type $action
+     * @throws \Exception
+     */
     protected function check_permission($action)
     {
         if ($action === 'delete' && $this->item->is_new()) {
@@ -513,6 +592,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
+    /**
+     * Display a popup to confirm deletion
+     * @param type $id : the id of item which will be display
+     * @return type View : the popup
+     */
     public function action_delete($id = null)
     {
         try {
@@ -530,6 +614,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
     }
 
+    /**
+     * Perform deletion (and pay attention to children and items existing in other languages)
+     */
     public function delete_confirm()
     {
         $dispatchEvent = null;
