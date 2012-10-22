@@ -232,7 +232,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $new_query = $tmp['query'];
         $new_query->group_by('group_by_pk');
         if ($config['limit']) {
-            $new_query->limit($config['limit']);
+            $new_query->limit($config['limit'] < 0 ? 1 : $config['limit']);
         }
         if ($config['offset']) {
             $new_query->offset($config['offset']);
