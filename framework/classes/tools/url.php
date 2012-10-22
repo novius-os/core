@@ -58,6 +58,6 @@ class Tools_Url
                 return $base_urls[0];
             }
         }
-        return Uri::base(false);
+        return \Uri::base(false);
     }
 }
