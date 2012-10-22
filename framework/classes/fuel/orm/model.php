@@ -910,9 +910,12 @@ class Model extends \Orm\Model
         $model_label = explode('_', $model_label);
         $model_label = $model_label[count($model_label) - 1];
 
-        if (!isset($config['controller'])) {
-            $config['controller'] = strtolower($model_label);
+        if (!isset($config['crud_controller'])) {
+            $namespace_pos = strrpos($model, '\\');
+            $controller = substr($model, 0, $namespace_pos).'\\Controller_Admin_'.substr($model, $namespace_pos + 7);
+            $config['crud_controller'] = $controller;
         }
+        $url_controller = $config['crud_controller']::get_path();
 
         if (!isset($config['labels'])) {
             $config['labels'] = array();
@@ -927,7 +930,7 @@ class Model extends \Orm\Model
             $generated_actions[$model.'.'.$name] = $template;
 
             if (isset($urls[$name])) {
-                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
+                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], $url_controller.'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
             }
 
             if (isset($config['labels'][$name])) {

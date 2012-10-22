@@ -16,25 +16,12 @@ return array(
     'query' => array(
         'related' => array('roles'),
     ),
-    'search_text' => array(
-        'user_firstname',
-        'user_name',
-        'user_email',
-    ),
-    'hideContexts' => true,
-    'selectedView' => 'default',
-    'views' => array(
-        'default' => array(
-            'name' => __('Default view'),
-        )
-    ),
     'i18n' => array(
         'Users' => __('Users'),
         'Add a user' => __('Add a user'),
         'User' => __('User'),
         'Email' => __('Email'),
         'Permissions' => __('Permissions'),
-
         'addDropDown' => __('Select an action'),
         'columns' => __('Columns'),
         'showFiltersColumns' => __('Filters column header'),
@@ -74,6 +61,7 @@ return array(
             },
         ),
     ),
+    /* @todo remove when on native apps */
     'appdesk' => array(
         'tab' => array(
             'label' => __('Users'),

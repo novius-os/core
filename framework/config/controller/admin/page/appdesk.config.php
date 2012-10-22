@@ -10,18 +10,47 @@
 
 use Nos\I18n;
 
+/*
+ * 'dataset' => array(
+        'fullname' => array(
+            'headerText' => __('Name'),
+            //'search_column' => \DB::expr('CONCAT(user_firstname, user_name)'),
+            'value' => function($item) {
+                return $item->fullname();
+            },
+        ),
+        'email' => array(
+            'headerText' => __('Email'),
+            'column' => 'user_email',
+        ),
+        'id_permission' => array(
+            'visible' => false,
+            'value' => function($item) {
+                return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
+            },
+        ),
+    ),
+ */
+
 $dataset = array(
-    'id' => 'page_id',
-    'title' => 'page_title',
-    'url' => function($page) {
-        return $page->url();
-    },
-    'previewUrl' => function($page) {
-        return $page->url(array('preview'  => true));
-    },
-    'is_home' => function($page) {
-        return (bool) (int) $page->page_entrance;
-    },
+    'title' => array(
+        'headerText' => __('Title'),
+        'column' => 'page_title',
+        'sortDirection' => 'ascending'
+    ),
+    'url' => array(
+        'value' => function($page) {
+            return $page->url();
+        },
+        'visible' => false
+    ),
+    'is_home' => array(
+        'value' => function($page) {
+            return (bool) (int) $page->page_entrance;
+        },
+        'visible' => false
+    ),
+    /*
     'actions' => array(
         'delete' => function($page) {
             return $page->page_lock != $page::LOCK_DELETION;
@@ -30,9 +59,11 @@ $dataset = array(
             return !$page->page_entrance;
         },
     ),
+    */
 );
 
 return array(
+    'model' => '\Nos\Model_Page',
     'tree' => array(
         'models' => array(
             array(
@@ -94,6 +125,21 @@ return array(
         'contexts' => __('Contexts'),
     ),
     'dataset' => $dataset,
+    /* @todo remove when on native apps */
+    'appdesk' => array(
+        'tab' => array(
+            'label' => __('Pages'),
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
+        ),
+        'reloadEvent' => 'Nos\\Model_Page', /* @todo: should not need this */
+        'appdesk' => array(
+            'treeGrid' => array(
+                'urlJson' => 'admin/nos/page/appdesk/tree_json',
+            ),
+            'defaultView' => 'treeGrid',
+        )
+    ),
+    /*
     'appdesk' => array(
         'tab' => array(
             'label' => __('Pages'),
@@ -225,4 +271,5 @@ return array(
             'defaultView' => 'treeGrid',
         ),
     ),
+    */
 );

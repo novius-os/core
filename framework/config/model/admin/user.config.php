@@ -1,19 +1,9 @@
 <?php
 return array(
-    'actions' => array(
-        'Nos\Model_User.edit' => array(
-            'action' => array(
-                'tab' => array(
-                    'url' => "admin/nos/user/user/insert_update/{{id}}",
-                ),
-            ),
-        ),
-        'Nos\Model_User.delete' => array(
-            'action' => array(
-                'dialog' => array(
-                    'contentUrl' => 'admin/nos/user/user/delete/{{id}}',
-                ),
-            ),
-        ),
+    'crud_controller' => '\Nos\Controller_Admin_User_User',
+    'search_text' => array(
+        'user_firstname',
+        'user_name',
+        'user_email',
     ),
 );

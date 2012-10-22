@@ -259,7 +259,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = isset($value['headerText']) ? $value['headerText'] : '';
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
-
                 }
 
                 $config['appdesk']['appdesk']['grid']['columns']['actions'] = array('actions' => array());
