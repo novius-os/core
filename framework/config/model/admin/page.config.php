@@ -1,6 +1,7 @@
 <?php
 return array(
     'crud_controller' => '\Nos\Controller_Admin_Page_Page',
+    'search_text' => 'page_title',
     'actions' => array(
         'Nos\Model_Page.delete' => array(
             'primary' => false

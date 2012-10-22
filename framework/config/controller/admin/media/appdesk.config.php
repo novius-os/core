@@ -12,18 +12,15 @@ use Nos\I18n;
 I18n::load('media', 'nos_media');
 
 return array(
+    'model' => 'Nos\\Model_Media',
     'query' => array(
-        'model' => 'Nos\Model_Media',
+        'model' => 'Nos\\Model_Media',
         'related' => array(),
         'limit' => 10,
     ),
-    'search_text' => array(
-        'media_title',
-        'media_ext',
-        'media_file',
+    'inspectors' => array(
+        'folder',
     ),
-    'hideContexts' => true,
-    'selectedView' => 'default',
     'views' => array(
         'default' => array(
             'name' => __('Default view'),
@@ -81,61 +78,91 @@ return array(
         'loading' => __('Loading...'),
     ),
     'dataset' => array(
-        'id' => 'media_id',
-        'title' => 'media_title',
-        'extension' => 'media_ext',
-        'file_name' => 'media_file',
-        'path' => function ($item) {
-            return $item->get_public_path();
-        },
-        'path_folder' => function ($item) {
-            return dirname($item->get_public_path());
-        },
-        'image' => function ($item) {
-            return $item->is_image();
-        },
-        'thumbnail' => function ($item) {
-            return $item->is_image() ? $item->get_public_path_resized(64, 64) : '';
-        },
-        'height' => 'media_height',
-        'width' => 'media_width',
-        'thumbnailAlternate' => function ($item) {
-            $extensions = array(
-                'gif' => 'image.png',
-                'png' => 'image.png',
-                'jpg' => 'image.png',
-                'jpeg' => 'image.png',
-                'bmp' => 'image.png',
-                'doc' => 'document.png',
-                'xls' => 'document.png',
-                'ppt' => 'document.png',
-                'docx' => 'document.png',
-                'xlsx' => 'document.png',
-                'pptx' => 'document.png',
-                'odt' => 'document.png',
-                'odf' => 'document.png',
-                'odp' => 'document.png',
-                'pdf' => 'document.png',
-                'mp3' => 'music.png',
-                'wav' => 'music.png',
-                'avi' => 'video.png',
-                'mkv' => 'video.png',
-                'mpg' => 'video.png',
-                'mpeg' => 'video.png',
-                'mov' => 'video.png',
-                'zip' => 'archive.png',
-                'rar' => 'archive.png',
-                'tar' => 'archive.png',
-                'gz' => 'archive.png',
-                '7z' => 'archive.png',
-                'txt' => 'text.png',
-                'xml' => 'text.png',
-                'htm' => 'text.png',
-                'html' => 'text.png',
-            );
-            return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$item->media_ext] : '';
-        },
+        'extension' => array(
+            'headerText' => __('Ext.'),
+            'column' => 'media_ext'
+        ),
+        'title' => array(
+            'headerText' => __('Title'),
+            'column' => 'media_title'
+        ),
+        'file_name' => array(
+            'column' => 'media_file',
+            'visible' => false
+        ),
+        'path' => array(
+            'value' => function ($item) {
+                return $item->get_public_path();
+            },
+            'visible' => false
+        ),
+        'path_folder' => array(
+            'value' => function ($item) {
+                return dirname($item->get_public_path());
+            },
+            'visible' => false
+        ),
+        'image' => array(
+            'value' => function ($item) {
+                return $item->is_image();
+            },
+            'visible' => false
+        ),
+        'thumbnail' => array(
+            'value' => function ($item) {
+                return $item->is_image() ? $item->get_public_path_resized(64, 64) : '';
+            },
+            'visible' => false
+        ),
+        'height' => array(
+            'column' => 'media_height',
+            'visible' => false
+        ),
+        'width' => array(
+            'column' => 'media_width',
+            'visible' => false
+        ),
+        'thumbnailAlternate' => array(
+            'value' => function ($item) {
+                $extensions = array(
+                    'gif' => 'image.png',
+                    'png' => 'image.png',
+                    'jpg' => 'image.png',
+                    'jpeg' => 'image.png',
+                    'bmp' => 'image.png',
+                    'doc' => 'document.png',
+                    'xls' => 'document.png',
+                    'ppt' => 'document.png',
+                    'docx' => 'document.png',
+                    'xlsx' => 'document.png',
+                    'pptx' => 'document.png',
+                    'odt' => 'document.png',
+                    'odf' => 'document.png',
+                    'odp' => 'document.png',
+                    'pdf' => 'document.png',
+                    'mp3' => 'music.png',
+                    'wav' => 'music.png',
+                    'avi' => 'video.png',
+                    'mkv' => 'video.png',
+                    'mpg' => 'video.png',
+                    'mpeg' => 'video.png',
+                    'mov' => 'video.png',
+                    'zip' => 'archive.png',
+                    'rar' => 'archive.png',
+                    'tar' => 'archive.png',
+                    'gz' => 'archive.png',
+                    '7z' => 'archive.png',
+                    'txt' => 'text.png',
+                    'xml' => 'text.png',
+                    'htm' => 'text.png',
+                    'html' => 'text.png',
+                );
+                return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$item->media_ext] : '';
+            },
+            'visible' => false
+        ),
     ),
+    /*
     'inputs' => array(
         'folder_id' =>
             function ($value, $query)
@@ -183,6 +210,20 @@ return array(
                 return $query;
             },
     ),
+    */
+    'appdesk' => array(
+        'tab' => array(
+            'label' => __('Media center'),
+            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/media.png',
+        ),
+        'reloadEvent' => array(
+            'Nos\\Model_Media',
+            array(
+                'name' => 'Nos\\Model_Media_Folder',
+                'action' => 'delete',
+            ),
+        ),
+    /*
     'appdesk' => array(
         'actions' => array(
             'edit' => array(
@@ -407,5 +448,7 @@ return array(
                 ),
             ),
         ),
+    */
     ),
+
 );

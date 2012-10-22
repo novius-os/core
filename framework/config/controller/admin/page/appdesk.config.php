@@ -85,7 +85,6 @@ return array(
         'model' => 'Nos\Model_Page',
         'related' => array(),
     ),
-    'search_text' => 'page_title',
     'selectedView' => 'default',
     'views' => array(
         'default' => array(
@@ -125,151 +124,18 @@ return array(
         'contexts' => __('Contexts'),
     ),
     'dataset' => $dataset,
-    /* @todo remove when on native apps */
     'appdesk' => array(
+        /* @todo remove when on native apps */
         'tab' => array(
             'label' => __('Pages'),
             'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
         ),
         'reloadEvent' => 'Nos\\Model_Page', /* @todo: should not need this */
-        'appdesk' => array(
+        'appdesk' => array( /* @todo: auto tree grid */
             'treeGrid' => array(
                 'urlJson' => 'admin/nos/page/appdesk/tree_json',
             ),
             'defaultView' => 'treeGrid',
         )
     ),
-    /*
-    'appdesk' => array(
-        'tab' => array(
-            'label' => __('Pages'),
-            'iconUrl' => 'static/novius-os/admin/novius-os/img/32/page.png',
-        ),
-        'actions' => array(
-            'edit' => array(
-                'label' => __('Edit'),
-                'name' => 'edit',
-                'primary' => true,
-                'icon' => 'pencil',
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'tab' => array(
-                        'url' => 'admin/nos/page/page/insert_update/{{id}}',
-                        'label' => '{{title}}',
-                        'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
-                    ),
-                ),
-            ),
-            'add_subpage' => array(
-                'name' => 'add_page',
-                'label' => __('Add a sub-page to this page'),
-                'icon' => 'plus',
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'tab' => array(
-                        'url' => 'admin/nos/page/page/insert_update?environment_id={{id}}',
-                        'label' => __('Add a page'),
-                        'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
-                    ),
-                ),
-            ),
-            'delete' => array(
-                'label' => __('Delete'),
-                'name' => 'delete',
-                'primary' => false,
-                'red' => true,
-                'icon' => 'trash',
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => 'admin/nos/page/page/delete/{{id}}',
-                        'title' => __('Delete a page')
-                    ),
-                ),
-            ),
-            'visualise' => array(
-                'label' => __('Visualise'),
-                'name' => 'visualise',
-                'primary' => true,
-                'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                'action' => array(
-                    'action' => 'window.open',
-                    'url' => '{{previewUrl}}',
-                ),
-            ),
-            'set_homepage' => array(
-                'label' => __('Set as homepage'),
-                'name' => 'set_homepage',
-                'primary' => false,
-                'icon' => 'home',
-                'action' => array(
-                    'action' => 'nosAjax',
-                    'params' => array(
-                        'url' => 'admin/nos/page/page/set_homepage',
-                        'method' => 'POST',
-                        'data' => array(
-                            'id' => '{{id}}',
-                        ),
-                    ),
-                ),
-            ),
-        ),
-        'reloadEvent' => 'Nos\\Model_Page',
-        'appdesk' => array(
-            'buttons' => array(
-                'page' => array(
-                    'label' => __('Add a page'),
-                    'action' => array(
-                        'action' => 'nosTabs',
-                        'method' => 'add',
-                        'tab' => array(
-                            'url' => 'admin/nos/page/page/insert_update?context={{context}}',
-                            'label' => __('Add a page'),
-                            'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
-                        ),
-                    ),
-                ),
-                'renew_cache' => array(
-                    'label' => __('Renew pages\' cache'),
-                    'action' => array(
-                        'action' => 'nosAjax',
-                        'params' => array(
-                            'url' => 'admin/nos/page/appdesk/clear_cache',
-                        ),
-                    ),
-                ),
-            ),
-            'grid' => array(
-                'urlJson' => 'admin/nos/page/appdesk/json',
-                'columns' => array(
-                    'title' => array(
-                        'headerText' => __('Title'),
-                        'sortDirection' => 'ascending',
-                    ),
-                    'context' => array(
-                        'context' => true
-                    ),
-                    'url' => array(
-                        'headerText' => __('Virtual url'),
-                        'visible' => false,
-                        'dataKey' => 'url',
-                        'multiContextHide' => true,
-                    ),
-                    'published' => array(
-                        'headerText' => __('Status'),
-                        'dataKey' => 'publication_status',
-                        'multiContextHide' => true,
-                    ),
-                    'actions' => array(
-                        'actions' => array('edit', 'add_subpage', 'visualise', 'delete', 'set_homepage'),
-                    ),
-                ),
-            ),
-            'treeGrid' => array(
-                'urlJson' => 'admin/nos/page/appdesk/tree_json',
-            ),
-            'defaultView' => 'treeGrid',
-        ),
-    ),
-    */
 );

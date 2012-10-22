@@ -14,7 +14,7 @@ define([
     return function(appDesk) {
         return {
             appdesk : {
-                inspectorsOrder : 'folders,extensions,preview'
+                /*inspectorsOrder : 'folders,extensions,preview' @todo uncomment */
             }
         };
     };

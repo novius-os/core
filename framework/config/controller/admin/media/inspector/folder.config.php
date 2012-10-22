@@ -9,6 +9,17 @@
  */
 
 return array(
+    'model' => 'Nos\Model_Media_Folder',
+    'dataset' => array(
+        'title' => array(
+            'column' => 'medif_title',
+            'headerText' => __('Title'),
+        ),
+    ),
+    'input' => array(
+        'key' => 'media_folder.id'
+    ),
+    /*
     'models' => array(
         array(
             'model' => 'Nos\Model_Media_Folder',
@@ -38,4 +49,5 @@ return array(
             'order_by' => 'medif_title',
         ),
     ),
+    */
 );
