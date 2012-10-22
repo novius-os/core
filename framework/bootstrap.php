@@ -147,7 +147,7 @@ if ($routes_novius === false) {
 
 $config_app = include(APPPATH.'config/config.php');
 if (!empty($config_app['base_url'])) {
-    define('NOS_RELATIVE_DIR', parse_url($config_app['base_url'], PHP_URL_PATH));
+    define('NOS_RELATIVE_DIR', ltrim(parse_url($config_app['base_url'], PHP_URL_PATH), '/'));
 }
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
