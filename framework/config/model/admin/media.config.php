@@ -6,4 +6,18 @@ return array(
         'media_ext',
         'media_file',
     ),
+    'actions' => array(
+        'Nos\Model_Media.visualise' => array(
+            'label' => __('Visualise'),
+            'name' => 'visualise',
+            'primary' => true,
+            'iconClasses' => 'nos-icon16 nos-icon16-eye',
+            'action' => array(
+                'action' => 'nosMediaVisualise',
+            ),
+            'enabled' => function($item) {
+                return true;
+            }
+        ),
+    )
 );

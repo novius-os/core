@@ -245,10 +245,6 @@ return array(
                 'action' => 'delete',
             ),
         ),
-        /*'appdesk' => array(
-            //'defaultView' => 'thumbnails',
-            'inspectorsOrder' => 'preview,folder,extension',
-        ),*/
     /*
     'appdesk' => array(
         'actions' => array(

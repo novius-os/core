@@ -216,6 +216,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['appdesk']['appdesk'] = array();
             }
 
+            if (!isset($config['appdesk']['appdesk']['thumbnails'])) {
+                $config['appdesk']['appdesk']['thumbnails'] = array();
+            }
+
+            if (!isset($config['appdesk']['appdesk']['thumbnails']['actions'])) {
+                $config['appdesk']['appdesk']['thumbnails']['actions'] = array();
+                foreach ($config['appdesk']['actions'] as $key => $action) {
+                    $config['appdesk']['appdesk']['thumbnails']['actions'][] = $key;
+                }
+            }
+
+            if (!isset($config['appdesk']['appdesk']['thumbnails']['thumbnailSize'])) {
+                $config['appdesk']['appdesk']['thumbnails']['thumbnailSize'] = 64;
+            }
+
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
                 $config['appdesk']['appdesk']['buttons'] = array();
                 $actions = \Arr::merge(\Config::actions(array('models' => $config['toolbar']['models'], 'type' => 'appdeskToolbar')), $config['toolbar']['actions']);
@@ -268,11 +283,10 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
                 }
-
             }
 
-            if (!isset($config['appdesk']['appdesk']['grid']['columns']['actions'])) {
-                $config['appdesk']['appdesk']['grid']['columns']['actions'] = array('actions' => array());
+            if (!isset($config['appdesk']['appdesk']['grid']['columns']['actions']['actions'])) {
+                $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'] = array();
                 foreach ($config['appdesk']['actions'] as $action_key => $action_value) {
                     $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'][] = $action_key;
                 }
