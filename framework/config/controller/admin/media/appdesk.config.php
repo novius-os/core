@@ -20,6 +20,7 @@ return array(
     ),
     'inspectors' => array(
         'folder',
+        'extension'
     ),
     'views' => array(
         'default' => array(

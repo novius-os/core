@@ -10,44 +10,17 @@
 
 return array(
     'model' => 'Nos\Model_Media_Folder',
+    'order_by' => 'medif_title',
     'dataset' => array(
         'title' => array(
             'column' => 'medif_title',
-            'headerText' => __('Title'),
+            'headerText' => __('Folder'),
         ),
     ),
     'input' => array(
-        'key' => 'media_folder.id'
+        'key' => 'media_folder_id'
     ),
-    /*
-    'models' => array(
-        array(
-            'model' => 'Nos\Model_Media_Folder',
-            'order_by' => 'medif_title',
-            'childs' => array('Nos\Model_Media_Folder'),
-            'dataset' => array(
-                'id' => 'medif_id',
-                'title' => 'medif_title',
-                'path' => function($obj) {
-                    return $obj->medif_path;
-                },
-                'actions' => array(
-                    'edit' => function($item) {
-                        return $item->medif_parent_id != null;
-                    },
-                    'delete' => function($item) {
-                        return $item->medif_parent_id != null;
-                    },
-                ),
-            ),
-        ),
+    'appdesk' => array(
+        'label'     => __('Folder'),
     ),
-    'roots' => array(
-        array(
-            'model' => 'Nos\Model_Media_Folder',
-            'where' => array(array('medif_parent_id', 'IS', \DB::expr('NULL'))),
-            'order_by' => 'medif_title',
-        ),
-    ),
-    */
 );
