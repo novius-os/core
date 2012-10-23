@@ -81,7 +81,7 @@ font[face=mceinline] {font-family:inherit !important}
 }
 .nos_enhancer_action {
 	display: inline-block;
-	text-indent: -1000;
+	text-indent: -1000px;
 	width : 16px;
 	height : 16px;
 	vertical-align: middle;

@@ -14,9 +14,9 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
 {
     protected $page_parent = false;
 
-    protected function form_item()
+    protected function from_item()
     {
-        parent::form_item();
+        parent::from_item();
         if ($this->item->is_new()) {
             // The first page we create is a homepage
             $context_has_home = (int) (bool) Model_Page::count(array(
