@@ -1055,6 +1055,7 @@ define('jquery-nos-appdesk',
                     columns = $.extend({}, o.treeGrid.columns || o.grid.columns);
 
                 delete grid.columns;
+                delete grid.urlJson;
 
                 self._columnsMultiContext(columns);
 
