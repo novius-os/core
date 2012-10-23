@@ -95,7 +95,7 @@ define('jquery-nos-preview',
                         if (action.iconClasses) {
                             iconClass = action.iconClasses;
                         } else if (action.icon) {
-                            iconClass = 'nos-icon16 ui-icon ui-icon-' + action.icon;
+                            iconClass = 'nos-inline-icon16 ui-icon ui-icon-' + action.icon;
                         }
                         var text;
                         if (action.primary) {
