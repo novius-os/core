@@ -159,17 +159,25 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             $inspectors = array();
             foreach ($config['inspectors'] as $key => $value) {
+                $inspector_config = array();
                 if (is_array($value)) {
-                    // @todo: extended inspectors
+                    $inspector_key = $key;
+                    $inspector_config = $value;
                 } else {
-                    $inspector_name = $inspectors_class_prefix.ucfirst($value);
+                    $inspector_key = $value;
+                }
+                $inspector_name = $inspectors_class_prefix.ucfirst($inspector_key);
+                if (class_exists($inspector_name)) {
                     list($application, $file_name) = \Config::configFile($inspector_name);
-                    $inspector_config = \Config::loadConfiguration($application, $file_name);
+                    $inspector_config = \Arr::merge($inspector_config, \Config::loadConfiguration($application, $file_name));
                     $inspector_config = $inspector_name::process_config($application, $inspector_config);
-                    $inspectors[$value] = $inspector_config;
-                    if (isset($inspector_config['model'])) {
-                        $config['toolbar']['models'][] = $inspector_config['model'];
-                    }
+                }
+                if (count($inspector_config) == 0) {
+                    throw new \Exception('No configuration for inspector '.$inspector_key);
+                }
+                $inspectors[$inspector_key] = $inspector_config;
+                if (isset($inspector_config['model'])) {
+                    $config['toolbar']['models'][] = $inspector_config['model'];
                 }
             }
 
@@ -180,7 +188,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             foreach ($config['inspectors'] as $inspector_config) {
-                if ($inspector_config['input'] && !isset($config['inputs'][$inspector_config['input']['key']])) {
+                if (isset($inspector_config['input']) && !isset($config['inputs'][$inspector_config['input']['key']])) {
                     $config['inputs'][$inspector_config['input']['key']] = $inspector_config['input']['query'];
                 }
             }
@@ -261,6 +269,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                     }
                 }
 
+            }
+
+            if (!isset($config['appdesk']['appdesk']['grid']['columns']['actions'])) {
                 $config['appdesk']['appdesk']['grid']['columns']['actions'] = array('actions' => array());
                 foreach ($config['appdesk']['actions'] as $action_key => $action_value) {
                     $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'][] = $action_key;

@@ -20,7 +20,27 @@ return array(
     ),
     'inspectors' => array(
         'folder',
-        'extension'
+        'extension',
+        'preview' => array(
+            'appdesk' => array(
+                'vertical' => true,
+                'reloadEvent' => 'Nos\\Model_Media',
+                'label' => __('Preview'),
+                'preview' => true,
+                'options' => array(
+                    'meta' => array(
+                        'fileName' => array(
+                            'label' => __('File name:'),
+                        ),
+                        'pathFolder' => array(
+                            'label' => __('Path:')
+                        ),
+                    ),
+                    'actions' => array('edit', 'delete', 'visualise'),
+                    'actionThumbnail' => 'visualise',
+                ),
+            )
+        )
     ),
     'views' => array(
         'default' => array(
@@ -81,7 +101,8 @@ return array(
     'dataset' => array(
         'extension' => array(
             'headerText' => __('Ext.'),
-            'column' => 'media_ext'
+            'column' => 'media_ext',
+            'width' => 60,
         ),
         'title' => array(
             'headerText' => __('Title'),
@@ -224,6 +245,10 @@ return array(
                 'action' => 'delete',
             ),
         ),
+        /*'appdesk' => array(
+            //'defaultView' => 'thumbnails',
+            'inspectorsOrder' => 'preview,folder,extension',
+        ),*/
     /*
     'appdesk' => array(
         'actions' => array(
