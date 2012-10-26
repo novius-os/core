@@ -123,6 +123,10 @@ $config = array(
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.contextable-invariant-fields',
         'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appstab',
+        'jquery-nos-media-folder-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-folder-form',
+        'jquery-nos-media-add-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-add-form',
+        'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-edit-form',
+        'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.image-wysiwyg',
     ),
     'shim' => array(
         'jquery.bgiframe' => array('jquery'),

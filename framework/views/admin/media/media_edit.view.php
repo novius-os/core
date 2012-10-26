@@ -51,60 +51,10 @@ if ($item->is_image()) {
 
 <script type="text/javascript">
 require(
-    [
-        'jquery-nos',
-        'static/novius-os/admin/config/media/seo_compliant'
-    ],
+    ['jquery-nos-media-edit-form'],
     function($) {
         $(function() {
-            var $container = $('#<?= $uniqid ?>');
-
-            var $file       = $container.find(':file[name=media]');
-            var $title      = $container.find('input[name=media_title]');
-            var $slug       = $container.find('input[name=media_file]');
-            var $same_title = $container.find('input[data-id=same_title]');
-
-            $file.change(function() {
-                var path = $file.val();
-
-                // Get the filename only
-                // Remove the dirname
-                path = path.replace(/^.*[\/\\]/g, '');
-                // Remove the extension
-                path = path.split('.');
-                if (path.length > 1) {
-                    path.pop();
-                }
-                path = path.join('.');
-
-                // Format a bit the title
-                // Cleanup
-                path = path.replace(/[^a-z0-9A-Z]/g, ' ').replace(/\s+/g, ' ');
-                // Ucwords
-                path = path.replace(/^([a-z])|\s+([a-z])/g, function ($1) {
-                    return $1.toUpperCase();
-                });
-                $title.val(path).triggerHandler('change');
-            });
-
-            // Same title and description (alt)
-            $title.bind('change keyup', function() {
-                if ($same_title.is(':checked')) {
-                    $slug.val($.seoCompliant($title.val()));
-                }
-            });
-            $same_title.change(function() {
-                if ($(this).is(':checked')) {
-                    $slug.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-                    $title.triggerHandler('change');
-                } else {
-                    $slug.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-                }
-            }).triggerHandler('change');
-
-            $container.find('form').bind('ajax_success', function() {
-                $(this).nosDialog('close');
-            });
+            $('#<?= $uniqid ?>').nosMediaEditForm();
         });
     });
 </script>
