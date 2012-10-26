@@ -24,7 +24,7 @@ echo View::forge('nos::crud/tab', $view_params, false);
 <?php
 if (!in_array($context, $possible)) {
     echo '<p>&nbsp;</p>';
-    $parent = $item->get_parent();
+    $parent = $crud['behaviours']['tree'] ? $item->get_parent() : null;
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
         echo strtr($crud['config']['messages']['error added in context not parent'], array(

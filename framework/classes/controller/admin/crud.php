@@ -275,6 +275,27 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     ),
                 )
             );
+
+            if (count($this->behaviours['contextableAndTwinnable']['invariant_fields']) > 0 &&
+                ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 1) ||
+                ($this->is_new && !empty($this->item_from)))) {
+                if ($this->is_new) {
+                    $contexts = $this->item_from->get_all_context();
+                }
+                $context_labels = array();
+                foreach ($contexts as $context) {
+                    $context_labels[] = Tools_Context::context_label($context);
+                }
+                $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
+
+                foreach ($fields as $key => $field) {
+                    if (in_array($key, $this->behaviours['contextableAndTwinnable']['invariant_fields'])) {
+                        $fields[$key]['form']['disabled'] = true;
+                        $fields[$key]['form']['context_invariant_field'] = true;
+                        $fields[$key]['form']['data-other-contexts'] = $context_labels;
+                    }
+                }
+            }
         }
         if ($this->is_new) {
             if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
