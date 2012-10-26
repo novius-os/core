@@ -127,6 +127,7 @@ $config = array(
         'jquery-nos-media-add-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-add-form',
         'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-edit-form',
         'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.image-wysiwyg',
+        'jquery-nos-link-wysiwyg' => 'static/novius-os/admin/novius-os/js/page/jquery.novius-os.link-wysiwyg',
     ),
     'shim' => array(
         'jquery.bgiframe' => array('jquery'),
