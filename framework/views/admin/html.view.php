@@ -121,6 +121,7 @@ $config = array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
+        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.contextable-invariant-fields',
     ),
     'shim' => array(
         'jquery.bgiframe' => array('jquery'),
