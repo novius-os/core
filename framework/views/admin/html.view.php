@@ -121,6 +121,7 @@ $config = array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
+
         'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.contextable-invariant-fields',
         'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.appstab',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
@@ -132,6 +133,12 @@ $config = array(
         'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-edit-form',
         'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.image-wysiwyg',
         'jquery-nos-link-wysiwyg' => 'static/novius-os/admin/novius-os/js/page/jquery.novius-os.link-wysiwyg',
+        'jquery-nos-inspector-date' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-date',
+        'jquery-nos-inspector-model' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-model',
+        'jquery-nos-inspector-tree-model' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model',
+        'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-checkbox',
+        'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-radio',
+        'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-plain-data',
     ),
     'shim' => array(
         'jquery.bgiframe' => array('jquery'),
