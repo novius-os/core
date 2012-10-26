@@ -73,7 +73,7 @@ require(
                         .click(function() {
                             if ($element.is(':disabled')) {
                                 dialog.call($element, function() {
-                                    if ($element !== $elementUI) {
+                                    if ($element !== $elementUI || $element.is('.wijmo-wijtextbox')) {
                                         if ($element.is(':text')) {
                                             $element.wijtextbox('option', 'disabled', false);
                                         } else if ($element.is(':radio')) {
