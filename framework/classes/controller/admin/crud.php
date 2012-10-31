@@ -256,6 +256,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 array(
                     'save' => array(
                         'form' => array(
+                            'type' => 'submit',
                             'value' => __('Add'),
                         ),
                     ),

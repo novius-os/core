@@ -522,8 +522,8 @@ define('jquery-nos',
             nosFormUI : function() {
                 var $context = this;
 
-                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
-                $context.find(":input[type='submit'],button").each(function() {
+                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").filter(':not(.notransform)').wijtextbox();
+                $context.find(":input[type='submit'],button").filter(':not(.notransform)').each(function() {
                     var data = $(this).data(),
                         options = $.extend(true, {
                             icons : {}
@@ -574,11 +574,11 @@ define('jquery-nos',
                 $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijradio();
                 });
-                $context.find('.expander').each(function() {
+                $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
                     $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
                 });
-                $context.find('.accordion').wijaccordion({
+                $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",
                     selectedIndexChanged : function(e, args) {
                         $(e.target).find('.ui-accordion-content').eq(args.newIndex).nosOnShow();

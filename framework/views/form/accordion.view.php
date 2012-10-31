@@ -19,7 +19,7 @@ foreach ($fieldset->field() as $field) {
     }
 }
 ?>
-<div class="accordion fieldset">
+<div class="accordion fieldset <?= !empty($classes) ? $classes : '' ?>">
 <?php
 foreach ((array) $accordions as $options) {
     if (!is_array($options)) {
@@ -55,4 +55,3 @@ foreach ((array) $accordions as $options) {
 }
 ?>
  </div>
-</div>
