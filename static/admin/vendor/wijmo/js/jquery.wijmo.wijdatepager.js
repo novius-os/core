@@ -4,10 +4,10 @@ clearTimeout,amplify*/
 /*jslint nomen: false*/
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
@@ -34,12 +34,34 @@ clearTimeout,amplify*/
 			///	</summary>
 			culture: "",
 
+			///<summary>
+			///	Use the localization option in order to provide custom localization.
+			///	Default: {
+			///	dayViewTooltipFormat: "{0:dddd, MMMM d, yyyy}",
+			///	weekViewTooltipFormat: "{0:MMMM d} - {1:d, yyyy}",
+			///	weekViewTooltip2MothesFormat: "{0:MMMM d} - {1:MMMM d, yyyy}",			
+			///	monthViewTooltipFormat: "{0:MMMM yyyy}",			
+			///	dayViewLabelFormat": "{0:d }",
+			///	weekViewLabelFormat: "{0:MMM dd}-{1:dd}",
+			///	monthViewLabelFormat: "{0:MMM}"
+			///	}
+			/// Type: Object.
+			/// Code example: $("#datepager").wijdatepager(
+			///					{ 
+			///						localization: {
+			///							weekViewTooltip2MothesFormat: "{0:MMMM d} - {1:MMMM d}",
+			///							dayViewTooltipFormat: "{0:dddd, MMMM d}"
+			///						}
+			///					});
+			///</summary>
+			localization: null,
+
 			/// <summary>
 			/// The first day of the week (from 0 to 6). 
 			///	Sunday is 0, Monday is 1, and so on.
 			/// Default: 0
 			/// Type: Number.
-			/// Code example: $("#eventscalendar").wijeventscalendar(
+			/// Code example: $("#datepager").wijdatepager(
 			///	{ firstDayOfWeek: 1 });
 			/// </summary>
 			firstDayOfWeek: 0,
@@ -60,7 +82,25 @@ clearTimeout,amplify*/
 			/// Code example: $("#datepager").wijdatepager(
 			///			{ viewType: "month" });
 			/// </summary>
-			viewType: "day"
+			viewType: "day",
+
+			///	<summary>
+			///	Gets or sets the text for the 'next' button's ToolTip. 
+			/// Default: "right"
+			/// Type: String
+			/// Code example:
+			///		$(".selector").wijdatepager({nextTooltip: "Next"}); 
+			///	</summary>
+			nextTooltip: "right",
+
+			///	<summary>
+			///	Gets or sets the text for the 'previous' button's ToolTip. 
+			/// Default: "left"
+			/// Type: String
+			/// Code example:
+			///		$(".selector").wijdatepager({prevTooltip: "Previous"}); 
+			///	</summary>
+			prevTooltip: "left"
 
 			/*Available Events:
 			/// <summary>
@@ -91,6 +131,10 @@ clearTimeout,amplify*/
 		_setOption: function (key, value) {
 			$.Widget.prototype._setOption.apply(this, arguments);
 			switch (key) {
+				case "culture":
+					this.options.culture = value;
+					this._initBackground();
+					break;
 				case "selectedDate":
 					this.options.selectedDate = value;
 					this._initBackground();
@@ -105,6 +149,14 @@ clearTimeout,amplify*/
 				case "viewType":
 					this.options.viewType = value;
 					this._initBackground();
+					break;
+				case "nextTooltip":
+					//this.element.find(".wijmo-wijdatepager-increment").text(value).button("refresh");
+					this.element.find(".wijmo-wijdatepager-increment").attr("title", value);
+					break;
+				case "prevTooltip":
+					//this.element.find(".wijmo-wijdatepager-decrement").text(value).button("refresh");
+					this.element.find(".wijmo-wijdatepager-decrement").attr("title", value);
 					break;
 			}
 			return this;
@@ -131,6 +183,12 @@ clearTimeout,amplify*/
 		///	</summary>
 		_create: function () {
 			var o = this.options, resizeHandler;
+
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+
 			if (!o.selectedDate) {
 				o.selectedDate = new Date();
 			}
@@ -141,13 +199,14 @@ clearTimeout,amplify*/
 
 			this.element.disableSelection();
 			this.element
-				.append($("<a class=\"wijmo-wijdatepager-decrement\"><span>left</span></a>"
+				.append($("<a class=\"wijmo-wijdatepager-decrement\"><span>" +
+				o.prevTooltip + "</span></a>"
 		))
 				.append("<div class=\"wijmo-wijdatepager-container ui-widget-content\">" +
 
 						"<div class=\"wijmo-wijdatepager-pages\"></div>" +
 						"</div>" +
-"<a class=\"wijmo-wijdatepager-increment\"><span>right</span></a>"
+"<a class=\"wijmo-wijdatepager-increment\"><span>" + o.nextTooltip + "</span></a>"
 );
 
 			$.Widget.prototype._create.apply(this, arguments);
@@ -186,14 +245,29 @@ clearTimeout,amplify*/
 		///	Refreshes the widget layout.
 		///	</summary>
 		invalidate: function () {
-			var selectedPage = $(this.element
-						.find(".wijmo-wijdatepager-pagelabel")[this._index]),
+			var selectedPage, selectedDate = this.options.selectedDate, newIndex,
 				container = this.element.find(".wijmo-wijdatepager-container"),
 				decBtn = this.element.find(".wijmo-wijdatepager-decrement"),
 				incBtn = this.element.find(".wijmo-wijdatepager-increment"),
 				innerWidth = this.element.innerWidth(),
 				decBtnW = decBtn.is(":visible") ? decBtn.outerWidth(true) : 0,
-				incBtnW = incBtn.is(":visible") ? incBtn.outerWidth(true) : 0;
+				incBtnW = incBtn.is(":visible") ? incBtn.outerWidth(true) : 0,
+				pagesBg, pageLabels, pageWidth;
+
+
+			selectedPage = this.element.find(".wijmo-wijdatepager-pagelabel." + this._getDateClass(selectedDate));
+			if (selectedPage.length !== 1) {
+				selectedPage = $(this.element
+						.find(".wijmo-wijdatepager-pagelabel")[this._index]);
+			} else {
+				newIndex = this.element
+							.find(".wijmo-wijdatepager-pagelabel").index(selectedPage)
+				this._index = newIndex;
+/*
+				if (this._index !== newIndex) {
+					this._index = newIndex;
+				}*/
+			}
 
 			this.element.find(".wijmo-wijdatepager-pagelabel.ui-state-active")
 												.removeClass("ui-state-active");
@@ -212,6 +286,16 @@ clearTimeout,amplify*/
 				this.element.addClass("wijmo-wijdatepager-width-normal");
 			}
 			container.outerWidth(innerWidth - decBtnW - incBtnW);
+
+			//ie6/7 don't support display: table and display: table-cell,
+			//so set width to each page label.			
+			if ($.browser.msie && parseInt($.browser.version, 10) <= 7) {
+				pagesBg = this.element.find(".wijmo-wijdatepager-pages");
+				pageLabels = pagesBg.find(".wijmo-wijdatepager-pagelabel");
+				pageWidth = parseInt(pagesBg.width() / this._datesDef.length) -
+					(pageLabels.outerWidth(true) - pageLabels.width());
+				pageLabels.width(pageWidth);
+			}
 		},
 
 		///	<summary>
@@ -247,7 +331,7 @@ clearTimeout,amplify*/
 
 		_initBackground: function (animate, isRightToLeft) {
 			var s, i, oldBg, newBg, pageLabels, newPageIndPos,
-				self = this;
+				self = this, pageWidth;
 			if (this._isInAnimate) {
 				return;
 			}
@@ -267,6 +351,7 @@ clearTimeout,amplify*/
 					" wijmo-wijdatepager-pageheader ui-state-highlight" : "") +
 					(i === this._datesDef.length - 1 ?
 								" wijmo-wijdatepager-pagelabel-last" : "") +
+					" " + this._getDateClass(this._datesDef[i].d) +
 					"\">" +
 							this._datesDef[i].l + "</div>";
 			}
@@ -315,15 +400,13 @@ clearTimeout,amplify*/
 				this.invalidate();
 			}
 			//.stop().animate({ left: "0px" })
+			pageLabels = newBg.find(".wijmo-wijdatepager-pagelabel");
+			pageLabels.hover(
+				$.proxy(this._pagelabelHover, this),
+				$.proxy(this._pagelabelHout, this));
 
-			newBg.find(".wijmo-wijdatepager-pagelabel").hover(
-						$.proxy(this._pagelabelHover, this),
-						$.proxy(this._pagelabelHout, this));
-
-			newBg.find(".wijmo-wijdatepager-pagelabel")
-						.bind("mousedown", $.proxy(this._pagelabelMouseDown, this));
-
-			newBg.find(".wijmo-wijdatepager-pagelabel").click($.proxy(function (e) {
+			pageLabels.bind("mousedown", $.proxy(this._pagelabelMouseDown, this));
+			pageLabels.click($.proxy(function (e) {
 				var target = $(e.target), ind;
 				ind = this.element
 							.find(".wijmo-wijdatepager-pagelabel").index(target);
@@ -334,7 +417,9 @@ clearTimeout,amplify*/
 
 
 		},
-
+		_getDateClass: function (dt) {
+			return "c1dt" + dt.getFullYear() + "_" + dt.getMonth() + "_" + dt.getDate();
+		},
 		_addDays: function (dt, num) {
 			return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + num);
 		},
@@ -361,10 +446,8 @@ clearTimeout,amplify*/
 
 						nextDt = this._addDays(curDt, 7);
 						datesDef.push({
-							l: Globalize.format(curDt, "MMM", this._getCulture()) +
-								" " + Globalize.format(curDt, "dd", this._getCulture()) +
-								"-" + Globalize.format(this._addDays(curDt, 6),
-															"dd", this._getCulture()),
+							l: this._formatString(this.localizeString("weekViewLabelFormat", "{0:MMM dd}-{1:dd}"),
+											curDt, this._addDays(curDt, 6)),
 							d: curDt,
 							d2: this._addDays(curDt, 6)
 						});
@@ -384,7 +467,7 @@ clearTimeout,amplify*/
 					for (i = 0; i < 12; i += 1) {
 						dt = new Date(selectedDate.getFullYear(), i, 1);
 						datesDef.push({
-							l: Globalize.format(dt, "MMM", this._getCulture()),
+							l: this._formatString(this.localizeString("monthViewLabelFormat", "{0:MMM}"), dt),
 							d: dt
 						});
 						nextDt = new Date(selectedDate.getFullYear(), i + 1, 1);
@@ -401,7 +484,8 @@ clearTimeout,amplify*/
 
 					dt = new Date(selectedDate.getFullYear(),
 													selectedDate.getMonth(), 0);
-					datesDef.push({ l: Globalize.format(dt, "MMM", this._getCulture()), d: dt,
+					datesDef.push({ l: Globalize.format(dt, "MMM", this._getCulture()),
+						d: dt,
 						range: true
 					});
 					dt = new Date(selectedDate.getFullYear(),
@@ -418,7 +502,7 @@ clearTimeout,amplify*/
 						nextDt = new Date(curDt.getFullYear(),
 							curDt.getMonth(), curDt.getDate() + 1);
 						datesDef.push({
-							l: Globalize.format(curDt, "d ", this._getCulture()),
+							l: this._formatString(this.localizeString("dayViewLabelFormat", "{0:d }"), curDt),
 							d: curDt
 						});
 						if (selectedDate >= curDt && selectedDate <= nextDt) {
@@ -440,7 +524,7 @@ clearTimeout,amplify*/
 		},
 
 		_setSelectedIndex: function (ind, skipHeader) {
-			var o = this.options;
+			var o = this.options, pendingSelectedDate;
 			if (o.disabled) {
 				return;
 			}
@@ -459,20 +543,26 @@ clearTimeout,amplify*/
 						}
 					}
 					this._index = ind;
-					o.selectedDate = this._datesDef[ind].d;
+					pendingSelectedDate = this._datesDef[ind].d;
+					o.selectedDate = pendingSelectedDate;
+					/*
 					if (this._index === this._max) {
-						if (o.viewType === "week") {
-							o.selectedDate = new Date(o.selectedDate.getFullYear(),
-								o.selectedDate.getMonth(), o.selectedDate.getDate() + 7);
-						}
-
+					if (o.viewType === "week") {
+					o.selectedDate = new Date(o.selectedDate.getFullYear(),
+					o.selectedDate.getMonth(), o.selectedDate.getDate() + 7);
 					}
+					}*/
 
 					if (this._max > 2 && this._index === 0) {
 						this._initBackground(true, true);
 					}
 					else if (this._index === this._max) {
+						if (o.viewType === "week") {
+							o.selectedDate = new Date(o.selectedDate.getFullYear(),
+								o.selectedDate.getMonth(), o.selectedDate.getDate() + 7);
+						}
 						this._initBackground(true, false);
+						o.selectedDate = pendingSelectedDate;
 					} else {
 						this.invalidate();
 					}
@@ -505,18 +595,21 @@ clearTimeout,amplify*/
 
 			s = "";
 			switch (viewType) {
-				case "day":
-					s = Globalize.format(dateDef.d, "dddd, MMMM d, yyyy", this._getCulture());
-					break;
 				case "week":
-					s = Globalize.format(dateDef.d, "MMMM d - ", this._getCulture()) +
-						Globalize.format(dateDef.d2,
-						(dateDef.d.getMonth() !==
-							dateDef.d2.getMonth() ?
-										"MMMM d, yyyy" : "d, yyyy"), this._getCulture());
+					if (dateDef.d.getMonth() !==
+							dateDef.d2.getMonth()) {
+						s = this._formatString(this.localizeString("weekViewTooltip2MothesFormat", "{0:MMMM d} - {1:MMMM d, yyyy}"), dateDef.d, dateDef.d2);
+					} else {
+						s = this._formatString(this.localizeString("weekViewTooltipFormat", "{0:MMMM d} - {1:d, yyyy}"), dateDef.d, dateDef.d2);
+					}
 					break;
 				case "month":
-					s = Globalize.format(dateDef.d, "MMMM yyyy", this._getCulture());
+					s = this._formatString(this.localizeString("monthViewTooltipFormat", "{0:MMMM yyyy}"), dateDef.d);
+					break;
+				default:
+					//case "day":
+					s = this._formatString(this.localizeString("dayViewTooltipFormat", "{0:dddd, MMMM d, yyyy}"), dateDef.d);
+					break;
 					break;
 			}
 
@@ -612,6 +705,54 @@ clearTimeout,amplify*/
 				}
 			}
 			return -1;
+		},
+
+		///
+		localizeString: function (key, defaultValue) {
+			var o = this.options;
+			if (o.localization && o.localization[key]) {
+				return o.localization[key];
+			}
+			return defaultValue;
+			//("buttonToday", "today")
+		},
+
+		_formatString: function (fmt) {
+			var r, args = arguments, i, funcArgs, self = this;
+			if (args.length <= 1) {
+				return Globalize.format(args);
+			}
+			if (typeof fmt === "string") {
+				/*
+				if (fmt === "_formatWeekTitle") {
+				fmt = this._formatWeekTitle;
+				}
+				else if (fmt === "_formatMonthTitle") {
+				fmt = this._formatMonthTitle;
+				}
+				else 
+				*/
+				if (typeof window[fmt] === "function") {
+					fmt = window[fmt];
+				}
+			}
+			if (typeof fmt === "function") {
+				funcArgs = [];
+				for (i = 1; i < args.length; i += 1) {
+					funcArgs[i - 1] = args[i];
+				}
+				return fmt.apply(this, funcArgs);
+			}
+			r = new RegExp("\\{(\\d+)(?:,([-+]?\\d+))?(?:\\:" +
+					"([^(^}]+)(?:\\(((?:\\\\\\)|[^)])+)\\)){0,1}){0,1}\\}", "g");
+			return fmt.replace(r, function (m, num, len, f, params) {
+				m = args[Number(num) + 1];
+				if (f) {
+					return Globalize.format(m, f, self._getCulture());
+				} else {
+					return m;
+				}
+			});
 		}
 
 

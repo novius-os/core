@@ -1,10 +1,10 @@
 /*globals jQuery*/
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
@@ -34,6 +34,19 @@
 		itemKey = "item.wijlist";
 	$.widget("wijmo.wijlist", {
 		options: {
+		    /// <summary>
+		    /// wijdataview to which this wijlist is bound.
+		    /// Default: null.
+		    /// Type: wijdataview
+		    /// </summary>
+		    /// <remarks>
+		    /// This option is used if this wijlist is bound to a wijdataview.
+		    /// In that case, you can also specify a mapping option to 
+            /// select the properties to bind to,
+		    /// and the listItems option returns an array of objects containing 
+            /// value and label property values determined by that mapping.
+		    /// </remarks>
+		    dataSource: null,
 			/// <summary>
 			/// An array that specifies the listItem collections of wijlist.
 			/// Example: listItems: [{label: "label1", value: "value1"},
@@ -64,7 +77,7 @@
 			///	</param>
 			selected: null,
 			/// <summary>
-			/// A value indicates the selection mode of wijlist.
+			/// A value indicates the list items can be single-selected or multi-selected
 			/// Default: "single".
 			/// Type: String.
 			/// Code example:$("#element").wijlist("option","selectionMode",'single');
@@ -82,8 +95,8 @@
 			/// </summary>
 			autoSize: false,
 			/// <summary>
-			/// A value specifies the max items count to display if 
-			///autoSize is set to true.
+			/// A value specifies the maximum number of items that will be displayed 
+			/// if the autoSize option is also set to true.
 			/// Default: 5.
 			/// Type: Number.
 			/// Code example:$("#element").wijlist("option","maxItemsCount",6);
@@ -98,7 +111,8 @@
 			/// </summary>
 			addHoverItemClass: true,
 			/// <summary>
-			/// A hash value sets to supepanel options when superpanel is created.
+			/// The option indicates the customized options of wijsuperpanel when the wijsuperpanel is created. 
+			/// (superpanel is container of the list, detailed options please refer the wijsuperpanel widget)
 			/// Default: null.
 			/// Type: Object.
 			/// Code example:$("#element").wijlist("option","superPanelOptions",null);
@@ -137,8 +151,8 @@
 			/// </returns>
 			focusing: null,
 			/// <summary>
-			/// A function called when the mouse enters the item and after 
-			/// logic in the hover event is processed.
+			/// A function called when the mouse enters the item and 
+			/// after the hover event logic is processed
 			/// Default: null.
 			/// Type: Function.
 			/// Supply a callback function to handle the focus event:
@@ -242,8 +256,7 @@
 			/// </param>
 			listRendered: null,
 			/// <summary>
-			/// A value determines whether to keep item highlight when mouse 
-			/// is leaving list. 
+			/// A value determines the highlight state when the mouse leaves an item.
 			/// Default: Boolean.
 			/// Type: false.
 			/// Code example:$("#element")
@@ -254,7 +267,7 @@
 
 		removeAll: function () {
 			///	<summary>
-			///	Remove all wijlist items. 
+			///	The method removes all items in the wijlist.
 			/// Code example: $("#element").wijlist("removeAll");
 			///	</summary>
 
@@ -312,7 +325,7 @@
 
 		indexOf: function (item) {
 			///	<summary>
-			///	Return the index of the specified item. 
+			///	Return the index of the specified list item. 
 			/// Code example: $("#element")
 			///			.wijlist("indexOf", {label: "label1", value: "value1"});
 			///	</summary>
@@ -334,7 +347,7 @@
 
 		removeItemAt: function (index) {
 			///	<summary>
-			///	Remove the specified item by index from the wijlist.
+			///	Remove the specified item by index from the wijlist widget.
 			/// Code example: $("#element").wijlist("removeItemAt", 3);
 			///	</summary>
 			/// <param name="item" type="Object">
@@ -361,7 +374,8 @@
 		},
 
 		_setOption: function (key, value) {
-			var self = this, selectedItem;
+			var self = this, selectedItem, 
+			isBind, renderItems;
 
 			$.Widget.prototype._setOption.apply(self, arguments);
 
@@ -383,9 +397,23 @@
 				});
 				self.selectedItem = [];
 			} else if (key === "listItems") {
-				self.setItems(value);
+				isBind = self._isBind();
+				if (isBind) {
+					renderItems = self._getRenderItems();
+					self.setItems(renderItems);
+				} else {
+					self.setItems(value);
+				}
 				self.renderList();
 				self.refreshSuperPanel();
+			} else if (key === "dataSource") {
+				isBind = self._isBind();
+				if (isBind) {
+					renderItems = self._getRenderItems();
+					self.setItems(renderItems);
+					self.renderList();
+					self.refreshSuperPanel();
+				}
 			} else if (key === "autoSize" || key === "maxItemsCount") {
 				self.refreshSuperPanel();
 			}
@@ -393,7 +421,14 @@
 		},
 
 		_create: function () {
-			var self = this, ele = this.element, o = this.options;
+			var self = this, ele = this.element, o = this.options,
+			renderItems;
+			
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+			
 			ele.addClass(listCSS).attr({
 				role: "listbox",
 				"aria-activedescendant": activeItem,
@@ -413,11 +448,23 @@
 			self.ul = $("<ul class='wijmo-wijlist-ul'></ul>").appendTo(ele);
 
 			if (o.listItems !== null) {
-				if (o.listItems.length > 0) {
-					self.setItems(o.listItems);
+				renderItems = self._getRenderItems();
+				if (renderItems) {
+					self.setItems(renderItems);
 					self.renderList();
 					self.refreshSuperPanel();
 				}
+			}
+			
+			//update for visibility change
+			if (self.element.is(":hidden") &&
+						self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+					self.refreshSuperPanel();
+					if (self.element.wijRemoveVisibilityObserver) {
+						self.element.wijRemoveVisibilityObserver();
+					}
+				}, "wijlist");
 			}
 
 			//Add for support disabled option at 2011/7/8
@@ -425,6 +472,63 @@
 				self.disable();
 			}
 			//end for disabled option
+		},
+		
+		_isBind: function () {
+			var o = this.options,
+			listItems = o.listItems;
+			
+			if (listItems !== null && 
+					listItems.label &&
+					listItems.label.bind) {
+				return true;
+			}
+			return false;
+		},
+		
+		_getRenderItems: function () {
+			var o = this.options,
+			listItems = o.listItems;
+			
+			if (listItems !== null) {
+				if ($.isArray(listItems) && listItems.length > 0 && 
+						typeof (listItems[0].label) === "string") {
+					return listItems;
+				} else if (listItems.label && listItems.label.bind) {
+					return this._getMappingItems();
+				} else {
+					return null;
+				}
+			} 
+			return null;
+		},
+		
+		_getMappingItems: function () {
+			var o = this.options, dataSource = o.dataSource, listItems = o.listItems,
+			mappingItems, labelKey, valueKey;
+			if (!dataSource || !listItems) {
+				return null;
+			}
+			
+			if (!listItems.label || !listItems.label.bind ||
+					!listItems.value || !listItems.value.bind) {
+				return null;
+			}
+			
+			labelKey = listItems.label.bind;
+			valueKey = listItems.value.bind;
+			
+			//1.Array
+			if (dataSource && dataSource.length !== 0) {
+				mappingItems = [];
+
+				$.each(dataSource, function (i, item) {
+					mappingItems.push({label: item[labelKey], value: item[valueKey]});
+				});
+				
+				return mappingItems;
+			}
+			return null;
 		},
 
 		_handleDisabledOption: function (disabled, ele) {
@@ -470,7 +574,7 @@
 
 		setItems: function (items) {
 			///	<summary>
-			///	Sets Items to be rendered by the wijlist. 
+			///	Sets Items to be rendered by the wijlist widget. 
 			/// This will return the element back to its pre-init state.
 			/// Code example: $("#element")
 			///		.wijlist("setItems",{label: "label1", value: "value1"});
@@ -493,10 +597,14 @@
 			var self = this, selectedItems;
 
 			if (isExtend) {
+				//update for 24130 issue at 2012/7/20
+				//first load the items by keydown, the 
+				//items.length will not be equal self._templates.length				
 				if (self._templates && items && items.length !== self._templates.length) {
 					return;
 				}
 				self.items = items;
+				//end
 				if (!self.items) {
 					self.items = [];
 				}
@@ -504,8 +612,10 @@
 					if (self.items[idx]) {
 						self.items[idx].templateHtml = self._templates[idx].templateHtml;
 					} else {
-						self.items.push({ templateHtml:
-							self._templates[idx].templateHtml
+						self.items.push({ 
+							templateHtml: self._templates[idx].templateHtml,
+							label: items[idx].label,
+							value: items[idx].value	
 						});
 					}
 				});
@@ -530,6 +640,41 @@
 			}
 		},
 
+		filterTemplateItems: function (searchTerm) {
+			var self = this,
+			term1 = self._escapeRegex(searchTerm), matcher,
+			topHit = null;
+			/// TODO : start with or contains and case sensitive.
+			if (!this.items) {
+				return null;
+			}
+			matcher = new RegExp(term1, "i");
+			$.each(this.items, function (index, item) {
+				var matchResult = matcher.exec(item.label);
+				if (matchResult === null) {
+					item.element.hide();
+				}
+				else {
+					// update for: when using the key to active the item 
+					// the active item is incorrect at 2012/8/13
+					if (item.selected) {
+						self.activate(null, item, false);
+					}
+					if (!item.element.is("visible")) {
+						item.element.show();
+					}
+
+					//update for 25224 issue at 2012/8/13
+					if (term1 !== undefined && term1.length !== 0 &&
+							topHit === null && matchResult.index === 0) {
+						//self.activate(null, item, true);
+						topHit = item;
+					}
+				}
+			});
+			return topHit;
+		},
+		
 		popItem: function () {
 			///	<summary>
 			///	Remove the last item in the wijlist. 
@@ -544,7 +689,7 @@
 
 		getList: function () {
 			/// <summary>
-			/// Gets the JQuery object reference of the ul element of wijlist.
+			/// Gets the JQuery object reference of the <ul> element of the wijlist widget.
 			/// Code example: $("#element").wijlist("getList");
 			/// </summary>
 			/// <returns type="JQueryObj">
@@ -574,7 +719,8 @@
 				self.superPanel.destroy();
 			}
 
-			ele.removeClass(listCSS).removeAttr("role")
+			ele.removeClass("wijmo-wijobserver-visibility")
+			.removeClass(listCSS).removeAttr("role")
 			.removeAttr("aria-activedescendant").unbind("." + self.widgetName);
 			self.ul.remove();
 
@@ -594,7 +740,7 @@
 
 		activate: function (event, item, scrollTo) {
 			///	<summary>
-			///		Activates a wijlist item.
+			///	The method activates an item in the wijlist and will allow the list to scrollTo the item.
 			/// Code example: 
 			/// var item = {element:$(".wijmo-wijlist-item:first"),list:$("#list")
 			///			.wijlist()};
@@ -634,7 +780,7 @@
 
 		deactivate: function () {
 			/// <summary>
-			/// Deactivates activated items.
+			/// Deactivates activated items in the wijlist widget.
 			/// Code example: $("#element").wijlist("deactivate");
 			/// </summary>
 
@@ -696,7 +842,7 @@
 
 		first: function () {
 			/// <summary>
-			/// Tests that the focus is at the first item.
+			/// Tests that the focus is at the first list item.
 			/// Code example: $("#element").wijlist("first");
 			/// </summary>
 
@@ -705,7 +851,7 @@
 
 		last: function () {
 			/// <summary>
-			/// Tests that the focus is at the last item.
+			/// Tests that the focus is at the last list item.
 			/// Code example: $("#element").wijlist("last");
 			/// </summary>
 
@@ -723,7 +869,13 @@
 				self.activate(event, item, true);
 				return;
 			}
-			next = self.active.element[direction + "All"]("." + listItemCSS).eq(0);
+			if (!self._templates) {
+				next = self.active.element[direction + "All"]("." + listItemCSS).eq(0);
+			} else {
+				//add for only visible item will be moved
+				next = self.active.element[direction + "All"](":visible." + listItemCSS).eq(0);
+			}
+			
 			if (next.length) {
 				self.activate(event, next.data(itemKey), true);
 			}
@@ -751,6 +903,11 @@
 				return;
 			}
 			item = ele.data(itemKey);
+			//update for 24106 issue at 2012/7/20
+			if (!item) {
+				return;
+			}
+			//end 
 			singleMode = self.options.selectionMode === "single";
 			if (singleMode) {
 				previous = self.selectedItem;
@@ -822,7 +979,7 @@
 
 		getItems: function (indices) {
 			/// <summary>
-			/// Find list items by indices or values.
+			/// Allows the user to find list items by indices or values.
 			/// Code Example:$("#element").wijlist("getItems",5);
 			/// </summary>
 			/// <param name="indices" type="Array/Number">
@@ -902,7 +1059,7 @@
 
 		unselectItems: function (indices) {
 			/// <summary>
-			/// Unselects items by items' indices.
+			/// Unselects list items by items' indices.
 			/// Code Example:$("#element").wijlist("unselectItems",5);
 			/// </summary>
 			/// <param name="indices" type="Array">
@@ -933,7 +1090,7 @@
 
 		renderList: function () {
 			/// <summary>
-			/// Render items of wijlist.
+			/// Render the wijlist widget on the client browser.
 			/// Code Example:$("#element").wijlist("renderList");
 			/// </summary>
 			var self = this, ul = this.ul, o = this.options, items,
@@ -1009,6 +1166,13 @@
 			self._trigger("itemRendered", null, item);
 		},
 		
+		_escapeRegex: function (value) {
+			if (value === undefined) {
+				return value;
+			}
+			return value.replace(/([\^\$\(\)\[\]\{\}\*\.\+\?\|\\])/gi, "\\$1");
+		},
+		
 		//update for juice
 		adjustOptions: function () {
 			var o = this.options, i;
@@ -1029,6 +1193,7 @@
 
 			var self = this, ele = this.element, o = this.options, ul = this.ul,
 			singleItem = ul.children(".wijmo-wijlist-item:first"),
+			headerHeight,
 			adjustHeight = null, h, percent, small, vScroller, large, spOptions, pt;
 			if (!ele.is(":visible")) {
 				return false;
@@ -1072,7 +1237,22 @@
 				vScroller = self.superPanel.options.vScroller;
 				vScroller.scrollLargeChange = large;
 				vScroller.scrollSmallChange = small;
+				//update for fixing can't show all dropdown items by wuhao
 				self.superPanel.paintPanel();
+				if (self.superPanel.vNeedScrollBar) {
+					ul.setOutWidth(ele.innerWidth() - 18);
+					self.superPanel.refresh();
+				} else {
+					ul.setOutWidth(ele.outerWidth());
+					headerHeight = ele
+					.children(".wijmo-wijsuperpanel-header").outerHeight();
+					//update for case 24248 at 2012/7/27
+					//Note: not good method for doing this
+					ele.height(ul.outerHeight() + headerHeight);
+					//end 
+					self.superPanel.refresh();
+				}
+				//end for issue
 			}
 			pt = ul.css("padding-top");
 			if (pt.length > 0) {

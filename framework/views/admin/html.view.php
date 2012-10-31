@@ -17,7 +17,7 @@ $config = array(
         'log' => 'static/novius-os/admin/bundle/vendor.min',
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
-        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.7.2.min',
+        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.8.2.min',
 
         'jquery.bgiframe' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
@@ -121,6 +121,24 @@ $config = array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
+
+        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.contextable-invariant-fields',
+        'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.appstab',
+        'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.publishable',
+        'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.toolbar-crud',
+        'jquery-nos-update-tab-crud' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.update-tab-crud',
+        'jquery-nos-virtualname' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.virtualname',
+        'jquery-nos-media-folder-form' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.media-folder-form',
+        'jquery-nos-media-add-form' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.media-add-form',
+        'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.media-edit-form',
+        'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.image-wysiwyg',
+        'jquery-nos-link-wysiwyg' => 'static/novius-os/admin/novius-os/js/page/minified/jquery.novius-os.link-wysiwyg',
+        'jquery-nos-inspector-date' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-date',
+        'jquery-nos-inspector-model' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-model',
+        'jquery-nos-inspector-tree-model' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model',
+        'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model-checkbox',
+        'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model-radio',
+        'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-plain-data',
     ),
     'shim' => array(
         'jquery.bgiframe' => array('jquery'),
@@ -227,7 +245,7 @@ if (!$assets_minified) {
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
         'log' => 'static/novius-os/admin/vendor/log',
 
-        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.7.2',
+        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.8.2',
 
         'jquery.bgiframe' => 'static/novius-os/admin/vendor/jquery/bgiframe/jquery.bgiframe-2.1.3-pre',
         'jquery.cookie' => 'static/novius-os/admin/vendor/jquery/cookie/jquery.cookie',
@@ -329,6 +347,24 @@ if (!$assets_minified) {
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.thumbnailsgrid',
         'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
+
+        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.contextable-invariant-fields',
+        'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.appstab',
+        'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
+        'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.toolbar-crud',
+        'jquery-nos-update-tab-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.update-tab-crud',
+        'jquery-nos-virtualname' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.virtualname',
+        'jquery-nos-media-folder-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-folder-form',
+        'jquery-nos-media-add-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-add-form',
+        'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-edit-form',
+        'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.image-wysiwyg',
+        'jquery-nos-link-wysiwyg' => 'static/novius-os/admin/novius-os/js/page/jquery.novius-os.link-wysiwyg',
+        'jquery-nos-inspector-date' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-date',
+        'jquery-nos-inspector-model' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-model',
+        'jquery-nos-inspector-tree-model' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model',
+        'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-checkbox',
+        'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-radio',
+        'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-plain-data',
     ));
 }
 ?>
@@ -355,7 +391,7 @@ if (hash.substr(0, 4) == 'tab=') {
 
 <link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.css">
-<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.1.4.min.css">
+<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-complete.all.2.2.2.min.css">
 <?php
 if ($assets_minified) {
     ?>

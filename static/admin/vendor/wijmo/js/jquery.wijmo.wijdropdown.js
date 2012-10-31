@@ -1,17 +1,17 @@
 /*globals jQuery,document,window*/
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
-*
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
+* 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
 * http://www.wijmo.com/license
 *
 * * Wijmo Dropdown widget.
-*
+* 
 * Depends:
 *	jquery.js
 *	jquery.ui.js
@@ -37,6 +37,7 @@
 			$.Widget.prototype._setOption.apply(this, arguments);
 			if (key === "disabled") {
 				this._labelWrap.toggleClass("ui-state-disabled", value);
+				this._label.toggleClass("ui-state-disabled", value);
 				this.element.attr("disabled", value ? "disabled" : "");
 			}
 		},
@@ -44,6 +45,12 @@
 		_create: function () {
 			var self = this,
 				ele = self.element;
+			
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+			
 			if (ele.get(0).tagName.toLowerCase() !== "select") {
 				return;
 			}
@@ -57,6 +64,16 @@
 			else {
 				self.needInit = true;
 			}
+			
+			//update for visibility change
+			if (self.element.is(":hidden") &&
+						self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+			           self.refresh();
+			           if(self.element.wijRemoveVisibilityObserver) {
+			        	   self.element.wijRemoveVisibilityObserver();
+			           }}, "wijdropdown");
+			 }
 		},
 
 		_createSelect: function () {
@@ -95,6 +112,7 @@
 			if (ele.get(0).disabled !== false) {
 				self.options.disabled = true;
 				labelWrap.addClass("ui-state-disabled");
+				label.addClass("ui-state-disabled");
 			}
 
 			labelWrap.append(label);
@@ -115,14 +133,14 @@
 			self._list = list;
 			self._value = ele.val();
 			//self._selectedIndex = ele.find("option:selected").index();
-			self._selectedIndex = $('option',ele)
-									.index(ele.find("option:selected")),
+			self._selectedIndex = $('option', ele)
+									.index(ele.find("option:selected"));
 			self._selectWrap = selectWrap;
 			self._labelWrap = labelWrap;
 			self._container = container;
 
 			//update for fixed tooltip can't take effect
-			container.attr("title",ele.attr("title"));
+			container.attr("title", ele.attr("title"));
 			ele.removeAttr("title");
 		},
 
@@ -154,7 +172,7 @@
 				}
 			});
 
-			//update for fixing height setting is incorrect when
+			//update for fixing height setting is incorrect when 
 			//execute refresh at 2011/11/30
 			listContainer.height("");
 			//end for height setting
@@ -466,7 +484,7 @@
 				self._label.text(self._activeItem.text());
 				self._value = self._activeItem.data("value");
 				//self._selectedIndex = self._activeItem.index();
-				self._selectedIndex = $('li.wijmo-dropdown-item',listContainer)
+				self._selectedIndex = $('li.wijmo-dropdown-item', listContainer)
 											.index(self._activeItem);
 
 				if (self.superpanel.vNeedScrollBar) {
@@ -489,7 +507,7 @@
 			var self = this, ele = self.element,
 				oldSelectedItem = ele.find("option[selected]"),
 				//oldSelectedIndex = oldSelectedItem.index(),
-				oldSelectedIndex = $('option',ele).index(oldSelectedItem),
+				oldSelectedIndex = $('option', ele).index(oldSelectedItem),
 				selectedIndex = self._selectedIndex;
 
 			//self.oldVal = ele.val();
@@ -593,8 +611,8 @@
 				self._buildList(self._list, self._listContainer, containerWidth);
 				self._value = self.element.val();
 				//self._selectedIndex = ele.find("option :selected").index();
-				self._selectedIndex = $('option',ele)
-									.index(ele.find("option:selected")),
+				self._selectedIndex = $('option', ele)
+									.index(ele.find("option:selected"));
 				self._initActiveItem();
 				if (self._activeItem) {
 					self._label.text(self._activeItem.text());
@@ -667,7 +685,7 @@
 			//update for fixed tooltip can't take effect
 			this.element.attr("title", this._container.attr("title"));
 
-			/// Remove the functionality completely.
+			/// Remove the functionality completely. 
 			/// This will return the element back to its pre-init state.
 			this.element.closest(".wijmo-wijdropdown")
 			.find(">div.wijmo-dropdown-trigger,>div.wijmo-dropdown," +

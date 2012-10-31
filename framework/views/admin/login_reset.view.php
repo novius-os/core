@@ -10,14 +10,16 @@
 
 ?>
 <html>
-<head></head>
+<head>
+    <base href="<?= \Uri::base(false) ?>" />
+</head>
 <body>
 <script type="text/javascript">
     var top = window;
     while (top.parent != top) {
         top = top.parent;
     }
-    top.location = '/admin/nos/login';
+    top.location = 'admin/nos/login';
 </script>
 </body>
 </html>

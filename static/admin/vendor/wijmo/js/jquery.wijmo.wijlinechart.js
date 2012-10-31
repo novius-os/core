@@ -1,10 +1,10 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
@@ -71,8 +71,8 @@
 			///  });
 			type: "line",
 			/// <summary>
-			/// A value that indicates whether to show the animation
-			/// and the duration for the animation.
+			/// An option that controls aspects of the widget's animation, 
+			/// such as duration and easing.
 			/// Default: {direction: "horizontal",enabled:true, 
 			/// duration:2000, easing: ">"}.
 			/// Type: Object.
@@ -629,16 +629,20 @@
 		_mouseOver: function (e, lineSeries) {
 			var self = this;
 
-			if (!lineSeries || lineSeries.type !== "line") {
+			if (!lineSeries || !(lineSeries.type === "line" || lineSeries.type === "marker")) {
 				return;
 			}
 
 			$.wijmo.wijchartcore.prototype._mouseOver.apply(this, arguments);
+			
+			if (lineSeries.type === "marker") {
+				lineSeries = lineSeries.lineSeries;
+			}
 
 			if (lineSeries.path.removed) {
 				return;
 			}
-			if (self.hoverLine !== lineSeries) {
+			if (self.hoverLine !== lineSeries || self.hoverLine === null) {
 				self.isNewLine = true;
 				if (self.hoverLine) {
 					if (!self.hoverLine.path.removed) {
@@ -1343,7 +1347,8 @@
 			prevPathArr,
 			prevPath,
 			currentPathArr,
-			idx;
+			idx,
+			noFillStyle;
 		path = canvas.path(pathArr.join(" "));
 		path.straight = initAniPath.join(" ");
 		//shadow
@@ -1478,7 +1483,14 @@
 				labels: aniLabelsAttr
 			});
 		} else {
-			path.wijAttr(lineStyle);
+			//remove fill attribute when painting line.
+			//path.wijAttr(lineStyle);
+			noFillStyle = $.extend(true, {}, lineStyle);
+			if (noFillStyle.fill) {
+				delete noFillStyle.fill;
+			}
+			path.wijAttr(noFillStyle);
+			//end comments.
 
 			aniPathsAttr.push({
 				path: $.extend(true, {}, path.attr()),
@@ -1602,6 +1614,8 @@
 			pathArr = self.getPathArrByFitType(pathArr, fitType, pointIdx, 
 				valuesY.length, cBounds, valuesX, valuesY, X, Y,  isXTime, isYTime, 
 				valX, valY, kx, ky, minX, minY, valsY, display, stacked);
+		} else {
+			return pathArr;
 		}
 		//pathArr = self.getPathArrByFitType(pathArr, fitType, pointIdx, valuesY.length, 
 		//	cBounds, valuesX, valuesY, X, Y,  isXTime, isYTime, 

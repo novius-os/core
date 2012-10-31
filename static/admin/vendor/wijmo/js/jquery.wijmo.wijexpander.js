@@ -2,10 +2,10 @@
 /*jslint white: false */
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
@@ -167,7 +167,7 @@
 		// handle option changes:
 		_setOption: function (key, value) {
 			switch (key) {
-				case "contentUrl":
+				case "contentUrl": 
 					if (value) {
 						this.element.find("> .ui-widget-content").wijContent(value);
 					} else {
@@ -176,9 +176,13 @@
 					break;
 				case "disabled":
 					if (value) {
-						this.element.addClass("ui-state-disabled");
+						this.element.addClass("ui-state-disabled")
+					.find("> .ui-expander-header").addClass("ui-state-disabled");
+						this.element.find("> .ui-widget-content").addClass("ui-state-disabled");
 					} else {
-						this.element.removeClass("ui-state-disabled");
+						this.element.removeClass("ui-state-disabled")
+					.find("> .ui-expander-header").removeClass("ui-state-disabled");
+						this.element.find("> .ui-widget-content").removeClass("ui-state-disabled");
 					}
 					break;
 				case "expandDirection":
@@ -261,10 +265,13 @@
 				.addClass(this._triangleIconOpened);
 				this.element.find("> .ui-widget-content")
 				.addClass("ui-expander-content-active")
-				.addClass(this._contentCornerOpened);
+				.addClass(this._contentCornerOpened)
+				.wijTriggerVisibility();
 			}
 			if (o.disabled) {
-				this.element.addClass("ui-state-disabled");
+				this.element.addClass("ui-state-disabled")
+					.find("> .ui-expander-header").addClass("ui-state-disabled");
+				this.element.find("> .ui-widget-content").addClass("ui-state-disabled");
 			}
 			this._bindLiveEvents();
 		},
@@ -476,8 +483,9 @@
 					complete: jQuery.proxy(function () {
 						this.element.find("> .ui-widget-content")
 						.addClass("ui-expander-content-active")
-						.addClass(this._contentCornerOpened);
-						this._trigger("afterExpand");
+						.addClass(this._contentCornerOpened)
+						.wijTriggerVisibility();
+						this._trigger("afterExpand")
 						this.element.find("> .ui-widget-content").css('display', '');
 					}, this),
 					horizontal: this.element.hasClass("ui-helper-horizontal")

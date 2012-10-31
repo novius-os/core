@@ -382,7 +382,7 @@ define('jquery-nos-appdesk',
                 self.uiToolbarContextsDialog.wijdialog('close');
                 self._uiToolbarContextsButtonLabel();
 
-                self.element.nosSaveUserConfig('selectedContexts', o.selectedContexts);
+                self.element.nosSaveUserConfig(o.name + '.selectedContexts', o.selectedContexts);
 
                 self.uiSearchInput.val('');
                 self.uiInspectorsTags.wijsuperpanel('destroy');
@@ -1055,6 +1055,7 @@ define('jquery-nos-appdesk',
                     columns = $.extend({}, o.treeGrid.columns || o.grid.columns);
 
                 delete grid.columns;
+                delete grid.urlJson;
 
                 self._columnsMultiContext(columns);
 
@@ -1505,31 +1506,34 @@ define('jquery-nos-appdesk',
                         if (!$.isArray(params.reloadEvent)) {
                             params.reloadEvent = [params.reloadEvent];
                         }
-                        var match = [];
-                        $.each(params.reloadEvent, function(i, reloadEvent) {
-                            if ($.type(reloadEvent) === 'string') {
-                                // Reload the grid if a action on a same context's item occurs
-                                // Or if a update or a insert on a other context's item occurs
-                                if (dispatcher.data('nosContext')) {
-                                    match.push({
-                                        name : reloadEvent,
-                                        context : dispatcher.data('nosContext')
-                                    });
-                                    match.push({
-                                        name : reloadEvent,
-                                        action : ['delete', 'insert']
-                                    });
+                        var listenEvent = function() {
+                            var match = [];
+                            $.each(params.reloadEvent, function(i, reloadEvent) {
+                                if ($.type(reloadEvent) === 'string') {
+                                    // Reload the grid if a action on a same language's item occurs
+                                    // Or if a update or a insert on a other language's item occurs
+                                    if (dispatcher.data('nosContext')) {
+                                        match.push({
+                                            name : reloadEvent,
+                                            context : dispatcher.data('nosContext')
+                                        });
+                                    } else {
+                                        match.push({
+                                            name : reloadEvent
+                                        });
+                                    }
                                 } else {
-                                    match.push({
-                                        name : reloadEvent
-                                    });
+                                    match.push(reloadEvent);
                                 }
-                            } else {
-                                match.push(reloadEvent);
-                            }
-                        });
-                        dispatcher.nosListenEvent(match, function() {
-                            div.appdesk('gridReload');
+                            });
+                            dispatcher.nosListenEvent(match, function() {
+                                    div.appdesk('gridReload');
+                                }, 'appdeskContext');
+                        };
+                        listenEvent();
+                        dispatcher.on('contextChange', function() {
+                            dispatcher.nosUnlistenEvent('appdeskContext');
+                            listenEvent();
                         });
                     }
 
@@ -1820,7 +1824,7 @@ define('jquery-nos-appdesk',
                         }
                         var uiAction = $('<th></th>')
                             .css('white-space', 'nowrap')
-                            .addClass("ui-state-default")
+                            .addClass("ui-state-default" + (action.red ? ' ui-state-error' : ''))
                             .attr('title', action.label)
                             .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
 
@@ -1904,6 +1908,10 @@ define('jquery-nos-appdesk',
                                     .appendTo(ul)
                                     .find('a')
                                     .html(text);
+
+                                if (action.red) {
+                                    li.addClass('ui-state-error');
+                                }
 
                                 // Check whether action name is disabled
                                 if (action.name && noParseData.actions && noParseData.actions[action.name] == false) {

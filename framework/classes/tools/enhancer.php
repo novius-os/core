@@ -52,11 +52,10 @@ class Tools_Enhancer
         // This files contains all the urlPath for the pages containing an URL enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
-        $url_enhanced_flipped = array_flip($url_enhanced);
 
         $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
-        $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable', false);
-        if ($contextable) {
+        $contextableAndTwinnable = $item->behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
+        if ($contextableAndTwinnable) {
             $item_context = $item->get_context();
         }
         $urlItem   = call_user_func($callback, $item, $params);
@@ -66,9 +65,11 @@ class Tools_Enhancer
         $preview = \Arr::get($params, 'preview', false);
         if ($urlPath === false) {
             foreach ($page_enhanced as $page_id => $params) {
-                $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
-                if ($urlPath !== false && (!$contextable || $params['context'] == $item_context) && ($preview || $params['published'])) {
-                    $urls[$page_id.'::'.$urlItem] = $urlPath.$urlItem;
+                if ((!$contextableAndTwinnable || $params['context'] == $item_context) && ($preview || $params['published'])) {
+                    $page_params = \Arr::get($url_enhanced, $page_id, false);
+                    if ($page_params) {
+                        $urls[$page_id.'::'.$urlItem] = $page_params['url'].$urlItem;
+                    }
                 }
             }
         } else {
@@ -93,16 +94,17 @@ class Tools_Enhancer
         // This files contains all the urlPath for the pages containing an URL enhancer
         \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
         $url_enhanced = \Config::get('data::url_enhanced', array());
-        $url_enhanced_flipped = array_flip($url_enhanced);
 
         // Now fetch all the possible URLS
         $urls = array();
         $preview = \Arr::get($params, 'preview', false);
         $context    = \Arr::get($params, 'context', false);
         foreach ($page_enhanced as $page_id => $params) {
-            $urlPath = \Arr::get($url_enhanced_flipped, $page_id, false);
-            if ($urlPath !== false && ($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
-                $urls[$page_id] = $urlPath;
+            if (($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
+                $page_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($page_params) {
+                    $urls[$page_id] = $page_params['url'];
+                }
             }
         }
 
@@ -114,14 +116,4 @@ class Tools_Enhancer
         $urls = static::urls($enhancer_name, $params);
         return reset($urls) ?: null;
     }
-
-    public static function url_page($page_id)
-    {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-        $url_enhanced = \Config::get('data::url_enhanced', array());
-        $url_enhanced = array_flip($url_enhanced);
-
-        return \Arr::get($url_enhanced, $page_id, false);
-    }
-
 }

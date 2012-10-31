@@ -10,6 +10,10 @@
 
 namespace Nos;
 
+/**
+ * The Tools_Context class allows you to work with contexts,
+ * locales and sites of your Novius OS instance.
+ */
 class Tools_Context
 {
     static protected $_contexts = null;
@@ -25,15 +29,38 @@ class Tools_Context
     public static function contexts()
     {
         if (!is_array(static::$_contexts)) {
+            $all_domains = array();
+
             $sites = static::sites();
             $locales = static::locales();
             $contexts = \Config::get('contexts', array());
             static::$_contexts = array();
-            foreach ($contexts as $context_code => $context_params) {
+            foreach ($contexts as $context_code => $domains) {
                 $site = static::site_code($context_code);
                 $locale = static::locale_code($context_code);
                 if (isset($sites[$site]) && isset($locales[$locale])) {
-                    static::$_contexts[$context_code] = $context_params;
+                    if (empty($domains)) {
+                        if (!in_array(\Uri::base(false), $all_domains)) {
+                            $domains = array(\Uri::base(false));
+                        } else {
+                            $domains = array(\Uri::base(false).$site.'/'.$locale.'/');
+                        }
+                    }
+                    foreach ($domains as $i => $domain) {
+                        $domain = rtrim($domain, '/').'/';
+                        $domains[$i] = $domain;
+
+                        if (in_array($domain, $all_domains)) {
+                            unset($domains[$i]);
+                        } else {
+                            $all_domains[] = $domain;
+                        }
+                    }
+                    if (empty($domains)) {
+                        $domains = array(\Uri::base(false).$site.'/'.$locale.'/');
+                    }
+
+                    static::$_contexts[$context_code] = $domains;
                 }
             }
         }
@@ -140,6 +167,7 @@ class Tools_Context
                 'alias' => false,
                 'template' => '{site} {locale}',
                 'flag' => true,
+                'force_flag' => false,
             ), $options);
 
         $site = self::site($context);
@@ -147,7 +175,7 @@ class Tools_Context
         $site_label = $options['alias'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : '';
         $site_label = empty($site_label) ? $site['title'] : $site_label;
         if (count(static::sites()) === 1) {
-            $label = $locale['title'];
+            $label = $options['force_flag'] ? static::flag($context) : $locale['title'];
         } elseif (count(static::locales()) === 1) {
             $label = $site_label;
         } else {
@@ -155,6 +183,16 @@ class Tools_Context
         }
 
         return $label;
+    }
+
+    /**
+     * @return string
+     */
+    public static function default_context()
+    {
+        $contexts = static::contexts();
+
+        return current($contexts);
     }
 
     /**

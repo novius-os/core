@@ -14,21 +14,16 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Setup dir constants
 if (isset($_SERVER['NOS_ROOT'])) {
-    define('DOCROOT', $_SERVER['NOS_ROOT'].'/public'.DIRECTORY_SEPARATOR);
-
-    define('APPPATH', $_SERVER['NOS_ROOT'].'/local/');
-    define('PKGPATH', $_SERVER['NOS_ROOT'].'/novius-os/packages/');
-    define('COREPATH', $_SERVER['NOS_ROOT'].'/novius-os/fuel-core/');
-    define('NOSPATH', $_SERVER['NOS_ROOT'].'/novius-os/framework/');
+    define('NOS_ROOT', $_SERVER['NOS_ROOT'].DIRECTORY_SEPARATOR);
 } else {
-
-    define('DOCROOT', realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR);
-
-    define('APPPATH', realpath(DOCROOT.'../local/').DIRECTORY_SEPARATOR);
-    define('PKGPATH', realpath(DOCROOT.'../novius-os/packages/').DIRECTORY_SEPARATOR);
-    define('COREPATH', realpath(DOCROOT.'../novius-os/fuel-core/').DIRECTORY_SEPARATOR);
-    define('NOSPATH', realpath(DOCROOT.'../novius-os/framework/').DIRECTORY_SEPARATOR);
+    define('NOS_ROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 }
+define('DOCROOT', NOS_ROOT.'public'.DIRECTORY_SEPARATOR);
+
+define('APPPATH', NOS_ROOT.'local'.DIRECTORY_SEPARATOR);
+define('PKGPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
+define('COREPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
+define('NOSPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
@@ -151,6 +146,9 @@ if ($routes_novius === false) {
 }
 
 $config_app = include(APPPATH.'config/config.php');
+if (!empty($config_app['base_url'])) {
+    define('NOS_RELATIVE_DIR', ltrim(parse_url($config_app['base_url'], PHP_URL_PATH), '/'));
+}
 
 Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
 

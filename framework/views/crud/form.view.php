@@ -31,3 +31,5 @@ foreach ($layout as $view) {
 }
 
 echo $fieldset->close();
+
+echo View::forge('nos::crud/invariant_fields', $view_params, false);

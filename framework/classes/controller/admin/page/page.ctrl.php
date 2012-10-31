@@ -14,14 +14,14 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
 {
     protected $page_parent = false;
 
-    protected function form_item()
+    protected function from_item()
     {
-        parent::form_item();
+        parent::from_item();
         if ($this->item->is_new()) {
             // The first page we create is a homepage
             $context_has_home = (int) (bool) Model_Page::count(array(
                 'where' => array(
-                    array('page_home', '=', 1),
+                    array('page_entrance', '=', 1),
                     array('page_context', $this->item->page_context),
                 ),
             ));
@@ -89,7 +89,7 @@ class Controller_Admin_Page_Page extends Controller_Admin_Crud
             $pages_context = $this->item->find_context('all');
             $pages_old = Model_Page::find('all', array(
                 'where' => array(
-                    array('page_home', '=', 1),
+                    array('page_entrance', '=', 1),
                     array('page_context', 'IN', $contexts),
                     array('page_id', 'NOT IN', array_keys($pages_context)),
                 ),

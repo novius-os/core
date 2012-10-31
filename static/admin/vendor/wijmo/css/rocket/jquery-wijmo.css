@@ -3,7 +3,7 @@
  * Wijmo Rocket Theme
  * http://wijmo.com/
  * 
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
@@ -1923,14 +1923,17 @@ button.ui-button::-moz-focus-inner
 
 .wijmo-wijinput, .wijmo-wijtextbox, .wijmo-wijgrid .wijmo-wijinput
 {
-    /*background: #242122 url(images/ui-bg_inset-soft_15_242122_1x100.png) 50% 50% repeat-x !important;*/ /*background: #e1e1e1 url(images/ui-bg_inset-soft_100_e1e1e1_1x100.png) 50% 50% repeat-x !important;*/
-    background: #f1f1f1 !important;
-    color: #404040;
-    border: solid 1px #e1e1e1;
+    background: #fff !important;
+    color: #404040 !important;
+    border: solid 1px #e1e1e1 !important;
 }
-.wijmo-checkbox .wijmo-checkbox-box, div.wijmo-wijradio-box
+.wijmo-wijinput:hover, .wijmo-wijtextbox:hover, .wijmo-wijgrid .wijmo-wijinput:hover, .wijmo-wijinput:focus, .wijmo-wijtextbox:focus, .wijmo-wijgrid .wijmo-wijinput:focus
 {
-    background: #f1f1f1;
+    border-color: #00a6dd !important;
+}
+.wijmo-checkbox .wijmo-checkbox-box, .wijmo-wijradio div.wijmo-wijradio-box
+{
+    background: #fff;
     border: solid 1px #e1e1e1;
 }
 .wijmo-wijinput.ui-state-focus, .wijmo-wijtextbox.ui-state-focus
@@ -1952,7 +1955,7 @@ button.ui-button::-moz-focus-inner
     text-shadow: none;
 }
 
-.wijmo-checkbox .ui-state-active, .wijmo-wijradio .ui-state-active
+.wijmo-checkbox .ui-state-active, .wijmo-wijradio .wijmo-wijradio-box.ui-state-active
 {
     -moz-box-shadow: inset 1px 1px 0 rgba(255,255,255,0.15);
     -webkit-box-shadow: inset 1px 1px 0 rgba(255,255,255,0.15);
@@ -2346,4 +2349,9 @@ div.wijmo-wijribbon .ui-state-active .ui-button-text
 /* Grid highlight row icon fix */
 .wijmo-wijgrid .ui-state-highlight .ui-state-active .ui-icon {
     background-image: url("images/ui-icons_00a6dd_256x240.png");
+}
+
+.wijmo-wijinput .wijmo-wijinput-input
+{
+    color: #404040;
 }

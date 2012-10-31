@@ -313,7 +313,7 @@ return array(
                                         'action' => array(
                                             'action' => 'nosTabs',
                                             'tab' => array(
-                                                'url' => 'admin/nos/media/media/insert_update?context_id={{id}}',
+                                                'url' => 'admin/nos/media/media/insert_update?environment_id={{id}}',
                                                 'label' => 'Add a media in the "{{title}}" folder'
                                             ),
                                         ),
@@ -325,7 +325,7 @@ return array(
                                         'action' => array(
                                             'action' => 'nosTabs',
                                             'tab' => array(
-                                                'url' => 'admin/nos/media/folder/insert_update?context_id={{id}}',
+                                                'url' => 'admin/nos/media/folder/insert_update?environment_id={{id}}',
                                                 'label' => 'Add a sub-folder in "{{title}}"',
                                             ),
                                             'dialog' => array(

@@ -39,7 +39,8 @@ class Model extends \Orm\Model
     public $medias;
     public $wysiwygs;
 
-    public static function prefix() {
+    public static function prefix()
+    {
         // @todo: add cache
         return static::get_prefix();
     }
@@ -332,11 +333,11 @@ class Model extends \Orm\Model
 
     public function get_possible_context()
     {
-        $contextable = static::behaviours('Nos\Orm_Behaviour_Contextable');
+        $contextableAndTwinnable = static::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
-        if (!$contextable || !$tree) {
-            return array_keys(Tools_Context::contexts());
+        if (!$contextableAndTwinnable || !$tree) {
+            return array_keys(\Nos\Tools_Context::contexts());
         }
 
         // Return contexts from parent if available
@@ -345,7 +346,7 @@ class Model extends \Orm\Model
             return $parent->get_all_context();
         }
 
-        return array_keys(Tools_Context::contexts());
+        return array_keys(\Nos\Tools_Context::contexts());
     }
 
     /**
@@ -545,7 +546,8 @@ class Model extends \Orm\Model
         return null;
     }
 
-    public function set($name, $value = null) {
+    public function set($name, $value = null)
+    {
         if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
             $name = static::prefix().$name;
         }
@@ -633,7 +635,8 @@ class Model extends \Orm\Model
         return parent::__set($name, $value);
     }
 
-    public function & get($name) {
+    public function & get($name)
+    {
         if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
             $name = static::prefix().$name;
         }
@@ -789,7 +792,8 @@ class Model extends \Orm\Model
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
 
-    public static function admin_config() {
+    public static function admin_config()
+    {
         list($application_name, $file) = \Config::configFile(get_called_class());
         $file = explode('/', $file);
 
@@ -808,7 +812,8 @@ class Model extends \Orm\Model
         return $config;
     }
 
-    public static function process_actions($application_name, $model, $config) {
+    public static function process_actions($application_name, $model, $config)
+    {
         $urls = array(
             'add' => 'action.tab.url',
             'edit' => 'action.tab.url',
@@ -822,7 +827,7 @@ class Model extends \Orm\Model
                     'action' => 'nosTabs',
                     'method' => 'add',
                     'tab' => array(
-                        'url' => 'insert_update?lang={{lang}}',
+                        'url' => 'insert_update?context={{context}}',
                         'label' => __('Add a new monkey'),
                     ),
                 ),
@@ -856,13 +861,15 @@ class Model extends \Orm\Model
                 'label' => __('Delete'),
                 'primary' => true,
                 'icon' => 'trash',
+                'red' => true,
                 'context' => array(
                     'item' => true,
                     'list' => true
                 ),
-                'enabled' =>  function($item) {
-                    return !$item->is_new();
-                },
+                'enabled' =>
+                    function($item) {
+                        return !$item->is_new();
+                    },
             ),
             'visualise' => array(
                 'label' => 'Visualise',
@@ -876,14 +883,15 @@ class Model extends \Orm\Model
                     'item' => true,
                     'list' => true
                 ),
-                'enabled' =>  function($item) {
-                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        $url = $item->url_canonical(array('preview' => true));
+                'enabled' =>
+                    function($item) {
+                        if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                            $url = $item->url_canonical(array('preview' => true));
 
-                        return !$item->is_new() && !empty($url);
-                    }
-                    return false;
-                },
+                            return !$item->is_new() && !empty($url);
+                        }
+                        return false;
+                    },
             ),
             'share' => array(
                 'label' => __('Share'),
@@ -898,9 +906,10 @@ class Model extends \Orm\Model
                 'context' => array(
                     'item' => true
                 ),
-                'enabled' =>  function($item) {
-                    return !$item->is_new();
-                },
+                'enabled' =>
+                    function($item) {
+                        return !$item->is_new();
+                    },
             )
         );
 
@@ -927,7 +936,7 @@ class Model extends \Orm\Model
             $generated_actions[$model.'.'.$name] = $template;
 
             if (isset($urls[$name])) {
-                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name],'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
+                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
             }
 
             if (isset($config['labels'][$name])) {

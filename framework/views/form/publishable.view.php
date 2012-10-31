@@ -18,64 +18,41 @@ if (empty($publishable)) {
 ?>
 <td>
     <?php $published = !empty($item) ? $item->published() : false; ?>
-    <table style="margin:0 2em 0 1em;">
+    <table style="margin:0 2em 0 1em;" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
-            <td id="<?= $buttonset = uniqid('buttonset_') ?>" class="publishable" style="width:50px;">
+            <td class="publishable" style="width:50px;">
                 <input type="radio" name="<?= $publishable['publication_bool_property'] ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $published === false ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
                 <input type="radio" name="<?= $publishable['publication_bool_property'] ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $published === true ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
             </td>
-            <td style="padding-left:10px;" id="<?= $label = uniqid('label_') ?>"></td>
+            <td style="padding-left:10px;"></td>
         </tr>
     </table>
 </td>
 
+<?php
+$formatter = \Format::forge();
+?>
 <script type="text/javascript">
 require(
-    ['jquery-nos'],
+    ['jquery-nos-publishable'],
     function($) {
-<?php
-    $formatter = \Format::forge();
-?>
-        var labels = {
-            'undefined' : {
-                0 : <?= $formatter->to_json('Will not be published') ?>,
-                1 : <?= $formatter->to_json('Will be published') ?>
-            },
-            'no' : {
-                0 : <?= $formatter->to_json('Not published') ?>,
-                1 : <?= $formatter->to_json('Will be published') ?>
-            },
-            'yes' : {
-                0 : <?= $formatter->to_json('Will be unpublished') ?>,
-                1 : <?= $formatter->to_json('Published') ?>
-            }
-        };
-
-        var initial_status = '<?= empty($item) || $item->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>';
-
         $(function() {
-            var $buttonset = $('#<?= $buttonset ?>');
-            var $label     = $('#<?= $label ?>');
-
-            $buttonset.buttonset({
-                text : false,
-                icons : {
-                    primary:'ui-icon-locked'
+            $('#<?= $publishable_id ?>').nosPublishable({
+                initialStatus: '<?= empty($item) || $item->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>',
+                texts: {
+                    'undefined' : {
+                        0 : <?= $formatter->to_json('Will not be published') ?>,
+                        1 : <?= $formatter->to_json('Will be published') ?>
+                    },
+                    'no' : {
+                        0 : <?= $formatter->to_json('Not published') ?>,
+                        1 : <?= $formatter->to_json('Will be published') ?>
+                    },
+                    'yes' : {
+                        0 : <?= $formatter->to_json('Will be unpublished') ?>,
+                        1 : <?= $formatter->to_json('Published') ?>
+                    }
                 }
-            });
-            $buttonset.find(':radio').change(function() {
-                $label.text(labels[initial_status][$(this).val()]);
-            })
-            $buttonset.find(':checked').triggerHandler('change');
-
-            $buttonset.closest('form').bind('ajax_success', function(e, json) {
-                if (json.publication_initial_status == null) {
-                    log('Potential error: publication_initial_status in JSON response.');
-
-                    return;
-                }
-                initial_status = json.publication_initial_status == 1 ? 'yes' : 'no';
-                $buttonset.find(':checked').triggerHandler('change');
             });
         });
     });

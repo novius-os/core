@@ -36,8 +36,7 @@ $fields[\Nos\DataCatcher::TYPE_TITLE] = array(
     'label' => __('Title:'),
 );
 
-if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget))
-{
+if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget)) {
     $fields[\Nos\DataCatcher::TYPE_URL] = array(
         'label' => __('URL:'),
         'form' => array(
@@ -94,71 +93,67 @@ echo \View::forge(
             \Nos\DataCatcher::TYPE_IMAGE,
             \Nos\DataCatcher::TYPE_TEXT,
         ),
-        'callback' => function($field) use ($item, $nugget_db, $nugget) {
-            $template = $field->template;
-            if (empty($template))
-            {
-                $template = $field->fieldset->form()->get_config('field_template');
-            }
-            $field_name = $field->name;
-            $id = uniqid('for_');
-            $sharable_property = $item->get_sharable_property($field_name);
-            // Don't show 'Use default' if the property has no default (= $sharable_property is empty)
-            if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)) && array_key_exists($field_name, $nugget) && !empty($sharable_property))
-            {
-                $label = \Arr::get($sharable_property, 'useTitle', __('Use default'));
-                $checked = '';
-                if (!isset($nugget_db[$field_name]))
-                {
-                    $checked = 'checked';
-                    $field->set_attribute('disabled', true);
+        'callback' =>
+            function($field) use ($item, $nugget_db, $nugget) {
+                $template = $field->template;
+                if (empty($template)) {
+                    $template = $field->fieldset->form()->get_config('field_template');
                 }
-                $template = str_replace('{default}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label>', $template);
-            }
-            else
-            {
-                $template = str_replace('{default}', '', $template);
-            }
+                $field_name = $field->name;
+                $id = uniqid('for_');
+                $sharable_property = $item->get_sharable_property($field_name);
+                // Don't show 'Use default' if the property has no default (= $sharable_property is empty)
+                if (in_array($field_name, array(\Nos\DataCatcher::TYPE_TITLE, \Nos\DataCatcher::TYPE_TEXT)) && array_key_exists($field_name, $nugget) && !empty($sharable_property)) {
+                    $label = \Arr::get($sharable_property, 'useTitle', __('Use default'));
+                    $checked = '';
+                    if (!isset($nugget_db[$field_name])) {
+                        $checked = 'checked';
+                        $field->set_attribute('disabled', true);
+                    }
+                    $template = str_replace('{default}', '<input type="checkbox" name="default['.$field_name.']" id="'.$id.'" class="nos-datacatchers-nugget-checkbox" '.$checked.' /> <label for="'.$id.'">'.$label.'</label>', $template);
+                } else {
+                    $template = str_replace('{default}', '', $template);
+                }
 
-            // Image field displays a bit differently: radio button with several options
-            if ($field->name == \Nos\DataCatcher::TYPE_IMAGE) {
-                $field->set_template('{field}');
-                $options = $item->get_sharable_property($field_name.'.options', array());
-                foreach ($options as $media_id => $idk) {
-                    $media = \Nos\Model_Media::find($media_id);
+                // Image field displays a bit differently: radio button with several options
+                if ($field->name == \Nos\DataCatcher::TYPE_IMAGE) {
+                    $field->set_template('{field}');
+                    $options = $item->get_sharable_property($field_name.'.options', array());
+                    foreach ($options as $media_id => $idk) {
+                        $media = \Nos\Model_Media::find($media_id);
+                        $field->set_options(
+                            array(
+                                $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
+                            )
+                        );
+                    }
+                    $value = isset($nugget_db[$field_name]) ? $nugget_db[$field_name] : 0;
                     $field->set_options(
                         array(
-                            $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
+                            0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(
+                                array(
+                                    'name' => 'custom_image',
+                                    'value' => isset($options[$value]) ? 0 : $value,
+                                    'widget_options' => array(
+                                        'inputFileThumb' => array(
+                                            'title' => __('Pick a custom image'),
+                                        ),
+                                    ),
+                                )
+                            ).'</div>',
+                        )
+                    );
+                    $template = strtr(
+                        $template,
+                        array(
+                            '{label}' => '{group_label}',
+                            '{field}' => '{fields} <div class="nos-datacatchers-nugget-image"> {label} <br /> {field} </div> {fields}',
                         )
                     );
                 }
-                $value = isset($nugget_db[$field_name]) ? $nugget_db[$field_name] : 0;
-                $field->set_options(
-                    array(
-                        0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(
-                            array(
-                                'name' => 'custom_image',
-                                'value' => isset($options[$value]) ? 0 : $value,
-                                'widget_options' => array(
-                                    'inputFileThumb' => array(
-                                        'title' => __('Pick a custom image'),
-                                    ),
-                                ),
-                            )
-                        ).'</div>',
-                    )
-                );
-                $template = strtr(
-                    $template,
-                    array(
-                        '{label}' => '{group_label}',
-                        '{field}' => '{fields} <div class="nos-datacatchers-nugget-image"> {label} <br /> {field} </div> {fields}',
-                    )
-                );
-            }
-            $field->set_template($template);
-            echo $field->build();
-        },
+                $field->set_template($template);
+                echo $field->build();
+            },
     ),
     false
 );

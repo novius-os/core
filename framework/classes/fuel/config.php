@@ -33,7 +33,8 @@ class Config extends \Fuel\Core\Config
         return parent::get($item, $default);
     }
 
-    public static function load_and_get($item, $default = null) {
+    public static function load_and_get($item, $default = null)
+    {
         $config_file = substr($item, 0, strpos($item, '.'));
         static::load($config_file, true);
         return static::get($item, $default);
@@ -177,7 +178,8 @@ class Config extends \Fuel\Core\Config
 
 
 
-    static function placeholder_replace($obj, $data) {
+    public static function placeholder_replace($obj, $data)
+    {
         $retrieveFromData = function($arg, $data) {
             if (isset($data[$arg])) {
                 return $data[$arg];
@@ -214,7 +216,8 @@ class Config extends \Fuel\Core\Config
         return $obj;
     }
 
-    public static function icon($application_name, $icon_key) {
+    public static function icon($application_name, $icon_key)
+    {
         \Config::load($application_name.'::metadata', true);
         $metadata = \Config::get($application_name.'::metadata');
         return $metadata['icons'][$icon_key];

@@ -14,23 +14,20 @@ $dataset = array(
     'id' => 'page_id',
     'title' => 'page_title',
     'url' => function($page) {
-        return $page->get_href();
+        return $page->url();
     },
     'previewUrl' => function($page) {
-        return $page->get_href(array(
-            'preview'  => true,
-            'absolute' => true,
-        ));
+        return $page->url(array('preview'  => true));
     },
     'is_home' => function($page) {
-        return (bool) (int) $page->page_home;
+        return (bool) (int) $page->page_entrance;
     },
     'actions' => array(
         'delete' => function($page) {
             return $page->page_lock != $page::LOCK_DELETION;
         },
         'set_homepage' => function($page) {
-            return !$page->page_home;
+            return !$page->page_entrance;
         },
     ),
 );
@@ -124,7 +121,7 @@ return array(
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => 'admin/nos/page/page/insert_update?context_id={{id}}',
+                        'url' => 'admin/nos/page/page/insert_update?environment_id={{id}}',
                         'label' => __('Add a page'),
                         'iconUrl' => 'static/novius-os/admin/novius-os/img/16/page.png',
                     ),
@@ -134,6 +131,7 @@ return array(
                 'label' => __('Delete'),
                 'name' => 'delete',
                 'primary' => false,
+                'red' => true,
                 'icon' => 'trash',
                 'action' => array(
                     'action' => 'confirmationDialog',

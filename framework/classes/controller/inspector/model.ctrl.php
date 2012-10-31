@@ -68,7 +68,8 @@ class Controller_Inspector_Model extends Controller_Inspector
         \Response::json($json);
     }
 
-    public static function process_config($application, $config, $item_actions = array(), $gridKey = 'grid') {
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = 'grid')
+    {
         if (isset($config['model'])) {
             $admin_config = $config['model']::admin_config();
 

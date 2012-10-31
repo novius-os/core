@@ -20,33 +20,19 @@ if (!$item->is_new()) {
 ?>
 <script type="text/javascript">
     require(
-        ['jquery-nos-ostabs'],
+        ['jquery-nos-update-tab-crud'],
         function ($) {
             $(function () {
-                var tabInfos = <?= \Format::forge()->to_json($crud['tab_params']) ?>,
-                    isNew = <?= \Format::forge()->to_json($item->is_new()) ?>;
-
-                var $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>');
-                $container.nosTabs('update', tabInfos);
-                if (!isNew) {
-                    $container.nosListenEvent({
-                            name: <?= \Format::forge()->to_json($crud['model']) ?>,
-                            action: 'delete',
-                            id: <?= (int) $item->{$crud['pk']} ?>
-                        }, function() {
-                            var $close = $('#<?= $uniqid_close ?>');
-                            $close.show().nosFormUI();
-                            $container.nosDialog({
-                                title: <?= Format::forge()->to_json(__('Bye bye')) ?>,
-                                content: $close,
-                                width: 300,
-                                height: 130,
-                                close: function() {
-                                    $container.nosTabs('close');
-                                }
-                            });
-                        });
-                }
+                $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>').nosUpdateTabCrud({
+                    tabParams: <?= \Format::forge()->to_json($crud['tab_params']) ?>,
+                    isNew: <?= \Format::forge()->to_json($item->is_new()) ?>,
+                    model: <?= \Format::forge()->to_json($crud['model']) ?>,
+                    itemId: <?= (int) $item->{$crud['pk']} ?>,
+                    closeEle: '#<?= $uniqid_close ?>',
+                    texts: {
+                        titleClose: <?= Format::forge()->to_json(__('Bye bye')) ?>
+                    }
+                });
             });
         });
 </script>

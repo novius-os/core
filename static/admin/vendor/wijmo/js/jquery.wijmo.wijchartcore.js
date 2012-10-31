@@ -1,10 +1,10 @@
 /*globals $, Raphael, jQuery, document, window, Globalize, wijmoASPNetParseOptions*/
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
 * licensing@wijmo.com
@@ -232,7 +232,7 @@
 			easing: null,
 			duration: 500
 		},
-		windowCollisionDetection: true,
+		windowCollisionDetection: "flip",
 		calloutSide: null,
 		width: null,
 		height: null,
@@ -624,10 +624,12 @@
 				var pos = position.split("-"),
 					r = 5,
 					bb = set.getBBox(),
-					w = Math.round(bb.width),
-					h = Math.round(bb.height),
-					x = Math.round(bb.x) - r,
-					y = Math.round(bb.y) - r,
+					p = o.padding,
+					padding = p && !isNaN(p) ? parseInt(p) : 0,
+					w = Math.round(bb.width + padding * 2),
+					h = Math.round(bb.height + padding * 2),
+					x = Math.round(bb.x - padding) - r,
+					y = Math.round(bb.y - padding) - r,
 					gap = 0,
 					off = 0,
 					dx = 0,
@@ -754,7 +756,8 @@
 				return out;
 			},
 
-			_isWindowCollision = function (container, compass, offsetX, offsetY, ox, oy) {
+			_isWindowCollision = function (container, compass, offsetX, offsetY, 
+					ox, oy, windowCollisionDetection) {
 				var box = container.getBBox(),
 					counter = 0,
 					cps = compass,
@@ -763,77 +766,104 @@
 					w = self.width,
 					h = self.height,
 					offX = offsetX,
-					offY = offsetY;
+					offY = offsetY,
+					strokeWidth = container.attr("stroke-width"),
+					flip = windowCollisionDetection === true ||
+						windowCollisionDetection === "flip";
 				if (self.raphael.vml) {
 					w = $(self.canvas).width();
 					h = $(self.canvas).height();
 				}
-				if (x + offsetX < 0) {
+				if (x - strokeWidth < 0) {
 					// counter++;
-					if (cps.toLowerCase().indexOf("west") === -1) {
-						// check if window collision after change compass.
-						if (x + box.width / 2 + box.width - offsetX <= w) {
-							counter++;
-							cps = cps.toLowerCase() + "east";
-							offX = 0 - offsetX;
+					if (flip) {
+						if (cps.toLowerCase().indexOf("west") === -1) {
+							// check if window collision after change compass.
+							if (x + box.width / 2 + box.width - offsetX <= w) {
+								counter++;
+								cps = cps.toLowerCase() + "east";
+								offX = 0 - offsetX;
+							}
+						} else {
+							if (x + box.width + box.width - offsetX <= w) {
+								counter++;
+								cps = cps.toLowerCase().replace("west", "east");
+								offX = 0 - offsetX;
+							}
 						}
 					} else {
-						if (x + box.width + box.width - offsetX <= w) {
-							counter++;
-							cps = cps.toLowerCase().replace("west", "east");
-							offX = 0 - offsetX;
-						}
+						//fit
+						counter++;
+						offX = 0 - x + strokeWidth + offsetX;
 					}
 				}
-				if (y + offsetY < 0) {
-					// counter++;
-					if (cps.toLowerCase().indexOf("north") === -1) {
-						// check if window collision after change compass.
-						if (y + box.height / 2 + box.height - offsetY <= h) {
-							counter++;
-							cps = cps.toLowerCase() + "south";
-							offY = 0 - offsetY;
+				if (y - strokeWidth < 0) {
+					if (flip) {
+						// counter++;
+						if (cps.toLowerCase().indexOf("north") === -1) {
+							// check if window collision after change compass.
+							if (y + box.height / 2 + box.height - offsetY <= h) {
+								counter++;
+								cps = cps.toLowerCase() + "south";
+								offY = 0 - offsetY;
+							}
+						} else {
+							if (y + box.height + box.height - offsetY <= h) {
+								counter++;
+								cps = cps.toLowerCase().replace("north", "south");
+								offY = 0 - offsetY;
+							}
 						}
 					} else {
-						if (y + box.height + box.height - offsetY <= h) {
-							counter++;
-							cps = cps.toLowerCase().replace("north", "south");
-							offY = 0 - offsetY;
-						}
+						//fit
+						counter++;
+						offY = 0 - y + strokeWidth + offsetY;
 					}
 				}
-				if (x + box.width + offsetX > w) {
-					// counter++;
-					if (cps.toLowerCase().indexOf("east") === -1) {
-						// check if window collision after change compass.
-						if (x - box.width / 2 - offsetX >= 0) {
-							counter++;
-							cps = cps.toLowerCase() + "west";
-							offX = 0 - offsetX;
+				if (x + box.width + strokeWidth > w) {
+					if (flip) {
+						// counter++;
+						if (cps.toLowerCase().indexOf("east") === -1) {
+							// check if window collision after change compass.
+							if (x - box.width / 2 - offsetX >= 0) {
+								counter++;
+								cps = cps.toLowerCase() + "west";
+								offX = 0 - offsetX;
+							}
+						} else {
+							if (x - box.width - offsetX >= 0) {
+								counter++;
+								cps = cps.toLowerCase().replace("east", "west");
+								offX = 0 - offsetX;
+							}
 						}
 					} else {
-						if (x - box.width - offsetX >= 0) {
-							counter++;
-							cps = cps.toLowerCase().replace("east", "west");
-							offX = 0 - offsetX;
-						}
+						//fit
+						counter++;
+						offX = w - (x + box.width + strokeWidth) + offsetX;
 					}
 				}
-				if (y + box.height + offsetY > h) {
-					// counter++;
-					if (cps.toLowerCase().indexOf("south") === -1) {
-						// check if window collision after change compass.
-						if (y - box.height / 2 - offsetY >= 0) {
-							counter++;
-							cps = cps.toLowerCase() + "north";
-							offY = 0 - offsetY;
+				if (y + box.height + strokeWidth > h) {
+					if (flip) {
+						// counter++;
+						if (cps.toLowerCase().indexOf("south") === -1) {
+							// check if window collision after change compass.
+							if (y - box.height / 2 - offsetY >= 0) {
+								counter++;
+								cps = cps.toLowerCase() + "north";
+								offY = 0 - offsetY;
+							}
+						} else {
+							if (y - box.height - offsetY >= 0) {
+								counter++;
+								cps = cps.toLowerCase().replace("south", "north");
+								offY = 0 - offsetY;
+							}
 						}
 					} else {
-						if (y - box.height - offsetY >= 0) {
-							counter++;
-							cps = cps.toLowerCase().replace("south", "north");
-							offY = 0 - offsetY;
-						}
+						//fit
+						counter++;
+						offY = h - (y + box.height + strokeWidth) + offsetY;
 					}
 				}
 				if (counter) {
@@ -920,6 +950,14 @@
 					content.transform(Raphael.format("T0,{0}",
 					titleBox.height / 2 + contentBox.height / 2));
 				}
+
+				if (title) {
+					// content.translate(0, titleBox.height / 2 +
+					// contentBox.height / 2);
+					title.transform(Raphael.format("T0,{0}",
+					0));
+				}
+
 				if (o.closeBehavior === "sticky") {
 					closeBtn = self.closeBtn(-1000, -1000, closeBtnLength);
 					elements.push(closeBtn);
@@ -1015,7 +1053,7 @@
 					if (windowCollisionDetection) {
 						isWindowCollision = _isWindowCollision(container,
 							compass, offsetX, offsetY, newPoint.x - lastPoint.x,
-							newPoint.y - lastPoint.y);
+							newPoint.y - lastPoint.y, windowCollisionDetection);
 						// TODO: window collision
 						if (isWindowCollision) {
 							_createTooltipEles(point, tit, cont, false,
@@ -1077,7 +1115,7 @@
 					}
 					if (windowCollisionDetection) {
 						isWindowCollision = _isWindowCollision(container,
-							compass, offsetX, offsetY, 0, 0);
+							compass, offsetX, offsetY, 0, 0, windowCollisionDetection);
 						// TODO: window collision
 						if (isWindowCollision) {
 							_createTooltipEles(point, tit, cont, false,
@@ -1451,7 +1489,7 @@
 			/// </summary>
 			culture: "",
 			// / <summary>
-			// / An array collection that contains the data to be charted.
+			// / An array collection that contains the data that will be displayed by the chart.
 			// / Default: [].
 			// / Type: Array.
 			// / Code example:
@@ -1498,7 +1536,7 @@
 			// / </summary>
 			seriesList: [],
 			// / <summary>
-			// / An array collection that contains the style to be charted.
+			// / An array collection that contains the style applied to the chart elements.
 			// / Default: [{stroke: "#00cc00", opacity: 0.9, "stroke-width": 1},
 			// {
 			// / stroke: "#0099cc", opacity: 0.9, "stroke-width": 1}, {
@@ -1570,8 +1608,8 @@
 				"stroke-width": 1
 			}],
 			// / <summary>
-			// / An array collection that contains the style to
-			// / be charted when hovering the chart element.
+			// / An array collection that contains the style applied
+			// / to the chart element on mouse hover.
 			// / Default: [{opacity: 1, "stroke-width": 1.5}, {
 			// / opacity: 1, "stroke-width": 1.5}, {
 			// / opacity: 1, "stroke-width": 1.5}, {
@@ -1670,13 +1708,16 @@
 			// / </summary>
 			marginLeft: 25,
 			// / <summary>
-			// / A value that indicates the style of the chart text.
+			// / A value that contains the styles that will be applied to the chart text.
 			// / Default: {fill:"#888", "font-size": 10, stroke:"none"}.
 			// / Type: Object.
 			// / Code example:
 			// / $("#chartcore").wijchartcore({
 			// / textStyle: {fill: "red"}
 			// / });
+			/// the style is defined in Raphael here is the documentation: 
+			/// http://raphaeljs.com/reference.html#Element.attr. 
+			/// The style is the ��attr�� method��s parameters.
 			// / </summary>
 			textStyle: {
 				fill: "#888",
@@ -1710,13 +1751,16 @@
 				// / A value that indicates the style of the header.
 				// / Default: {fill:"none", stroke:"none"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the ��attr�� method��s parameters.
 				// / </summary>
 				style: {
 					fill: "none",
 					stroke: "none"
 				},
 				// / <summary>
-				// / A value that indicates the style of the header text.
+				// / A value that contains the styles that will be applied to the header text.
 				// / Default: {"font-size": 18, fill:"#666", stroke:"none"}.
 				// / Type: Object.
 				// / </summary>
@@ -1726,7 +1770,7 @@
 					stroke: "none"
 				},
 				// / <summary>
-				// / A value that indicates the compass of the header.
+				// / A value that indicates the compass position of the header.
 				// / Default: "north".
 				// / Type: String.
 				// / </summary>
@@ -1777,22 +1821,28 @@
 				// / A value that indicates the style of the footer.
 				// / Default: {fill:"#fff", stroke:"none"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the ��attr�� method��s parameters.
 				// / </summary>
 				style: {
 					fill: "#fff",
 					stroke: "none"
 				},
 				// / <summary>
-				// / A value that indicates the style of the footer text.
+				// / A value that contains the styles that will be applied to the footer text.
 				// / Default: {fill:"#000", stroke:"none"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the ��attr�� method��s parameters.
 				// / </summary>
 				textStyle: {
 					fill: "#000",
 					stroke: "none"
 				},
 				// / <summary>
-				// / A value that indicates the compass of the footer.
+				// / A value that indicates the compass position of the footer.
 				// / Default: "south".
 				// / Type: String.
 				// / </summary>
@@ -1851,6 +1901,9 @@
 				// / A value that indicates the style of the legend.
 				// / Default: {fill:"#none", stroke:"none"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the 'attr' method's parameters.
 				// / </summary>
 				style: {
 					fill: "none",
@@ -1863,9 +1916,12 @@
 				/// </summary>
 				textWidth: null,
 				// / <summary>
-				// / A value that indicates the style of the legend text.
+				// / A value that contains the styles that will be applied to the legend text.
 				// / Default: {fill:"#333", stroke:"none"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the 'attr' method's parameters.
 				// / </summary>
 				textStyle: {
 					fill: "#333",
@@ -1876,6 +1932,9 @@
 				// / Default: {"font-weight": "bold", fill:"#000",
 				// stroke:"none"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the 'attr' method's parameters.
 				// / </summary>
 				titleStyle: {
 					"font-weight": "bold",
@@ -1883,7 +1942,7 @@
 					stroke: "none"
 				},
 				// / <summary>
-				// / A value that indicates the compass of the legend.
+				// / A value that indicates the compass position of the legend.
 				// / Default: "east".
 				// / Type: String.
 				// / </summary>
@@ -1976,6 +2035,9 @@
 					// / A value that indicates the style of the X axis.
 					// / Default: {stroke: "#999999", "stroke-width": 0.5}.
 					// / Type: Object.
+					/// the style is defined in Raphael here is the documentation: 
+					/// http://raphaeljs.com/reference.html#Element.attr. 
+					/// The style is the ��attr�� method��s parameters.
 					// / </summary>
 					style: {
 						stroke: "#999999",
@@ -2001,10 +2063,14 @@
 					// / </summary>
 					text: "",
 					// / <summary>
-					// / A value that indicates the style of text of the X axis.
+					// / A value that contains the styles that will be applied to the text of the X axis.
 					// / Default: {fill: "#888","font-size": 15,"font-weight":
 					// "bold"}.
 					// / Type: Object.
+					/// Remark:
+					/// the style is defined in Raphael here is the documentation: 
+					/// http://raphaeljs.com/reference.html#Element.attr. 
+					/// The style is the ��attr�� method��s parameters.
 					// / </summary>
 					textStyle: {
 						fill: "#888",
@@ -2023,6 +2089,9 @@
 						// the X axis.
 						// / Default: {fill: "#333","font-size": 11}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: {
 							fill: "#333",
@@ -2051,7 +2120,7 @@
 						width: null
 					},
 					// / <summary>
-					// / A value that indicates the compass of the X axis.
+					// / A value that indicates the compass position of the X axis.
 					// / Default: "south".
 					// / Type: String.
 					// / </summary>
@@ -2140,6 +2209,10 @@
 						// / Default: {stroke:"#CACACA", "stroke-dasharray": "-
 						// "}.
 						// / Type: Object.
+						/// Remark:
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: {
 							stroke: "#CACACA",
@@ -2167,6 +2240,10 @@
 						// / Default: {stroke:"#CACACA", "stroke-dasharray": "-
 						// "}.
 						// / Type: Object.
+						/// Remark:
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: {
 							stroke: "#CACACA",
@@ -2195,6 +2272,9 @@
 						// mark.
 						// / Default: {fill: "black"}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: { fill: "black" },
 						// / <summary>
@@ -2227,6 +2307,9 @@
 						// mark.
 						// / Default: {fill: "black"}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: { fill: "black" },
 						// / <summary>
@@ -2244,10 +2327,15 @@
 					// / </summary>
 					// / <remarks>
 					// / Options are 'values', 'valueLabels'.
+					/// If the value is 'values', when paint axis, 
+					/// the axis's label will set to the data value of the series.
+					/// If the value is 'valueLabels', when paint the axis, The axis's label 
+					/// will set to a value which is set in axis's valueLabels option.
 					// / </remarks>
 					annoMethod: "values",
 					// / <summary>
-					// / A value that indicates the format string of annotation.
+					// / A value that indicates the format string of annotation, 
+					/// set it to format x axis's labels.
 					// / Default: "".
 					// / Type: String.
 					// / </summary>
@@ -2257,6 +2345,9 @@
 					// X axis.
 					// / Default: [].
 					// / Type: Array.
+					/// Remarks: 
+					/// If the annoMethod is "values", this option will lost effect, 
+					/// If the annoMethod is "valueLabels", the axis's label will set to this option's value.
 					// / </summary>
 					valueLabels: []
 					// todo.
@@ -2297,6 +2388,9 @@
 					// / A value that indicates the style of the Y axis.
 					// / Default: {stroke:"#999999", "stroke-width": 0.5}.
 					// / Type: Object.
+					/// the style is defined in Raphael here is the documentation: 
+					/// http://raphaeljs.com/reference.html#Element.attr. 
+					/// The style is the ��attr�� method��s parameters.
 					// / </summary>
 					style: {
 						stroke: "#999999",
@@ -2322,10 +2416,13 @@
 					// / </summary>
 					text: "",
 					// / <summary>
-					// / A value that indicates the style of text of the Y axis.
+					// / A value that contains the styles that will be applied to the text of the Y axis.
 					// / Default: {fill: "#888", "font-size": 15,
 					// / "font-weight": "bold"}.
 					// / Type: Object.
+					/// the style is defined in Raphael here is the documentation: 
+					/// http://raphaeljs.com/reference.html#Element.attr. 
+					/// The style is the ��attr�� method��s parameters.
 					// / </summary>
 					textStyle: {
 						fill: "#888",
@@ -2344,6 +2441,9 @@
 						// the Y axis.
 						// / Default: {fill: "#333","font-size": 11}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: {
 							fill: "#333",
@@ -2372,7 +2472,7 @@
 						width: null
 					},
 					// / <summary>
-					// / A value that indicates the compass of the Y axis.
+					// / A value that indicates the compass position of the Y axis.
 					// / Default: "west".
 					// / Type: String.
 					// / </summary>
@@ -2461,6 +2561,9 @@
 						// / Default: {stroke:"#999999", "stroke-width": 0.5,
 						// / "stroke-dasharray": "none"}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: {
 							stroke: "#999999",
@@ -2489,6 +2592,9 @@
 						// / Default: {stroke:"#CACACA", "stroke-dasharray": "-
 						// "}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: {
 							stroke: "#CACACA",
@@ -2517,6 +2623,9 @@
 						// mark.
 						// / Default: {fill: "black"}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: { fill: "black" },
 						// / <summary>
@@ -2549,6 +2658,9 @@
 						// mark.
 						// / Default: {fill: "black"}.
 						// / Type: Object.
+						/// the style is defined in Raphael here is the documentation: 
+						/// http://raphaeljs.com/reference.html#Element.attr. 
+						/// The style is the ��attr�� method��s parameters.
 						// / </summary>
 						style: { fill: "black" },
 						// / <summary>
@@ -2566,10 +2678,15 @@
 					// / </summary>
 					// / <remarks>
 					// / options are 'values', 'valueLabels'.
+					/// If the value is ��values��, when paint axis, 
+					/// the axis��s label will set to the data value of the series.
+					/// If the value is ��valueLabels��, when paint the axis, The axis��s label 
+					/// will set to a value which is set in axis��s valueLabels option.
 					// / </remarks>
 					annoMethod: "values",
 					// / <summary>
-					// / A value that indicates the format string of annotation.
+					// / A value that indicates the format string of annotation,
+					// /  set it to format y axis's labels.
 					// / Default: "".
 					// / Type: String.
 					// / </summary>
@@ -2579,6 +2696,9 @@
 					// y axis.
 					// / Default: [].
 					// / Type: Array.
+					/// Remarks: 
+					/// If the annoMethod is "values", this option will lost effect, 
+					/// If the annoMethod is "valueLabels", the axis's label will set to this option's value.
 					// / </summary>
 					valueLabels: []
 					// todo.
@@ -2632,6 +2752,9 @@
 				// / A value that indicates the style of content text.
 				// / Default: {fill: "#d1d1d1","font-size": 16}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the 'attr' method's parameters.
 				// / </summary>
 				contentStyle: {
 					fill: "#d1d1d1",
@@ -2649,6 +2772,9 @@
 				// / A value that indicates the style of title text.
 				// / Default: {fill: "#d1d1d1","font-size": 16}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the 'attr' method's parameters.
 				// / </summary>
 				titleStyle: {
 					fill: "#d1d1d1",
@@ -2659,6 +2785,9 @@
 				// / Default: {fill: "#000000", "stroke-width":
 				// 2}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the 'attr' method's parameters.
 				// / </summary>
 				style: {
 					fill: "#000000",
@@ -2706,6 +2835,8 @@
 				// / <summary>
 				// / A value that indicates the easing during show or hide when
 				// / showEasing or hideEasing isn't specified.
+				/// Remark: The easing is defined in Raphael, the documentation is:
+				/// http://raphaeljs.com/reference.html#Raphael.easing_formulas
 				// / Default: "".
 				// / Type: String.
 				// / </summary>
@@ -2736,7 +2867,7 @@
 				// / </summary>
 				hideDelay: 150,
 				// / <summary>
-				// / A value that indicates the compass of the tooltip.
+				// / A value that indicates the compass position of the tooltip.
 				// / Default: "north".
 				// / Type: String.
 				// / </summary>
@@ -2776,6 +2907,9 @@
 				// / A value that indicates the style of the callout filled.
 				// / Default: {fill: "#000"}.
 				// / Type: Object.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the ��attr�� method��s parameters.
 				// / </summary>
 				calloutFilledStyle: {
 					fill: "#000"
@@ -2799,10 +2933,14 @@
 			// / $("#chartcore").wijchartcore({
 			// / chartLabelStyle: {fill: "red"}
 			// / });
+			/// the style is defined in Raphael here is the documentation: 
+			/// http://raphaeljs.com/reference.html#Element.attr. 
+			/// The style is the ��attr�� method��s parameters.
 			// / </summary>
 			chartLabelStyle: {},
 			// / <summary>
-			// / A value that indicates the format string of the chart labels.
+			// / A value that indicates the format string of the chart labels,
+			// / set it to format chart labels.
 			// / Default: "".
 			// / Type: String.
 			// / Code example:
@@ -2833,7 +2971,10 @@
 			// / </summary>
 			shadow: true,
 			/// <summary>
-			/// A dataview object to bind data to chart seriesLists
+			/// This option is used for data bind. The charts can bind Array and wijdataView object.  
+			/// The related option is bind option in widget's data option, and bind option in seriesList.
+			/// For more information please see the datasource demo: 
+			/// http://wijmo.com/demo/explore/?widget=BarChart&sample=Array%20as%20datasource
 			/// Default: null
 			/// Type: Object
 			/// Code example:
@@ -2856,6 +2997,9 @@
 			// / "return false;" to cancel the event.
 			// / Default: null.
 			// / Type: Function.
+			/// Code example:
+			/// $("#chartcore").wijchartcore({beforeSeriesChange, function(e, data){ }})
+			/// or $("#chartcore").bind("wijchartcorebeforeSeriesChange", function(e, data) {} );
 			// / </summary>
 			// / <param name="e" type="eventObj">
 			// / jQuery.Event object.
@@ -2871,6 +3015,9 @@
 			// / Default: null.
 			// / Type: Function.
 			// / </summary>
+			/// Code example:
+			/// $("#chartcore").wijchartcore({seriesChanged, function(e, data){ }})
+			/// or $("#chartcore").bind("wijchartcoreserieschanged", function(e, data) {} );
 			// / <param name="e" type="eventObj">
 			// / jQuery.Event object.
 			// / </param>
@@ -2885,6 +3032,9 @@
 			// / Default: null.
 			// / Type: Function.
 			// / </summary>
+			/// Code example:
+			/// $("#chartcore").wijchartcore({beforebeforePaintSeriesChange, function(e, data){ }})
+			/// or $("#chartcore").bind("wijchartcorebeforepaint", function(e, data) {} );
 			// / <param name="e" type="eventObj">
 			// / jQuery.Event object.
 			// / </param>
@@ -2894,6 +3044,9 @@
 			// / Default: null.
 			// / Type: Function.
 			// / </summary>
+			/// Code example:
+			/// $("#chartcore").wijchartcore({painted, function(e, data){ }})
+			/// or $("#chartcore").bind("wijchartcorepainted", function(e, data) {} );
 			// / <param name="e" type="eventObj">
 			// / jQuery.Event object.
 			// / </param>
@@ -2911,9 +3064,12 @@
 				idx = 0,
 				oldXMajorFactor = o.axis.x.tickMajor.factor,
 				oldXMinorFactor = o.axis.x.tickMinor.factor,
-				oldYMajorFactor = o.axis.y.tickMajor.factor,
-				oldYMinorFactor = o.axis.y.tickMinor.factor,
-				hoverStyleLen;
+				oldYMajorFactor, oldYMinorFactor, bakYAxis, newYAxis,
+//				oldYMajorFactor = o.axis.y.tickMajor.factor,
+//				oldYMinorFactor = o.axis.y.tickMinor.factor,
+				hoverStyleLen,
+				baseAxis = $.wijmo.wijchartcore.prototype.options.axis,
+				oldYAxis;
 
 			if (key === "dataSource") {
 				self.seriesTransition = true;
@@ -2945,20 +3101,89 @@
 			}
 			else {
 				if ($.isPlainObject(o[key])) {
-					$.extend(true, o[key], value);
+					
 					if (key === "axis") {
+						if ($.isArray(o.axis.y)) {
+							bakYAxis = $.arrayClone(o.axis.y);
+						}
+						else {
+							bakYAxis = $.extend(true, {}, o.axis.y);
+						}
+					}
+
+					//extend the axis from base chartcore.
+					if (key === "axis"){
+						$.extend(true, o.axis.x, value.x || {});
+						if ($.isArray(o.axis.y) || $.isArray(value.y)) {
+							oldYAxis = {};
+						}
+						else {
+							oldYAxis = o.axis.y;
+						}
+						if ($.isArray(value.y)) {
+							$.each(value.y, function(i, _yaxis){
+								value.y[i] = $.extend(true, {}, baseAxis.y, oldYAxis, _yaxis);
+							})
+							o.axis.y = value.y;
+						}
+						else {
+							o.axis.y = $.extend(true, {}, baseAxis.y, oldYAxis, value.y);
+						}
+					}
+					else{
+						$.extend(true, o[key], value);
+					}
+					if (key === "axis") {
+						newYAxis = o.axis.y;
 						if (o.axis.x.tickMajor.factor < 0) {
 							o.axis.x.tickMajor.factor = oldXMajorFactor;
 						}
 						if (o.axis.x.tickMinor.factor < 0) {
 							o.axis.x.tickMinor.factor = oldXMinorFactor;
 						}
-						if (o.axis.y.tickMajor.factor < 0) {
-							o.axis.y.tickMajor.factor = oldYMajorFactor;
+
+						//case origin y is object, now is object
+						if (!$.isArray(newYAxis)) {
+							if ($.isArray(bakYAxis)) {
+								oldYMajorFactor = bakYAxis[0].tickMajor.factor;
+								oldYMinorFactor = bakYAxis[0].tickMinor.factor;
+							}
+							else {
+								oldXMajorFactor = bakYAxis.tickMajor.factor;
+								oldXMinorFactor = bakYAxis.tickMinor.factor;
+							}
+							if (o.axis.y.tickMajor && o.axis.y.tickMajor.factor !== undefined && 
+								o.axis.y.tickMajor.factor < 0) {
+								o.axis.y.tickMajor.factor = oldYMajorFactor;
+							}
+							if (o.axis.y.tickMinor && o.axis.y.tickMinor.factor !== undefined &&
+								o.axis.y.tickMinor.factor < 0) {
+								o.axis.y.tickMinor.factor = oldYMinorFactor;
+							}	
 						}
-						if (o.axis.y.tickMinor.factor < 0) {
-							o.axis.y.tickMinor.factor = oldYMinorFactor;
+						// case newYAxis is array
+						else {
+							if (!$.isArray(bakYAxis)) {
+								bakYAxis = [bakYAxis];
+							}
+							$.each(newYAxis, function (i, yAxis) {
+								var baky = bakYAxis[i] || {};
+								if (baky.tickMajor && baky.tickMajor.factor && yAxis.tickMajor && 
+									yAxis.tickMajor.factor) {
+									if (yAxis.tickMajor.factor < 0) {
+										yAxis.tickMajor.factor = baky.tickMajor.factor;
+									}
+								}
+								if (baky.tickMinor && baky.tickMinor.factor && yAxis.tickMinor && 
+									yAxis.tickMinor.factor) {
+									if (yAxis.tickMinor.factor < 0) {
+										yAxis.tickMinor.factor = baky.tickMinor.factor;
+									}
+								}
+								
+							});
 						}
+						
 					}
 				} else {
 					$.Widget.prototype._setOption.apply(self, arguments);
@@ -3049,9 +3274,23 @@
 				height = o.height || self.element.height(),
 				newEle = null,
 				canvas;
+			
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
 
 			self.updating = 0;
 			self.innerState = {};
+			
+			if (self.element.is(":hidden") && self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+					self.redraw();
+					if (self.element.wijRemoveVisibilityObserver) {
+						self.element.wijRemoveVisibilityObserver();
+					}
+				}, "wijchart");
+			}
 
 			// Add for parse date options for jUICE. D.H
 			if ($.isFunction(window["wijmoASPNetParseOptions"])) {
@@ -3111,8 +3350,17 @@
 				// end for bug 16039
 
 				self.chartElement.addClass("ui-widget");
+				
 				canvas = new Raphael(self.chartElement[0], width, height);
 				self.canvas = canvas;
+				
+				//add comments to fix tfs issue 27816, if element's height is not set,
+				//element's height will be 4px larger than canvas's,
+				//so set height to element is height is 0;
+				if (height === 0 && o.height !== 0) {
+					self.element.height(canvas.height);
+				}
+				// end comments.
 
 				// add for fixing bug 16039 by wuhao 2011/7/7
 				if (o.disabled) {
@@ -3123,7 +3371,7 @@
 				// fixed the issue 20422 by dail on 2012-3-12, If user set 
 				// rotation and scale. the transform will only effect on scale.
 				canvas.customAttributes.rotation = function (num) {
-				    //return {transform: "...R" + num};
+					//return {transform: "...R" + num};
 					this.transform("...R" + num);
 				};
 				canvas.customAttributes.scale = function (num) {
@@ -3161,8 +3409,8 @@
 		},
 
 		_getCulture: function (name) {
-            return Globalize.findClosestCulture(name || this.options.culture);
-        },
+			return Globalize.findClosestCulture(name || this.options.culture);
+		},
 
 		_handleDisabledOption: function (disabled, ele) {
 			var self = this;
@@ -3340,6 +3588,8 @@
 		getCanvas: function () {
 			// / <summary>
 			// / Returns a reference to the Raphael canvas object.
+			/// Code example:
+			/// $("#chartcore").wijchartcore("getCanvas")
 			// / </summary>
 			// / <returns type="Raphael">
 			// / Reference to raphael canvas object.
@@ -3398,6 +3648,8 @@
 		redraw: function (drawIfNeeded) {
 			// / <summary>
 			// / Redraw the chart.
+			/// Code example:
+			/// $("#chartcore").wijchartcore("redraw", true)
 			// / </summary>
 			// / <param name="drawIfNeeded" type="Boolean">
 			// / A value that indicates whether to redraw the chart
@@ -3668,7 +3920,7 @@
 			self._paintFooter();
 			self._paintLegend();
 			self._paintChartArea();
-			self._paintChartLabels();
+			//self._paintChartLabels();
 			self._paintTooltip();
 			self._trigger("painted");
 
@@ -3918,7 +4170,8 @@
 						textStyle = $.extend(true, {}, o.textStyle, legend.textStyle);
 						//text.attr(textStyle);
 						if (legend.textWidth) {
-							text = self.canvas.wrapText(0, 0, series.label, legend.textWidth, "far", textStyle);
+							text = self.canvas.wrapText(0, 0, series.label, 
+								legend.textWidth, "far", textStyle);
 						} else {
 							text = self._text(0, 0, series.label);
 							text.attr(textStyle);
@@ -3961,7 +4214,7 @@
 							if (series.visible === false && !isline) {
 								$(text.node).data("hidden", true)
 								.data("textOpacity", 
-									text.attr("opacity") || 1);							
+									text.attr("opacity") || 1);	
 								text.attr("opacity", 0.3);
 							}
 							$.wijraphael.addClass($(text.node), 
@@ -4157,7 +4410,8 @@
 						});
 					$.wijraphael.addClass($(legCover.node), 
 					"wijchart-legend-textCover wijchart-legend");
-					$(legCover.node).data("legendIndex", $(leg0.node).data("legendIndex"));
+					$(legCover.node).data("legendIndex", 
+						$(leg0.node).data("legendIndex"));
 					$(legCover.node).data("index", $(leg0.node).data("index"));
 					self.legendEles.push(legCover);
 				}
@@ -4426,7 +4680,7 @@
 							autoMajor: true,
 							autoMinor: true,
 							annoMethod: axisOption.x.annoMethod,
-							valueLabels: []
+							valueLabels: axisOption.x.valueLabels || []
 						},
 						y: {}
 					};
@@ -4452,7 +4706,7 @@
 								autoMajor: true,
 								autoMinor: true,
 								annoMethod: axisY.annoMethod,
-								valueLabels: []
+								valueLabels: axisY.valueLabels || []
 							};
 						});				
 					} else
@@ -4476,11 +4730,11 @@
 							autoMajor: true,
 							autoMinor: true,
 							annoMethod: axisOption.y.annoMethod,
-							valueLabels: []
+							valueLabels: axisOption.y.valueLabels || []
 						};
 					}
 
-					self._getSeriesGroup();
+					self._getSeriesGroup(isMultiYAxis);
 					extremeValue = self._getDataExtreme(isMultiYAxis);
 
 					// handle x axis.
@@ -4503,18 +4757,18 @@
 					});
 
 
-					for (yIdx = 0; yIdx < yAxisCount; yIdx++) {
+					for (yIdx = 0; yIdx < (axisOption.y.length || 1); yIdx++) {
 						yaxisOpt = axisOption.y[yIdx] || axisOption.y;
 						key = yIdx.toString();
-						if (yaxisOpt.autoMin && self.axisInfo.y[key].autoMin) {
+						if (yaxisOpt.autoMin && self.axisInfo.y[key].autoMin && extremeValue.y[key]) {
 							yaxisOpt.min = extremeValue.y[key].tyn;
 						} else if (yaxisOpt.min && self._isDate(yaxisOpt.min)) {
 							// if is date time, convert to number.
 							yaxisOpt.min = $.toOADate(yaxisOpt.min);
 						}
 
-						if (yaxisOpt.autoMax && self.axisInfo.y[key].autoMax) {
-							yaxisOpt.max = extremeValue.y[key].tyx;
+						if (yaxisOpt.autoMax && self.axisInfo.y[key].autoMax && extremeValue.y[key]) {
+							yaxisOpt.max = extremeValue.y[key].tyx || 0;
 						} else if (yaxisOpt.max && self._isDate(yaxisOpt.max)) {
 							// if is date time, convert to number.
 							yaxisOpt.max = $.toOADate(yaxisOpt.max);
@@ -4561,13 +4815,13 @@
 		},
 
 
-		_getSeriesGroup: function () {
+		_getSeriesGroup: function (isMultiYAxis) {
 			var self = this,
 				o = self.options, 
 				group = {};
 
 			$.each(o.seriesList, function (i, serie) {
-				if (serie.yAxis) {
+				if (serie.yAxis && isMultiYAxis) {
 					if (group[serie.yAxis.toString()]) {
 						group[serie.yAxis.toString()].push(serie);
 					}
@@ -6104,7 +6358,8 @@
 					self._hideSerieEles(seriesEle);
 					if (!legendNode.data("textOpacity")) {
 						if (l.textWidth) {
-							legendNode.data("textOpacity", legend[0].attr("opacity") || 1);
+							legendNode.data("textOpacity", 
+								legend[0].attr("opacity") || 1);
 						} else {
 							legendNode.data("textOpacity", legend.attr("opacity") || 1);
 						}
@@ -6736,7 +6991,9 @@
 				valueLabels = [],
 				validValue,
 				valGroup = { y: {} },
-				xValueLabels = axis.x.valueLabels;
+				xValueLabels = axis.x.valueLabels,
+				xAnnoMethod = axisInfo.x.annoMethod,
+				yAnnoMethod = axisInfo.y.annoMethod;
 
 			if (!seriesList || seriesList.length === 0) {
 				return val;
@@ -6744,7 +7001,8 @@
 			
 			if (self.seriesGroup) {
 				$.each(self.seriesGroup, function (key, seriesL) {
-					var valuesY = [];
+					var valuesY = [],
+						k = parseInt(key, 10);
 					$.each(seriesL, function (i, series) {
 						if (series.type === "pie") {
 							return true;
@@ -6857,8 +7115,7 @@
 								// For fixing the issue#15881.
 								// valueLabels.push(valueY);
 								var formatString = axis.y.annoFormatString,
-									value = valueY,
-									k = parseInt(key, 10);
+									value = valueY;
 
 								if (formatString && formatString.length > 0) {
 									// value = $.format(value, formatString);
@@ -6879,7 +7136,8 @@
 
 							//axis.y[k].annoMethod = "valueLabels";
 							axisInfo.y[key].annoMethod = "valueLabels";
-							if (!axis.y[k].valueLabels && axis.y[k].valueLabels.length === 0) {
+							if (!axis.y[k].valueLabels && 
+								axis.y[k].valueLabels.length === 0) {
 								//axis.y[k].valueLabels = valueLabels;
 								axisInfo.y[key].valueLabels = valueLabels;
 							} else {
@@ -6902,6 +7160,9 @@
 			
 			if (valuesX.length) {
 				validValue = $.wijchart.getFirstValidListValue(valuesX);
+				if (xAnnoMethod === "valueLabels" && xValueLabels && xValueLabels.length > 0) {
+					axisInfo.x.valueLabels = xValueLabels;
+				}
 				if (self._isDate(validValue)) {
 					axisInfo.x.isTime = true;
 				} else if (typeof (validValue) !== "number") {
@@ -6909,14 +7170,14 @@
 						var vLabel = {},
 							xvl,
 							xvlType;
-						if (xValueLabels && xValueLabels.length 
-								&& idx < xValueLabels.length) {
+						if (xAnnoMethod === "valueLabels" && xValueLabels && xValueLabels.length && 
+							idx < xValueLabels.length) {
 							xvl = xValueLabels[idx];
 							xvlType = typeof xvl;
 							if (xvlType === "string") {
 								xvl = { text: xvl };
-							} else if (xvlType === "number" 
-									|| self._isDate(xvl)) {
+							} else if (xvlType === "number" || 
+								self._isDate(xvl)) {
 								xvl = { value: xvl };
 							}
 						}
