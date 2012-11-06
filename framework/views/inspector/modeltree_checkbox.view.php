@@ -45,9 +45,9 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                                 movable : false,
                                 treeUrl : params.treeUrl,
                                 treeColumnIndex : 1,
-                                treeOptions : $.extend(true, {
+                                treeOptions : $.extend(true, params.treeOptions || {}, {
                                     lang : connector.data('nosLang') || ''
-                                }, params.treeOptions || {}),
+                                }),
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',

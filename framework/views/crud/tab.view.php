@@ -24,7 +24,8 @@ if (!$item->is_new()) {
         function ($) {
             $(function () {
                 var tabInfos = <?= \Format::forge()->to_json($crud['tab_params']) ?>,
-                    isNew = <?= \Format::forge()->to_json($item->is_new()) ?>;
+                    isNew = <?= \Format::forge()->to_json($item->is_new()) ?>,
+                    lang = <?= \Format::forge()->to_json(isset($crud['lang']) ? $crud['lang'] : false) ?>;
 
                 var $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>');
                 $container.nosTabs('update', tabInfos);
@@ -46,6 +47,9 @@ if (!$item->is_new()) {
                                 }
                             });
                         });
+                }
+                if (lang) {
+                    $container.closest('.nos-dispatcher').data('nosLang', lang);
                 }
             });
         });
