@@ -89,7 +89,7 @@ body {
 		    margin : 0px 30px 0 30px;
 		}
 
-		li.nos-ostabs-appstab, li.nos-ostabs-tray, li.nos-ostabs-newtab, li.nos-ostabs-app {
+		li.nos-ostabs-appstab, li.nos-ostabs-newtab, li.nos-ostabs-app {
 			a {
 				.nos-ostabs-label {
 					display : none;
@@ -132,7 +132,7 @@ body {
 			}
 		}
 
-		ul.nos-ostabs-nav {
+		ul.nos-ostabs-nav, div.nos-ostabs-nav {
 			position : absolute;
 			height : 46px;
 			@include box-sizing(border-box);
@@ -145,7 +145,7 @@ body {
 			top : 0px;
 		}
 
-		ul.nos-ostabs-tray {
+		div.nos-ostabs-tray {
 			right : 0px;
 			top : 0px;
             font-size: 0.8em;
@@ -378,12 +378,6 @@ body {
 		ul.nos-ostabs-appstab {
 			height : 55px;
 			padding: 0;
-		}
-
-		ul.nos-ostabs-tray {
-			li:not(.ui-state-open) {
-			    background:transparent;
-		    }
 		}
 
 		li.nos-ostabs-newtab:not(.ui-state-active) {

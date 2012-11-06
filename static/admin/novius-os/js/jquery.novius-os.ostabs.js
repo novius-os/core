@@ -144,7 +144,7 @@ define('jquery-nos-ostabs',
                         .addClass('nos-ostabs-tabs')
                         .appendTo( self.uiOstabsHeader );
 
-                    self.uiOstabsTray = $( '<ul></ul>' )
+                    self.uiOstabsTray = $( '<div></div>' )
                         .addClass( 'nos-ostabs-tray nos-ostabs-nav' );
                     if ( o.trayView !== null ) {
                         self.uiOstabsTray.html(o.trayView);
@@ -249,7 +249,6 @@ define('jquery-nos-ostabs',
                         update: function() {
                             self._trigger( "drag", null );
                             self.lis = self.uiOstabsAppsTab
-                                .add( self.uiOstabsTray )
                                 .add( self.uiOstabsTabs )
                                 .find( "li:has(a[href])" );
                             self.anchors = self.lis.map(function(i) {
@@ -271,7 +270,7 @@ define('jquery-nos-ostabs',
                 }
 
                 var tabOpenRank = [];
-                self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTray).add(self.uiOstabsTabs).find("li:has(a[href])")
+                self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTabs).find("li:has(a[href])")
                     .each(function(i) {
                         var $li = $(this),
                             tab = $li.data( 'ui-ostab') || {};
@@ -605,7 +604,7 @@ define('jquery-nos-ostabs',
                     .addClass( 'nos-ostabs-actions-links' )
                     .prependTo( actions );
 
-                var removable = li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length;
+                var removable = li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length;
                 var closable = li.not( '.nos-ostabs-appstab' ).length;
                 var reloadable = a.data( "iframe.tabs" );
 
@@ -824,7 +823,7 @@ define('jquery-nos-ostabs',
                     }
                 }
 
-                if ( $li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
+                if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
                     $li.remove();
                     $panel.remove();
                 } else {
