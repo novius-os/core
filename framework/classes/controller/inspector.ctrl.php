@@ -21,6 +21,7 @@ class Controller_Inspector extends Controller_Admin_Application
     {
         if (isset($config['model'])) {
             $inspector_path = static::get_path();
+            $model = $config['model'];
 
             $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
 
@@ -33,7 +34,7 @@ class Controller_Inspector extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['contextChange'])) {
-                $config['appdesk']['contextChange'] = isset($behaviours['Nos\Orm_Behaviour_ContextableAndTwinnable']);
+                $config['appdesk']['contextChange'] = !!$model::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
             }
 
             if (!isset($config['appdesk']['url'])) {
