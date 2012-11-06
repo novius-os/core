@@ -23,16 +23,20 @@ if (!$item->is_new()) {
         ['jquery-nos-update-tab-crud'],
         function ($) {
             $(function () {
-                $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>').nosUpdateTabCrud({
-                    tabParams: <?= \Format::forge()->to_json($crud['tab_params']) ?>,
-                    isNew: <?= \Format::forge()->to_json($item->is_new()) ?>,
-                    model: <?= \Format::forge()->to_json($crud['model']) ?>,
-                    itemId: <?= (int) $item->{$crud['pk']} ?>,
-                    closeEle: '#<?= $uniqid_close ?>',
-                    texts: {
-                        titleClose: <?= Format::forge()->to_json(__('Bye bye')) ?>
-                    }
-                });
+                var $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>').nosUpdateTabCrud({
+                            tabParams: <?= \Format::forge()->to_json($crud['tab_params']) ?>,
+                            isNew: <?= \Format::forge()->to_json($item->is_new()) ?>,
+                            model: <?= \Format::forge()->to_json($crud['model']) ?>,
+                            itemId: <?= (int) $item->{$crud['pk']} ?>,
+                            closeEle: '#<?= $uniqid_close ?>',
+                            texts: {
+                                titleClose: <?= Format::forge()->to_json(__('Bye bye')) ?>
+                            }
+                        }),
+                    context = <?= \Format::forge()->to_json(isset($crud['context']) ? $crud['context'] : false) ?>;
+                if (context) {
+                    $container.closest('.nos-dispatcher').data('nosContext', context);
+                }
             });
         });
 </script>

@@ -54,9 +54,9 @@ define('jquery-nos-inspector-tree-model-radio',
                                 movable : false,
                                 urlJson : params.urlJson,
                                 treeColumnIndex : 1,
-                                treeOptions : $.extend(true, {
+                                treeOptions : $.extend(true, params.treeOptions || {}, {
                                     context : connector.data('nosContext') || ''
-                                }, params.treeOptions || {}),
+                                }),
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',
