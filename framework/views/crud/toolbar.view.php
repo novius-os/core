@@ -20,8 +20,8 @@
                     model: <?= \Format::forge($crud['model'])->to_json() ?>,
                     itemId: <?= \Format::forge((int) $item->{$crud['pk']})->to_json() ?>,
                     urlActions: <?= \Format::forge($crud['url_actions'])->to_json() ?>,
-                    ajaxData: <?= \Format::forge($crud['behaviours']['contextableAndTwinnable'] ? array(
-                            'common_id' => $item->{$crud['behaviours']['contextableAndTwinnable']['common_id_property']},
+                    ajaxData: <?= \Format::forge($crud['behaviours']['twinnable'] ? array(
+                            'common_id' => $item->{$crud['behaviours']['twinnable']['common_id_property']},
                             'context' => $crud['context'],
                         ) : '')->to_json() ?>
                 });

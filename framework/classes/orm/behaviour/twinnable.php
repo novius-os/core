@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Orm_Behaviour_ContextableAndTwinnable extends Orm_Behaviour_Contextable
+class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 {
     /**
      * common_id_property
@@ -176,7 +176,7 @@ class Orm_Behaviour_ContextableAndTwinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Returns null if the Model is not contextableAndTwinnable. Returns true or false whether the object is in the main context.
+     * Returns null if the Model is not twinnable. Returns true or false whether the object is in the main context.
      *
      * @return bool
      */

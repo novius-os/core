@@ -333,10 +333,10 @@ class Model extends \Orm\Model
 
     public function get_possible_context()
     {
-        $contextableAndTwinnable = static::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
+        $twinnable = static::behaviours('Nos\Orm_Behaviour_Twinnable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
-        if (!$contextableAndTwinnable || !$tree) {
+        if (!$twinnable || !$tree) {
             return array_keys(\Nos\Tools_Context::contexts());
         }
 
