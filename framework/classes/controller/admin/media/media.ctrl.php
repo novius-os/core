@@ -26,19 +26,17 @@ class Controller_Admin_Media_Media extends Controller_Admin_Crud
         }
     }
 
-    protected function from_item()
+    protected function init_item()
     {
-        parent::from_item();
-        if ($this->item->is_new() && empty($this->item_environment)) {
+        parent::init_item();
+        if (empty($this->item_environment)) {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
             $this->item->media_folder_id = $root->medif_id;
         }
-        if (!$this->item->is_new()) {
-            $pathinfo = pathinfo($this->item->media_file);
-            $this->item->media_file = $pathinfo['filename'];
-        }
+        $pathinfo = pathinfo($this->item->media_file);
+        $this->item->media_file = $pathinfo['filename'];
     }
 
     protected function fieldset($fieldset)

@@ -160,7 +160,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     /**
      * Called before displaying the form to
-     * - call from_item
+     * - call init_item
      * - check permission
      * - build fields
      * @param type $id
@@ -168,69 +168,65 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     public function action_form($id = null)
     {
-        //try {
-            $this->item = $this->crud_item($id);
-            $this->clone = clone $this->item;
-            $this->is_new = $this->item->is_new();
-            $this->from_item();
-            $this->check_permission($this->is_new ? 'insert' : 'update');
+        $this->item = $this->crud_item($id);
+        $this->clone = clone $this->item;
+        $this->is_new = $this->item->is_new();
+        if ($this->is_new) {
+            $this->init_item();
+        }
+        $this->check_permission($this->is_new ? 'insert' : 'update');
 
-            $fields = $this->fields($this->config['fields']);
-            $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
-            $fieldset = $this->fieldset($fieldset);
+        $fields = $this->fields($this->config['fields']);
+        $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
+        $fieldset = $this->fieldset($fieldset);
 
-            $view_params = $this->view_params();
-            $view_params['fieldset'] = $fieldset;
+        $view_params = $this->view_params();
+        $view_params['fieldset'] = $fieldset;
 
-            // We can't do this form inside the view_params() method, because additional vars (added
-            // after the reference was created) won't be available from the reference
-            $view_params['view_params'] = &$view_params;
+        // We can't do this form inside the view_params() method, because additional vars (added
+        // after the reference was created) won't be available from the reference
+        $view_params['view_params'] = &$view_params;
 
-            return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], $view_params, false);
-        /*} catch (\Exception $e) {
-            $this->send_error($e);
-        }*/
+        return \View::forge($this->config['views'][$this->is_new ? 'insert' : 'update'], $view_params, false);
     }
 
     /**
-     * from_item() is used to pre-configure an object based on a related other object.
+     * init_item() is used to pre-configure an new object.
      */
-    protected function from_item()
+    protected function init_item()
     {
-        if ($this->is_new) {
-            $create_from_id = \Input::get('create_from_id', 0);
-            $common_id = \Input::get('common_id', null);
-            $environment_id = \Input::get('environment_id', null);
-            if (!empty($create_from_id)) {
-                $this->item_from = $this->crud_item($create_from_id);
-                $this->item = clone $this->item_from;
-            } elseif (!empty($common_id) && $this->behaviours['contextableAndTwinnable']) {
-                $this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']} = $common_id;
-            } elseif (!empty($environment_id) && !empty($this->config['environment_relation'])) {
-                $model_context = $this->config['environment_relation']->model_to;
-                $this->item_environment = $model_context::find($environment_id);
-                $this->item->{$this->config['environment_relation']->key_from[0]} = $this->item_environment->{$this->config['environment_relation']->key_to[0]};
-            }
-            if ($this->behaviours['contextable']) {
-                $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(Tools_Context::contexts());
-            }
-            if ($this->behaviours['contextableAndTwinnable'] && $this->behaviours['tree']) {
-                // New page: no parent
-                // Translation: we have a common_id and can determine the parent
-                if (!empty($this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']})) {
-                    $model = $this->config['model'];
-                    $item_context_common = $model::find($this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']});
-                    $item_parent = $item_context_common->get_parent();
+        $create_from_id = \Input::get('create_from_id', 0);
+        $common_id = \Input::get('common_id', null);
+        $environment_id = \Input::get('environment_id', null);
+        if (!empty($create_from_id)) {
+            $this->item_from = $this->crud_item($create_from_id);
+            $this->item = clone $this->item_from;
+        } elseif (!empty($common_id) && $this->behaviours['contextableAndTwinnable']) {
+            $this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']} = $common_id;
+        } elseif (!empty($environment_id) && !empty($this->config['environment_relation'])) {
+            $model_context = $this->config['environment_relation']->model_to;
+            $this->item_environment = $model_context::find($environment_id);
+            $this->item->{$this->config['environment_relation']->key_from[0]} = $this->item_environment->{$this->config['environment_relation']->key_to[0]};
+        }
+        if ($this->behaviours['contextable']) {
+            $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(Tools_Context::contexts());
+        }
+        if ($this->behaviours['contextableAndTwinnable'] && $this->behaviours['tree']) {
+            // New page: no parent
+            // Translation: we have a common_id and can determine the parent
+            if (!empty($this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']})) {
+                $model = $this->config['model'];
+                $item_context_common = $model::find($this->item->{$this->behaviours['contextableAndTwinnable']['common_id_property']});
+                $item_parent = $item_context_common->get_parent();
 
-                    // Fetch in the appropriate context
-                    if (!empty($item_parent)) {
-                        $item_parent = $item_parent->find_context($this->item->{$this->behaviours['contextableAndTwinnable']['context_property']});
-                    }
+                // Fetch in the appropriate context
+                if (!empty($item_parent)) {
+                    $item_parent = $item_parent->find_context($this->item->{$this->behaviours['contextableAndTwinnable']['context_property']});
+                }
 
-                    // Set manually, because set_parent doesn't handle new items
-                    if (!empty($item_parent)) {
-                        $this->item->{$this->item->parent_relation()->key_from[0]} = $item_parent->{$this->pk};
-                    }
+                // Set manually, because set_parent doesn't handle new items
+                if (!empty($item_parent)) {
+                    $this->item->{$this->item->parent_relation()->key_from[0]} = $item_parent->{$this->pk};
                 }
             }
         }

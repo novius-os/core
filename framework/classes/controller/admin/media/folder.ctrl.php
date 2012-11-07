@@ -26,10 +26,10 @@ class Controller_Admin_Media_Folder extends Controller_Admin_Crud
         }
     }
 
-    protected function from_item()
+    protected function init_item()
     {
-        parent::from_item();
-        if ($this->item->is_new() && empty($this->item_environment)) {
+        parent::init_item();
+        if (empty($this->item_environment)) {
             $query = Model_Media_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
