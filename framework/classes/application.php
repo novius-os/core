@@ -45,8 +45,10 @@ class Application
     }
 
     public static function install_native_applications() {
+
         foreach (static::$repositories as $where => $repository) {
-            if ($repository['visible']) {
+            if ($repository['native']) {
+
                 $list = \File::read_dir($repository['path'], 1);
 
                 // idc = I don't care

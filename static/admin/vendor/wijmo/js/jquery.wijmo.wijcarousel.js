@@ -1,10 +1,10 @@
 /*globals jQuery window */
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
@@ -59,7 +59,9 @@
 		captionHtml = "<div class=\"ui-helper-clearfix\"></div>",
 		pagerHtml = "<li class=\"ui-state-default wijmo-wijcarousel-page\"><a></a></li>",
 		liSel = "li.wijmo-wijcarousel-page",
+		captionSel = ".wijmo-wijcarousel-text,.wijmo-wijcarousel-caption",
 		previewNum = 1;
+
 	$.widget("wijmo.wijcarousel", {
 		options: {
 			/// <summary>
@@ -469,6 +471,11 @@
 				o = self.options,
 				el = self.element;
 
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+
 			self._initStates(o, el);
 			self._createDom(self.isHorizontal);
 			self.list.bind("click." + self.widgetName, $.proxy(self._itemClick, self));
@@ -493,6 +500,16 @@
 			}
 			else if (o.auto) {
 				self.play();
+			}
+
+			//update for visibility change
+			if (self.element.is(":hidden") && self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+					self.refresh();
+					if (self.element.wijRemoveVisibilityObserver) {
+						self.element.wijRemoveVisibilityObserver();
+					}
+				}, "wijcarousel");
 			}
 		},
 
@@ -756,7 +773,7 @@
 				isH = o.orientation === "horizontal",
 				dir = isH ? "left" : "top",
 				antiDir = isH ? "right" : "bottom",
-				bound;
+				bound, idx;
 
 			size = self.itemBound[isH ? "w" : "h"];
 			offset = self.offset = Math.round(size / 4);
@@ -774,6 +791,13 @@
 			self.container
 				.css("margin-" + dir, offset + "px")
 				.css("margin-" + antiDir, offset + "px");
+
+			self.list.find(captionSel).hide();
+
+			for (idx = 0; idx < o.display; idx++) {
+				self._getItemByIndex(self.currentIdx + idx)
+				.find(captionSel).show();
+			}
 		},
 
 		_createItemsFromData: function (data) {
@@ -930,9 +954,7 @@
 		},
 
 		_hideCaption: function () {
-			this.element
-			.find(".wijmo-wijcarousel-text,.wijmo-wijcarousel-caption")
-			.hide();
+			this.element.find(captionSel).hide();
 		},
 
 		_createClip: function (isHorizontal) {
@@ -1004,8 +1026,8 @@
 		_createPagingItem: function (isDot, thumbOpt, ul, idx) {
 			var item = $(pagerHtml).attr({
 				"role": "tab",
-				"aria-label": idx,
-				"title": idx
+				"aria-label": idx + 1,
+				"title": idx + 1
 			}), width, height;
 			if (isDot) {
 				item.addClass("wijmo-wijcarousel-dot");
@@ -1324,6 +1346,11 @@
 			.removeClass("wijmo-wijcarousel-horizontal")
 			.removeClass("wijmo-wijcarousel-vertical");
 
+			if (self.timeout) {
+				window.clearTimeout(self.timeout);
+				self.timeout = null;
+			}
+
 			self.list.unwrap().removeClass("wijmo-wijcarousel-list ui-helper-clearfix")
 			.unbind("." + self.widgetName).removeAttr("style")
 			.children("li").each(function () {
@@ -1546,6 +1573,9 @@
 					else if (self.currentIdx + o.display < self.count) {
 						scrolled = self.count - self.currentIdx - o.display;
 						offset = -currentLeft - size * scrolled;
+					}
+					else {
+						return;
 					}
 				}
 				else {

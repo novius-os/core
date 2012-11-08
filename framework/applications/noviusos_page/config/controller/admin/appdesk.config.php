@@ -14,23 +14,20 @@ $dataset = array(
     'id' => 'page_id',
     'title' => 'page_title',
     'url' => function($page) {
-        return $page->get_href();
+        return $page->url();
     },
     'previewUrl' => function($page) {
-        return $page->get_href(array(
-            'preview'  => true,
-            'absolute' => true,
-        ));
+        return $page->url(array('preview'  => true));
     },
     'is_home' => function($page) {
-        return (bool) (int) $page->page_home;
+        return (bool) (int) $page->page_entrance;
     },
     'actions' => array(
         'delete' => function($page) {
             return $page->page_lock != $page::LOCK_DELETION;
         },
         'set_homepage' => function($page) {
-            return !$page->page_home;
+            return !$page->page_entrance;
         },
     ),
 );
@@ -120,7 +117,7 @@ return array(
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => 'admin/noviusos_page/page/insert_update?context_id={{id}}',
+                        'url' => 'admin/noviusos_page/page/insert_update?environment_id={{id}}',
                         'label' => __('Add a page'),
                         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                     ),
@@ -130,6 +127,7 @@ return array(
                 'label' => __('Delete'),
                 'name' => 'delete',
                 'primary' => false,
+                'red' => true,
                 'icon' => 'trash',
                 'action' => array(
                     'action' => 'confirmationDialog',
@@ -204,11 +202,13 @@ return array(
                     'url' => array(
                         'headerText' => __('Virtual url'),
                         'visible' => false,
-                        'dataKey' => 'url'
+                        'dataKey' => 'url',
+                        'multiContextHide' => true,
                     ),
                     'published' => array(
                         'headerText' => __('Status'),
                         'dataKey' => 'publication_status',
+                        'multiContextHide' => true,
                     ),
                     'actions' => array(
                         'actions' => array('edit', 'add_subpage', 'visualise', 'delete', 'set_homepage'),

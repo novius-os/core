@@ -15,6 +15,8 @@ class Model_Folder extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media_folder';
     protected static $_primary_key = array('medif_id');
 
+    protected static $_title_property = 'medif_title';
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'medif_id',

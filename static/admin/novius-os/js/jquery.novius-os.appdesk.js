@@ -18,37 +18,31 @@ define('jquery-nos-appdesk',
                 inspectors : [],
                 thumbnails : false,
                 defaultView : 'grid',
+                locales : {},
+                sites : {},
                 contexts : {},
                 hideContexts : false,
                 texts : {
-                    allContexts : 'All',
-                    addDropDown : 'Select an action',
-                    columns : 'Columns',
-                    showFiltersColumns : 'Filters column header',
-                    visibility : 'Visibility',
+                    allSites : 'All sites',
+                    allLanguages : 'All languages',
+                    allContexts : 'All contexts',
                     settings : 'Settings',
-                    vertical : 'Vertical',
-                    horizontal : 'Horizontal',
-                    hidden : 'Hidden',
-                    save : 'Save',
-                    cancel: 'Cancel',
-                    mainView: 'Main view',
                     item : 'item',
                     items : 'items',
                     showNbItems : 'Showing {{x}} items out of {{y}}',
                     showOneItem : 'Show 1 item',
                     showNoItem : 'No item',
                     showAll : 'Show all items',
-                    views : 'Views',
                     viewGrid : 'Grid',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
-                    loading : 'Loading...',
-                    contexts: 'Contexts'
+                    selectContexts : 'Select the context(s) to work in',
+                    workInContext : 'Work in {{context}}',
+                    otherContexts : 'Other contexts',
+                    contextsPopinOk : 'Ok'
                 },
                 values: {},
                 //callbabks
-                columnVisibilityChange : null,
                 slidersChange : null,
                 splitters: {
                     vertical: null,
@@ -56,7 +50,7 @@ define('jquery-nos-appdesk',
                 },
                 views: {},
                 selectedView: null,
-                selectedContext : null,
+                selectedContexts : [],
                 fromView: null,
                 name: null,
                 grid: {}
@@ -152,22 +146,25 @@ define('jquery-nos-appdesk',
 
                 if (!$.isEmptyObject(o.contexts)) {
 
-                    if (!$.type(o.selectedContext) === 'string') {
-                        o.selectedContext = null;
+                    if (!$.isArray(o.selectedContexts)) {
+                        o.selectedContexts = $.type(o.selectedContexts) === 'string' ? [o.selectedContexts] : [];
                     }
-                    if (o.selectedContext === null || !o.contexts[o.selectedContext]) {
-                        o.selectedContext = Object.keys(o.contexts)[0];
+                    $.each(o.selectedContexts, function(i, context) {
+                        if (!o.contexts[context]) {
+                            delete o.selectedContexts[context];
+                        }
+                    })
+                    if (o.selectedContexts.length === 0) {
+                        o.selectedContexts.push(Object.keys(o.contexts)[0]);
                     }
                 }
 
                 self._css()
-                    ._uiActionsToolbar()
+                    ._uiToolbar()
                     ._uiSplitters()
                     ._uiInspectors()
                     ._uiSearchBar()
-                    ._uiList()
-                    ._uiContextsDropDown()
-                    ._uiViewsDropDown();
+                    ._uiList();
 
                 self.init = true;
             },
@@ -200,7 +197,15 @@ define('jquery-nos-appdesk',
                 return self;
             },
 
-            _uiActionsToolbar : function() {
+            _uiToolbar : function() {
+                var self = this;
+
+                return self._uiToolbarActions()
+                    ._uiToolbarContexts()
+                    ._uiToolbarViews();
+            },
+
+            _uiToolbarActions : function() {
                 var self = this,
                     o = self.options;
 
@@ -216,7 +221,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(first.action, {
-                                    context: o.selectedContext
+                                    context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
                         });
 
@@ -230,7 +235,7 @@ define('jquery-nos-appdesk',
                             e.preventDefault();
                             e.stopImmediatePropagation();
                             $(this).nosAction(add.action, {
-                                    context: o.selectedContext
+                                    context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
                         });
 
@@ -240,52 +245,307 @@ define('jquery-nos-appdesk',
                 return self;
             },
 
-            _uiContextsDropDown : function() {
+            _uiToolbarContexts : function() {
                 var self = this,
                     o = self.options;
 
                 if (o.hideContexts || !!$.isEmptyObject(o.contexts)) {
                     return self;
                 }
-                self.dispatcher.data('nosContext', o.selectedContext);
+                self.dispatcher.data('nosContext', o.selectedContexts);
 
-                var date = new Date(),
-                    uniqid = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
-                    $uiContexts = $('<div></div>').addClass('nos-appdesk-dropdowncontext');
+                self._uiToolbarContextsButton();
+                self.uiToolbarContextsDialog = $('<div><form><table><thead><tr><th></th></tr></thead><tbody></tbody></table></form></div>');
+                var $table = self.uiToolbarContextsDialog.find('table'),
+                    $tbody = $table.find('tbody'),
+                    $trHeader = $table.find('tr');
 
-                $.each(o.contexts, function(key, locale) {
-                    var flag = key.split('_')[1].toLowerCase();
-                    $uiContexts.append(
-                        $('<input type="radio" class="notransform" name="' + uniqid +'" id="' + key + '_' + uniqid + '" value="' + key +'" ' + (o.selectedContext == key ? 'checked' : '') + '/> <label for="' + key + '_' + uniqid + '" title="' + locale + '"><img src="static/novius-os/admin/novius-os/img/flags/' + flag + '.png" /></label>')
-                    );
+                $.each(o.locales, function(locale, locale_params) {
+                    $('<th></th>').text(locale_params.title)
+                        .append('<br /><img src="static/novius-os/admin/novius-os/img/flags/' + locale_params.flag + '.png" />')
+                        .appendTo($trHeader)
                 });
 
-                $uiContexts.append(
-                    $('<input type="radio" class="notransform" name="' + uniqid +'" id="all_' + uniqid + '" value="" ' + (o.selectedContext == "" ? 'checked' : '') + '/> <label for="all_' + uniqid + '">' + o.texts.allContexts + '</label>')
-                );
-                $uiContexts.buttonset();
+                $.each(o.sites, function(site, site_params) {
+                    var $tr = $('<tr></tr>').appendTo($tbody);
 
-                $uiContexts.find('input[name=' + uniqid + ']').change(function() {
-                    var select = $(this);
+                    $('<th></th>').text(site_params.title)
+                        .appendTo($tr);
 
-                    o.selectedContext = select.val();
-
-                    select.nosSaveUserConfig(o.name + '.selectedContext', o.selectedContext);
-
-                    self.uiResetSearch.click();
-
-                    self.dispatcher.data('nosContext', o.selectedContext)
-                        .trigger('contextChange');
-                }).filter(function() {
-                    return $(this).val() == o.selectedcontext;
+                    $.each(o.locales, function(locale, locale_params) {
+                        if (o.contexts[site + '::' + locale]) {
+                            $('<td></td>').append('<input type="checkbox" name="contexts" value="' + site + '::' + locale +'" />')
+                                .appendTo($tr);
+                        } else {
+                            $('<td></td>')
+                                .appendTo($tr);
+                        }
+                    });
                 });
+                self.uiToolbarContextsDialog.wijdialog({
+                        title:o.texts.selectContexts,
+                        autoOpen: false,
+                        buttons: [
+                            {
+                                text:o.texts.contextsPopinOk,
+                                click: function(){
+                                    o.selectedContexts = [];
+                                    self.uiToolbarContextsDialog.find(':checked').each(function() {
+                                        o.selectedContexts.push($(this).val());
+                                    });
 
-                self.element.nosToolbar('add', $uiContexts, true);
+                                    self._selectContexts();
+                                }
+                            }
+                        ],
+                        captionButtons: {
+                            pin: {visible: false},
+                            refresh: {visible: false},
+                            toggle: {visible: false},
+                            minimize: {visible: false},
+                            maximize: {visible: false}
+                        },
+                        modal: true,
+                        open: function() {
+                            self.uiToolbarContextsDialog.nosOnShow('show');
+                            self.uiToolbarContextsDialog.find(':checkbox').attr('checked', false);
+                            $.each(o.selectedContexts, function(i, context) {
+                                self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
+                            });
+                            self.uiToolbarContextsDialog.find(':checkbox').wijcheckbox('refresh');
+                        }
+                    })
+                    .nosOnShow('one', function() {
+                        $table.wijgrid({
+                            columns: [
+                                {
+                                    cellFormatter: function(args) {
+                                        args.$container.text(args.formattedValue)
+                                            .parent().addClass('wijmo-wijgrid-rowheader ui-widget-content ui-state-default')
+                                            .removeClass('wijdata-type-string');
+                                        return true;
+                                    }
+                                }
+                            ],
+                            cellStyleFormatter: function(args) {
+                                if (args.state & $.wijmo.wijgrid.renderState.selected) {
+                                    args.$cell.removeClass('ui-state-highlight');
+                                }
+                                if (args._cellIndex > 0) {
+                                    args.$cell.css('text-align', 'center');
+                                    if (args.row.dataRowIndex === -1) {
+                                        var data = $table.wijgrid('data');
+
+                                        args.$cell.click(function(e) {
+                                            e.preventDefault();
+                                            e.stopImmediatePropagation();
+
+                                            var checked = null;
+
+                                            for (var i = 1; i <= data.length; i++) {
+                                                var $checkbox = $table.find('tr:eq(' + i + ')')
+                                                        .find('td:eq(' + args._cellIndex + ')')
+                                                        .find(':checkbox');
+
+                                                if (checked === null) {
+                                                    checked = $checkbox.is(':checked');
+                                                }
+                                                $checkbox.attr('checked', !checked)
+                                                    .wijcheckbox('refresh');
+                                            }
+                                        });
+
+                                    }
+                                } else {
+                                    var $tr = args.$cell.parent();
+                                    args.$cell.click(function(e) {
+                                        e.preventDefault();
+                                        e.stopImmediatePropagation();
+
+                                        var $checkbox = $tr.find(':checkbox');
+                                        $checkbox.attr('checked', !$checkbox.is(':checked'))
+                                            .wijcheckbox('refresh');
+                                    });
+                                }
+                            }
+                        });
+                        self.uiToolbarContextsDialog.nosFormUI();
+                    });
 
                 return self;
             },
 
-            _uiViewsDropDown : function() {
+            _selectContexts : function() {
+                var self = this,
+                    o = self.options;
+
+                self.uiToolbarContextsDialog.wijdialog('close');
+                self._uiToolbarContextsButtonLabel();
+
+                self.element.nosSaveUserConfig(o.name + '.selectedContexts', o.selectedContexts);
+
+                self.uiSearchInput.val('');
+                self.uiInspectorsTags.wijsuperpanel('destroy');
+                self.uiInspectorsTags.empty();
+                self._uiList();
+
+                self.dispatcher.data('nosContext', o.selectedContexts)
+                    .trigger('contextChange');
+
+                return self;
+            },
+
+            _uiToolbarContextsButton : function() {
+                var self = this,
+                    o = self.options;
+
+                var $splitButton = $('<div><button></button><button></button></div>').addClass('nos-appdesk-buttoncontext'),
+                    date = new Date(),
+                    id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds(),
+                    $ul = $('<ul></ul>'),
+                    count = 0;
+
+                $splitButton.find('button:first')
+                    .click(function(e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        self.uiToolbarContextsDialog.wijdialog('open');
+                    })
+                    .end()
+                    .find('button:last')
+                    .attr('id', id)
+                    .text(o.texts.selectContexts)
+                    .data({
+                        text: false,
+                        icons: {
+                            primary: 'triangle-1-s'
+                        }
+                    });
+
+                self.uiToolbarContextsButton = self.element.nosToolbar('add', $splitButton, true);
+                self.uiToolbarContextsButton.buttonset();
+                self._uiToolbarContextsButtonLabel();
+
+                $('<li><a></a></li>')
+                    .appendTo($ul)
+                    .find('a')
+                    .text(o.texts.selectContexts);
+
+                $('<li></li>')
+                    .appendTo($ul);
+
+                $.each(o.contexts, function(context) {
+                    var site_locale = context.split('::', 2),
+                        site = o.sites[site_locale[0]],
+                        locale = o.locales[site_locale[1]],
+                        content = o.texts.workInContext.replace('{{context}}', site.title + ' ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" />');
+
+                    count++;
+                    $('<li><a></a></li>')
+                        .data('context', context)
+                        .appendTo($ul)
+                        .find('a')
+                        .append(content);
+
+                    if (count > 10 && Object.key(o.contexts).length > 12) {
+                        $('<li><a></a></li>')
+                            .appendTo($ul)
+                            .find('a')
+                            .text(o.texts.otherContexts);
+
+                        return false
+                    }
+                });
+
+                $ul.insertAfter(self.uiToolbarContextsButton)
+                    .wijmenu({
+                            orientation: 'vertical',
+                            direction: 'rtl',
+                            trigger: '#' + id,
+                            select: function(e, data) {
+                                var $li = $(data.item.element),
+                                    context = $li.data('context');
+
+                                if (context) {
+                                    o.selectedContexts = [context];
+
+                                    self._selectContexts();
+                                } else {
+                                    self.uiToolbarContextsDialog.wijdialog('open');
+                                }
+                            }
+                        });
+
+                return self;
+            },
+
+            _uiToolbarContextsButtonLabel : function() {
+                var self = this,
+                    o = self.options,
+                    $button = self.uiToolbarContextsButton.find('button:first');
+
+                if (o.selectedContexts.length === 1) {
+                    var site_locale = o.selectedContexts[0].split('::', 2),
+                        site = o.sites[site_locale[0]],
+                        locale = o.locales[site_locale[1]];
+
+                    $button.button('option', 'label', (Object.keys(o.sites).length > 1 ? '<span title="' + site.title + '">' + site.alias + '</span>' : '') + ' ' + (Object.keys(o.locales).length > 1 ? '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" />' : ''));
+                } else {
+                    var nbSites = 0,
+                        nbLocales = 0,
+                        sites = {},
+                        locales = {};
+                    $.each(o.selectedContexts, function(i, context) {
+                        var site_locale = context.split('::', 2),
+                            site = site_locale[0],
+                            locale = site_locale[1];
+
+                        if (!sites[site]) {
+                            nbSites++;
+                            sites[site] = [];
+                        }
+                        sites[site].push(locale);
+
+                        if (!locales[locale]) {
+                            nbLocales++;
+                            locales[locale] = [];
+                        }
+                        locales[locale].push(site);
+                    });
+
+                    if (Object.keys(o.contexts).length === o.selectedContexts.length) {
+                        $button.button('option', 'label', o.texts.allContexts);
+                    } else if (Object.keys(o.sites).length === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
+                        $button.button('option', 'label', o.texts.allLanguages);
+                    } else if (Object.keys(o.locales).length === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
+                        $button.button('option', 'label', o.texts.allSites);
+                    } else if (nbSites === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
+                        $button.button('option', 'label', '<span title="' + o.sites[Object.keys(sites)[0]].title + '">' + o.sites[Object.keys(sites)[0]].alias  + '</span>' + ', ' + o.texts.allLanguages);
+                    } else if (nbLocales === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
+                        $button.button('option', 'label', o.texts.allSites + ', ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[Object.keys(locales)[0]].flag + '.png" title="' + o.locales[Object.keys(locales)[0]].title + '" style="vertical-align:middle;" /> ')
+                    } else {
+                        var label = '';
+                        $.each(sites, function(site, locales) {
+                            if (label !== '') {
+                                label += '&nbsp;&nbsp;';
+                            }
+                            if (Object.keys(o.sites).length > 1) {
+                                label += '<span title="' + o.sites[site].title + '">' + o.sites[site].alias  + '</span> ';
+                            }
+                            if (Object.keys(o.locales).length > 1) {
+                                $.each(locales, function(i, locale) {
+                                    label += '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" /> ';
+                                });
+                            }
+                        });
+                        $button.button('option', 'label', label);
+                    }
+                }
+
+                return self;
+            },
+
+            _uiToolbarViews : function() {
                 var self = this,
                     o = self.options;
 
@@ -663,7 +923,10 @@ define('jquery-nos-appdesk',
                     position = self.uiGrid.offset(),
                     positionContainer = self.element.offset(),
                     height = self.element.height() - position.top + positionContainer.top,
-                    heights = $.grid.getHeights();
+                    heights = $.grid.getHeights(),
+                    grid = $.extend(true, {}, o.grid);
+
+                self._columnsMultiContext(grid.columns);
 
                 self.uiGrid.css({
                         height : height,
@@ -696,7 +959,7 @@ define('jquery-nos-appdesk',
                                 if (self.gridRendered) {
                                     self.uiGrid.noslistgrid("currentCell", -1, -1);
                                 }
-                                dataSource.proxy.options.data.context = o.selectedContext || '';
+                                dataSource.proxy.options.data.context = o.selectedContexts || '';
                                 dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                                 dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                                 dataSource.proxy.options.data.limit = r.pageSize;
@@ -777,7 +1040,7 @@ define('jquery-nos-appdesk',
                         loaded: function() {
                             self.uiSplitterHorizontalBottom.find('.wijmo-wijgrid-footer').prepend(self.uiPaginationLabel);
                         }
-                    }, o.grid));
+                    }, grid));
 
                 return self;
             },
@@ -788,9 +1051,13 @@ define('jquery-nos-appdesk',
                     position = self.uiTreeGrid.offset(),
                     positionContainer = self.element.offset(),
                     height = self.element.height() - position.top + positionContainer.top,
-                    grid = $.extend(true, {}, o.grid);
+                    grid = $.extend(true, {}, o.grid),
+                    columns = $.extend({}, o.treeGrid.columns || o.grid.columns);
 
                 delete grid.columns;
+                delete grid.urlJson;
+
+                self._columnsMultiContext(columns);
 
                 self.uiTreeGrid.css({
                         height : height,
@@ -798,7 +1065,7 @@ define('jquery-nos-appdesk',
                     }).nostreegrid($.extend(true, { // True for recursive clone
                         urlJson : o.treeGrid.urlJson,
                         treeOptions : {
-                            context : o.selectedContext || ''
+                            context : o.selectedContexts || ''
                         },
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
@@ -886,7 +1153,7 @@ define('jquery-nos-appdesk',
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
                             self.pageIndex = r.pageIndex;
-                            dataSource.proxy.options.data.context = o.selectedContext || '';
+                            dataSource.proxy.options.data.context = o.selectedContexts || '';
                             dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
                             dataSource.proxy.options.data.limit = r.pageSize;
@@ -946,6 +1213,23 @@ define('jquery-nos-appdesk',
                             }
                         }
                     }, o.thumbnails));
+
+                return self;
+            },
+
+            _columnsMultiContext : function(columns) {
+                var self = this,
+                    o = self.options;
+
+                if (Object.keys(o.contexts).length > 1 && !o.hideContexts) {
+                    $.each(columns, function(i, column) {
+                        if (column.dataKey === 'context') {
+                            column.visible = o.selectedContexts.length > 1;
+                        } else if (column.multiContextHide && o.selectedContexts.length > 1) {
+                            column.visible = false;
+                        }
+                    });
+                }
 
                 return self;
             },
@@ -1174,11 +1458,13 @@ define('jquery-nos-appdesk',
 
                     $.extend(true, appdesk.appdesk, {
                         contexts : config.contexts,
+                        sites : config.sites,
+                        locales : config.locales,
                         hideContexts : hideContexts,
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
-                        selectedContext : config.selectedContext
+                        selectedContexts : config.selectedContexts
                     });
                     if (onCustom) {
                         $.extend(true, appdesk.appdesk, {
@@ -1220,31 +1506,34 @@ define('jquery-nos-appdesk',
                         if (!$.isArray(params.reloadEvent)) {
                             params.reloadEvent = [params.reloadEvent];
                         }
-                        var match = [];
-                        $.each(params.reloadEvent, function(i, reloadEvent) {
-                            if ($.type(reloadEvent) === 'string') {
-                                // Reload the grid if a action on a same context's item occurs
-                                // Or if a update or a insert on a other context's item occurs
-                                if (dispatcher.data('nosContext')) {
-                                    match.push({
-                                        name : reloadEvent,
-                                        context : dispatcher.data('nosContext')
-                                    });
-                                    match.push({
-                                        name : reloadEvent,
-                                        action : ['delete', 'insert']
-                                    });
+                        var listenEvent = function() {
+                            var match = [];
+                            $.each(params.reloadEvent, function(i, reloadEvent) {
+                                if ($.type(reloadEvent) === 'string') {
+                                    // Reload the grid if a action on a same language's item occurs
+                                    // Or if a update or a insert on a other language's item occurs
+                                    if (dispatcher.data('nosContext')) {
+                                        match.push({
+                                            name : reloadEvent,
+                                            context : dispatcher.data('nosContext')
+                                        });
+                                    } else {
+                                        match.push({
+                                            name : reloadEvent
+                                        });
+                                    }
                                 } else {
-                                    match.push({
-                                        name : reloadEvent
-                                    });
+                                    match.push(reloadEvent);
                                 }
-                            } else {
-                                match.push(reloadEvent);
-                            }
-                        });
-                        dispatcher.nosListenEvent(match, function() {
-                            div.appdesk('gridReload');
+                            });
+                            dispatcher.nosListenEvent(match, function() {
+                                    div.appdesk('gridReload');
+                                }, 'appdeskContext');
+                        };
+                        listenEvent();
+                        dispatcher.on('contextChange', function() {
+                            dispatcher.nosUnlistenEvent('appdeskContext');
+                            listenEvent();
                         });
                     }
 
@@ -1535,7 +1824,7 @@ define('jquery-nos-appdesk',
                         }
                         var uiAction = $('<th></th>')
                             .css('white-space', 'nowrap')
-                            .addClass("ui-state-default")
+                            .addClass("ui-state-default" + (action.red ? ' ui-state-error' : ''))
                             .attr('title', action.label)
                             .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
 
@@ -1619,6 +1908,10 @@ define('jquery-nos-appdesk',
                                     .appendTo(ul)
                                     .find('a')
                                     .html(text);
+
+                                if (action.red) {
+                                    li.addClass('ui-state-error');
+                                }
 
                                 // Check whether action name is disabled
                                 if (action.name && noParseData.actions && noParseData.actions[action.name] == false) {

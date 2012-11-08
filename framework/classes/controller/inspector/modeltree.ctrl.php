@@ -46,7 +46,8 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
         \Response::json($json);
     }
 
-    public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid') {
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid')
+    {
         if (isset($config['model'])) {
             $admin_config = $config['model']::admin_config();
 

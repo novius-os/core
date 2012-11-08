@@ -1895,3 +1895,19 @@ div.wijmo-wijev .wijmo-wijev-view .ui-state-highlight
 {	
 	background-color: #515152;
 }
+
+.wijmo-wijinput .wijmo-wijinput-input
+{
+    color: #fff;
+}
+
+.wijmo-wijinput, .wijmo-wijtextbox, .wijmo-wijgrid .wijmo-wijinput
+{
+    background: #191921 !important;
+    color: #fafafa !important;
+    border: solid 1px #373740 !important;
+}
+.wijmo-wijinput:hover, .wijmo-wijtextbox:hover, .wijmo-wijgrid .wijmo-wijinput:hover, .wijmo-wijinput:focus, .wijmo-wijtextbox:focus, .wijmo-wijgrid .wijmo-wijinput:focus
+{
+    border-color: #8FDDFF !important;
+}

@@ -61,42 +61,11 @@ if ($item->is_new()) {
 
 <script type="text/javascript">
     require(
-        ['jquery-nos', 'static/apps/noviusos_media/config/seo_compliant'],
+        ['jquery-nos-media-folder-form'],
         function($) {
             $(function() {
-                var $container = $('#<?= $uniqid ?>').nosFormUI();
-
-                var $title      = $container.find('input[name=medif_title]');
-                var $seo_title  = $container.find('input[name=medif_dir_name]');
-                var $same_title = $container.find('input[data-id=same_title]');
-
-                // Same title and description (alt)
-                $title.bind('change keyup', function() {
-                    if ($same_title.is(':checked')) {
-                        $seo_title.val($.seoCompliant($title.val()));
-                    }
-                });
-                $same_title.change(function() {
-                    if ($(this).is(':checked')) {
-                        $seo_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
-                        $title.triggerHandler('change');
-                    } else {
-                        $seo_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
-                    }
-                }).triggerHandler('change');
-
-                var $path_prefix = $container.find('span[data-id=path_prefix]');
-                $container.find('#<?= $uniqid_radio ?>').delegate('input[name=medif_parent_id]', 'selectionChanged', function(e, row_data) {
-                    $path_prefix.text(row_data && row_data.path && row_data.path != '/' ? row_data.path : '');
-                });
-
-                $container.find('form').bind('ajax_success', function() {
-                    $(this).nosDialog('close');
-                });
-
-                $container.find('a[data-id=cancel]').click(function(e) {
-                    e.preventDefault();
-                    $(this).nosTabs('close');
+                $('#<?= $uniqid ?>').nosMediaFolderForm({
+                    containerParentId: '#<?= $uniqid_radio ?>'
                 });
             });
         });

@@ -26,10 +26,10 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         }
     }
 
-    protected function form_item()
+    protected function init_item()
     {
-        parent::form_item();
-        if ($this->item->is_new() && empty($this->item_situation)) {
+        parent::init_item();
+        if (empty($this->item_environment)) {
             $query = Model_Folder::find();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();

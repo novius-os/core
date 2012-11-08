@@ -11,15 +11,17 @@
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
-$redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), 1);
+// Remove "public/" when DOCUMENT_ROOT is public parent's folder
+// Else remove leading /
+$redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), defined('NOS_RELATIVE_DIR') ? 8 + mb_strlen(NOS_RELATIVE_DIR) : 1);
 
 if (in_array($redirect_url, array(
-    'favicon.ico',
-    'robots.txt',
-    'humans.txt',
-))) {
-     is_file(DOCROOT.$redirect_url) && Nos\Tools_File::send(DOCROOT.$redirect_url);
-     exit();
+        'favicon.ico',
+        'robots.txt',
+        'humans.txt',
+    ))) {
+    is_file(DOCROOT.$redirect_url) && Nos\Tools_File::send(DOCROOT.$redirect_url);
+    exit();
 }
 
 $is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
@@ -37,8 +39,8 @@ if ($is_media) {
 
     $media = false;
     $res = \DB::select()->from(\Nos\Media\Model_Media::table())->where(array(
-                array('media_path', '=', '/'.$media_url),
-            ))->execute()->as_array();
+            array('media_path', '=', '/'.$media_url),
+        ))->execute()->as_array();
 
     if (!empty($res)) {
         $media = \Nos\Media\Model_Media::forge(reset($res));

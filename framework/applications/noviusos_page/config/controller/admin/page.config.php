@@ -38,7 +38,7 @@ return array(
         'delete an item' => __('Delete a page'),
         'delete' => __('Delete'),
     ),
-    'situation_relation' => 'parent',
+    'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
         'labels' => array(
@@ -56,7 +56,7 @@ return array(
                         'iconClasses' => 'nos-icon16 nos-icon16-eye',
                         'action' => array(
                             'action' => 'window.open',
-                            'url' => $item->get_href().'?_preview=1',
+                            'url' => $item->url(array('preview'  => true)),
                         ),
                     );
                 } else {

@@ -31,7 +31,6 @@ return array(
             ),
             'iconUrl' => 'static/apps/noviusos_tray/img/32/help.png',
             'icon64' => 'static/apps/noviusos_tray/img/64/help.png',
-            'application' => 'nos_tray',
         ),
         'nos_account' => array(
             'name' => 'My account',
@@ -45,7 +44,6 @@ return array(
             ),
             'iconUrl' => 'static/apps/noviusos_tray/img/32/myaccount.png',
             'icon64' => 'static/apps/noviusos_tray/img/64/myaccount.png',
-            'application' => 'nos_tray',
         ),
         'nos_appmanager' => array(
             'name' => 'Application manager',
@@ -59,7 +57,6 @@ return array(
             ),
             'iconUrl' => 'static/apps/noviusos_tray/img/32/app-manager.png',
             'icon64' => 'static/apps/noviusos_tray/img/64/app-manager.png',
-            'application' => 'nos_tray',
         ),
     ),
     'icons' => array(

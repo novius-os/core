@@ -2,10 +2,10 @@
 wijNumberFormat window jQuery*/
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
@@ -110,6 +110,7 @@ wijNumberFormat window jQuery*/
 
 		_createTextProvider: function () {
 			this._textProvider = new wijNumberTextProvider(this, this.options.type);
+			this._textProvider._nullvalue = this.element.val() === "" && this.options.value === null;
 		},
 
 		_beginUpdate: function () {
@@ -192,7 +193,11 @@ wijNumberFormat window jQuery*/
 		},
 
 		getValue: function () {
-			/// <summary>Gets the value.</summary>
+			/// <summary>
+			/// Gets the value.
+			/// Code example:
+			/// $(".selector").wijinputnumber("getValue")
+			/// </summary>
 			var val = this._textProvider.getValue();
 			if (val === undefined || val === null) {
 				val = this.getText(); 
@@ -201,7 +206,11 @@ wijNumberFormat window jQuery*/
 		},
 
 		setValue: function (val, exact) {
-			/// <summary>Sets the value.</summary>
+			/// <summary>
+			/// Sets the value.
+			/// Code example:
+			/// $(".selector").wijinputnumber("setValue", 10, true)
+			/// </summary>
 			try {
 				exact = !!exact;
 				if (typeof val === 'boolean') {
@@ -235,7 +244,11 @@ wijNumberFormat window jQuery*/
 		},
 
 		isValueNull: function () {
-			/// <summary>Determines whether the value is in null state.</summary>
+			/// <summary>
+			/// Determines whether the value is in null state.
+			/// Code example:
+			/// $(".selector").wijinputnumber("isValueNull")
+			/// </summary>
 			try {
 				return (this._textProvider).isValueNull();
 			}
@@ -247,6 +260,8 @@ wijNumberFormat window jQuery*/
 		getPostValue: function () {
 			/// <summary>
 			/// Gets the text value when the container form is posted back to server.
+			/// Code example:
+			/// $(".selector").wijinputnumber("getPostValue")
 			/// </summary>
 			if (!this._isInitialized()) {
 				return this.element.val(); 
@@ -325,6 +340,7 @@ wijNumberFormat window jQuery*/
 	wijNumberTextProvider.prototype = {
 		_type: 'numeric',
 		_stringFormat: null,
+		_nullvalue: false,
 
 		_getCulture: function () {
 			return this.inputWidget._getCulture();
@@ -351,7 +367,7 @@ wijNumberFormat window jQuery*/
 				nullValue = o.minValue;
 			//nullValue = Math.max(0, o.minValue);
 
-			return null === o.value || undefined === o.value || nullValue === o.value;
+			return null === o.value || undefined === o.value || nullValue === o.value || this._nullvalue;
 		},
 
 		set: function (input, rh) {
@@ -438,7 +454,9 @@ wijNumberFormat window jQuery*/
 				input = nf['.']; 
 			}
 			if (!rh) {
-				rh = new wijInputResult(); 
+				rh = new wijInputResult();
+			} else {
+				this._nullvalue = false;
 			}
 			if (input.length === 1) {
 				if (input === '+') {
@@ -502,7 +520,7 @@ wijNumberFormat window jQuery*/
 			}
 
 			rh.testPosition = beginText.length + input.length - 1;
-			this._stringFormat.deFormatValue(beginText + input + endText);
+			this._stringFormat.deFormatValue(beginText + input + endText);			
 			//this.checkAndRepairBounds(true, false);
 			try {
 				if (input.length === 1) {
@@ -552,6 +570,7 @@ wijNumberFormat window jQuery*/
 					curInsertText = '0'; 
 				}
 				this._stringFormat.deFormatValue(curInsertText);
+				this._nullvalue = false;
 				if (start === end && this.inputWidget.options.showGroup) {
 					try {
 						newBegText = this._stringFormat._currentText
@@ -590,6 +609,7 @@ wijNumberFormat window jQuery*/
 				rh = new wijInputResult(); 
 			}
 			this._stringFormat.increment(val);
+			this._nullvalue = false;
 			return this.checkAndRepairBounds(true, false);
 		},
 
@@ -598,6 +618,7 @@ wijNumberFormat window jQuery*/
 				rh = new wijInputResult(); 
 			}
 			this._stringFormat.decrement(val);
+			this._nullvalue = false;
 			return this.checkAndRepairBounds(true, false);
 		},
 

@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-use Asset, Format, Input, Session, View, Uri;
+use Format, Input, View;
 
 /**
  * The cloud Controller.
@@ -29,9 +29,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $this->load_config();
     }
 
-    public function load_config() {
+    public function load_config()
+    {
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
+
         return $this->config;
     }
 
@@ -50,14 +52,41 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view = View::forge('admin/appdesk');
 
-        $contexts = \Config::get('contexts', array());
+        $contexts = Tools_Context::contexts();
+        $locales = Tools_Context::locales();
+        $sites = Tools_Context::sites();
 
-        $view->set('appdesk', \Format::forge(array_merge(array('contexts' => $contexts), $this->config))->to_json(), false);
+        foreach ($contexts as $context => $params) {
+            $site = Tools_Context::site_code($context);
+            $locale = Tools_Context::locale_code($context);
+
+            if (!isset($sites[$site]['locales'])) {
+                $sites[$site]['locales'] = array();
+            }
+            $sites[$site]['locales'][] = $locale;
+
+            if (!isset($locales[$locale]['sites'])) {
+                $locales[$locale]['sites'] = array();
+            }
+            $locales[$locale]['sites'][] = $site;
+        }
+
+        $params = array_merge(
+            array(
+                'contexts' => $contexts,
+                'locales' => $locales,
+                'sites' => $sites,
+            ),
+            $this->config
+        );
+
+        $view->set('appdesk', \Format::forge($params)->to_json(), false);
 
         return $view;
     }
 
-    public static function process_config($application, $config) {
+    public static function process_config($application, $config)
+    {
         if (isset($config['model'])) {
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();
@@ -150,7 +179,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['inputs'] = array();
             }
 
-            foreach ($config['inspectors'] as $key => $inspector_config) {
+            foreach ($config['inspectors'] as $inspector_config) {
                 if ($inspector_config['input'] && !isset($config['inputs'][$inspector_config['input']['key']])) {
                     $config['inputs'][$inspector_config['input']['key']] = $inspector_config['input']['query'];
                 }
@@ -219,8 +248,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['appdesk']['appdesk']['grid']['columns'])) {
                 $config['appdesk']['appdesk']['grid']['columns'] = array();
                 foreach ($config['dataset'] as $key => $value) {
-                    if ($key == 'lang') {
-                        $config['appdesk']['appdesk']['grid']['columns'][$key] = array('lang' => true);
+                    if ($key == 'context') {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key] = array('context' => true);
                     } else if ($key == 'published') {
                         $config['appdesk']['appdesk']['grid']['columns']['published'] = array(
                             'headerText' => __('Status'),

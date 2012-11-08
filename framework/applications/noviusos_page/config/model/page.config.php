@@ -9,10 +9,10 @@ return array(
                 ),
                 \Nos\DataCatcher::TYPE_URL => array(
                     'value' => function($page) {
-                        return $page->get_href(array('absolute' => true));
+                        return $page->url();
                     },
                     'options' => function($page) {
-                        return array($page->get_href(array('absolute' => true)));
+                        return array($page->url());
                     },
                 ),
                 \Nos\DataCatcher::TYPE_IMAGE => array(

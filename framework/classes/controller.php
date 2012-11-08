@@ -184,16 +184,26 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
 
         $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable');
-        $tree = $model::behaviours('Nos\Orm_Behaviour_Tree');
-        if ($contextable) {
+        $twinnable = $model::behaviours('Nos\Orm_Behaviour_Twinnable');
+        if ($twinnable || $contextable) {
+            if (!$contextable) {
+                $contextable = $twinnable;
+            }
             if (empty($config['context'])) {
-                // No inspector, we only search items in their primary context
-                $query->where($contextable['is_main_property'], 1);
-            } elseif (is_array($config['context'])) {
+                if ($twinnable) {
+                    // No inspector, we only search items in their primary context
+                    $query->where($twinnable['is_main_property'], 1);
+                }
+            } elseif (is_array($config['context']) && count($config['context']) > 1) {
                 // Multiple contexts
-                $query->where($contextable['context_property'], 'IN', $config['context']);
+                if ($twinnable) {
+                    $query->where($twinnable['is_main_property'], 1);
+                    $query->where($twinnable['common_id_property'], 'IN', \DB::select($twinnable['common_id_property'])->from($model::table())->where($twinnable['context_property'], 'IN', $config['context']));
+                } else {
+                    $query->where($contextable['context_property'], 'IN', $config['context']);
+                }
             } else {
-                $query->where($contextable['context_property'], '=', $config['context']);
+                $query->where($contextable['context_property'], '=', is_array($config['context']) ? $config['context'][0] : $config['context']);
             }
             $common_ids = array();
             $keys = array();
@@ -222,7 +232,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $new_query = $tmp['query'];
         $new_query->group_by('group_by_pk');
         if ($config['limit']) {
-            $new_query->limit($config['limit']);
+            $new_query->limit($config['limit'] < 0 ? 1 : $config['limit']);
         }
         if ($config['offset']) {
             $new_query->offset($config['offset']);
@@ -285,14 +295,17 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 }
                 $item['_id'] = $object->{$pk};
                 $item['_model'] = $model;
+                if ($contextable && !$twinnable) {
+                    $item['context'] = Tools_Context::context_label($object->{$contextable['context_property']}, array('force_flag' => true));
+                }
                 $items[] = $item;
-                if ($contextable) {
-                    $common_id = $object->{$contextable['common_id_property']};
+                if ($twinnable) {
+                    $common_id = $object->{$twinnable['common_id_property']};
                     $keys[] = $common_id;
-                    $common_ids[$contextable['common_id_property']][] = $common_id;
+                    $common_ids[$twinnable['common_id_property']][] = $common_id;
                 }
             }
-            if ($contextable) {
+            if ($twinnable) {
                 $contexts = $model::contexts($common_ids);
                 foreach ($contexts as $common_id => $list) {
                     $contexts[$common_id] = explode(',', $list);
@@ -300,25 +313,36 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 foreach ($keys as $key => $common_id) {
                     $items[$key]['context'] = $contexts[$common_id];
                 }
-                if ($tree) {
-                    $root = reset($objects)->find_root();
-                    if (!empty($root)) {
-                        $all_contexts = $root->get_all_context();
-                    } else {
-                        $all_contexts = array_unique(\Arr::flatten($contexts));
-                    }
-                } else {
-                    $all_contexts = array_unique(\Arr::flatten($contexts));
-                }
+
+                $sites_count = count(Tools_Context::sites());
+                $locales_count = count(Tools_Context::locales());
+                $global_contexts = array_keys(Tools_Context::contexts());
                 foreach ($items as &$item) {
                     $flags = '';
+                    $site_flag = '';
                     $contexts = $item['context'];
-                    foreach ($all_contexts as $context) {
-                        if (in_array($context, $contexts)) {
-                            $flags .= \Nos\Helper::flag($context);
-                        } else {
-                            $flags .= \Nos\Helper::flag_empty();
+
+                    $site = false;
+                    foreach ($global_contexts as $context) {
+                        if (is_array($config['context']) && !in_array($context, $config['context'])) {
+                            continue;
                         }
+                        $site_params = Tools_Context::site($context);
+                        if ($sites_count > 1 && $site !== $site_params['alias']) {
+                            $flags .= $site_flag.(empty($site_flag) ? '' : '&nbsp;&nbsp;');
+                            $site = $site_params['alias'];
+                            $site_flag = ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
+                        }
+                        if ($locales_count > 1) {
+                            if (in_array($context, $contexts)) {
+                                $flags .= \Nos\Tools_Context::flag($context);
+                            } else {
+                                $flags .= '<span style="display:inline-block; width:16px;"></span> ';
+                            }
+                        }
+                    }
+                    if ($sites_count > 1) {
+                        $flags .= $site_flag;
                     }
                     $item['context'] = $flags;
                 }
@@ -627,7 +651,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Contextable')) {
+                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Twinnable')) {
                     $item = $model::find($params['id']);
                     $contexts = $item->get_all_context();
                     $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));

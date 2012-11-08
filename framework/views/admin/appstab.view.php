@@ -36,47 +36,11 @@ foreach ($apps as $app) {
 </div>
 <script type="text/javascript">
 require(
-    ['jquery-nos', 'jquery-ui.sortable'],
+    ['jquery-nos-appstab'],
     function($) {
         $(function() {
-            var $panel = $('#<?= $id ?>').nosListenEvent({name : 'Nos\\Application'} ,function(json) {
-                        $.ajax({
-                            url: '/admin/nos/noviusos/appstab',
-                            success: function(data) {
-                                $panel.parent().empty().append(data);
-                            }
-                        });
-                    }),
-                apps = $panel.find('#apps').sortable({
-                        update: function() {
-                            var orders = {};
-                            $('.app').each(function(i) {
-                                orders[$(this).data('launcher').key] = {order: i};
-                            });
-                            $(apps).nosSaveUserConfig('misc.apps', orders);
-                        }
-                    });
-<?php
-if ($background) {
-    ?>
-            $('#noviusospanel').css('background-image', 'url("<?= Uri::create($background->get_public_path()) ?>")');
-    <?php
-}
-?>
-            $panel.find('a.app').click(function(e) {
-                e.preventDefault();
-                var $launcher = $(this),
-                    tab = $launcher.data('launcher');
-
-                if (tab.action.tab) {
-                    tab.action.tab = $.extend({
-                        app: true,
-                        iconSize: 32,
-                        labelDisplay: false
-                    }, tab.action.tab);
-                }
-
-                $launcher.nosAction(tab.action);
+            $('#<?= $id ?>').nosAppsTab({
+                backgroundUrl: <?= $background ? \Format::forge(Uri::create($background->get_public_path()))->to_json() : 'null' ?>
             });
         });
     });

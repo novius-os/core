@@ -1,10 +1,10 @@
 /*globals jQuery Raphael Globalize*/
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
 * licensing@wijmo.com
@@ -23,8 +23,7 @@
 (function ($) {
 	"use strict";
 
-	var maxSize = 10000,
-		bubMax = 0,
+	var bubMax = 0,
 		bubMin = 0,
 		bubDiff = 0;
 
@@ -51,13 +50,17 @@
 			/// Default: "diameter"
 			/// Type: "string"
 			/// Remarks: The value should be "area" or "diameter".
+			/// a.	area: when paint the bubble, the bubble’s area will 
+			///				calculate by the rate of y1 value
+			/// b.	diameter: when paint the bubble, the bubble’s diameter 
+			///				will calculate by the rate of the y1 value.
 			/// Code example: $("#bubblechart").wijbubblechart("option", 
 			/// "sizingMethod", "area")
 			/// </summary>
 			sizingMethod: "diameter",
 			/// <summary>
 			/// A value that indicates whether to show animation 
-			///	and the duration for the animation.
+			///	and the duration and easing for the animation.
 			/// Default: {enabled:true, duration:1000, easing: "elastic"}.
 			/// Type: Object.
 			/// Code example:
@@ -69,7 +72,7 @@
 			/// </summary>
 			animation: {
 				/// <summary>
-				/// A value that determines whether to show animation.
+				/// This option determines whether or not the animation is shown.
 				/// Default: true.
 				/// Type: Boolean.
 				/// </summary>
@@ -81,7 +84,9 @@
 				/// </summary>
 				duration: 1000,
 				/// <summary>
-				/// A value that indicates the easing for the series transition.
+				/// An option that controls the speed of an animation.
+				/// Remark: The easing is defined in Raphael, the documentation is:
+				/// http://raphaeljs.com/reference.html#Raphael.easing_formulas
 				/// Default: ">".
 				/// Type: string.
 				/// </summary>
@@ -90,7 +95,7 @@
 
 			/// <summary>
 			/// A value that indicates whether to show animation 
-			///	and the duration for the animation when reload data.
+			///	and the duration and easing for the animation when reload data.
 			/// Default: {enabled:true, duration:400, easing: ">"}.
 			/// Type: Object.
 			/// Code example:
@@ -112,7 +117,9 @@
 				/// </summary>
 				duration: 400,
 				/// <summary>
-				/// A value that indicates the easing for the series transition.
+				/// An option that controls the speed of an animation.
+				/// Remark: The easing is defined in Raphael, the documentation is:
+				/// http://raphaeljs.com/reference.html#Raphael.easing_formulas
 				/// Default: ">".
 				/// Type: string.
 				/// </summary>
@@ -120,7 +127,7 @@
 			},
 
 			/// <summary>
-			/// An array collection that contains the data to be charted.
+			/// An array collection that contains the data that will be displayed by the chart.
 			/// Default: [].
 			/// Type: Array.
 			/// Code example:
@@ -172,8 +179,7 @@
 			seriesList: [],
 
 			/// <summary>
-			/// An array collection that contains the style to 
-			/// be charted when hovering the chart element.
+			/// An array collection that contains the style applied to the chart element on mouse hover.
 			/// Default: [{opacity: 1, "stroke-width": 5}, {
 			///				opacity: 1, "stroke-width": 5}, {
 			///				opacity: 1, "stroke-width": 5}, {
@@ -249,7 +255,7 @@
 				/// </summary>
 				position: "inside",
 				/// <summary>
-				/// A value that indicates the label's position.
+				/// It is the compass position of the chart label.
 				/// Default: "north"
 				/// Type: String
 				/// Remark: the value should be "north", "east", "west" or "south"
@@ -263,6 +269,9 @@
 				visible: true,
 				/// <summary>
 				/// A value that indicates the label's style.
+				/// the style is defined in Raphael here is the documentation: 
+				/// http://raphaeljs.com/reference.html#Element.attr. 
+				/// The style is the “attr” method’s parameters.
 				/// Default: {}.
 				/// Type: Object.
 				/// </summary>
@@ -457,9 +466,6 @@
 				if (isNaN(value) || value < 0) {
 					value = 0;
 				}
-				else if (value > maxSize) {
-					value = maxSize;
-				}
 				o[key] = value;
 				self.redraw();
 			}
@@ -584,7 +590,7 @@
 
 		_paintPlotArea: function () {
 			var self = this,
-				element = this.element,
+				element = this.chartElement,
 				o = self.options,
 				seriesList = o.seriesList,
 				nSeries = seriesList.length,
@@ -1098,7 +1104,7 @@
 
 		_paintTooltip: function () {
 			var self = this,
-				fields = self.element.data("fields");
+				fields = self.chartElement.data("fields");
 
 			$.wijmo.wijchartcore.prototype._paintTooltip.apply(this, arguments);
 
@@ -1166,7 +1172,7 @@
 			/// <returns type="Raphael element">
 			/// The bubble object.
 			/// </returns>
-			return this.element.data("fields").bubbles[index];
+			return this.chartElement.data("fields").bubbles[index];
 		}
 	});
 	$.fn.extend({
@@ -1351,18 +1357,18 @@
 					r = rf.r;
 
 				switch (compass) {
-				case "north":
-					rf.y -= (r + labelBox.height / 2);
-					break;
-				case "south":
-					rf.y += (r + labelBox.height / 2);
-					break;
-				case "east":
-					rf.x += (r + labelBox.width / 2);
-					break;
-				case "west":
-					rf.x -= (r + labelBox.width / 2);
-					break;
+					case "north":
+						rf.y -= (r + labelBox.height / 2);
+						break;
+					case "south":
+						rf.y += (r + labelBox.height / 2);
+						break;
+					case "east":
+						rf.x += (r + labelBox.width / 2);
+						break;
+					case "west":
+						rf.x -= (r + labelBox.width / 2);
+						break;
 				}
 			}
 
@@ -1476,12 +1482,14 @@
 
 					// in vml, if the tracker has a stroke, the boder is black.
 					if ($.browser.msie && $.browser.version < 9) {
-						tracker.attr({ opacity: 0.01, fill: "white", 
-						"stroke-width": 0, "fill-opacity": 0.01 });
+						tracker.attr({ opacity: 0.01, fill: "white",
+							"stroke-width": 0, "fill-opacity": 0.01
+						});
 					}
 					else {
-						tracker.attr({ opacity: 0.01, fill: "white", 
-						"fill-opacity": 0.01 });
+						tracker.attr({ opacity: 0.01, fill: "white",
+							"fill-opacity": 0.01
+						});
 					}
 
 					$(tracker.node).data("owner", $(bubble.node));
@@ -1669,12 +1677,18 @@
 				width = bounds.endX - bounds.startX,
 				height = bounds.endY - bounds.startY;
 
-			val -= bubMin;
+			// adjust the bubble size calculate.
+			//val -= bubMin;
+
+			if (val < 0) {
+				val = 0;
+			}
+
 			if (bubDiff === 0) {
 				val = 1;
 			}
 			else {
-				val /= bubDiff;
+				val /= bubMax;
 			}
 			val = $.wijbubble.transformByArea(val, sizingMethod, markerType);
 
@@ -1691,24 +1705,24 @@
 			var val = yval;
 			if (sizingMethod === "area") {
 				switch (markerType) {
-				case "circle":
-					val = Math.sqrt(val / Math.PI);
-					break;
-				case "tri":
-				case "invertedTri":
-					val = Math.sqrt(val / (3 * Math.sin(Math.PI / 6) *
+					case "circle":
+						val = Math.sqrt(val / Math.PI);
+						break;
+					case "tri":
+					case "invertedTri":
+						val = Math.sqrt(val / (3 * Math.sin(Math.PI / 6) *
 				Math.cos(Math.PI / 6)));
-					break;
-				case "box":
-					val = Math.sqrt(val / 2);
-					break;
-				case "diamond":
-				case "cross":
-					val = Math.sqrt(val / 2);
-					break;
-				default:
-					val = Math.sqrt(4 * val / Math.PI);
-					break;
+						break;
+					case "box":
+						val = Math.sqrt(val / 2);
+						break;
+					case "diamond":
+					case "cross":
+						val = Math.sqrt(val / 2);
+						break;
+					default:
+						val = Math.sqrt(4 * val / Math.PI);
+						break;
 				}
 			}
 			return val;

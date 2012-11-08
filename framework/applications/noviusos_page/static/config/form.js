@@ -93,6 +93,10 @@ define(
                 })
             });
 
+            var $page_virtual_name_container = $container.find('input[name=page_virtual_name]').closest('.ui-accordion-content');
+            var $page_meta_title_container = $container.find('input[name=page_meta_noindex]').closest('.ui-accordion-content');
+            var $accordion = $container.find('.accordion');
+
             var $template_unit = $container.find('select[name=page_template]').closest('td');
             $container.find('select[name=page_type]').change(function() {
                 var val = $(this).val();
@@ -105,16 +109,34 @@ define(
                 // 3 = External link
                 // 4 = Internal link
 
+                // 0 = Classic, 2 = Folder
                 if (val == 0 || val == 2) {
                     $wysiwyg.show().siblings().hide();
                     $template_unit.show().end().change();
+
+                    // Show .accordion-header
+                    $page_virtual_name_container.prev().show();
+                    $page_meta_title_container.prev().show();
                 }
 
+                // 3 = External link
                 if (val == 3) {
                     $external.show().siblings().hide();
                     $template_unit.hide();
+
+                    // We need to select the appropriate index with wijaccordion() prior to changing the style or it's all messed up
+                    var selected_index = $accordion.wijaccordion('option', 'selectedIndex');
+                    if ($accordion.children().eq(selected_index * 2 + 1).find('input[name=page_virtual_name], input[name=page_meta_title]').length > 0) {
+                        $accordion.wijaccordion({selectedIndex: 0});
+                        // wijaccordion('activate', 0) does not work properly.
+                    }
+
+                    // Hide .accordion-header and .accordion-content
+                    $page_virtual_name_container.hide().prev().hide();
+                    $page_meta_title_container.hide().prev().hide();
                 }
 
+                // 4 = Internal link
                 if (val == 4) {
                     $internal.show().siblings().hide();
                     $template_unit.hide();

@@ -1,10 +1,10 @@
 /*globals window, document, jQuery, _comma_separated_list_of_variables_*/
 /*
  *
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  *
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the Wijmo Commercial or GNU GPL Version 3 licenses.
  * licensing@wijmo.com
@@ -30,65 +30,66 @@
 	$.widget("wijmo.wijwizard", {
 		options: {
 			/// <summary>
-			/// Determines the type of navigation buttons used with the wijwizard. 
+			/// The navButtons option defines the type of navigation buttons used with the wijwizard. 
 			/// Possible values are 'auto', 'common', 'edge' and 'none'.
 			/// </summary>
 			navButtons: 'auto',
 			/// <summary>
-			/// Determines whether panels are automatically displayed in order.
+			/// The autoPlay option allows the panels to automatically display in order.
 			/// </summary>
 			autoPlay: false,
 			/// <summary>
-			/// Determines the time span between panels in autoplay mode. 
+			/// Determines the time span between displaying panels in autoplay mode. 
 			/// </summary>
 			delay: 3000,
 			/// <summary>
-			/// Determines whether start from the first panel
-			/// when reaching the end in autoplay mode.
+			/// The loop option allows the wijwizard to begin again from the first panel
+			/// when reaching the last panel in autoPlay mode.
 			/// </summary>
 			loop: false,
 			/// <summary>
-			/// This is an animation option for hiding the panel content.
+			/// The hideOption option defines the animation effects when hiding the panel content.
 			/// </summary>
 			// e.g. { blind: true, fade: true, duration: 200}
 			hideOption: { fade: true },
 			/// <summary>
-			/// This is an animation option for showing the panel content. 
+			/// The showOption option defines the animation effects when showing the panel content.
 			/// </summary> 
 			// e.g. { blind: true, fade: true, duration: 200}
 			showOption: { fade: true, duration: 400 },
 			/// <summary>
 			/// Additional Ajax options to consider when
 			/// loading panel content (see $.ajax).
+			/// See following link for more details,
+			/// http://api.jquery.com/jQuery.ajax/
 			/// </summary>
 			ajaxOptions: null,
 			/// <summary>
-			/// Whether or not to cache remote wijwizard content; 
-			/// Cached content is being lazy loaded; e.g once and
-			/// only once for the panel is displayed. 
-			/// Note that to prevent the actual Ajax requests from being cached
-			/// by the browser you need to provide an extra cache: 
-			/// false flag to ajaxOptions.
+			/// The cache option allows the wijwizard to cache remote content. 
+			/// Cached content can then be lazy loaded, for example only once when the panel is displayed. 
+			/// To prevent actual Ajax requests from being cached by the browser, 
+			/// you need to provide an extra cache: false flag to ajaxOptions.
 			/// </summary>
 			cache: false,
 			/// <summary>
-			/// Store the latest active index in a cookie. 
+			/// The cookie option is a value that store the latest active index in a cookie. 
 			/// The cookie is then used to determine the initially active index
 			/// if the activeIndex option is not defined. 
-			/// Requires cookie plugin. The object needs to have key/value pairs
+			/// This option requires a cookie plugin. The object needs to have key/value pairs
 			/// of the form the cookie plugin expects as options. 
 			/// </summary>
 			// e.g. { expires: 7, path: '/', domain: 'jquery.com', secure: true }
 			cookie: null,
 			/// <summary>
-			/// HTML template for step header when a new panel is added with the
+			/// The stepHeaderTemplate option creates an HTML template 
+			/// for step header when a new panel is added with the
 			/// add method or  when creating a panel for a remote panel on the fly.
 			/// </summary>
 			stepHeaderTemplate: '',
 			/// <summary>
-			/// HTML template from which a new panel is created
-			/// by adding a panel with the add method or
-			/// when creating a panel for a remote panel on the fly.
+			/// The panelTemplate option is an HTML template from which a new panel is created. 
+			/// The new panel is created by adding a panel with the add method or when creating 
+			/// a panel from a remote panel on the fly.
 			/// </summary>
 			panelTemplate: '',
 			/// <summary>
@@ -97,6 +98,18 @@
 			/// Pass in empty string to deactivate that behavior. 
 			/// </summary>
 			spinner: '',
+			/// <summary>
+			/// The backBtnText option defines the text for the wizard back button.
+			/// Code example: 
+			/// $("#element").wijwizard("option", "backBtnText", "Back Button");
+			/// </summary>
+			backBtnText: 'back',
+			/// <summary>
+			/// The nextBtnText option defines the text for the wijwizard next button.
+			/// Code example: 
+			/// $("#element").wijwizard("option", "nextBtnText", "next Button");
+			/// </summary>
+			nextBtnText: 'next',
 			/// <summary>
 			/// The add event handler. A function called when a panel is added.
 			/// Default: null.
@@ -126,8 +139,8 @@
 			///</param>
 			remove: null,
 			/// <summary>
-			/// The activeIndexChanged event handler.
-			/// A function called when the activeIndex changed.
+			/// The activeIndexChanged event handler is
+			/// a function called when the activeIndex changed.
 			/// Default: null.
 			/// Type: Function.
 			/// Code example: 
@@ -142,7 +155,7 @@
 			///</param>
 			activeIndexChanged: null,
 			/// <summary>
-			/// The show event handler. A function called when a panel is shown.
+			/// The show event handler is a function called when a panel is shown.
 			/// Default: null.
 			/// Type: Function.
 			/// Code example: $("#element").wijwizard({ show: function (e, ui) { } });
@@ -156,8 +169,8 @@
 			///</param>
 			show: null,
 			/// <summary>
-			/// The load event handler. 
-			/// A function called after the content of a remote panel has been loaded.
+			/// The load event handler is
+			/// a function called after the content of a remote panel has been loaded.
 			/// Default: null.
 			/// Type: Function.
 			/// Code example: $("#element").wijwizard({ load: function (e, ui) { } });
@@ -171,8 +184,9 @@
 			///</param>
 			load: null,
 			/// <summary>
-			/// The validating event handler. 
-			/// A function called before moving to next panel. Cancellable.
+			/// The validating event handler is
+			/// a function called before moving to next panel. 
+			/// This event is Cancellable.
 			/// Default: null.
 			/// Type: Function.
 			/// Code example: 
@@ -197,7 +211,24 @@
 		},
 
 		_create: function () {
-			this._pageLize(true);
+			var self = this;
+			
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+			
+			if (self.element.is(":hidden") && self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+					self._pageLize(true);
+					if (self.element.wijRemoveVisibilityObserver) {
+						self.element.wijRemoveVisibilityObserver();
+					}
+				}, "wijchart");
+				return;
+			}
+			
+			self._pageLize(true);
 		},
 
 		_init: function () {
@@ -232,7 +263,9 @@
 		},
 
 		play: function () {
-			/// <summary>Start displaying the panels in order automatically.</summary>
+			/// <summary>
+			/// Begin displaying the panels in order automatically.
+			/// </summary>
 			var o = this.options, self = this, id;
 			if (!this.element.data('intId.wijwizard')) {
 				id = window.setInterval(function () {
@@ -253,7 +286,9 @@
 		},
 
 		stop: function () {
-			/// <summary>Stop automatic displaying.</summary>
+			/// <summary>
+			/// Stop displaying the panels in order automatically.
+			/// </summary>
 			var id = this.element.data('intId.wijwizard');
 			if (id) {
 				window.clearInterval(id);
@@ -283,7 +318,9 @@
 
 		_createButtons: function () {
 			var self = this, o = this.options, bt,
-				addState, removeState;
+				addState, removeState,
+				backBtnText = o.backBtnText,
+				nextBtnText = o.nextBtnText;
 
 			this._removeButtons();
 			if (o.navButtons === 'none') {
@@ -316,7 +353,8 @@
 
 				if (bt === 'common') {
 					this.backBtn =
-						$("<a href='#'><span class='ui-button-text'>back</span></a>")
+						$("<a href='#'><span class='ui-button-text'>" + 
+							backBtnText + "</span></a>")
 						.addClass('ui-widget ui-button ui-button-text-only' +
 							' ui-state-default ui-corner-all')
 						.appendTo(this.buttons).bind({
@@ -339,7 +377,8 @@
 						}).attr("role", "button");
 
 					this.nextBtn =
-						$("<a href='#'><span class='ui-button-text'>next</span></a>")
+						$("<a href='#'><span class='ui-button-text'>" +
+							nextBtnText + "</span></a>")
 						.addClass('ui-widget ui-button ui-button-text-only' +
 							' ui-state-default ui-corner-all')
 						.appendTo(this.buttons).bind({
@@ -421,7 +460,9 @@
 			var self = this, o = this.options,
 				fragmentId = /^#.+/; // Safari 2 reports '#' for an empty hash;
 
-			this.list = this.element.find('ol,ul').eq(0);
+			//Fix a bug that when no title and has ul li element in its content
+			//this.list = this.element.find('ol,ul').eq(0);
+			this.list = this.element.children('ol,ul').eq(0);
 			if (this.list && this.list.length === 0) {
 				this.list = null;
 			}
@@ -801,6 +842,9 @@
 				$show.hide().removeClass('wijmo-wijwizard-hide') // avoid flicker that way
 					.animate(props, o.showOption.duration || 'normal', function () {
 						self._resetStyle($show);
+						if ($show.wijTriggerVisibility) {
+							$show.wijTriggerVisibility();
+						}
 						self._trigger('show', null, self._ui($show[0]));
 						self._removeSpinner();
 						$show.attr('aria-hidden', false);
@@ -808,6 +852,9 @@
 					});
 			} else {
 				$show.removeClass('wijmo-wijwizard-hide').attr('aria-hidden', false);
+				if ($show.wijTriggerVisibility) {
+					$show.wijTriggerVisibility();
+				}
 				self._trigger('show', null, self._ui($show[0]));
 				self._removeSpinner();
 				self._trigger('activeIndexChanged', null, self._ui($show[0]));
@@ -837,7 +884,9 @@
 		},
 
 		show: function (index) {
-			/// <summary>Active and display the panel at specified position.</summary>
+			/// <summary>
+			/// Selects an active panel and displays the panel at a specified position.
+			/// </summary>
 			/// <param name="index" type="Number">
 			/// The zero-based index of the panel to be actived.
 			/// </param>

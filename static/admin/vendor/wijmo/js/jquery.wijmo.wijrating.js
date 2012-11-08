@@ -1,10 +1,10 @@
 /*globals jQuery, window*/
 /*
  * 
- * Wijmo Library 2.1.4
+ * Wijmo Library 2.2.2
  * http://wijmo.com/
  * 
- * Copyright(c) ComponentOne, LLC.  All rights reserved.
+ * Copyright(c) GrapeCity, Inc.  All rights reserved.
  * 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
@@ -77,14 +77,14 @@
 			/// </summary>
 			value: 0,
 			/// <summary>
-			/// The minimize value that can be rated.
+			/// An option that defines the minimize value that can be rated using the rating widget.
 			/// Type: Number.
 			/// Default: null.
 			/// Code example: $(".selector").wijrating("option", "min", 2).
 			/// </summary>
 			min: null,
 			/// <summary>
-			/// The maximum value that can be rated.
+			/// An option that defines the maximum value that can be rated using the rating widget.
 			/// Type: Number.
 			/// Default: null.
 			/// Code example: $(".selector").wijrating("option", "max", 3).
@@ -117,7 +117,7 @@
 				/// </summary>
 				hint: "cancel this rating!",
 				/// <summary>
-				/// Position of the reset button.
+				/// Defines the resetButton's position in relation to the rating widget.
 				/// Type: String.
 				/// Default: "leftOrTop".
 				/// </summary>
@@ -126,15 +126,21 @@
 				/// </remarks>
 				position: "leftOrTop",
 				/// <summary>
-				/// The customized class added to the reset button.
+				/// The customized class added to the reset button so that user can 
+				/// customize the style of reset button.
 				/// Type: String.
 				/// Default: "".
+				/// Code example: $(".selector").wijrating("option", 
+				///		"resetButton", {customizedClass: "customResetButtonClass"}).
 				/// </summary>
 				customizedClass: "",
 				/// <summary>
-				/// The customized class added to the reset button when hover it.
+				/// The customized class added to the reset button so that user can 
+				/// customize the style of reset button when hover it.
 				/// Type: String.
 				/// Default: "".
+				/// Code example: $(".selector").wijrating("option", 
+				///		"resetButton", {customizedHoverClass: "customResetButtonHoverClass"}).
 				/// </summary>
 				customizedHoverClass: ""
 			},
@@ -175,7 +181,7 @@
 			/// </remarks>
 			orientation: "horizontal",
 			/// <summary>
-			/// Determines the direction of the rating widget.
+			/// Determines the direction in which items are rated.
 			/// Type: String.
 			/// Default: "normal".
 			/// Code example: $(".selector").wijrating("option", "direction", "reversed").
@@ -187,6 +193,7 @@
 			direction: "normal",
 			/// <summary>
 			/// Determines the rating mode of the rating widget.
+			/// The widget can rate things continuously or singly.
 			/// Type: String.
 			/// Default: "continuous".
 			/// Code example: $(".selector").wijrating("option", "ratingMode", "single").
@@ -200,9 +207,9 @@
 			/// <summary>
 			/// A value that indicates the settings for customize rating icons.
 			/// Type: Object.
-			/// Default: {iconsUrl: null, hoverIconsUrl: null, ratedIconsUrl: null}.
+			/// Default: {iconsClass: null, hoverIconsClass: null, ratedIconsClass: null}.
 			/// Code example: $(".selector").wijrating("option", "icons", 
-			/// {iconsUrl:["c.jpg", "b.jpg", "a.jpg"]}).
+			/// {iconsClass:["class1", "class2", "class3"]}).
 			/// </summary>
 			icons: {
 				/// <summary>
@@ -256,22 +263,21 @@
 			/// </summary>
 			iconHeight: 16,
 			/// <summary>
-			/// A value indicates whether to show animation 
-			/// and the duration for the animation.
+			/// An option that controls aspects of the widget's animation, 
+			/// such as the animation duration and easing.
 			/// Type: Object.
 			/// Default: null.
 			/// </summary>
 			/// <remarks>
-			/// animation.animated is used to set the effect of the animation.
-			/// animation.duration is used to set the duration of the animation.
-			/// animation.easing is used to set the easing of the animation.
-			/// animation.delay is used to set the delay time of each star to 
-			/// play the animation.
+			/// animation.animated defines the animation effect for the rating widget.
+			/// animation.duration defines the length of the animation effect in milliseconds.
+			/// animation.easing defines the easing effect of an animation..
+			/// animation.delay defines the length of the delay in milliseconds.
 			/// </remarks>
 			animation: null,
 			/// <summary>
-			/// Fires before the widget rating.  This event can be cancelled. 
-			/// Use "return false;" to cancel the event.
+			/// The rating event fires before widget rating. 
+			/// This event can be cancelled with "return false;" 
 			/// Default: null.
 			/// Type: Function.
 			/// </summary>
@@ -288,7 +294,7 @@
 			///	$(".selector").bind("wijratingrating", function(e, data) {} );
 			rating: null,
 			/// <summary>
-			/// Fires after the widget is rated.
+			/// The rated event fires after the widget is rated.
 			/// Default: null.
 			/// Type: Function.
 			/// </summary>
@@ -305,7 +311,7 @@
 			///	$(".selector").bind("wijratingrated", function(e, data) {} );
 			rated: null,
 			/// <summary>
-			/// Fires when the reset button is clicked.
+			/// The reset event fires when the reset button is clicked.
 			/// Default: null.
 			/// Type: Function.
 			/// </summary>
@@ -319,7 +325,7 @@
 			///	$(".selector").bind("wijratingreset", function(e) {} );
 			reset: null,
 			/// <summary>
-			/// Fires when the widget is hovered over.
+			/// The hover event fires on mouse hover.
 			/// Default: null.
 			/// Type: Function.
 			/// </summary>
@@ -508,6 +514,11 @@
 				o = self.options,
 				//cre = /({.*})/, 
 				ratingElement;
+			
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
 				
 			//var m = cre.exec(self.element.attr("class"));
 			//if (m && m.length) {
@@ -519,7 +530,7 @@
 				ratingElement = $("<div></div>");
 				self.element.after(ratingElement);
 			} else if (self.element.is("div")) {
-				if (self.element.children("input:[type='radio']").length > 0) {
+				if (self.element.children("input[type='radio']").length > 0) {
 					self._parseRadio();
 					self.element.hide();
 					ratingElement = $("<div></div>");
@@ -539,8 +550,8 @@
 		},
 
 		destroy: function () {
-			///Remove the functionality completely. 
-			///This will return the element back to its pre-init state. 
+			///The destroy() method will remove the rating functionality completely 
+			/// and will return the element to its pre-init state.
 			var self = this;
 			self._unbindLiveEvents();
 			if (self.element !== self.ratingElement) {
@@ -780,8 +791,13 @@
 					if (typeof (iconsClass) === "string") {
 						$(star).addClass(iconsClass);
 					} else if ($.isArray(iconsClass)) {
-						if (iconsIdx < iconsClass.length) {
-							$(star).addClass(iconsClass[iconsIdx]);
+						var len = iconsClass.length;
+						if (iconsIdx < len) {
+							if (self.options.direction === "reversed") {
+								$(star).addClass(iconsClass[len - iconsIdx - 1]);
+							} else {
+								$(star).addClass(iconsClass[iconsIdx]);
+							}
 						}
 					}
 					idx++;
@@ -1083,12 +1099,12 @@
 					if (typeof (ratedIconsClass) === "string") {
 						customizedIconClass = ratedIconsClass;
 					} else if ($.isArray(ratedIconsClass)) {
-						if (o.direction === "reversed") {
-							customizedIconIdx = Math.floor((starCount * split - 1 - idx) /
-								split);
-						} else {
+						//if (o.direction === "reversed") {
+						//	customizedIconIdx = Math.floor((starCount * split - 1 - idx) /
+						//		split);
+						//} else {
 							customizedIconIdx = Math.floor(idx / split);
-						}
+						//}
 						if (ratedIconsClass.length > customizedIconIdx) {
 							customizedIconClass = ratedIconsClass[customizedIconIdx];
 						}
@@ -1122,7 +1138,7 @@
 			var self = this,
 				o = self.options,
 				hintValues = [],
-				radios = $("input:[type='radio']", self.element);
+				radios = $("input[type='radio']", self.element);
 			if (radios.length) {
 				o.count = radios.length;
 				o.totalValue = radios.length;
@@ -1131,7 +1147,7 @@
 						radioId = jRadio.attr("id"),
 						jLabel;
 					if (radioId && radioId.length > 0) {
-						jLabel = $("label:[for='" + radioId + "']", self.element);
+						jLabel = $("label[for='" + radioId + "']", self.element);
 						if (jLabel.length) {
 							hintValues.push(jLabel.html());
 						} else {

@@ -117,12 +117,12 @@ class Nos
 
     public static function parse_enhancers($content, $closure)
     {
-        preg_match_all('`<(\w+)\s[^>]+data-enhancer="([^"]+)" data-config="([^"]+)">.*?</\\1>`u', $content, $matches);
+        preg_match_all('`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
         foreach ($matches[2] as $match_id => $enhancer) {
             $closure($enhancer, $matches[3][$match_id], $matches[0][$match_id]);
         }
 
-        preg_match_all('`<(\w+)\s[^>]+data-config="([^"]+)" data-enhancer="([^"]+)">.*?</\\1>`u', $content, $matches);
+        preg_match_all('`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
         foreach ($matches[3] as $match_id => $enhancer) {
             $closure($enhancer, $matches[2][$match_id], $matches[0][$match_id]);
         }
@@ -173,16 +173,23 @@ class Nos
     {
         Tools_Wysiwyg::parse_medias(
             $content,
-            function ($media, $params) use (&$content) {
+            function($media, $params) use (&$content) {
                 if (empty($media)) {
-                    $content = str_replace($params['tag'], '', $content);
+                    if ($params['tag'] == 'img') {
+                        // Remove dead images
+                        $content = str_replace($params['content'], '', $content);
+                    } elseif ($params['tag'] == 'a') {
+                        // Remove href for links (they become anchor)?
+                        // http://stackoverflow.com/questions/11144653/a-script-links-without-href
+                        //$content = str_replace('href="'.$params['url'].'"', '', $content);
+                    }
                 } else {
                     if (!empty($params['height'])) {
                         $media_url = $media->get_public_path_resized($params['width'], $params['height']);
                     } else {
                         $media_url = $media->get_public_path();
                     }
-                    $content = str_replace($params['src'], $media_url, $content);
+                    $content = str_replace($params['url'], $media_url, $content);
                 }
             }
         );
@@ -199,7 +206,7 @@ class Nos
             }
             $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
             foreach ($matches[1] as $match_id => $page_id) {
-                $content = str_replace($matches[0][$match_id], $pages[$page_id]->get_href(), $content);
+                $content = str_replace($matches[0][$match_id], $pages[$page_id]->url(), $content);
             }
         }
     }

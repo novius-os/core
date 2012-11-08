@@ -1,10 +1,10 @@
 /*globals window document clearTimeout setTimeout jQuery */
 /*
 *
-* Wijmo Library 2.1.4
+* Wijmo Library 2.2.2
 * http://wijmo.com/
 *
-* Copyright(c) ComponentOne, LLC.  All rights reserved.
+* Copyright(c) GrapeCity, Inc.  All rights reserved.
 * 
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
@@ -45,7 +45,7 @@
 			/// </summary>
 			content: '',
 			/// <summary>
-			/// Specifies a value that sets the tooltip��s title.
+			/// Specifies a value that sets the tooltip's title.
 			/// Type: String or Function.
 			/// Default: "".
 			/// Code example: $(".selector").wijtooltip("option", "title", "title");
@@ -261,7 +261,15 @@
 			/// <param name="ui" type="Object">
 			/// The wijtooltip widget object.
 			/// </param>
-			hidden: null
+			hidden: null,
+			/// <summary>
+			/// A value that indicates whether to set user-defined class.
+			/// Type: String.
+			/// Default: "".
+			/// Code example:
+			/// $(".selector").wijtooltip("option", "cssClass", cssClass).
+			/// </summary>
+			cssClass: ""
 		},
 
 		_setOption: function (key, value) {
@@ -277,6 +285,23 @@
 
 			if (self[funName]) {
 				self[funName](oldValue);
+			}
+		},
+
+		
+
+		//fix the issue 21416: cssClass does not show.
+		_set_cssClass: function () {
+			var self = this,
+				o = self.options,
+				cssClass = o.cssClass,
+				tooltip = self._tooltip;
+
+			if (!tooltip) {
+				return;
+			}
+			if (!tooltip.hasClass(cssClass)) {
+				tooltip.addClass(cssClass);
 			}
 		},
 
@@ -300,8 +325,14 @@
 				element = self.element,
 				id = element && element.attr("id"),
 				describedBy = "",
+				cssClass = "",
 				key = o.group || defaultTooltipKey,
 				tooltip = $.wijmo.wijtooltip._getTooltip(key);
+
+			// enable touch support:
+			if (window.wijmoApplyWijTouchUtilEvents) {
+				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
 
 			if (tooltip) {
 				tooltip.count++;
@@ -309,6 +340,12 @@
 				tooltip = self._createTooltip();
 				tooltip.count = 0;
 				$.wijmo.wijtooltip._tooltips[key] = tooltip;
+			}
+
+			//fix the issue 21416: cssClass does not show.
+			cssClass = o.cssClass ? o.cssClass : "";
+			if (!tooltip.hasClass(cssClass)) {
+				tooltip.addClass(cssClass);
 			}
 
 			o.position.of = self.element;
@@ -343,7 +380,7 @@
 			/// <summary>
 			/// Returns the wijtooltip element.
 			/// Code example:
-			/// $(��#tooltip��).wijtooltip(��widget��);
+			/// $("#tooltip").wijtooltip("widget");
 			/// </summary>
 			return this._tooltip;
 		},
@@ -595,9 +632,9 @@
 				break;
 			case "rightClick":
 				element.bind("contextmenu.tooltip", function (e) {
-					self.show();
-					e.preventDefault();
-				});
+						self.show();
+						e.preventDefault();
+					});
 				break;
 			}
 		},
@@ -673,30 +710,57 @@
 				}
 			}
 
-			if (flip.h) {
-				if (calloutShape.indexOf('l') > -1) {
-					calloutShape = calloutShape.replace(/l/, 'r');
-					flip.h = "l";
-				} else if (calloutShape.indexOf('r') > -1) {
-					calloutShape = calloutShape.replace(/r/, 'l');
-					flip.h = "r";
+			//fix the issue 21386, calloutShape undefind
+			if (o.showCallout) {
+				if (flip.h) {
+					if (calloutShape.indexOf('l') > -1) {
+						calloutShape = calloutShape.replace(/l/, 'r');
+						flip.h = "l";
+					} else if (calloutShape.indexOf('r') > -1) {
+						calloutShape = calloutShape.replace(/r/, 'l');
+						flip.h = "r";
+					}
 				}
+
+				if (flip.v) {
+					if (calloutShape.indexOf('t') > -1) {
+						calloutShape = calloutShape.replace(/t/, 'b');
+						flip.v = "t";
+					} else if (calloutShape.indexOf('b') > -1) {
+						calloutShape = calloutShape.replace(/b/, 't');
+						flip.v = "b";
+					}
+				}
+				if (flip.h || flip.v) {
+					self._removeCalloutCss();
+					tooltip.addClass(calloutCssPrefix + calloutShape);
+				}
+			}
+			/*
+			if (flip.h) {
+			if (calloutShape.indexOf('l') > -1) {
+			calloutShape = calloutShape.replace(/l/, 'r');
+			flip.h = "l";
+			} else if (calloutShape.indexOf('r') > -1) {
+			calloutShape = calloutShape.replace(/r/, 'l');
+			flip.h = "r";
+			}
 			}
 
 			if (flip.v) {
-				if (calloutShape.indexOf('t') > -1) {
-					calloutShape = calloutShape.replace(/t/, 'b');
-					flip.v = "t";
-				} else if (calloutShape.indexOf('b') > -1) {
-					calloutShape = calloutShape.replace(/b/, 't');
-					flip.v = "b";
-				}
+			if (calloutShape.indexOf('t') > -1) {
+			calloutShape = calloutShape.replace(/t/, 'b');
+			flip.v = "t";
+			} else if (calloutShape.indexOf('b') > -1) {
+			calloutShape = calloutShape.replace(/b/, 't');
+			flip.v = "b";
 			}
-
+			}
 			if (flip.h || flip.v) {
-				self._removeCalloutCss();
-				tooltip.addClass(calloutCssPrefix + calloutShape);
-			}
+			self._removeCalloutCss();
+			tooltip.addClass(calloutCssPrefix + calloutShape);
+			} 
+			*/
 
 			return { flip: flip, calloutShape: calloutShape };
 		},
@@ -714,6 +778,9 @@
 
 				self._setCalloutOffset(true);
 			}
+
+			//fix the issue 21467.
+			self._setText();
 		},
 
 		_set_showCallOut: function (value) {
@@ -959,7 +1026,17 @@
 				}
 			}
 
-			if (value !== "") {
+			//when 'position.offset' is set "none none", 
+			//the properties left and top of the 'callout' element in the tooltip
+			//need to be removed.
+			if (offsetItems && offsetItems.length === 2 && 
+				offsetItems[0] === "none" && offsetItems[1] === "none") {
+				callout.css("left", "").css("top", "");
+			}
+			else if (value === "none") {
+				callout.css(horizontal ? "left" : "top", "");
+			}
+			else if (value !== "") {
 				if (showCalloutAnimation && !showCalloutAnimation.disabled) {
 					callout.animate(horizontal ? { left: value} : { top: value },
 						calloutAnimation.duration, calloutAnimation.easing);

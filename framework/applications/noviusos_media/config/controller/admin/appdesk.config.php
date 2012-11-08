@@ -312,10 +312,8 @@ return array(
                                         'icon' => 'plus',
                                         'action' => array(
                                             'action' => 'nosTabs',
-                                            'tab' => array(
-                                                'url' => 'admin/noviusos_media/media/insert_update?context_id={{id}}',
+                                                'url' => 'admin/noviusos_media/media/insert_update?environment_id={{id}}',
                                                 'label' => 'Add a media in the "{{title}}" folder'
-                                            ),
                                         ),
                                     ),
                                     array(
@@ -325,7 +323,7 @@ return array(
                                         'action' => array(
                                             'action' => 'nosTabs',
                                             'tab' => array(
-                                                'url' => 'admin/noviusos_media/folder/insert_update?context_id={{id}}',
+                                                'url' => 'admin/noviusos_media/folder/insert_update?environment_id={{id}}',
                                                 'label' => 'Add a sub-folder in "{{title}}"',
                                             ),
                                             'dialog' => array(

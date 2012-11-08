@@ -195,6 +195,88 @@ define('jquery-nos',
                     }
                     image.src = media.path;
                 });
+            },
+
+            nosUIElement : function(element) {
+                var $element;
+
+                element = $.extend({
+                    type: 'button',
+                    bind: {}
+                }, element);
+
+                if (element.action) {
+                    element.bind['click'] = $.extend(true, {}, element.action);
+                    delete element.action;
+                }
+
+                switch (element.type) {
+                    case 'button' :
+                        $element = $('<button></button>').data(element);
+                        if (element.label) {
+                            $element.text(element.label);
+                        }
+                        $.each(element.bind, function(event, action) {
+                            $element.bind(event, function() {
+                                $element.nosAction(action);
+                            });
+                        });
+
+                        break;
+                }
+
+                if (element.menu) {
+                    var date = new Date(),
+                        id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                    $element.attr('id', id)
+                        .nosOnShow('one', function() {
+                            var $ul = $('<ul></ul>');
+                            $.each(element.menu.menus, function() {
+                                var menu = this,
+                                    $a = $('<li><a></a></li>').data('action', menu.action)
+                                        .appendTo($ul)
+                                        .find('a');
+
+                                if (menu.content) {
+                                    $a.append(menu.content);
+                                } else {
+                                    if (menu.icon) {
+                                        $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
+                                            .appendTo($a);
+                                    } else if (menu.iconClasses) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
+                                            .appendTo($a);
+                                    } else if (menu.iconUrl) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
+                                            .css('backgroundImage', 'url(' + menu.iconUrl + ')')
+                                            .appendTo($a);
+                                    }
+                                    if (menu.label) {
+                                        $('<span></span>').addClass('wijmo-wijmenu-text')
+                                            .text(menu.label)
+                                            .appendTo($a);
+                                    }
+                                }
+                            });
+
+                            $ul.insertAfter($element)
+                                .wijmenu($.extend(true, {
+                                        orientation: 'vertical'
+                                    },
+                                    element.menu.options || {},
+                                    {
+                                        trigger: '#' + id,
+                                        select: function(e, data) {
+                                            var $li = $(data.item.element);
+                                            $li.nosAction($li.data('action'));
+                                        }
+                                    }
+                                ));
+                        });
+                }
+
+
+                return $element;
             }
         });
 
@@ -383,7 +465,7 @@ define('jquery-nos',
 
             nosSaveUserConfig : function(key, configuration) {
                 this.nosAjax({
-                    url: '/admin/nos/noviusos/save_user_configuration',
+                    url: 'admin/nos/noviusos/save_user_configuration',
                     data: {
                         key: key,
                         configuration: configuration
@@ -397,8 +479,8 @@ define('jquery-nos',
 
                 data = data || {};
                 var contentUrls = {
-                        'all'   : '/admin/nos/media/appdesk',
-                        'image' : '/admin/nos/media/appdesk?view=image_pick'
+                        'all'   : 'admin/nos/media/appdesk',
+                        'image' : 'admin/nos/media/appdesk?view=image_pick'
                     },
                     $input = this;
 
@@ -430,7 +512,7 @@ define('jquery-nos',
                 ], function() {
                     $(function() {
                         $input.inputFileThumb(options);
-                        $input.prependTo($input.parents('.ui-widget-content'));
+                        $input.prependTo($input.closest('.ui-widget-content'));
                     });
                 });
 
@@ -440,30 +522,53 @@ define('jquery-nos',
             nosFormUI : function() {
                 var $context = this;
 
-                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
-                $context.find(":input[type='submit'],button").each(function() {
-                    var options = {},
-                        data = $(this).data();
+                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").filter(':not(.notransform)').wijtextbox();
+                $context.find(":input[type='submit'],button").filter(':not(.notransform)').each(function() {
+                    var data = $(this).data(),
+                        options = $.extend(true, {
+                            icons : {}
+                        }, data || {}),
+                        replace = {},
+                        $button = $(this);
+
+                    if (data.red) {
+                        $button.addClass('ui-state-error');
+                    }
+
+                    data.icons = $.extend(true, {
+                            primary: null,
+                            secondary: null
+                        }, data.icons || {});
                     if (data.icon) {
-                        options.icons = {
-                            primary: 'ui-icon-' + data.icon
-                        }
+                        data.icons.primary = {icon: data.icon};
                     } else if (data.iconClasses) {
-                        options.icons = {
-                            primary: data.iconClasses
-                        }
+                        data.icons.primary = {iconClasses: data.iconClasses};
                     } else if (data.iconUrl) {
-                        options.icons = {
-                            primary: 'nos-icon16'
+                        data.icons.primary = {iconUrl: data.iconUrl};
+                    }
+                    $.each(data.icons, function(key, value) {
+                        if (!value) {
+                            return true;
                         }
-                    }
-                    $(this).button(options);
-                    if (data.iconUrl) {
-                        $(this).find('span:first')
+                        if ($.type(value) === 'string') {
+                            options.icons[key] = 'ui-icon-' + value.replace('ui-icon-', '');
+                        } else if (value.icon) {
+                            options.icons[key] = 'ui-icon-' + value.icon.replace('ui-icon-', '');
+                        } else if (value.iconClasses) {
+                            options.icons[key] = value.iconClasses;
+                        } else if (value.iconUrl) {
+                            replace[key] = value.iconUrl;
+                            options.icons[key] = 'nos-icon16';
+                        }
+                    });
+
+                    $button.button(options);
+                    $.each(replace, function(key, url) {
+                        $button.find('span.ui-button-icon-' + key)
                             .css({
-                                backgroundImage: 'url(' + data.iconUrl + ')'
+                                backgroundImage: 'url(' + url + ')'
                             });
-                    }
+                    });
                 });
                 $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijdropdown();
@@ -474,11 +579,11 @@ define('jquery-nos',
                 $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijradio();
                 });
-                $context.find('.expander').each(function() {
+                $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
                     $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
                 });
-                $context.find('.accordion').wijaccordion({
+                $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",
                     selectedIndexChanged : function(e, args) {
                         $(e.target).find('.ui-accordion-content').eq(args.newIndex).nosOnShow();
@@ -685,7 +790,7 @@ define('jquery-nos',
                                     // Store the response as specified by the jqXHR object
                                     responseText = jqXHR.responseText;
                                     // If successful, inject the HTML into all the matched elements
-                                    if ( jqXHR.isResolved() ) {
+                                    if ( jqXHR.state() === 'resolved' ) {
                                         // #4825: Get the actual response in case
                                         // a dataFilter is present in ajaxSettings
                                         jqXHR.done(function( r ) {
@@ -730,43 +835,79 @@ define('jquery-nos',
                 return this;
             },
 
-            nosListenEvent : function(json_match, callback) {
-                var self = this;
-                json_match = $.isArray(json_match) ? json_match : [json_match];
+            nosListenEvent : function(json_match, callback, caller) {
+                var self = this,
+                    $dispatcher = this.closest('.nos-dispatcher, body'),
+                    listens = $dispatcher.data('noviusos-listens');
 
-                this.closest('.nos-dispatcher, body').on('noviusos', function(e) {
-                    var matched = false;
-                    e.noviusos = e.noviusos || {};
+                caller = caller || null;
 
-                    // Check if one of match_obj matched with event
-                    $.each(json_match, function(i, match_obj) {
-                        var matched_obj = true;
-                        $.each(match_obj, function(key, value) {
-                            if (!$.isArray(e.noviusos[key]) && !$.isArray(value)) {
-                                matched_obj = e.noviusos[key] === value;
-                            } else if ($.isArray(e.noviusos[key]) && !$.isArray(value)) {
-                                matched_obj = $.inArray(value, e.noviusos[key]) !== -1;
-                            } else if (!$.isArray(e.noviusos[key]) && $.isArray(value)) {
-                                matched_obj = $.inArray(e.noviusos[key], value) !== -1;
-                            } else if ($.isArray(e.noviusos[key]) && $.isArray(value)) {
-                                var matched_temp = false;
-                                $.each(value, function(i, val) {
-                                    matched_temp = $.inArray(val, e.noviusos[key]) !== -1;
-                                    return !matched_temp;
+                if (!$.isArray(listens)) {
+                    $dispatcher.on('noviusos', function(e) {
+                        e.noviusos = e.noviusos || {};
+
+                        $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
+                            var json_match = listen.json_match,
+                                callback = listen.callback,
+                                matched = false;
+
+                            // Check if one of match_obj matched with event
+                            $.each(json_match, function(i, match_obj) {
+                                var matched_obj = true;
+                                $.each(match_obj, function(key, value) {
+                                    if (!$.isArray(e.noviusos[key]) && !$.isArray(value)) {
+                                        matched_obj = e.noviusos[key] === value;
+                                    } else if ($.isArray(e.noviusos[key]) && !$.isArray(value)) {
+                                        matched_obj = $.inArray(value, e.noviusos[key]) !== -1;
+                                    } else if (!$.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                        matched_obj = $.inArray(e.noviusos[key], value) !== -1;
+                                    } else if ($.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                        var matched_temp = false;
+                                        $.each(value, function(i, val) {
+                                            matched_temp = $.inArray(val, e.noviusos[key]) !== -1;
+                                            return !matched_temp;
+                                        });
+                                        matched_obj = matched_temp;
+                                    }
+                                    return matched_obj;
                                 });
-                                matched_obj = matched_temp;
+                                if (matched_obj) {
+                                    matched = true;
+                                    return false;
+                                }
+                            });
+                            if (matched) {
+                                callback(e.noviusos);
                             }
-                            return matched_obj;
                         });
-                        if (matched_obj) {
-                            matched = true;
-                            return false;
+                    });
+                }
+                listens = $.isArray(listens) ? listens : [];
+                listens.push({
+                    caller: caller,
+                    json_match: $.isArray(json_match) ? json_match : [json_match],
+                    callback: callback
+                });
+                $dispatcher.data('noviusos-listens', listens);
+
+                return self;
+            },
+
+            nosUnlistenEvent : function(caller) {
+                var self = this,
+                    $dispatcher = this.closest('.nos-dispatcher, body'),
+                    listens = $dispatcher.data('noviusos-listens');
+
+                if ($.isArray(listens)) {
+                    listens = $.extend(true, [], listens);
+                    // Loop on original array, remove on clone : not change index inside the loop
+                    $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
+                        if (listen.caller === caller) {
+                            listens.splice(index_listen, 1);
                         }
                     });
-                    if (matched) {
-                        callback(e.noviusos);
-                    }
-                });
+                    $dispatcher.data('noviusos-listens', listens);
+                }
 
                 return self;
             },
