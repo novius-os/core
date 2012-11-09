@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-media-add-form',
-    ['jquery-nos', 'static/novius-os/admin/config/media/seo_compliant'],
+    ['jquery-nos', 'static/apps/noviusos_media/config/seo_compliant'],
     function($) {
         "use strict";
 

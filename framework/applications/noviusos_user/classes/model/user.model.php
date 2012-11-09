@@ -86,7 +86,7 @@ class Model_User extends \Nos\Orm\Model
         $already_saved[$this->user_id] = true;
 
         if (empty($this->roles)) {
-            $role = new User\Model_Role();
+            $role = new Model_Role();
             $role->role_user_id = $this->user_id;
         } else {
             $role = reset($this->roles);

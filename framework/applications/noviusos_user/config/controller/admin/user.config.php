@@ -20,7 +20,7 @@ return array(
     ),
     'layout_insert' => array(
         array(
-            'view' => 'nos::admin/user/user_add',
+            'view' => 'noviusos_user::admin/user_add',
         ),
     ),
     'views' => array(
