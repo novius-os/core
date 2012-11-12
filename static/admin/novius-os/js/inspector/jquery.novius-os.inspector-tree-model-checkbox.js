@@ -49,15 +49,18 @@ define('jquery-nos-inspector-tree-model-checkbox',
                         init = function() {
                             listenReloadEvent();
 
+                            var treeOptions = $.extend(true, {}, params.treeOptions || {});
+                            if (!treeOptions.context) {
+                                treeOptions.context = connector.data('nosContext') || '';
+                            }
+
                             container.find('input[name="' + params.input_name + '[]"]').remove();
                             table.nostreegrid({
                                 sortable : false,
                                 movable : false,
                                 urlJson : params.urlJson,
                                 treeColumnIndex : 1,
-                                treeOptions : $.extend(true, params.treeOptions || {}, {
-                                    context : connector.data('nosContext') || ''
-                                }),
+                                treeOptions : treeOptions,
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',

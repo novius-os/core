@@ -30,6 +30,7 @@ define('jquery-nos-wysiwyg',
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
                         paste_text_use_dialog : true,
                         theme_nos_enhancers : enhancers,
+                        theme_nos_context: self.closest('.nos-dispatcher').data('nosContext'),
                         // extended_valid_elements: http://www.tinymce.com/wiki.php/Configuration:extended_valid_elements
                         // Fixes issue: http://www.tinymce.com/develop/bugtracker_view.php?id=5522
                         // Rule sets inspired by: http://www.tinymce.com/wiki.php/Configuration:valid_elements
