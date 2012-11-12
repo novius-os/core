@@ -47,7 +47,7 @@ class Controller_Admin_Account extends \Controller
 
     public function action_disconnect()
     {
-        Auth::disconnect();
+        \Nos\Auth::disconnect();
         \Response::redirect('admin/nos/login/reset');
         exit();
     }
