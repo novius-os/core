@@ -39,14 +39,17 @@
                             });
                         }
 
+                        var treeOptions = $.extend(true, {}, params.treeOptions || {});
+                        if (!treeOptions.lang) {
+                            treeOptions.lang = connector.data('nosLang') || '';
+                        }
+
                         table.nostreegrid({
                                 sortable : false,
                                 movable : false,
                                 treeUrl : params.treeUrl,
                                 treeColumnIndex : 1,
-                                treeOptions : $.extend(true, params.treeOptions || {}, {
-                                    lang : connector.data('nosLang') || ''
-                                }),
+                                treeOptions : treeOptions,
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',

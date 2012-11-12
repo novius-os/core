@@ -39,15 +39,18 @@ empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
                             });
                         }
 
+                        var treeOptions = $.extend(true, {}, params.treeOptions || {});
+                        if (!treeOptions.lang) {
+                            treeOptions.lang = connector.data('nosLang') || '';
+                        }
+
                         container.find('input[name="' + params.input_name + '[]"]').remove();
                         table.nostreegrid({
                                 sortable : false,
                                 movable : false,
                                 treeUrl : params.treeUrl,
                                 treeColumnIndex : 1,
-                                treeOptions : $.extend(true, params.treeOptions || {}, {
-                                    lang : connector.data('nosLang') || ''
-                                }),
+                                treeOptions : treeOptions,
                                 preOpen : params.selected || {},
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',
