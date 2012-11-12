@@ -12,7 +12,7 @@ namespace Nos;
 
 class Application
 {
-    static $repositories;
+    protected static $repositories;
 
     public static function _init()
     {
@@ -34,7 +34,8 @@ class Application
         );
     }
 
-    public static function get_application_path($application) {
+    public static function get_application_path($application)
+    {
         foreach (static::$repositories as $repository) {
             $path = $repository['path'].$application;
             if (is_dir($path)) {
@@ -44,7 +45,8 @@ class Application
         return false;
     }
 
-    public static function install_native_applications() {
+    public static function install_native_applications()
+    {
 
         foreach (static::$repositories as $where => $repository) {
             if ($repository['native']) {
