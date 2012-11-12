@@ -139,14 +139,14 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
 
-        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
+        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Media\Model_Link'));
     }
 
     public static function linked_medias()
     {
         $class = get_called_class();
 
-        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
+        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Media\Model_Link'));
     }
 
     /**
@@ -178,7 +178,7 @@ class Model extends \Orm\Model
             if (static::linked_medias()) {
                 static::$_has_many['linked_medias'] = array(
                     'key_from' => static::$_primary_key[0],
-                    'model_to' => 'Nos\Model_Media_Link',
+                    'model_to' => 'Nos\Media\Model_Link',
                     'key_to' => 'medil_foreign_id',
                     'cascade_save' => true,
                     'cascade_delete' => false,
@@ -333,10 +333,10 @@ class Model extends \Orm\Model
 
     public function get_possible_context()
     {
-        $contextableAndTwinnable = static::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
+        $twinnable = static::behaviours('Nos\Orm_Behaviour_Twinnable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
-        if (!$contextableAndTwinnable || !$tree) {
+        if (!$twinnable || !$tree) {
             return array_keys(\Nos\Tools_Context::contexts());
         }
 
@@ -607,7 +607,7 @@ class Model extends \Orm\Model
 
                 // Create a new relation if it doesn't exist yet
                 if (!empty($value)) {
-                    $medil = new \Nos\Model_Media_Link();
+                    $medil = new \Nos\Media\Model_Link();
                     $medil->medil_from_table = static::$_table_name;
                     $medil->medil_key = $key;
                     $medil->medil_foreign_id = $this->id;
@@ -988,8 +988,8 @@ class Model_Media_Provider implements \Iterator
     public function __set($property, $value)
     {
         // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
-        $media_id = (string) ($value instanceof \Nos\Model_Media ? $value->media_id : $value);
-        $media = \Nos\Model_Media::find($media_id);
+        $media_id = (string) ($value instanceof \Nos\Media\Model_Media ? $value->media_id : $value);
+        $media = \Nos\Media\Model_Media::find($media_id);
         if (is_null($media)) {
             $pk = $this->parent->primary_key();
             throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(

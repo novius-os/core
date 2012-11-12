@@ -204,7 +204,7 @@ class Nos
             foreach ($matches[1] as $match_id => $page_id) {
                 $page_ids[] = $page_id;
             }
-            $pages = Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+            $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
             foreach ($matches[1] as $match_id => $page_id) {
                 $content = str_replace($matches[0][$match_id], $pages[$page_id]->url(), $content);
             }

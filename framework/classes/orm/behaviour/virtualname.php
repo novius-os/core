@@ -21,7 +21,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
             $this->_properties['unique'] = 'context';
         }
         if ($this->_properties['unique'] === 'context') {
-            $this->_properties['unique'] = $class::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', true);
+            $this->_properties['unique'] = $class::behaviours('Nos\Orm_Behaviour_Twinnable', true);
         }
     }
 

@@ -508,9 +508,10 @@ class Controller_Front extends Controller
                     $where[] = array('page_virtual_url', $url);
                 }
 
-                $page = Model_Page::find('first', array(
+                $page = \Nos\Page\Model_Page::find('first', array(
                         'where' => $where,
-                    ));
+                ));
+
 
                 if (!empty($page)) {
                     $this->_page = $page;
@@ -576,7 +577,7 @@ class Controller_Front extends Controller
 
     public function rebuild_cache($cache)
     {
-        $this->_page = new Model_Page();
+        $this->_page = new \Nos\Page\Model_Page();
         foreach ($cache['page'] as $field => $value) {
             $this->_page->{'page_'.$field} = $value;
         }

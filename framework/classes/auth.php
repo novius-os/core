@@ -16,7 +16,7 @@ class Auth
 
     public static function login($login, $password, $remember_me = true)
     {
-        $user = Model_User::find(
+        $user = User\Model_User::find(
             'all',
             array(
                 'where' => array(
@@ -56,7 +56,7 @@ class Auth
         if (empty($logged_user_id)) {
             return false;
         } else {
-            $logged_user = Model_User::find_by_user_id($logged_user_id); // We reload the user
+            $logged_user = User\Model_User::find_by_user_id($logged_user_id); // We reload the user
             if (!$logged_user || $logged_user->user_md5 != $logged_user_md5) {
                 return false;
             }

@@ -49,7 +49,7 @@ if (!empty($medias)) {
 
 $contexts = array_keys(\Nos\Tools_Context::contexts());
 if (!empty($item) && count($contexts) > 1) {
-    $contextable = $item->behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable') !== null || $item->behaviours('Nos\Orm_Behaviour_Contextable') !== null;
+    $contextable = $item->behaviours('Nos\Orm_Behaviour_Twinnable') !== null || $item->behaviours('Nos\Orm_Behaviour_Contextable') !== null;
     if ($contextable) {
         echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
     }

@@ -44,7 +44,7 @@ class Permission
         }
         $role = reset($user->roles);
         try {
-            $access = new Model_User_Permission();
+            $access = new User\Model_Permission();
             $access->perm_role_id     = $role->role_id;
             $access->perm_application = $key;
             $access->perm_identifier  = '';
