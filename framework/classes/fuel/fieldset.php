@@ -13,6 +13,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     protected $append = array();
     protected $config_used = array();
     protected $js_validation = false;
+    protected $require_js = array();
 
     public function append($content)
     {
@@ -118,6 +119,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         $append[] = (string) \View::forge('form/fieldset_js', array(
             'id' => $form_attributes['id'],
             'rules' => \Format::forge()->to_json($json),
+            'require_js' => $this->require_js,
         ), false);
 
         return implode('', $append);
@@ -328,9 +330,10 @@ class Fieldset extends \Fuel\Core\Fieldset
         return array($name, $args);
     }
 
-    public function js_validation($validation = true)
+    public function js_validation($require_js = array())
     {
-        $this->js_validation = $validation;
+        $this->js_validation = true;
+        $this->require_js = array_merge($this->require_js, $require_js);
     }
 
     public static function build_from_config($config, $model = null, $options = array())

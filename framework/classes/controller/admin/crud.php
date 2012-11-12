@@ -51,6 +51,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         'actions' => array(),
         'layout' => array(),
         'fields' => array(),
+        'require_js' => array(),
         'views' => array(
             'form' => 'nos::crud/form',
             'delete' => 'nos::crud/delete_popup',
@@ -111,6 +112,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $this->behaviours['contextable'] = $this->behaviours['twinnable'];
         }
         $this->pk = \Arr::get($model::primary_key(), 0);
+
+        if (empty($this->config['require_js'])) {
+            $this->config['require_js'] = array();
+        }
     }
 
     /**
@@ -331,7 +336,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function fieldset($fieldset)
     {
-        $fieldset->js_validation();
+        $fieldset->js_validation($this->config['require_js']);
         $fieldset->populate_with_instance($this->item);
         $fieldset->form()->set_config('field_template', '<tr><th class="{error_class}">{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
