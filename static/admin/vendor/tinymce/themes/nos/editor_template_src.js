@@ -1906,8 +1906,9 @@
             var ed = tinyMCE.activeEditor;
 
 			// Keep reference to the wijnosDialog node, so we can close the popup manually
-			var dialog = null;
-			var self   = this;
+			var dialog = null,
+			    self   = this,
+                data_config = $.extend(true, {nosContext : self.settings.theme_nos_context}, edit.data('config') || {});
 
             var save = function(json) {
 
@@ -1970,7 +1971,7 @@
             if (metadata.dialog.ajax || !edit) {
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
-                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
+                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : data_config}) : metadata.dialog));
             } else {
                 // Open empty dialog
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
@@ -2003,7 +2004,7 @@
                         }
                     };
 
-                $.each(edit.data('config') || {}, function(key, val) {
+                $.each(data_config || {}, function(key, val) {
                     addInput(key, val);
                 });
                 dialog.css('padding', '0px');
