@@ -56,7 +56,7 @@ class Application
                     $app_name = trim($folder, '/\\');
                     $application = static::forge($app_name);
                     if (!$application->is_installed()) {
-                        $application->install();
+                        $application->install(false);
                     }
                 }
             }
@@ -199,9 +199,11 @@ class Application
      * @return bool
      * @throws \Exception
      */
-    public function install()
+    public function install($add_permission = true)
     {
-        $this->addPermission();
+        if ($add_permission) {
+            $this->addPermission();
+        }
 
         $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
         \Config::load($this->folder.'::metadata', true);
