@@ -47,7 +47,7 @@ if (!MBSTRING) {
         'Config_File' => FUEL_EXTEND_PATH.'config_file.php',
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
-        'Event' => FUEL_EXTEND_PATH.'event.php',
+        'Event_Instance' => FUEL_EXTEND_PATH.'event/instance.php',
         'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
         'Finder' => FUEL_EXTEND_PATH.'finder.php',
         'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
