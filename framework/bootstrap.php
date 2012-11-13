@@ -85,15 +85,7 @@ Autoloader::register();
  * Fuel::STAGE
  * Fuel::PRODUCTION
  */
-Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOPMENT);
-
-/**
- * Set error reporting and display errors settings.
- */
-if (Fuel::$env != FUEL::PRODUCTION) {
-    error_reporting(-1);
-    ini_set('display_errors', 1);
-}
+Fuel::$env = (isset($_SERVER['NOS_ENV']) ? $_SERVER['NOS_ENV'] : (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOPMENT));
 
 //* Register application autoloader
 spl_autoload_register(
