@@ -161,7 +161,7 @@ define('jquery-nos-image-wysiwyg',
                             if (media_id) {
                                 $.ajax({
                                     method: 'GET',
-                                    url: params.base_url + 'admin/nos/media/appdesk/info/' + media_id,
+                                    url: params.base_url + 'admin/noviusos_media/appdesk/info/' + media_id,
                                     dataType: 'json',
                                     success: function(item) {
                                         tinymce_image_select(item, $img);
