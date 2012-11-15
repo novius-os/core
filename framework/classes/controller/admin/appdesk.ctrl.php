@@ -89,6 +89,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     {
         $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk');
         if (isset($config['model'])) {
+            $namespace_model = substr($config['model'], 0, strrpos($config['model'], '\\'));
+
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();
             $inspectors_class_prefix = explode('_', $inspectors_class_prefix);
@@ -150,6 +152,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['toolbar'] = array();
             }
 
+            $wasToolbarModelsSet = isset($config['toolbar']['models']);
             if (!isset($config['toolbar']['models'])) {
                 $config['toolbar']['models'] = array($config['model']);
             }
@@ -160,15 +163,18 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             $inspectors = array();
             foreach ($config['inspectors'] as $key => $value) {
+                $inspector_key = is_array($value) ? $key : $value;
+                $inspector_name = $inspectors_class_prefix.ucfirst($inspector_key);
+                list($application, $file_name) = \Config::configFile($inspector_name);
+                $inspector_config = \Config::loadConfiguration($application, $file_name);
                 if (is_array($value)) {
-                    // @todo: extended inspectors
-                } else {
-                    $inspector_name = $inspectors_class_prefix.ucfirst($value);
-                    list($application, $file_name) = \Config::configFile($inspector_name);
-                    $inspector_config = \Config::loadConfiguration($application, $file_name);
-                    $inspector_config = $inspector_name::process_config($application, $inspector_config);
-                    $inspectors[$value] = $inspector_config;
-                    if (isset($inspector_config['model'])) {
+                    $inspector_config = \Arr::merge($inspector_config, $value);
+                }
+                $inspector_config = $inspector_name::process_config($application, $inspector_config);
+                $inspectors[$inspector_key] = $inspector_config;
+                if (isset($inspector_config['model']) && !$wasToolbarModelsSet) {
+                    $inspector_model_namespace = substr($inspector_config['model'], 0, strrpos($inspector_config['model'], '\\'));
+                    if ($inspector_model_namespace == $namespace_model) {
                         $config['toolbar']['models'][] = $inspector_config['model'];
                     }
                 }
