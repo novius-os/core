@@ -481,7 +481,7 @@ class Controller_Front extends Controller
                 $where[] = array('page_published', 1);
             }
 
-            $page = Model_Page::find('first', array(
+            $page = Page\Model_Page::find('first', array(
                     'where' => $where,
                 ));
 
