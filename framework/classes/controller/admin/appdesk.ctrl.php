@@ -87,7 +87,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk');
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id');
         if (isset($config['model'])) {
             $namespace_model = substr($config['model'], 0, strrpos($config['model'], '\\'));
 
@@ -355,6 +355,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public function action_tree_json()
     {
+
         $tree_config = $this->config['tree'];
         $tree_config['id'] = $this->config['configuration_id'];
 
