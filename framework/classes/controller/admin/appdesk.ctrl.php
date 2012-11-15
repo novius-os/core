@@ -99,10 +99,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             $application_config = \Config::metadata($application);
 
-            $admin_config = $config['model']::admin_config();
+            $common_config = \Nos\Config_Common::load($config['model']);
+            $dataset = \Nos\Config_Common::get_fields($common_config, 'appdesk'); //@todo: allow customization
 
             if (!isset($config['query'])) {
-                $config['query'] = $admin_config['query'];
+                $config['query'] = $common_config['query'];
             }
 
             if (!isset($config['query']['model'])) {
@@ -110,11 +111,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['search_text'])) {
-                $config['search_text'] = $admin_config['search_text'];
+                $config['search_text'] = $common_config['search_text'];
             }
 
             if (!isset($config['dataset'])) {
-                $config['dataset'] = $admin_config['dataset'];
+                $config['dataset'] = $dataset;
             }
             $config['dataset']['id'] = array(
                 'column' => 'id',
@@ -126,18 +127,19 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 foreach ($item_actions as $action_key => $action_value) {
 
                     if (isset($action_value['enabled'])) {
-
                         $config['dataset']['actions'][$action_key] = $action_value['enabled'];
                     }
                 }
             }
 
+
+
             if (!isset($config['selectedView'])) {
-                $config['selectedView'] = isset($admin_config['selectedView']) ? $admin_config['selectedView'] : 'default';
+                $config['selectedView'] = isset($common_config['selectedView']) ? $common_config['selectedView'] : 'default';
             }
 
             if (!isset($config['views'])) {
-                $config['views'] = isset($admin_config['views']) ? $admin_config['views'] : array(
+                $config['views'] = isset($common_config['views']) ? $common_config['views'] : array(
                     'default' => array(
                         'name' => __('Default view'),
                     )
@@ -204,7 +206,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['reloadEvent'])) {
-                $config['appdesk']['reloadEvent'] = isset($admin_config['reloadEvent']) ? $admin_config['reloadEvent'] : $config['model'];
+                $config['appdesk']['reloadEvent'] = isset($common_config['reloadEvent']) ? $common_config['reloadEvent'] : $config['model'];
             }
 
             if (!isset($config['appdesk']['actions'])) {

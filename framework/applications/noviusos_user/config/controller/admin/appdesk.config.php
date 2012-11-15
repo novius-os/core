@@ -55,23 +55,4 @@ return array(
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
     ),
-    'dataset' => array(
-        'fullname' => array(
-            'headerText' => __('Name'),
-            //'search_column' => \DB::expr('CONCAT(user_firstname, user_name)'),
-            'value' => function($item) {
-                return $item->fullname();
-            },
-        ),
-        'email' => array(
-            'headerText' => __('Email'),
-            'column' => 'user_email',
-        ),
-        'id_permission' => array(
-            'visible' => false,
-            'value' => function($item) {
-                return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
-            },
-        ),
-    ),
 );

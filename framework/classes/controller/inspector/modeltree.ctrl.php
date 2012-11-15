@@ -49,10 +49,11 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
     public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid')
     {
         if (isset($config['model'])) {
-            $admin_config = $config['model']::admin_config();
+            $common_config = \Nos\Config_Common::load($config['model']);
+            $dataset = \Nos\Config_Common::get_fields($common_config, 'inspector'); //@todo: allow customization
 
             if (!isset($config['dataset'])) {
-                $config['dataset']  = $admin_config['dataset'];
+                $config['dataset']  = $dataset;
             }
             $config['dataset']['id']       = array(
                 'column' => 'id',
