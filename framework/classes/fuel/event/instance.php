@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-class Event extends Fuel\Core\Event
+class Event_Instance extends Fuel\Core\Event_Instance
 {
 
     // --------------------------------------------------------------------
@@ -24,7 +24,7 @@ class Event extends Fuel\Core\Event
      * @param	mixed	callback information
      * @return	void
      */
-    public static function register()
+    public function register()
     {
         // get any arguments passed
         $callback = func_get_args();
@@ -34,11 +34,11 @@ class Event extends Fuel\Core\Event
         // if the arguments are valid, register the event
         if (is_string($event) and isset($callback[0]) and is_callable($callback[0])) {
             // make sure we have an array for this event
-            isset(static::$_events[$event]) or static::$_events[$event] = array();
-            isset(static::$_events[$event][$priority]) or static::$_events[$event][$priority] = array();
+            isset($this->_events[$event]) or $this->_events[$event] = array();
+            isset($this->_events[$event][$priority]) or $this->_events[$event][$priority] = array();
 
             // store the callback on the call stack
-            array_unshift(static::$_events[$event][$priority], $callback);
+            array_unshift($this->_events[$event][$priority], $callback);
 
             // and report success
             return true;
@@ -66,18 +66,20 @@ class Event extends Fuel\Core\Event
      * @param	mixed	Any data that is to be passed to the listener
      * @param	string	The return type
      * @return	mixed	The return of the listeners, in the return type
+     *
+     * @todo: take a look at reversed, we are not using that for the moment...
      */
-    public static function trigger($event, $data = '', $return_type = 'array')
+    public function trigger($event, $data = '', $return_type = 'array', $reversed = false)
     {
         $calls = array();
 
         // check if we have events registered
-        if (static::has_events($event)) {
+        if ($this->has_events($event)) {
             // order them by priority (lowest key is higest priority)
-            ksort(static::$_events[$event]);
+            ksort($this->_events[$event]);
 
             // process them
-            foreach (static::$_events[$event] as $events) {
+            foreach ($this->_events[$event] as $events) {
                 foreach ($events as $arguments) {
                     // get the callback method
                     $callback = array_shift($arguments);
@@ -90,10 +92,10 @@ class Event extends Fuel\Core\Event
             }
         }
 
-        return static::_format_return($calls, $return_type);
+        return $this->_format_return($calls, $return_type);
     }
 
-    public static function register_function()
+    public function register_function()
     {
         // get any arguments passed
         $args     = func_get_args();
@@ -108,13 +110,13 @@ class Event extends Fuel\Core\Event
             };
             array_unshift($args, $event, $priority, $callback_function);
 
-            $ret = call_user_func_array('static::register', $args);
+            $ret = call_user_func_array(array($this, 'register'), $args);
         } else {
             return false;
         }
     }
 
-    public static function trigger_function($event, $args = array())
+    public function trigger_function($event, $args = array())
     {
         foreach (\Event::trigger($event, null, 'array') as $c) {
             is_callable($c) && call_user_func_array($c, $args);

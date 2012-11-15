@@ -282,13 +282,13 @@ define('jquery-nos',
 
         $.fn.extend({
             nosAction : function(obj, data) {
-                var params;
+                var url, placeholderReplace, params;
                 data = data || {};
                 try {
                     if ($.isFunction(obj)) {
                         obj($(this), data);
                     } else {
-                        var placeholderReplace = function (obj, data) {
+                        placeholderReplace = function (obj, data) {
                             if ($.type(obj) === 'string') {
                                 return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
                                         return data[p1] || '';
@@ -326,6 +326,11 @@ define('jquery-nos',
                                 $(this).nosDialog(params);
                                 break;
 
+                            case 'nosDialog' :
+                                params = $.extend(true, {}, placeholderReplace($.extend(true, {}, obj.dialog), data));
+                                $(this).nosDialog(params);
+                                break;
+
                             case 'nosAjax' :
                                 params = placeholderReplace($.extend(true, {}, obj.params), data);
                                 $(this).nosAjax(params);
@@ -340,7 +345,7 @@ define('jquery-nos',
                                 break;
 
                             case 'window.open' :
-                                var url = placeholderReplace(obj.url, data);
+                                url = placeholderReplace(obj.url, data);
                                 window.open(url);
                                 break;
                         }

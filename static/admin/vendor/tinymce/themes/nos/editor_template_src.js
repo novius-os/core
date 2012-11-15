@@ -1906,52 +1906,52 @@
             var ed = tinyMCE.activeEditor;
 
 			// Keep reference to the wijnosDialog node, so we can close the popup manually
-			var dialog = null;
-			var self   = this;
+			var dialog = null,
+			    self   = this,
+                data_config = edit ? $.extend(true, {nosContext : self.settings.theme_nos_context}, edit.data('config') || {}) : {nosContext : self.settings.theme_nos_context},
+                save = function(json) {
 
-            var save = function(json) {
+                    var pr = $(json.preview);
+                    // We set a temporary ID so we can fetch the node later
+                    pr.attr({
+                        'id': '__mce_tmp',
+                        'data-config': json.config,
+                        'data-enhancer': metadata.id
+                    }).addClass('mceNonEditable');
 
-				var pr = $(json.preview);
-				// We set a temporary ID so we can fetch the node later
-				pr.attr({
-					'id': '__mce_tmp',
-					'data-config': json.config,
-					'data-enhancer': metadata.id
-				}).addClass('mceNonEditable');
+                    if (edit) {
+                        // @todo needs review!
+                        edit.empty().removeClass('mceNonEditable nosEnhancer').data('config', '').data('enhancer', '');
+                        ed.selection.select(edit.get(0), true);
+                        ed.focus(false);
+                        ed.execCommand('mceSelectNode', false, edit.get(0), {skip_undo : 1});
+                        ed.execCommand('mceReplaceContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
+                    } else {
+                        ed.execCommand('mceInsertContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
+                    }
 
-                if (edit) {
-                    // @todo needs review!
-                    edit.empty().removeClass('mceNonEditable nosEnhancer').data('config', '').data('enhancer', '');
-					ed.selection.select(edit.get(0), true);
-					ed.focus(false);
-					ed.execCommand('mceSelectNode', false, edit.get(0), {skip_undo : 1});
-                    ed.execCommand('mceReplaceContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
-                } else {
-                    ed.execCommand('mceInsertContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
-                }
+                    // Retrieve the preview node from the tinyMce document context, or we get this error:
+                    // "Node cannot be used in a document other than the one in which it was created"
+                    var preview = $(ed.dom.get('__mce_tmp'));
+                    // We don't need the id anymore now
+                    preview.attr('id', '');
 
-				// Retrieve the preview node from the tinyMce document context, or we get this error:
-				// "Node cannot be used in a document other than the one in which it was created"
-				var preview = $(ed.dom.get('__mce_tmp'));
-				// We don't need the id anymore now
-				preview.attr('id', '');
+                    // Add special links (this is also called onInit())
+                    self.onEnhancerAdd(preview, metadata);
 
-				// Add special links (this is also called onInit())
-				self.onEnhancerAdd(preview, metadata);
+                    // @todo search why this doesn't work
+                    // This is an uncessfull attempt to refocus the editor after the nonEditable block content has been added
+                    // Right now, the undo/redo buttons are disabled after insertion, which is a bug
+                    ed.selection.select(preview.get(0), true);
+                    ed.selection.collapse(true);
+                    ed.focus(false);
+                    ed.execCommand('mceSelectNode', false, preview.get(0), {skip_undo : 1});
+                    ed.execCommand('mceStartTyping');
 
-				// @todo search why this doesn't work
-				// This is an uncessfull attempt to refocus the editor after the nonEditable block content has been added
-				// Right now, the undo/redo buttons are disabled after insertion, which is a bug
-				ed.selection.select(preview.get(0), true);
-				ed.selection.collapse(true);
-				ed.focus(false);
-				ed.execCommand('mceSelectNode', false, preview.get(0), {skip_undo : 1});
-				ed.execCommand('mceStartTyping');
-
-				// mceAddUndoLevel has been removed in 3.3, we don't need it anymore
-				// mceEndUndoLevel calls mceAddUndoLevel
-				ed.execCommand("mceEndUndoLevel");
-			};
+                    // mceAddUndoLevel has been removed in 3.3, we don't need it anymore
+                    // mceEndUndoLevel calls mceAddUndoLevel
+                    ed.execCommand("mceEndUndoLevel");
+                };
 
             if (!$.isPlainObject(metadata.dialog) || !metadata.dialog.contentUrl) {
                 $.ajax({
@@ -1970,7 +1970,7 @@
             if (metadata.dialog.ajax || !edit) {
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
-                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
+                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : data_config}) : metadata.dialog));
             } else {
                 // Open empty dialog
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
@@ -2003,7 +2003,7 @@
                         }
                     };
 
-                $.each(edit.data('config') || {}, function(key, val) {
+                $.each(data_config || {}, function(key, val) {
                     addInput(key, val);
                 });
                 dialog.css('padding', '0px');

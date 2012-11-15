@@ -12,7 +12,7 @@ namespace Nos;
 
 class Application
 {
-    static $repositories;
+    protected static $repositories;
 
     public static function _init()
     {
@@ -34,7 +34,8 @@ class Application
         );
     }
 
-    public static function get_application_path($application) {
+    public static function get_application_path($application)
+    {
         foreach (static::$repositories as $repository) {
             $path = $repository['path'].$application;
             if (is_dir($path)) {
@@ -44,7 +45,8 @@ class Application
         return false;
     }
 
-    public static function install_native_applications() {
+    public static function install_native_applications()
+    {
 
         foreach (static::$repositories as $where => $repository) {
             if ($repository['native']) {
@@ -56,7 +58,7 @@ class Application
                     $app_name = trim($folder, '/\\');
                     $application = static::forge($app_name);
                     if (!$application->is_installed()) {
-                        $application->install();
+                        $application->install(false);
                     }
                 }
             }
@@ -199,9 +201,11 @@ class Application
      * @return bool
      * @throws \Exception
      */
-    public function install()
+    public function install($add_permission = true)
     {
-        $this->addPermission();
+        if ($add_permission) {
+            $this->addPermission();
+        }
 
         $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
         \Config::load($this->folder.'::metadata', true);

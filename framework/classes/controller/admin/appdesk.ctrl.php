@@ -87,6 +87,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk');
         if (isset($config['model'])) {
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();
@@ -266,6 +267,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 foreach ($config['appdesk']['actions'] as $action_key => $action_value) {
                     $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'][] = $action_key;
                 }
+            }
+        }
+
+        foreach ($config as $key => $idc) {
+            if (!in_array($key, $valid_keys)) {
+                unset($config[$key]);
             }
         }
 
