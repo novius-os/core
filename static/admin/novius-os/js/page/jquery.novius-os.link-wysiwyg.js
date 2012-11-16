@@ -175,7 +175,7 @@ define('jquery-nos-link-wysiwyg',
                                 link_type = 'internal';
                                 $.ajax({
                                     method: 'GET',
-                                    url: params.base_url + 'admin/nos/page/appdesk/info/' + found[1],
+                                    url: params.base_url + 'admin/noviusos_page/appdesk/info/' + found[1],
                                     dataType: 'json',
                                     success: function(page) {
                                         $real_url.text(params.base_url + page.url);
@@ -189,7 +189,7 @@ define('jquery-nos-link-wysiwyg',
                                 link_type = 'media';
                                 $.ajax({
                                     method: 'GET',
-                                    url: params.base_url + 'admin/nos/media/appdesk/info/' + found[1],
+                                    url: params.base_url + 'admin/noviusos_media/appdesk/info/' + found[1],
                                     dataType: 'json',
                                     success: function(media) {
                                         $real_url.text(params.base_url + media.path);
@@ -230,7 +230,7 @@ define('jquery-nos-link-wysiwyg',
                                             padding: 0,
                                             margin: 0
                                         })
-                                        .load(link_type === 'internal' ? 'admin/nos/page/appdesk/index/link_pick' : 'admin/nos/media/appdesk/index/media_pick');
+                                        .load(link_type === 'internal' ? 'admin/noviusos_page/appdesk/index/link_pick' : 'admin/noviusos_media/appdesk/index/media_pick');
                                     appdesk_loaded = link_type;
                                 }
                             } else if (ui.panel === $panel_properties[0]) {
