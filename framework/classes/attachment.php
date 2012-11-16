@@ -24,11 +24,6 @@ class Attachment
     protected $config = array();
 
     /**
-     * @var  \Fuel\Core\File_Area The File_Area of attachment
-     */
-    protected $area = null;
-
-    /**
      * @var  \Fuel\Core\File_Handler_File New file handler
      */
     protected $new_file = null;
@@ -84,10 +79,20 @@ class Attachment
         }
         $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
 
-        $attached = preg_replace('`_`Uu', '-', $attached);
+        $attached = preg_replace('`/`Uu', '_', $attached);
 
         $this->config = $config;
         $this->attached = $attached;
+    }
+
+    /**
+     * Get the new Attachment file if one, FALSE if no
+     *
+     * @return string|bool
+     */
+    public function new_file()
+    {
+        return !empty($this->new_file) ? $this->new_file : false;
     }
 
     /**
@@ -99,7 +104,7 @@ class Attachment
     {
         $filename = $this->filename();
 
-        return !empty($filename) ? APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$filename : false;
+        return !empty($filename) ? APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached.DS.$filename : false;
     }
 
     /**
@@ -109,9 +114,9 @@ class Attachment
      */
     public function filename()
     {
-        $files = \Fuel\Core\File::read_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'], 1, array(
-            '^'.$this->attached.'_' => 'file', // or css files
-        ));
+        if (is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached)) {
+            $files = \Fuel\Core\File::read_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached, 1, array('!^\.'));
+        }
 
         return !empty($files) ? current($files) : false;
     }
@@ -152,7 +157,7 @@ class Attachment
             return false;
         }
 
-        return 'files/'.$this->config['alias'].str_replace($this->attached.'_', $this->attached.'/', $filename);
+        return 'files/'.$this->config['alias'].$this->attached.'/'.$filename;
 
     }
 
@@ -171,7 +176,7 @@ class Attachment
         $filename = $this->filename();
         $extension = $this->extension();
 
-        return 'cache/files/'.$this->config['alias'].rtrim(str_replace($this->attached.'_', $this->attached.'/', $filename), '.'.$extension).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$extension;
+        return 'cache/files/'.$this->config['alias'].$this->attached.'/'.rtrim($filename, '.'.$extension).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$extension;
     }
 
     /**
@@ -219,8 +224,10 @@ class Attachment
                 \Config::set('data::attachments', $attachments);
             }
 
-            !is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir']) && \File::create_dir(APPPATH.'data', 'files'.DS.$this->config['dir']);
-            copy($this->new_file, APPPATH.'data'.DS.'files'.DS.$this->config['dir'].DS.$this->attached.'_'.$this->new_file_name);
+            $this->delete();
+
+            !is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached) && \File::create_dir(APPPATH.'data', 'files'.DS.$this->config['dir'].$this->attached);
+            copy($this->new_file, APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached.DS.$this->new_file_name);
 
             $this->new_file = null;
             $this->new_file_name = null;
@@ -232,9 +239,15 @@ class Attachment
      */
     public function delete()
     {
-        $path = $this->path();
-        if (!empty($path)) {
-            unlink($path);
+        if (is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached)) {
+            \File::delete_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached);
         }
+    }
+
+    public static function implode_pk($data)
+    {
+        $new_file = $data->new_file();
+        $path = $data->path();
+        return $new_file ? $new_file : ($path ? $path : null);
     }
 }
