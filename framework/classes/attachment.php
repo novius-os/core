@@ -1,0 +1,240 @@
+<?php
+/**
+ * NOVIUS OS - Web OS for digital communication
+ *
+ * @copyright  2011 Novius
+ * @license    GNU Affero General Public License v3 or (at your option) any later version
+ *             http://www.gnu.org/licenses/agpl-3.0.html
+ * @link http://www.novius-os.org
+ */
+
+namespace Nos;
+
+class Attachment
+{
+
+    /**
+     * @var  int|string  The ID of the object that the file is attached
+     */
+    protected $attached = null;
+
+    /**
+     * @var  array  The attachment configuration
+     */
+    protected $config = array();
+
+    /**
+     * @var  \Fuel\Core\File_Area The File_Area of attachment
+     */
+    protected $area = null;
+
+    /**
+     * @var  \Fuel\Core\File_Handler_File New file handler
+     */
+    protected $new_file = null;
+
+    /**
+     * @var  string New file name
+     */
+    protected $new_file_name = null;
+
+    /**
+     * Returns a new Attachment object.
+     *
+     * @param   mixed   $attached Can be the object that the file is attached, or his ID
+     * @param   array|string  $config The Config file or a configuration array
+     * @return  Attachment
+     */
+    public static function forge($attached, $config)
+    {
+        return new static($attached, $config);
+    }
+
+    /**
+     * Sets the attachment configuration.
+     *
+     * @param   mixed   $attached Can be the object that the file is attached, or his ID
+     * @param   array|string  $config The Config file or a configuration array
+     * @throws \InvalidArgumentException
+     * @return \Nos\Attachment
+     */
+    public function __construct($attached, $config)
+    {
+        if (!is_array($config)) {
+            $config = \Config::load($config);
+        }
+
+        if (!empty($config['image']) && empty($config['extensions'])) {
+            $config['extensions'] = array('jpg', 'gif', 'png', 'jpeg');
+            unset($config['image']);
+        }
+
+        if (empty($config['extensions']) || !is_array($config['extensions'])) {
+            $config['extensions'] = !empty($config['extensions']) ? array($config['extensions']) : array();
+        }
+        $config['extensions'] = array_map(array('\Str', 'lower'), $config['extensions']);
+
+        if (empty($config['dir'])) {
+            throw new \InvalidArgumentException('No directory specified in the configuration.');
+        }
+        $config['dir'] = rtrim($config['dir'], DS).DS;
+
+        if (empty($config['alias'])) {
+            $config['alias'] = $config['dir'];
+        }
+        $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
+
+        $attached = preg_replace('`_`Uu', '-', $attached);
+
+        $this->config = $config;
+        $this->attached = $attached;
+    }
+
+    /**
+     * Get the Attachment file path or FALSE if no file
+     *
+     * @return string|bool
+     */
+    public function path()
+    {
+        $filename = $this->filename();
+
+        return !empty($filename) ? APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$filename : false;
+    }
+
+    /**
+     * Get the Attachment filename or FALSE if no file
+     *
+     * @return string|bool
+     */
+    public function filename()
+    {
+        $files = \Fuel\Core\File::read_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'], 1, array(
+            '^'.$this->attached.'_' => 'file', // or css files
+        ));
+
+        return !empty($files) ? current($files) : false;
+    }
+
+    /**
+     * Get the Attachment extension or FALSE if no file
+     *
+     * @return string|bool
+     */
+    public function extension()
+    {
+        $filename = $this->filename();
+
+        return !empty($filename) ? pathinfo($filename, PATHINFO_EXTENSION) : false;
+    }
+
+    /**
+     * Checks if the Attachment is an image.
+     *
+     * @return bool
+     */
+    public function is_image()
+    {
+        $extension = $this->extension();
+
+        return !empty($extension) ? in_array($extension, array('jpg', 'png', 'gif', 'jpeg', 'bmp')) : false;
+    }
+
+    /**
+     * Get the url or FALSE if no file
+     *
+     * @return	string|bool
+     */
+    public function url()
+    {
+        $filename = $this->filename();
+        if ($filename === false) {
+            return false;
+        }
+
+        return 'files/'.$this->config['alias'].str_replace($this->attached.'_', $this->attached.'/', $filename);
+
+    }
+
+    /**
+     * Get the url of Attachment resized or FALSE if no file or not an image.
+     *
+     * @param   int $max_width
+     * @param   int $max_height
+     * @return  string|bool
+     */
+    public function url_resized($max_width = 0, $max_height = 0)
+    {
+        if (!$this->is_image()) {
+            return false;
+        }
+        $filename = $this->filename();
+        $extension = $this->extension();
+
+        return 'cache/files/'.$this->config['alias'].rtrim(str_replace($this->attached.'_', $this->attached.'/', $filename), '.'.$extension).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$extension;
+    }
+
+    /**
+     * Set a new Attachment file
+     *
+     * @param   string  $file File path
+     * @param   string  $filename The name file
+     * @throws \Fuel\Core\FileAccessException
+     * @return \Nos\Attachment
+     */
+    public function set($file, $filename = null)
+    {
+        if (!is_file($file)) {
+            throw new \Fuel\Core\FileAccessException('Invalid path for file.');
+        }
+
+        if (empty($filename)) {
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+        }
+
+        $extension = \Str::lower(pathinfo($filename, PATHINFO_EXTENSION));
+        if (!empty($this->config['extensions']) && array_key_exists($extension, $this->config['extensions'])) {
+            throw new \Fuel\Core\FileAccessException('File operation not allowed: disallowed file extension.');
+        }
+
+        $this->new_file = $file;
+        $this->new_file_name = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Save a new Attachment file
+     */
+    public function save()
+    {
+        if (!empty($this->new_file)) {
+            \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
+
+            $attachments = \Config::get("data::attachments", array());
+            if (!isset($attachments[$this->config['alias']])) {
+                $attachments[$this->config['alias']] = $this->config;
+
+                \Config::save(APPPATH.'data'.DS.'config'.DS.'attachments.php', $attachments);
+                \Config::set('data::attachments', $attachments);
+            }
+
+            !is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir']) && \File::create_dir(APPPATH.'data', 'files'.DS.$this->config['dir']);
+            copy($this->new_file, APPPATH.'data'.DS.'files'.DS.$this->config['dir'].DS.$this->attached.'_'.$this->new_file_name);
+
+            $this->new_file = null;
+            $this->new_file_name = null;
+        }
+    }
+
+    /**
+     * Delete the Attachment file
+     */
+    public function delete()
+    {
+        $path = $this->path();
+        if (!empty($path)) {
+            unlink($path);
+        }
+    }
+}
