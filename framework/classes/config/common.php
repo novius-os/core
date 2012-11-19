@@ -3,22 +3,24 @@ namespace Nos;
 class Config_Common
 {
 
-    public static function load($class)
+    public static function load($class, $filter_data_mapping)
     {
         list($application_name, $file) = \Config::configFile($class);
         $file = 'common'.substr($file, strrpos($file, '/'));
 
         $config = \Config::loadConfiguration($application_name, $file);
 
-        if (!isset($config['data'])) {
-            $config['data'] = array();
-        }
-        $config['data'] = static::process_data($application_name, $class, $config);
-
         if (!isset($config['actions'])) {
             $config['actions'] = array();
         }
         $config['actions'] = static::process_actions($application_name, $class, $config);
+
+        if (!isset($config['data_mapping'])) {
+            $config['data_mapping'] = array();
+        }
+
+        $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
+        $config['data_mapping'] = static::process_data_mapping($application_name, $class, $config);
 
         return $config;
     }
@@ -171,60 +173,58 @@ class Config_Common
         return $actions;
     }
 
-    static function process_data($application_name, $class, $config) {
-        if (!isset($config['data']) || !isset($config['data']['fields'])) {
+    static function process_data_mapping($application_name, $class, $config) {
+        if (!isset($config['data_mapping'])) {
             return array();
         }
-        foreach ($config['data']['fields'] as $key => &$item) {
+        foreach ($config['data_mapping'] as $key => &$item) {
             if (is_array($item)) {
                 // @todo two keys to process : appdesk and fieldset
-                if (!isset($item['appdesk'])) {
-                    $item['appdesk'] = array();
+                if (!isset($item['headerText']) && isset($item['title'])) {
+                    $item['headerText'] = $item['title'];
                 }
-                if (!isset($item['appdesk']['headerText']) && isset($item['label'])) {
-                    $item['appdesk']['headerText'] = $item['label'];
-                }
-                if (isset($item['value']) && !isset($item['appdesk']['value'])) {
-                    $item['appdesk']['value'] = $item['value'];
-                }
-                if (!isset($item['appdesk']['column']) && !isset($item['appdesk']['value'])) {
-                    $item['appdesk']['column'] = str_replace('->', '.', $key);
+                if (!isset($item['column']) && !isset($item['value'])) {
+                    $item['column'] = str_replace('->', '.', $key);
                 }
                 $relations = explode('->', $key);
-                if (!isset($item['appdesk']['search_relation']) && count($relations) > 1) {
+                if (!isset($item['search_relation']) && count($relations) > 1) {
                     // @todo: support multilevel relations ?
-                    $item['appdesk']['search_relation'] = $relations[0];
+                    $item['search_relation'] = $relations[0];
                 }
-                if (!isset($item['appdesk']['headerText'])) {
-                    $item['appdesk']['visible'] = false;
+                if (!isset($item['headerText'])) {
+                    $item['visible'] = false;
                 }
             }
         }
 
-        return $config['data'];
+        return $config['data_mapping'];
     }
 
-    static function get_fields($config, $context) {
-        if (!isset($config['data']) || !isset($config['data']['contexts'])) {
-            return false;
-        }
-        $fields = array();
-        $raw_fields = array();
-        $fallback = false;
-        if (isset($config['data']['contexts'][$context]['fields'])) {
-            $fallback = $config['data']['contexts'][$context]['fallback'];
-            $raw_fields = $config['data']['contexts'][$context]['fields'];
-        } else {
-            $raw_fields = $config['data']['contexts'][$context];
-        }
+    static function filter_data_mapping($initial_data_mapping, $filter) {
+        if ($filter != null) {
+            $data_mapping = array();
+            foreach ($filter as $key => $value) {
+                $data_mapping_key = null;
+                $data_mapping_extend = null;
+                if (is_array($value)) {
+                    $data_mapping_key = $key;
+                    $data_mapping_extend = $value;
+                } else {
+                    $data_mapping_key = $value;
+                }
 
-        foreach ($raw_fields as $field) {
-            $field_config = isset($config['data']['fields'][$field][$context]) ? $config['data']['fields'][$field][$context] : null;
-            if (!$field_config && $fallback) {
-                $field_config = isset($config['data']['fields'][$field][$fallback]) ? $config['data']['fields'][$field][$fallback] : null;
+                if (!is_array($initial_data_mapping[$data_mapping_key])) {
+                    $data_mapping[$data_mapping_key] = $data_mapping_extend === null ? $initial_data_mapping[$data_mapping_key] : $data_mapping_extend;
+                } else {
+                    if ($data_mapping_extend === null) {
+                        $data_mapping_extend = array();
+                    }
+                    $data_mapping[$data_mapping_key] = \Arr::merge($initial_data_mapping[$data_mapping_key], $data_mapping_extend);
+                }
             }
-            $fields[$field] = $field_config ? $field_config : true;
+            return $data_mapping;
+        } else {
+            return $initial_data_mapping;
         }
-        return $fields;
     }
 }

@@ -71,8 +71,12 @@ class Controller_Inspector_Model extends Controller_Inspector
     public static function process_config($application, $config, $item_actions = array(), $gridKey = 'grid')
     {
         if (isset($config['model'])) {
-            $common_config = \Nos\Config_Common::load($config['model']);
-            $dataset = \Nos\Config_Common::get_fields($common_config, 'inspector'); //@todo: allow customization
+            if (!isset($config['data_mapping'])) {
+                $config['data_mapping'] = null;
+            }
+
+            $common_config = \Nos\Config_Common::load($config['model'], $config['data_mapping']);
+            $data_mapping = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array(); //@todo: allow customization
 
             if (!isset($config['query'])) {
                 $config['query'] = $common_config['query'];
@@ -83,7 +87,7 @@ class Controller_Inspector_Model extends Controller_Inspector
             }
 
             if (!isset($config['dataset'])) {
-                $config['dataset']  = $dataset;
+                $config['dataset']  = $data_mapping;
             }
             $config['dataset']['id']       = array(
                 'column' => 'id',

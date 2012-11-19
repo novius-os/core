@@ -99,11 +99,25 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             $application_config = \Config::metadata($application);
 
-            $common_config = \Nos\Config_Common::load($config['model']);
-            $dataset = \Nos\Config_Common::get_fields($common_config, 'appdesk'); //@todo: allow customization
+            $behaviours = array(
+                'contextable' => $config['model']::behaviours('Nos\Orm_Behaviour_Contextable', false),
+                'twinnable' => $config['model']::behaviours('Nos\Orm_Behaviour_Twinnable', false),
+                'sharable' => $config['model']::behaviours('Nos\Orm_Behaviour_Sharable', false),
+                'tree' => $config['model']::behaviours('Nos\Orm_Behaviour_Tree', false),
+                'url' => $config['model']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false),
+                'sortable' => $config['model']::behaviours('Nos\Orm_Behaviour_Sortable', false),
+            );
+
+
+            if (!isset($config['data_mapping'])) {
+                $config['data_mapping'] = null;
+            }
+
+            $common_config = \Nos\Config_Common::load($config['model'], $config['data_mapping']);
+            $data_mapping = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array();
 
             if (!isset($config['query'])) {
-                $config['query'] = $common_config['query'];
+                $config['query'] = isset($common_config['query']) ? $common_config['query'] : array();
             }
 
             if (!isset($config['query']['model'])) {
@@ -115,7 +129,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['dataset'])) {
-                $config['dataset'] = $dataset;
+                $config['dataset'] = $data_mapping;
             }
             $config['dataset']['id'] = array(
                 'column' => 'id',
@@ -161,6 +175,70 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             if (!isset($config['toolbar']['actions'])) {
                 $config['toolbar']['actions'] = array();
+            }
+
+
+            if (!isset($config['tree'])) {
+                if ($behaviours['tree']) {
+                    $config['tree'] = array();
+                }
+            }
+
+            if (isset($config['tree'])) {
+
+
+                if (!isset($config['tree']['models'])) {
+                    $config['tree']['models'] = array();
+                }
+
+                if (count($config['tree']['models']) == 0) {
+                    $config['tree']['models'][] = array();
+                }
+
+                foreach ($config['tree']['models'] as &$model) {
+                    if (!isset($model['model'])) {
+                        $model['model'] = $config['model'];
+                    }
+
+                    $sortable_behaviour = $model['model']::behaviours('Nos\Orm_Behaviour_Sortable', false);
+                    if (!isset($model['order_by']) && $sortable_behaviour) {
+                        $model['order_by'] = $sortable_behaviour['sort_property'];
+                    }
+
+                    if (!isset($model['childs'])) {
+                        $model['childs'] = array($model['model']);
+                    }
+
+                    if (!isset($model['dataset'])) {
+                        $model['dataset'] = $config['dataset'];
+                    }
+                }
+
+
+                if (!isset($config['tree']['roots'])) {
+                    $config['tree']['roots'] = array();
+                }
+
+                if (count($config['tree']['roots']) == 0) {
+                    $config['tree']['roots'][] = array();
+                }
+
+                foreach ($config['tree']['roots'] as &$root) {
+                    if (!isset($root['model'])) {
+                        $root['model'] = $config['model'];
+                    }
+
+                    if (!isset($root['where'])) {
+                        $tree_behaviour = $root['model']::behaviours('Nos\Orm_Behaviour_Tree', false);
+                        $relation = $root['model']::relations($tree_behaviour['parent_relation']);
+                        $root['where'] = array(array($relation->key_from[0], 'IS', \DB::expr('NULL')));
+                    }
+
+                    $sortable_behaviour = $root['model']::behaviours('Nos\Orm_Behaviour_Sortable', false);
+                    if (!isset($root['order_by']) && $sortable_behaviour) {
+                        $root['order_by'] = $sortable_behaviour['sort_property'];
+                    }
+                }
             }
 
             $inspectors = array();
@@ -275,6 +353,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 foreach ($config['appdesk']['actions'] as $action_key => $action_value) {
                     $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'][] = $action_key;
                 }
+            }
+
+            if (!isset($config['appdesk']['appdesk']['treeGrid'])) {
+                $config['appdesk']['appdesk']['treeGrid'] = array();
+            }
+
+            if (!isset($config['appdesk']['appdesk']['treeGrid']['urlJson'])) {
+                $config['appdesk']['appdesk']['treeGrid']['urlJson'] = $appdesk_path.'/tree_json';
             }
         }
 

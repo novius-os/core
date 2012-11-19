@@ -22,12 +22,6 @@ return array(
         'user_email',
     ),
     'hideContexts' => true,
-    'selectedView' => 'default',
-    'views' => array(
-        'default' => array(
-            'name' => __('Default view'),
-        )
-    ),
     'i18n' => array(
         'Users' => __('Users'),
         'Add a user' => __('Add a user'),
