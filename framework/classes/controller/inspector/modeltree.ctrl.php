@@ -75,6 +75,10 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 }
             }
 
+            if (!isset($config['order_by'])) {
+                $config['order_by'] = $config['model']::prefix().'sort';
+            }
+
             if (!isset($config['models'])) {
                 $config['models'] = array(array());
             }
@@ -84,7 +88,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             }
 
             if (!isset($config['models'][0]['order_by'])) {
-                $config['models'][0]['order_by'] = $config['model']::prefix().'sort';
+                $config['models'][0]['order_by'] = $config['order_by'];
             }
 
             if (!isset($config['models'][0]['childs'])) {
@@ -108,7 +112,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             }
 
             if (!isset($config['roots'][0]['order_by'])) {
-                $config['roots'][0]['order_by'] = $config['model']::prefix().'sort';
+                $config['roots'][0]['order_by'] = $config['order_by'];
             }
 
             if (!isset($config['input']['query'])) {

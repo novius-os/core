@@ -125,7 +125,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['search_text'])) {
-                $config['search_text'] = $common_config['search_text'];
+                $config['search_text'] = isset($common_config['search_text']) ? $common_config['search_text'] : array();
             }
 
             if (!isset($config['dataset'])) {
@@ -245,6 +245,10 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             foreach ($config['inspectors'] as $key => $value) {
                 $inspector_key = is_array($value) ? $key : $value;
                 $inspector_name = $inspectors_class_prefix.ucfirst($inspector_key);
+                if (!class_exists($inspector_name) && is_array($value)) {
+                    $inspectors[$inspector_key] = $value;
+                    continue;
+                }
                 list($application, $file_name) = \Config::configFile($inspector_name);
                 $inspector_config = \Config::loadConfiguration($application, $file_name);
                 if (is_array($value)) {
@@ -267,7 +271,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             foreach ($config['inspectors'] as $inspector_config) {
-                if ($inspector_config['input'] && !isset($config['inputs'][$inspector_config['input']['key']])) {
+                if (isset($inspector_config['input']) && !isset($config['inputs'][$inspector_config['input']['key']])) {
                     $config['inputs'][$inspector_config['input']['key']] = $inspector_config['input']['query'];
                 }
             }
@@ -293,6 +297,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             if (!isset($config['appdesk']['appdesk'])) {
                 $config['appdesk']['appdesk'] = array();
+            }
+
+            if (!isset($config['appdesk']['appdesk']['thumbnails'])) {
+                $config['appdesk']['appdesk']['thumbnails'] = array();
+            }
+
+            if (!isset($config['appdesk']['appdesk']['thumbnails']['actions'])) {
+                $config['appdesk']['appdesk']['thumbnails']['actions'] = array();
+                foreach ($config['appdesk']['actions'] as $key => $action) {
+                    $config['appdesk']['appdesk']['thumbnails']['actions'][] = $key;
+                }
+            }
+
+            if (!isset($config['appdesk']['appdesk']['thumbnails']['thumbnailSize'])) {
+                $config['appdesk']['appdesk']['thumbnails']['thumbnailSize'] = 64;
             }
 
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
@@ -346,10 +365,11 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = isset($value['headerText']) ? $value['headerText'] : '';
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
-
                 }
+            }
 
-                $config['appdesk']['appdesk']['grid']['columns']['actions'] = array('actions' => array());
+            if (!isset($config['appdesk']['appdesk']['grid']['columns']['actions']['actions'])) {
+                $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'] = array();
                 foreach ($config['appdesk']['actions'] as $action_key => $action_value) {
                     $config['appdesk']['appdesk']['grid']['columns']['actions']['actions'][] = $action_key;
                 }
@@ -369,6 +389,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 unset($config[$key]);
             }
         }
+
+
+
 
         return $config;
     }

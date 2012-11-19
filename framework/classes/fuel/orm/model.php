@@ -791,7 +791,6 @@ class Model extends \Orm\Model
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
-
 }
 
 

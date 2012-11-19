@@ -26,7 +26,7 @@ define(
                         }
                     },
                     inspectors : {
-                        extensions : {
+                        extension : {
                             grid : {
                                 columns : {
                                     title : {

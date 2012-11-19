@@ -46,4 +46,64 @@ return array(
             'icon' => 'book-question.png',
         ),
     ),
+    'input' => array(
+        'key' => 'media_extension',
+        'query' =>
+            function ($value, $query)
+            {
+                static $extensions = array(
+                    'image' => 'gif,png,jpg,jpeg,bmp',
+                    'document' => 'doc,xls,ppt,docx,xlsx,pptx,odt,odf,odp,pdf',
+                    'music' => 'mp3,wav',
+                    'video' => 'avi,mkv,mpg,mpeg,mov',
+                    'archive' => 'zip,rar,tar,gz,7z',
+                    'text' => 'txt,xml,htm,html',
+                );
+                $ext = array();
+                $other = array();
+                $value = (array) $value;
+                foreach ($extensions as $extension => $extension_list) {
+                    $extension_list = explode(',', $extension_list);
+                    if (in_array($extension, $value)) {
+                        $ext = array_merge($ext, $extension_list);
+                    } else {
+                        $other = array_merge($other, $extension_list);
+                    }
+                }
+                $opened = false;
+                if (!empty($ext)) {
+                    $opened or $query->and_where_open();
+                    $opened = true;
+                    $query->or_where(array('media_ext', 'IN', $ext));
+                }
+                if (in_array('other', $value)) {
+                    $opened or $query->and_where_open();
+                    $opened = true;
+                    $query->or_where(array('media_ext', 'NOT IN', $other));
+                }
+                $opened and $query->and_where_close();
+
+                return $query;
+            },
+    ),
+    'appdesk' => array(
+        'vertical' => true,
+        'label' => __('Type of file'),
+        'url' => 'admin/noviusos_media/inspector/extension/list',
+        'inputName' => 'media_extension[]',
+        'grid' => array(
+            'columns' => array(
+                'title' => array(
+                    'headerText' => __('Type of file'),
+                    'dataKey' => 'title',
+                ),
+                'hide' => array(
+                    'visible' => false,
+                ),
+                'hide2' => array(
+                    'visible' => false,
+                ),
+            ),
+        ),
+    ),
 );

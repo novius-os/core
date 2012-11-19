@@ -28,7 +28,6 @@ return array(
         'User' => __('User'),
         'Email' => __('Email'),
         'Permissions' => __('Permissions'),
-
         'addDropDown' => __('Select an action'),
         'columns' => __('Columns'),
         'showFiltersColumns' => __('Filters column header'),

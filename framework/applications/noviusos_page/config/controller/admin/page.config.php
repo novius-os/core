@@ -46,24 +46,6 @@ return array(
             'blankSlate' => __('Translate a page'),
         ),
     ),
-    'actions' => array(
-        'visualise' =>
-            function ($item)
-            {
-                if (!$item->is_new()) {
-                    return array(
-                        'label' => __('Visualise'),
-                        'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                        'action' => array(
-                            'action' => 'window.open',
-                            'url' => $item->url(array('preview'  => true)),
-                        ),
-                    );
-                } else {
-                    return array();
-                }
-            }
-    ),
     'layout' => array(
         'form' => array(
             'view' => 'nos::form/layout_standard',
