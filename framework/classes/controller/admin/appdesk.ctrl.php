@@ -87,7 +87,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id');
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs');
         if (isset($config['model'])) {
             $namespace_model = substr($config['model'], 0, strrpos($config['model'], '\\'));
 
@@ -218,10 +218,17 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
                 $config['appdesk']['appdesk']['buttons'] = array();
                 $actions = \Arr::merge(\Config::actions(array('models' => $config['toolbar']['models'], 'type' => 'appdeskToolbar')), $config['toolbar']['actions']);
+                $primary = false;
                 foreach ($actions as $key => $action) {
                     if ($action !== false) {
+                        if (!empty($action['primary']) && $action['primary']) {
+                            $primary = true;
+                        }
                         $config['appdesk']['appdesk']['buttons'][$key] = $action;
                     }
+                }
+                if (!$primary && !empty($config['appdesk']['appdesk']['buttons'][$config['model'].'.add'])) {
+                    $config['appdesk']['appdesk']['buttons'][$config['model'].'.add']['primary'] = true;
                 }
             }
 
@@ -310,6 +317,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
                     }
                 }
+                $query->or_where(array(\Db::expr('1'), 1));
                 $query->and_where_close();
             }
 
