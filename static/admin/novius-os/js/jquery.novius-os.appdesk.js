@@ -213,33 +213,32 @@ define('jquery-nos-appdesk',
                     return self;
                 }
 
-                var first = o.buttons.shift(),
-                    $button = $('<button></button>').text(first.label)
-                        .data('icon', first.icon || 'plus')
-                        .addClass('primary')
-                        .click(function(e) {
-                            e.preventDefault();
-                            e.stopImmediatePropagation();
-                            $(this).nosAction(first.action, {
+                $.each(o.buttons, function(i, button) {
+                    var $el;
+                    if (button.primary) {
+                        $el = $('<button></button>').text(button.label)
+                            .data('icon', button.icon || 'plus')
+                            .addClass('primary')
+                            .click(function(e) {
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                $(this).nosAction(button.action, {
                                     context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
-                        });
-
-                self.element.nosToolbar('add', $button);
-
-                $.each(o.buttons, function(i, add) {
-                    var $a = $('<a href="#"></a>')
-                        .addClass('nos-appdesk-action-secondary')
-                        .text(this.label)
-                        .click(function(e) {
-                            e.preventDefault();
-                            e.stopImmediatePropagation();
-                            $(this).nosAction(add.action, {
+                            });
+                    } else {
+                        $el = $('<a href="#"></a>')
+                            .addClass('nos-appdesk-action-secondary')
+                            .text(button.label)
+                            .click(function(e) {
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                $(this).nosAction(button.action, {
                                     context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
-                        });
-
-                    self.element.nosToolbar('add', $a);
+                            });
+                    }
+                    self.element.nosToolbar('add', $el);
                 });
 
                 return self;
