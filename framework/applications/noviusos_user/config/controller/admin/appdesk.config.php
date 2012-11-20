@@ -22,19 +22,12 @@ return array(
         'user_email',
     ),
     'hideContexts' => true,
-    'selectedView' => 'default',
-    'views' => array(
-        'default' => array(
-            'name' => __('Default view'),
-        )
-    ),
     'i18n' => array(
         'Users' => __('Users'),
         'Add a user' => __('Add a user'),
         'User' => __('User'),
         'Email' => __('Email'),
         'Permissions' => __('Permissions'),
-
         'addDropDown' => __('Select an action'),
         'columns' => __('Columns'),
         'showFiltersColumns' => __('Filters column header'),
@@ -54,24 +47,5 @@ return array(
         'viewThumbnails' => __('Thumbnails'),
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
-    ),
-    'dataset' => array(
-        'fullname' => array(
-            'headerText' => __('Name'),
-            //'search_column' => \DB::expr('CONCAT(user_firstname, user_name)'),
-            'value' => function($item) {
-                return $item->fullname();
-            },
-        ),
-        'email' => array(
-            'headerText' => __('Email'),
-            'column' => 'user_email',
-        ),
-        'id_permission' => array(
-            'visible' => false,
-            'value' => function($item) {
-                return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
-            },
-        ),
     ),
 );

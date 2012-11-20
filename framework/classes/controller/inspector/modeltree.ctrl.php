@@ -49,10 +49,15 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
     public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid')
     {
         if (isset($config['model'])) {
-            $admin_config = $config['model']::admin_config();
+            if (!isset($config['data_mapping'])) {
+                $config['data_mapping'] = null;
+            }
+
+            $common_config = \Nos\Config_Common::load($config['model'], $config['data_mapping']);
+            $data_mapping = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array();
 
             if (!isset($config['dataset'])) {
-                $config['dataset']  = $admin_config['dataset'];
+                $config['dataset']  = $data_mapping;
             }
             $config['dataset']['id']       = array(
                 'column' => 'id',
@@ -70,6 +75,10 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 }
             }
 
+            if (!isset($config['order_by'])) {
+                $config['order_by'] = $config['model']::prefix().'sort';
+            }
+
             if (!isset($config['models'])) {
                 $config['models'] = array(array());
             }
@@ -79,7 +88,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             }
 
             if (!isset($config['models'][0]['order_by'])) {
-                $config['models'][0]['order_by'] = $config['model']::prefix().'sort';
+                $config['models'][0]['order_by'] = $config['order_by'];
             }
 
             if (!isset($config['models'][0]['childs'])) {
@@ -103,7 +112,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             }
 
             if (!isset($config['roots'][0]['order_by'])) {
-                $config['roots'][0]['order_by'] = $config['model']::prefix().'sort';
+                $config['roots'][0]['order_by'] = $config['order_by'];
             }
 
             if (!isset($config['input']['query'])) {
