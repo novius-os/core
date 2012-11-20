@@ -22,6 +22,15 @@ use Arr;
 
 class Model extends \Orm\Model
 {
+
+    protected static $_valid_relations = array(
+        'belongs_to' => 'Orm\\BelongsTo',
+        'has_one' => 'Orm\\HasOne',
+        'has_many' => 'Orm\\HasMany',
+        'many_many' => 'Orm\\ManyMany',
+        'attachment' => 'Nos\\Orm_Attachment',
+    );
+
     protected static $_has_many = array();
 
     /**
