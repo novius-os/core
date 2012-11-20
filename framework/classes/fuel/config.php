@@ -157,7 +157,7 @@ class Config extends \Fuel\Core\Config
 
         $selected_actions = array();
         foreach ($context['models'] as $model) {
-            $actions = $model::admin_config();
+            $actions = \Nos\Config_Common::load($model, array());
             $actions = $actions['actions'];
 
             foreach ($actions as $key => $action) {

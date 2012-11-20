@@ -143,7 +143,6 @@ define('jquery-nos',
                 require([
                     'wijmo.wijlightbox'
                 ], function() {
-
                     var image = new Image();
                     image.onerror = function() {
                         $.nosNotify('Image not found', 'error');
@@ -159,7 +158,7 @@ define('jquery-nos',
                             .find('img')
                             .attr({
                                 src : media.path,
-                                title : media.title
+                                title : media.media_title
                             })
                             .css({
                                 width : 0,

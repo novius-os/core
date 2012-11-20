@@ -17,7 +17,7 @@ define(
                     thumbnails : {
                         dataParser : function(size, item) {
                             var data = {
-                                title : item.title,
+                                title : item.media_title,
                                 thumbnail : (item.image ? item.thumbnail : item.thumbnailAlternate).replace(/64/g, size),
                                 thumbnailAlternate : (item.image ? item.thumbnailAlternate : '').replace(/64/g, size),
                                 actions : []
@@ -26,7 +26,7 @@ define(
                         }
                     },
                     inspectors : {
-                        extensions : {
+                        extension : {
                             grid : {
                                 columns : {
                                     title : {
@@ -51,11 +51,11 @@ define(
                             options : {
                                 dataParser : function(item) {
                                     var data = {
-                                        title : item.title,
+                                        title : item.media_title,
                                         thumbnail : (item.image ? item.thumbnail.replace(/64/g, 256) : item.thumbnailAlternate),
                                         thumbnailAlternate : (item.image ? item.thumbnailAlternate : ''),
                                         meta : {
-                                            fileName : item.file_name,
+                                            fileName : item.media_file,
                                             pathFolder : item.path_folder + '/'
                                         }
                                     };

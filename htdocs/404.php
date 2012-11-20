@@ -25,7 +25,6 @@ if (in_array($redirect_url, array(
 }
 
 $is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
-
 if ($is_media) {
     $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $redirect_url, $m);
 
@@ -51,7 +50,8 @@ if ($is_media) {
     } else {
         if ($is_resized) {
             $source = APPPATH.$media->get_private_path();
-            $dest = DOCROOT.$m[0];
+            $target = $m[0];
+            $dest = APPPATH.$target;
             $dir = dirname($dest);
             if (!is_dir($dir)) {
                 if (!@mkdir($dir, 0755, true)) {
@@ -65,14 +65,89 @@ if ($is_media) {
                 $send_file = false;
             }
         } else {
-            $source = APPPATH.$media->get_private_path();
-            $target = DOCROOT.$media->get_public_path();
-            $dir = dirname($target);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
+            $send_file = APPPATH.$media->get_private_path();
+            $target = $media->get_public_path();
+        }
+
+        $source = $send_file;
+        $target = DOCROOT.$target;
+        $dir = dirname($target);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
+        $send_file = $source;
+    }
+
+    if (false !== $send_file && is_file($send_file)) {
+        //Nos\Tools_File::$use_xsendfile = false;
+        // This is a 404 error handler, so force status 200
+        header('HTTP/1.0 200 Ok');
+        header('HTTP/1.1 200 Ok');
+
+        Nos\Tools_File::send($send_file);
+    }
+}
+
+$is_attachment = preg_match('`^(?:cache/)?files/`', $redirect_url);
+if ($is_attachment) {
+    $is_resized = preg_match('`cache/files/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`Uu', $redirect_url, $m);
+
+    if ($is_resized) {
+        list($target_resized, $path, $max_width, $max_height, $verification, $extension) = $m;
+        $attachment_url = str_replace("/$max_width-$max_height-$verification", '', $path);
+        $attachment_url = str_replace("/$max_width-$max_height", '', $attachment_url);
+    } else {
+        $attachment_url = str_replace('files/', '', $redirect_url);
+    }
+
+    $send_file = false;
+    $check = false;
+    $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z]+)$`Uu', $attachment_url, $m);
+    if ($match) {
+        list(, $alias, $attached, $filename, $extension) = $m;
+
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
+        $attachments = \Config::get("data::attachments", array());
+        if (isset($attachments[$alias])) {
+            $config = $attachments[$alias];
+            $attachment = \Nos\Attachment::forge($attached, $config);
+            $send_file = $attachment->path();
+            if (!empty($send_file)) {
+                if (isset($config['check']) && is_callable($config['check'])) {
+                    $check = $config['check'];
+                    if (!$check($attachment)) {
+                        $send_file = false;
+                    }
+                }
             }
-            symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
-            $send_file = $source;
+        }
+
+        if ($send_file && $is_resized) {
+            $source = $send_file;
+            $target_relative = $target_resized;
+            $send_file = APPPATH.$target_relative;
+            $dir = dirname($send_file);
+            try {
+                !is_dir($dir) && \File::create_dir(APPPATH.'cache', \Str::sub($dir, \Str::length(APPPATH.'cache')));
+                \Nos\Tools_Image::resize($source, $max_width, $max_height, $send_file);
+            } catch (\Exception $e) {
+                $send_file = false;
+            }
+        } else if ($send_file) {
+            $target_relative = $attachment->url();
+        }
+
+        if ($send_file && $check === false) {
+            $source = $send_file;
+            $target = DOCROOT.$target_relative;
+            $dir = dirname($target);
+            try {
+                !is_dir($dir) && \File::create_dir(DOCROOT, \Str::sub($dir, \Str::length(DOCROOT)));
+                symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
+            } catch (\Exception $e) {
+                $send_file = false;
+            }
         }
     }
 
@@ -87,7 +162,7 @@ if ($is_media) {
 }
 
 // real 404
-if (!$is_media && pathinfo($redirect_url, PATHINFO_EXTENSION) == 'html') {
+if (!$is_attachment && !$is_media && pathinfo($redirect_url, PATHINFO_EXTENSION) == 'html') {
     $response = Request::forge('nos/front/index', false)->execute()->response();
     $response->send(true);
 }

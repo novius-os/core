@@ -12,10 +12,6 @@ define([
 ], function() {
     "use strict";
     return function(appDesk) {
-        return {
-            appdesk : {
-                inspectorsOrder : 'folders,extensions,preview'
-            }
-        };
+        return {};
     };
 });
