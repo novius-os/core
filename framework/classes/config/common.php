@@ -1,5 +1,6 @@
 <?php
 namespace Nos;
+
 class Config_Common
 {
 
@@ -149,13 +150,20 @@ class Config_Common
             $generated_actions[$model.'.'.$name] = $template;
 
             if (isset($urls[$name])) {
-                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
+                \Arr::set(
+                    $generated_actions[$model.'.'.$name],
+                    $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.
+                    \Arr::get($generated_actions[$model.'.'.$name], $urls[$name])
+                );
             }
 
             if (isset($config['labels'][$name])) {
                 $generated_actions[$model.'.'.$name]['label'] = $config['labels'][$name];
             }
-            $generated_actions[$model.'.'.$name]['label'] = \Str::tr($generated_actions[$model.'.'.$name]['label'], array('model_label' => $model_label));
+            $generated_actions[$model.'.'.$name]['label'] = \Str::tr(
+                $generated_actions[$model.'.'.$name]['label'],
+                array('model_label' => $model_label)
+            );
 
             if ($name == 'share') {
                 $generated_actions[$model.'.'.$name]['action']['data']['model_name'] = $model;
@@ -173,7 +181,8 @@ class Config_Common
         return $actions;
     }
 
-    static function process_data_mapping($application_name, $class, $config) {
+    protected static function process_data_mapping($application_name, $class, $config)
+    {
         if (!isset($config['data_mapping'])) {
             return array();
         }
@@ -202,7 +211,8 @@ class Config_Common
         return $config['data_mapping'];
     }
 
-    static function filter_data_mapping($initial_data_mapping, $filter) {
+    protected static function filter_data_mapping($initial_data_mapping, $filter)
+    {
         if ($filter != null) {
             $data_mapping = array();
             foreach ($filter as $key => $value) {
@@ -216,12 +226,16 @@ class Config_Common
                 }
 
                 if (!is_array($initial_data_mapping[$data_mapping_key])) {
-                    $data_mapping[$data_mapping_key] = $data_mapping_extend === null ? $initial_data_mapping[$data_mapping_key] : $data_mapping_extend;
+                    $data_mapping[$data_mapping_key] = $data_mapping_extend === null ?
+                        $initial_data_mapping[$data_mapping_key] : $data_mapping_extend;
                 } else {
                     if ($data_mapping_extend === null) {
                         $data_mapping_extend = array();
                     }
-                    $data_mapping[$data_mapping_key] = \Arr::merge($initial_data_mapping[$data_mapping_key], $data_mapping_extend);
+                    $data_mapping[$data_mapping_key] = \Arr::merge(
+                        $initial_data_mapping[$data_mapping_key],
+                        $data_mapping_extend
+                    );
                 }
             }
             return $data_mapping;
