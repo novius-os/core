@@ -116,10 +116,14 @@ class Event_Instance extends Fuel\Core\Event_Instance
         }
     }
 
-    public function trigger_function($event, $args = array())
+    public function trigger_function($event, $args = array(), $return_type = 'array')
     {
+        $calls = array();
         foreach (\Event::trigger($event, null, 'array') as $c) {
-            is_callable($c) && call_user_func_array($c, $args);
+            if (is_callable($c)) {
+                $calls[] = call_user_func_array($c, $args);
+            }
         }
+        return $this->_format_return($calls, $return_type);
     }
 }
