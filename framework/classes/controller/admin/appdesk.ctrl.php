@@ -87,7 +87,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id');
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs');
         if (isset($config['model'])) {
             $namespace_model = substr($config['model'], 0, strrpos($config['model'], '\\'));
 
@@ -176,7 +176,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['toolbar']['actions'])) {
                 $config['toolbar']['actions'] = array();
             }
-
 
             if (!isset($config['tree'])) {
                 if ($behaviours['tree']) {
@@ -299,19 +298,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['appdesk']['appdesk'] = array();
             }
 
-            if (!isset($config['appdesk']['appdesk']['thumbnails'])) {
-                $config['appdesk']['appdesk']['thumbnails'] = array();
-            }
-
-            if (!isset($config['appdesk']['appdesk']['thumbnails']['actions'])) {
-                $config['appdesk']['appdesk']['thumbnails']['actions'] = array();
-                foreach ($config['appdesk']['actions'] as $key => $action) {
-                    $config['appdesk']['appdesk']['thumbnails']['actions'][] = $key;
+            if (isset($config['thumbnails']) && ($config['thumbnails'] === true || is_array($config['thumbnails']))) {
+                if (!isset($config['appdesk']['appdesk']['thumbnails'])) {
+                    $config['appdesk']['appdesk']['thumbnails'] = $config['thumbnails'] === true ? array() : $config['thumbnails'];
                 }
-            }
 
-            if (!isset($config['appdesk']['appdesk']['thumbnails']['thumbnailSize'])) {
-                $config['appdesk']['appdesk']['thumbnails']['thumbnailSize'] = 64;
+                if (!isset($config['appdesk']['appdesk']['thumbnails']['actions'])) {
+                    $config['appdesk']['appdesk']['thumbnails']['actions'] = array();
+                    foreach ($config['appdesk']['actions'] as $key => $action) {
+                        $config['appdesk']['appdesk']['thumbnails']['actions'][] = $key;
+                    }
+                }
+
+                if (!isset($config['appdesk']['appdesk']['thumbnails']['thumbnailSize'])) {
+                    $config['appdesk']['appdesk']['thumbnails']['thumbnailSize'] = 64;
+                }
             }
 
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
@@ -375,12 +376,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
 
-            if (!isset($config['appdesk']['appdesk']['treeGrid'])) {
-                $config['appdesk']['appdesk']['treeGrid'] = array();
-            }
+            if (isset($config['tree'])) {
+                if (!isset($config['appdesk']['appdesk']['treeGrid'])) {
+                    $config['appdesk']['appdesk']['treeGrid'] = array();
+                }
 
-            if (!isset($config['appdesk']['appdesk']['treeGrid']['urlJson'])) {
-                $config['appdesk']['appdesk']['treeGrid']['urlJson'] = $appdesk_path.'/tree_json';
+                if (!isset($config['appdesk']['appdesk']['treeGrid']['urlJson'])) {
+                    $config['appdesk']['appdesk']['treeGrid']['urlJson'] = $appdesk_path.'/tree_json';
+                }
             }
         }
 

@@ -184,6 +184,7 @@ return array(
             'visible' => false
         ),
     ),
+    'thumbnails' => true,
     'appdesk' => array(
         'reloadEvent' => array(
             'Nos\\Media\\Model_Media',
@@ -192,6 +193,9 @@ return array(
                 'action' => 'delete',
             ),
         ),
+        'appdesk' => array(
+            'defaultView' => 'thumbnails',
+        )
     ),
 
 );
