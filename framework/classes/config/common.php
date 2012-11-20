@@ -194,6 +194,8 @@ class Config_Common
                 if (!isset($item['headerText'])) {
                     $item['visible'] = false;
                 }
+            } else if (is_string($item)) {
+                $config['data_mapping'][$item] = array();
             }
         }
 

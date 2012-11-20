@@ -14,8 +14,6 @@ I18n::load('media', 'nos_media');
 return array(
     'model' => 'Nos\\Media\\Model_Media',
     'query' => array(
-        'model' => 'Nos\Media\Model_Media',
-        'related' => array(),
         'limit' => 10,
     ),
     'inspectors' => array(
@@ -97,92 +95,6 @@ return array(
         'viewThumbnails' => __('Thumbnails'),
         'preview' => __('Preview'),
         'loading' => __('Loading...'),
-    ),
-    'dataset' => array(
-        'extension' => array(
-            'headerText' => __('Ext.'),
-            'column' => 'media_ext',
-            'width' => 60,
-        ),
-        'title' => array(
-            'headerText' => __('Title'),
-            'column' => 'media_title'
-        ),
-        'file_name' => array(
-            'column' => 'media_file',
-            'visible' => false
-        ),
-        'path' => array(
-            'value' => function ($item) {
-                return $item->get_public_path();
-            },
-            'visible' => false
-        ),
-        'path_folder' => array(
-            'value' => function ($item) {
-                return dirname($item->get_public_path());
-            },
-            'visible' => false
-        ),
-        'image' => array(
-            'value' => function ($item) {
-                return $item->is_image();
-            },
-            'visible' => false
-        ),
-        'thumbnail' => array(
-            'value' => function ($item) {
-                return $item->is_image() ? $item->get_public_path_resized(64, 64) : '';
-            },
-            'visible' => false
-        ),
-        'height' => array(
-            'column' => 'media_height',
-            'visible' => false
-        ),
-        'width' => array(
-            'column' => 'media_width',
-            'visible' => false
-        ),
-        'thumbnailAlternate' => array(
-            'value' => function ($item) {
-                $extensions = array(
-                    'gif' => 'image.png',
-                    'png' => 'image.png',
-                    'jpg' => 'image.png',
-                    'jpeg' => 'image.png',
-                    'bmp' => 'image.png',
-                    'doc' => 'document.png',
-                    'xls' => 'document.png',
-                    'ppt' => 'document.png',
-                    'docx' => 'document.png',
-                    'xlsx' => 'document.png',
-                    'pptx' => 'document.png',
-                    'odt' => 'document.png',
-                    'odf' => 'document.png',
-                    'odp' => 'document.png',
-                    'pdf' => 'document.png',
-                    'mp3' => 'music.png',
-                    'wav' => 'music.png',
-                    'avi' => 'video.png',
-                    'mkv' => 'video.png',
-                    'mpg' => 'video.png',
-                    'mpeg' => 'video.png',
-                    'mov' => 'video.png',
-                    'zip' => 'archive.png',
-                    'rar' => 'archive.png',
-                    'tar' => 'archive.png',
-                    'gz' => 'archive.png',
-                    '7z' => 'archive.png',
-                    'txt' => 'text.png',
-                    'xml' => 'text.png',
-                    'htm' => 'text.png',
-                    'html' => 'text.png',
-                );
-                return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$item->media_ext] : '';
-            },
-            'visible' => false
-        ),
     ),
     'thumbnails' => true,
     'appdesk' => array(
