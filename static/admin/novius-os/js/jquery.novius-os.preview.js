@@ -79,7 +79,7 @@ define('jquery-nos-preview',
                 return self;
             },
 
-            _uiFooter : function() {
+            _uiFooter : function(data) {
                 var self = this,
                     o = self.options;
 
@@ -90,50 +90,16 @@ define('jquery-nos-preview',
                         .appendTo(self.uiContainer);
 
                     $.each(o.actions, function() {
-                        var action = this;
-                        var iconClass = false;
-                        if (action.iconClasses) {
-                            iconClass = action.iconClasses;
-                        } else if (action.icon) {
-                            iconClass = 'nos-inline-icon16 ui-icon ui-icon-' + action.icon;
-                        }
-                        var text;
-                        if (action.primary) {
-                            text = (iconClass ? '<span class="ui-button-icon-primary ' + iconClass +' wijmo-wijmenu-icon-left"></span>' : '');
-                            text += '<span class="ui-button-text">' + action.label + '</span>';
-                            $('<button></button>')
-                                .addClass('ui-button ui-button-text' + (action.icon ? '-icon-primary' : '') + ' ui-widget ui-state-default ui-corner-all')
-                                .css({
-                                    marginBottom : '5px'
-                                })
+                        var action = this,
+                            element = $.extend(true, {
+                                    type: action.primary ? 'button' : 'link'
+                                }, action),
+                            $element = $.nosUIElement(element, data)
                                 .appendTo(self.uiFooter)
-                                .html(text)
-                                .hover(function() {
-                                    $(this).addClass('ui-state-hover');
-                                }, function() {
-                                    $(this).removeClass('ui-state-hover');
-                                })
-                                .click(function(e) {
-                                    e.preventDefault();
-                                    e.stopImmediatePropagation();
-                                    $(this).nosAction(action.action, self.data);
-                                })
-                        } else {
-                            text = (iconClass ? '<span class="' + iconClass +'"></span> ' : '');
-                            text += '<span class="ui-button-text">' + action.label + '</span>';
-                            $('<a href="#"></a>')
-                                .css({
-                                    display : 'inline-block',
-                                    marginBottom : '5px'
-                                })
-                                .appendTo(self.uiFooter)
-                                .html(text)
-                                .click(function(e) {
-                                    e.preventDefault();
-                                    e.stopImmediatePropagation();
-                                    $(this).nosAction(action.action, self.data);
-                                })
-                        }
+                                .css({marginBottom : '5px'})
+                                .nosOnShow('show');
+
+                        self.uiFooter.nosFormUI();
                     });
 
                 }
@@ -144,8 +110,12 @@ define('jquery-nos-preview',
             _uiThumbnail : function(data) {
                 var self = this,
                     o = self.options,
-                    thumbnail = data.thumbnail.replace(/64-64/g, '256-256') || data.thumbnailAlternate;
-
+                    thumbnail;
+                if (data.thumbnail) {
+                    thumbnail = data.thumbnail.replace(/64-64/g, '256-256');
+                } else if (data.thumbnailAlternate) {
+                    thumbnail = data.thumbnailAlternate;
+                }
                 if (thumbnail) {
                     self._loadImg(data, thumbnail);
                 }
@@ -283,15 +253,15 @@ define('jquery-nos-preview',
                         .empty()
                         .css('height', '100%');
 
-                    self._uiHeader(data.title);
+                    self._uiHeader(data.title || o.texts.headerDefault);
 
                     self.uiContainer = $('<div></div>')
                         .addClass('nos-preview-container')
                         .appendTo(self.element);
 
                     self._uiThumbnail(data)
-                        ._uiMetaData(data.meta)
-                        ._uiFooter();
+                        ._uiMetaData(data)
+                        ._uiFooter(data);
 
                     self.element.wijsuperpanel({
                             showRounder : false,

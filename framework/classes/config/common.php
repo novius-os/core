@@ -122,7 +122,8 @@ class Config_Common
                 ),
                 'enabled' =>
                 function($item) {
-                    return !$item->is_new();
+                    $model = get_class($item);
+                    return !$item->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },
             )
         );
