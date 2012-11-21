@@ -79,7 +79,7 @@ define('jquery-nos-preview',
                 return self;
             },
 
-            _uiFooter : function() {
+            _uiFooter : function(data) {
                 var self = this,
                     o = self.options;
 
@@ -94,7 +94,7 @@ define('jquery-nos-preview',
                             element = $.extend(true, {
                                     type: action.primary ? 'button' : 'link'
                                 }, action),
-                            $element = $.nosUIElement(element)
+                            $element = $.nosUIElement(element, data)
                                 .appendTo(self.uiFooter)
                                 .css({marginBottom : '5px'})
                                 .nosOnShow('show');
@@ -261,7 +261,7 @@ define('jquery-nos-preview',
 
                     self._uiThumbnail(data)
                         ._uiMetaData(data)
-                        ._uiFooter();
+                        ._uiFooter(data);
 
                     self.element.wijsuperpanel({
                             showRounder : false,

@@ -196,7 +196,7 @@ define('jquery-nos',
                 });
             },
 
-            nosUIElement : function(element) {
+            nosUIElement : function(element, data) {
                 var date, id, iconClass, $element;
 
                 element = $.extend({
@@ -238,7 +238,7 @@ define('jquery-nos',
                 if ($element) {
                     $.each(element.bind, function(event, action) {
                         $element.bind(event, function() {
-                            $element.nosAction(action);
+                            $element.nosAction(action, data);
                         });
                     });
 
