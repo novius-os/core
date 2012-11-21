@@ -144,8 +144,12 @@ define('jquery-nos-preview',
             _uiThumbnail : function(data) {
                 var self = this,
                     o = self.options,
-                    thumbnail = data.thumbnail.replace(/64-64/g, '256-256') || data.thumbnailAlternate;
-
+                    thumbnail;
+                if (data.thumbnail) {
+                    thumbnail = data.thumbnail.replace(/64-64/g, '256-256');
+                } else if (data.thumbnailAlternate) {
+                    thumbnail = data.thumbnailAlternate;
+                }
                 if (thumbnail) {
                     self._loadImg(data, thumbnail);
                 }
@@ -283,14 +287,14 @@ define('jquery-nos-preview',
                         .empty()
                         .css('height', '100%');
 
-                    self._uiHeader(data.title);
+                    self._uiHeader(data.title || o.texts.headerDefault);
 
                     self.uiContainer = $('<div></div>')
                         .addClass('nos-preview-container')
                         .appendTo(self.element);
 
                     self._uiThumbnail(data)
-                        ._uiMetaData(data.meta)
+                        ._uiMetaData(data)
                         ._uiFooter();
 
                     self.element.wijsuperpanel({
