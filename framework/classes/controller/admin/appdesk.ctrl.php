@@ -89,7 +89,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     {
         $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs');
         if (isset($config['model'])) {
-            $namespace_model = substr($config['model'], 0, strrpos($config['model'], '\\'));
+            $config['model'] = ltrim($config['model'], '\\');
+            $namespace_model = \Inflector::get_namespace($config['model']);
 
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();
