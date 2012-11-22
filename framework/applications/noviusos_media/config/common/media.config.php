@@ -4,6 +4,8 @@ return array(
         'media_ext' => array(
             'title' => __('Ext.'),
             'width' => 60,
+            'ensurePxWidth' => true,
+            'allowSizing' => false,
         ),
         'media_title' => array(
             'title' => __('Title'),

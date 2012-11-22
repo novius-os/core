@@ -77,7 +77,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 'locales' => $locales,
                 'sites' => $sites,
             ),
-            $this->config
+            array_diff_key($this->config, array('dataset' => '', 'inputs' => '', 'query' => ''))
         );
 
         $view->set('appdesk', \Format::forge($params)->to_json(), false);
@@ -369,8 +369,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                             'headerText' => __('Status'),
                             'dataKey' => 'publication_status'
                         );
-                    } else if (!isset($value['visible']) || $value['visible']) {
-                        $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = isset($value['headerText']) ? $value['headerText'] : '';
+                    } else if (isset($value['headerText'])) {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key] = $value;
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
                 }
@@ -399,9 +399,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 unset($config[$key]);
             }
         }
-
-
-
 
         return $config;
     }

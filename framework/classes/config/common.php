@@ -20,8 +20,8 @@ class Config_Common
             $config['data_mapping'] = array();
         }
 
-        $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
         $config['data_mapping'] = static::process_data_mapping($application_name, $class, $config);
+        $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
 
         return $config;
     }
@@ -187,7 +187,13 @@ class Config_Common
         if (!isset($config['data_mapping'])) {
             return array();
         }
-        foreach ($config['data_mapping'] as $key => &$item) {
+        $data_mapping = array();
+        foreach ($config['data_mapping'] as $key => $item) {
+            if (is_string($item)) {
+                $key = $item;
+                $item = array();
+            }
+
             if (is_array($item)) {
                 // @todo two keys to process : appdesk and fieldset
                 if (!isset($item['headerText']) && isset($item['title'])) {
@@ -201,15 +207,11 @@ class Config_Common
                     // @todo: support multilevel relations ?
                     $item['search_relation'] = $relations[0];
                 }
-                if (!isset($item['headerText'])) {
-                    $item['visible'] = false;
-                }
-            } else if (is_string($item)) {
-                $config['data_mapping'][$item] = array();
+                $data_mapping[$key] = $item;
             }
         }
 
-        return $config['data_mapping'];
+        return $data_mapping;
     }
 
     protected static function filter_data_mapping($initial_data_mapping, $filter)
