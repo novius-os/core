@@ -24,6 +24,9 @@ require(
 </script>
 
 <?php
+foreach ($fieldset->field() as $field) {
+    $field->is_expert() && $field->set_type('hidden')->set_template('{field}');
+}
 echo $fieldset->build_hidden_fields();
 
 $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
@@ -99,6 +102,9 @@ if (!empty($subtitle) || !empty($publishable)) {
         $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
+            if ($field->is_expert()) {
+                continue;
+            }
             $field_template = $field->template;
             if (!empty($field_template)) {
                 $field_template = str_replace(array('<tr>', '</tr>', '<td>', '</td>'), '', $field_template);

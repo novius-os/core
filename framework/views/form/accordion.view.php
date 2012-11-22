@@ -34,6 +34,16 @@ foreach ((array) $accordions as $options) {
     if (!isset($options['title'])) {
         $options['title'] = '';
     }
+    $exclude = true;
+    foreach ((array) $options['fields'] as $field) {
+        if ($field instanceof \View || !$fieldset->field($field)->is_expert()) {
+            $exclude = false;
+            continue;
+        }
+    }
+    if ($exclude) {
+        continue;
+    }
     ?>
         <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $options['title'] ?></a></h3>
         <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">

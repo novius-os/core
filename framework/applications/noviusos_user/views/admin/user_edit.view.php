@@ -24,16 +24,6 @@ echo View::forge('nos::crud/toolbar', $view_params, false);
 }
 </style>
 
-<?php
-$fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-
-foreach ($fieldset->field() as $field) {
-    if ($field->type == 'checkbox') {
-        $field->set_template('{field} {label}');
-    }
-}
-?>
-<div>
 <div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
     <ul style="width: 15%;">
         <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
@@ -64,7 +54,6 @@ echo \View::forge('noviusos_user::admin/permission', array(
 ), false);
 ?>
     </div>
-</div>
 </div>
 
 <script type="text/javascript">
