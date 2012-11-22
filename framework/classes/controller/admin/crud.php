@@ -150,6 +150,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'url_actions'  => $this->config['controller_url'].'/json_actions'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
                 'actions' => $this->get_actions(),
+                'dataset' => \Nos\Controller::dataset_item($this->item),
                 'tab_params' => $this->get_tab_params(),
             ),
             'item' => $this->item,

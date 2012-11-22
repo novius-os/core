@@ -21,6 +21,7 @@ if (empty($saveField) && !empty($fieldset)) {
                     isNew: <?= \Format::forge($crud['is_new'])->to_json() ?>,
                     saveField: <?= \Format::forge($saveField)->to_json() ?>,
                     model: <?= \Format::forge($crud['model'])->to_json() ?>,
+                    dataset: <?= \Format::forge($crud['dataset'])->to_json() ?>,
                     itemId: <?= \Format::forge((int) $item->{$crud['pk']})->to_json() ?>,
                     urlActions: <?= \Format::forge($crud['url_actions'])->to_json() ?>,
                     ajaxData: <?= \Format::forge($crud['behaviours']['twinnable'] ? array(

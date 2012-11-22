@@ -20,6 +20,7 @@ define('jquery-nos-toolbar-crud',
                     model: '',
                     itemId: 0,
                     urlActions: '',
+                    dataset: {},
                     ajaxData: {}
                 };
                 return this.each(function() {
@@ -81,7 +82,7 @@ define('jquery-nos-toolbar-crud',
                                     }
                                 }
 
-                                $element = $container.nosToolbar('add', $.nosUIElement(element), true)
+                                $element = $container.nosToolbar('add', $.nosUIElement(element, params.dataset), true)
                                     .nosOnShow('show');
 
                                 $buttons.push($element);
