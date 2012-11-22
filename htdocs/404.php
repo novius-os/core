@@ -116,7 +116,7 @@ if ($is_attachment) {
             if (!empty($send_file)) {
                 if (isset($config['check']) && is_callable($config['check'])) {
                     $check = $config['check'];
-                    if (!$check($attachment)) {
+                    if (!call_user_func($check, $attachment)) {
                         $send_file = false;
                     }
                 }
