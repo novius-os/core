@@ -57,19 +57,7 @@ class Model_Page extends \Nos\Orm\Model
             'lang_property'      => 'page_lang',
             'common_id_property' => 'page_lang_common_id',
             'is_main_property' => 'page_lang_is_main',
-            'invariant_fields'   => array(
-                //'page_parent_id', // Depends on the lang, cannot be updated automagically
-                //'page_template',
-                'page_level',
-                //'page_raw_html',
-                'page_sort',
-                //'page_menu',
-                //'page_type',
-                //'page_lock',
-                //'page_entrance',
-                //'page_home',
-                //'page_cache_duration',
-            ),
+            'invariant_fields'   => array(),
         ),
         'Nos\Orm_Behaviour_Tree' => array(
             'events' => array('before_query', 'after_delete'),
@@ -85,7 +73,7 @@ class Model_Page extends \Nos\Orm\Model
             'parent_relation' => 'parent',
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
-            'events' => array('after_sort', 'before_insert'),
+            'events' => array('before_insert', 'before_save', 'after_save'),
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(

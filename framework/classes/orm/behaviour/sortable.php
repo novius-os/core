@@ -17,6 +17,8 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      */
     protected $_properties = array();
 
+    protected $_sort_change = false;
+
     public function before_query(&$options)
     {
         if (array_key_exists('order_by', $options)) {
@@ -50,11 +52,11 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         $this->_move($item, 10000);
     }
 
-    public function get_sort(\Nos\Orm\Model $obj)
+    public function get_sort(\Nos\Orm\Model $item)
     {
         $sort_property = $this->_properties['sort_property'];
 
-        return $obj->get($sort_property);
+        return $item->get($sort_property);
     }
 
     public function set_sort(\Nos\Orm\Model $item, $sort)
@@ -65,17 +67,23 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
     protected function _move($item, $sort)
     {
-        $sort_property = $this->_properties['sort_property'];
-        $item->set($sort_property, $sort);
-        $item->observe('before_sort');
+        $this->set_sort($item, $sort);
         $item->save();
-        $item->observe('after_sort');
     }
 
     public function before_insert(\Nos\Orm\Model $item)
     {
         $sort_property = $this->_properties['sort_property'];
         if (empty($item->{$sort_property})) {
+            $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
+            if (!empty($translatable)) {
+                if (!empty($item->{$translatable['common_id_property']})) {
+                    $obj_main = $item->find_main_lang();
+                    $item->{$sort_property} = $obj_main->{$sort_property};
+                    return;
+                }
+            }
+
             $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
             $conditions = array();
             if (!empty($tree)) {
@@ -93,29 +101,88 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         }
     }
 
-    public function after_sort(\Nos\Orm\Model $item)
-    {
-        $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
-        $sort_property = $this->_properties['sort_property'];
-        $conditions = array();
-        if (!empty($tree)) {
-            $conditions[] = array('parent', $item->get_parent());
-        }
-        $i = 1;
-        $unsorted = $item::find('all', array(
-            'where' => $conditions,
-            'order_by' => array('default_sort' => 'ASC')
-        ));
 
-        $round_value = +0.25;
-        foreach ($unsorted as $u) {
-            $sort = $u->get($sort_property);
-            if (round($sort + 0.25) != round($sort - 0.25)) {
-                $round_value += 1;
+    public function before_save(\Nos\Orm\Model $item)
+    {
+        if ($item->is_new()) {
+            return;
+        }
+
+        $sort_property = $this->_properties['sort_property'];
+        if ($item->is_changed($sort_property)) {
+            $this->_sort_change = true;
+        }
+    }
+
+    public function after_save(\Nos\Orm\Model $item)
+    {
+        if ($this->_sort_change) {
+            $this->_sort_change = false;
+            $sort_property = $this->_properties['sort_property'];
+            $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
+            if (!empty($translatable) && !$item->is_main_lang()) {
+                $obj_main = $item->find_main_lang();
+                $obj_main->set($sort_property, $item->get($sort_property));
+                $obj_main->save();
+                return;
             }
-            $u->set($sort_property, round($sort + $round_value));
-            $u->save();
-            $updated[$u->get_sort()] = $u->id;
+
+            $item->observe('before_sort');
+
+            $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
+            if (!empty($tree)) {
+                $parent = $item->get_parent();
+                if (!empty($translatable)) {
+                    if (!empty($parent)) {
+                        $unsorted = $item::find()->related($tree['parent_relation'], array(
+                            'where' => array(
+                                array($translatable['common_id_property'], $parent->{$translatable['common_id_property']}),
+                                array($translatable['is_main_property'], true),
+                            ),
+                        ))->order_by(array($sort_property => 'ASC'))->get();
+                    } else {
+                        $unsorted = $item::find('all', array(
+                            'where' => array(
+                                array('parent', $parent),
+                                array($translatable['is_main_property'], true),
+                            ),
+                            'order_by' => array($sort_property => 'ASC'),
+                        ));
+                    }
+                } else {
+                    $unsorted = $item::find('all', array(
+                        'where' => array(
+                            array('parent', $parent),
+                        ),
+                        'order_by' => array($sort_property => 'ASC'),
+                    ));
+                }
+            } else {
+                if (!empty($translatable)) {
+                    $unsorted = $item::find('all', array(
+                        'where' => array(
+                            array($translatable['is_main_property'], true),
+                        ),
+                        'order_by' => array($sort_property => 'ASC'),
+                    ));
+                } else {
+                    $unsorted = $item::find('all', array(
+                        'order_by' => array($sort_property => 'ASC'),
+                    ));
+                }
+            }
+            $i = 1;
+            $pk = \Arr::get($item->primary_key(), 0);
+            foreach ($unsorted as $u) {
+                if (!empty($translatable)) {
+                    $item::query()->set($sort_property, $i)->where($translatable['common_id_property'], $u->{$translatable['common_id_property']})->update();
+                } else {
+                    $item::query()->set($sort_property, $i)->where($pk, $u->{$pk})->update();
+                }
+                $i++;
+            }
+
+            $item->observe('after_sort');
         }
     }
 }
