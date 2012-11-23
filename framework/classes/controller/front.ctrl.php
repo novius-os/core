@@ -109,7 +109,15 @@ class Controller_Front extends Controller
                         exit($e->getMessage());
                     }
 
-                    echo $this->_view->render();
+                    $content = $this->_view->render();
+
+                    $this->_handle_head($content);
+                    foreach (\Event::trigger('front.display', null, 'array') as $c) {
+                        is_callable($c) && call_user_func_array($c, array(&$content));
+                    }
+
+                    echo $content;
+
                     $cache->save($no_cache ? -1 : CACHE_DURATION_PAGE, $this);
                     $content = $cache->execute();
 
@@ -132,12 +140,6 @@ class Controller_Front extends Controller
                     }
                 }
             }
-        }
-
-        $this->_handle_head($content);
-
-        foreach (\Event::trigger('front.display', null, 'array') as $c) {
-            is_callable($c) && call_user_func_array($c, array(&$content));
         }
 
         return \Response::forge($content, $status);
