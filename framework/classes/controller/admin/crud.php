@@ -154,9 +154,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         return $view_params;
     }
-    
+
     /**
-     * Called before displaying the form to 
+     * Called before displaying the form to
      * - call from_item
      * - check permission
      * - build fields
@@ -510,20 +510,28 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     );
                 }
             }
-            $actions[] = array(
-                'label' => $this->config['messages']['delete'],
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
-                        'title' => $this->config['messages']['delete an item'],
+            if (empty($this->config['actions']['delete']) || !is_callable($this->config['actions']['delete']) || $this->config['actions']['delete']($this->item)) {
+                $actions[] = array(
+                    'label' => $this->config['messages']['delete'],
+                    'action' => array(
+                        'action' => 'confirmationDialog',
+                        'dialog' => array(
+                            'contentUrl' => $this->config['controller_url'].'/delete/'.$this->item->{$this->pk},
+                            'title' => $this->config['messages']['delete an item'],
+                        ),
                     ),
-                ),
-                'icon' => 'trash',
-            );
+                    'icon' => 'trash',
+                );
+                unset($this->config['actions']['delete']);
+            }
         }
         foreach ($this->config['actions'] as $action) {
-            $actions[] = is_callable($action) ? $action($this->item) : $action;
+            if (is_callable($action)) {
+                $action = $action($this->item);
+            }
+            if (!empty($action)) {
+                $actions[] = $action;
+            }
         }
         if (!$this->is_new) {
             if ($this->behaviours['sharable']) {

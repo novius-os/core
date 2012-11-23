@@ -47,6 +47,9 @@ return array(
         ),
     ),
     'actions' => array(
+        'delete' => function($item) {
+            return $item->page_lock != $item::LOCK_DELETION;
+        },
         'visualise' => function($item) {
             if (!$item->is_new())
             {
