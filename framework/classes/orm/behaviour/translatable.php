@@ -121,28 +121,25 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
         $new_parent = $item->get_parent();
 
-        // Parent was removed, it's ok
-        if (null === $new_parent) {
-            return;
-        }
+        if (!empty($new_parent)) {
+            $langs_parent = $new_parent->get_all_lang();
 
-        $langs_parent = $new_parent->get_all_lang();
+            if ($item->is_new()) {
+                $lang_self = $item->get_lang();
+                if (!in_array($lang_self, $langs_parent)) {
+                    throw new \Exception(strtr(__('Cannot create this element here because the parent does not exists in {lang}.'), array(
+                        '{lang}' => $lang_self,
+                    )));
+                }
+            } else {
+                $langs_self= $this->get_all_lang($item);
 
-        if ($item->is_new()) {
-            $lang_self = $item->get_lang();
-            if (!in_array($lang_self, $langs_parent)) {
-                throw new \Exception(strtr(__('Cannot create this element here because the parent does not exists in {lang}.'), array(
-                    '{lang}' => $lang_self,
-                )));
-            }
-        } else {
-            $langs_self= $this->get_all_lang($item);
-
-            $missing_langs = array_diff($langs_self, $langs_parent);
-            if (!empty($missing_langs)) {
-                throw new \Exception(strtr(__('Cannot move this element here because the parent does not exists in the following langages: {langs}'), array(
-                    '{langs}' => implode(', ', $missing_langs),
-                )));
+                $missing_langs = array_diff($langs_self, $langs_parent);
+                if (!empty($missing_langs)) {
+                    throw new \Exception(strtr(__('Cannot move this element here because the parent does not exists in the following langages: {langs}'), array(
+                        '{langs}' => implode(', ', $missing_langs),
+                    )));
+                }
             }
         }
 
@@ -154,9 +151,6 @@ class Orm_Behaviour_Translatable extends Orm_Behaviour
             return;
         }
         $in_progress = array_keys($items);
-
-        // This event has been sent from the tree behaviour, so we don't need to check it exists
-        $new_parent = $item->get_parent();
 
         foreach ($items as $item) {
             $parent = $new_parent === null ? null : $new_parent->find_lang($item->get_lang());
