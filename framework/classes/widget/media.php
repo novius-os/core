@@ -88,7 +88,7 @@ class Widget_Media extends \Fieldset_Field
         if (!empty($media_id)) {
             $media = \Nos\Model_Media::find($media_id);
             if (!empty($media)) {
-                $options['inputFileThumb']['file'] = $media->get_public_path_resized(64, 64);
+                $options['inputFileThumb']['file'] = $media->is_image() ? $media->get_public_path_resized(64, 64) : $media->get_public_path();
             }
         }
     }
