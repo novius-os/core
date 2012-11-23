@@ -55,6 +55,7 @@ if ($is_media) {
             $dir = dirname($dest);
             if (!is_dir($dir)) {
                 if (!@mkdir($dir, 0755, true)) {
+                    error_log("Can't create dir ".$dir);
                     exit("Can't create dir ".$dir);
                 }
             }
@@ -142,12 +143,17 @@ if ($is_attachment) {
             $source = $send_file;
             $target = DOCROOT.$target_relative;
             $dir = dirname($target);
-            try {
-                !is_dir($dir) && \File::create_dir(DOCROOT, \Str::sub($dir, \Str::length(DOCROOT)));
-                symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
-            } catch (\Exception $e) {
-                $send_file = false;
+            if (!is_dir($dir)) {
+                if(!@mkdir($dir, 0755, true)) {
+                    Log::error("Can't create dir ".$dir);
+                    exit("Can't create dir ".$dir);
+                }
             }
+            if(!@symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target)) {
+                Log::error("Can't symlink in ".$source);
+                exit("Can't symlink in ".$source);
+            }
+            $send_file = $source;
         }
     }
 

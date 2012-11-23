@@ -501,7 +501,7 @@ define('jquery-nos',
 
                 data = data || {};
                 var contentUrls = {
-                        'all'   : 'admin/noviusos_media/appdesk',
+                        'all'   : 'admin/noviusos_media/appdesk?view=media_pick',
                         'image' : 'admin/noviusos_media/appdesk?view=image_pick'
                     },
                     $input = this;
@@ -518,7 +518,7 @@ define('jquery-nos',
                                 title: 'Choose a media file'
                             }).bind('select_media', function(e, item) {
                                 $input.inputFileThumb({
-                                    file: item.thumbnail
+                                    file: item.image ? item.thumbnail : item.path
                                 });
                                 $input.val(item.id).trigger('change', {
                                     item : item

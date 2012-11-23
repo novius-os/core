@@ -73,7 +73,7 @@ class Model_Page extends \Nos\Orm\Model
             'parent_relation' => 'parent',
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
-            'events' => array('after_sort', 'before_insert'),
+            'events' => array('before_insert', 'before_save', 'after_save'),
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(
