@@ -132,6 +132,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
                     throw new \Exception(strtr(__('Cannot move this element here because the parent does not exists in the following contexts: {contexts}'), array(
                         '{contexts}' => implode(', ', $missing_contexts),
                     )));
+                }
             }
         }
 
