@@ -55,6 +55,7 @@ if ($is_media) {
             $dir = dirname($dest);
             if (!is_dir($dir)) {
                 if (!@mkdir($dir, 0755, true)) {
+                    error_log("Can't create dir ".$dir);
                     exit("Can't create dir ".$dir);
                 }
             }
@@ -69,9 +70,15 @@ if ($is_media) {
             $target = DOCROOT.$media->get_public_path();
             $dir = dirname($target);
             if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
+                if(!@mkdir($dir, 0755, true)) {
+                    Log::error("Can't create dir ".$dir);
+                    exit("Can't create dir ".$dir);
+                }
             }
-            symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
+            if(!@symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target)) {
+                Log::error("Can't symlink in ".$source);
+                exit("Can't symlink in ".$source);
+            }
             $send_file = $source;
         }
     }
