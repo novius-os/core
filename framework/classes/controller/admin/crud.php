@@ -166,11 +166,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     /**
      * Called before displaying the form to
-<<<<<<< HEAD
      * - call init_item
-=======
-     * - call from_item
->>>>>>> master/0.1.3
      * - check permission
      * - build fields
      * @param type $id
