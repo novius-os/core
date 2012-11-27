@@ -19,16 +19,6 @@ $uniqid = uniqid('id_');
 }
 </style>
 
-<?php
-$fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
-
-foreach ($fieldset->field() as $field) {
-    if ($field->type == 'checkbox') {
-        $field->set_template('{field} {label}');
-    }
-}
-?>
-
 <div class="page line ui-widget" id="<?= $uniqid ?>">
     <?= View::forge('form/layout_standard', array(
         'fieldset' => $fieldset,
@@ -47,7 +37,7 @@ foreach ($fieldset->field() as $field) {
                 'nomargin' => false,
                 'content' => \View::forge('form/fields', array(
                     'fieldset' => $fieldset,
-                    'fields' => array('user_email', 'user_password', 'password_confirmation'),
+                    'fields' => array('user_email', 'user_password', 'password_confirmation', 'user_expert'),
                 ), false)
             ), false),
         ),

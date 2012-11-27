@@ -63,10 +63,19 @@ return array(
                 'date_format' => 'eu_full',
             ),
         ),
+        'user_expert' => array(
+            'label' => __('Expert view '),
+            'form' => array(
+                'type' => 'checkbox',
+                'value' => '1',
+                'empty' => '0',
+            ),
+        ),
         'user_password' => array(
             'label' => __('Password: '),
             'form' => array(
                 'type' => 'password',
+                'size' => 20,
                 'value' => '',
             ),
             'validation' => array(
@@ -112,7 +121,7 @@ return array(
                 'tag' => 'button',
                 'data-icon' => 'check',
                 'class' => 'primary',
-                'value' => 'Save',
+                'value' => __('Save'),
             ),
         ),
     ),

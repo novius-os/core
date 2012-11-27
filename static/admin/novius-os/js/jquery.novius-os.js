@@ -196,8 +196,8 @@ define('jquery-nos',
                 });
             },
 
-            nosUIElement : function(element) {
-                var $element;
+            nosUIElement : function(element, data) {
+                var date, id, iconClass, $element;
 
                 element = $.extend({
                     type: 'button',
@@ -215,65 +215,83 @@ define('jquery-nos',
                         if (element.label) {
                             $element.text(element.label);
                         }
-                        $.each(element.bind, function(event, action) {
-                            $element.bind(event, function() {
-                                $element.nosAction(action);
-                            });
-                        });
+                        break;
 
+                    case 'link' :
+                        if (element.iconClasses) {
+                            iconClass = element.iconClasses;
+                        } else if (element.icon) {
+                            iconClass = 'nos-inline-icon16 ui-icon ui-icon-' + element.icon;
+                        }
+                        $element = (iconClass ? '<span class="' + iconClass +'"></span> ' : '');
+                        $element += '<span class="ui-button-text">' + element.label + '</span>';
+                        $element = $('<a href="#"></a>')
+                            .css({display : 'inline-block'})
+                            .html($element);
+
+                        if (element.red) {
+                            $element.addClass('ui-state-error');
+                        }
                         break;
                 }
 
-                if (element.menu) {
-                    var date = new Date(),
+                if ($element) {
+                    $.each(element.bind, function(event, action) {
+                        $element.bind(event, function() {
+                            $element.nosAction(action, data);
+                        });
+                    });
+
+                    if (element.menu) {
+                        date = new Date();
                         id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
-                    $element.attr('id', id)
-                        .nosOnShow('one', function() {
-                            var $ul = $('<ul></ul>');
-                            $.each(element.menu.menus, function() {
-                                var menu = this,
-                                    $a = $('<li><a></a></li>').data('action', menu.action)
-                                        .appendTo($ul)
-                                        .find('a');
+                        $element.attr('id', id)
+                            .nosOnShow('one', function() {
+                                var $ul = $('<ul></ul>');
+                                $.each(element.menu.menus, function() {
+                                    var menu = this,
+                                        $a = $('<li><a></a></li>').data('action', menu.action)
+                                            .appendTo($ul)
+                                            .find('a');
 
-                                if (menu.content) {
-                                    $a.append(menu.content);
-                                } else {
-                                    if (menu.icon) {
-                                        $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
-                                            .appendTo($a);
-                                    } else if (menu.iconClasses) {
-                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
-                                            .appendTo($a);
-                                    } else if (menu.iconUrl) {
-                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
-                                            .css('backgroundImage', 'url(' + menu.iconUrl + ')')
-                                            .appendTo($a);
-                                    }
-                                    if (menu.label) {
-                                        $('<span></span>').addClass('wijmo-wijmenu-text')
-                                            .text(menu.label)
-                                            .appendTo($a);
-                                    }
-                                }
-                            });
-
-                            $ul.insertAfter($element)
-                                .wijmenu($.extend(true, {
-                                        orientation: 'vertical'
-                                    },
-                                    element.menu.options || {},
-                                    {
-                                        trigger: '#' + id,
-                                        select: function(e, data) {
-                                            var $li = $(data.item.element);
-                                            $li.nosAction($li.data('action'));
+                                    if (menu.content) {
+                                        $a.append(menu.content);
+                                    } else {
+                                        if (menu.icon) {
+                                            $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
+                                                .appendTo($a);
+                                        } else if (menu.iconClasses) {
+                                            $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
+                                                .appendTo($a);
+                                        } else if (menu.iconUrl) {
+                                            $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
+                                                .css('backgroundImage', 'url(' + menu.iconUrl + ')')
+                                                .appendTo($a);
+                                        }
+                                        if (menu.label) {
+                                            $('<span></span>').addClass('wijmo-wijmenu-text')
+                                                .text(menu.label)
+                                                .appendTo($a);
                                         }
                                     }
-                                ));
-                        });
-                }
+                                });
 
+                                $ul.insertAfter($element)
+                                    .wijmenu($.extend(true, {
+                                            orientation: 'vertical'
+                                        },
+                                        element.menu.options || {},
+                                        {
+                                            trigger: '#' + id,
+                                            select: function(e, data) {
+                                                var $li = $(data.item.element);
+                                                $li.nosAction($li.data('action'));
+                                            }
+                                        }
+                                    ));
+                            });
+                    }
+                }
 
                 return $element;
             }
@@ -483,7 +501,7 @@ define('jquery-nos',
 
                 data = data || {};
                 var contentUrls = {
-                        'all'   : 'admin/noviusos_media/appdesk',
+                        'all'   : 'admin/noviusos_media/appdesk?view=media_pick',
                         'image' : 'admin/noviusos_media/appdesk?view=image_pick'
                     },
                     $input = this;
@@ -500,7 +518,7 @@ define('jquery-nos',
                                 title: 'Choose a media file'
                             }).bind('select_media', function(e, item) {
                                 $input.inputFileThumb({
-                                    file: item.thumbnail
+                                    file: item.image ? item.thumbnail : item.path
                                 });
                                 $input.val(item.id).trigger('change', {
                                     item : item

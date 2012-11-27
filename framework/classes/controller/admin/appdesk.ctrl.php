@@ -77,7 +77,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 'locales' => $locales,
                 'sites' => $sites,
             ),
-            $this->config
+            array_diff_key($this->config, array('dataset' => '', 'inputs' => '', 'query' => ''))
         );
 
         $view->set('appdesk', \Format::forge($params)->to_json(), false);
@@ -89,7 +89,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
     {
         $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts');
         if (isset($config['model'])) {
-            $namespace_model = substr($config['model'], 0, strrpos($config['model'], '\\'));
+            $config['model'] = ltrim($config['model'], '\\');
+            $namespace_model = \Inflector::get_namespace($config['model']);
 
             $appdesk_path = static::get_path();
             $inspectors_class_prefix = get_called_class();
@@ -329,10 +330,17 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
                 $config['appdesk']['appdesk']['buttons'] = array();
                 $actions = \Arr::merge(\Config::actions(array('models' => $config['toolbar']['models'], 'type' => 'appdeskToolbar')), $config['toolbar']['actions']);
+                $primary = false;
                 foreach ($actions as $key => $action) {
                     if ($action !== false) {
+                        if (!empty($action['primary']) && $action['primary']) {
+                            $primary = true;
+                        }
                         $config['appdesk']['appdesk']['buttons'][$key] = $action;
                     }
+                }
+                if (!$primary && !empty($config['appdesk']['appdesk']['buttons'][$config['model'].'.add'])) {
+                    $config['appdesk']['appdesk']['buttons'][$config['model'].'.add']['primary'] = true;
                 }
             }
 
@@ -373,8 +381,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                             'headerText' => __('Status'),
                             'dataKey' => 'publication_status'
                         );
-                    } else if (!isset($value['visible']) || $value['visible']) {
-                        $config['appdesk']['appdesk']['grid']['columns'][$key]['headerText'] = isset($value['headerText']) ? $value['headerText'] : '';
+                    } else if (isset($value['headerText'])) {
+                        $config['appdesk']['appdesk']['grid']['columns'][$key] = $value;
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
                 }
@@ -404,9 +412,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
         }
 
-
-
-
         return $config;
     }
 
@@ -435,6 +440,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
                     }
                 }
+                $query->or_where(array(\Db::expr('1'), 1));
                 $query->and_where_close();
             }
 

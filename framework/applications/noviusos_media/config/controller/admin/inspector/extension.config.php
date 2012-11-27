@@ -97,10 +97,10 @@ return array(
                     'headerText' => __('Type of file'),
                     'dataKey' => 'title',
                 ),
-                'hide' => array(
+                'id' => array(
                     'visible' => false,
                 ),
-                'hide2' => array(
+                'icon' => array(
                     'visible' => false,
                 ),
             ),

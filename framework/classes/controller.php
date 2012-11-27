@@ -266,35 +266,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             $objects = $query->get();
             foreach ($objects as $object) {
-                $item = array();
-                $dataset = $config['dataset'];
-                $actions = \Arr::get($dataset, 'actions', array());
-                unset($dataset['actions']);
-                $object->import_dataset_behaviours($dataset);
-                foreach ($dataset as $key => $data) {
-                    // Array with a 'value' key
-                    if (is_array($data) and !empty($data['value'])) {
-                        $data = $data['value'];
-                    }
+                $item = static::dataset_item($object, $config['dataset']);
 
-                    if ($data === true) {
-                        continue;
-                    }
-
-                    if (is_callable($data)) {
-                        $item[$key] = call_user_func($data, $object);
-                    } else if (is_array($data)) {
-                        $item[$key] = $object->get($data['column']);
-                    } else {
-                        $item[$key] = $object->get($data);
-                    }
-                }
-                $item['actions'] = array();
-                foreach ($actions as $action => $callback) {
-                    $item['actions'][$action] = $callback($object);
-                }
-                $item['_id'] = $object->{$pk};
-                $item['_model'] = $model;
                 if ($contextable && !$twinnable) {
                     $item['context'] = Tools_Context::context_label($object->{$contextable['context_property']}, array('force_flag' => true));
                 }
@@ -730,5 +703,47 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
 
         return $params['countProcess'] ? $count : $items;
+    }
+
+    static public function dataset_item(\Nos\Orm\Model $object, array $dataset = array())
+    {
+        $model = get_class($object);
+        $pk = \Arr::get($model::primary_key(), 0);
+
+        if (count($dataset) === 0) {
+            $common_config = \Nos\Config_Common::load($model, array());
+            $dataset = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array();
+        }
+
+        $item = array();
+        $actions = \Arr::get($dataset, 'actions', array());
+        unset($dataset['actions']);
+        $object->import_dataset_behaviours($dataset);
+        foreach ($dataset as $key => $data) {
+            // Array with a 'value' key
+            if (is_array($data) and !empty($data['value'])) {
+                $data = $data['value'];
+            }
+
+            if ($data === true) {
+                continue;
+            }
+
+            if (is_callable($data)) {
+                $item[$key] = call_user_func($data, $object);
+            } else if (is_array($data)) {
+                $item[$key] = $object->get($data['column']);
+            } else {
+                $item[$key] = $object->get($data);
+            }
+        }
+        $item['actions'] = array();
+        foreach ($actions as $action => $callback) {
+            $item['actions'][$action] = $callback($object);
+        }
+        $item['_id'] = $object->{$pk};
+        $item['_model'] = $model;
+
+        return $item;
     }
 }

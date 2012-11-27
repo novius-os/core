@@ -34,7 +34,7 @@ return array(
                             'label' => __('Path:')
                         ),
                     ),
-                    'actions' => array('edit', 'delete', 'visualise'),
+                    'actions' => array('Nos\\Media\\Model_Media.edit', 'Nos\\Media\\Model_Media.delete', 'visualise'),
                     'actionThumbnail' => 'visualise',
                 ),
             )

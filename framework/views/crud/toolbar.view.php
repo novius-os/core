@@ -8,6 +8,9 @@
  * @link http://www.novius-os.org
  */
 
+if (empty($saveField) && !empty($fieldset)) {
+    $saveField = (string) \View::forge('form/layout_save', array('save_field' => $fieldset->field('save')), false);
+}
 ?>
 <script type="text/javascript">
     require(['jquery-nos-toolbar-crud'],
@@ -16,8 +19,9 @@
                 $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>').nosToolbarCrud({
                     actions: <?= \Format::forge($crud['actions'])->to_json() ?>,
                     isNew: <?= \Format::forge($crud['is_new'])->to_json() ?>,
-                    saveField: <?= \Format::forge((string) \View::forge('form/layout_save', array('save_field' => $fieldset->field('save')), false))->to_json() ?>,
+                    saveField: <?= \Format::forge($saveField)->to_json() ?>,
                     model: <?= \Format::forge($crud['model'])->to_json() ?>,
+                    dataset: <?= \Format::forge($crud['dataset'])->to_json() ?>,
                     itemId: <?= \Format::forge((int) $item->{$crud['pk']})->to_json() ?>,
                     urlActions: <?= \Format::forge($crud['url_actions'])->to_json() ?>,
                     ajaxData: <?= \Format::forge($crud['behaviours']['twinnable'] ? array(

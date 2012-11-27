@@ -238,6 +238,7 @@ return array(
                     Nos\Page\Model_Page::LOCK_EDITION => __('Modification'),
                 ),
             ),
+            'expert' => true,
         ),
         'page_cache_duration' => array(
             'label' => __('Regenerate every {duration} seconds'),
@@ -245,6 +246,7 @@ return array(
                 'type' => 'text',
                 'size' => 4,
             ),
+            'expert' => true,
         ),
         'save' => array(
             'label' => '',

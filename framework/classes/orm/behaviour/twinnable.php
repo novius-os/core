@@ -114,28 +114,25 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
         $new_parent = $item->get_parent();
 
-        // Parent was removed, it's ok
-        if (null === $new_parent) {
-            return;
-        }
+        if (!empty($new_parent)) {
+            $contexts_parent = $new_parent->get_all_context();
 
-        $contexts_parent = $new_parent->get_all_context();
+            if ($item->is_new()) {
+                $context_self = $item->get_context();
+                if (!in_array($context_self, $contexts_parent)) {
+                    throw new \Exception(strtr(__('Cannot create this element here because the parent does not exists in {context}.'), array(
+                        '{context}' => $context_self,
+                    )));
+                }
+            } else {
+                $contexts_self= $this->get_all_context($item);
 
-        if ($item->is_new()) {
-            $context_self = $item->get_context();
-            if (!in_array($context_self, $contexts_parent)) {
-                throw new \Exception(strtr(__('Cannot create this element here because the parent does not exists in {context}.'), array(
-                    '{context}' => $context_self,
-                )));
-            }
-        } else {
-            $contexts_self= $this->get_all_context($item);
-
-            $missing_contexts = array_diff($contexts_self, $contexts_parent);
-            if (!empty($missing_contexts)) {
-                throw new \Exception(strtr(__('Cannot move this element here because the parent does not exists in the following contexts: {contexts}'), array(
-                    '{contexts}' => implode(', ', $missing_contexts),
-                )));
+                $missing_contexts = array_diff($contexts_self, $contexts_parent);
+                if (!empty($missing_contexts)) {
+                    throw new \Exception(strtr(__('Cannot move this element here because the parent does not exists in the following contexts: {contexts}'), array(
+                        '{contexts}' => implode(', ', $missing_contexts),
+                    )));
+                }
             }
         }
 
@@ -147,9 +144,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             return;
         }
         $in_progress = array_keys($items);
-
-        // This event has been sent from the tree behaviour, so we don't need to check it exists
-        $new_parent = $item->get_parent();
 
         foreach ($items as $item) {
             $parent = $new_parent === null ? null : $new_parent->find_context($item->get_context());

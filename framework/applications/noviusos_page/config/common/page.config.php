@@ -44,8 +44,8 @@ return array(
                 ),
             ),
             'context' => array(
-                'list' => true
-            )
+                'list' => true,
+            ),
         ),
         '\Nos\Page\Model_Page.visualise' => array(
             'label' => __('Visualise'),
@@ -58,7 +58,12 @@ return array(
             ),
             'context' => array(
                 'list' => true,
-            )
+                'item' => true,
+            ),
+            'enabled' =>
+                function($item) {
+                    return !$item->is_new();
+                }
         ),
         '\Nos\Page\Model_Page.set_homepage' => array(
             'label' => __('Set as homepage'),
@@ -76,8 +81,8 @@ return array(
                 ),
             ),
             'context' => array(
-                'list' => true
-            )
+                'list' => true,
+            ),
         ),
         '\Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
@@ -88,8 +93,8 @@ return array(
                 ),
             ),
             'context' => array(
-                'appdeskToolbar' => true
-            )
+                'appdeskToolbar' => true,
+            ),
         ),
     )
 );

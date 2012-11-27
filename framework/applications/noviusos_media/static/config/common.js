@@ -54,10 +54,8 @@ define(
                                         title : item.media_title,
                                         thumbnail : (item.image ? item.thumbnail.replace(/64/g, 256) : item.thumbnailAlternate),
                                         thumbnailAlternate : (item.image ? item.thumbnailAlternate : ''),
-                                        meta : {
-                                            fileName : item.media_file,
-                                            pathFolder : item.path_folder + '/'
-                                        }
+                                        fileName : item.media_file,
+                                        pathFolder : item.path_folder + '/'
                                     };
                                     return data;
                                 }

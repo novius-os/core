@@ -167,10 +167,6 @@ class Config extends \Fuel\Core\Config
                     $selected_actions[$key] = $action;
                 }
             }
-
-            if (isset($context['item'])) {
-                $selected_actions = static::placeholder_replace($selected_actions, $context['item']);
-            }
         }
 
         return $selected_actions;

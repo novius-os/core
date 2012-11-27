@@ -11,7 +11,7 @@
 use Nos\I18n;
 
 return array(
-    'model' => '\Nos\Page\Model_Page',
+    'model' => 'Nos\Page\Model_Page',
     'search_text' => 'page_title',
     'selectedView' => 'default',
     'views' => array(
