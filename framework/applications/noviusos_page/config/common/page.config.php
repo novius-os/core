@@ -57,7 +57,7 @@ return array(
                 'url' => '{{previewUrl}}',
             ),
             'context' => array(
-                'list' => true
+                'list' => true,
             )
         ),
         '\Nos\Page\Model_Page.set_homepage' => array(
