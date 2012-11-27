@@ -392,10 +392,9 @@ class Model extends \Orm\Model
         $class = get_called_class();
         if (static::linked_wysiwygs()) {
             $w_keys = array_keys($this->linked_wysiwygs);
-            for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
-                $i = $w_keys[$j];
+            foreach($w_keys as $i) {
                 // Remove empty wysiwyg
-                if ($this->linked_wysiwygs[$i]->wysiwyg_text == '') {
+                if (empty($this->linked_wysiwygs[$i]->wysiwyg_text)) {
                     $this->linked_wysiwygs[$i]->delete();
                     unset($this->linked_wysiwygs[$i]);
                 }
@@ -404,10 +403,9 @@ class Model extends \Orm\Model
 
         if (static::linked_medias()) {
             $w_keys = array_keys($this->linked_medias);
-            for ($j = 0; $j < count($this->linked_medias); $j++) {
-                $i = $w_keys[$j];
+            foreach($w_keys as $i) {
                 // Remove empty medias
-                if ($this->linked_medias[$i]->medil_media_id == '') {
+                if (empty($this->linked_medias[$i]->medil_media_id)) {
                     $this->linked_medias[$i]->delete();
                     unset($this->linked_medias[$i]);
                 }
