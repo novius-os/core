@@ -38,17 +38,17 @@ class Config_Common
         if (!empty($config['i18n_file'])) {
             array_unshift($dicts, $config['i18n_file']);
         }
-        $i18n = \Nos\I18n::dictionary($dicts);
+        \Nos\I18n::current_dictionary($dicts);
 
         $actions_template = array(
             'add' => array(
-                'label' => $i18n('Add :model_label'),
+                'label' => __('Add :model_label'),
                 'action' => array(
                     'action' => 'nosTabs',
                     'method' => 'add',
                     'tab' => array(
                         'url' => 'insert_update?context={{context}}',
-                        'label' => $i18n('Add a new item'),
+                        'label' => __('Add a new item'),
                     ),
                 ),
                 'context' => array(
@@ -60,10 +60,10 @@ class Config_Common
                     'action' => 'nosTabs',
                     'tab' => array(
                         'url' => "insert_update/{{id}}",
-                        'label' => $i18n('Edit'),
+                        'label' => __('Edit'),
                     ),
                 ),
-                'label' => $i18n('Edit'),
+                'label' => __('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',
                 'context' => array(
@@ -75,10 +75,10 @@ class Config_Common
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => 'delete/{{id}}',
-                        'title' => $i18n('Delete'),
+                        'title' => __('Delete'),
                     ),
                 ),
-                'label' => $i18n('Delete'),
+                'label' => __('Delete'),
                 'primary' => true,
                 'icon' => 'trash',
                 'red' => true,
@@ -92,7 +92,7 @@ class Config_Common
                 },
             ),
             'visualise' => array(
-                'label' => $i18n('Visualise'),
+                'label' => __('Visualise'),
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
                 'action' => array(
@@ -114,7 +114,7 @@ class Config_Common
                     },
             ),
             'share' => array(
-                'label' => $i18n('Share'),
+                'label' => __('Share'),
                 'iconClasses' => 'nos-icon16 nos-icon16-share',
                 'action' => array(
                     'action' => 'share',

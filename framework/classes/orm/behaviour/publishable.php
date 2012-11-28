@@ -19,6 +19,11 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
      */
     protected $_properties = array();
 
+    public static function _init()
+    {
+        I18n::current_dictionary(array('nos::common'));
+    }
+
     public static function dataset(&$dataset)
     {
         $dataset['publication_status'] = array(__CLASS__, 'publication_status');
@@ -28,13 +33,13 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     {
         $published = $item->published();
         if ($published === true) {
-            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.___('nos::generic', 'Published');
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published');
         }
         if ($published === false) {
-            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.___('nos::generic', 'Not published');
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
         }
 
-        return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-schedule.png"> '.strtr(___('nos::generic', 'From {date}'), array(
+        return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-schedule.png"> '.strtr(__('From {date}'), array(
             '{date}' => \Date::create_from_string($published)->format('local'),
         ));
     }

@@ -14,9 +14,10 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 {
     protected $page_parent = false;
 
-    public static function _init()
+    public function before()
     {
-        \Nos\I18n::current_dictionary('noviusos_page::common');
+        parent::before();
+        \Nos\I18n::current_dictionary('noviusos_page::common', 'nos::common');
     }
 
     protected function init_item()

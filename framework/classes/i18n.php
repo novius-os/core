@@ -119,13 +119,21 @@ class I18n
     public static function current_dictionary($list)
     {
         $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        static::$_files_dict[$dbg[0]['file']] = call_user_func('static::dictionary', (array) $list);
+        $i = -1;
+        do {
+            $function = $dbg[++$i]['function'];
+        } while ($function == '{closure}');
+
+        static::$_files_dict[$dbg[$i]['file']] = call_user_func('static::dictionary', (array) $list);
     }
 
     public static function translate_from_file($file, $message, $default)
     {
+        if (empty(static::$_files_dict[$file])) {
+            return static::get($message, $default);
+        }
         $lookup = static::$_files_dict[$file];
-        return empty($lookup) ? static::get($message, $default) : $lookup($message, $default);
+        return call_user_func($lookup, $message, $default);
     }
 
     public static function dictionary($list)

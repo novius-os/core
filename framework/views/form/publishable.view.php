@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('nos::common'));
+
 if (empty($publishable) && !empty($item)) {
     $publishable = $item->behaviours('Nos\Orm_Behaviour_Publishable');
 }
@@ -41,16 +43,16 @@ require(
                 initialStatus: '<?= empty($item) || $item->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>',
                 texts: {
                     'undefined' : {
-                        0 : <?= $formatter->to_json(___('nos::generic', 'Will not be published')) ?>,
-                        1 : <?= $formatter->to_json(___('nos::generic', 'Will be published')) ?>
+                        0 : <?= $formatter->to_json(__('Will not be published')) ?>,
+                        1 : <?= $formatter->to_json(__('Will be published')) ?>
                     },
                     'no' : {
-                        0 : <?= $formatter->to_json(___('nos::generic', 'Not published')) ?>,
-                        1 : <?= $formatter->to_json(___('nos::generic', 'Will be published')) ?>
+                        0 : <?= $formatter->to_json(__('Not published')) ?>,
+                        1 : <?= $formatter->to_json(__('Will be published')) ?>
                     },
                     'yes' : {
-                        0 : <?= $formatter->to_json(___('nos::generic', 'Will be unpublished')) ?>,
-                        1 : <?= $formatter->to_json(___('nos::generic', 'Published')) ?>
+                        0 : <?= $formatter->to_json(__('Will be unpublished')) ?>,
+                        1 : <?= $formatter->to_json(__('Published')) ?>
                     }
                 }
             });
