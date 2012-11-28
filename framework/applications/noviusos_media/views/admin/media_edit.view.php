@@ -8,6 +8,9 @@
  * @link http://www.novius-os.org
  */
 
+
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
 $uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
 $pathinfo = pathinfo($item->media_file);

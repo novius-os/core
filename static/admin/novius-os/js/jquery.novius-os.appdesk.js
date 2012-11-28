@@ -39,7 +39,9 @@ define('jquery-nos-appdesk',
                     selectContexts : 'Select the context(s) to work in',
                     workInContext : 'Work in {{context}}',
                     otherContexts : 'Other contexts',
-                    contextsPopinOk : 'Ok'
+                    contextsPopinOk : 'Ok',
+                    loading : 'Loading...',
+                    search: 'Search'
                 },
                 values: {},
                 //callbabks
@@ -108,7 +110,7 @@ define('jquery-nos-appdesk',
 
                 self.uiSearchIcon = $('<div></div>').addClass('nos-appdesk-search-icon ui-icon ui-icon-search')
                     .appendTo(self.uiInputContainer);
-                self.uiSearchInput = $('<input type="search" name="search" placeholder="Search" value="" />')
+                self.uiSearchInput = $('<input type="search" name="search" placeholder="' + o.texts['search'] + '" value="" />')
                     .addClass('nos-appdesk-search-input ui-helper-reset')
                     .appendTo(self.uiInputContainer);
                 self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
@@ -932,6 +934,7 @@ define('jquery-nos-appdesk',
                         width : '100%'
                     })
                     .noslistgrid($.extend({
+                        loadingText: o.texts.loading,
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
                         showFilter: self.showFilter,
@@ -1062,6 +1065,7 @@ define('jquery-nos-appdesk',
                         height : height,
                         width : '100%'
                     }).nostreegrid($.extend(true, { // True for recursive clone
+                        loadingText: o.texts.loading,
                         urlJson : o.treeGrid.urlJson,
                         treeOptions : {
                             context : o.selectedContexts || ''
@@ -1147,6 +1151,9 @@ define('jquery-nos-appdesk',
 
                 self.uiThumbnail.css('height', height)
                     .thumbnailsgrid($.extend({
+                        texts: {
+                            loading: o.texts.loading
+                        },
                         pageIndex: 0,
                         url: o.grid.urlJson,
                         loading: function (dataSource, userData) {

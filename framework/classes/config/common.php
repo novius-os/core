@@ -34,15 +34,21 @@ class Config_Common
             'delete' => 'action.dialog.contentUrl',
         );
 
+        $dicts = array('nos::common');
+        if (!empty($config['i18n_file'])) {
+            array_unshift($dicts, $config['i18n_file']);
+        }
+        $i18n = \Nos\I18n::dictionary($dicts);
+
         $actions_template = array(
             'add' => array(
-                'label' => __('Add :model_label'),
+                'label' => $i18n('Add :model_label'),
                 'action' => array(
                     'action' => 'nosTabs',
                     'method' => 'add',
                     'tab' => array(
                         'url' => 'insert_update?context={{context}}',
-                        'label' => __('Add a new monkey'),
+                        'label' => $i18n('Add a new item'),
                     ),
                 ),
                 'context' => array(
@@ -54,10 +60,10 @@ class Config_Common
                     'action' => 'nosTabs',
                     'tab' => array(
                         'url' => "insert_update/{{id}}",
-                        'label' => __('Edit'),
+                        'label' => $i18n('Edit'),
                     ),
                 ),
-                'label' => __('Edit'),
+                'label' => $i18n('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',
                 'context' => array(
@@ -69,10 +75,10 @@ class Config_Common
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => 'delete/{{id}}',
-                        'title' => __('Delete'),
+                        'title' => $i18n('Delete'),
                     ),
                 ),
-                'label' => __('Delete'),
+                'label' => $i18n('Delete'),
                 'primary' => true,
                 'icon' => 'trash',
                 'red' => true,
@@ -86,7 +92,7 @@ class Config_Common
                 },
             ),
             'visualise' => array(
-                'label' => 'Visualise',
+                'label' => $i18n('Visualise'),
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
                 'action' => array(
@@ -98,17 +104,17 @@ class Config_Common
                     'list' => true
                 ),
                 'enabled' =>
-                function($item) {
-                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        $url = $item->url_canonical(array('preview' => true));
+                    function($item) {
+                        if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                            $url = $item->url_canonical(array('preview' => true));
 
-                        return !$item->is_new() && !empty($url);
-                    }
-                    return false;
-                },
+                            return !$item->is_new() && !empty($url);
+                        }
+                        return false;
+                    },
             ),
             'share' => array(
-                'label' => __('Share'),
+                'label' => $i18n('Share'),
                 'iconClasses' => 'nos-icon16 nos-icon16-share',
                 'action' => array(
                     'action' => 'share',
@@ -121,10 +127,10 @@ class Config_Common
                     'item' => true
                 ),
                 'enabled' =>
-                function($item) {
-                    $model = get_class($item);
-                    return !$item->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
-                },
+                    function($item) {
+                        $model = get_class($item);
+                        return !$item->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
+                    },
             )
         );
 
@@ -201,6 +207,9 @@ class Config_Common
                 }
                 if (!isset($item['column']) && !isset($item['value'])) {
                     $item['column'] = str_replace('->', '.', $key);
+                }
+                if (!isset($item['search_column']) && isset($item['column'])) {
+                    $item['search_column'] = $item['column'];
                 }
                 $relations = explode('->', $key);
                 if (!isset($item['search_relation']) && count($relations) > 1) {

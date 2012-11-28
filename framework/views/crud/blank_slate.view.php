@@ -18,6 +18,8 @@ $common_id = $main_context ? $main_context->id : false;
 $view_params['container_id'] = $uniqid;
 
 echo View::forge('nos::crud/tab', $view_params, false);
+
+Nos\I18n::current_dictionary(__);
 ?>
 <div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
@@ -27,7 +29,7 @@ if (!in_array($context, $possible)) {
     $parent = $crud['behaviours']['tree'] ? $item->get_parent() : null;
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
-        echo strtr($crud['config']['messages']['error added in context not parent'], array(
+        echo strtr(__('error added in context not parent'), array(
             '{context}' => \Nos\Tools_Context::context_label($context),
             '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
         ));
@@ -41,7 +43,7 @@ if (!in_array($context, $possible)) {
         </script>
         <?php
     } else {
-        echo strtr($crud['config']['messages']['error added in context'], array('{context}' => \Nos\Tools_Context::context_label($context)));
+        echo strtr(__('error added in context'), array('{context}' => \Nos\Tools_Context::context_label($context)));
     }
 } else {
     foreach ($possible as $possible_context) {

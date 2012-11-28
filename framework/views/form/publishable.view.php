@@ -41,16 +41,16 @@ require(
                 initialStatus: '<?= empty($item) || $item->is_new() ? 'undefined' : ($published ? 'yes' : 'no') ?>',
                 texts: {
                     'undefined' : {
-                        0 : <?= $formatter->to_json('Will not be published') ?>,
-                        1 : <?= $formatter->to_json('Will be published') ?>
+                        0 : <?= $formatter->to_json(___('nos::generic', 'Will not be published')) ?>,
+                        1 : <?= $formatter->to_json(___('nos::generic', 'Will be published')) ?>
                     },
                     'no' : {
-                        0 : <?= $formatter->to_json('Not published') ?>,
-                        1 : <?= $formatter->to_json('Will be published') ?>
+                        0 : <?= $formatter->to_json(___('nos::generic', 'Not published')) ?>,
+                        1 : <?= $formatter->to_json(___('nos::generic', 'Will be published')) ?>
                     },
                     'yes' : {
-                        0 : <?= $formatter->to_json('Will be unpublished') ?>,
-                        1 : <?= $formatter->to_json('Published') ?>
+                        0 : <?= $formatter->to_json(___('nos::generic', 'Will be unpublished')) ?>,
+                        1 : <?= $formatter->to_json(___('nos::generic', 'Published')) ?>
                     }
                 }
             });

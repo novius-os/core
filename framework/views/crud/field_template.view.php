@@ -15,5 +15,4 @@ if ($type === 'checkbox') {
     ?>
     <tr><th class="{error_class}">{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>
     <?php
-
 }

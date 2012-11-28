@@ -25,6 +25,8 @@ class I18n
 
     private static $_loaded_files = array();
 
+    public static $_files_dict = array();
+
     public static $fallback;
 
     public static function _init()
@@ -65,33 +67,31 @@ class I18n
 
     public static function load($file, $group = null)
     {
-        $languages = static::$fallback;
-        array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
+        $group = ($group === null) ? $file : $group;
+        static::$_group = $group;
 
         $_messages = array();
-        foreach ($languages as $lang) {
-            if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
-                foreach ($path as $p) {
-                    if (array_key_exists($p, static::$_loaded_files)) {
-                        break;
-                    }
-                    $_messages = \Arr::merge(\Fuel::load($p), $_messages);
-                }
-                static::$_loaded_files[$p] = true;
-                break;
-            }
-        }
+        if (empty(static::$_loaded_files[static::$_locale][$file])) {
 
-        if (count($_messages)) {
             if ( ! isset(static::$_messages[static::$_locale])) {
                 static::$_messages[static::$_locale] = array();
             }
-            $group = ($group === null) ? $file : $group;
-            static::$_group = $group;
-            if ( ! isset(static::$_messages[$group])) {
+
+            if ( ! isset(static::$_messages[static::$_locale][$group])) {
                 static::$_messages[static::$_locale][$group] = array();
             }
-            static::$_messages[static::$_locale][$group] = \Arr::merge($_messages, static::$_messages[static::$_locale][$group]);
+
+            $languages = array(static::$_locale, mb_substr(static::$_locale, 0, 2), static::$fallback);
+
+            // Priority == 'en_GB', then 'en', then 'fallback'
+            foreach ($languages as $lang) {
+                if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
+                    foreach ($path as $p) {
+                        static::$_messages[static::$_locale][$group] = \Arr::merge(static::$_messages[static::$_locale][$group], \Fuel::load($p));
+                    }
+                }
+            }
+            static::$_loaded_files[static::$_locale] = true;
         }
     }
 
@@ -100,11 +100,59 @@ class I18n
         return static::gget(static::$_group, $_message, $default);
     }
 
-    public static function gget($group, $_message, $default = null)
+    public static function group($group)
     {
-        $result = isset(static::$_messages[static::$_locale][$group][$_message]) ? static::$_messages[static::$_locale][$group][$_message] : $default;
-        $result = $result ? : $_message;
+        static::$_group = $group;
+    }
+
+    public static function gget($group, $message, $default = null)
+    {
+        $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
+
+        if (empty($result)) {
+            $result = $default ?: $message;
+        }
 
         return $result;
+    }
+
+    public static function current_dictionary()
+    {
+        $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        static::$_files_dict[$dbg[0]['file']] = call_user_func_array('static::dictionary', func_get_args());
+    }
+
+    public static function translate_from_file($file, $message, $default)
+    {
+        $lookup = static::$_files_dict[$file];
+        return empty($lookup) ? static::get($message, $default) : $lookup($message, $default);
+    }
+
+    public static function dictionary()
+    {
+        $groups = func_get_args();
+
+        $active_group = static::$_group;
+        foreach ($groups as $group) {
+            static::load($group);
+        }
+        static::$_group = $active_group;
+
+        $messages = static::$_messages[static::$_locale];
+
+        return function($message, $default = null) use ($groups, $messages) {
+            foreach ($groups as $group) {
+                $result = isset($messages[$group][$message]) ? $messages[$group][$message] : false;
+
+                // If translation exists, but is empty, then it's not translated
+                if (!empty($result)) {
+                    break;
+                }
+            }
+            if (empty($result)) {
+                $result = $default ?: $message;
+            }
+            return $result;
+        };
     }
 }

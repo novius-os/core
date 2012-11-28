@@ -14,30 +14,12 @@ foreach (Config::get('data::templates', array()) as $tpl_key => $template) {
     $templates[$tpl_key] = $template['title'];
 }
 
+Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
+
 return array(
     'controller_url' => 'admin/noviusos_page/page',
     'model' => 'Nos\\Page\\Model_Page',
-    'messages' => array(
-        'successfully added' => __('Page successfully added.'),
-        'successfully saved' => __('Page successfully saved.'),
-        'successfully deleted' => __('The page has successfully been deleted!'),
-        'you are about to delete, confim' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?'),
-        'you are about to delete' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>.'),
-        'exists in multiple context' => __('This page exists in <strong>{count} contexts</strong>.'),
-        'delete in the following contexts' => __('Delete this page in the following contexts:'),
-        'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
-        'item has multiple sub-items' => __('This page has <strong>{count} sub-pages</strong>.'),
-        'confirm deletion, enter number' => __('To confirm the deletion, you need to enter this number in the field below'),
-        'yes delete sub-items' => __('Yes, I want to delete this page and all of its {count} sub-pages.'),
-        'item deleted' => __('This page has been deleted.'),
-        'not found' => __('Page not found'),
-        'error added in context not parent' => __('This page cannot be added {context} because its {parent} is not available in this context yet.'),
-        'error added in context' => __('This page cannot be added {context}.'),
-        'item inexistent in context yet' => __('This page has not been added in {context} yet.'),
-        'add an item in context' => __('Add a new page in {context}'),
-        'delete an item' => __('Delete a page'),
-        'delete' => __('Delete'),
-    ),
+    'i18n_file' => 'noviusos_page::common',
     'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',

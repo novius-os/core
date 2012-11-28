@@ -25,15 +25,13 @@ class Controller_Admin_Inspector_Page extends \Nos\Controller_Inspector_Modeltre
         // If we're requesting the root
         if ($id === null) {
             $json['total'] = 0;
+            $__ = \Nos\I18n::dictionary('noviusos_page::common');
             $json['items'] = array(
                 array(
                     '_id' => '0',
                     '_model' => 'Nos\Page\Model_Page',
-                    //'actions' => array(),
                     'id' => '0',
-                    //'context' => '',
-                    //'publication_status' => '',
-                    'title' => __('Root'),
+                    'title' => $__('Root'),
                     'treeChilds' => $json['items'],
                 ),
             );

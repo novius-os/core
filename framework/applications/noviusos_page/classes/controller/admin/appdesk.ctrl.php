@@ -50,8 +50,9 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
         } catch (\Exception $e) {
             $this->send_error($e);
         }
+        $__ = \Nos\I18n::dictionary('noviusos_page::common');
         \Response::json(array(
-            'notify' => __('Cache has been renewed.'),
+            'notify' => $__('Cache has been renewed.'),
         ));
     }
 

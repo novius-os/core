@@ -23,6 +23,8 @@ use Format, Input, View;
  */
 class Controller_Admin_Appdesk extends Controller_Admin_Application
 {
+    protected $dictionary = null;
+
     public function before()
     {
         parent::before();
@@ -34,7 +36,36 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
 
+        $dicts = array('nos::common');
+        if (!empty($this->config['i18n_file'])) {
+            array_unshift($dicts, $this->config['i18n_file']);
+        }
+        $this->dictionary = I18n::dictionary($dicts);
+
+        $this->config['i18n'] = array(
+            // Appdesk: allLanguages
+            'allLanguages' => $this->i18n('All'),
+            'item' => $this->i18n('item'),
+            'items' => $this->i18n('items'),
+            'showNbItems' => $this->i18n('Showing {{x}} items out of {{y}}'),
+            'showOneItem' => $this->i18n('Show 1 item'),
+            'showNoItem' => $this->i18n('No items'),
+            'showAll' => $this->i18n('Show all items'),
+            'viewGrid' => $this->i18n('Grid'),
+            'viewTreeGrid' => $this->i18n('Tree grid'),
+            'viewThumbnails' => $this->i18n('Thumbnails'),
+            'preview' => $this->i18n('Preview'),
+            'loading' => $this->i18n('Loading...'),
+            'languages' => $this->i18n('Languages'),
+            'search' => $this->i18n('Search'),
+            // @todo review here
+        );
         return $this->config;
+    }
+
+    public function i18n($message, $default = null)
+    {
+        return call_user_func($this->dictionary, $message, $default);
     }
 
     public function action_index($view = null)
@@ -87,14 +118,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs');
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'i18n_file');
         if (isset($config['model'])) {
             $config['model'] = ltrim($config['model'], '\\');
             $namespace_model = \Inflector::get_namespace($config['model']);
 
             $appdesk_path = static::get_path();
-            $inspectors_class_prefix = get_called_class();
-            $inspectors_class_prefix = explode('_', $inspectors_class_prefix);
+            $inspectors_class_prefix = explode('_', get_called_class());
             $inspectors_class_prefix[count($inspectors_class_prefix) - 1] = 'Inspector';
             $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
 
@@ -429,7 +459,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $query->or_where(array($field, 'LIKE', '%'.$value.'%'));
                     }
                 }
-                $query->or_where(array(\Db::expr('1'), 1));
+                $query->or_where(array(\Db::expr('0'), 1));
                 $query->and_where_close();
             }
 

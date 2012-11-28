@@ -8,13 +8,15 @@
  * @link http://www.novius-os.org
  */
 $id = $uniqid = uniqid('form_');
+
+Nos\I18n::current_dictionary(__);
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
 <?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
 <p>
-    <button type="submit" class="primary ui-state-error"><?= $crud['config']['messages']['confirm deletion ok'] ?></button>
-    <span><?= $crud['config']['messages']['confirm deletion or'] ?></span>
-    <a href="#"><?= $crud['config']['messages']['confirm deletion cancel'] ?></a>
+    <button type="submit" class="primary ui-state-error"><?= __('confirm deletion ok') ?></button>
+    <span><?= __('confirm deletion or') ?></span>
+    <a href="#"><?= __('confirm deletion cancel') ?></a>
 </p>
 </form>
 <script type="text/javascript">
@@ -45,7 +47,7 @@ $id = $uniqid = uniqid('form_');
                         });
                         $form.nosDialog('close');
                     } else {
-                        $.nosNotify(<?= \Format::forge($crud['config']['messages']['confirm deletion wrong_confirmation'])->to_json() ?>, 'error');
+                        $.nosNotify(<?= \Format::forge(__('confirm deletion wrong_confirmation'))->to_json() ?>, 'error');
                     }
 
                 });

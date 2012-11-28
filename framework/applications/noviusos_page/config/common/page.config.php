@@ -1,4 +1,7 @@
 <?php
+
+Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
+
 return array(
     'data_mapping' => array(
         'page_title' => array(
@@ -28,10 +31,13 @@ return array(
         ),
     ),
     'actions' => array(
-        '\Nos\Page\Model_Page.delete' => array(
+        'Nos\Page\Model_Page.delete' => array(
             'primary' => false
         ),
-        '\Nos\Page\Model_Page.add_subpage' => array(
+        'Nos\Page\Model_Page.add' => array(
+            'label' => __('Add a page'),
+        ),
+        'Nos\Page\Model_Page.add_subpage' => array(
             'name' => 'add_page',
             'label' => __('Add a sub-page to this page'),
             'icon' => 'plus',
@@ -47,7 +53,7 @@ return array(
                 'list' => true,
             ),
         ),
-        '\Nos\Page\Model_Page.visualise' => array(
+        'Nos\Page\Model_Page.visualise' => array(
             'label' => __('Visualise'),
             'name' => 'visualise',
             'primary' => true,
@@ -65,7 +71,7 @@ return array(
                     return !$item->is_new();
                 }
         ),
-        '\Nos\Page\Model_Page.set_homepage' => array(
+        'Nos\Page\Model_Page.set_homepage' => array(
             'label' => __('Set as homepage'),
             'name' => 'set_homepage',
             'primary' => false,
@@ -84,7 +90,7 @@ return array(
                 'list' => true,
             ),
         ),
-        '\Nos\Page\Model_Page.renew_cache' => array(
+        'Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
             'action' => array(
                 'action' => 'nosAjax',
@@ -96,5 +102,5 @@ return array(
                 'appdeskToolbar' => true,
             ),
         ),
-    )
+    ),
 );

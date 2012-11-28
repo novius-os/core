@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_media::common'));
+
 return array(
     'model' => 'Nos\Media\Model_Folder',
     'order_by' => 'medif_title',

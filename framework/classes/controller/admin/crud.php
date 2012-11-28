@@ -14,31 +14,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 {
     protected $config = array(
         'model' => '',
-        'messages' => array(
-            'successfully added' => 'Item successfully added.',
-            'successfully saved' => 'Item successfully saved.',
-            'successfully deleted' => 'The item has successfully been deleted!',
-            'you are about to delete, confim' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?',
-            'you are about to delete' => 'You are about to delete the item <span style="font-weight: bold;">":title"</span>.',
-            'exists in multiple context' => 'This item exists within <strong>{count} contexts</strong>.',
-            'delete in the following contexts' => 'Delete this item in the following contexts:',
-            'item has 1 sub-item' => 'This item has <strong>1 sub-item</strong>.',
-            'item has multiple sub-items' => 'This item has <strong>{count} sub-items</strong>.',
-            'confirm deletion, enter number' => 'To confirm the deletion, you need to enter this number in the field below',
-            'yes delete sub-items' => 'Yes, I want to delete this item and all of its {count} sub-items.',
-            'item deleted' => 'This item has been deleted.',
-            'not found' => 'Item not found',
-            'error added in context not parent' => 'This item cannot be added {context} because its {parent} is not available in this context yet.',
-            'error added in context' => 'This item cannot be added {context}.',
-            'visualise' => 'Visualise',
-            'delete' => 'Delete',
-            'delete an item' => 'Delete an item',
-            'confirm deletion ok' => 'Confirm the deletion',
-            'confirm deletion or' => 'or',
-            'confirm deletion cancel' => 'Cancel',
-            'confirm deletion wrong_confirmation' => 'Wrong confirmation',
-            'add an item in context' => 'Add a new item in {context}',
-        ),
         'environment_relation' => null,
         'tab' => array(
             'iconUrl' => '',
@@ -65,6 +40,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected $is_new = false;
     protected $item_from = null;
     protected $item_environment = null;
+    protected $i18n_files = array();
 
     public function & __get($property)
     {
@@ -75,6 +51,13 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         parent::before();
         $this->config_build();
+
+        $dicts = array('nos::common');
+        if (!empty($this->config['i18n_file'])) {
+            array_unshift($dicts, $this->config['i18n_file']);
+        }
+        $this->i18n_files = $dicts;
+        I18n::current_dictionary($this->i18n_files);
     }
 
     /**
@@ -138,6 +121,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function view_params()
     {
+        $self = $this;
         $view_params = array(
             'crud' => array(
                 'model' => $this->config['model'],
@@ -154,6 +138,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'tab_params' => $this->get_tab_params(),
             ),
             'item' => $this->item,
+            'i18n_files' => $this->i18n_files,
         );
         if ($this->behaviours['contextable']) {
             $view_params['crud']['context'] = $this->item->{$this->behaviours['contextable']['context_property']};
@@ -380,7 +365,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $return = array(
-            'notify' => $this->is_new ? $this->config['messages']['successfully added'] : $this->config['messages']['successfully saved'],
+            'notify' => $this->is_new ? __('successfully added') : __('successfully saved'),
             'closeDialog' => true,
             'dispatchEvent' => $dispatchEvent,
         );
@@ -440,7 +425,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+            return $this->send_error(new \Exception(__('item deleted')));
         }
 
         $this->is_new = $this->item->is_new();
@@ -552,7 +537,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions()
     {
-        $applicationActions = \Config::actions(array('models' => array(get_class($this->item)), 'type' => 'item', 'item' => $this->item));
+        $applicationActions = \Config::actions(array(
+            'models' => array(get_class($this->item)),
+            'type' => 'item',
+            'item' => $this->item,
+        ));
 
         $actions = array_values($this->get_actions_context());
 
@@ -597,7 +586,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $item_context = $this->item->find_context($context);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
             if (empty($main_context)) {
-                $label = $this->config['messages']['add an item in context'];
+                $label = __('add an item in context');
             } else {
                 if (empty($item_context)) {
                     if (count($sites) === 1) {
@@ -653,7 +642,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function check_permission($action)
     {
         if ($action === 'delete' && $this->item->is_new()) {
-            throw new \Exception($this->config['messages']['not found']);
+            throw new \Exception(__('not found'));
         }
     }
 
@@ -684,7 +673,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     public function delete_confirm()
     {
-        $dispatchEvent = null;
         $id = \Input::post('id', 0);
         if (empty($id) && \Fuel::$env === \Fuel::DEVELOPMENT) {
             $id = \Input::get('id');
@@ -762,7 +750,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->response(
             array(
-                'notify' => $this->config['messages']['successfully deleted'],
+                'notify' => __('successfully deleted'),
                 'dispatchEvent' => $dispatchEvent,
             )
         );
