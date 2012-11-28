@@ -176,8 +176,8 @@ return array(
         * );
         */
         'packages'    => array(
-            'orm',
-            'parser',
+            //'orm',
+            //'parser',
         ),
 
         /**

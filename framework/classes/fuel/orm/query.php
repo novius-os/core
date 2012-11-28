@@ -10,6 +10,8 @@
 
 namespace Nos\Orm;
 
+\Package::load('orm');
+
 class Query extends \Orm\Query
 {
     public function alias()
