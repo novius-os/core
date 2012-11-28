@@ -67,7 +67,8 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field
         return $return;
     }
 
-    public function is_expert() {
+    public function is_expert()
+    {
         return $this->fieldset->is_expert($this->name);
     }
 

@@ -8,18 +8,12 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos\Orm;
+\Package::load('email');
 
-\Package::load('orm');
-
-class Query extends \Orm\Query
+class Email extends \Email\Email
 {
-    public function alias()
+    public static function hasDefaultFrom()
     {
-        return $this->alias;
-    }
-    public function connection()
-    {
-        return $this->connection;
+        return static::$_defaults['from']['email'];
     }
 }

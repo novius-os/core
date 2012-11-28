@@ -244,6 +244,24 @@ class Attachment
         }
     }
 
+    /**
+     * Delete an alias
+     */
+    static public function delete_alias($alias)
+    {
+        $alias = rtrim($alias, '/').'/';
+
+        \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
+
+        $attachments = \Config::get("data::attachments", array());
+        if (!isset($attachments[$alias])) {
+            unset($attachments[$alias]);
+
+            \Config::save(APPPATH.'data'.DS.'config'.DS.'attachments.php', $attachments);
+            \Config::set('data::attachments', $attachments);
+        }
+    }
+
     public static function implode_pk($data)
     {
         $new_file = $data->new_file();

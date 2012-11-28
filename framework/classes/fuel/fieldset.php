@@ -579,7 +579,8 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $json_response;
     }
 
-    function is_expert($field_name) {
+    public function is_expert($field_name)
+    {
         return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
     }
 }

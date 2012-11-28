@@ -10,6 +10,8 @@
 
 namespace Nos\Orm;
 
+\Package::load('orm');
+
 class UnknownBehaviourException extends \Exception
 {
 }
