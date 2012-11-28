@@ -87,7 +87,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs');
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts');
         if (isset($config['model'])) {
             $config['model'] = ltrim($config['model'], '\\');
             $namespace_model = \Inflector::get_namespace($config['model']);
@@ -108,7 +108,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 'url' => $config['model']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false),
                 'sortable' => $config['model']::behaviours('Nos\Orm_Behaviour_Sortable', false),
             );
-
 
             if (!isset($config['data_mapping'])) {
                 $config['data_mapping'] = null;
@@ -241,6 +240,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
 
+            $models = array($config['model']);
             $inspectors = array();
             foreach ($config['inspectors'] as $key => $value) {
                 $inspector_key = is_array($value) ? $key : $value;
@@ -258,10 +258,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $inspectors[$inspector_key] = $inspector_config;
                 if (isset($inspector_config['model']) && !$wasToolbarModelsSet) {
                     $inspector_model_namespace = substr($inspector_config['model'], 0, strrpos($inspector_config['model'], '\\'));
+                    $models[] = $inspector_config['model'];
                     if ($inspector_model_namespace == $namespace_model) {
                         $config['toolbar']['models'][] = $inspector_config['model'];
                     }
                 }
+            }
+
+            $has_context = false;
+            for ($i = 0; $i < count($models); $i++) {
+                if ($models[$i]::behaviours('Nos\Orm_Behaviour_Contextable', false)) {
+                    $has_context = true;
+                }
+            }
+            if (!$has_context) {
+                $config['hideContexts'] = true;
             }
 
             $config['inspectors'] = $inspectors;
