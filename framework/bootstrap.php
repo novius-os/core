@@ -14,16 +14,16 @@ defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Setup dir constants
 if (isset($_SERVER['NOS_ROOT'])) {
-    define('NOS_ROOT', $_SERVER['NOS_ROOT'].DIRECTORY_SEPARATOR);
+    define('NOSROOT', $_SERVER['NOS_ROOT'].DIRECTORY_SEPARATOR);
 } else {
-    define('NOS_ROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
+    define('NOSROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 }
-define('DOCROOT', NOS_ROOT.'public'.DIRECTORY_SEPARATOR);
+define('DOCROOT', NOSROOT.'public'.DIRECTORY_SEPARATOR);
 
-define('APPPATH', NOS_ROOT.'local'.DIRECTORY_SEPARATOR);
-define('PKGPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
-define('COREPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
-define('NOSPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
+define('APPPATH', NOSROOT.'local'.DIRECTORY_SEPARATOR);
+define('PKGPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
+define('COREPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
+define('NOSPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
@@ -48,6 +48,8 @@ if (!MBSTRING) {
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
         'Event_Instance' => FUEL_EXTEND_PATH.'event/instance.php',
+        'Email' => FUEL_EXTEND_PATH.'email.php',
+        'Email_Driver' => FUEL_EXTEND_PATH.'email'.DIRECTORY_SEPARATOR.'driver.php',
         'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
         'Finder' => FUEL_EXTEND_PATH.'finder.php',
         'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
