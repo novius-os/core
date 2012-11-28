@@ -116,10 +116,10 @@ class I18n
         return $result;
     }
 
-    public static function current_dictionary()
+    public static function current_dictionary($list)
     {
         $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        static::$_files_dict[$dbg[0]['file']] = call_user_func_array('static::dictionary', func_get_args());
+        static::$_files_dict[$dbg[0]['file']] = call_user_func('static::dictionary', (array) $list);
     }
 
     public static function translate_from_file($file, $message, $default)
@@ -128,20 +128,20 @@ class I18n
         return empty($lookup) ? static::get($message, $default) : $lookup($message, $default);
     }
 
-    public static function dictionary()
+    public static function dictionary($list)
     {
-        $groups = func_get_args();
+        $list = (array) $list;
 
         $active_group = static::$_group;
-        foreach ($groups as $group) {
+        foreach ($list as $group) {
             static::load($group);
         }
         static::$_group = $active_group;
 
         $messages = static::$_messages[static::$_locale];
 
-        return function($message, $default = null) use ($groups, $messages) {
-            foreach ($groups as $group) {
+        return function($message, $default = null) use ($list, $messages) {
+            foreach ($list as $group) {
                 $result = isset($messages[$group][$message]) ? $messages[$group][$message] : false;
 
                 // If translation exists, but is empty, then it's not translated
