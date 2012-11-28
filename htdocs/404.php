@@ -144,12 +144,12 @@ if ($is_attachment) {
             $target = DOCROOT.$target_relative;
             $dir = dirname($target);
             if (!is_dir($dir)) {
-                if(!@mkdir($dir, 0755, true)) {
+                if (!@mkdir($dir, 0755, true)) {
                     Log::error("Can't create dir ".$dir);
                     exit("Can't create dir ".$dir);
                 }
             }
-            if(!@symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target)) {
+            if (!@symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target)) {
                 Log::error("Can't symlink in ".$source);
                 exit("Can't symlink in ".$source);
             }
