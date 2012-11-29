@@ -425,7 +425,7 @@ class Model extends \Orm\Model
         $class = get_called_class();
         if (static::linked_wysiwygs()) {
             $w_keys = array_keys($this->linked_wysiwygs);
-            foreach($w_keys as $i) {
+            foreach ($w_keys as $i) {
                 // Remove empty wysiwyg
                 if (empty($this->linked_wysiwygs[$i]->wysiwyg_text)) {
                     $this->linked_wysiwygs[$i]->delete();
@@ -436,7 +436,7 @@ class Model extends \Orm\Model
 
         if (static::linked_medias()) {
             $w_keys = array_keys($this->linked_medias);
-            foreach($w_keys as $i) {
+            foreach ($w_keys as $i) {
                 // Remove empty medias
                 if (empty($this->linked_medias[$i]->medil_media_id)) {
                     $this->linked_medias[$i]->delete();
