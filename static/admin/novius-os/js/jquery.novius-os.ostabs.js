@@ -28,6 +28,7 @@ define('jquery-nos-ostabs',
                     newTab: 'New tab',
                     closeTab: 'Close tab',
                     closeOtherTabs: 'Close all other tabs',
+                    confirmCloseOtherTabs: 'Are you sure to want to close all other tabs ?',
                     reloadTab: 'Reload tab',
                     spinner: 'Loading...'
                 },
@@ -647,12 +648,14 @@ define('jquery-nos-ostabs',
                 closeOtherTabs = $( '<a href="#"></a>' )
                     .addClass( 'nos-ostabs-close-allothers' )
                     .click(function() {
-                        self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
-                            var $liTemp = this;
-                            if ($liTemp !== li[0]) {
-                                self.remove( self.lis.index($liTemp) );
-                            }
-                        });
+                        if (confirm(o.texts.confirmCloseOtherTabs)) {
+                            self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                var $liTemp = this;
+                                if ($liTemp !== li[0]) {
+                                    self.remove( self.lis.index($liTemp) );
+                                }
+                            });
+                        }
                         return false;
                     })
                     .appendTo( links );
