@@ -1,2 +1,2 @@
-<li><a onclick="$(this).nosTabs('open', {url: 'admin/noviusos_tray/account', app: true, iconSize: 32, labelDisplay: false, iconUrl: 'static/novius-os/admin/novius-os/img/32/myaccount.png', label: <?= htmlentities(\Format::forge(__('My account'))->to_json()) ?>});"><?= __('My account') ?></a></li>
+<li><a onclick="$(this).nosTabs('open', {url: 'admin/noviusos_tray/account', app: true, iconSize: 32, labelDisplay: false, iconUrl: 'static/apps/noviusos_tray/img/32/myaccount.png', label: <?= htmlentities(\Format::forge(__('My account'))->to_json()) ?>});"><?= __('My account') ?></a></li>
 <li><a onclick="document.location = 'admin/noviusos_tray/account/disconnect';"><?= __('Log out') ?></a></li>
