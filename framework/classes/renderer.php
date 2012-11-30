@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Widget
+class Renderer
 {
     public static function date($field, $value = null, array $attributes = array())
     {

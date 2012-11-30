@@ -12,7 +12,7 @@ namespace Nos;
 
 class Tools_Wysiwyg
 {
-    public static function prepare_widget($content)
+    public static function prepare_renderer($content)
     {
         $replaces = array();
         static::parse_medias(

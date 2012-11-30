@@ -10,28 +10,28 @@
 
 namespace Nos;
 
-class Widget_Media extends \Fieldset_Field
+class Renderer_Media extends \Fieldset_Field
 {
     /**
-     * Standalone build of the media widget.
+     * Standalone build of the media renderer.
      *
-     * @param  array  $widget Widget definition (attributes + widget_options)
+     * @param  array  $renderer Renderer definition (attributes + renderer_options)
      * @return string The <input> tag + JavaScript to initialise it
      */
-    public static function widget($widget = array())
+    public static function renderer($renderer = array())
     {
-        list($attributes, $widget_options) = static::parse_options($widget);
-        static::hydrate_options($widget_options, isset($attributes['value']) ? $attributes['value'] : null);
-        $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($widget_options));
+        list($attributes, $renderer_options) = static::parse_options($renderer);
+        static::hydrate_options($renderer_options, isset($attributes['value']) ? $attributes['value'] : null);
+        $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
 
         return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id']);
     }
 
     protected $options = array();
 
-    public function __construct($name, $label = '', array $widget = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
+    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        list($attributes, $this->options) = static::parse_options($widget);
+        list($attributes, $this->options) = static::parse_options($renderer);
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
@@ -50,32 +50,32 @@ class Widget_Media extends \Fieldset_Field
     }
 
     /**
-     * Parse the widget array to get attributes and the widget options
-     * @param  array $widget
-     * @return array 0: attributes, 1: widget options
+     * Parse the renderer array to get attributes and the renderer options
+     * @param  array $renderer
+     * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($widget = array())
+    protected static function parse_options($renderer = array())
     {
-        $widget['class'] = (isset($widget['class']) ? $widget['class'] : '').' media';
+        $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' media';
 
-        if (empty($widget['id'])) {
-            $widget['id'] = uniqid('media_');
+        if (empty($renderer['id'])) {
+            $renderer['id'] = uniqid('media_');
         }
 
-        // Default options of the widget
-        $widget_options = array(
+        // Default options of the renderer
+        $renderer_options = array(
             'mode' => 'image',
             'inputFileThumb' => array(
                 'title' => __('Image from the media library'),
             ),
         );
 
-        if (!empty($widget['widget_options'])) {
-            $widget_options = \Arr::merge($widget_options, $widget['widget_options']);
+        if (!empty($renderer['renderer_options'])) {
+            $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
         }
-        unset($widget['widget_options']);
+        unset($renderer['renderer_options']);
 
-        return array($widget, $widget_options);
+        return array($renderer, $renderer_options);
     }
 
     /**
@@ -94,14 +94,14 @@ class Widget_Media extends \Fieldset_Field
     }
 
     /**
-     * Generates the JavaScript to initialise the widget
+     * Generates the JavaScript to initialise the renderer
      *
      * @param   string  HTML ID attribute of the <input> tag
-     * @return string JavaScript to execute to initialise the widget
+     * @return string JavaScript to execute to initialise the renderer
      */
     protected static function js_init($id)
     {
-        return \View::forge('widget/media', array(
+        return \View::forge('renderer/media', array(
             'id' => $id,
         ), false);
     }

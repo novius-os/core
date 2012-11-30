@@ -58,7 +58,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     {
         $output = '';
         foreach ($this->field() as $field) {
-            if (false != mb_strpos(get_class($field), 'Widget_')) {
+            if (false != mb_strpos(get_class($field), 'Renderer_')) {
                 continue;
             }
             if ($field->type == 'hidden') {
@@ -162,7 +162,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     }
 
     /**
-     * Override default populate() to allow widgets populate themselves
+     * Override default populate() to allow renderers populate themselves
      * @param   array|object  The whole input array
      * @param   bool          Also repopulate?
      * @return  Fieldset this, to allow chaining
@@ -171,7 +171,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     {
         foreach ($this->fields as $f) {
             $class = mb_strtolower(\Inflector::denamespace(get_class($f)));
-            if (mb_substr($class, 0, 6) == 'widget' && isset($input->{$f->name})) {
+            if (mb_substr($class, 0, 8) == 'renderer' && isset($input->{$f->name})) {
                 $f->populate($input);
             }
         }
@@ -179,7 +179,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     }
 
     /**
-     * Override default repopulate() to allow widgets populate themselves
+     * Override default repopulate() to allow renderers populate themselves
      *
      * @param   array|object  input for initial population of fields, this is deprecated - you should use populate() instea
      * @return  Fieldset  this, to allow chaining
@@ -197,8 +197,8 @@ class Fieldset extends \Fuel\Core\Fieldset
             if ($f->name === \Config::get('security.csrf_token_key', 'fuel_csrf_token')) {
                 continue;
             }
-            if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 6) == 'widget') {
-                // Widgets populates themselves
+            if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 8) == 'renderer') {
+                // Renderers populates themselves
                 $f->repopulate($input);
             }
         }
@@ -238,7 +238,7 @@ class Fieldset extends \Fuel\Core\Fieldset
      * @param   Fieldset|null
      * @return  Fieldset
      */
-    public function add_model_widgets($class, $instance = null, $options = array())
+    public function add_model_renderers($class, $instance = null, $options = array())
     {
         if (is_object($class)) {
             $instance = $class;
@@ -247,14 +247,14 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
 
         $properties = is_object($instance) ? $instance->properties() : $class::properties();
-        $this->add_widgets($properties);
+        $this->add_renderers($properties);
 
         $instance and $this->populate($instance);
 
         return $this;
     }
 
-    public function add_widgets($properties, $options = array())
+    public function add_renderers($properties, $options = array())
     {
         $this->config_used = $properties;
 
@@ -265,9 +265,9 @@ class Fieldset extends \Fuel\Core\Fieldset
 
             $label      = isset($settings['label']) ? $settings['label'] : $p;
             $attributes = isset($settings['form']) ? $settings['form'] : array();
-            if (!empty($settings['widget'])) {
-                 $class = $settings['widget'];
-                 $attributes['widget_options'] = \Arr::get($settings, 'widget_options', array());
+            if (!empty($settings['renderer'])) {
+                 $class = $settings['renderer'];
+                 $attributes['renderer_options'] = \Arr::get($settings, 'renderer_options', array());
                  $field = new $class($p, $label, $attributes, array(), $this);
                  $this->add_field($field);
             } else {
@@ -373,7 +373,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             $instance->form_fieldset_fields($config);
         }
 
-        $fieldset->add_widgets($config, $options);
+        $fieldset->add_renderers($config, $options);
 
         if (!empty($options['extend']) && is_callable($options['extend'])) {
             call_user_func($options['extend'], $fieldset);
@@ -500,7 +500,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         try {
 
             foreach ($fields as $name => $config) {
-                if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
+                if (!empty($config['renderer']) && in_array($config['renderer'], array('Nos\Renderer_Text', 'Nos\Renderer_Empty'))) {
                     continue;
                 }
                 $type = \Arr::get($config, 'form.type', null);
@@ -513,7 +513,7 @@ class Fieldset extends \Fuel\Core\Fieldset
                     continue;
                 }
 
-                if (!empty($config['widget']) && !$options['fieldset']->fields[$name]->before_save($item, $data)) {
+                if (!empty($config['renderer']) && !$options['fieldset']->fields[$name]->before_save($item, $data)) {
                     continue;
                 }
 
@@ -553,7 +553,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
 
             foreach ($fields as $name => $config) {
-                if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
+                if (!empty($config['renderer']) && in_array($config['renderer'], array('Nos\Renderer_Text', 'Nos\Renderer_Empty'))) {
                     continue;
                 }
                 $type = \Arr::get($config, 'form.type', null);

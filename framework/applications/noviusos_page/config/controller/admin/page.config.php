@@ -134,8 +134,8 @@ return array(
             ),
         ),
         'page_parent_id' => array(
-            'widget' => 'Nos\Page\Widget_Selector',
-            'widget_options' => array(
+            'renderer' => 'Nos\Page\Renderer_Selector',
+            'renderer_options' => array(
                 'width' => '250px',
                 'height' => '250px',
             ),
@@ -151,7 +151,7 @@ return array(
         ),
         'page_virtual_name' => array(
             'label' => __('URL: '),
-            'widget' => 'Nos\Widget_Virtualname',
+            'renderer' => 'Nos\Renderer_Virtualname',
             'validation' => array(
                 'required',
                 'min_length' => array(2),

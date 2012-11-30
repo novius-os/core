@@ -30,7 +30,7 @@ class Controller_Admin_Ajax extends \Controller
 
         $page = empty($page_id) ? null : Model_Page::find($page_id);
         foreach ($data['layout'] as $wysiwyg => $coords) {
-            $data['content'][$wysiwyg] = empty($page) ? '' : \Nos\Tools_Wysiwyg::prepare_widget($page->wysiwygs->{$wysiwyg});
+            $data['content'][$wysiwyg] = empty($page) ? '' : \Nos\Tools_Wysiwyg::prepare_renderer($page->wysiwygs->{$wysiwyg});
         }
 
         // @todo replace images

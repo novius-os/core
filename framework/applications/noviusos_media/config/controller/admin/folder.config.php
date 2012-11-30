@@ -40,7 +40,7 @@ return array(
             ),
         ),
         'medif_parent_id' => array(
-            'widget' => 'Nos\Media\Widget_Folder',
+            'renderer' => 'Nos\Media\Renderer_Folder',
             'form' => array(
                 'type'  => 'hidden',
             ),

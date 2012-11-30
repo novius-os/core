@@ -306,7 +306,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $fields,
                     array(
                         $parent_id => array(
-                            'widget_options' => array(
+                            'renderer_options' => array(
                                 'context' => $this->item->{$this->behaviours['contextable']['context_property']},
                             ),
                         ),

@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Widget_Text extends \Fieldset_Field
+class Renderer_Text extends \Fieldset_Field
 {
     public function build()
     {

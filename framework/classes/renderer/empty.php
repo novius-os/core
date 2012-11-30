@@ -11,9 +11,9 @@
 namespace Nos;
 
 /**
- * @todo rename to Widget_Validation
+ * @todo rename to Renderer_Validation
  */
-class Widget_Empty extends \Fieldset_Field
+class Renderer_Empty extends \Fieldset_Field
 {
     public function build()
     {

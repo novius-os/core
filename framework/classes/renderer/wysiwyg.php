@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Widget_Wysiwyg extends \Fieldset_Field
+class Renderer_Wysiwyg extends \Fieldset_Field
 {
     protected $options = array();
 
@@ -23,10 +23,10 @@ class Widget_Wysiwyg extends \Fieldset_Field
             $attributes['id'] = uniqid('wysiwyg_');
         }
 
-        if (!empty($attributes['widget_options'])) {
-            $this->options = \Arr::merge($this->options, $attributes['widget_options']);
+        if (!empty($attributes['renderer_options'])) {
+            $this->options = \Arr::merge($this->options, $attributes['renderer_options']);
         }
-        unset($attributes['widget_options']);
+        unset($attributes['renderer_options']);
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
@@ -40,7 +40,7 @@ class Widget_Wysiwyg extends \Fieldset_Field
         parent::build();
         $this->fieldset()->append($this->js_init());
 
-        $this->value = Tools_Wysiwyg::prepare_widget($this->value);
+        $this->value = Tools_Wysiwyg::prepare_renderer($this->value);
         $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
 
         return (string) parent::build();
@@ -50,7 +50,7 @@ class Widget_Wysiwyg extends \Fieldset_Field
     {
         // we have to find why it's called two times...
 
-        return \View::forge('widget/wysiwyg', array(
+        return \View::forge('renderer/wysiwyg', array(
             'id' => $this->get_attribute('id'),
         ), false);
     }

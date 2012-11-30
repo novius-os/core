@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Widget_Date_Select extends \Fieldset_Field
+class Renderer_Date_Select extends \Fieldset_Field
 {
     /**
      * @var \Nos\Fieldset_Field
@@ -44,7 +44,7 @@ class Widget_Date_Select extends \Fieldset_Field
      * @param  array               $attributes
      * @param  array               $rules
      * @param  \Fuel\Core\Fieldset $fieldset
-     * @return Nos\Widget_Date
+     * @return Nos\Renderer_Date
      */
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
@@ -75,7 +75,7 @@ class Widget_Date_Select extends \Fieldset_Field
             $attributes['month']['options'] = static::_get_month_names();
         }
 
-        // Build the fields used by the widget
+        // Build the fields used by the renderer
         $this->parts = \Fieldset::forge($name.uniqid());
 
         $this->day = $this->parts->add($name.'_day', '', $attributes['day']);

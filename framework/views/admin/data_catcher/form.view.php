@@ -130,11 +130,11 @@ echo \View::forge(
                     $value = isset($nugget_db[$field_name]) ? $nugget_db[$field_name] : 0;
                     $field->set_options(
                         array(
-                            0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(
+                            0 => '<div style="float:left;">'.\Nos\Renderer_Media::renderer(
                                 array(
                                     'name' => 'custom_image',
                                     'value' => isset($options[$value]) ? 0 : $value,
-                                    'widget_options' => array(
+                                    'renderer_options' => array(
                                         'inputFileThumb' => array(
                                             'title' => __('Pick a custom image'),
                                         ),

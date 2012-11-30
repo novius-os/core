@@ -42,10 +42,10 @@ return array(
     'fields' => array(
         'id' => array (
             'label' => 'ID: ',
-            'widget' => 'Nos\Widget_Text',
+            'renderer' => 'Nos\Renderer_Text',
         ),
         'media_folder_id' => array(
-            'widget' =>  'Nos\Media\Widget_Folder',
+            'renderer' =>  'Nos\Media\Renderer_Folder',
             'form' => array(
                 'type'  => 'hidden',
             ),
