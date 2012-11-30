@@ -1621,8 +1621,7 @@ define('jquery-nos-appdesk',
                                             },
                                             width : 1
                                         };
-                                    }
-                                    if (object[key][i].actions) {
+                                    } else if (object[key][i].actions) {
                                         var actions = object[key][i].actions;
                                         var width;
                                         var showOnlyArrow = object[key][i].showOnlyArrow ? true : false;
@@ -1644,9 +1643,10 @@ define('jquery-nos-appdesk',
                                         object[key][i] = {
                                             headerText : showOnlyArrow ? '' : '',
                                             cellFormatter : function(args) {
+                                                var buttons;
                                                 if ($.isPlainObject(args.row.data)) {
 
-                                                    var buttons = $.appdeskActions(actions, args.row.data, {
+                                                    buttons = $.appdeskActions(actions, args.row.data, {
                                                         showOnlyArrow : showOnlyArrow
                                                     });
 
@@ -1663,6 +1663,46 @@ define('jquery-nos-appdesk',
                                             showFilter : false,
                                             setupkey: 'actions'
                                         };
+                                    } else if (object[key][i].cellFormatter) {
+                                        (function() {
+                                            var cellFormatters = $.isArray(object[key][i].cellFormatter) ? object[key][i].cellFormatter : [object[key][i].cellFormatter];
+                                            object[key][i] = $.extend(object[key][i], {
+                                                cellFormatter : function(args) {
+                                                    if (args.row.type & $.wijmo.wijgrid.rowType.data) {
+                                                        $.each(cellFormatters, function(i, formatter) {
+                                                            formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
+                                                            switch (formatter.type) {
+                                                                case 'bold':
+                                                                    args.$container.css('font-weight', 'bold');
+                                                                    break;
+
+                                                                case 'css':
+                                                                    if ($.type(formatter.css) === 'object') {
+                                                                        args.$container.css(formatter.css);
+                                                                    }
+                                                                    break;
+
+                                                                case 'link':
+                                                                    args.formattedValue = $('<a href="#"></a>').text(args.formattedValue)
+                                                                        .click(function(e) {
+                                                                            e.preventDefault();
+                                                                            if (formatter.action && $.type(formatter.action) !== 'object' && config.appdesk.actions && config.appdesk.actions[formatter.action]) {
+                                                                                formatter.action = config.appdesk.actions[formatter.action].action;
+                                                                            }
+                                                                            if ($.type(formatter.action) === 'object') {
+                                                                                $(this).nosAction(formatter.action, args.row.data);
+                                                                            }
+                                                                        });
+                                                                    break;
+                                                            }
+                                                        });
+                                                        args.$container.html(args.formattedValue);
+
+                                                        return true;
+                                                    }
+                                                }
+                                            });
+                                        })();
                                     }
                                 }
                             }
