@@ -193,7 +193,9 @@ class Config_Common
                 $key = $item;
                 $item = array();
             }
-
+            if ($key === 'context') {
+                $data_mapping[$key] = $item;
+            }
             if (is_array($item)) {
                 // @todo two keys to process : appdesk and fieldset
                 if (!isset($item['headerText']) && isset($item['title'])) {

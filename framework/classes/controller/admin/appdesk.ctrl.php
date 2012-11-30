@@ -267,7 +267,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             $has_context = false;
             for ($i = 0; $i < count($models); $i++) {
-                if ($models[$i]::behaviours('Nos\Orm_Behaviour_Contextable', false)) {
+                if ($models[$i]::behaviours('Nos\Orm_Behaviour_Contextable', false) || $models[$i]::behaviours('Nos\Orm_Behaviour_Twinnable', false)) {
                     $has_context = true;
                 }
             }
@@ -386,6 +386,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
                     }
                 }
+            }
+            if ($has_context && !isset($config['appdesk']['appdesk']['grid']['columns']['context'])) {
+                $config['appdesk']['appdesk']['grid']['columns']['context'] = array('context' => true);
             }
 
             if (!isset($config['appdesk']['appdesk']['grid']['columns']['actions']['actions'])) {
