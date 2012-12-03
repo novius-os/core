@@ -53,7 +53,7 @@ class Config_Common
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => "insert_update/{{id}}",
+                        'url' => "insert_update/{{_id}}",
                         'label' => __('Edit'),
                     ),
                 ),
@@ -68,7 +68,7 @@ class Config_Common
                 'action' => array(
                     'action' => 'confirmationDialog',
                     'dialog' => array(
-                        'contentUrl' => 'delete/{{id}}',
+                        'contentUrl' => 'delete/{{_id}}',
                         'title' => __('Delete'),
                     ),
                 ),
@@ -113,7 +113,7 @@ class Config_Common
                 'action' => array(
                     'action' => 'share',
                     'data' => array(
-                        'model_id' => '{{id}}',
+                        'model_id' => '{{_id}}',
                         'model_name' => '',
                     ),
                 ),
