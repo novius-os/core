@@ -23,25 +23,25 @@ return array(
     'fields' => array(
         'user_id' => array(
             'label' => __('ID: '),
-            'widget' => 'Nos\Widget_Text',
+            'renderer' => 'Nos\Renderer_Text',
         ),
         'user_name' => array(
             'label' => __('Family name'),
-            'widget' => '',
+            'renderer' => '',
             'validation' => array(
                 'required',
             ),
         ),
         'user_firstname' => array(
             'label' => __('First name'),
-            'widget' => '',
+            'renderer' => '',
             'validation' => array(
                 'required',
             ),
         ),
         'user_email' => array(
             'label' => __('Email: '),
-            'widget' => '',
+            'renderer' => '',
             'validation' => array(
                 'required',
                 'valid_email',
@@ -50,7 +50,7 @@ return array(
         'user_last_connection' => array(
             'label' => __('Last login: '),
             'add' => false,
-            'widget' => 'Nos\Widget_Date_Select',
+            'renderer' => 'Nos\Renderer_Date_Select',
             'form' => array(
                 'readonly' => true,
                 'date_format' => 'eu_full',

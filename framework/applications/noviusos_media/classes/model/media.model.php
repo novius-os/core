@@ -139,7 +139,7 @@ class Model_Media extends \Nos\Orm\Model
         } else {
             list($width, $height) = array($this->media_width, $this->media_height);
             $src = $this->get_public_path();
-            $ration = 1;
+            $ratio = 1;
         }
 
         return array($src, $width, $height, $ratio);

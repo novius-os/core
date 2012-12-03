@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Widget_Tag extends \Fieldset_Field
+class Renderer_Tag extends \Fieldset_Field
 {
     protected $options = array();
 
@@ -23,10 +23,10 @@ class Widget_Tag extends \Fieldset_Field
             $attributes['id'] = uniqid('tag_');
         }
 
-        if (!empty($attributes['widget_options'])) {
-            $this->options = \Arr::merge($this->options, $attributes['widget_options']);
+        if (!empty($attributes['renderer_options'])) {
+            $this->options = \Arr::merge($this->options, $attributes['renderer_options']);
         }
-        unset($attributes['widget_options']);
+        unset($attributes['renderer_options']);
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
@@ -89,12 +89,12 @@ class Widget_Tag extends \Fieldset_Field
     public function js_init()
     {
         // we have to find why it's called two times...
-        // @todo: This widget is supposing that they are not a lot of tags (< 500) : this is generally the case, but if there is more, think of an Ajax mode       $tags = $this->options['model']::find('all');
+        // @todo: This renderer is supposing that they are not a lot of tags (< 500) : this is generally the case, but if there is more, think of an Ajax mode       $tags = $this->options['model']::find('all');
         $model = $this->options['model'];
         $tags = $model::find('all');
         $labels = static::get_labels_from_tags($tags, $this->options['label_column']);
 
-        return \View::forge('widget/tag', array(
+        return \View::forge('renderer/tag', array(
             'id' => $this->get_attribute('id'),
             'labels' => $labels
         ), false);

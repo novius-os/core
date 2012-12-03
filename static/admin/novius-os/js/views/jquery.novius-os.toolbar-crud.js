@@ -64,7 +64,7 @@ define('jquery-nos-toolbar-crud',
                                             $share = 'load';
                                             $.ajax({
                                                 url : 'admin/nos/datacatcher/form',
-                                                data : action.data,
+                                                data : $.nosDataReplace(action.data, params.dataset),
                                                 success : function(data) {
                                                     $share = $(data).insertAfter($container)
                                                         .bind('close', function() {

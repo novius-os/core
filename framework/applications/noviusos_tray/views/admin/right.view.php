@@ -1,25 +1,24 @@
-<div class="menu">
+<div id="tray-username" class="menu">
     <?= \Session::user()->user_firstname ?>
 </div>
-<div class="menu_dropdown">
+<ul id="tray-username-menu">
     <?= \View::forge('noviusos_tray::admin/right/inside') ?>
-</div>
+</ul>
 <script type="text/javascript">
-    $('body').click(function(e) {
-        var visible = false;
-        if ($(e.target).closest('.menu_dropdown').length == 0) {
-            var $menu = $(e.target).closest('.menu');
-            if ($menu.length > 0 && !$menu.hasClass('active')) {
-                visible = true;
-            }
-        }
-        if (visible) {
-            $('.menu_dropdown').addClass('active');
-            $('.menu').addClass('active');
-        } else {
-            $('.menu_dropdown').removeClass('active');
-            $('.menu').removeClass('active');
-        }
-
-    });
+    require(
+            ['jquery-nos'],
+            function($) {
+                $(function() {
+                    $("#tray-username-menu").appendTo('body').wijmenu({
+                        trigger: "#tray-username",
+                        triggerEvent: "click",
+                        orientation: "vertical",
+                        position: {
+                            offset: '-5 -10',
+                            my: "right top",
+                            at: "right bottom"
+                        }
+                    });
+                });
+            });
 </script>

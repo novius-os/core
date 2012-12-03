@@ -26,8 +26,9 @@ define('jquery-nos-ostabs',
                     scrollLeft : 'Scroll left',
                     scrollRight : 'Scroll right',
                     newTab: 'New tab',
-                    removeTab: 'Remove tab',
                     closeTab: 'Close tab',
+                    closeOtherTabs: 'Close all other tabs',
+                    confirmCloseOtherTabs: 'Are you sure to want to close all other tabs ?',
                     reloadTab: 'Reload tab',
                     spinner: 'Loading...'
                 },
@@ -611,27 +612,26 @@ define('jquery-nos-ostabs',
 
             _actions: function( $panel, index, other_actions) {
                 var self = this,
-                    o = self.options;
-
-                var li = self.lis.eq(index),
+                    o = self.options,
+                    actions, links, closable, reloadable, close, closeOtherTabs, reload, reversed_actions,
+                    li = self.lis.eq(index),
                     a =  self.anchors.eq(index);
 
                 $panel.find('.nos-ostabs-actions').remove();
 
-                var actions = $( '<div></div>' )
+                actions = $( '<div></div>' )
                     .addClass( 'nos-ostabs-actions ui-state-active' )
                     .prependTo( $panel );
 
-                var links = $( '<div></div>' )
+                links = $( '<div></div>' )
                     .addClass( 'nos-ostabs-actions-links' )
                     .prependTo( actions );
 
-                var removable = li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length;
-                var closable = li.not( '.nos-ostabs-appstab' ).length;
-                var reloadable = a.data( "iframe.tabs" );
+                closable = li.not( '.nos-ostabs-appstab' ).length;
+                reloadable = a.data( "iframe.tabs" );
 
                 if ( closable ) {
-                    var close = $( '<a href="#"></a>' )
+                    close = $( '<a href="#"></a>' )
                         .addClass( 'nos-ostabs-close' )
                         .click(function() {
                             self.remove( self.lis.index(li) ); // On recalcule l'index au cas où l'onglet est été déplacé
@@ -639,14 +639,34 @@ define('jquery-nos-ostabs',
                         })
                         .appendTo( links );
                     $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
-                        .text( removable ? o.texts.removeTab : o.texts.closeTab )
+                        .text( o.texts.closeTab )
                         .appendTo( close );
-                    $( '<span></span>' ).text( removable ? o.texts.removeTab : o.texts.closeTab )
+                    $( '<span></span>' ).text( o.texts.closeTab )
                         .appendTo( close );
                 }
 
+                closeOtherTabs = $( '<a href="#"></a>' )
+                    .addClass( 'nos-ostabs-close-allothers' )
+                    .click(function() {
+                        if (confirm(o.texts.confirmCloseOtherTabs)) {
+                            self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                var $liTemp = this;
+                                if ($liTemp !== li[0]) {
+                                    self.remove( self.lis.index($liTemp) );
+                                }
+                            });
+                        }
+                        return false;
+                    })
+                    .appendTo( links );
+                $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
+                    .text( o.texts.closeOtherTabs )
+                    .appendTo( closeOtherTabs );
+                $( '<span></span>' ).text( o.texts.closeOtherTabs )
+                    .appendTo( closeOtherTabs );
+
                 if ( reloadable ) {
-                    var reload = $( '<a href="#"></a>' )
+                    reload = $( '<a href="#"></a>' )
                         .addClass( 'nos-ostabs-reload' )
                         .click(function() {
                             var fr = $panel.find( 'iframe.nos-ostabs-panel-content' );
@@ -663,22 +683,22 @@ define('jquery-nos-ostabs',
                 }
 
                 // slice() = clone()
-                var reversed_actions = other_actions.slice(0).reverse();
+                reversed_actions = other_actions.slice(0).reverse();
                 $.each(reversed_actions, function() {
-                    var action = this;
-
-                    var $el = $( '<a href="#"></a>' )
-                        .addClass( 'nos-ostabs-action' )
-                        .click(function(e) {
-                            e.preventDefault();
-                            $(this).nosAction(action.action);
-                        })
-                        .appendTo( links );
+                    var action = this,
+                        icon,
+                        $el = $( '<a href="#"></a>' )
+                            .addClass( 'nos-ostabs-action' )
+                            .click(function(e) {
+                                e.preventDefault();
+                                $(this).nosAction(action.action);
+                            })
+                            .appendTo( links );
 
                     if (action.faded) {
                        $el.addClass('faded');
                     }
-                    var icon = $( '<span></span>' ).addClass( 'ui-icon' )
+                    icon = $( '<span></span>' ).addClass( 'ui-icon' )
                         .text( action.label || '' )
                         .appendTo( $el );
                     if ( action.iconUrl ) {

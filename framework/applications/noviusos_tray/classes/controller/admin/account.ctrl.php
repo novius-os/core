@@ -69,7 +69,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         $fields = array(
             'background' => array(
                 'label' => 'Wallpaper',
-                'widget' => 'Nos\Widget_Media',
+                'renderer' => 'Nos\Renderer_Media',
                 'form' => array(
                     'value' => \Arr::get($configuration, 'misc.display.background', ''),
                 ),

@@ -10,29 +10,29 @@
 
 namespace Nos;
 
-abstract class Widget_Selector extends \Fieldset_Field
+abstract class Renderer_Selector extends \Fieldset_Field
 {
-    protected $widget_options = array();
+    protected $renderer_options = array();
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
         $this->before_construct($attributes, $rules);
 
-        if (!empty($attributes['widget_options'])) {
-            $this->set_widget_options($attributes['widget_options']);
+        if (!empty($attributes['renderer_options'])) {
+            $this->set_renderer_options($attributes['renderer_options']);
         }
-        unset($attributes['widget_options']);
+        unset($attributes['renderer_options']);
 
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
-    public function set_widget_options(array $options)
+    public function set_renderer_options(array $options)
     {
-        $this->widget_options = \Arr::merge($this->widget_options, $options);
+        $this->renderer_options = \Arr::merge($this->renderer_options, $options);
     }
 
     /**
-     * Add a class and an id with a prefix to the widget attributes
+     * Add a class and an id with a prefix to the renderer attributes
      * @abstract
      * @param $attributes
      * @param $rules

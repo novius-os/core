@@ -8,51 +8,49 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos\Media;
+namespace Nos\Page;
 
-class Widget_Folder extends \Nos\Widget_Selector
+class Renderer_Selector extends \Nos\Renderer_Selector
 {
     public function before_construct(&$attributes, &$rules)
     {
-        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' media';
+        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' nos-page';
 
         if (empty($attributes['id'])) {
-            $attributes['id'] = uniqid('media_');
+            $attributes['id'] = uniqid('page_');
         }
     }
 
     public function build()
     {
-        return $this->template(static::widget(array(
+        return $this->template(static::renderer(array(
             'input_name' => $this->name,
             'selected' => array(
-                'id' => $this->value,
+                // Converts null to 0
+                'id' => (string) (int) $this->value,
             ),
             'treeOptions' => array(
-                'context' => \Arr::get($this->widget_options, 'context', null),
+                'context' => \Arr::get($this->renderer_options, 'context', null),
             ),
-            'height' => \Arr::get($this->widget_options, 'height', '150px'),
-            'width' => \Arr::get($this->widget_options, 'width', null),
+            'height' => \Arr::get($this->renderer_options, 'height', '150px'),
+            'width' => \Arr::get($this->renderer_options, 'width', null),
         )));
     }
 
     /**
-     * Construct the radio selector widget
-     * When using a fieldset,
-     * build() method should be overwritten to call the template() method on widget() response
+     * Returns a page selector renderer
      * @static
-     * @abstract
      * @param array $options
      */
-    public static function widget($options = array())
+    public static function renderer($options = array())
     {
         $options = \Arr::merge(array(
-            'urlJson' => 'admin/noviusos_media/inspector/folder/json',
-            'reloadEvent' => 'Nos\\Media\\Model_Folder',
+            'urlJson' => 'admin/noviusos_page/inspector/page/json',
+            'reloadEvent' => 'Nos\\Page\\Model_Page',
             'input_name' => null,
             'selected' => array(
                 'id' => null,
-                'model' => 'Nos\\Media\\Model_Folder',
+                'model' => 'Nos\\Page\\Model_Page',
             ),
             'columns' => array(
                 array(
@@ -66,7 +64,7 @@ class Widget_Folder extends \Nos\Widget_Selector
             'width' => null,
         ), $options);
 
-        return (string) \Request::forge('admin/noviusos_media/inspector/folder/list')->execute(
+        return (string) \Request::forge('admin/noviusos_page/inspector/page/list')->execute(
             array(
                 'inspector/modeltree_radio',
                 array(

@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Widget_Time_Picker extends \Fieldset_Field
+class Renderer_Time_Picker extends \Fieldset_Field
 {
     protected $options = array(
         'timeFormat' => 'hh:mm',
@@ -25,10 +25,10 @@ class Widget_Time_Picker extends \Fieldset_Field
         if (empty($attributes['id'])) {
             $attributes['id'] = uniqid('date_');
         }
-        if (!empty($attributes['widget_options'])) {
-            $this->options = \Arr::merge($this->options, $attributes['widget_options']);
+        if (!empty($attributes['renderer_options'])) {
+            $this->options = \Arr::merge($this->options, $attributes['renderer_options']);
         }
-        unset($attributes['widget_options']);
+        unset($attributes['renderer_options']);
 
         if (empty($attributes['size'])) {
             $attributes['size'] = 5;
@@ -55,7 +55,7 @@ class Widget_Time_Picker extends \Fieldset_Field
     public function js_init()
     {
         return \View::forge(
-            'widget/time_picker',
+            'renderer/time_picker',
             array(
                 'id' => $this->get_attribute('id'),
             ),
