@@ -23,8 +23,6 @@ class Controller_Inspector extends Controller_Admin_Application
             $inspector_path = static::get_path();
             $model = $config['model'];
 
-            $item_actions = \Config::actions(array('models' => array($config['model']), 'target' => 'grid', 'class' => get_called_class()));
-
             if (!isset($config['appdesk']['inputName'])) {
                 $config['appdesk']['inputName'] = $config['input']['key'].'[]';
             }
