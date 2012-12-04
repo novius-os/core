@@ -8,17 +8,12 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
 return array(
     'controller_url'  => 'admin/noviusos_media/media',
     'model' => 'Nos\\Media\\Model_Media',
-    'messages' => array(
-        'successfully added' => __('Media successfully added.'),
-        'successfully saved' => __('Media successfully saved.'),
-        'successfully deleted' => __('The media has successfully been deleted!'),
-        'item deleted' => __('This media has been deleted.'),
-        'not found' => __('Media not found'),
-        'delete an item' => __('Delete a media'),
-    ),
+    'i18n_file' => 'nosviusos_media::common',
     'environment_relation' => 'folder',
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_media/img/media-16.png',
@@ -75,7 +70,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
-                'value' => 'Save',
+                'value' => __('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',
             ),

@@ -14,6 +14,12 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 {
     protected $page_parent = false;
 
+    public function before()
+    {
+        parent::before();
+        \Nos\I18n::current_dictionary('noviusos_page::common', 'nos::common');
+    }
+
     protected function init_item()
     {
         parent::init_item();
@@ -47,7 +53,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             'context' => $this->item->page_context,
         ));
 
-        $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.strtr(__('Use {field}'), array('{field}' => __('title'))).'</label>';
+        $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.__('Use title').'</label>';
 
         $cache_duration = $fieldset->field('page_cache_duration');
         $cache_duration->set_template(str_replace('{duration}', '{field} {required}', $cache_duration->label));
@@ -115,7 +121,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             );
 
             $body = array(
-                'notify' => 'Homepage successfully changed.',
+                'notify' => __('Homepage successfully changed.'),
                 'dispatchEvent' => $dispatchEvent,
             );
 

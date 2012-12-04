@@ -8,10 +8,13 @@
  * @link http://www.novius-os.org
  */
 $uniqid_close = uniqid('close_');
+
+Nos\I18n::current_dictionary($i18n_files);
+
 if (!$item->is_new()) {
     ?>
     <div id="<?= $uniqid_close ?>" style="display:none;">
-        <p><?= $crud['config']['messages']['item deleted'] ?></p>
+        <p><?= __('item deleted') ?></p>
         <p>&nbsp;</p>
         <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
     </div>

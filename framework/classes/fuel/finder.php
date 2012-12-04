@@ -10,7 +10,7 @@
 
 class Finder extends Fuel\Core\Finder
 {
-    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view');
+    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view', 'lang' => 'lang');
 
     public static function instance()
     {

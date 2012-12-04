@@ -1,4 +1,7 @@
 <?php
+
+Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
+
 return array(
     'data_mapping' => array(
         'page_title' => array(
@@ -30,6 +33,9 @@ return array(
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(
             'primary' => false
+        ),
+        'Nos\Page\Model_Page.add' => array(
+            'label' => __('Add a page'),
         ),
         'Nos\Page\Model_Page.add_subpage' => array(
             'name' => 'add_page',
@@ -96,5 +102,5 @@ return array(
                 'toolbar-list' => true,
             ),
         ),
-    )
+    ),
 );

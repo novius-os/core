@@ -42,7 +42,7 @@ class Filter
             if (!empty($config['dataset'][$key]['search_relation'])) {
                 $query->related($config['dataset'][$key]['search_relation']);
             }
-            $column = $config['dataset'][$key]['search_column'];
+            $column = $key;//$config['dataset'][$key]['search_column'];
         } else {
             $column = $config['dataset'][$key];
         }
