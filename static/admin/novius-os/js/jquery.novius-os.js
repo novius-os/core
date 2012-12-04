@@ -344,7 +344,7 @@ define('jquery-nos',
                                 break;
 
                             case 'nosDialog' :
-                                params = $.extend(true, {}, $.nosDataReplace($.extend(true, {}, obj.dialog), data));
+                                params = $.nosDataReplace($.extend(true, {}, obj.dialog), data);
                                 $(this).nosDialog(params);
                                 break;
 

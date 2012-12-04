@@ -21,19 +21,6 @@ class Finder extends Fuel\Core\Finder
         return static::$instance;
     }
 
-    public static function normalize_namespace($name)
-    {
-        return implode(
-            '\\',
-            array_map(
-                function ($a) {
-                    return Inflector::words_to_upper($a);
-                },
-                explode('\\', $name)
-            )
-        );
-    }
-
     public function add_path($paths, $pos = null)
     {
         if ($pos !== null && $pos !== -1) {
@@ -90,8 +77,7 @@ class Finder extends Fuel\Core\Finder
         if ($pos = strripos($file, '::')) {
             // Novius OS : force load module if not already load
             $dir_app = substr($file, 0, $pos);
-            $namespace = self::normalize_namespace($dir_app);
-            Module::load(strtolower($namespace));
+            Module::load(strtolower($dir_app));
 
             if ($dir === 'views' && $dir_app !== 'local') {
                 // Novius OS : load view in local if exist

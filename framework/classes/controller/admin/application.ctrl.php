@@ -20,15 +20,8 @@ class Controller_Admin_Application extends Controller_Admin_Auth
         parent::before();
 
         if (!$this->bypass) {
-            list($application, $location) = \Config::configFile(get_called_class());
-            $location = explode('/', $location);
-            if ($application == 'nos' && isset($location[2])) {
-                $submodule = explode('_', \Inflector::denamespace(get_called_class()));
-                if ($submodule[0] == 'Controller' && $submodule[1] == 'Admin' && count($submodule) > 2) {
-                    $application = 'nos_'.mb_strtolower($submodule[2]); // this hack should be temporary until we figure out how to correctly implement native applications...
-                }
-            }
-            if ($application != 'nos' && !Permission::check($application, 'access')) {
+            list($application) = \Config::configFile(get_called_class());
+            if (!Permission::check($application, 'access')) {
                 throw new \Exception('You don\'t have access to application '.$application.'!');
             }
         }

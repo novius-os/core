@@ -12,6 +12,7 @@
 define('jquery.bgiframe');
 define('jquery.cookie');
 define('jquery.globalize');
+define('jquery.globalize.cultures');
 define('jquery.mousewheel');
 define('jquery-form');
 
