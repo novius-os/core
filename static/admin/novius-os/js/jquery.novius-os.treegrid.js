@@ -81,7 +81,8 @@ define('jquery-nos-treegrid',
                         if (args.column.dataKey) {
                             $('<span></span>').text(args.row.data[args.column.dataKey])
                                 .appendTo(args.$container);
-                        } else if ($.isFunction(self.oldFirstColumn.cellFormatter)) {
+                        }
+                        if ($.isFunction(self.oldFirstColumn.cellFormatter)) {
                             self.oldFirstColumn.cellFormatter(args);
                         }
                         if (node.treeChilds) {
