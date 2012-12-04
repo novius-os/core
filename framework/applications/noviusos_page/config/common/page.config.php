@@ -32,7 +32,11 @@ return array(
     ),
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(
-            'primary' => false
+            'primary' => false,
+            'enabled' =>
+                function($page) {
+                    return $page->page_lock != $page::LOCK_DELETION;
+                },
         ),
         'Nos\Page\Model_Page.add' => array(
             'label' => __('Add a page'),
@@ -89,6 +93,10 @@ return array(
             'targets' => array(
                 'grid' => true,
             ),
+            'enabled' =>
+                function($page) {
+                    return !$page->page_home;
+                },
         ),
         'Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
