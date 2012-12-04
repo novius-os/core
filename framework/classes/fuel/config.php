@@ -137,6 +137,10 @@ class Config extends \Fuel\Core\Config
                     continue;
                 }
 
+                if (!empty($params['item']) && isset($action['enabled'])) {
+                    $action['enabled'] = $action['enabled']($params['item']);
+                }
+
                 if (!isset($action['visible']) || $action['visible']($params)) {
                     $selected_actions[$key] = $action;
                 }
