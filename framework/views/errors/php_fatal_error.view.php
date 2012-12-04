@@ -169,7 +169,6 @@ if (count($non_fatal) > 0) {
         } ?></pre>
                 </div>
             </li>
-
         <?php
     }
     ?>

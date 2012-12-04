@@ -34,6 +34,12 @@ class Config_Common
             'delete' => 'action.dialog.contentUrl',
         );
 
+        $dicts = array('nos::common');
+        if (!empty($config['i18n_file'])) {
+            array_unshift($dicts, $config['i18n_file']);
+        }
+        \Nos\I18n::current_dictionary($dicts);
+
         $actions_template = array(
             'add' => array(
                 'label' => __('Add :model_label'),
@@ -42,11 +48,11 @@ class Config_Common
                     'method' => 'add',
                     'tab' => array(
                         'url' => 'insert_update?context={{context}}',
-                        'label' => __('Add a new monkey'),
+                        'label' => __('Add a new item'),
                     ),
                 ),
-                'context' => array(
-                    'appdeskToolbar' => true
+                'targets' => array(
+                    'toolbar-list' => true,
                 ),
             ),
             'edit' => array(
@@ -60,8 +66,8 @@ class Config_Common
                 'label' => __('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',
-                'context' => array(
-                    'list' => true
+                'targets' => array(
+                    'grid' => true,
                 ),
             ),
             'delete' => array(
@@ -76,33 +82,42 @@ class Config_Common
                 'primary' => true,
                 'icon' => 'trash',
                 'red' => true,
-                'context' => array(
-                    'item' => true,
-                    'list' => true
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
                 ),
-                'enabled' =>
-                function($item) {
-                    return !$item->is_new();
+                'visible' =>
+                function($params) {
+                    return !isset($params['item']) || !$params['item']->is_new();
                 },
             ),
             'visualise' => array(
-                'label' => 'Visualise',
+                'label' => __('Visualise'),
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
                 'action' => array(
                     'action' => 'window.open',
                     'url' => '{{preview_url}}?_preview=1'
                 ),
-                'context' => array(
-                    'item' => true,
-                    'list' => true
-                ),
-                'enabled' =>
-                function($item) {
+                'enabled' => function($item) {
                     if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                         $url = $item->url_canonical(array('preview' => true));
-
                         return !$item->is_new() && !empty($url);
+                    }
+                    return false;
+                },
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
+                ),
+                'visible' =>
+                function($params) {
+                    if (isset($params['item']) && $params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        $url = $params['item']->url_canonical(array('preview' => true));
+                        return !$params['item']->is_new() && !empty($url);
+                    }
+                    if (isset($params['model']) && $params['model']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        return true;
                     }
                     return false;
                 },
@@ -117,13 +132,13 @@ class Config_Common
                         'model_name' => '',
                     ),
                 ),
-                'context' => array(
-                    'item' => true
+                'targets' => array(
+                    'toolbar-edit' => true
                 ),
-                'enabled' =>
-                function($item) {
-                    $model = get_class($item);
-                    return !$item->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
+                'visible' =>
+                function($params) {
+                    $model = get_class($params['item']);
+                    return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },
             )
         );
@@ -203,6 +218,9 @@ class Config_Common
                 }
                 if (!isset($item['column']) && !isset($item['value'])) {
                     $item['column'] = str_replace('->', '.', $key);
+                }
+                if (!isset($item['search_column']) && isset($item['column'])) {
+                    $item['search_column'] = $item['column'];
                 }
                 $relations = explode('->', $key);
                 if (!isset($item['search_relation']) && count($relations) > 1) {

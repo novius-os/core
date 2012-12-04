@@ -94,7 +94,7 @@ class Controller_Inspector_Model extends Controller_Inspector
                 'visible' => false
             );
 
-            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'target' => 'grid', 'inspector' => 'model', 'class' => get_called_class()));
 
             if (!isset($config['dataset']['actions'])) {
                 $config['dataset']['actions'] = array();

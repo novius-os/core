@@ -8,10 +8,14 @@
  * @link http://www.novius-os.org
  */
 
-    $appdeskview = (string) Request::forge('admin/noviusos_media/appdesk/index')->execute(array('image_pick'))->response();
-    $uniqid = uniqid('tabs_');
-    $id_library = $uniqid.'_library';
-    $id_properties = $uniqid.'_properties';
+
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
+$appdeskview = (string) Request::forge('admin/noviusos_media/appdesk/index')->execute(array('image_pick'))->response();
+$uniqid = uniqid('tabs_');
+$id_library = $uniqid.'_library';
+$id_properties = $uniqid.'_properties';
+
 ?>
 <style type="text/css">
     .box-sizing-border {

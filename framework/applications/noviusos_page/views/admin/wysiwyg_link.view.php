@@ -8,14 +8,17 @@
  * @link http://www.novius-os.org
  */
 
-    $uniqid = uniqid('tabs_');
-    $id_type = $uniqid.'_type';
-    $id_appdesk = $uniqid.'_appdesk';
-    $id_properties = $uniqid.'_properties';
-    $title_appdesk_page = $edit ? __('Pick a new link') : __('2. Pick a link');
-    $title_appdesk_media = $edit ? __('Pick a new media') : __('2. Pick a media');
-    $title_properties_2 = $edit ? __('Edit properties') : __('2. Set the properties');
-    $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties');
+Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
+
+$uniqid = uniqid('tabs_');
+$id_type = $uniqid.'_type';
+$id_appdesk = $uniqid.'_appdesk';
+$id_properties = $uniqid.'_properties';
+$title_appdesk_page = $edit ? __('Pick a new link') : __('2. Pick a link');
+$title_appdesk_media = $edit ? __('Pick a new media') : __('2. Pick a media');
+$title_properties_2 = $edit ? __('Edit properties') : __('2. Set the properties');
+$title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties');
+
 ?>
 <style type="text/css">
     .box-sizing-border {

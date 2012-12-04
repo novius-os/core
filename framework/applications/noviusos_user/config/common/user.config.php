@@ -1,4 +1,7 @@
 <?php
+
+Nos\I18n::current_dictionary(array('noviusos_user::common', 'nos::common'));
+
 return array(
     'data_mapping' => array(
         'fullname' => array(

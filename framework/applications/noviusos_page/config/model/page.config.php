@@ -1,4 +1,7 @@
 <?php
+
+Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
+
 return array(
     'behaviours' => array (
         'Nos\Orm_Behaviour_Sharable' => array(

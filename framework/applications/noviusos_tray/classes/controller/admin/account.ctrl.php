@@ -12,7 +12,7 @@ namespace Nos\Tray;
 
 use View;
 
-class Controller_Admin_Account extends \Controller
+class Controller_Admin_Account extends \Nos\Controller_Admin_Application
 {
     public function action_index()
     {
@@ -50,6 +50,17 @@ class Controller_Admin_Account extends \Controller
         \Nos\Auth::disconnect();
         \Response::redirect('admin/nos/login/reset');
         exit();
+    }
+
+    public function action_lang($lang)
+    {
+        if (in_array($lang, array('en_GB', 'fr_FR'))) {
+            \Session::set('lang', $lang);
+            \Response::json(array(
+                'notify' => 'Language has been set to '.$lang.', please refresh to see changes.',
+            ));
+        }
+        $this->send_error('Invalid lang '.$lang);
     }
 
     public static function fieldset_display($user)

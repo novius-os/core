@@ -63,6 +63,7 @@ if (!MBSTRING) {
         'Response' => FUEL_EXTEND_PATH.'response.php',
         'Session' => FUEL_EXTEND_PATH.'session.php',
         'Str' => FUEL_EXTEND_PATH.'str.php',
+        'Validation_Error'  => FUEL_EXTEND_PATH.'validation_error.php',
         'View' => FUEL_EXTEND_PATH.'view.php',
         'Nos\Oil\Console' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'console.php',
         'Nos\Orm\Model' => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'model.php',
@@ -71,9 +72,20 @@ if (!MBSTRING) {
     )
 );
 
-function __($_message, $default = null)
+function __($message, $default = null)
 {
-    return \Nos\I18n::get($_message, $default);
+    $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    $i = -1;
+    do {
+        $function = $dbg[++$i]['function'];
+    } while ($function == '{closure}');
+
+    return \Nos\I18n::translate_from_file($dbg[$i]['file'], $message, $default);
+}
+
+function ___($group, $message, $default = null)
+{
+    return \Nos\I18n::gget($group, $message, $default);
 }
 
 // Register the autoloader
