@@ -9,7 +9,7 @@
  */
 $id = $uniqid = uniqid('form_');
 
-Nos\I18n::current_dictionary(__);
+Nos\I18n::current_dictionary($i18n_files);
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
 <?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
