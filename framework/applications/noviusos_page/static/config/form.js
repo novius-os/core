@@ -14,7 +14,7 @@ define(
     ],
     function($) {
         "use strict";
-        return function() {
+        return function(language) {
 
             var $container = $(this);
             if ($container.data('already-processed')) {
@@ -83,6 +83,7 @@ define(
                                 $wysiwyg.append(bloc);
                                 // The bottom row from TinyMCE is roughly 21px
                                 $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg({
+                                    language : language,
                                     urlEnhancers : true,
                                     height: (coords[3] / data.rows * ratio) - 21,
                                     content_css: data.content_css || ''

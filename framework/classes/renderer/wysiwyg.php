@@ -12,7 +12,9 @@ namespace Nos;
 
 class Renderer_Wysiwyg extends \Fieldset_Field
 {
-    protected $options = array();
+    protected $options = array(
+        'language' => '', // en, fr or ja
+    );
 
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
@@ -22,6 +24,8 @@ class Renderer_Wysiwyg extends \Fieldset_Field
         if (empty($attributes['id'])) {
             $attributes['id'] = uniqid('wysiwyg_');
         }
+
+        $this->options['language'] = substr(\Session::get('lang', 'en_GB'), 0, 2);
 
         if (!empty($attributes['renderer_options'])) {
             $this->options = \Arr::merge($this->options, $attributes['renderer_options']);
