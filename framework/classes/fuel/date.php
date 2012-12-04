@@ -64,6 +64,11 @@ class Date extends \Fuel\Core\Date
 
         return $this;
     }
+
+    public function wijmoFormat()
+    {
+        return '/Date('.($this->timestamp * 1000).')/';
+    }
 }
 
 /* End of file date.php */
