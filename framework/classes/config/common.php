@@ -210,6 +210,9 @@ class Config_Common
                 if (!isset($item['column']) && !isset($item['value'])) {
                     $item['column'] = str_replace('->', '.', $key);
                 }
+                if (!isset($item['search_column']) && isset($item['column'])) {
+                    $item['search_column'] = $item['column'];
+                }
                 $relations = explode('->', $key);
                 if (!isset($item['search_relation']) && count($relations) > 1) {
                     // @todo: support multilevel relations ?
