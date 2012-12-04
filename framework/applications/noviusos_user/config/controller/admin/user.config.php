@@ -10,14 +10,7 @@
 return array(
     'controller_url' => 'admin/noviusos_user/user',
     'model' => 'Nos\\User\\Model_User',
-    'messages' => array(
-        'successfully added' => __('User successfully added.'),
-        'successfully saved' => __('User successfully saved.'),
-        'successfully deleted' => __('The user has successfully been deleted!'),
-        'item deleted' => __('This user has been deleted.'),
-        'not found' => __('User not found'),
-        'delete an item' => __('Delete an user'),
-    ),
+    'i18n_file' => 'nos::user',
     'layout_insert' => array(
         array(
             'view' => 'noviusos_user::admin/user_add',

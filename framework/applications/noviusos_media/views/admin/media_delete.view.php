@@ -8,6 +8,9 @@
  * @link http://www.novius-os.org
  */
 
+
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
 $usage_count = count($item->link);
 ?>
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />

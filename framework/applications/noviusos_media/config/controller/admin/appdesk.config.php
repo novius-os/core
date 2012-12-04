@@ -9,7 +9,7 @@
  */
 use Nos\I18n;
 
-I18n::load('media', 'nos_media');
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 
 return array(
     'model' => 'Nos\\Media\\Model_Media',
@@ -74,28 +74,7 @@ return array(
             ),
         )
     ),
-    'i18n' => array(
-        'Pick' => __('Pick'),
-        'addDropDown' => __('Select an action'),
-        'columns' => __('Columns'),
-        'showFiltersColumns' => __('Filters column header'),
-        'visibility' => __('Visibility'),
-        'settings' => __('Settings'),
-        'vertical' => __('Vertical'),
-        'horizontal' => __('Horizontal'),
-        'hidden' => __('Hidden'),
-        'item' => __('media'),
-        'items' => __('medias'),
-        'showNbItems' => __('Showing {{x}} medias out of {{y}}'),
-        'showOneItem' => __('Show 1 media'),
-        'showNoItem' => __('No media'),
-        'showAll' => __('Show all medias'),
-        'views' => __('Views'),
-        'viewGrid' => __('Grid'),
-        'viewThumbnails' => __('Thumbnails'),
-        'preview' => __('Preview'),
-        'loading' => __('Loading...'),
-    ),
+    'i18n_file' => 'noviusos_media::media',
     'thumbnails' => true,
     'appdesk' => array(
         'reloadEvent' => array(
@@ -107,7 +86,7 @@ return array(
         ),
         'appdesk' => array(
             'defaultView' => 'thumbnails',
-        )
+        ),
     ),
 
 );

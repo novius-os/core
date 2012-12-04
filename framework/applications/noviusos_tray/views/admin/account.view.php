@@ -38,12 +38,27 @@ $uniqid = uniqid('id_');
         <ul style="width: 15%;">
             <li><a href="#infos"><?= __('Your account') ?></a></li>
             <li><a href="#display"><?= __('Theme') ?></a></li>
+            <li><a href="#lang"><?= __('Language') ?></a></li>
         </ul>
         <div id="infos">
             <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
         </div>
         <div id="display">
             <?= $fieldset_display ?>
+        </div>
+        <div id="lang">
+            <?php
+            foreach (array('en_GB' => array('gb', 'English'), 'fr_FR' => array('fr', 'Français')) as $code => $locale) {
+                list($flag, $label) = $locale;
+                ?>
+                <form action="admin/noviusos_tray/account/lang/<?= $code ?>">
+                    <button class="primary" data-icon-url="static/novius-os/admin/novius-os/img/flags/<?= $flag ?>.png"><?= strtr(__('Switch to {lang}'), array(
+                        '{lang}' => $label,
+                    )); ?></button>
+                </form>
+                <?php
+            }
+            ?>
         </div>
     </div>
 </div>
@@ -57,6 +72,7 @@ $uniqid = uniqid('id_');
         ],
         function($) {
             $(function() {
+                $('#lang').nosFormAjax();
                 var $container = $('#<?= $uniqid ?>');
                 $container.nosFormUI();
                 $('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {

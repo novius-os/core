@@ -8,6 +8,9 @@
  * @link http://www.novius-os.org
  */
 
+
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
 $uniqid_radio = uniqid('radio_');
 ?>
 <div class="page" id="<?= $uniqid = uniqid('id_') ?>">

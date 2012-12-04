@@ -8,6 +8,9 @@
  * @link http://www.novius-os.org
  */
 
+
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
 $media_count = $item->count_media();
 ?>
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />

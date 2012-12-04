@@ -34,6 +34,12 @@ class Config_Common
             'delete' => 'action.dialog.contentUrl',
         );
 
+        $dicts = array('nos::common');
+        if (!empty($config['i18n_file'])) {
+            array_unshift($dicts, $config['i18n_file']);
+        }
+        \Nos\I18n::current_dictionary($dicts);
+
         $actions_template = array(
             'add' => array(
                 'label' => __('Add :model_label'),
@@ -42,7 +48,7 @@ class Config_Common
                     'method' => 'add',
                     'tab' => array(
                         'url' => 'insert_update?context={{context}}',
-                        'label' => __('Add a new monkey'),
+                        'label' => __('Add a new item'),
                     ),
                 ),
                 'visible' =>
@@ -93,7 +99,7 @@ class Config_Common
                 },
             ),
             'visualise' => array(
-                'label' => 'Visualise',
+                'label' => __('Visualise'),
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
                 'action' => array(

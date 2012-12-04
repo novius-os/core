@@ -19,6 +19,11 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
      */
     protected $_properties = array();
 
+    public static function _init()
+    {
+        I18n::current_dictionary(array('nos::common'));
+    }
+
     public static function dataset(&$dataset)
     {
         $dataset['publication_status'] = array(__CLASS__, 'publication_status');
