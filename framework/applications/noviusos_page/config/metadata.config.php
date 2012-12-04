@@ -19,7 +19,7 @@ return array(
         'icon64'  => 'static/apps/noviusos_page/img/64/page.png',
     ),
     'launchers' => array(
-        'nos_page' => array(
+        'noviusos_page' => array(
             'name' => 'Pages',
             'action' => array(
                 'action' => 'nosTabs',

@@ -15,9 +15,7 @@ class Config extends \Fuel\Core\Config
 {
     public static function load($file, $group = null, $reload = false, $overwrite = false)
     {
-        $originFileName = $file;
-        $file = static::convertFileName($file, 'load');
-        if ($originFileName == 'db') {
+        if ($file == 'db') {
             $group = 'db';
         }
         if (!$reload and is_array($file) and is_string($group)) {
@@ -25,36 +23,6 @@ class Config extends \Fuel\Core\Config
         }
 
         return parent::load($file, $group, $reload, $overwrite);
-    }
-
-    public static function get($item, $default = null)
-    {
-        $item = static::convertFileName($item, 'get');
-        return parent::get($item, $default);
-    }
-
-    public static function load_and_get($item, $default = null)
-    {
-        $config_file = substr($item, 0, strpos($item, '.'));
-        static::load($config_file, true);
-        return static::get($item, $default);
-    }
-
-    public static function save($file, $config)
-    {
-        $file = static::convertFileName($file, 'save');
-
-        return parent::save($file, $config);
-    }
-
-    public static function convertFileName($file, $from = 'load')
-    {
-        if (is_string($file) && mb_strpos($file, '::') !== false && mb_substr($file, 0, 4) == 'nos_') {
-            list($application, $configuration_path) = explode('::', $file);
-            $file = 'nos::admin/'.$application.'/'.$configuration_path;
-        }
-
-        return $file;
     }
 
     public static function mergeWithUser($item, $config)
@@ -174,7 +142,7 @@ class Config extends \Fuel\Core\Config
 
 
 
-    public static function placeholder_replace($obj, $data)
+    public static function placeholderReplace($obj, $data)
     {
         $retrieveFromData = function($arg, $data) {
             if (isset($data[$arg])) {
@@ -202,8 +170,8 @@ class Config extends \Fuel\Core\Config
             }, $obj);
         } else if (is_array($obj)) {
             foreach ($obj as $key => $value) {
-                $new_key = static::placeholder_replace($key, $data);
-                $obj[$new_key] = static::placeholder_replace($value, $data);
+                $new_key = static::placeholderReplace($key, $data);
+                $obj[$new_key] = static::placeholderReplace($value, $data);
                 if ($new_key !== $key) {
                     unset($obj[$key]);
                 }

@@ -294,41 +294,41 @@ define('jquery-nos',
                 }
 
                 return $element;
+            },
+
+            nosDataReplace : function (obj, data) {
+                if ($.type(obj) === 'string') {
+                    return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
+                        return data[p1] || '';
+                    }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
+                            return data[p1] || '';
+                        }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
+                            return encodeURIComponent(data[p1] || '');
+                        });
+                } else if ($.isPlainObject(obj)) {
+                    $.each(obj, function(key, value) {
+                        obj[key] = $.nosDataReplace(value, data);
+                    });
+                }
+                return obj;
             }
-        });
+    });
 
         $.fn.extend({
             nosAction : function(obj, data) {
-                var url, placeholderReplace, params;
+                var url, params;
                 data = data || {};
                 try {
                     if ($.isFunction(obj)) {
                         obj($(this), data);
                     } else {
-                        placeholderReplace = function (obj, data) {
-                            if ($.type(obj) === 'string') {
-                                return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
-                                        return data[p1] || '';
-                                    }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
-                                        return data[p1] || '';
-                                    }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
-                                        return encodeURIComponent(data[p1] || '');
-                                    });
-                            } else if ($.isPlainObject(obj)) {
-                                $.each(obj, function(key, value) {
-                                    obj[key] = placeholderReplace(value, data);
-                                });
-                            }
-                            return obj;
-                        };
-
                         switch(obj.action) {
                             case 'nosTabs' :
                                 var args = [];
                                 params = $.extend(true, {}, obj);
 
                                 params.method && args.push(params.method);
-                                args.push(placeholderReplace(params.tab, data));
+                                args.push($.nosDataReplace(params.tab, data));
                                 params.dialog && args.push(params.dialog);
                                 $.fn.nosTabs.apply($(this), args);
                                 break;
@@ -339,17 +339,17 @@ define('jquery-nos',
                                     width: 500,
                                     height: 'auto',
                                     'class': 'nos-confirmation-dialog'
-                                }, placeholderReplace($.extend(true, {}, obj.dialog), data));
+                                }, $.nosDataReplace($.extend(true, {}, obj.dialog), data));
                                 $(this).nosDialog(params);
                                 break;
 
                             case 'nosDialog' :
-                                params = $.extend(true, {}, placeholderReplace($.extend(true, {}, obj.dialog), data));
+                                params = $.nosDataReplace($.extend(true, {}, obj.dialog), data);
                                 $(this).nosDialog(params);
                                 break;
 
                             case 'nosAjax' :
-                                params = placeholderReplace($.extend(true, {}, obj.params), data);
+                                params = $.nosDataReplace($.extend(true, {}, obj.params), data);
                                 $(this).nosAjax(params);
                                 break;
 
@@ -362,7 +362,7 @@ define('jquery-nos',
                                 break;
 
                             case 'window.open' :
-                                url = placeholderReplace(obj.url, data);
+                                url = $.nosDataReplace(obj.url, data);
                                 window.open(url);
                                 break;
                         }
