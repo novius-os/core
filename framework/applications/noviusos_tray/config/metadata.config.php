@@ -19,7 +19,7 @@ return array(
         'icon64'  => 'static/apps/noviusos_tray/img/64/app-manager.png',
     ),
     'launchers' => array(
-        'nos_help' => array(
+        'noviusos_help' => array(
             'name' => 'Help',
             'action' => array(
                 'action' => 'nosTabs',
@@ -32,7 +32,7 @@ return array(
             'iconUrl' => 'static/apps/noviusos_tray/img/32/help.png',
             'icon64' => 'static/apps/noviusos_tray/img/64/help.png',
         ),
-        'nos_account' => array(
+        'noviusos_account' => array(
             'name' => 'My account',
             'action' => array(
                 'action' => 'nosTabs',
@@ -45,7 +45,7 @@ return array(
             'iconUrl' => 'static/apps/noviusos_tray/img/32/myaccount.png',
             'icon64' => 'static/apps/noviusos_tray/img/64/myaccount.png',
         ),
-        'nos_appmanager' => array(
+        'noviusos_appmanager' => array(
             'name' => 'Application manager',
             'action' => array(
                 'action' => 'nosTabs',
