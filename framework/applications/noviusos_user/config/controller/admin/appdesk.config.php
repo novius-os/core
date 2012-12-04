@@ -22,5 +22,5 @@ return array(
         'user_email',
     ),
     'hideContexts' => true,
-    'i18n_file' => 'nosviusos_user::common',
+    'i18n_file' => 'noviusos_user::common',
 );
