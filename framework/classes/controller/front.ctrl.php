@@ -385,7 +385,7 @@ class Controller_Front extends Controller
                 $head[] = '<link href="'.(is_string($css) ? $css : $css['css']).'" rel="stylesheet" type="text/css">';
             }
         }
-        $this->_js_header = array_unique($this->_js_header);
+        $this->_js_header = array_unique($this->_js_header, SORT_REGULAR);
         foreach ($this->_js_header as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $head[] = '<script type="text/javascript">'.$js['js'].'</script>';
@@ -398,7 +398,7 @@ class Controller_Front extends Controller
         }
 
         $footer = array();
-        $this->_js_footer = array_unique($this->_js_footer);
+        $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         $this->_js_footer = array_diff($this->_js_footer, $this->_js_header);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
