@@ -45,9 +45,13 @@ class Config_Common
                         'label' => __('Add a new monkey'),
                     ),
                 ),
-                'context' => array(
-                    'appdeskToolbar' => true
-                ),
+                'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('toolbar-list'))) {
+                        return false;
+                    }
+                    return true;
+                },
             ),
             'edit' => array(
                 'action' => array(
@@ -60,9 +64,13 @@ class Config_Common
                 'label' => __('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',
-                'context' => array(
-                    'list' => true
-                ),
+                'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('grid'))) {
+                        return false;
+                    }
+                    return true;
+                },
             ),
             'delete' => array(
                 'action' => array(
@@ -76,13 +84,12 @@ class Config_Common
                 'primary' => true,
                 'icon' => 'trash',
                 'red' => true,
-                'context' => array(
-                    'item' => true,
-                    'list' => true
-                ),
-                'enabled' =>
-                function($item) {
-                    return !$item->is_new();
+                'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('grid', 'toolbar-edit'))) {
+                        return false;
+                    }
+                    return !isset($params['item']) || !$params['item']->is_new();
                 },
             ),
             'visualise' => array(
@@ -93,16 +100,14 @@ class Config_Common
                     'action' => 'window.open',
                     'url' => '{{preview_url}}?_preview=1'
                 ),
-                'context' => array(
-                    'item' => true,
-                    'list' => true
-                ),
-                'enabled' =>
-                function($item) {
-                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        $url = $item->url_canonical(array('preview' => true));
-
-                        return !$item->is_new() && !empty($url);
+                'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('grid', 'toolbar-edit'))) {
+                        return false;
+                    }
+                    if ($params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        $url = $params['item']->url_canonical(array('preview' => true));
+                        return !$params['item']->is_new() && !empty($url);
                     }
                     return false;
                 },
@@ -117,13 +122,14 @@ class Config_Common
                         'model_name' => '',
                     ),
                 ),
-                'context' => array(
-                    'item' => true
-                ),
-                'enabled' =>
-                function($item) {
-                    $model = get_class($item);
-                    return !$item->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
+                'visible' =>
+                function($params) {
+                    if ($params['target'] != 'toolbar-edit') {
+                        return false;
+                    }
+
+                    $model = get_class($params['item']);
+                    return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },
             )
         );

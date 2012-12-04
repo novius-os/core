@@ -28,10 +28,10 @@ return array(
         ),
     ),
     'actions' => array(
-        '\Nos\Page\Model_Page.delete' => array(
+        'Nos\Page\Model_Page.delete' => array(
             'primary' => false
         ),
-        '\Nos\Page\Model_Page.add_subpage' => array(
+        'Nos\Page\Model_Page.add_subpage' => array(
             'name' => 'add_page',
             'label' => __('Add a sub-page to this page'),
             'icon' => 'plus',
@@ -43,11 +43,15 @@ return array(
                     'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                 ),
             ),
-            'context' => array(
-                'list' => true,
-            ),
+            'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('grid'))) {
+                        return false;
+                    }
+                    return true;
+                }
         ),
-        '\Nos\Page\Model_Page.visualise' => array(
+        'Nos\Page\Model_Page.visualise' => array(
             'label' => __('Visualise'),
             'name' => 'visualise',
             'primary' => true,
@@ -56,16 +60,15 @@ return array(
                 'action' => 'window.open',
                 'url' => '{{previewUrl}}',
             ),
-            'context' => array(
-                'list' => true,
-                'item' => true,
-            ),
-            'enabled' =>
-                function($item) {
-                    return !$item->is_new();
+            'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('grid', 'toolbar-edit'))) {
+                        return false;
+                    }
+                    return !isset($params['item']) || !$params['item']->is_new();
                 }
         ),
-        '\Nos\Page\Model_Page.set_homepage' => array(
+        'Nos\Page\Model_Page.set_homepage' => array(
             'label' => __('Set as homepage'),
             'name' => 'set_homepage',
             'primary' => false,
@@ -80,11 +83,15 @@ return array(
                     ),
                 ),
             ),
-            'context' => array(
-                'list' => true,
-            ),
+            'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('grid'))) {
+                        return false;
+                    }
+                    return true;
+                }
         ),
-        '\Nos\Page\Model_Page.renew_cache' => array(
+        'Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
             'action' => array(
                 'action' => 'nosAjax',
@@ -92,9 +99,13 @@ return array(
                     'url' => 'admin/noviusos_page/appdesk/clear_cache',
                 ),
             ),
-            'context' => array(
-                'appdeskToolbar' => true,
-            ),
+            'visible' =>
+                function($params) {
+                    if (!in_array($params['target'], array('toolbar-list'))) {
+                        return false;
+                    }
+                    return true;
+                }
         ),
     )
 );

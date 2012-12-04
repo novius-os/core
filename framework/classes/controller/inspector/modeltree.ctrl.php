@@ -64,13 +64,13 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 'visible' => false
             );
 
-            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'target' => 'grid', 'inspector' => 'modeltree', 'class' => get_called_class()));
 
             if (!isset($config['dataset']['actions'])) {
                 $config['dataset']['actions'] = array();
                 foreach ($item_actions as $action_key => $action_value) {
-                    if (isset($action_value['enabled'])) {
-                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    if (isset($action_value['visible'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['visible'];
                     }
                 }
             }

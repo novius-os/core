@@ -548,14 +548,11 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions()
     {
-        $applicationActions = \Config::actions(array('models' => array(get_class($this->item)), 'type' => 'item', 'item' => $this->item));
-
+        $applicationActions = \Config::actions(array('models' => array(get_class($this->item)), 'target' => 'toolbar-edit', 'class' => get_called_class(), 'item' => $this->item));
         $actions = array_values($this->get_actions_context());
 
         foreach ($applicationActions as $action) {
-            if (!isset($action['enabled']) || $action['enabled']($this->item)) {
-                $actions[] = $action;
-            }
+            $actions[] = $action;
         }
         foreach ($this->config['actions'] as $action) {
             if (is_callable($action)) {

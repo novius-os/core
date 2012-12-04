@@ -163,7 +163,7 @@ class Config extends \Fuel\Core\Config
             foreach ($actions as $key => $action) {
                 $action['name'] = $key;
 
-                if (isset($context['type']) && isset($action['context']) && isset($action['context'][$context['type']]) && $action['context'][$context['type']]) {
+                if (!isset($action['visible']) || $action['visible']($context)) {
                     $selected_actions[$key] = $action;
                 }
             }
