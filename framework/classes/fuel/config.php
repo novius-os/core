@@ -117,21 +117,27 @@ class Config extends \Fuel\Core\Config
         return static::extendable_load($application_name, 'config');
     }
 
-    public static function actions($context = array())
+    public static function actions($params = array())
     {
-        if (!isset($context['models'])) {
+        if (!isset($params['models'])) {
             return array();
         }
 
         $selected_actions = array();
-        foreach ($context['models'] as $model) {
+        foreach ($params['models'] as $model) {
             $actions = \Nos\Config_Common::load($model, array());
             $actions = $actions['actions'];
+
+            $params['model'] = $model;
 
             foreach ($actions as $key => $action) {
                 $action['name'] = $key;
 
-                if (!isset($action['visible']) || $action['visible']($context)) {
+                if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
+                    continue;
+                }
+
+                if (!isset($action['visible']) || $action['visible']($params)) {
                     $selected_actions[$key] = $action;
                 }
             }

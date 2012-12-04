@@ -45,13 +45,9 @@ class Config_Common
                         'label' => __('Add a new monkey'),
                     ),
                 ),
-                'visible' =>
-                function($params) {
-                    if (!in_array($params['target'], array('toolbar-list'))) {
-                        return false;
-                    }
-                    return true;
-                },
+                'targets' => array(
+                    'toolbar-list' => true,
+                ),
             ),
             'edit' => array(
                 'action' => array(
@@ -64,13 +60,9 @@ class Config_Common
                 'label' => __('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',
-                'visible' =>
-                function($params) {
-                    if (!in_array($params['target'], array('grid'))) {
-                        return false;
-                    }
-                    return true;
-                },
+                'targets' => array(
+                    'grid' => true,
+                ),
             ),
             'delete' => array(
                 'action' => array(
@@ -84,11 +76,12 @@ class Config_Common
                 'primary' => true,
                 'icon' => 'trash',
                 'red' => true,
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
+                ),
                 'visible' =>
                 function($params) {
-                    if (!in_array($params['target'], array('grid', 'toolbar-edit'))) {
-                        return false;
-                    }
                     return !isset($params['item']) || !$params['item']->is_new();
                 },
             ),
@@ -100,14 +93,25 @@ class Config_Common
                     'action' => 'window.open',
                     'url' => '{{preview_url}}?_preview=1'
                 ),
+                'enabled' => function($item) {
+                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        $url = $item->url_canonical(array('preview' => true));
+                        return !$item->is_new() && !empty($url);
+                    }
+                    return false;
+                },
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
+                ),
                 'visible' =>
                 function($params) {
-                    if (!in_array($params['target'], array('grid', 'toolbar-edit'))) {
-                        return false;
-                    }
-                    if ($params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                    if (isset($params['item']) && $params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                         $url = $params['item']->url_canonical(array('preview' => true));
                         return !$params['item']->is_new() && !empty($url);
+                    }
+                    if (isset($params['model']) && $params['model']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                        return true;
                     }
                     return false;
                 },
@@ -122,12 +126,11 @@ class Config_Common
                         'model_name' => '',
                     ),
                 ),
+                'targets' => array(
+                    'toolbar-edit' => true
+                ),
                 'visible' =>
                 function($params) {
-                    if ($params['target'] != 'toolbar-edit') {
-                        return false;
-                    }
-
                     $model = get_class($params['item']);
                     return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },

@@ -43,13 +43,9 @@ return array(
                     'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                 ),
             ),
-            'visible' =>
-                function($params) {
-                    if (!in_array($params['target'], array('grid'))) {
-                        return false;
-                    }
-                    return true;
-                }
+            'targets' => array(
+                'grid' => true,
+            ),
         ),
         'Nos\Page\Model_Page.visualise' => array(
             'label' => __('Visualise'),
@@ -60,11 +56,12 @@ return array(
                 'action' => 'window.open',
                 'url' => '{{previewUrl}}',
             ),
+            'targets' => array(
+                'grid' => true,
+                'toolbar-edit' => true,
+            ),
             'visible' =>
                 function($params) {
-                    if (!in_array($params['target'], array('grid', 'toolbar-edit'))) {
-                        return false;
-                    }
                     return !isset($params['item']) || !$params['item']->is_new();
                 }
         ),
@@ -83,13 +80,9 @@ return array(
                     ),
                 ),
             ),
-            'visible' =>
-                function($params) {
-                    if (!in_array($params['target'], array('grid'))) {
-                        return false;
-                    }
-                    return true;
-                }
+            'targets' => array(
+                'grid' => true,
+            ),
         ),
         'Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
@@ -99,13 +92,9 @@ return array(
                     'url' => 'admin/noviusos_page/appdesk/clear_cache',
                 ),
             ),
-            'visible' =>
-                function($params) {
-                    if (!in_array($params['target'], array('toolbar-list'))) {
-                        return false;
-                    }
-                    return true;
-                }
+            'targets' => array(
+                'toolbar-list' => true,
+            ),
         ),
     )
 );

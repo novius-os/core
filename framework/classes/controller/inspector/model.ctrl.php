@@ -99,8 +99,8 @@ class Controller_Inspector_Model extends Controller_Inspector
             if (!isset($config['dataset']['actions'])) {
                 $config['dataset']['actions'] = array();
                 foreach ($item_actions as $action_key => $action_value) {
-                    if (isset($action_value['visible'])) {
-                        $config['dataset']['actions'][$action_key] = $action_value['visible'];
+                    if (isset($action_value['enabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
                     }
                 }
             }
