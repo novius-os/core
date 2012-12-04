@@ -377,7 +377,7 @@ class Controller_Front extends Controller
         foreach ($this->_metas as $metas) {
             $head[] = $metas;
         }
-        $this->_css = array_unique($this->_css);
+        $this->_css = array_unique($this->_css, SORT_REGULAR);
         foreach ($this->_css as $css) {
             if (is_array($css) && isset($css['inline']) && $css['inline'] && isset($css['css'])) {
                 $head[] = '<style type="text/css">'.$css['css'].'</style>';
