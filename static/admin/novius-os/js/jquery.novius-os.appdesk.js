@@ -1673,7 +1673,7 @@ define('jquery-nos-appdesk',
                                             showFilter : false,
                                             setupkey: 'actions'
                                         };
-                                    } else if (object[key][i].cellFormatter) {
+                                    } else if (object[key][i].cellFormatter && !$.isFunction(object[key][i].cellFormatter)) {
                                         (function() {
                                             var cellFormatters = $.isArray(object[key][i].cellFormatter) ? object[key][i].cellFormatter : [object[key][i].cellFormatter];
                                             object[key][i] = $.extend(object[key][i], {
