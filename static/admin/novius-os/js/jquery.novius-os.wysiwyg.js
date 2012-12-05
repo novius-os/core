@@ -25,6 +25,7 @@ define('jquery-nos-wysiwyg',
                     var base_url = $('base').attr('href');
                     options = $.extend({
                         // Location of TinyMCE script
+                        language : $.nosLang.substr(0, 2),
                         script_url : base_url + 'static/novius-os/admin/vendor/tinymce/tiny_mce_jquery' + (module.config().minified ? '' : '_src') + '.js',
                         theme      : 'nos',
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
