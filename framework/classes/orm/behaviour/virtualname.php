@@ -66,7 +66,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     public static function friendly_slug($slug)
     {
         $slug = preg_replace("` `u", '-', $slug);
-        $slug = preg_replace("`[\?|:|\\|\/|\#|\[|\]|@]`u", '-', $slug);
+        $slug = preg_replace("`[\?|:|\\|\/|\#|\[|\]|@|&]`u", '-', $slug);
         $slug = preg_replace("`-{2,}`u", '-', $slug);
         $slug = preg_replace("`-$`u", '', $slug);
         $slug = preg_replace("`^-`u", '', $slug);
