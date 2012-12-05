@@ -57,9 +57,7 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
         echo '<div>', htmlspecialchars(strtr(__('"{item}" can be shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
         echo '<h4>', htmlspecialchars(__('Click to share:')) ,'</h4>';
         echo '<small>', htmlspecialchars(__('(Don\'t worry, you\'ll get a preview first)')) ,'</small>';
-    }
-    elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto)
-    {
+    } elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto) {
         echo '<div>', htmlspecialchars(strtr(__('"{item}" is automatically shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
         echo '<h4>', htmlspecialchars(__('No action required, click to customise:')) ,'</h4>';
         $auto = true;
