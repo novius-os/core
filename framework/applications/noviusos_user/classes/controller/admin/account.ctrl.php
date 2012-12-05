@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos\Tray;
+namespace Nos\User;
 
 use View;
 
@@ -35,7 +35,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         $fieldset_display = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return View::forge(
-            'noviusos_tray::admin/account',
+            'noviusos_user::admin/account',
             array(
                 'logged_user' => $user,
                 'fieldset_infos' => $fieldset_infos,
