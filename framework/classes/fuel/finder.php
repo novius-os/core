@@ -127,6 +127,7 @@ class Finder extends Fuel\Core\Finder
             return $cached_path;
         }
 
+        list($section) = explode(DS, $dir);
         $directory = $dir;
         foreach ($paths as $dir) {
             // Novius OS : load config in local if exist
@@ -137,11 +138,11 @@ class Finder extends Fuel\Core\Finder
             }
 
             // Novius OS : somme file can have a sub-suffixe
-            if (!empty(static::$_suffixed_directories[$directory])) {
+            if (!empty(static::$_suffixed_directories[$section])) {
                 if (!empty($paths_add) && in_array($dir, $paths_add)) {
-                    $file_path_alt = $dir.$file_original.'.'.static::$_suffixed_directories[$directory].$ext;
+                    $file_path_alt = $dir.$file_original.'.'.static::$_suffixed_directories[$section].$ext;
                 } else {
-                    $file_path_alt = $dir.$this->prep_path($directory).$file_original.'.'.static::$_suffixed_directories[$directory].$ext;
+                    $file_path_alt = $dir.$this->prep_path($directory).$file_original.'.'.static::$_suffixed_directories[$section].$ext;
                 }
 
                 if (is_file($file_path_alt)) {

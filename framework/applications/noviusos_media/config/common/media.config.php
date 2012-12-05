@@ -8,9 +8,10 @@
  * @link http://www.novius-os.org
  */
 
-Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
 
 return array(
+    'i18n_file' => array('noviusos_media::folder', 'noviusos_media::common'),
     'data_mapping' => array(
         'media_ext' => array(
             'title' => __('Ext.'),

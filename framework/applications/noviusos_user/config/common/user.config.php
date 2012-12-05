@@ -3,6 +3,7 @@
 Nos\I18n::current_dictionary(array('noviusos_user::common', 'nos::common'));
 
 return array(
+    'i18n_file' => array('noviusos_user::user', 'noviusos_user::common'),
     'data_mapping' => array(
         'fullname' => array(
             'headerText' => __('Name'),
