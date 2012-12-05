@@ -9,19 +9,8 @@
  */
 
 return array(
-    'version' =>
-    array(
-        'app' =>
-        array(
-            'default' => 2,
-        ),
-        'module' =>
-        array(
-        ),
-        'package' =>
-        array(
-        ),
-    ),
-    'folder' => 'migrations/',
-    'table' => 'migration',
+
+    'fullname'    => '0.2.0.0',
+
+    'date'            => \Date::forge()->create_from_string('2012-12-05', 'mysql_date'),
 );
