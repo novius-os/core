@@ -110,7 +110,7 @@ return array(
     #: config/controller/admin/page/appdesk.config.php:106
     #: config/controller/admin/page/appdesk.config.php:155
     #: config/controller/admin/page/appdesk.config.php:161
-    'Add a page' => 'TEST',
+    'Add a page' => '',
 
     #: config/controller/admin/page/page.config.php:28
     'Translate a page' => '',

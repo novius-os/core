@@ -146,4 +146,7 @@ return array(
 
     #. Overwritten
     'check_old_password' => 'The old password is incorrect.',
+
+    #. Overwritten
+    'match_field' =>  'This field doesn\'t match.',
 );
