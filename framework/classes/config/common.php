@@ -79,27 +79,6 @@ class Config_Common
                     'grid' => true,
                 ),
             ),
-            'delete' => array(
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => 'delete/{{_id}}',
-                        'title' => __('Delete'),
-                    ),
-                ),
-                'label' => __('Delete'),
-                'primary' => true,
-                'icon' => 'trash',
-                'red' => true,
-                'targets' => array(
-                    'grid' => true,
-                    'toolbar-edit' => true
-                ),
-                'visible' =>
-                function($params) {
-                    return !isset($params['item']) || !$params['item']->is_new();
-                },
-            ),
             'visualise' => array(
                 'label' => __('Visualise'),
                 'primary' => true,
@@ -149,7 +128,28 @@ class Config_Common
                     $model = get_class($params['item']);
                     return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },
-            )
+            ),
+            'delete' => array(
+                'action' => array(
+                    'action' => 'confirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => 'delete/{{_id}}',
+                        'title' => __('Delete'),
+                    ),
+                ),
+                'label' => __('Delete'),
+                'primary' => true,
+                'icon' => 'trash',
+                'red' => true,
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
+                ),
+                'visible' =>
+                function($params) {
+                    return !isset($params['item']) || !$params['item']->is_new();
+                },
+            ),
         );
 
 
