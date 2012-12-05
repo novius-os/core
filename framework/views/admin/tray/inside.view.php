@@ -2,8 +2,7 @@
 <li><a href="#"><?= __('Switch language') ?></a>
     <ul>
 <?php
-foreach (array('en_GB' => array('gb', 'English'), 'fr_FR' => array('fr', 'Français')) as $code => $locale) {
-    list($flag, $label) = $locale;
+foreach (array('en_GB' => 'English', 'fr_FR' => 'Français') as $code => $label) {
     ?>
     <li><a href="#" data-action='{"action":"nosAjax","params":{"url":"admin/noviusos_user/account/lang/<?= $code ?>"}}'><?= $label ?></a></li>
     <?php

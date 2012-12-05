@@ -54,10 +54,12 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
 
     public function action_lang($lang)
     {
-        if (in_array($lang, array('en_GB', 'fr_FR'))) {
+        $languages = array('en_GB' => 'English', 'fr_FR' => 'Français');
+        if (array_key_exists($lang, $languages)) {
             \Session::set('lang', $lang);
+            $label = $languages[$lang];
             \Response::json(array(
-                'notify' => 'Language has been set to '.$lang.', please refresh to see changes.',
+                'notify' => strtr(__('Language has been set to {{language}}, please <a>refresh</a> to see changes.'), array('{{language}}' => $label, '<a>' => '<a href="javascript:document.location.reload();">')),
             ));
         }
         $this->send_error('Invalid lang '.$lang);
