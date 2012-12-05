@@ -13,11 +13,12 @@
         [
             'jquery-nos',
             'jquery',
-            'jquery-ui.datetimepicker'
+            'jquery-ui.datetimepicker.i18n'
         ],
         function($) {
             $(function() {
                 var $input = $('input#<?= $id ?>');
+                $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
                 $input.timepicker($input.data('timepicker-options'));
             });
         });

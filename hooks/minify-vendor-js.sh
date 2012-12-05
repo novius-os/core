@@ -16,21 +16,30 @@ WIJMO_FILES=( wijmo.wijutil plugin.wijtextselection wijmo.wijinputcore wijmo.wij
 #clear the files
 > $JS_COMBINED_FILE
 
+
 #run thru the JS files
 for F in ${PLUGIN_FILES[@]}; do
   cat "../vendor/$F.js" >> $JS_COMBINED_FILE
   echo ';' >> $JS_COMBINED_FILE
 done
 
+
 for F in ${UI_FILES[@]}; do
   cat "../vendor/jquery-ui/minified/jquery.$F.min.js" >> $JS_COMBINED_FILE
   echo ';' >> $JS_COMBINED_FILE
 done
 
+
+cat "../vendor/jquery-ui/i18n/jquery-ui-i18n.js"  >> $JS_COMBINED_FILE
+echo ';' >> $JS_COMBINED_FILE
+
+
 for F in ${WIJMO_FILES[@]}; do
   cat "../vendor/wijmo/js/minified/jquery.$F.min.js" >> $JS_COMBINED_FILE
   echo ';' >> $JS_COMBINED_FILE
 done
+
+echo "Compressing JS files"
 
 yui-compressor -o "define.min.js" "define.js"
 cat "define.min.js" >> $JS_COMBINED_FILE

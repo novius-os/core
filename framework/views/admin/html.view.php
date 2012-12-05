@@ -26,6 +26,7 @@ $config = array(
         'jquery.mousewheel' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-form' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.datetimepicker' => 'static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon',
+        'jquery-ui.datetimepicker.i18n' => 'static/novius-os/admin/vendor/jquery/ui-datetimepicker/i18n/jquery-ui-i18n',
         'jquery.passwordstrength' => 'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
 
         'jquery-ui.core' => 'static/novius-os/admin/bundle/vendor.min',
@@ -44,6 +45,7 @@ $config = array(
         'jquery-ui.slider' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.slider.min',
         'jquery-ui.tabs' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.tabs.min',
         'jquery-ui.datepicker' => 'static/novius-os/admin/bundle/vendor.min',
+        'jquery-ui.datepicker.i18n' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.progressbar' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.progressbar.min',
         'jquery-ui.effects.core' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.effects.blind' => 'static/novius-os/admin/bundle/vendor.min',
@@ -149,6 +151,7 @@ $config = array(
         'jquery.mousewheel' => array('jquery'),
         'jquery-form' => array('jquery'),
         'jquery-ui.datetimepicker' => array('jquery', 'jquery-ui.slider', 'link!static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon.css'),
+        'jquery-ui.datetimepicker.i18n' => array('jquery-ui.datetimepicker'),
         'jquery.passwordstrength' => array('jquery', 'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'),
 
         'jquery-ui.core' => array('jquery'),
@@ -167,6 +170,7 @@ $config = array(
         'jquery-ui.slider' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.mouse'),
         'jquery-ui.tabs' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'jquery-ui.datepicker' => array('jquery', 'jquery-ui.core'),
+        'jquery-ui.datepicker.i18n' => array('jquery-ui.datepicker'),
         'jquery-ui.progressbar' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'jquery-ui.effects.core' => array('jquery'),
         'jquery-ui.effects.blind' => array('jquery', 'jquery-ui.effects.core'),
@@ -272,6 +276,7 @@ if (!$assets_minified) {
         'jquery-ui.slider' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.slider',
         'jquery-ui.tabs' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.tabs',
         'jquery-ui.datepicker' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.datepicker',
+        'jquery-ui.datepicker.i18n' => 'static/novius-os/admin/vendor/jquery-ui/i18n/jquery-ui-i18n',
         'jquery-ui.progressbar' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.progressbar',
         'jquery-ui.effects.core' => 'static/novius-os/admin/vendor/jquery-ui/jquery.effects.core',
         'jquery-ui.effects.blind' => 'static/novius-os/admin/vendor/jquery-ui/jquery.effects.blind',
@@ -418,6 +423,11 @@ if ($assets_minified) {
 <script src="<?= $require ?>" type="text/javascript"></script>
 <script type="text/javascript">
     require.config(<?= \Format::forge($config)->to_json() ?>);
+</script>
+<script type="text/javascript">
+    require(['jquery-nos'], function($) {
+        $.nosLang = '<?= \Session::get('lang', 'en_GB'); ?>';
+    });
 </script>
 <?= $js ?>
 </head>

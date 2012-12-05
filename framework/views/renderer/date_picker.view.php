@@ -12,11 +12,12 @@
     require(
         [
             'jquery-nos',
-            'jquery-ui.datepicker'
+            'jquery-ui.datepicker.i18n'
         ],
         function($) {
             $(function() {
                 var $input = $('input#<?= $id ?>');
+                $.datepicker.setDefaults($.datepicker.regional[$.nosLang.substr(0, 2)]);
                 $input<?= !empty($wrapper) ? '.wrap('.\Format::forge()->to_json($wrapper).')' : '' ?>.datepicker($input.data('datepicker-options'));
             });
         });

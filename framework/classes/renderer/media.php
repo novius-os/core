@@ -67,6 +67,12 @@ class Renderer_Media extends \Fieldset_Field
             'mode' => 'image',
             'inputFileThumb' => array(
                 'title' => __('Image from the media library'),
+                'texts' => array(
+                    'add'            => __('Add'),
+                    'edit'           => __('Edit'),
+                    'delete'         => __('Delete'),
+                    'wrongExtension' => __('This extension is not allowed'),
+                ),
             ),
         );
 
