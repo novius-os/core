@@ -860,8 +860,8 @@ class Model_Media_Provider implements \Iterator
     public function rewind()
     {
         $keys = array();
-        foreach ($this->parent->linked_medias as $wysiwyg) {
-            $keys[] = $wysiwyg->medil_key;
+        foreach ($this->parent->linked_medias as $media) {
+            $keys[] = $media->medil_key;
         }
         $this->iterator = $keys;
         reset($keys);

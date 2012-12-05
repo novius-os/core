@@ -20,7 +20,7 @@ define('jquery-nos-virtualname',
                                 }
 
                                 return str.replace(/ /g, '-')
-                                    .replace(/[\?|:|\\|\/|\#|\[|\]|@]/g, '-')
+                                    .replace(/[\?|:|\\|\/|\#|\[|\]|@|&]/g, '-')
                                     .replace(/-{2,}/g, '-')
                                     .replace(/-$/g, '')
                                     .replace(/^-/g, '')
