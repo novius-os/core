@@ -29,6 +29,22 @@
                                 offset: '-5 -10',
                                 my: "right top",
                                 at: "right bottom"
+                            },
+                            animation: {
+                                animated:"slide",
+                                option: {
+                                    direction: "up"
+                                },
+                                duration: 200,
+                                easing: null
+                            },
+                            hideAnimation: {
+                                animated:"slide",
+                                option: {
+                                    direction: "up"
+                                },
+                                duration: 200,
+                                easing: null
                             }
                         });
                 });
