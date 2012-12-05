@@ -9,16 +9,28 @@
             ['jquery-nos'],
             function($) {
                 $(function() {
-                    $("#tray-username-menu").appendTo('body').wijmenu({
-                        trigger: "#tray-username",
-                        triggerEvent: "click",
-                        orientation: "vertical",
-                        position: {
-                            offset: '-5 -10',
-                            my: "right top",
-                            at: "right bottom"
-                        }
-                    });
+                    $("#tray-username-menu")
+                        .find('a')
+                        .each(function() {
+                            var $a = $(this),
+                                action = $a.data('action');
+                            $a.click(function(e) {
+                                e.preventDefault();
+                                $a.nosAction(action);
+                            });
+                        })
+                        .end()
+                        .appendTo('body')
+                        .wijmenu({
+                            trigger: "#tray-username",
+                            triggerEvent: "click",
+                            orientation: "vertical",
+                            position: {
+                                offset: '-5 -10',
+                                my: "right top",
+                                at: "right bottom"
+                            }
+                        });
                 });
             });
 </script>
