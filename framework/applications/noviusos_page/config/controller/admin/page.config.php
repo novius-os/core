@@ -19,7 +19,7 @@ Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
 return array(
     'controller_url' => 'admin/noviusos_page/page',
     'model' => 'Nos\\Page\\Model_Page',
-    'i18n_file' => 'noviusos_page::common',
+    'i18n_file' => array('noviusos_page::page', 'noviusos_page::common'),
     'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',

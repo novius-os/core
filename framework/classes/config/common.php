@@ -43,9 +43,9 @@ class Config_Common
             'delete' => 'action.dialog.contentUrl',
         );
 
-        $dicts = array('nos::common');
+        $dicts = array('nos::application', 'nos::common');
         if (!empty($config['i18n_file'])) {
-            array_unshift($dicts, $config['i18n_file']);
+            $dicts = array_merge((array) $config['i18n_file'], $dicts);
         }
         \Nos\I18n::current_dictionary($dicts);
 
@@ -134,7 +134,7 @@ class Config_Common
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => 'delete/{{_id}}',
-                        'title' => __('Delete'),
+                        'title' => __('Delete an item'),
                     ),
                 ),
                 'label' => __('Delete'),

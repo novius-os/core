@@ -7,9 +7,6 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-use Nos\I18n;
-
-I18n::load('user', 'nos_user');
 
 return array(
     'model' => 'Nos\User\Model_User',
@@ -22,5 +19,5 @@ return array(
         'user_email',
     ),
     'hideContexts' => true,
-    'i18n_file' => 'noviusos_user::common',
+    'i18n_file' => array('noviusos_user::user', 'noviusos_user::common'),
 );

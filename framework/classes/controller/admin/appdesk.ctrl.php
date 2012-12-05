@@ -36,9 +36,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
 
-        $dicts = array('nos::common');
+        $dicts = array('nos::application', 'nos::common');
         if (!empty($this->config['i18n_file'])) {
-            array_unshift($dicts, $this->config['i18n_file']);
+            $dicts = array_merge((array) $this->config['i18n_file'], $dicts);
         }
         $this->dictionary = I18n::dictionary($dicts);
 
@@ -58,7 +58,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             'loading' => $this->i18n('Loading...'),
             'languages' => $this->i18n('Languages'),
             'search' => $this->i18n('Search'),
-            // @todo review here
         );
         return $this->config;
     }

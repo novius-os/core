@@ -28,7 +28,7 @@ return array(
             ),
         ),
     ),
-    'i18n_file' => 'noviusos_page::common',
+    'i18n_file' => array('noviusos_page::page', 'noviusos_page::common'),
     'appdesk' => array(
         'appdesk' => array(
             'defaultView' => 'treeGrid',
