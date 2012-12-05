@@ -109,7 +109,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $ostabs = array(
             'initTabs' => array(),
-            'trayView' => (string) \View::forge('noviusos_tray::admin/right'),
+            'trayView' => (string) \View::forge('nos::admin/tray'),
             'appsTab' => $osTabs,
             'newTab' => array(
                 'panelId' => 'noviusospanel',

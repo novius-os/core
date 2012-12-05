@@ -16,7 +16,7 @@ return array(
         'name'  => 'Novius OS',
     ),
     'permission' => array(
-        'icon64'  => 'static/apps/noviusos_user/img/user-64.png',
+        'icon64'  => 'static/apps/noviusos_user/img/64/user.png',
     ),
     'launchers' => array(
         'noviusos_user' => array(
@@ -29,10 +29,23 @@ return array(
                 ),
             ),
         ),
+        'noviusos_account' => array(
+            'name' => 'My account',
+            'action' => array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'label' => __('Account'),
+                    'url' => 'admin/noviusos_user/account',
+                    'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
+                ),
+            ),
+            'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
+            'icon64' => 'static/apps/noviusos_user/img/64/myaccount.png',
+        ),
     ),
     'icons' => array(
-        64 => 'static/apps/noviusos_user/img/user-64.png',
-        32 => 'static/apps/noviusos_user/img/user-32.png',
-        16 => 'static/apps/noviusos_user/img/user-16.png',
+        64 => 'static/apps/noviusos_user/img/64/user.png',
+        32 => 'static/apps/noviusos_user/img/32/user.png',
+        16 => 'static/apps/noviusos_user/img/13/user.png',
     ),
 );

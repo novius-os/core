@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos\Tray;
+namespace Nos\Appmanager;
 
 use Fuel\Core\File;
 use View;
@@ -30,7 +30,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
             }
         }
 
-        $view = View::forge('noviusos_tray::admin/app_manager');
+        $view = View::forge('noviusos_appmanager::admin/app_manager');
         $view->set(
             array(
                 'nos' => \Nos\Application::forge('nos'),
@@ -101,11 +101,11 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
     public function action_upload()
     {
         if (\Config::get('allow_plugin_upload', false) == false) {
-            Response::redirect('admin/noviusos_tray/appmanager');
+            Response::redirect('admin/noviusos_appmanager/appmanager');
         }
 
         if (empty($_FILES['zip'])) {
-            \Response::redirect('admin/noviusos_tray/appmanager');
+            \Response::redirect('admin/noviusos_appmanager/appmanager');
         }
 
         if (!is_uploaded_file($_FILES['zip']['tmp_name'])) {
@@ -116,7 +116,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                     'type' => 'error',
                 )
             );
-            \Response::redirect('admin/noviusos_tray/appmanager');
+            \Response::redirect('admin/noviusos_appmanager/appmanager');
         }
 
         if ($_FILES['zip']['error'] != UPLOAD_ERR_OK) {
@@ -127,7 +127,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                     'type' => 'error',
                 )
             );
-            \Response::redirect('admin/noviusos_tray/appmanager');
+            \Response::redirect('admin/noviusos_appmanager/appmanager');
         }
 
         $files = array();
@@ -154,7 +154,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                     'type' => 'error',
                 )
             );
-            \Response::redirect('admin/noviusos_tray/appmanager');
+            \Response::redirect('admin/noviusos_appmanager/appmanager');
         }
         $root = ($count == 1 ? $root_files[0] : '');
 
@@ -169,7 +169,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                     'type' => 'error',
                 )
             );
-            \Response::redirect('admin/noviusos_tray/appmanager');
+            \Response::redirect('admin/noviusos_appmanager/appmanager');
         }
 
         $path = APPPATH.'applications'.DS.$metadata['install_folder'];
@@ -181,7 +181,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                     'type' => 'error',
                 )
             );
-            \Response::redirect('admin/noviusos_tray/appmanager');
+            \Response::redirect('admin/noviusos_appmanager/appmanager');
         }
 
         usort(
@@ -212,7 +212,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         } catch (\Exception $e) {
             \Fuel\Core\File::delete_dir($path, true, true);
         }
-        \Response::redirect('admin/noviusos_tray/appmanager');
+        \Response::redirect('admin/noviusos_appmanager/appmanager');
     }
 
     public function after($response)

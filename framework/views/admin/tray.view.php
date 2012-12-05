@@ -2,7 +2,7 @@
     <?= \Session::user()->user_firstname ?>
 </div>
 <ul id="tray-username-menu">
-    <?= \View::forge('noviusos_tray::admin/right/inside') ?>
+    <?= \View::forge('nos::admin/tray/inside') ?>
 </ul>
 <script type="text/javascript">
     require(

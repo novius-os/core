@@ -24,7 +24,7 @@ $uniqid = uniqid('id_');
                     $container.find('form:visible').submit();
                 });
 
-            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_tray/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Disconnect'))->to_json() ?> + '</button></a>', true);
+            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_user/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Disconnect'))->to_json() ?> + '</button></a>', true);
         });
     });
 </script>
@@ -51,7 +51,7 @@ $uniqid = uniqid('id_');
             foreach (array('en_GB' => array('gb', 'English'), 'fr_FR' => array('fr', 'Français')) as $code => $locale) {
                 list($flag, $label) = $locale;
                 ?>
-                <form action="admin/noviusos_tray/account/lang/<?= $code ?>">
+                <form action="admin/noviusos_user/account/lang/<?= $code ?>">
                     <button class="primary" data-icon-url="static/novius-os/admin/novius-os/img/flags/<?= $flag ?>.png"><?= strtr(__('Switch to {lang}'), array(
                         '{lang}' => $label,
                     )); ?></button>
