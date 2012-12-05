@@ -47,18 +47,18 @@ $uniqid = uniqid('id_');
             <?= $fieldset_display ?>
         </div>
         <div id="lang">
-            <?php
-            foreach (array('en_GB' => array('gb', 'English'), 'fr_FR' => array('fr', 'Français')) as $code => $locale) {
-                list($flag, $label) = $locale;
-                ?>
-                <form action="admin/noviusos_user/account/lang/<?= $code ?>">
-                    <button class="primary" data-icon-url="static/novius-os/admin/novius-os/img/flags/<?= $flag ?>.png"><?= strtr(__('Switch to {lang}'), array(
-                        '{lang}' => $label,
-                    )); ?></button>
-                </form>
-                <?php
-            }
-            ?>
+<?php
+foreach (array('en_GB' => array('gb', 'English'), 'fr_FR' => array('fr', 'Français')) as $code => $locale) {
+    list($flag, $label) = $locale;
+    ?>
+            <form action="admin/noviusos_user/account/lang/<?= $code ?>">
+                <button class="primary" data-icon-url="static/novius-os/admin/novius-os/img/flags/<?= $flag ?>.png"><?= strtr(__('Switch to {lang}'), array(
+                    '{lang}' => $label,
+                )); ?></button>
+            </form>
+    <?php
+}
+?>
         </div>
     </div>
 </div>
