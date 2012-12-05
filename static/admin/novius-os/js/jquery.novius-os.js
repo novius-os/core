@@ -234,6 +234,9 @@ define('jquery-nos',
                         }
                         break;
                 }
+                if ($.type(element.enabled) === 'boolean' && !element.enabled) {
+                    $element.attr('disabled', true);
+                }
 
                 if ($element) {
                     $.each(element.bind, function(event, action) {
