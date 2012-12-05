@@ -91,9 +91,13 @@ return array(
             'action' => array(
                 'action' => 'nosMediaVisualise',
             ),
-            'context' => array(
-                'list' => true
-            )
+            'targets' => array(
+                'grid' => true,
+                'toolbar-edit' => true,
+            ),
+            'visible' => function($params) {
+                return !isset($params['item']) || !$params['item']->is_new();
+            }
         ),
     )
 );

@@ -14,7 +14,16 @@ class Config_Common
         if (!isset($config['actions'])) {
             $config['actions'] = array();
         }
-        $config['actions'] = static::process_actions($application_name, $class, $config);
+
+        if (!isset($config['actions']['list'])) {
+            $config['actions']['list'] = count($config['actions']) == 1 && isset($config['actions']['order']) ? array() : $config['actions'];
+        }
+
+        if (!isset($config['actions']['order'])) {
+            $config['actions']['order'] = array();
+        }
+
+        $config['actions']['list'] = static::process_actions($application_name, $class, $config);
 
         if (!isset($config['data_mapping'])) {
             $config['data_mapping'] = array();
@@ -186,7 +195,7 @@ class Config_Common
             }
         }
 
-        $actions = \Arr::merge($generated_actions, $config['actions']);
+        $actions = \Arr::merge($generated_actions, $config['actions']['list']);
 
         foreach ($actions as $key => $action) {
             if ($action === false) {

@@ -125,23 +125,26 @@ class Config extends \Fuel\Core\Config
 
         $selected_actions = array();
         foreach ($params['models'] as $model) {
-            $actions = \Nos\Config_Common::load($model, array());
-            $actions = $actions['actions'];
+            $common_config = \Nos\Config_Common::load($model, array());
+            $actions = $common_config['actions']['list'];
+            $actions_order = $common_config['actions']['order'];
 
             $params['model'] = $model;
 
+            if (!empty($params['item']) && isset($action['enabled'])) {
+                $action['enabled'] = $action['enabled']($params['item']);
+            }
+
+            foreach ($actions_order as $key) {
+                $action = $actions[$key];
+                if (static::can_add_action($action, $params)) {
+                    $selected_actions[$key] = $action;
+                }
+                unset($actions[$key]);
+            }
+
             foreach ($actions as $key => $action) {
-                $action['name'] = $key;
-
-                if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
-                    continue;
-                }
-
-                if (!empty($params['item']) && isset($action['enabled'])) {
-                    $action['enabled'] = $action['enabled']($params['item']);
-                }
-
-                if (!isset($action['visible']) || $action['visible']($params)) {
+                if (static::can_add_action($action, $params)) {
                     $selected_actions[$key] = $action;
                 }
             }
@@ -150,7 +153,14 @@ class Config extends \Fuel\Core\Config
         return $selected_actions;
     }
 
+    protected static function can_add_action($action, $params)
+    {
+        if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
+            return false;
+        }
 
+        return !isset($action['visible']) || $action['visible']($params);
+    }
 
     public static function placeholderReplace($obj, $data)
     {
