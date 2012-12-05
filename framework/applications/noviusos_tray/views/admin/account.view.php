@@ -72,9 +72,8 @@ $uniqid = uniqid('id_');
         ],
         function($) {
             $(function() {
-                $('#lang').nosFormAjax();
+                $('#lang').nosFormUI().nosFormAjax();
                 var $container = $('#<?= $uniqid ?>');
-                $container.nosFormUI();
                 $('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
                     if (json.wallpaper_url) {
                         $('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
