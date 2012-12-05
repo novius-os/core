@@ -368,6 +368,11 @@ define('jquery-nos',
                                 url = $.nosDataReplace(obj.url, data);
                                 window.open(url);
                                 break;
+
+                            case 'document.location' :
+                                url = $.nosDataReplace(obj.url, data);
+                                document.location  = url;
+                                break;
                         }
                     }
                 } catch (e) {
