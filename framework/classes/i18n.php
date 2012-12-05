@@ -31,7 +31,7 @@ class I18n
 
     public static function _init()
     {
-        static::$fallback = (array) \Config::get('language_fallback', 'en');
+        static::$fallback = \Config::get('language_fallback', 'en');
         static::setLocale(\Fuel::$locale);
     }
 
@@ -70,7 +70,6 @@ class I18n
         $group = ($group === null) ? $file : $group;
         static::$_group = $group;
 
-        $_messages = array();
         if (empty(static::$_loaded_files[static::$_locale][$file])) {
 
             if ( ! isset(static::$_messages[static::$_locale])) {
@@ -87,7 +86,7 @@ class I18n
             foreach ($languages as $lang) {
                 if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
                     foreach ($path as $p) {
-                        static::$_messages[static::$_locale][$group] = \Arr::merge(static::$_messages[static::$_locale][$group], \Fuel::load($p));
+                        static::$_messages[static::$_locale][$group] = \Arr::merge(\Fuel::load($p), static::$_messages[static::$_locale][$group]);
                     }
                 }
             }
@@ -110,7 +109,7 @@ class I18n
         $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
 
         if (empty($result)) {
-            $result = $default ?: $message;
+            $result = $default === null ? $message : $default;
         }
 
         return $result;

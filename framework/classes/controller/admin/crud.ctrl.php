@@ -52,9 +52,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         parent::before();
         $this->config_build();
 
-        $dicts = array('nos::common');
+        $dicts = array('nos::application', 'nos::common');
         if (!empty($this->config['i18n_file'])) {
-            array_unshift($dicts, $this->config['i18n_file']);
+            $dicts = array_merge((array) $this->config['i18n_file'], $dicts);
         }
         $this->i18n_files = $dicts;
         I18n::current_dictionary($this->i18n_files);

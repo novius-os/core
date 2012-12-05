@@ -1,31 +1,6 @@
 <?php
 
-// Generated on 03/12/2012 18:58:42
-
-// 0 out of 44 messages are translated (0%).
-// 0 out of 162 words are translated (0%).
-
 return array(
-    #: classes/config/common.php:45
-    'Add :model_label' => '',
-
-    #: classes/config/common.php:51
-    'Add a new item' => '',
-
-    #: classes/config/common.php:63
-    #: classes/config/common.php:66
-    'Edit' => '',
-
-    #: classes/config/common.php:78
-    #: classes/config/common.php:81
-    'Delete' => '',
-
-    #: classes/config/common.php:95
-    'Visualise' => '',
-
-    #: classes/config/common.php:117
-    'Share' => '',
-
     #: classes/tools/image.php:33
     'This image doesn\'t exist.' => '',
 
@@ -145,4 +120,30 @@ return array(
     #: views/admin/data_catcher/panel.view.php:42
     'What is shared - Default settings' => '',
 
+    #. Overwritten
+    'confirm deletion ok' => 'Confirm the deletion',
+
+    #. Overwritten
+    'confirm deletion or' => 'or',
+
+    #. Overwritten
+    'confirm deletion cancel' => 'Cancel',
+
+    #. Overwritten
+    'confirm deletion wrong_confirmation' => 'Wrong confirmation',
+
+    #. Overwritten
+    'required' => 'This field is required.',
+
+    #. Overwritten
+    'min_length' => 'This field has to contain at least :param:1 characters.',
+
+    #. Overwritten
+    'max_length' => 'This field may not contain more than :param:1 characters.',
+
+    #. Overwritten
+    'valid_date' => 'The entered date is invalid.',
+
+    #. Overwritten
+    'check_old_password' => 'The old password is incorrect.',
 );

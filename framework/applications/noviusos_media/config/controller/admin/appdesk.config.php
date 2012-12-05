@@ -7,7 +7,6 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-use Nos\I18n;
 
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 
@@ -74,7 +73,7 @@ return array(
             ),
         )
     ),
-    'i18n_file' => 'noviusos_media::media',
+    'i18n_file' => array('noviusos_media::media', 'noviusos_media::common'),
     'thumbnails' => true,
     'appdesk' => array(
         'reloadEvent' => array(

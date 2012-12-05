@@ -6,6 +6,26 @@
 // 0 out of 204 words are translated (0%).
 
 return array(
+    #: classes/config/common.php:45
+    'Add :model_label' => '',
+
+    #: classes/config/common.php:51
+    'Add a new item' => '',
+
+    #: classes/config/common.php:63
+    #: classes/config/common.php:66
+    'Edit' => '',
+
+    #: classes/config/common.php:78
+    #: classes/config/common.php:81
+    'Delete' => '',
+
+    #: classes/config/common.php:95
+    'Visualise' => '',
+
+    #: classes/config/common.php:117
+    'Share' => '',
+
     #: classes/controller/admin/crud.php:308
     'Add' => '',
 
