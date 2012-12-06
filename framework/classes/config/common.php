@@ -200,6 +200,8 @@ class Config_Common
         foreach ($actions as $key => $action) {
             if ($action === false) {
                 unset($actions[$key]);
+            } else {
+                $actions[$key]['name'] = $key;
             }
         }
 
