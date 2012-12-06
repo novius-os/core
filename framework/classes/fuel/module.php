@@ -51,10 +51,15 @@ class Module extends Fuel\Core\Module
 
     public static function exists($module)
     {
-        if (static::loaded($module)) {
-            return static::$modules[$module];
+        $exists = static::loaded($module) ? static::$modules[$module] : parent::exists($module);
+
+        if (!$exists) {
+            $application = \Nos\Application::forge($module);
+            if ($application->is_installed()) {
+                $application->uninstall();
+            }
         }
 
-        return parent::exists($module);
+        return $exists;
     }
 }

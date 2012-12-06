@@ -25,7 +25,7 @@
             <h1 class="title"><?= __('Novius OS framework configuration'); ?></h1>
             <p>
 <?php
-if ($nos->is_dirty()) {
+if (\Nos\Application::areNativeApplicationsDirty()) {
     echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'nos', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
 } else {
     echo __('Up to date!');

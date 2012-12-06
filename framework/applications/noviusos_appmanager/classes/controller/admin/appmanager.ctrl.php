@@ -18,6 +18,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
 
     public function action_index()
     {
+        \Nos\Application::cleanApplications();
         $applications = \Nos\Application::search_all();
         $app_installed = array();
         $app_others = array();
@@ -33,7 +34,6 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         $view = View::forge('noviusos_appmanager::admin/app_manager');
         $view->set(
             array(
-                'nos' => \Nos\Application::forge('nos'),
                 'local' => \Nos\Application::forge('local'),
                 'installed' => $app_installed,
                 'others' => $app_others,
@@ -51,8 +51,12 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         \Module::load($app_name);
 
         try {
-            $application = \Nos\Application::forge($app_name);
-            $application->install();
+            if ($app_name === 'nos') {
+                \Nos\Application::installNativeApplications();
+            } else {
+                $application = \Nos\Application::forge($app_name);
+                $application->install();
+            }
         } catch (\Exception $e) {
             $this->response(
                 array(

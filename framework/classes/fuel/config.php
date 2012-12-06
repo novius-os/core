@@ -202,8 +202,8 @@ class Config extends \Fuel\Core\Config
 
     public static function icon($application_name, $icon_key)
     {
-        \Config::load($application_name.'::metadata', true);
-        $metadata = \Config::get($application_name.'::metadata');
+        $metadata = \Config::get('data::app_installed');
+        $metadata = $metadata[$application_name];
         return $metadata['icons'][$icon_key];
     }
 

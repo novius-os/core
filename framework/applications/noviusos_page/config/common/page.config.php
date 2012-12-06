@@ -133,7 +133,7 @@ return array(
                 ),
             ),
             'targets' => array(
-                'toolbar-list' => true,
+                'toolbar-grid' => true,
             ),
         ),
     ),

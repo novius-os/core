@@ -45,7 +45,7 @@ class Application
         return false;
     }
 
-    public static function install_native_applications()
+    public static function installNativeApplications()
     {
 
         foreach (static::$repositories as $where => $repository) {
@@ -57,11 +57,33 @@ class Application
                 foreach ($list as $folder => $idc) {
                     $app_name = trim($folder, '/\\');
                     $application = static::forge($app_name);
-                    if (!$application->is_installed()) {
-                        $application->install(false);
+                    $application->install(false);
+                }
+            }
+        }
+    }
+
+    public static function areNativeApplicationsDirty() {
+        foreach (static::$repositories as $where => $repository) {
+            if ($repository['native']) {
+                $list = \File::read_dir($repository['path'], 1);
+                foreach ($list as $folder => $idc) {
+                    $app_name = trim($folder, '/\\');
+                    $application = static::forge($app_name);
+                    if ($application->is_dirty()) {
+                        return true;
                     }
                 }
             }
+        }
+
+        return false;
+    }
+
+    public static function cleanApplications() {
+        $metadata = \Config::get('data::app_installed');
+        foreach ($metadata as $key => $application) {
+            \Module::exists($key);
         }
     }
 

@@ -62,7 +62,7 @@ return array(
             ),
             'targets' => array(
                 'grid' => true,
-                'toolbar-list' => true,
+                'toolbar-grid' => true,
             ),
         ),
     ),

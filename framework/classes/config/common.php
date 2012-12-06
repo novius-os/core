@@ -59,7 +59,7 @@ class Config_Common
                     ),
                 ),
                 'targets' => array(
-                    'toolbar-list' => true,
+                    'toolbar-grid' => true,
                 ),
             ),
             'edit' => array(

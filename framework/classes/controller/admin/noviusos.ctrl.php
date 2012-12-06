@@ -128,6 +128,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
     public function action_appstab()
     {
+        \Nos\Application::cleanApplications();
         \Config::load(APPPATH.'metadata'.DS.'launchers.php', 'data::launchers');
         $launchers = \Config::get('data::launchers', array());
         $launchers = \Config::mergeWithUser('misc.apps', $launchers);
@@ -148,8 +149,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 // do we have to display the application?
                 if (!isset($app['application']) || Permission::check($app['application'], 'access')) {
                     // do we have the rights to access the application?
-
-
                     $apps[] = $app;
                 }
             }
