@@ -131,10 +131,6 @@ class Config extends \Fuel\Core\Config
 
             $params['model'] = $model;
 
-            if (!empty($params['item']) && isset($action['enabled'])) {
-                $action['enabled'] = $action['enabled']($params['item']);
-            }
-
             foreach ($actions_order as $key) {
                 $action = $actions[$key];
                 if (static::can_add_action($action, $params)) {
@@ -146,6 +142,12 @@ class Config extends \Fuel\Core\Config
             foreach ($actions as $key => $action) {
                 if (static::can_add_action($action, $params)) {
                     $selected_actions[$key] = $action;
+                }
+            }
+
+            foreach ($selected_actions as $key => $action) {
+                if (!empty($params['item']) && isset($action['enabled'])) {
+                    $selected_actions[$key]['enabled'] = $action['enabled']($params['item']);
                 }
             }
         }
