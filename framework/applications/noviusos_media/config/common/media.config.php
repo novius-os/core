@@ -97,16 +97,23 @@ return array(
         ),
     ),
     'actions' => array(
-        'visualise' => array(
+        'Nos\Media\Model_Media.add' => array(
+            'label' => __('Add a media'),
+        ),
+        'Nos\Media\Model_Media.visualise' => array(
             'name' => 'visualise',
             'iconClasses' => 'nos-icon16 nos-icon16-eye',
             'label' => __('Visualise'),
             'action' => array(
                 'action' => 'nosMediaVisualise',
             ),
-            'context' => array(
-                'list' => true
+            'targets' => array(
+                'grid' => true,
+                'toolbar-edit' => true,
             ),
+            'visible' => function($params) {
+                return !isset($params['item']) || !$params['item']->is_new();
+            },
         ),
     ),
 );

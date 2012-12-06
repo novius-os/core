@@ -25,14 +25,19 @@ return array(
         'delete an item' => __('Delete a folder'),
     ),
     'actions' => array(
-        'add_media' => array(
+        'Nos\Media\Model_Folder.delete' => array(
+            'enabled' => function($item) {
+                return !empty($item->medif_parent_id);
+            },
+        ),
+        'Nos\Media\Model_Folder.add_media' => array(
             'name' => 'add_media',
             'label' => __('Add a media in this folder'),
             'icon' => 'plus',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_media/media/insert_update?context_id={{id}}',
+                    'url' => 'admin/noviusos_media/media/insert_update?environment_id={{id}}',
                     'label' => __('Add a media in the "{{title}}" folder'),
                 ),
             ),
@@ -40,15 +45,15 @@ return array(
                 'grid' => true,
             ),
         ),
-        'add_folder' => array(
-            'name' => 'add_folder',
+        'Nos\Media\Model_Folder.add_subfolder' => array(
+            'name' => 'add_subfolder',
             'label' => __('Add a sub-folder to this folder'),
             'icon' => 'folder-open',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_media/folder/insert_update?context_id={{id}}',
-                    'label' => 'Add a sub-folder in "{{title}}"',
+                    'url' => 'admin/noviusos_media/folder/insert_update?environment_id={{id}}',
+                    'label' => __('Add a sub-folder in "{{title}}"'),
                 ),
                 'dialog' => array(
                     'width' => 600,
@@ -57,7 +62,7 @@ return array(
             ),
             'targets' => array(
                 'grid' => true,
-                'toolbar-grid' => true,
+                'toolbar-list' => true,
             ),
         ),
     ),

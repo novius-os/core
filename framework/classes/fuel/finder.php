@@ -170,10 +170,8 @@ class Finder extends Fuel\Core\Finder
         }
 
         // Novius OS : If a config has to be written it HAS to be within the APPPATH
-        if (empty($found)) {
-            if (!$pos && $context == 'config.save') {
-                return APPPATH.$this->prep_path($directory).$file_original.'.config'.$ext;
-            }
+        if (empty($found) && $context == 'config.save') {
+            return Module::exists(!$pos ? 'local' : $dir_app).$this->prep_path($directory).$file_original.'.config'.$ext;
         }
 
         return $found;

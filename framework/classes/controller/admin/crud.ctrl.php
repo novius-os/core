@@ -92,8 +92,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $this->config['require_js'] = array();
         }
 
+        $common_config = \Nos\Config_Common::load($model, array());
         $i18n_default = \Config::load('nos::i18n_common', true);
-        $this->config['i18n'] = array_merge($i18n_default, \Arr::get($this->config, 'i18n', array()));
+        $this->config['i18n'] = array_merge($i18n_default, \Arr::get($common_config, 'i18n', array()));
     }
 
     /**
@@ -355,7 +356,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $return = array(
-            'notify' => $this->is_new ? __('successfully added') : __('successfully saved'),
+            'notify' => $this->is_new ? $this->config['i18n']['successfully added'] : $this->config['i18n']['successfully saved'],
             'closeDialog' => true,
             'dispatchEvent' => $dispatchEvent,
         );
@@ -415,7 +416,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception(__('item deleted')));
+            return $this->send_error(new \Exception($this->config['i18n']['item deleted']));
         }
 
         $this->is_new = $this->item->is_new();
@@ -574,7 +575,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $item_context = $this->item->find_context($context);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
             if (empty($main_context)) {
-                $label = __('add an item in context');
+                $label = $this->config['i18n']['add an item in context'];
             } else {
                 if (empty($item_context)) {
                     if (count($sites) === 1) {
@@ -599,7 +600,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     'action' => 'nosTabs',
                     'method' => empty($main_context) ? 'add' : 'open',
                     'tab' => array(
-                        'url' => $url
+                        'url' => $url,
                     ),
                 ),
             );
@@ -616,7 +617,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     'menus' => $actions,
                 ),
                 'icons' => array(
-                    'secondary' => 'triangle-1-s'
+                    'secondary' => 'triangle-1-s',
                 ),
             ),
         );
@@ -630,7 +631,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function check_permission($action)
     {
         if ($action === 'delete' && $this->item->is_new()) {
-            throw new \Exception(__('not found'));
+            throw new \Exception($this->config['i18n']['not found']);
         }
     }
 
@@ -738,7 +739,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->response(
             array(
-                'notify' => __('successfully deleted'),
+                'notify' => $this->config['i18n']['successfully deleted'],
                 'dispatchEvent' => $dispatchEvent,
             )
         );

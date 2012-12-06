@@ -10,7 +10,12 @@
 return array(
     'controller_url' => 'admin/noviusos_user/user',
     'model' => 'Nos\\User\\Model_User',
-    'i18n_file' => 'nos::user',
+    'tab' => array(
+        //'iconUrl' => 'static/apps/noviusos_user/img/16/user.png',
+        'labels' => array(
+            'insert' => __('Add a user'),
+        ),
+    ),
     'layout_insert' => array(
         array(
             'view' => 'noviusos_user::admin/user_add',

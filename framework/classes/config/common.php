@@ -3,7 +3,6 @@ namespace Nos;
 
 class Config_Common
 {
-
     public static function load($class, $filter_data_mapping)
     {
         list($application_name, $file) = \Config::configFile($class);
@@ -17,7 +16,16 @@ class Config_Common
         if (!isset($config['actions'])) {
             $config['actions'] = array();
         }
-        $config['actions'] = static::process_actions($application_name, $class, $config);
+
+        if (!isset($config['actions']['list'])) {
+            $config['actions']['list'] = count($config['actions']) == 1 && isset($config['actions']['order']) ? array() : $config['actions'];
+        }
+
+        if (!isset($config['actions']['order'])) {
+            $config['actions']['order'] = array();
+        }
+
+        $config['actions']['list'] = static::process_actions($application_name, $class, $config);
 
         if (!isset($config['data_mapping'])) {
             $config['data_mapping'] = array();
@@ -31,17 +39,13 @@ class Config_Common
 
     public static function process_actions($application_name, $model, $config)
     {
+        \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
+
         $urls = array(
             'add' => 'action.tab.url',
             'edit' => 'action.tab.url',
             'delete' => 'action.dialog.contentUrl',
         );
-
-        $dicts = array('nos::application', 'nos::common');
-        if (!empty($config['i18n_file'])) {
-            $dicts = array_merge((array) $config['i18n_file'], $dicts);
-        }
-        \Nos\I18n::current_dictionary($dicts);
 
         $actions_template = array(
             'add' => array(
@@ -73,27 +77,6 @@ class Config_Common
                     'grid' => true,
                 ),
             ),
-            'delete' => array(
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => 'delete/{{_id}}',
-                        'title' => $config['i18n']['delete an item'],
-                    ),
-                ),
-                'label' => __('Delete'),
-                'primary' => true,
-                'icon' => 'trash',
-                'red' => true,
-                'targets' => array(
-                    'grid' => true,
-                    'toolbar-edit' => true
-                ),
-                'visible' =>
-                function($params) {
-                    return !isset($params['item']) || !$params['item']->is_new();
-                },
-            ),
             'visualise' => array(
                 'label' => __('Visualise'),
                 'primary' => true,
@@ -102,13 +85,15 @@ class Config_Common
                     'action' => 'window.open',
                     'url' => '{{preview_url}}?_preview=1'
                 ),
-                'enabled' => function($item) {
-                    if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        $url = $item->url_canonical(array('preview' => true));
-                        return !$item->is_new() && !empty($url);
-                    }
-                    return false;
-                },
+                'enabled' =>
+                    function($item)
+                    {
+                        if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
+                            $url = $item->url_canonical(array('preview' => true));
+                            return !$item->is_new() && !empty($url);
+                        }
+                        return false;
+                    },
                 'targets' => array(
                     'grid' => true,
                     'toolbar-edit' => true
@@ -143,7 +128,28 @@ class Config_Common
                     $model = get_class($params['item']);
                     return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },
-            )
+            ),
+            'delete' => array(
+                'action' => array(
+                    'action' => 'confirmationDialog',
+                    'dialog' => array(
+                        'contentUrl' => 'delete/{{_id}}',
+                        'title' => $config['i18n']['delete an item'],
+                    ),
+                ),
+                'label' => __('Delete'),
+                'primary' => true,
+                'icon' => 'trash',
+                'red' => true,
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
+                ),
+                'visible' =>
+                function($params) {
+                    return !isset($params['item']) || !$params['item']->is_new();
+                },
+            ),
         );
 
 
@@ -189,7 +195,7 @@ class Config_Common
             }
         }
 
-        $actions = \Arr::merge($generated_actions, $config['actions']);
+        $actions = \Arr::merge($generated_actions, $config['actions']['list']);
 
         foreach ($actions as $key => $action) {
             if ($action === false) {

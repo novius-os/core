@@ -46,6 +46,6 @@ return array(
     'icons' => array(
         64 => 'static/apps/noviusos_user/img/64/user.png',
         32 => 'static/apps/noviusos_user/img/32/user.png',
-        16 => 'static/apps/noviusos_user/img/13/user.png',
+        16 => 'static/apps/noviusos_user/img/16/user.png',
     ),
 );

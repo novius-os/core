@@ -13,7 +13,6 @@ return array(
     array(
         'app' =>
         array(
-            'default' => 2,
         ),
         'module' =>
         array(

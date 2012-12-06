@@ -19,7 +19,6 @@ $view_params['container_id'] = $uniqid;
 
 echo View::forge('nos::crud/tab', $view_params, false);
 
-Nos\I18n::current_dictionary($i18n_files);
 ?>
 <div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
