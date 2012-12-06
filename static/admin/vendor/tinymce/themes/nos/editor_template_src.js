@@ -1970,7 +1970,7 @@
             if (metadata.dialog.ajax || !edit) {
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
-                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : data_config}) : metadata.dialog));
+                }, $.extend({}, metadata.dialog, {ajax : true, ajaxData : data_config})));
             } else {
                 // Open empty dialog
                 dialog = $nos(ed.getElement()).nosDialog($.extend({

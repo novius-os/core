@@ -192,7 +192,7 @@ class Tools_Context
     {
         $contexts = static::contexts();
 
-        return current($contexts);
+        return key($contexts);
     }
 
     /**

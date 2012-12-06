@@ -61,19 +61,23 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
             ), false);
     }
 
-    public function action_preview()
+    public function action_preview(array $args = null)
     {
-        return $this->action_save();
+        return $this->action_save($args);
     }
 
-    public function action_save()
+    public function action_save(array $args = null)
     {
+        if (empty($args)) {
+            $args = $_POST;
+        }
+
         $body = array(
-            'config'  => \Format::forge()->to_json($_POST),
+            'config'  => \Format::forge()->to_json($args),
             'preview' => \View::forge($this->config['preview']['view'], array(
                 'layout' => $this->config['preview']['layout'],
                 'params' => $this->config['preview']['params'],
-                'enhancer_args' => $_POST,
+                'enhancer_args' => $args,
             ))->render(),
         );
         \Response::json($body);
