@@ -63,7 +63,8 @@ class Application
         }
     }
 
-    public static function areNativeApplicationsDirty() {
+    public static function areNativeApplicationsDirty()
+    {
         foreach (static::$repositories as $where => $repository) {
             if ($repository['native']) {
                 $list = \File::read_dir($repository['path'], 1);
@@ -80,7 +81,8 @@ class Application
         return false;
     }
 
-    public static function cleanApplications() {
+    public static function cleanApplications()
+    {
         $metadata = \Config::get('data::app_installed');
         foreach ($metadata as $key => $application) {
             \Module::exists($key);
