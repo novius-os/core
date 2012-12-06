@@ -26,8 +26,8 @@ return array(
     ),
     'actions' => array(
         'Nos\Media\Model_Folder.delete' => array(
-            'enabled' => function($item) {
-                return !empty($item->medif_parent_id);
+            'disabled' => function($item) {
+                return !!empty($item->medif_parent_id);
             },
         ),
         'Nos\Media\Model_Folder.add_media' => array(

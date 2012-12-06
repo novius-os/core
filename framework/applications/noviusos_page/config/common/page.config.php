@@ -59,9 +59,9 @@ return array(
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(
             'primary' => false,
-            'enabled' =>
+            'disabled' =>
                 function($page) {
-                    return $page->page_lock != $page::LOCK_DELETION;
+                    return $page->page_lock == $page::LOCK_DELETION;
                 },
         ),
         'Nos\Page\Model_Page.add' => array(
@@ -116,9 +116,9 @@ return array(
             'targets' => array(
                 'grid' => true,
             ),
-            'enabled' =>
+            'disabled' =>
                 function($page) {
-                    return !$page->page_home;
+                    return !!$page->page_home;
                 },
         ),
         'Nos\Page\Model_Page.renew_cache' => array(

@@ -739,7 +739,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
         $item['actions'] = array();
         foreach ($actions as $action => $callback) {
-            $item['actions'][$action] = $callback($object);
+            $item['actions'][$action] = !$callback($object);
         }
         $item['_id'] = $object->{$pk};
         $item['_model'] = $model;

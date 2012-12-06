@@ -146,8 +146,8 @@ class Config extends \Fuel\Core\Config
             }
 
             foreach ($selected_actions as $key => $action) {
-                if (!empty($params['item']) && isset($action['enabled'])) {
-                    $selected_actions[$key]['enabled'] = $action['enabled']($params['item']);
+                if (!empty($params['item']) && isset($action['disabled'])) {
+                    $selected_actions[$key]['disabled'] = $action['disabled']($params['item']);
                 }
             }
         }
