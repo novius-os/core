@@ -59,16 +59,15 @@ return array(
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(
             'primary' => false,
-            'enabled' =>
+            'disabled' =>
                 function($page) {
-                    return $page->page_lock != $page::LOCK_DELETION;
+                    return $page->page_lock == $page::LOCK_DELETION;
                 },
         ),
         'Nos\Page\Model_Page.add' => array(
             'label' => __('Add a page'),
         ),
         'Nos\Page\Model_Page.add_subpage' => array(
-            'name' => 'add_page',
             'label' => __('Add a sub-page to this page'),
             'icon' => 'plus',
             'action' => array(
@@ -85,7 +84,6 @@ return array(
         ),
         'Nos\Page\Model_Page.visualise' => array(
             'label' => __('Visualise'),
-            'name' => 'visualise',
             'primary' => true,
             'iconClasses' => 'nos-icon16 nos-icon16-eye',
             'action' => array(
@@ -103,7 +101,6 @@ return array(
         ),
         'Nos\Page\Model_Page.set_homepage' => array(
             'label' => __('Set as homepage'),
-            'name' => 'set_homepage',
             'primary' => false,
             'icon' => 'home',
             'action' => array(
@@ -119,9 +116,9 @@ return array(
             'targets' => array(
                 'grid' => true,
             ),
-            'enabled' =>
+            'disabled' =>
                 function($page) {
-                    return !$page->page_home;
+                    return !!$page->page_home;
                 },
         ),
         'Nos\Page\Model_Page.renew_cache' => array(

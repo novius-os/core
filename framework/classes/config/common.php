@@ -85,14 +85,14 @@ class Config_Common
                     'action' => 'window.open',
                     'url' => '{{preview_url}}?_preview=1'
                 ),
-                'enabled' =>
+                'disabled' =>
                     function($item)
                     {
                         if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                             $url = $item->url_canonical(array('preview' => true));
-                            return !$item->is_new() && !empty($url);
+                            return $item->is_new() || !!empty($url);
                         }
-                        return false;
+                        return true;
                     },
                 'targets' => array(
                     'grid' => true,
@@ -200,6 +200,8 @@ class Config_Common
         foreach ($actions as $key => $action) {
             if ($action === false) {
                 unset($actions[$key]);
+            } else {
+                $actions[$key]['name'] = $key;
             }
         }
 
