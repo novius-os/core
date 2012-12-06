@@ -25,13 +25,17 @@ return array(
         'delete an item' => __('Delete a folder'),
     ),
     'actions' => array(
+        'Nos\Media\Model_Folder.edit' => array(
+            'disabled' => function($item) {
+                return !!empty($item->medif_parent_id);
+            },
+        ),
         'Nos\Media\Model_Folder.delete' => array(
-            'enabled' => function($item) {
-                return !empty($item->medif_parent_id);
+            'disabled' => function($item) {
+                return !!empty($item->medif_parent_id);
             },
         ),
         'Nos\Media\Model_Folder.add_media' => array(
-            'name' => 'add_media',
             'label' => __('Add a media in this folder'),
             'icon' => 'plus',
             'action' => array(
@@ -46,7 +50,6 @@ return array(
             ),
         ),
         'Nos\Media\Model_Folder.add_subfolder' => array(
-            'name' => 'add_subfolder',
             'label' => __('Add a sub-folder to this folder'),
             'icon' => 'folder-open',
             'action' => array(

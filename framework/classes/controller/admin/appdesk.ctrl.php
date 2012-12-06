@@ -140,8 +140,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['dataset']['actions'])) {
                 $item_actions = \Config::actions(array('models' => array($config['model']), 'target' => 'grid', 'class' => get_called_class()));
                 foreach ($item_actions as $action_key => $action_value) {
-                    if (isset($action_value['enabled'])) {
-                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    if (isset($action_value['disabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['disabled'];
                     }
                 }
             }

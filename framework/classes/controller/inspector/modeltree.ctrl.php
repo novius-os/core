@@ -69,8 +69,8 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             if (!isset($config['dataset']['actions'])) {
                 $config['dataset']['actions'] = array();
                 foreach ($item_actions as $action_key => $action_value) {
-                    if (isset($action_value['enabled'])) {
-                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    if (isset($action_value['disabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['disabled'];
                     }
                 }
             }
