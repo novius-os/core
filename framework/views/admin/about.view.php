@@ -19,6 +19,6 @@
         <br />
         <p><?= __('Licence:') ?> <a href="http://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><?= __('GNU AGPL v3') ?></a></p>
         <br />
-        <p><a href=""http://www.novius-os.org" target="_blank">www.novius-os.org</a></p>
+        <p><a href="http://www.novius-os.org" target="_blank">www.novius-os.org</a></p>
     </div>
 </div>
