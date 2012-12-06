@@ -41,10 +41,10 @@ return array(
         'not found' => __('Page not found'),
 
         // Blank slate
-        'error added in lang not parent' => __('This page cannot be added {lang} because its {parent} is not available in this language yet.'),
-        'error added in lang' => __('This page cannot be added {lang}.'),
-        'item inexistent in lang yet' => __('This page has not been added in {lang} yet.'),
-        'add an item in lang' => __('Add a new page in {lang}'),
+        'error added in context not parent' => __('This page cannot be added {context} because its {parent} is not available in this language yet.'),
+        'error added in context' => __('This page cannot be added {context}.'),
+        'item inexistent in context yet' => __('This page has not been added in {context} yet.'),
+        'add an item in context' => __('Add a new page in {context}'),
 
         // Deletion popup
         'delete an item' => __('Delete a page'),
