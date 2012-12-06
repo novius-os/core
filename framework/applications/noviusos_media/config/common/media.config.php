@@ -101,7 +101,6 @@ return array(
             'label' => __('Add a media'),
         ),
         'Nos\Media\Model_Media.visualise' => array(
-            'name' => 'visualise',
             'iconClasses' => 'nos-icon16 nos-icon16-eye',
             'label' => __('Visualise'),
             'action' => array(
