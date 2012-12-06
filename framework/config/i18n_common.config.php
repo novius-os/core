@@ -13,8 +13,8 @@ return array(
     'not found' => 'Item not found',
 
     // Blank slate
-    'error added in lang not parent' => 'This item cannot be added {lang} because its {parent} is not available in this language yet.',
-    'error added in lang' => 'This item cannot be added {lang}.',
+    'error added in context not parent' => 'This item cannot be added {context} because its {parent} is not available in this language yet.',
+    'error added in context' => 'This item cannot be added {context}.',
     'add an item in context' => 'Add a new item in {context}',
 
     // Deletion popup

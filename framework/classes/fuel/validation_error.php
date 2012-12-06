@@ -17,7 +17,7 @@ class Validation_Error extends Fuel\Core\Validation_Error
     {
         // Prevents from  loading validation translations
         // parent::_init();
-        \Nos\I18n::current_dictionary(array('nos::common'));
+        \Config::load('nos::validation', true);
     }
 
     /**
@@ -40,7 +40,7 @@ class Validation_Error extends Fuel\Core\Validation_Error
                 $msg = $this->field->fieldset()->validation()->get_message($this->rule);
             }
             if ($msg === false) {
-                $msg = __($this->rule, false) ?: __(\Arr::get(explode(':', $this->rule), 0));
+                $msg = \Config::get('nos::validation.'.$this->rule, false) ?: __(\Arr::get(explode(':', $this->rule), 0));
             }
         }
         if ($msg == false) {
