@@ -28,7 +28,14 @@ return array(
             ),
         ),
     ),
-    'i18n_file' => array('noviusos_page::page', 'noviusos_page::common'),
+    'i18n' => array(
+        'item' => __('page'),
+        'items' => __('pages'),
+        'showNbItems' => __('Showing {{x}} pages out of {{y}}'),
+        'showOneItem' => __('Show 1 page'),
+        'showNoItem' => __('No pages'),
+        'showAll' => __('Show all pages'),
+    ),
     'appdesk' => array(
         'appdesk' => array(
             'defaultView' => 'treeGrid',

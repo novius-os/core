@@ -11,7 +11,19 @@
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
 
 return array(
-    'i18n_file' => array('noviusos_media::folder', 'noviusos_media::common'),
+    'i18n' => array(
+        // Crud
+        'successfully added' => __('Media successfully added.'),
+        'successfully saved' => __('Media successfully saved.'),
+        'successfully deleted' => __('The media has successfully been deleted!'),
+
+        // General errors
+        'item deleted' => __('This media has been deleted.'),
+        'not found' => __('Media not found'),
+
+        // Deletion popup
+        'delete an item' => __('Delete a media'),
+    ),
     'data_mapping' => array(
         'media_ext' => array(
             'title' => __('Ext.'),
@@ -94,7 +106,7 @@ return array(
             ),
             'context' => array(
                 'list' => true
-            )
+            ),
         ),
-    )
+    ),
 );

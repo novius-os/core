@@ -19,5 +19,12 @@ return array(
         'user_email',
     ),
     'hideContexts' => true,
-    'i18n_file' => array('noviusos_user::user', 'noviusos_user::common'),
+    'i18n' => array(
+        'item' => __('user'),
+        'items' => __('users'),
+        'showNbItems' => __('Showing {{x}} users out of {{y}}'),
+        'showOneItem' => __('Show 1 user'),
+        'showNoItem' => __('No users'),
+        'showAll' => __('Show all users'),
+    ),
 );

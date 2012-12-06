@@ -3,7 +3,6 @@
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::application', 'nos::common'));
 
 return array(
-    'i18n_file' => array('noviusos_page::page', 'noviusos_page::common'),
     'data_mapping' => array(
         'page_title' => array(
             'title' => __('Title'),

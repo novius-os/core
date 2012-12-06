@@ -36,35 +36,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         list($application, $file_name) = \Config::configFile(get_called_class());
         $this->config = \Config::mergeWithUser($application.'::'.$file_name, static::process_config($application, $this->config));
 
-        $dicts = array('nos::application', 'nos::common');
-        if (!empty($this->config['i18n_file'])) {
-            $dicts = array_merge((array) $this->config['i18n_file'], $dicts);
-        }
-        $this->dictionary = I18n::dictionary($dicts);
-
-        $this->config['i18n'] = array(
-            // Appdesk: allLanguages
-            'allLanguages' => $this->i18n('All'),
-            'item' => $this->i18n('item'),
-            'items' => $this->i18n('items'),
-            'showNbItems' => $this->i18n('Showing {{x}} items out of {{y}}'),
-            'showOneItem' => $this->i18n('Show 1 item'),
-            'showNoItem' => $this->i18n('No items'),
-            'showAll' => $this->i18n('Show all items'),
-            'viewGrid' => $this->i18n('Grid'),
-            'viewTreeGrid' => $this->i18n('Tree grid'),
-            'viewThumbnails' => $this->i18n('Thumbnails'),
-            'preview' => $this->i18n('Preview'),
-            'loading' => $this->i18n('Loading...'),
-            'languages' => $this->i18n('Languages'),
-            'search' => $this->i18n('Search'),
-        );
         return $this->config;
-    }
-
-    public function i18n($message, $default = null)
-    {
-        return call_user_func($this->dictionary, $message, $default);
     }
 
     public function action_index($view = null)
@@ -117,7 +89,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts', 'i18n_file');
+        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts', 'i18n');
         if (isset($config['model'])) {
             $config['model'] = ltrim($config['model'], '\\');
             $namespace_model = \Inflector::get_namespace($config['model']);
@@ -435,6 +407,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
         }
+
+        $i18n_default = \Config::load('nos::i18n_common', true);
+        $config['i18n'] = array_merge($i18n_default, \Arr::get($config, 'i18n', array()));
 
         foreach ($config as $key => $idc) {
             if (!in_array($key, $valid_keys)) {

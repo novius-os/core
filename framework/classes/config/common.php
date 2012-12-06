@@ -11,6 +11,9 @@ class Config_Common
 
         $config = \Config::loadConfiguration($application_name, $file);
 
+        $i18n_default = \Config::load('nos::i18n_common', true);
+        $config['i18n'] = array_merge($i18n_default, \Arr::get($config, 'i18n', array()));
+
         if (!isset($config['actions'])) {
             $config['actions'] = array();
         }
@@ -75,7 +78,7 @@ class Config_Common
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => 'delete/{{_id}}',
-                        'title' => __('delete an item'),
+                        'title' => $config['i18n']['delete an item'],
                     ),
                 ),
                 'label' => __('Delete'),

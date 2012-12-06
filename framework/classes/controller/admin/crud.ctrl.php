@@ -40,7 +40,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected $is_new = false;
     protected $item_from = null;
     protected $item_environment = null;
-    protected $i18n_files = array();
 
     public function & __get($property)
     {
@@ -51,13 +50,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         parent::before();
         $this->config_build();
-
-        $dicts = array('nos::application', 'nos::common');
-        if (!empty($this->config['i18n_file'])) {
-            $dicts = array_merge((array) $this->config['i18n_file'], $dicts);
-        }
-        $this->i18n_files = $dicts;
-        I18n::current_dictionary($this->i18n_files);
     }
 
     /**
@@ -99,6 +91,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if (empty($this->config['require_js'])) {
             $this->config['require_js'] = array();
         }
+
+        $i18n_default = \Config::load('nos::i18n_common', true);
+        $this->config['i18n'] = array_merge($i18n_default, \Arr::get($this->config, 'i18n', array()));
     }
 
     /**
@@ -138,7 +133,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'tab_params' => $this->get_tab_params(),
             ),
             'item' => $this->item,
-            'i18n_files' => $this->i18n_files,
         );
         if ($this->behaviours['contextable']) {
             $view_params['crud']['context'] = $this->item->{$this->behaviours['contextable']['context_property']};

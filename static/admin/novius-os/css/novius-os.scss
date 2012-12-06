@@ -457,6 +457,7 @@ table.title-fields {
 .table-field {
     display: table;
     width:100%;
+    border-collapse: separate;
 }
 
 .table-field, .row-field {

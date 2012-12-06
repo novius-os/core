@@ -19,7 +19,32 @@ Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
 return array(
     'controller_url' => 'admin/noviusos_page/page',
     'model' => 'Nos\\Page\\Model_Page',
-    'i18n_file' => array('noviusos_page::page', 'noviusos_page::common'),
+    'i18n' => array(
+        // Crud
+        'successfully added' => __('Page successfully added.'),
+        'successfully saved' => __('Page successfully saved.'),
+        'successfully deleted' => __('The page has successfully been deleted!'),
+
+        // General errors
+        'item deleted' => __('This page has been deleted.'),
+        'not found' => __('Page not found'),
+
+        // Blank slate
+        'error added in lang not parent' => __('This page cannot be added {lang} because its {parent} is not available in this language yet.'),
+        'error added in lang' => __('This page cannot be added {lang}.'),
+        'item inexistent in lang yet' => __('This page has not been added in {lang} yet.'),
+        'add an item in lang' => __('Add a new page in {lang}'),
+
+        // Deletion popup
+        'delete an item' => __('Delete a page'),
+        'you are about to delete, confim' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>. Are you sure you want to continue?'),
+        'you are about to delete' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>.'),
+        'exists in multiple context' => __('This page exists in <strong>{count} contexts</strong>.'),
+        'delete in the following contexts' => __('Delete this page in the following contexts:'),
+        'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
+        'item has multiple sub-items' => __('This page has <strong>{count} sub-pages</strong>.'),
+        'yes delete sub-items' => __('Yes, I want to delete this page and all of its {count} sub-pages.'),
+    ),
     'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',

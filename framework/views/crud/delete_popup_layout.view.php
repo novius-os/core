@@ -9,14 +9,13 @@
  */
 $id = $uniqid = uniqid('form_');
 
-Nos\I18n::current_dictionary($i18n_files);
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
 <?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
 <p>
-    <button type="submit" class="primary ui-state-error"><?= __('confirm deletion ok') ?></button>
-    <span><?= __('confirm deletion or') ?></span>
-    <a href="#"><?= __('confirm deletion cancel') ?></a>
+    <button type="submit" class="primary ui-state-error"><?= $crud['config']['i18n']['confirm deletion ok'] ?></button>
+    <span><?= $crud['config']['i18n']['confirm deletion or'] ?></span>
+    <a href="#"><?= $crud['config']['i18n']['confirm deletion cancel'] ?></a>
 </p>
 </form>
 <script type="text/javascript">
@@ -47,7 +46,7 @@ Nos\I18n::current_dictionary($i18n_files);
                         });
                         $form.nosDialog('close');
                     } else {
-                        $.nosNotify(<?= \Format::forge(__('confirm deletion wrong_confirmation'))->to_json() ?>, 'error');
+                        $.nosNotify(<?= \Format::forge($crud['config']['i18n']['confirm deletion wrong_confirmation'])->to_json() ?>, 'error');
                     }
 
                 });

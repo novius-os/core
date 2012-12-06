@@ -8,6 +8,57 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
+
 return array(
-    'i18n_file' => array('noviusos_media::folder', 'noviusos_media::common'),
+    'i18n' => array(
+        // Crud
+        'successfully added' => __('Folder successfully added.'),
+        'successfully saved' => __('Folder successfully saved.'),
+        'successfully deleted' => __('The folder has successfully been deleted!'),
+
+        // General errors
+        'item deleted' => __('This folder has been deleted.'),
+        'not found' => __('Folder not found'),
+
+        // Deletion popup
+        'delete an item' => __('Delete a folder'),
+    ),
+    'actions' => array(
+        'add_media' => array(
+            'name' => 'add_media',
+            'label' => __('Add a media in this folder'),
+            'icon' => 'plus',
+            'action' => array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'url' => 'admin/noviusos_media/media/insert_update?context_id={{id}}',
+                    'label' => __('Add a media in the "{{title}}" folder'),
+                ),
+            ),
+            'targets' => array(
+                'grid' => true,
+            ),
+        ),
+        'add_folder' => array(
+            'name' => 'add_folder',
+            'label' => __('Add a sub-folder to this folder'),
+            'icon' => 'folder-open',
+            'action' => array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'url' => 'admin/noviusos_media/folder/insert_update?context_id={{id}}',
+                    'label' => 'Add a sub-folder in "{{title}}"',
+                ),
+                'dialog' => array(
+                    'width' => 600,
+                    'height' => 250
+                ),
+            ),
+            'targets' => array(
+                'grid' => true,
+                'toolbar-grid' => true,
+            ),
+        ),
+    ),
 );

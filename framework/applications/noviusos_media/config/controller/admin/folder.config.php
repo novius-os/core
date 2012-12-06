@@ -13,7 +13,6 @@ Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 return array(
     'controller_url'  => 'admin/noviusos_media/folder',
     'model' => 'Nos\\Media\\Model_Folder',
-    'i18n_file' => 'noviusos_media::folder',
     'environment_relation' => 'parent',
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_media/img/media-16.png',

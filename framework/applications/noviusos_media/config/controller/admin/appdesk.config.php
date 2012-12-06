@@ -73,7 +73,14 @@ return array(
             ),
         )
     ),
-    'i18n_file' => array('noviusos_media::media', 'noviusos_media::common'),
+    'i18n' => array(
+        'item' => __('media'),
+        'items' => __('medias'),
+        'showNbItems' => __('Showing {{x}} medias out of {{y}}'),
+        'showOneItem' => __('Show 1 media'),
+        'showNoItem' => __('No medias'),
+        'showAll' => __('Show all medias'),
+    ),
     'thumbnails' => true,
     'appdesk' => array(
         'reloadEvent' => array(
