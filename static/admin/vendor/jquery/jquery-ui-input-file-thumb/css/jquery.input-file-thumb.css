@@ -75,26 +75,33 @@
 }
 /* The thumbnail in the details layer */
 .ui-inputfilethumb .ui-inputfilethumb-filethumb {
-    display : inline-block;
+    display : block;
+    float: left;
 }
+.ui-inputfilethumb .ui-inputfilethumb-rtl .ui-inputfilethumb-filethumb {
+    float: right;
+}
+
 /* The file description in the details layer */
-.ui-inputfilethumb .ui-inputfilethumb-filemeta {
-    display         : inline-block;
-    margin-bottom   : 1em;
+.ui-inputfilethumb .ui-inputfilethumb-filewrapper {
+    display         : block;
+    margin          : 0 0 0 67px;
 }
+.ui-inputfilethumb .ui-inputfilethumb-rtl .ui-inputfilethumb-filewrapper {
+    display         : block;
+    margin          : 0 67px 0 0;
+}
+
 /* The file title in the the details layer */
-.ui-inputfilethumb .ui-inputfilethumb-filemeta .ui-inputfilethumb-filetitle {
-    padding    : 0.3em 1em;
-    display   : block;
+.ui-inputfilethumb .ui-inputfilethumb-filetitle {
 }
 /* The file informations in the the details layer */
-.ui-inputfilethumb .ui-inputfilethumb-filemeta .ui-inputfilethumb-filedescription {
+.ui-inputfilethumb .ui-inputfilethumb-filedescription {
 	margin-top  : 1em;
-    display     : block;
 }
 /* The line including the action links in the details layer */
 .ui-inputfilethumb .ui-inputfilethumb-fileactions {
-    margin-left     : 10px;
+    margin-top      : 1em;
     white-space     : nowrap;
 }
 /* The action links in the details layer */
