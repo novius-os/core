@@ -31,6 +31,9 @@ if (!$item->is_new()) {
                             itemId: <?= (int) $item->{$crud['pk']} ?>,
                             closeEle: '#<?= $uniqid_close ?>',
                             texts: {
+<?php
+// Popup notification state deleted title
+?>
                                 titleClose: <?= Format::forge()->to_json(__('Bye bye')) ?>
                             }
                         }),

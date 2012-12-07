@@ -56,7 +56,7 @@ class Attachment
     public function __construct($attached, $config)
     {
         if (!is_array($config)) {
-            $config = \Config::load($config);
+            $config = \Config::load($config, true);
         }
 
         if (!empty($config['image']) && empty($config['extensions'])) {
