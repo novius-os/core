@@ -45,6 +45,7 @@ class Config_Common
             'add' => 'action.tab.url',
             'edit' => 'action.tab.url',
             'delete' => 'action.dialog.contentUrl',
+            'clone' => 'action.tab.url',
         );
 
         $actions_template = array(
@@ -117,7 +118,7 @@ class Config_Common
                     'action' => 'share',
                     'data' => array(
                         'model_id' => '{{_id}}',
-                        'model_name' => '',
+                        'model_name' => $model,
                     ),
                 ),
                 'targets' => array(
@@ -147,6 +148,25 @@ class Config_Common
                 ),
                 'visible' =>
                 function($params) {
+                    return !isset($params['item']) || !$params['item']->is_new();
+                },
+            ),
+            'clone' => array(
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => "insert_update?clone_from_id={{_id}}".($model::behaviours('Nos\Orm_Behaviour_Contextable', false) === false ? '&context={{_context}}' : ''),
+                        'label' => __('Clone'),
+                    ),
+                ),
+                'label' => __('Clone'),
+                'primary' => false,
+                'icon' => 'circle-plus',
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true
+                ),
+                'visible' => function($params) {
                     return !isset($params['item']) || !$params['item']->is_new();
                 },
             ),
@@ -189,10 +209,6 @@ class Config_Common
                 $generated_actions[$model.'.'.$name]['label'],
                 array('model_label' => $model_label)
             );
-
-            if ($name == 'share') {
-                $generated_actions[$model.'.'.$name]['action']['data']['model_name'] = $model;
-            }
         }
 
         $actions = \Arr::merge($generated_actions, $config['actions']['list']);
