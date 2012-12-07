@@ -369,8 +369,9 @@ class Application
         // Small fix relative to permissions
         // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
         foreach ($added['launchers'] as $key => $launcher) {
-            if (empty($config['launchers'][$key]['application'])) {
+            if (empty($added['launchers'][$key]['application'])) {
                 $config['launchers'][$key]['application'] = $this->folder;
+                $added['launchers'][$key]['application'] = $this->folder;
             }
         }
 
