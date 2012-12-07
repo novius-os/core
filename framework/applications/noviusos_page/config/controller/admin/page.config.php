@@ -117,7 +117,6 @@ return array(
         'page_parent_id' => array(
             'renderer' => 'Nos\Page\Renderer_Selector',
             'renderer_options' => array(
-                'width' => '250px',
                 'height' => '250px',
             ),
             'label' => __('Location: '),

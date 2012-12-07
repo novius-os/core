@@ -31,7 +31,9 @@ define('jquery-nos-virtualname',
                         $use_title_checkbox = $('#' + id + '__use_title_checkbox'),
                         $title = $virtual_name.closest('form').find('input.title');
 
-                    if (replace_url($title.val()) == $virtual_name.val() || $virtual_name.val() == '') {
+                    var useTitle = $virtual_name.data('usetitle');
+
+                    if (typeof useTitle !== 'undefined' && useTitle == 1) {
                         $use_title_checkbox.attr('checked', true).wijcheckbox("refresh");
                     }
 

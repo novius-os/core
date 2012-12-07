@@ -141,7 +141,7 @@ class Application
     {
         $metadata = $this->metadata;
         if (empty($metadata)) {
-            $metadata = $this->get_real_metadata();
+            $metadata = $this->getRealMetadata();
         }
 
         return isset($metadata['name']) ? $metadata['name'] : $this->folder;
@@ -160,11 +160,10 @@ class Application
      * Read the actual metadata from the application's config file
      * @return array
      */
-    public function get_real_metadata()
+    public function getRealMetadata()
     {
         if (empty($this->real_metadata)) {
-            \Config::load($this->folder.'::metadata', true);
-            $this->real_metadata = \Config::get($this->folder.'::metadata');
+            $this->real_metadata = \Config::metadata($this->folder);
         }
 
         return $this->real_metadata;
@@ -211,7 +210,7 @@ class Application
     public function diff_metadata()
     {
         $diff_metadata = array();
-        static::array_diff_key_assoc($this->get_metadata(), $this->get_real_metadata(), $diff_metadata);
+        static::array_diff_key_assoc($this->get_metadata(), $this->getRealMetadata(), $diff_metadata);
 
         return $diff_metadata;
     }
@@ -232,8 +231,7 @@ class Application
         }
 
         $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
-        \Config::load($this->folder.'::metadata', true);
-        $new_metadata = \Config::get($this->folder.'::metadata');
+        $new_metadata = $this->getRealMetadata();
 
         // Check if the installation is compatible with other applications
         $config = $this->prepare_config($old_metadata, $new_metadata);
@@ -365,15 +363,6 @@ class Application
             $config[$section] = array_diff_key($config[$section], $removed[$section]);
         }
 
-        // More treatment for launchers
-        // Small fix relative to permissions
-        // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
-        foreach ($added['launchers'] as $key => $launcher) {
-            if (empty($config['launchers'][$key]['application'])) {
-                $config['launchers'][$key]['application'] = $this->folder;
-            }
-        }
-
         // More treatment for enhancers
 
         $old_namespace = \Arr::get($old_metadata, 'namespace', '');
@@ -465,8 +454,7 @@ class Application
 
         $dependencies = array();
         if ($add) {
-            \Config::load($app_refresh.'::metadata', true);
-            $config = \Config::get($app_refresh.'::metadata', array());
+            $config = \Config::metadata($app_refresh);
 
             if (isset($config['extends'])) {
                 if (!isset($dependencies[$config['extends']])) {
@@ -481,8 +469,7 @@ class Application
 
         foreach ($app_installed as $app_name => $app) {
             if ($app_refresh !== $app_name) {
-                \Config::load($app_name.'::metadata', true);
-                $config = \Config::get($app_name.'::metadata', array());
+                $config = \Config::metadata($app_name);
                 if (isset($config['extends'])) {
                     if (!isset($dependencies[$config['extends']])) {
                         $dependencies[$config['extends']] = array();

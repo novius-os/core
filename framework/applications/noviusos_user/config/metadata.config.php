@@ -26,8 +26,11 @@ return array(
                 'action' => 'nosTabs',
                 'tab' => array(
                     'url' => 'admin/noviusos_user/appdesk',
+                    'iconUrl' => 'static/apps/noviusos_user/img/32/user.png',
                 ),
             ),
+            'icon64' => 'static/apps/noviusos_user/img/64/user.png',
+            'iconUrl' => 'static/apps/noviusos_user/img/32/user.png',
         ),
         'noviusos_account' => array(
             'name' => 'My account',
@@ -41,6 +44,7 @@ return array(
             ),
             'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
             'icon64' => 'static/apps/noviusos_user/img/64/myaccount.png',
+            'application' => false
         ),
     ),
     'icons' => array(

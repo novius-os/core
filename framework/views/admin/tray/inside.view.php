@@ -11,4 +11,4 @@ foreach (array('en_GB' => 'English', 'fr_FR' => 'Français') as $code => $label)
     </ul>
 </li>
 <li><a href="#" data-action='{"action":"document.location","url":"admin/noviusos_user/account/disconnect"}'><?= __('Log out') ?></a></li>
-<li><a href="#" data-action='{"action":"nosDialog","dialog":{"contentUrl":"admin/nos/about","ajax":true,"width":600,"height":350,"title":<?= htmlentities(\Format::forge(__('About Novius OS'))->to_json()) ?>}}'><?= __('About Novius OS') ?></a></li>
+<li><a href="#" data-action='{"action":"nosDialog","dialog":{"contentUrl":"admin/nos/about","ajax":true,"width":620,"height":370,"title":<?= htmlentities(\Format::forge(__('About Novius OS'))->to_json()) ?>}}'><?= __('About Novius OS') ?></a></li>

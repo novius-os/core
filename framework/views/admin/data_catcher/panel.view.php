@@ -21,7 +21,7 @@ if ($twinnable) {
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">
     <a href="#" class="nos-datacatchers-close"><img src="static/novius-os/admin/novius-os/img/icons/close.png" /></a>
-    <div class="unit col c4">
+    <div class="col c4">
         <div class="accordion catchers">
             <h3><?= __('Applications') ?></h3>
             <div>
@@ -37,7 +37,7 @@ if ($twinnable) {
             </div>
         </div>
     </div>
-    <div class="unit col c8 lastUnit">
+    <div class="col c8">
         <div class="nos-datacatchers-default-nuggets accordion">
             <h3><?= __('What is shared - Default settings') ?></h3>
             <div>

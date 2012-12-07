@@ -108,8 +108,20 @@ class Config extends \Fuel\Core\Config
 
     public static function metadata($application_name)
     {
-        \Config::load($application_name.'::metadata', true);
-        return \Config::get($application_name.'::metadata');
+        $metadata = \Config::load($application_name.'::metadata', true);
+
+        // More treatment for launchers
+        // Small fix relative to permissions
+        // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
+        if (isset($metadata['launchers'])) {
+            foreach ($metadata['launchers'] as $key => $launcher) {
+                if (!isset($metadata['launchers'][$key]['application'])) {
+                    $metadata['launchers'][$key]['application'] = $application_name;
+                }
+            }
+        }
+
+        return $metadata;
     }
 
     public static function application($application_name)
