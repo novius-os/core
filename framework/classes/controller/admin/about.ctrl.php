@@ -14,7 +14,7 @@ class Controller_Admin_About extends \Nos\Controller
 {
     public function action_index()
     {
-        $version = \Config::load('nos::version');
+        $version = \Config::load('nos::version', true);
         return \View::forge('nos::admin/about', array('version' => $version));
     }
 }
