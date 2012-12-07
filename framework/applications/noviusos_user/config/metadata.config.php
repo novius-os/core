@@ -44,6 +44,7 @@ return array(
             ),
             'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
             'icon64' => 'static/apps/noviusos_user/img/64/myaccount.png',
+            'application' => false
         ),
     ),
     'icons' => array(

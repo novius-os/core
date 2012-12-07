@@ -10,6 +10,9 @@
 
 namespace Nos;
 
+class Access_Exception extends \Exception
+{
+}
 class Controller_Admin_Application extends Controller_Admin_Auth
 {
     public $template = 'nos::admin/html';
@@ -22,7 +25,7 @@ class Controller_Admin_Application extends Controller_Admin_Auth
         if (!$this->bypass) {
             list($application) = \Config::configFile(get_called_class());
             if (!Permission::check($application, 'access')) {
-                throw new \Exception('You don\'t have access to application '.$application.'!');
+                throw new Access_Exception('You don\'t have access to application '.$application.'!');
             }
         }
     }

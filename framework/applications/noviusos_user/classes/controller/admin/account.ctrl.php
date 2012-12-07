@@ -14,6 +14,14 @@ use View;
 
 class Controller_Admin_Account extends \Nos\Controller_Admin_Application
 {
+    public function before()
+    {
+        try {
+            parent::before();
+        } catch(\Nos\Access_Exception $e) {
+        }
+    }
+
     public function action_index()
     {
         $user = \Session::user();

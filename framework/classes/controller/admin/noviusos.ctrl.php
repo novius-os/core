@@ -147,7 +147,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 }
 
                 // do we have to display the application?
-                if (!isset($app['application']) || Permission::check($app['application'], 'access')) {
+                if (!isset($app['application']) || !$app['application'] || Permission::check($app['application'], 'access')) {
                     // do we have the rights to access the application?
                     $apps[] = $app;
                 }
