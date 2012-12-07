@@ -137,21 +137,21 @@
 				.addClass('ui-inputfilethumb-filethumb')
 				.appendTo(self.uiHover);
 
-			self.uiFileMeta = $('<span></span>')
-				.addClass('ui-inputfilethumb-filemeta')
+			self.uiFileWrapper = $('<div></div>')
+				.addClass('ui-inputfilethumb-filewrapper')
 				.appendTo(self.uiHover);
 
-			self.uiFileTitle = $('<span></span>')
-				.addClass('ui-inputfilethumb-filetitle ui-widget-header ui-corner-all ')
-				.appendTo(self.uiFileMeta);
+			self.uiFileTitle = $('<h4></h4>')
+				.addClass('ui-inputfilethumb-filetitle')
+				.appendTo(self.uiFileWrapper);
 
-			self.uiFileDescription = $('<span></span>')
+			self.uiFileDescription = $('<p></p>')
 				.addClass('ui-inputfilethumb-filedescription')
-				.appendTo(self.uiFileMeta);
+				.appendTo(self.uiFileWrapper);
 
 			self.uiFileActions = $('<div></div>')
 				.addClass('ui-inputfilethumb-fileactions')
-				.appendTo(self.uiHover);
+				.appendTo(self.uiFileWrapper);
 
 			self.uiAddFile = $('<span></span>')
 				.addClass('ui-inputfilethumb-fileaction')
@@ -509,29 +509,25 @@
 
 		show : function () {
 			var self = this,
-				o = self.options;
-
-			self.uiHover.css({
-					top : 0,
-					left : 0,
-					opacity : 0
-				})
-				.show();
-			self.uiFileThumb.css('float', 'left');
-			self.uiFileMeta.css('margin-left', '10px');
-			self.uiFileActions.css('margin-left', (o.width + 10) + 'px');
-
-			var clone = self.uiThumb
-				.clone(false)
-				.addClass('ui-state-active')
-				.appendTo(self.uiFileThumb)
-				.bind('click', function(e) {
-					self._trigger('visualize', e, {file : o.file});
-				}),
+				o = self.options,
+			    clone = self.uiThumb
+                    .clone(false)
+                    .addClass('ui-state-active')
+                    .appendTo(self.uiFileThumb)
+                    .bind('click', function(e) {
+                        self._trigger('visualize', e, {file : o.file});
+                    }),
 				ofst = self.uiThumb.offset(),
 				left = ofst.left,
 				top = ofst.top,
 				parent = self.uiThumb.offsetParent().not('body');
+
+            self.uiHover.css({
+                    top : 0,
+                    left : 0,
+                    opacity : 0
+                })
+                .show();
 
 			if (parent.size()) {
 				ofst = parent.offset();
@@ -545,21 +541,17 @@
 					right : parseInt(self.uiHover.css('padding-right').replace('px', '')) + parseInt(self.uiHover.css('border-right-width').replace('px', ''))
 				};
 			if (o.orientation == 'rtl' || (left - padding.left + self.uiHover.outerWidth()) > $(window).width()) {
-				self.uiFileThumb.css('float', 'right');
-				self.uiFileMeta.css({
-						marginRight : '10px',
-						marginLeft : '0px'
-					});
-				self.uiFileActions.css({
-						marginRight : (o.width + 10) + 'px',
-						marginLeft : '0px'
-					});
-				self.uiHover.css({
+                self.uiHover.addClass('ui-inputfilethumb-rtl')
+				    .css({
 						top : top - padding.top,
 						left : left + padding.right + self.uiThumb.outerWidth() - self.uiHover.outerWidth()
 					});
 			} else {
-				self.uiHover.css({'top':top - padding.top, 'left':left - padding.left});
+                self.uiHover.removeClass('ui-inputfilethumb-rtl')
+				    .css({
+                        'top':top - padding.top,
+                        'left':left - padding.left
+                    });
 			}
 			if ($.fn.bgiframe) {
 				self.uiHover.bgiframe();
