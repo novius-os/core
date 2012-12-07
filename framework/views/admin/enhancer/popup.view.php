@@ -12,8 +12,8 @@
 <div id="<?= $id = uniqid('temp_') ?>">
     <form method="POST" action="<?= $url ?>">
         <div class="line myBody">
-            <div class="unit col c1"></div>
-            <div class="unit col c10 ui-widget">
+            <div class="col c1"></div>
+            <div class="col c10 ui-widget">
 <?php
 foreach ($layout as $view) {
     if (is_array($view)) {
@@ -25,17 +25,19 @@ foreach ($layout as $view) {
 }
 ?>
             </div>
-            <div class="line">&nbsp;</div>
-            <div class="line">
-                <div class="unit col c1"></div>
-                <div class="unit col c10 ui-widget">
-                    <?= Str::tr(':save or :cancel', array(
-                        'save'   => '<button type="submit" data-icon="check">'.__('Save').'</button>',
-                        'cancel' => '<a data-id="close" href="#">'.__('Cancel').'</a>',
-                    )) ?>
-                </div>
-                <div class="unit lastUnit"></div>
+            <div class="col c1"></div>
+        </div>
+        <div class="line">&nbsp;</div>
+        <div class="line">
+            <div class="col c1"></div>
+            <div class="col c10 ui-widget">
+                <?= Str::tr(':save or :cancel', array(
+                    'save'   => '<button type="submit" data-icon="check">'.__('Save').'</button>',
+                    'cancel' => '<a data-id="close" href="#">'.__('Cancel').'</a>',
+                )) ?>
             </div>
+            <div class="col c1"></div>
+        </div>
     </form>
 </div>
 

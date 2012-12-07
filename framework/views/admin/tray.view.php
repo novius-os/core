@@ -1,7 +1,7 @@
 <div id="tray-username" class="menu">
     <?= \Session::user()->user_firstname ?>
 </div>
-<ul id="tray-username-menu">
+<ul id="tray-username-menu" style="display: none;">
     <?= \View::forge('nos::admin/tray/inside') ?>
 </ul>
 <script type="text/javascript">

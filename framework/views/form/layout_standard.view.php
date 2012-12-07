@@ -35,9 +35,9 @@ $large = !empty($large) && $large == true;
 
 <div id="<?= $uniqid ?>" class="nos-fixed-content fill-parent" style="display:none;">
     <div>
-        <?= $large ? '' : '<div class="unit col c1"></div>'; ?>
-        <div class="unit col <?= $large ? 'c12' : 'c10' ?>" style="">
-            <div class="line ui-widget" style="margin:2em 2em 1em;">
+        <?= $large ? '' : '<div class="col c1"></div>'; ?>
+        <div class="col <?= $large ? 'c12' : 'c10' ?>">
+            <div class="line ui-widget" style="margin:2em 0 1em;">
                 <table class="title-fields" style="margin-bottom:1em;">
                     <tr verti>
 <?php
@@ -129,19 +129,19 @@ if (!empty($subtitle) || !empty($publishable)) {
 ?>
             </div>
         </div>
-        <div class="unit col c1"></div>
-        <div class="unit col c3 <?= $large ? 'lastUnit' : '' ?>"></div>
-        <?= $large ? '' : '<div class="unit col c1 lastUnit"></div>' ?>
+        <div class="col c1"></div>
+        <div class="col c3"></div>
+        <?= $large ? '' : '<div class="col c1"></div>' ?>
     </div>
 
     <div style="clear:both;">
-        <div class="line ui-widget" style="margin: 0 2em 2em;">
+        <div class="line ui-widget" style="margin: 0 0 2em;">
 <?php
             $menus = empty($menu) ? array() : (array) $menu;
             $contents = empty($content) ? array() : (array) $content;
 ?>
-            <?= $large ? '' : '<div class="unit col c1"></div>' ?>
-            <div class="unit col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
+            <?= $large ? '' : '<div class="col c1"></div>' ?>
+            <div class="col c<?= ($large ? 8 : 7) + (empty($menu) ? ($large ? 4 : 3) : 0) ?>" id="line_second" style="position:relative;">
 <?php
 foreach ($contents as $content) {
     if (is_array($content) && !empty($content['view'])) {
@@ -157,7 +157,7 @@ foreach ($contents as $content) {
 <?php
 if (!empty($menus)) {
     ?>
-                <div class="unit col <?= $large ? 'c4 lastUnit' : 'c3' ?>" style="position:relative;">
+                <div class="col <?= $large ? 'c4' : 'c3' ?>" style="position:relative;">
     <?php
     $menu = current($menus);
     if (empty($menu['view'])) {
@@ -186,7 +186,7 @@ if (!empty($menus)) {
     <?php
 }
 ?>
-            <?= $large ? '' : '<div class="unit lastUnit"></div>' ?>
+            <?= $large ? '' : '<div class="col c1"></div>' ?>
         </div>
     </div>
 </div>
