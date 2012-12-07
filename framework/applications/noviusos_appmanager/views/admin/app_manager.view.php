@@ -104,7 +104,7 @@ if (empty($installed)) {
                     <tbody>
 <?php
 foreach ($others as $app) {
-    $metadata = $app->get_real_metadata();
+    $metadata = $app->getRealMetadata();
     ?>
                         <tr>
                             <td><?= e($app->name) ?> </td>
