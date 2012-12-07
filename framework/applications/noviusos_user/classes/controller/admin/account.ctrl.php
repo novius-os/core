@@ -18,7 +18,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
     {
         try {
             parent::before();
-        } catch(\Nos\Access_Exception $e) {
+        } catch (\Nos\Access_Exception $e) {
         }
     }
 
