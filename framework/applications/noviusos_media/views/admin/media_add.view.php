@@ -17,8 +17,8 @@ $fieldset->set_config('field_template', '{field}');
 
 <div class="page line ui-widget" id="<?= $uniqid ?>">
     <?= $fieldset->build_hidden_fields(); ?>
-    <div class="unit col c1" style="z-index:99;"></div>
-    <div class="unit col c8" style="z-index:99;">
+    <div class="col c1" style="z-index:99;"></div>
+    <div class="col c11" style="z-index:99;">
         <div class="line" style="margin-bottom:1em;">
             <table class="fieldset standalone">
                 <tr class="title">

@@ -19,8 +19,8 @@
         }
     </style>
 
-    <div class="unit col c1"></div>
-    <div class="unit col c10" id="line_first" style="position:relative;;">
+    <div class="col c1"></div>
+    <div class="col c10" id="line_first" style="position:relative;;">
         <div class="line" style="overflow:visible;">
             <h1 class="title"><?= __('Novius OS framework configuration'); ?></h1>
             <p>
@@ -152,7 +152,7 @@ if ($allow_upload) {
 ?>
         </div>
     </div>
-    <div class="unit lastUnit"></div>
+    <div class="col c1"></div>
 
     <script type="text/javascript">
         require(
