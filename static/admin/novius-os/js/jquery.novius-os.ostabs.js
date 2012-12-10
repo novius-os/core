@@ -1081,9 +1081,10 @@ define('jquery-nos-ostabs',
                 var self = this,
                     tabs = [];
                 self.uiOstabsTabs.find( 'li:not(.nos-ostabs-newtab)' )
-                    .each(function() {
+                    .each(function(i) {
                         var tab = $.extend({}, $(this).data('ui-ostab'));
                         delete tab.actions;
+                        tab.indexTab = i + self.uiOstabsTray.find('li').length + 1;
                         tabs.push(tab);
                     });
                 return tabs;

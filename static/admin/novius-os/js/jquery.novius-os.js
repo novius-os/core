@@ -808,12 +808,12 @@ define('jquery-nos',
                                     sel = false;
                                 $.each(tabs, function(i, t) {
                                     if (t.url === tab.url) {
-                                        sel = i;
+                                        sel = t.indexTab;
                                         return false;
                                     }
                                 });
                                 if (sel !== false) {
-                                    return noviusos().ostabs('select', sel + 4); // Add 4 because appstab and tray are before and not return by tabs
+                                    return noviusos().ostabs('select', sel);
                                 } else {
                                     self.nosTabs('add', tab);
                                 }
