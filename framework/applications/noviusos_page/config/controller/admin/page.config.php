@@ -65,30 +65,19 @@ return array(
                     ),
                 ),
                 'menu' => array(
-                    'accordion' => array(
-                        'view' => 'nos::form/accordion',
-                        'params' => array(
-                            'accordions' => array(
-                                'menu' => array(
-                                    'title' => __('Menu'),
-                                    'fields' => array('page_parent_id', 'page_menu', 'page_menu_title'),
-                                ),
-                                'url' => array(
-                                    'title' => __('URL (page address)'),
-                                    'fields' => array('page_virtual_name'),
-                                ),
-                                'seo' => array(
-                                    'title' => __('SEO'),
-                                    'fields' => array('page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords'),
-                                ),
-                                'admin' => array(
-                                    'title' => __('Admin'),
-                                    'header_class' => 'faded',
-                                    'content_class' => 'faded',
-                                    'fields' => array('page_cache_duration', 'page_lock'),
-                                ),
-                            ),
-                        ),
+                    __('Menu') => array(
+                        'page_parent_id', 'page_menu', 'page_menu_title',
+                    ),
+                    __('URL (page address)') => array(
+                         'page_virtual_name',
+                    ),
+                    __('SEO') => array(
+                        'page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords',
+                    ),
+                    __('Admin') => array(
+                        'header_class' => 'faded',
+                        'content_class' => 'faded',
+                        'fields' => array('page_cache_duration', 'page_lock'),
                     ),
                 ),
             ),
