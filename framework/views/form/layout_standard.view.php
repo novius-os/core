@@ -14,7 +14,53 @@ require(
     ['jquery-nos'],
     function($) {
         $(function() {
-            var $content = $("#<?= $uniqid = uniqid('id_') ?>");
+            var id = "<?= $uniqid = uniqid('id_') ?>",
+                $content = $('#' + id),
+                $contextButton = $content.find('.change-context')
+                        .attr('id', id + 'context')
+                        .data({
+                            icons: {
+                                secondary: 'triangle-1-s'
+                            }
+                        });
+
+            $contextButton.next()
+                    .wijmenu({
+                        orientation: 'vertical',
+                        animation: {
+                            animated:"slide",
+                            option: {
+                                direction: "up"
+                            },
+                            duration: 50,
+                            easing: null
+                        },
+                        hideAnimation: {
+                            animated:"slide",
+                            option: {
+                                direction: "up"
+                            },
+                            duration: 0,
+                            easing: null
+                        },
+                        direction: 'rtl',
+                        triggerEvent: "click",
+                        trigger: '#' + id + 'context',
+                        select: function(e, data) {
+                            var $li = $(data.item.element),
+                                context = $li.data('context'),
+                                tabParams = <?= \Format::forge()->to_json($crud['tab_params']) ?>;
+
+                            if (context) {
+                                tabParams.url = tabParams.url.replace(/context=([^&]+)/g, 'context=' + encodeURIComponent(context.code));
+
+                                $content.closest('form').find('.input-context').val(context.code);
+                                $contextButton.button('option', 'label', context.label);
+                                $li.nosTabs('update', tabParams);
+                            }
+                        }
+                    });
+
             $content.nosOnShow('one', function() {
                     $content.nosFormUI();
                 })
@@ -54,7 +100,24 @@ $contexts = array_keys(\Nos\Tools_Context::contexts());
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Twinnable') !== null || $item->behaviours('Nos\Orm_Behaviour_Contextable') !== null;
     if ($contextable) {
-        echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
+        if ($item->is_new()) {
+            $flag = \Nos\Tools_Context::flagUrl($item->get_context());
+            $site = \Nos\Tools_Context::site($item->get_context());
+            ?>
+            <td style="width:16px;text-align:center;">
+                <button class="change-context" type="button"><?= \Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)) ?></button>
+                <ul style="display: none;">
+            <?php
+            foreach (\Nos\Tools_Context::contexts() as $context => $domains) {
+                echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::context_label($context, array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true))))->to_json()).'"><a>'.\Str::tr(__('Add in :context'), array('context' => \Nos\Tools_Context::context_label($context))).'</a></li>';
+            }
+            ?>
+                </ul>
+            </div>
+            <?php
+        } else {
+            echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
+        }
     }
 }
 ?>

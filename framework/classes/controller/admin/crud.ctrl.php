@@ -254,6 +254,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                         'form' => array(
                             'type' => 'hidden',
                             'value' => $this->item->{$this->behaviours['contextable']['context_property']},
+                            'class' => 'input-context',
                         ),
                     ),
                 )
@@ -571,7 +572,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions_context()
     {
-        if (!$this->behaviours['twinnable']) {
+        if (!$this->behaviours['twinnable'] || $this->is_new) {
             return array();
         }
 

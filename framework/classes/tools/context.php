@@ -158,6 +158,16 @@ class Tools_Context
 
     /**
      * @param $context
+     * @return string
+     */
+    public static function flagUrl($context)
+    {
+        $locale = self::locale($context);
+        return 'static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png';
+    }
+
+    /**
+     * @param $context
      * @param array $options
      * @return string
      */
