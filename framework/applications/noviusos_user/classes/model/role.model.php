@@ -22,7 +22,7 @@ class Model_Role extends \Nos\Orm\Model
     {
         if ($key == 'access') {
             $this->load_access($application);
-            return $this->access->check($this, $application);
+            return $this->access->check($this, $key);
         }
 
         $args = func_get_args();
@@ -40,7 +40,7 @@ class Model_Role extends \Nos\Orm\Model
 
     public function load_access($application)
     {
-        $this->access = \Nos\Permission::forge('access', '', array(
+        $this->access = \Nos\Permission::forge($application, 'access', array(
             'driver' => 'select',
             'title'=> 'Grant access to the application',
             'label' => 'Grant access to the application',
