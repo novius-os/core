@@ -208,7 +208,7 @@ if (!empty($subtitle) || !empty($publishable)) {
 <?php
 foreach ($contents as $content) {
     if (is_array($content) && !empty($content['view'])) {
-        echo View::forge($content['view'], $view_params + $content['params'], false);
+        echo View::forge($content['view'], $view_params + (isset($content['params']) ? $content['params'] : array()) + array('view_params' => $view_params), false);
     } elseif (is_callable($content)) {
         echo $content();
     } else {
@@ -241,7 +241,7 @@ if (!empty($menus)) {
     }
     foreach ($menus as $view) {
         if (!empty($view['view'])) {
-            echo View::forge($view['view'], $view_params + $view['params'], false);
+            echo View::forge($view['view'], $view_params + (isset($view['params']) ? $view['params'] : array()) + array('view_params' => $view_params), false);
         }
     }
     ?>
