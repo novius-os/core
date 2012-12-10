@@ -70,12 +70,18 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
         if (array_key_exists('where', $options)) {
             $where = $options['where'];
             foreach ($where as $k => $w) {
-                if ($w[0] == 'context') {
-                    if (! is_array($w[1])) {
-                        $where[$k] = array($this->_properties['context_property'], '=', $w[1]);
-                    } elseif (count($w[1])) {
-                        $where[$k] = array($this->_properties['context_property'], 'IN', $w[1]);
+                $keys = array_keys($w);
+                if (count($w) == 1 && $keys[0] == 'context') {
+                    $where[$k] = array($this->_properties['context_property'] => $w[$keys[0]]);
+                }
+
+                if (count($w) > 1 && $w[0] == 'context') {
+                    $w[0] = $this->_properties['context_property'];
+                    if (count($w) == 2 && is_array($w[1])) {
+                        $w[2] = $w[1];
+                        $w[1] = 'IN';
                     }
+                    $where[$k] = $w;
                 }
             }
             $options['where'] = $where;
