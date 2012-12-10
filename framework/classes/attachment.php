@@ -90,7 +90,7 @@ class Attachment
      *
      * @return string|bool
      */
-    public function new_file()
+    public function newFile()
     {
         return !empty($this->new_file) ? $this->new_file : false;
     }
@@ -138,7 +138,7 @@ class Attachment
      *
      * @return bool
      */
-    public function is_image()
+    public function isImage()
     {
         $extension = $this->extension();
 
@@ -168,9 +168,9 @@ class Attachment
      * @param   int $max_height
      * @return  string|bool
      */
-    public function url_resized($max_width = 0, $max_height = 0)
+    public function urlResized($max_width = 0, $max_height = 0)
     {
-        if (!$this->is_image()) {
+        if (!$this->isImage()) {
             return false;
         }
         $filename = $this->filename();
@@ -247,7 +247,7 @@ class Attachment
     /**
      * Delete an alias
      */
-    static public function delete_alias($alias)
+    static public function deleteAlias($alias)
     {
         $alias = rtrim($alias, '/').'/';
 

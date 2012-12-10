@@ -254,6 +254,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                         'form' => array(
                             'type' => 'hidden',
                             'value' => $this->item->{$this->behaviours['contextable']['context_property']},
+                            'class' => 'input-context',
                         ),
                     ),
                 )
@@ -280,7 +281,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 }
                 $context_labels = array();
                 foreach ($contexts as $context) {
-                    $context_labels[] = Tools_Context::context_label($context);
+                    $context_labels[] = Tools_Context::contextLabel($context);
                 }
                 $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
 
@@ -394,7 +395,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $message = strtr(
                     __('This item already exists in {context}. Therefore your item cannot be added.'),
                     array(
-                        '{context}' => Tools_Context::context_label($item_context),
+                        '{context}' => Tools_Context::contextLabel($item_context),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -571,7 +572,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions_context()
     {
-        if (!$this->behaviours['twinnable']) {
+        if (!$this->behaviours['twinnable'] || $this->is_new) {
             return array();
         }
 
@@ -597,7 +598,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     } elseif (count($locales) === 1) {
                         $label = __('Add to {context}');
                     } else {
-                        if (Tools_Context::locale_code($context) === Tools_Context::locale_code($this->item->get_context())) {
+                        if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
                             $label = __('Add to {context}');
                         } else {
                             $label = __('Translate into {context}');
@@ -607,7 +608,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $label = __('Edit {context}');
                 }
             }
-            $label = strtr($label, array('{context}' => Tools_Context::context_label($context)));
+            $label = strtr($label, array('{context}' => Tools_Context::contextLabel($context)));
             $actions[] = array(
                 'content' => $label,
                 'action' => array(

@@ -59,8 +59,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $sites = Tools_Context::sites();
 
         foreach ($contexts as $context => $params) {
-            $site = Tools_Context::site_code($context);
-            $locale = Tools_Context::locale_code($context);
+            $site = Tools_Context::siteCode($context);
+            $locale = Tools_Context::localeCode($context);
 
             if (!isset($sites[$site]['locales'])) {
                 $sites[$site]['locales'] = array();

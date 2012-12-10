@@ -269,7 +269,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $item = static::dataset_item($object, $config['dataset']);
 
                 if ($contextable && !$twinnable) {
-                    $item['context'] = Tools_Context::context_label($object->{$contextable['context_property']}, array('force_flag' => true));
+                    $item['context'] = Tools_Context::contextLabel($object->{$contextable['context_property']}, array('force_flag' => true));
                 }
                 $items[] = $item;
                 if ($twinnable) {
