@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_help::common'));
+
 ?>
 <div id="<?= $uniqid = uniqid('id_'); ?>" style="margin: 3em;" class="blank_slate">
     <h1 class="title"><?= __('Sorry, you won\'t get much help here for now...') ?></h1>
