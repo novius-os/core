@@ -11,60 +11,12 @@
 ?>
 <script type="text/javascript">
 require(
-    ['jquery-nos'],
+    ['jquery-nos-layout-standard'],
     function($) {
         $(function() {
-            var id = "<?= $uniqid = uniqid('id_') ?>",
-                $content = $('#' + id),
-                $contextButton = $content.find('.change-context')
-                        .attr('id', id + 'context')
-                        .data({
-                            icons: {
-                                secondary: 'triangle-1-s'
-                            }
-                        });
-
-            $contextButton.next()
-                    .wijmenu({
-                        orientation: 'vertical',
-                        animation: {
-                            animated:"slide",
-                            option: {
-                                direction: "up"
-                            },
-                            duration: 50,
-                            easing: null
-                        },
-                        hideAnimation: {
-                            animated:"slide",
-                            option: {
-                                direction: "up"
-                            },
-                            duration: 0,
-                            easing: null
-                        },
-                        direction: 'rtl',
-                        triggerEvent: "click",
-                        trigger: '#' + id + 'context',
-                        select: function(e, data) {
-                            var $li = $(data.item.element),
-                                context = $li.data('context'),
-                                tabParams = <?= \Format::forge()->to_json($crud['tab_params']) ?>;
-
-                            if (context) {
-                                tabParams.url = tabParams.url.replace(/context=([^&]+)/g, 'context=' + encodeURIComponent(context.code));
-
-                                $content.closest('form').find('.input-context').val(context.code);
-                                $contextButton.button('option', 'label', context.label);
-                                $li.nosTabs('update', tabParams);
-                            }
-                        }
-                    });
-
-            $content.nosOnShow('one', function() {
-                    $content.nosFormUI();
-                })
-                .nosOnShow();
+            var $content = $("#<?= $uniqid = uniqid('id_') ?>").nosLayoutStandard({
+                    tabParams:  <?= isset($crud['tab_params']) ? \Format::forge()->to_json($crud['tab_params']) : 'null' ?>
+                });
         });
     });
 </script>
