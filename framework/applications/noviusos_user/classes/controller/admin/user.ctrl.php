@@ -60,9 +60,9 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
         $applications = \Input::post('applications');
         foreach ($applications as $application) {
             $access = Model_Permission::find('first', array('where' => array(
-                array('perm_role_id',     $role->role_id),
-                array('perm_application', 'access'),
-                array('perm_key',          $application),
+                array('perm_role_id',       $role->role_id),
+                array('perm_key',           'access'),
+                array('perm_application',   $application),
             )));
 
             // Grant of remove access to the application
@@ -73,9 +73,9 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             if (!empty($_POST['access'][$application]) && empty($access)) {
                 $access = new Model_Permission();
                 $access->perm_role_id     = $role->role_id;
-                $access->perm_application = 'access';
-                $access->perm_identifier  = '';
-                $access->perm_key         = $application;
+                $access->perm_key           = 'access';
+                $access->perm_identifier    = '';
+                $access->perm_application   = $application;
                 $access->save();
             }
 
