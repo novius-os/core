@@ -105,18 +105,18 @@ if (!empty($item) && count($contexts) > 1) {
             $site = \Nos\Tools_Context::site($item->get_context());
             ?>
             <td style="width:16px;text-align:center;">
-                <button class="change-context" type="button"><?= \Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)) ?></button>
+                <button class="change-context" type="button"><?= \Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)) ?></button>
                 <ul style="display: none;">
             <?php
             foreach (\Nos\Tools_Context::contexts() as $context => $domains) {
-                echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::context_label($context, array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true))))->to_json()).'"><a>'.\Str::tr(__('Add in :context'), array('context' => \Nos\Tools_Context::context_label($context))).'</a></li>';
+                echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::contextLabel($context, array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true))))->to_json()).'"><a>'.\Str::tr(__('Add in :context'), array('context' => \Nos\Tools_Context::contextLabel($context))).'</a></li>';
             }
             ?>
                 </ul>
             </div>
             <?php
         } else {
-            echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
+            echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
         }
     }
 }
