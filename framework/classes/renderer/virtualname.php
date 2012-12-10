@@ -22,7 +22,7 @@ class Renderer_Virtualname extends \Fieldset_Field
 
         $this->fieldset()->append($this->js_init());
 
-        if (empty($this->value)) {
+        if ($this->fieldset()->getInstance()->is_new()) {
             $this->set_attribute('data-usetitle', 1);
         }
 
