@@ -65,26 +65,19 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     }
 
     /**
-     * Deletes the children recursively
+     * Deletes all the children of the item (recursively)
+     * (will only affect the current context, by design)
+     *
+     * @param \Nos\Orm\Model $item
      */
     public function before_delete(\Nos\Orm\Model $item)
-    {
-        $this->delete_children($item);
-    }
-
-    /**
-     * Delete all the children of the item.
-     * (will only affect the current language, by design)
-     *
-     * @param type $item
-     */
-    public function delete_children($item)
     {
         foreach ($this->find_children($item) as $child) {
             $child->delete();
         }
+        // Reset the relation, since we deleted the children manually
+        unset($item->{$this->_properties['children_relation']});
     }
-
     /**
      * Returns all the direct children of the object
      *
