@@ -22,7 +22,7 @@ $id = $uniqid = uniqid('form_');
 <?php
 foreach ($contexts_list as $item_context) {
     ?>
-    <option value="<?= $item_context->get_context() ?>"><?= \Nos\Tools_Context::context_label($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false)) ?></option>
+    <option value="<?= $item_context->get_context() ?>"><?= \Nos\Tools_Context::contextLabel($item_context->get_context(), array('template' => '{site} - {locale}', 'flag' => false)) ?></option>
     <?php
 }
 ?>

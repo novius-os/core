@@ -132,7 +132,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         \Response::json($body);
     }
 
-    public function action_clone($id = null, $recursive = false)
+    public function action_clone($id = null)
     {
         $page = $this->crud_item($id);
         $contexts_list = $page->find_context('all');
@@ -282,7 +282,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 
         // Clone children if appropriate
         if ($recursive) {
-            $child_common_ids = array();
+            static $child_common_ids = array();
             // $all already contains only the contexts we want to duplicate
             // Clone each context separately
             foreach ($all as $parent) {
