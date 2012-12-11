@@ -62,40 +62,39 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
 
     public function before_save(\Nos\Orm\Model $item)
     {
+        parent::before_save($item);
         $diff = $item->get_diff();
 
+        // If the parent changes, then the virtual path changes
         if (!empty($this->_parent_relation)) {
             $key_from = $this->_parent_relation->key_from[0];
             // Compare $diff[0] and $diff[1] because the former can be (string) and latter (int), even if it's the same value
-            if (array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from]) {
+            $parent_has_changed = array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from];
+            if ($item->is_new() || $parent_has_changed) {
                 $class = $this->_parent_relation->model_to;
                 $parent = null;
                 if (!empty($item->{$this->_parent_relation->key_from[0]})) {
                     $parent = $class::find($item->{$this->_parent_relation->key_from[0]});
                 }
-                $item->{$this->_properties['virtual_path_property']} = $parent !== null ? $parent->virtual_path(true) : '';
-                $item->{$this->_properties['virtual_path_property']} .= $item->{$this->_properties['virtual_name_property']};
-                if (!empty($this->_properties['extension_property'])) {
-                    $item->{$this->_properties['virtual_path_property']} .= $this->extension($item);
-                }
-                // If the parent changes, then the virtual path changes
+                $item->{$this->_properties['virtual_path_property']} = ($parent !== null ? $parent->virtual_path(true) : '') . $this->virtual_name($item) . $this->extension($item);
                 $this->_data_diff[$item->{$this->_properties['virtual_path_property']}] = $diff;
             }
         }
-        parent::before_save($item);
 
         if (!empty($diff[1][$this->_properties['virtual_name_property']])) {
-            $diff[0][$this->_properties['virtual_path_property']] = $item->{$this->_properties['virtual_path_property']};
-            $old_name = $diff[0][$this->_properties['virtual_name_property']];
-            $new_name = $item->{$this->_properties['virtual_name_property']}.$this->extension($item);
+            $virtual_path = $this->_properties['virtual_path_property'];
+            $diff[0][$virtual_path] = $item->{$virtual_path};
+            $old_name = $diff[0][$virtual_path];
+            $new_name = $item->{$virtual_path}.$this->extension($item);
             if (!empty($old_name)) {
                 $old_name .= $this->extension($item, true);
-                $item->{$this->_properties['virtual_path_property']} = preg_replace('`'.preg_quote($old_name).'$`iUu', $new_name, $item->{$this->_properties['virtual_path_property']});
+                $item->{$this->_properties['virtual_path_property']} = preg_replace('`'.preg_quote($old_name).'$`iUu', $new_name, $item->{$virtual_path});
             }
-            $diff[1][$this->_properties['virtual_path_property']] = $item->{$this->_properties['virtual_path_property']};
-            $this->_data_diff[$item->{$this->_properties['virtual_path_property']}] = $diff;
+            $diff[1][$virtual_path] = $item->{$this->_properties['virtual_path_property']};
+            $this->_data_diff[$item->{$virtual_path}] = $diff;
         }
 
+        // Check uniqueness
         if (!empty($diff[0][$this->_properties['virtual_path_property']])) {
             $where = array(
                 array($this->_properties['virtual_path_property'], $item->{$this->_properties['virtual_path_property']})
@@ -107,7 +106,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
 
             $duplicate = $item::find('all', (array('where' => $where)));
             if (!empty($duplicate)) {
-                throw new \Exception(__('A item with the same path already exists.'));
+                throw new BehaviourDuplicateException(__('A item with the same path already exists.'));
             }
         }
     }
@@ -174,5 +173,6 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 return $this->_properties['extension_property'];
             }
         }
+        return '';
     }
 }

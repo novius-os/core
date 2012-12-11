@@ -131,4 +131,169 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 
         \Response::json($body);
     }
+
+    public function action_clone($id = null, $recursive = false)
+    {
+        $page = $this->crud_item($id);
+        $contexts_list = $page->find_context('all');
+        $context = \Input::post('context', null);
+        if (count($contexts_list) > 1 && empty($context)) {
+            \Response::json(array(
+                'action' => array(
+                    'action' => 'nosDialog',
+                    'dialog' => array(
+                        'ajax' => true,
+                        'contentUrl' => 'admin/noviusos_page/page/'.($recursive ? 'popup_clone_tree' : 'popup_clone').'/'.$id,
+                        'title' => strtr(__('Duplicate the page "{{title}}"'), array(
+                            '{{title}}' => $page->title_item(),
+                        )),
+                        'width' => 500,
+                        'height' => 200,
+                    ),
+                ),
+            ));
+        }
+
+        try {
+            static::clone_page($page, \Input::post('context', $page->get_context()), $recursive);
+            \Response::json(array(
+                'dispatchEvent' => array(
+                    'name' => 'Nos\Page\Model_Page',
+                    'action' => 'insert',
+                    'context' => $page->get_context(),
+                ),
+                'notify' => $recursive ? __('The page and its children have been cloned successfully.') : __('The page has been cloned successfully.'),
+            ));
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+    }
+
+    public function action_clone_tree($id = null)
+    {
+        return $this->action_clone($id, true);
+    }
+
+    public function action_popup_clone($id = null, $recursive = false)
+    {
+        $page = $this->crud_item($id);
+        $contexts_list = $page->find_context('all');
+        return \View::forge('noviusos_page::admin/popup_clone', array(
+            'item' => $page,
+            'action' => 'admin/noviusos_page/page/'.($recursive ? 'clone_tree' : 'tree').'/'.$id,
+            'crud' => $this->config,
+            'contexts_list' => $contexts_list,
+        ), false);
+    }
+
+    public function action_popup_clone_tree($id = null)
+    {
+        return $this->action_popup_clone($id, true);
+    }
+
+    protected static function clone_page($page, $context, $recursive, $parent = null, $common_id = null)
+    {
+        $all = $page->find_context($context);
+        if ($context != 'all') {
+            $all = array($all);
+        }
+        // Find the main context (or the only context we want to duplicate)
+        foreach ($all as $item) {
+            if (($context == 'all' && $item->is_main_context()) || $context == $item->get_context()) {
+                $main = $item;
+                break;
+            }
+        }
+
+        $parents = array();
+
+        // Clone the main context (or the only context we want to duplicate)
+        $clone = clone $main;
+        $clone->page_entrance = 0;
+        $clone->page_home = 0;
+        $clone->page_published = 0;
+        $clone->page_context_common_id = $common_id;
+        // Change the title for the root item only (children path will inherit from their parent)
+        if (!empty($parent)) {
+            $clone->set_parent($parent);
+        }
+
+        // Duplicate up to 5 times
+        $try = 1;
+        do {
+            try {
+                $failed = false;
+                if (empty($parent)) {
+                    $title_append = strtr(__(' (copy {{count}})'), array(
+                        '{{count}}' => $try,
+                    ));
+                    $clone->page_title = $main->page_title.$title_append;
+                    $clone->page_virtual_name = null;
+                    $clone->page_virtual_url = null;
+                }
+                $clone->save();
+                break;
+            } catch (\Nos\BehaviourDuplicateException $e) {
+                $failed = true;
+                if (!empty($parent)) {
+                    break;
+                }
+                $try++;
+                if ($try > 5) {
+                    throw new \Exception(__('You already duplicated this page 5 times. Please edit them before duplicating more.'));
+                }
+            }
+        } while ($try <= 5);
+
+        if ($failed) {
+            throw new \Exception(__('An unidentified error occurred during duplication.').' - '.$try.', '.$parent->id);
+        }
+
+        $parents[$clone->get_context()] = $clone;
+
+        // We need this from the main context to clone the other ones
+        $common_id = $clone->page_context_common_id;
+
+        // Clone other contexts
+        foreach ($all as $item) {
+            // Main context is already cloned
+            if ($item->id == $main->id) {
+                continue;
+            }
+            $clone = clone $item;
+            $clone->page_entrance = 0;
+            $clone->page_home = 0;
+            $clone->page_published = 0;
+            $clone->page_context_common_id = $common_id;
+            $clone->page_virtual_name = null;
+            $clone->page_virtual_url = null;
+            if (empty($parent)) {
+                $clone->page_title = $clone->page_title.$title_append;
+            } else {
+                $clone->set_parent($parent);
+            }
+            try {
+                $clone->save();
+            } catch (\Nos\BehaviourDuplicateException $e) {
+                throw new \Exception('Unexpected error');
+            }
+            $parents[$clone->get_context()] = $clone;
+        }
+
+        // Clone children if appropriate
+        if ($recursive) {
+            $child_common_ids = array();
+            // $all already contains only the contexts we want to duplicate
+            // Clone each context separately
+            foreach ($all as $parent) {
+                foreach ($parent->find_children() as $child) {
+                    $child_common_id = $child->page_context_common_id;
+                    $clone_common_id = \Arr::get($child_common_ids, $child_common_id, null);
+                    $child_common_ids[$child_common_id] = static::clone_page($child, $child->get_context(), $recursive, $parents[$child->get_context()], $clone_common_id);
+                }
+            }
+        }
+
+        return $common_id;
+    }
 }

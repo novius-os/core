@@ -19,18 +19,6 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
     protected $_properties = array();
 
     /**
-     *  Populates the dataset with a _context key containing the context of the current item
-     * @param $dataset
-     * @param $item
-     */
-    public static function dataset(&$dataset, $item)
-    {
-        $dataset['_context'] = function() use ($item) {
-            return $item->get_context();
-        };
-    }
-
-    /**
      * Fill in the context_common_id and context properties when creating the object
      *
      * @param   Model  The object

@@ -121,6 +121,34 @@ return array(
                     return !!$page->page_home;
                 },
         ),
+        'Nos\Page\Model_Page.clone' => array(
+            'action' => array(
+                'action' => 'nosAjax',
+                'params' => array(
+                    'url' => 'admin/noviusos_page/page/clone/{{_id}}',
+                ),
+            ),
+            'label' => __('Duplicate'),
+            'primary' => false,
+            'icon' => 'circle-plus',
+            'targets' => array(
+                'grid' => true,
+            ),
+        ),
+        'Nos\Page\Model_Page.clone_tree' => array(
+            'action' => array(
+                'action' => 'nosAjax',
+                'params' => array(
+                    'url' => 'admin/noviusos_page/page/clone_tree/{{_id}}',
+                ),
+            ),
+            'label' => __('Duplicate, including sub-pages'),
+            'primary' => false,
+            'icon' => 'circle-plus',
+            'targets' => array(
+                'grid' => true,
+            ),
+        ),
         'Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
             'action' => array(

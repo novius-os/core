@@ -58,7 +58,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
             $update->execute();
 
-            // Database were updated using DB directly, because save() triggers all the observers, and we don't need that
+            // Database was updated using DB directly, because save() triggers all the observers, and we don't need that
             // $item->save();
         }
     }
@@ -66,7 +66,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Copies all invariant fields from the main context
      *
-     * @param Model $item
+     * @param \Nos\Orm\Model $item
      */
     public function before_save(\Nos\Orm\Model $item)
     {
@@ -106,7 +106,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Check if the parent exists in all the contextages of the child
+     * Check if the parent exists in all the contexts of the child
      * @param \Nos\Orm\Model $item
      */
     public function change_parent(\Nos\Orm\Model $item)
@@ -183,7 +183,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Find the object in the main context
      *
-     * @return \Nos\Model
+     * @return \Nos\Orm\Model
      */
     public function find_main_context($item)
     {
