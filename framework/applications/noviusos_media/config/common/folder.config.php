@@ -14,7 +14,7 @@ return array(
     'data_mapping' => array(
         'title' => array(
             'column' => 'medif_title',
-            'headerText' => __('Folder'),
+            'title' => __('Title'),
         ),
         'path' => array(
             'value' => function($obj) {
