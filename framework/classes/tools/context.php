@@ -31,9 +31,10 @@ class Tools_Context
         if (!is_array(static::$_contexts)) {
             $all_domains = array();
 
+            \Config::load('contexts', true);
             $sites = static::sites();
             $locales = static::locales();
-            $contexts = \Config::get('contexts', array());
+            $contexts = \Config::get('contexts.contexts', array());
             static::$_contexts = array();
             foreach ($contexts as $context_code => $domains) {
                 $site = static::siteCode($context_code);
@@ -77,7 +78,8 @@ class Tools_Context
     {
         if (!is_array(static::$_sites)) {
             static::$_sites = array();
-            $sites = \Config::get('sites', array());
+            \Config::load('contexts', true);
+            $sites = \Config::get('contexts.sites', array());
             foreach ($sites as $site_code => $site_params) {
                 if (!is_array($site_params)) {
                     $site_params = array('title' => $site_params);
@@ -104,7 +106,8 @@ class Tools_Context
     {
         if (!is_array(static::$_locales)) {
             static::$_locales = array();
-            $locales = \Config::get('locales', array());
+            \Config::load('contexts', true);
+            $locales = \Config::get('contexts.locales', array());
             foreach ($locales as $locale_code => $locale_params) {
                 if (!is_array($locale_params)) {
                     $locale_params = array('title' => $locale_params);
