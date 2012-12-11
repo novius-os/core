@@ -29,15 +29,23 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     {
         $diff = $item->get_diff();
 
-        if (!empty($diff[0][$this->_properties['virtual_name_property']])) {
+        // If we have a new item or the virtual name has changed
+        if ($item->is_new() || !empty($diff[0][$this->_properties['virtual_name_property']])) {
+
+            // Enforce virtual name restrictions
             $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$this->_properties['virtual_name_property']});
+
+            // If the virtual name is empty, generate a default one from the title
             if (empty($item->{$this->_properties['virtual_name_property']})) {
                 $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$item->title_property()});
             }
+
+            // If it's still empty, we have an error
             if (empty($item->{$this->_properties['virtual_name_property']})) {
                 throw new \Exception(__('URL (SEO) was empty.'));
             }
 
+            // Check uniqueness if needed
             if ($this->_properties['unique']) {
                 $where = array(
                     array($this->_properties['virtual_name_property'], $item->{$this->_properties['virtual_name_property']})
@@ -52,7 +60,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
 
                 $duplicate = $item::find('all', (array('where' => $where)));
                 if (!empty($duplicate)) {
-                    throw new \Exception(__('A item with the same virtual name already exists.'));
+                    throw new BehaviourDuplicateException(__('A item with the same virtual name already exists.'));
                 }
             }
         }
