@@ -57,7 +57,7 @@ require(
     ['jquery-nos-media-edit-form'],
     function($) {
         $(function() {
-            $('#<?= $uniqid ?>').nosMediaEditForm();
+            $('#<?= $uniqid ?>').nosFormUI().nosMediaEditForm();
         });
     });
 </script>

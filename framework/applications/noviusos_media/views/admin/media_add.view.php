@@ -47,7 +47,7 @@ require(
     ['jquery-nos-media-add-form'],
     function($) {
         $(function() {
-            $('#<?= $uniqid ?>').nosMediaAddForm();
+            $('#<?= $uniqid ?>').nosFormUI().nosMediaAddForm();
         });
     });
 </script>
