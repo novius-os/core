@@ -443,6 +443,16 @@ define('jquery-nos',
                         $.nosNotify(json.notify);
                     }
                 }
+                if (json.action) {
+                    var self = this;
+                    if ($.isArray(json.action)) {
+                        $.each(json.action, function() {
+                            $(self).nosAction(this);
+                        });
+                    } else {
+                        $(self).nosAction(json.action);
+                    }
+                }
                 // Call user callback
                 if ($.isFunction(json.user_success)) {
                     json.user_success.call(this, json);
