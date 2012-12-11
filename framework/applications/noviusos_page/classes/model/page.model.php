@@ -60,7 +60,7 @@ class Model_Page extends \Nos\Orm\Model
             'invariant_fields'   => array(),
         ),
         'Nos\Orm_Behaviour_Tree' => array(
-            'events' => array('before_query', 'after_delete'),
+            'events' => array('before_query', 'before_delete'),
             'parent_relation' => 'parent',
             'children_relation' => 'children',
             'level_property' => 'page_level',
