@@ -59,8 +59,8 @@ return array(
                     'label' => __('Add a sub-folder in "{{title}}"'),
                 ),
                 'dialog' => array(
-                    'width' => 600,
-                    'height' => 250
+                    'width' => 800,
+                    'height' => 400
                 ),
             ),
             'targets' => array(
