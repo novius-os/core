@@ -144,29 +144,20 @@ spl_autoload_register(
 //*/
 
 // Initialize the framework with the config file.
-$config_novius = include(NOSPATH.'config/config.php');
+$config_nos = include(NOSPATH.'config/config.php');
 
-$routes_novius = @include(NOSPATH.'config/routes.config.php');
-if ($routes_novius === false) {
-    $routes_novius = include(NOSPATH.'config/routes.php');
+$config_app = @include(APPPATH.'config/config.php');
+if ($config_app === false) {
+    $config_app = array();
 }
-
-$config_app = include(APPPATH.'config/config.php');
 if (!empty($config_app['base_url'])) {
     define('NOS_RELATIVE_DIR', ltrim(parse_url($config_app['base_url'], PHP_URL_PATH), '/'));
 }
 
-Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
+Fuel::init(Arr::merge($config_nos, $config_app));
 
 Module::load('nos', NOSPATH);
-
-define('URL_ADMIN', Uri::base(false).'admin/');
-define('PHP_BEGIN', '<?php ');
-define('PHP_END', ' ?>');
 Module::load('local', APPPATH);
-
-//Autoloader::add_namespace('Nos', NOSPATH.'classes'.DS);
-//Autoloader::add_namespace('Local', APPPATH.'classes'.DS);
 
 Config::load('namespaces', true);
 
@@ -175,6 +166,3 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 }
 
 chdir(DOCROOT);
-
-define('CACHE_DURATION_PAGE', 5);
-define('CACHE_DURATION_FUNCTION', 10);

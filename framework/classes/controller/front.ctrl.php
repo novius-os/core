@@ -147,7 +147,8 @@ class Controller_Front extends Controller
 
                     echo $content;
 
-                    $cache->save($no_cache ? -1 : CACHE_DURATION_PAGE, $this);
+                    $config = \Config::load('config', true);
+                    $cache->save($no_cache ? -1 : \Arr::get($config, 'novius-os.cache_duration_page', 5), $this);
                     $content = $cache->execute();
 
                     break;

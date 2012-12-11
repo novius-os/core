@@ -214,6 +214,21 @@ return array(
         'language'    => array(),
     ),
 
+    'routes' => array(
+        '_root_' => 'nos/admin/noviusos/index',
+        '^admin' => 'nos/admin/noviusos/index',
+
+        //'admin/nos/(:any)' => 'nos/$1',
+        '^admin/(:segment)/(:any)' => '$1/admin/$2',
+        //'(:any)' => 'nos/admin/dispatch/$1',
+
+        '_404_' => null,
+    ),
+
+    'novius-os' => array(
+        'cache_duration_page' => 5,
+        'cache_duration_function' => 10,
+    ),
 );
 
 /* End of file config.php */
