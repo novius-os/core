@@ -48,6 +48,9 @@ foreach ((array) $accordions as $options) {
         <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $options['title'] ?></a></h3>
         <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
     <?php
+    if (!empty($options['view'])) {
+        echo View::forge($options['view'], $view_params + (isset($options['params']) ? $options['params'] : array()), false);
+    }
     foreach ((array) $options['fields'] as $field) {
         try {
             if ($field instanceof \View) {

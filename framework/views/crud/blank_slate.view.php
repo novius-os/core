@@ -29,7 +29,7 @@ if (!in_array($context, $possible)) {
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
         echo strtr(__('error added in context not parent'), array(
-            '{context}' => \Nos\Tools_Context::context_label($context),
+            '{context}' => \Nos\Tools_Context::contextLabel($context),
             '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
         ));
         ?>
@@ -42,24 +42,24 @@ if (!in_array($context, $possible)) {
         </script>
         <?php
     } else {
-        echo strtr(__('error added in context'), array('{context}' => \Nos\Tools_Context::context_label($context)));
+        echo strtr(__('error added in context'), array('{context}' => \Nos\Tools_Context::contextLabel($context)));
     }
 } else {
     foreach ($possible as $possible_context) {
         $item_context = $item->find_context($possible_context);
         if (!empty($item_context)) {
-            $labels[$item_context->id] = \Nos\Tools_Context::context_label($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
+            $labels[$item_context->id] = \Nos\Tools_Context::contextLabel($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
         }
     }
-    $locale_item = \Nos\Tools_Context::locale_code($item->get_context());
-    $locale_new = \Nos\Tools_Context::locale_code($context);
+    $locale_item = \Nos\Tools_Context::localeCode($item->get_context());
+    $locale_new = \Nos\Tools_Context::localeCode($context);
 
     if ($locale_item === $locale_new) {
         $label = __('Add "{item}" to {context}');
     } else {
         $label = __('Translate "{item}" into {context}');
     }
-    echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Tools_Context::context_label($context))), '</h1>';
+    echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Tools_Context::contextLabel($context))), '</h1>';
     ?>
             <p>&nbsp;</p>
 

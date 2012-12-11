@@ -462,6 +462,22 @@ define('jquery-nos-appdesk',
                 $ul.insertAfter(self.uiToolbarContextsButton)
                     .wijmenu({
                             orientation: 'vertical',
+                            animation: {
+                                animated:"slide",
+                                option: {
+                                    direction: "up"
+                                },
+                                duration: 50,
+                                easing: null
+                            },
+                            hideAnimation: {
+                                animated:"slide",
+                                option: {
+                                    direction: "up"
+                                },
+                                duration: 0,
+                                easing: null
+                            },
                             direction: 'rtl',
                             trigger: '#' + id,
                             select: function(e, data) {
@@ -1991,8 +2007,22 @@ define('jquery-nos-appdesk',
                                 trigger : dropDown,
                                 triggerEvent : 'click',
                                 orientation : 'vertical',
-                                showAnimation : {Animated:"slide", duration: 50, easing: null},
-                                hideAnimation : {Animated:"hide", duration: 0, easing: null},
+                                animation: {
+                                    animated:"slide",
+                                    option: {
+                                        direction: "up"
+                                    },
+                                    duration: 50,
+                                    easing: null
+                                },
+                                hideAnimation: {
+                                    animated:"slide",
+                                    option: {
+                                        direction: "up"
+                                    },
+                                    duration: 0,
+                                    easing: null
+                                },
                                 position : {
                                     my        : 'right top',
                                     at        : 'right bottom',

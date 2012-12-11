@@ -291,12 +291,21 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     {
         if (array_key_exists('where', $options)) {
             $where = $options['where'];
+            if (isset($where['context_main'])) {
+                $where[$this->_properties['is_main_property']] = $where['context_main'];
+                unset($where['context_main']);
+            }
+
             foreach ($where as $k => $w) {
-                if ($w[0] == 'context_main') {
-                    if ($w[1] == true) {
-                        $where[$k] = array($this->_properties['is_main_property'], true);
-                    } elseif ($w[1] == false) {
-                        $where[$k] = array($this->_properties['is_main_property'], false);
+                if (is_int($k)) {
+                    $keys = array_keys($w);
+                    if (count($w) == 1 && $keys[0] == 'context_main') {
+                        $where[$k] = array($this->_properties['is_main_property'] => $w[$keys[0]]);
+                    }
+
+                    if (count($w) > 1 && $w[0] == 'context_main') {
+                        $w[0] = $this->_properties['is_main_property'];
+                        $where[$k] = $w;
                     }
                 }
             }

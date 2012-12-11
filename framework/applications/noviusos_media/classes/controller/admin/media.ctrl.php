@@ -76,6 +76,9 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             }
             $media->media_title = $pathinfo['basename'];
         }
+        if (empty($media->media_file)) {
+            $media->media_title = \Nos\Orm_Behaviour_Virtualname::friendly_slug($media->media_title);
+        }
 
         $media->media_ext = $pathinfo['extension'];
 

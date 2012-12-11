@@ -281,7 +281,23 @@ define('jquery-nos',
 
                                 $ul.insertAfter($element)
                                     .wijmenu($.extend(true, {
-                                            orientation: 'vertical'
+                                            orientation: 'vertical',
+                                            animation: {
+                                                animated:"slide",
+                                                option: {
+                                                    direction: "up"
+                                                },
+                                                duration: 50,
+                                                easing: null
+                                            },
+                                            hideAnimation: {
+                                                animated:"slide",
+                                                option: {
+                                                    direction: "up"
+                                                },
+                                                duration: 0,
+                                                easing: null
+                                            }
                                         },
                                         element.menu.options || {},
                                         {

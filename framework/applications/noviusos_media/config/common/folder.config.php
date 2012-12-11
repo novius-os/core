@@ -11,6 +11,17 @@
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
 
 return array(
+    'data_mapping' => array(
+        'title' => array(
+            'column' => 'medif_title',
+            'title' => __('Title'),
+        ),
+        'path' => array(
+            'value' => function($obj) {
+                return $obj->medif_path;
+            },
+        ),
+    ),
     'i18n' => array(
         // Crud
         'successfully added' => __('Folder successfully added.'),
@@ -59,8 +70,8 @@ return array(
                     'label' => __('Add a sub-folder in "{{title}}"'),
                 ),
                 'dialog' => array(
-                    'width' => 600,
-                    'height' => 250
+                    'width' => 800,
+                    'height' => 400
                 ),
             ),
             'targets' => array(

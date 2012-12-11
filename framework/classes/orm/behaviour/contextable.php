@@ -30,7 +30,7 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
 
         if (empty($item->{$context_property})) {
             // @todo: decide whether we force a context or we use NULL instead
-            $item->set($context_property, \Arr::get($this->_properties, 'default_context', Tools_Context::default_context()));
+            $item->set($context_property, \Arr::get($this->_properties, 'default_context', Tools_Context::defaultContext()));
         }
     }
 
@@ -57,12 +57,25 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
     {
         if (array_key_exists('where', $options)) {
             $where = $options['where'];
+            if (isset($where['context'])) {
+                $where[$this->_properties['context_property']] = $where['context'];
+                unset($where['context']);
+            }
+
             foreach ($where as $k => $w) {
-                if ($w[0] == 'context') {
-                    if (! is_array($w[1])) {
-                        $where[$k] = array($this->_properties['context_property'], '=', $w[1]);
-                    } elseif (count($w[1])) {
-                        $where[$k] = array($this->_properties['context_property'], 'IN', $w[1]);
+                if (is_int($k)) {
+                    $keys = array_keys($w);
+                    if (count($w) == 1 && $keys[0] == 'context') {
+                        $where[$k] = array($this->_properties['context_property'] => $w[$keys[0]]);
+                    }
+
+                    if (count($w) > 1 && $w[0] == 'context') {
+                        $w[0] = $this->_properties['context_property'];
+                        if (count($w) == 2 && is_array($w[1])) {
+                            $w[2] = $w[1];
+                            $w[1] = 'IN';
+                        }
+                        $where[$k] = $w;
                     }
                 }
             }

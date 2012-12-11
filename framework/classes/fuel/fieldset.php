@@ -14,6 +14,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     protected $config_used = array();
     protected $js_validation = false;
     protected $require_js = array();
+    protected $instance = null;
 
     public function append($content)
     {
@@ -425,6 +426,8 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     public function populate_with_instance($instance = null, $generate_id = true)
     {
+        $this->instance = $instance;
+
         if ($generate_id) {
             $uniqid = uniqid();
             // Generate a new ID for the form
@@ -582,5 +585,10 @@ class Fieldset extends \Fuel\Core\Fieldset
     public function is_expert($field_name)
     {
         return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+    }
+
+    public function getInstance()
+    {
+        return $this->instance;
     }
 }

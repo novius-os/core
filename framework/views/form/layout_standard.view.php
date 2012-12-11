@@ -11,14 +11,12 @@
 ?>
 <script type="text/javascript">
 require(
-    ['jquery-nos'],
+    ['jquery-nos-layout-standard'],
     function($) {
         $(function() {
-            var $content = $("#<?= $uniqid = uniqid('id_') ?>");
-            $content.nosOnShow('one', function() {
-                    $content.nosFormUI();
-                })
-                .nosOnShow();
+            var $content = $("#<?= $uniqid = uniqid('id_') ?>").nosLayoutStandard({
+                    tabParams:  <?= isset($crud['tab_params']) ? \Format::forge()->to_json($crud['tab_params']) : 'null' ?>
+                });
         });
     });
 </script>
@@ -54,7 +52,24 @@ $contexts = array_keys(\Nos\Tools_Context::contexts());
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Twinnable') !== null || $item->behaviours('Nos\Orm_Behaviour_Contextable') !== null;
     if ($contextable) {
-        echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::context_label($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
+        if ($item->is_new()) {
+            $flag = \Nos\Tools_Context::flagUrl($item->get_context());
+            $site = \Nos\Tools_Context::site($item->get_context());
+            ?>
+            <td style="width:16px;text-align:center;">
+                <button class="change-context" type="button"><?= \Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)) ?></button>
+                <ul style="display: none;">
+            <?php
+            foreach (\Nos\Tools_Context::contexts() as $context => $domains) {
+                echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::contextLabel($context, array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true))))->to_json()).'"><a>'.\Str::tr(__('Add in :context'), array('context' => \Nos\Tools_Context::contextLabel($context))).'</a></li>';
+            }
+            ?>
+                </ul>
+            </div>
+            <?php
+        } else {
+            echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'alias' => true, 'force_flag' => true)).'</td>';
+        }
     }
 }
 ?>
@@ -145,7 +160,7 @@ if (!empty($subtitle) || !empty($publishable)) {
 <?php
 foreach ($contents as $content) {
     if (is_array($content) && !empty($content['view'])) {
-        echo View::forge($content['view'], $view_params + $content['params'], false);
+        echo View::forge($content['view'], $view_params + (isset($content['params']) ? $content['params'] : array()) + array('view_params' => $view_params), false);
     } elseif (is_callable($content)) {
         echo $content();
     } else {
@@ -178,7 +193,7 @@ if (!empty($menus)) {
     }
     foreach ($menus as $view) {
         if (!empty($view['view'])) {
-            echo View::forge($view['view'], $view_params + $view['params'], false);
+            echo View::forge($view['view'], $view_params + (isset($view['params']) ? $view['params'] : array()) + array('view_params' => $view_params), false);
         }
     }
     ?>

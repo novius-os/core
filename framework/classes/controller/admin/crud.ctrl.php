@@ -123,7 +123,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'model' => $this->config['model'],
                 'behaviours' => $this->behaviours,
                 'pk' => $this->pk,
-                'context' => $this->item_environment,
+                'environment' => $this->item_environment,
                 'config' => $this->config,
                 'url_form' => $this->config['controller_url'].'/form',
                 'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
@@ -190,8 +190,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         } elseif (!empty($common_id) && $this->behaviours['twinnable']) {
             $this->item->{$this->behaviours['twinnable']['common_id_property']} = $common_id;
         } elseif (!empty($environment_id) && !empty($this->config['environment_relation'])) {
-            $model_context = $this->config['environment_relation']->model_to;
-            $this->item_environment = $model_context::find($environment_id);
+            $model_environment = $this->config['environment_relation']->model_to;
+            $this->item_environment = $model_environment::find($environment_id);
             $this->item->{$this->config['environment_relation']->key_from[0]} = $this->item_environment->{$this->config['environment_relation']->key_to[0]};
         }
         if ($this->behaviours['contextable']) {
@@ -240,6 +240,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                         'form' => array(
                             'type' => 'hidden',
                             'value' => $this->item->{$this->behaviours['contextable']['context_property']},
+                            'class' => 'input-context',
                         ),
                     ),
                 )
@@ -266,7 +267,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 }
                 $context_labels = array();
                 foreach ($contexts as $context) {
-                    $context_labels[] = Tools_Context::context_label($context);
+                    $context_labels[] = Tools_Context::contextLabel($context);
                 }
                 $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
 
@@ -380,7 +381,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $message = strtr(
                     __('This item already exists in {context}. Therefore your item cannot be added.'),
                     array(
-                        '{context}' => \Arr::get(Tools_Context::contexts(), $item_context, $item_context),
+                        '{context}' => Tools_Context::contextLabel($item_context),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -557,7 +558,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions_context()
     {
-        if (!$this->behaviours['twinnable']) {
+        if (!$this->behaviours['twinnable'] || $this->is_new) {
             return array();
         }
 
@@ -583,7 +584,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     } elseif (count($locales) === 1) {
                         $label = __('Add to {context}');
                     } else {
-                        if (Tools_Context::locale_code($context) === Tools_Context::locale_code($this->item->get_context())) {
+                        if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
                             $label = __('Add to {context}');
                         } else {
                             $label = __('Translate into {context}');
@@ -593,7 +594,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     $label = __('Edit {context}');
                 }
             }
-            $label = strtr($label, array('{context}' => Tools_Context::context_label($context)));
+            $label = strtr($label, array('{context}' => Tools_Context::contextLabel($context)));
             $actions[] = array(
                 'content' => $label,
                 'action' => array(

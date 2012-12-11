@@ -13,12 +13,6 @@ Nos\I18n::current_dictionary(array('noviusos_media::common'));
 return array(
     'model' => 'Nos\Media\Model_Folder',
     'order_by' => 'medif_title',
-    'dataset' => array(
-        'title' => array(
-            'column' => 'medif_title',
-            'headerText' => __('Folder'),
-        ),
-    ),
     'input' => array(
         'key' => 'media_folder_id'
     ),
