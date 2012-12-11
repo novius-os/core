@@ -181,19 +181,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function init_item()
     {
-        // Create_from_id is used for translation (twinnable)
         $create_from_id = \Input::get('create_from_id', 0);
-        // CLone_from_id is used for new items (not related to another existing one)
-        $clone_from_id = \Input::get('clone_from_id', 0);
         $common_id = \Input::get('common_id', null);
         $environment_id = \Input::get('environment_id', null);
-        if (!empty($clone_from_id)) {
-            $this->item_from = $this->crud_item($clone_from_id);
-            $this->item = clone $this->item_from;
-            if ($this->behaviours['twinnable']) {
-                $this->item->{$this->behaviours['twinnable']['common_id_property']} = null;
-            }
-        } else if (!empty($create_from_id)) {
+        if (!empty($create_from_id)) {
             $this->item_from = $this->crud_item($create_from_id);
             $this->item = clone $this->item_from;
         } elseif (!empty($common_id) && $this->behaviours['twinnable']) {
@@ -234,15 +225,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     protected function fields($fields)
     {
         if (!empty($this->item_from)) {
-            if ($this->behaviours['twinnable'] && $this->item->{$this->behaviours['twinnable']['common_id_property']} === null) {
-                $field_name = 'clone_from_id';
-            } else {
-                $field_name = 'create_from_id';
-            }
-            $fields[$field_name] = array(
+            $fields['create_from_id'] = array(
                 'form' => array(
                     'type' => 'hidden',
-                    'value' => \Input::get($field_name, 0),
+                    'value' => \Input::get('create_from_id', 0),
                 ),
             );
         }
@@ -394,7 +380,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $message = strtr(
                     __('This item already exists in {context}. Therefore your item cannot be added.'),
                     array(
-                        '{context}' => Tools_Context::context_label($item_context),
+                        '{context}' => \Arr::get(Tools_Context::contexts(), $item_context, $item_context),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -416,7 +402,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     }
 
     /**
-     * Determine whether the item is updated or added and if it's creating from a different language
+     * Determine wether the item is udpated or added and if it's creating from a different language
      * @param type $id of the item
      * @return View resulting from the call of a method (either action_form or blank_slate)
      */
@@ -454,7 +440,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     /**
      * Display a blank slate to create a new item from an another one in a different language
-     * @param type $id : original item's id
+     * @param type $id : orignal item's id
      * @param type $context : chosen context
      * @return type View : blank_slate
      */
@@ -512,7 +498,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $url = $this->config['controller_url'].'/insert_update'.(empty($this->item->id) ? '' : '/'.$this->item->id);
         if ($this->is_new) {
             $params = array();
-            foreach (array('create_from_id', 'clone_from_id', 'common_id', 'environment_id') as $key) {
+            foreach (array('create_from_id', 'common_id', 'environment_id') as $key) {
                 $value = \Input::get($key, false);
                 if ($value !== false) {
                     $params[$key] = $value;
