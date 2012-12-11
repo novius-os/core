@@ -18,6 +18,11 @@ return array(
             'column' => 'medif_title',
             'headerText' => __('Folder'),
         ),
+        'path' => array(
+            'value' => function($obj) {
+                return $obj->medif_path;
+            },
+        ),
     ),
     'input' => array(
         'key' => 'media_folder_id'

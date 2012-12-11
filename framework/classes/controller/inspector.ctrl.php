@@ -63,7 +63,9 @@ class Controller_Inspector extends Controller_Admin_Application
                                 'dataKey' => 'publication_status'
                             );
                         } else {
-                            $config['appdesk'][$gridKey]['columns'][$key]['headerText'] = $value['headerText'];
+                            if (!empty($value['headerText'])) {
+                                $config['appdesk'][$gridKey]['columns'][$key]['headerText'] = $value['headerText'];
+                            }
                             $config['appdesk'][$gridKey]['columns'][$key]['dataKey'] = $key;
                         }
                     }
