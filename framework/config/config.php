@@ -51,7 +51,7 @@ return array(
     ),
 
     'language'  => 'en',
-    'locale'    => 'en_GB',
+    'locale'    => 'en_GB.utf8',
     'encoding'  => 'UTF-8',
 
     /**
@@ -73,7 +73,7 @@ return array(
     * Fuel::L_INFO
     * Fuel::L_ALL
     */
-    'log_threshold'   => Fuel::L_WARNING,
+    'log_threshold'   => Fuel::$env === Fuel::DEVELOPMENT ? Fuel::L_WARNING : Fuel::L_ERROR,
     'log_path'        => APPPATH.'../logs/fuel/',
     'log_date_format' => 'Y-m-d H:i:s',
 
@@ -123,7 +123,7 @@ return array(
     /**
      * Whether to use minified assets (css & js)
      */
-    'assets_minified' => true,
+    'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
 
     /**
      * Cookie settings
@@ -228,6 +228,12 @@ return array(
     'novius-os' => array(
         'cache_duration_page' => 5,
         'cache_duration_function' => 10,
+
+        'allow_plugin_upload' => false,
+
+        'upload' => array(
+            'disabled_extensions' => array('php'),
+        ),
     ),
 );
 

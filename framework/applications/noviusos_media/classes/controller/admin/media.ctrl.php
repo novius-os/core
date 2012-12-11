@@ -59,7 +59,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         if ($is_uploaded) {
             $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
-            $disallowed_extensions = \Config::get('upload.disabled_extensions', array('php'));
+            $disallowed_extensions = \Config::get('novius-os.upload.disabled_extensions', array('php'));
             if (in_array($pathinfo['extension'], $disallowed_extensions)) {
                 throw new \Exception(__('This extension is not allowed due to security reasons.'));
             }

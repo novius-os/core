@@ -37,7 +37,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                 'local' => \Nos\Application::forge('local'),
                 'installed' => $app_installed,
                 'others' => $app_others,
-                'allow_upload' => \Config::get('allow_plugin_upload'),
+                'allow_upload' => \Config::get('novius-os.allow_plugin_upload'),
             ),
             false,
             false
