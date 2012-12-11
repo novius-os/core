@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-$assets_minified = \Config::get('assets_minified', true);
+$assets_minified = \Config::get('novius-os.assets_minified', true);
 $config = array(
     'baseUrl' => $base,
     'paths' => array(

@@ -121,11 +121,6 @@ return array(
     ),
 
     /**
-     * Whether to use minified assets (css & js)
-     */
-    'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
-
-    /**
      * Cookie settings
      */
     'cookie' => array(
@@ -234,6 +229,11 @@ return array(
         'upload' => array(
             'disabled_extensions' => array('php'),
         ),
+
+        /**
+         * Whether to use minified assets (css & js)
+         */
+        'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
     ),
 );
 
