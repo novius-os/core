@@ -11,6 +11,17 @@
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
 
 return array(
+    'data_mapping' => array(
+        'title' => array(
+            'column' => 'medif_title',
+            'headerText' => __('Folder'),
+        ),
+        'path' => array(
+            'value' => function($obj) {
+                return $obj->medif_path;
+            },
+        ),
+    ),
     'i18n' => array(
         // Crud
         'successfully added' => __('Folder successfully added.'),
