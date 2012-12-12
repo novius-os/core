@@ -28,7 +28,7 @@ define('jquery-nos-ostabs',
                     newTab: 'New tab',
                     closeTab: 'Close tab',
                     closeOtherTabs: 'Close all other tabs',
-                    confirmCloseOtherTabs: 'Are you sure to want to close all other tabs ?',
+                    confirmCloseOtherTabs: 'Are you sure to want to close all other tabs?',
                     reloadTab: 'Reload tab',
                     spinner: 'Loading...'
                 },
@@ -1071,7 +1071,7 @@ define('jquery-nos-ostabs',
 
                             // If response looks like JSON, execute standard success callback
                             try {
-                                var json = $.parseJSON(xhr.responseText)
+                                var json = $.parseJSON(xhr.responseText);
                                 $(self).nosAjaxSuccess(json);
 
                             } catch (e) {}
@@ -1080,6 +1080,9 @@ define('jquery-nos-ostabs',
                             self._cleanup();
 
                             self._trigger( "load", null, self._ui( self.lis[index] ) );
+                        },
+                        error : function ( ) {
+                            self.remove(index)
                         }
                     });
                 } else {

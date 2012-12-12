@@ -118,6 +118,17 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 'iconSize' => 16,
             ),
             'user_configuration' => $user_configuration,
+
+            'texts' => array(
+                'scrollLeft' => __('Scroll left'),
+                'scrollRight' => 'Scroll right',
+                'newTab' => __('New tab'),
+                'closeTab' => __('Close tab'),
+                'closeOtherTabs' => __('Close all other tabs'),
+                'confirmCloseOtherTabs' => __('Are you sure to want to close all other tabs?'),
+                'reloadTab' => __('Reload tab'),
+                'spinner' => __('Loading...')
+            ),
         );
 
         $view->set('ostabs', \Format::forge($ostabs)->to_json(), false);
