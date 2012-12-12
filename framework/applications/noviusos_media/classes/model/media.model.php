@@ -156,6 +156,10 @@ class Model_Media extends \Nos\Orm\Model
             return false;
         }
 
+        if ($this->media_width == $max_width && $this->media_height == $max_height) {
+            return $this->get_public_path();
+        }
+
         return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
     }
 
