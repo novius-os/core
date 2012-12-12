@@ -19,12 +19,21 @@ class Controller_Admin_Auth extends Controller
         // Because our routine doesn't need anything from the parent, and we define the language, which may affect the parent too (config file).
         if (!\Nos\Auth::check()) {
             if (\Input::is_ajax()) {
+                $this->response = \Response::forge();
                 $this->response(
                     array(
-                        'login_page' => \Uri::base(false).'admin/nos/login',
+                        'login_popup' => array(
+                            'ajax' => true,
+                            'contentUrl' => '/admin/nos/login/popup',
+                            'title' => __("You've been inactive for too long"),
+                            'width' => 350,
+                            'height' => 540,
+                        ),
                     ),
                     403
                 );
+                $this->response->send(true);
+                exit();
             } else {
                 \Response::redirect(
                     '/admin/nos/login?'.http_build_query(
@@ -35,8 +44,8 @@ class Controller_Admin_Auth extends Controller
                         '&'
                     )
                 );
-                exit();
             }
+            exit();
         }
         $this->prepare_i18n();
         parent::before();

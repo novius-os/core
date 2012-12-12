@@ -119,20 +119,7 @@ define('jquery-nos-thumbnailsgrid',
                         error: function(jqXHR, textStatus, errorThrown) {
                             // Session lost, can't login
                             if (jqXHR.status == 403) {
-
-                                var notify = {
-                                    title: "You've been inactive for too long",
-                                    text: "Please log-in again.",
-                                    type: 'error'
-                                }
-
-                                try {
-                                    var json = $.parseJSON(jqXHR.responseText);
-                                    if (json.login_page) {
-                                        notify.text = notify.text.replace('log-in again', "<a href=\"" + json.login_page + "\">log-in again</a>");
-                                    }
-                                } catch (e) {}
-                                $.nosNotify(notify);
+                                $(this).nosAjaxError(jqXHR);
                             }
                             self.uiOverlay.hide();
                             log(jqXHR, textStatus, errorThrown);

@@ -415,14 +415,14 @@ define('jquery-nos',
                         }
                         self.nosAjaxSuccess(json);
                     };
-
-                    options.error = function(json) {
-                        self.nosAjaxError(json);
-                        if ($.isFunction(old_error)) {
-                            old_error.call(this, params);
-                        }
-                    };
                 }
+
+                options.error = function(x, e) {
+                    self.nosAjaxError(x, e);
+                    if ($.isFunction(old_error)) {
+                        old_error.call(this, x, e);
+                    }
+                };
 
                 return $.ajax(options);
             },
@@ -507,6 +507,26 @@ define('jquery-nos',
             },
 
             nosAjaxError : function(x, e) {
+                if (x.status == 403) {
+                    log('403 received', x);
+                    try {
+                        // If it's valid JSON, then we'll open the reconnect popup
+                        var json =  $.parseJSON(x.responseText);
+                        if (typeof $.nos.login_popup_opened == 'undefined') {
+                            $.nos.login_popup_opened = false;
+                        }
+                        log('is the popup already opened?', $.nos.login_popup_opened);
+                        if (json.login_popup && !$.nos.login_popup_opened) {
+                            json.login_popup['close'] = function() {
+                                $.nos.login_popup_opened = false;
+                            };
+                            log("let's open the popup", json.login_popup);
+                            $('body').nosDialog('open', json.login_popup);
+                            $.nos.login_popup_opened = true;
+                        }
+                        return;
+                    } catch(e) {}
+                }
                 // http://www.maheshchari.com/jquery-ajax-error-handling/
                 if (x.status != 0) {
                     $.nosNotify('Connection error!', 'error');
@@ -682,8 +702,8 @@ define('jquery-nos',
                             $context.nosAjaxSuccess(json)
                                 .triggerHandler('ajax_success', [json]);
                         },
-                        error: function() {
-                            $.nosNotify('An error occured', 'error');
+                        error: function(x, e) {
+                            $context.nosAjaxError(x, e);
                         }
                     });
                 });
@@ -836,7 +856,7 @@ define('jquery-nos',
                             $dialog.wijdialog(options);
 
                             // Request the remote document
-                            $.ajax({
+                            $dialog.nosAjax({
                                 url: contentUrl,
                                 type: 'GET',
                                 dataType: "html",

@@ -7,47 +7,31 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+$uniqid = uniqid('login');
 ?>
 <script type="text/javascript">
 require(
     ['jquery-nos'],
     function($) {
         $(function() {
-            $('#login').nosFormUI();
-<?php
-if (!empty($error)) {
-    ?>
-            $.nosNotify(<?= json_encode(array(
-                'title' => $error,
-                'type' => 'error',
-                'addclass' => 'nos-login-error',
-            )) ?>);
-    <?php
-}
-?>
-            var $email = $('#email');
+            $('#<?= $uniqid ?>').nosFormUI().nosFormAjax();
+            var $email = $('#<?= $uniqid ?>_email');
             $email.select();
         });
     });
 </script>
-<style type="text/css">
-.nos-login-error {
-    left: 50%;
-    margin-left: -150px;
-}
-</style>
-<div id="login">
-    <img src="static/novius-os/admin/novius-os/img/logo.png" />
-    <form method="POST" action="">
-        <p><input type="email" name="email" id="email" value="<?= \Input::post('email', ''); ?>" placeholder="Email" /></p>
-        <p><input type="password" name="password" placeholder="Password" /></p>
+<div id="<?= $uniqid ?>" class="login_popup blank_slate">
+    <img src="static/novius-os/admin/novius-os/img/logo.png" style="width: 245px;" alt="" />
+    <form method="POST" action="/admin/nos/login/popup">
+        <p><input type="email" name="email" id="<?= $uniqid ?>_email" value="<?= \Input::post('email', ''); ?>" placeholder="<?= __('Email') ?>" /></p>
+        <p><input type="password" name="password" placeholder="<?= __('Password') ?>" /></p>
         <p>
-            <label style="font-size: 13px;" for="remember_me">
+            <input type="checkbox" id="remember_me" name="remember_me" value="1" />
+            <label for="remember_me">
                 <?= __('Remember me') ?>
             </label>
-
-            <input type="checkbox" id="remember_me" name="remember_me" value="1" />
         </p>
-        <p><input type="submit" value="Dive in"></p>
+        <p><input type="submit" value="<?= __('Resume my work') ?>"></p>
     </form>
 </div>
