@@ -134,6 +134,16 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 
     public function action_clone($id = null)
     {
+        return $this->_clone($id, false);
+    }
+
+    public function action_clone_tree($id = null)
+    {
+        return $this->_clone($id, true);
+    }
+
+    protected function _clone($id = null, $recursive = false)
+    {
         $page = $this->crud_item($id);
         $contexts_list = $page->find_context('all');
         $context = \Input::post('context', null);
@@ -167,11 +177,6 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         } catch (\Exception $e) {
             $this->send_error($e);
         }
-    }
-
-    public function action_clone_tree($id = null)
-    {
-        return $this->action_clone($id, true);
     }
 
     public function action_popup_clone($id = null, $recursive = false)
