@@ -25,16 +25,20 @@ return array(
         'delete an item' => __('Delete a media'),
     ),
     'data_mapping' => array(
-        'media_ext' => array(
+        'ext' => array(
             'title' => __('Ext.'),
+            'column' => 'media_ext',
             'width' => 60,
             'ensurePxWidth' => true,
             'allowSizing' => false,
         ),
-        'media_title' => array(
+        'title' => array(
+            'column' => 'media_title',
             'title' => __('Title'),
         ),
-        'media_file',
+        'file' => array(
+            'column' => 'media_file',
+         ),
         'path' => array(
             'value' => function ($item) {
                 return $item->get_public_path();
@@ -55,8 +59,12 @@ return array(
                 return $item->is_image() ? $item->get_public_path_resized(64, 64) : '';
             },
         ),
-        'media_height',
-        'media_width',
+        'height' => array(
+            'column' => 'media_height',
+        ),
+        'width' => array(
+            'column' => 'media_width',
+        ),
         'thumbnailAlternate' => array(
             'value' => function ($item) {
                 $extensions = array(

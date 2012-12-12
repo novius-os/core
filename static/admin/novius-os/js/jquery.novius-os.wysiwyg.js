@@ -37,7 +37,7 @@ define('jquery-nos-wysiwyg',
                         // Rule sets inspired by: http://www.tinymce.com/wiki.php/Configuration:valid_elements
                         extended_valid_elements: "div[id|data-enhancer|data-config|class|style|title|dir<ltr?rtl|lang|xml::lang|onclick|ondblclick|"
                             + "onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|"
-                            + "onkeydown|onkeyup],img[longdesc|data-media-id|usemap|"
+                            + "onkeydown|onkeyup],img[longdesc|data-media|data-media-id|usemap|"
                             + "src|border|style|alt=|title|hspace|vspace|width|height|align]"
                     }, options || {});
 
