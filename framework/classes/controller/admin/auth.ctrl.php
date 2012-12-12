@@ -12,22 +12,30 @@ namespace Nos;
 
 class Controller_Admin_Auth extends Controller
 {
-
     public function before()
     {
         // Exceptionally, we run the parent::before() after our own routine.
         // Because our routine doesn't need anything from the parent, and we define the language, which may affect the parent too (config file).
         if (!\Nos\Auth::check()) {
             if (\Input::is_ajax()) {
+                $lang = \Input::get('lang', 'en_GB');
+                I18n::setLocale($lang);
+                I18n::current_dictionary('nos::common');
                 $this->response = \Response::forge();
                 $this->response(
                     array(
                         'login_popup' => array(
                             'ajax' => true,
                             'contentUrl' => '/admin/nos/login/popup',
-                            'title' => __("You've been inactive for too long"),
+                            // The title here is useless, as we can't know the lang of the user here, it will be updated in the login_popup view
+                            'title' => '',
                             'width' => 350,
                             'height' => 540,
+                            'captionButtons' => array(
+                                'close' => array(
+                                    'visible' => false,
+                                ),
+                            ),
                         ),
                     ),
                     403

@@ -508,19 +508,17 @@ define('jquery-nos',
 
             nosAjaxError : function(x, e) {
                 if (x.status == 403) {
-                    log('403 received', x);
                     try {
                         // If it's valid JSON, then we'll open the reconnect popup
                         var json =  $.parseJSON(x.responseText);
                         if (typeof $.nos.login_popup_opened == 'undefined') {
                             $.nos.login_popup_opened = false;
                         }
-                        log('is the popup already opened?', $.nos.login_popup_opened);
                         if (json.login_popup && !$.nos.login_popup_opened) {
                             json.login_popup['close'] = function() {
                                 $.nos.login_popup_opened = false;
                             };
-                            log("let's open the popup", json.login_popup);
+                            json.login_popup.contentUrl += '?lang=' + $.nosLang;
                             $('body').nosDialog('open', json.login_popup);
                             $.nos.login_popup_opened = true;
                         }

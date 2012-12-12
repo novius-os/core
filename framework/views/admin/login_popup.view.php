@@ -8,6 +8,7 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary('nos::common');
 $uniqid = uniqid('login');
 ?>
 <script type="text/javascript">
@@ -15,7 +16,10 @@ require(
     ['jquery-nos'],
     function($) {
         $(function() {
-            $('#<?= $uniqid ?>').nosFormUI().nosFormAjax();
+            var $container = $('#<?= $uniqid ?>').nosFormUI().nosFormAjax();
+            $container.closest(':wijmo-wijdialog').wijdialog({
+                title : <?= \Format::forge()->to_json(__("You've been inactive for too long")) ?>
+            });
             var $email = $('#<?= $uniqid ?>_email');
             $email.select();
         });

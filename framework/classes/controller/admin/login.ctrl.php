@@ -22,6 +22,9 @@ class Controller_Admin_Login extends Controller
         if (\Nos\Auth::check()) {
             $this->redirect();
         }
+
+        I18n::setLocale(\Input::get('lang', 'en_GB'));
+        I18n::current_dictionary('nos::common');
     }
 
     protected function redirect()

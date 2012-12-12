@@ -37,15 +37,21 @@ class I18n
 
     public static function setLocale($locale)
     {
-        if (static::$_locale) {
-            static::$_locale_stack[] = static::$_locale;
-        }
-
         list($remaining, $variant) = explode('@', $locale.'@');
         list($remaining, $encoding) = explode('.', $remaining.'.');
         list($language, $country) = explode('_', $remaining.'_');
         if (!$country) {
             $country = mb_strtoupper($language);
+        }
+        // Check the language is supported (because it can be injected via GET on the login screens)
+        if (!in_array($language, array('en', 'fr', 'ja'))) {
+            $language = 'en';
+            $country = 'GB';
+            $encoding = null;
+            $variant = null;
+        }
+        if (static::$_locale) {
+            static::$_locale_stack[] = static::$_locale;
         }
         static::$_locale = $language.'_'.$country;
         if (!empty($encoding)) {
