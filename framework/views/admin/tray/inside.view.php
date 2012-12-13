@@ -2,9 +2,9 @@
 <li><a href="#"><?= __('Switch language') ?></a>
     <ul>
 <?php
-foreach (array('en_GB' => 'English', 'fr_FR' => 'Français') as $code => $label) {
+foreach (\Config::get('novius-os.locales', array()) as $code => $locale) {
     ?>
-    <li><a href="#" data-action='{"action":"nosAjax","params":{"url":"admin/noviusos_user/account/lang/<?= $code ?>"}}'><?= $label ?></a></li>
+    <li><a href="#" data-action='{"action":"nosAjax","params":{"url":"admin/noviusos_user/account/lang/<?= $code ?>"}}'><?= $locale['title'] ?></a></li>
     <?php
 }
 ?>
