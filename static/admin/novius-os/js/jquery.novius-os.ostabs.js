@@ -1059,30 +1059,35 @@ define('jquery-nos-ostabs',
                 if (!iframe) {
                     self.xhr = $.ajax({
                         url: url,
-                        success: function( r ) {
+                        success: function( r, s, xhr ) {
+                            var json;
+
                             $( '<div></div>' ).addClass( 'nos-ostabs-panel-content nos-dispatcher' )
                                 .data( 'nos-ostabs-index', index )
                                 .prependTo( panel.data('callbacks.ostabs', {}) )
                                 .html( r );
 
                             $.data( a, "cache.tabs", true );
-                        },
-                        complete: function(xhr) {
 
+                            // case error, response not html but json (tab item was deleted)
                             // If response looks like JSON, execute standard success callback
                             try {
-                                var json = $.parseJSON(xhr.responseText);
-                                $(self).nosAjaxSuccess(json);
+                                json = $.parseJSON(xhr.responseText);
+                                self.element.nosAjaxSuccess(json);
 
                             } catch (e) {}
-
+                        },
+                        complete: function(xhr) {
                             // take care of tab labels
                             self._cleanup();
 
                             self._trigger( "load", null, self._ui( self.lis[index] ) );
                         },
-                        error : function ( ) {
+                        error : function (xhr, s) {
                             self.remove(index)
+
+                            // If response looks like JSON, execute standard success callback
+                            self.element.nosAjaxError(xhr, s);
                         }
                     });
                 } else {

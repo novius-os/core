@@ -13,6 +13,7 @@ define('jquery-nos',
         var undefined = void(0),
             $nos = window.$nos = $,
             $noviusos = undefined,
+            login_popup_opened = false,
             noviusos = function() {
                     if ($noviusos === undefined) {
                         $noviusos = $('.nos-ostabs');
@@ -511,16 +512,13 @@ define('jquery-nos',
                     try {
                         // If it's valid JSON, then we'll open the reconnect popup
                         var json =  $.parseJSON(x.responseText);
-                        if (typeof $.nos.login_popup_opened == 'undefined') {
-                            $.nos.login_popup_opened = false;
-                        }
-                        if (json.login_popup && !$.nos.login_popup_opened) {
+                        if (json.login_popup && !login_popup_opened) {
                             json.login_popup['close'] = function() {
-                                $.nos.login_popup_opened = false;
+                                login_popup_opened = false;
                             };
                             json.login_popup.contentUrl += '?lang=' + $.nosLang;
                             $('body').nosDialog('open', json.login_popup);
-                            $.nos.login_popup_opened = true;
+                            login_popup_opened = true;
                         }
                         return;
                     } catch(e) {}
