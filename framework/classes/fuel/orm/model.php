@@ -50,12 +50,6 @@ class Model extends \Orm\Model
     public $medias;
     public $wysiwygs;
 
-    public static function prefix()
-    {
-        // @todo: add cache
-        return static::get_prefix();
-    }
-
     /**
      * Get the class's title property
      *
@@ -507,7 +501,7 @@ class Model extends \Orm\Model
         return Query::forge(get_called_class(), static::connection(), $options);
     }
 
-    public static function  get_prefix()
+    public static function prefix()
     {
         return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
     }

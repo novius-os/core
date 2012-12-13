@@ -550,7 +550,6 @@ class Controller_Front extends Controller
         }
 
         try {
-            // @todo : always load from the template directory?
             // Try normal loading
             $this->_view = View::forge($this->_template['file']);
         } catch (\FuelException $e) {

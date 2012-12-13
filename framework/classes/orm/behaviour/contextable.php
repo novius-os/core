@@ -29,7 +29,6 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
         $context_property      = $this->_properties['context_property'];
 
         if (empty($item->{$context_property})) {
-            // @todo: decide whether we force a context or we use NULL instead
             $item->set($context_property, \Arr::get($this->_properties, 'default_context', Tools_Context::defaultContext()));
         }
     }

@@ -222,7 +222,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
     public function after($response)
     {
         foreach (array(
-                     'title' => 'Administration',
+                     'title' => __('Administration'),
                      'base' => \Uri::base(false),
                      'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
                  ) as $var => $default) {

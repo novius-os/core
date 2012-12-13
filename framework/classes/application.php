@@ -16,8 +16,6 @@ class Application
 
     public static function _init()
     {
-        // @todo repair that
-        //\Module::load('data', APPPATH.'data');
         \Nos\Config_Data::load('app_installed');
 
         static::$repositories = array(
