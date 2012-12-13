@@ -1096,7 +1096,7 @@ define('jquery-nos',
                     case 'current' :
                         return (function() {
                             if (window.parent != window && window.parent.$nos) {
-                                return window.parent.$nos(window.frameElement).tab('current');
+                                return window.parent.$nos(window.frameElement).nosTabs('current');
                             } else {
                                 if (noviusos().length) {
                                     return noviusos().ostabs('current');
