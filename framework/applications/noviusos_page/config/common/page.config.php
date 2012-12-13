@@ -73,7 +73,7 @@ return array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_page/page/insert_update?environment_id={{_id}}',
+                    'url' => 'admin/noviusos_page/page/insert_update?environment_id={{_id}}&context={{_context}}',
                     'label' => __('Add a page'),
                     'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                 ),
