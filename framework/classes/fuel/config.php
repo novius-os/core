@@ -53,14 +53,12 @@ class Config extends \Fuel\Core\Config
 
     public static function loadConfiguration($app_name, $file_name)
     {
-        \Config::load($app_name.'::'.$file_name, true);
-        $config = \Config::get($app_name.'::'.$file_name);
+        $config = \Config::load($app_name.'::'.$file_name, true);
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$app_name])) {
             foreach ($dependencies[$app_name] as $dependency) {
-                \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
+                $config = \Arr::merge($config, \Config::load($dependency.'::'.$file_name, true));
             }
         }
         $config = \Arr::recursive_filter(
@@ -83,8 +81,7 @@ class Config extends \Fuel\Core\Config
 
     public static function extendable_load($module_name, $file_name)
     {
-        \Config::load($module_name.'::'.$file_name, true);
-        $config = \Config::get($module_name.'::'.$file_name);
+        $config = \Config::load($module_name.'::'.$file_name, true);
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$module_name])) {

@@ -18,8 +18,7 @@ class Controller_Admin_User_Permission_Basic extends Controller
     {
         $role = User\Model_Role::find($role_id);
 
-        \Config::load("$app::permissions", true);
-        $permissions = \Config::get("$app::permissions", array());
+        $permissions = \Config::load("$app::permissions", true);
 
         return View::forge('admin/user/permission/basic', array(
             'role' => $role,

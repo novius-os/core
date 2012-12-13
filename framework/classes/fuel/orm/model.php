@@ -319,8 +319,7 @@ class Model extends \Orm\Model
                 }
             }
 
-            \Config::load($application.'::'.$file_name, true);
-            $config = \Config::get($application.'::'.$file_name);
+            $config = \Config::load($application.'::'.$file_name, true);
             $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
             if (!empty($dependencies[$application])) {

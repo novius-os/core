@@ -60,10 +60,7 @@ class Model_Role extends \Nos\Orm\Model
             return;
         }
 
-        //\Config::load('applications', true);
-        //$apps = \Config::get('applications', array());
-        \Config::load("$application::permissions", true);
-        $permissions = \Config::get("$application::permissions", array());
+        $permissions = \Config::load("$application::permissions", true);
 
         static::$permissions[$application][$key] = Permission::forge($application, $key, $permissions[$key]);
 
