@@ -153,7 +153,7 @@ class Model_Page extends \Nos\Orm\Model
 
     public function _event_after_save()
     {
-        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
+        \Nos\Config_Data::load('enhancers');
 
         $content = '';
         foreach ($this->wysiwygs as $text) {
@@ -170,30 +170,24 @@ class Model_Page extends \Nos\Orm\Model
         foreach ($regexps as $regexp => $name_index) {
             preg_match_all($regexp, $content, $matches);
             foreach ($matches[$name_index] as $i => $name) {
-                $config = \Config::get("data::enhancers.$name", false);
+                $config = \Nos\Config_Data::get('enhancers.'.$name, false);
                 if ($config && !empty($config['urlEnhancer'])) {
-                    \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-
-                    $url_enhanced = \Config::get("data::url_enhanced", array());
+                    $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
                     $url = $this->page_entrance ? '' : $this->virtual_path(true);
                     $url_enhanced[$this->page_id] = array(
                         'url' => $url,
                         'context' => $this->page_context,
                     );
-                    \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
-                    \Config::set('data::url_enhanced', $url_enhanced);
+                    \Nos\Config_Data::save('url_enhanced', $url_enhanced);
 
-                    \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-
-                    $page_enhanced = \Config::get("data::page_enhanced", array());
+                    $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
                     $page_enhanced[$name][$this->page_id] = array(
                         'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
                         'context' => $this->page_context,
                         'published' => $this->published(),
                     );
 
-                    \Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
-                    \Config::set('data::page_enhanced', $page_enhanced);
+                    \Nos\Config_Data::save('page_enhanced', $page_enhanced);
                     break 2;
                 }
             }
@@ -214,22 +208,17 @@ class Model_Page extends \Nos\Orm\Model
 
     protected static function _remove_url_enhanced($id)
     {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-
-        $url_enhanced = \Config::get("data::url_enhanced", array());
+        $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
         if (isset($url_enhanced[$id])) {
             unset($url_enhanced[$id]);
         }
 
-        \Config::save(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', $url_enhanced);
-        \Config::set('data::url_enhanced', $url_enhanced);
+        \Nos\Config_Data::save('url_enhanced', $url_enhanced);
     }
 
     protected static function _remove_page_enhanced($id)
     {
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-
-        $page_enhanced = \Config::get("data::page_enhanced", array());
+        $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
         $enhancers = array_filter($page_enhanced, function ($val) use ($id) {
             return isset($val[$id]);
         });
@@ -238,7 +227,6 @@ class Model_Page extends \Nos\Orm\Model
             unset($page_enhanced[$enhancer][$id]);
         }
 
-        \Config::save(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', $page_enhanced);
-        \Config::set('data::page_enhanced', $page_enhanced);
+        \Nos\Config_Data::save('page_enhanced', $page_enhanced);
     }
 }

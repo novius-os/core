@@ -96,8 +96,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         }
 
         if (!empty($page_id)) {
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-            $page_enhanced = \Config::get('data::page_enhanced', array());
+            $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
 
             // The page should contain a valid enhancer for the current item
             foreach ($this->_properties['enhancers'] as $enhancer_name) {

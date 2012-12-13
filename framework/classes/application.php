@@ -18,7 +18,7 @@ class Application
     {
         // @todo repair that
         //\Module::load('data', APPPATH.'data');
-        \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
+        \Nos\Config_Data::load('app_installed');
 
         static::$repositories = array(
             'local' => array(
@@ -83,7 +83,7 @@ class Application
 
     public static function cleanApplications()
     {
-        $metadata = \Config::get('data::app_installed');
+        $metadata = \Nos\Config_Data::get('app_installed');
         foreach ($metadata as $key => $application) {
             \Module::exists($key);
         }
@@ -129,7 +129,7 @@ class Application
     public function __construct($folder, $metadata = array(), $real_metadata = array())
     {
         $this->folder = $folder;
-        $this->metadata = \Config::get('data::app_installed.'.$this->folder, array());
+        $this->metadata = \Nos\Config_Data::get('app_installed.'.$this->folder, array());
         $this->real_metadata = $real_metadata;
     }
 
@@ -230,7 +230,7 @@ class Application
             $this->addPermission();
         }
 
-        $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
+        $old_metadata = \Nos\Config_Data::get('app_installed.'.$this->folder, array());
         $new_metadata = $this->getRealMetadata();
 
         // Check if the installation is compatible with other applications
@@ -243,7 +243,7 @@ class Application
         }
 
         // Cache the metadata used to install the application
-        $config['app_installed'] = \Config::get('data::app_installed', array());
+        $config['app_installed'] = \Nos\Config_Data::get('app_installed', array());
         $config['app_installed'][$this->folder] = $new_metadata;
         $this->save_config($config);
 
@@ -260,7 +260,7 @@ class Application
      */
     public function uninstall()
     {
-        $old_metadata = \Config::get('data::app_installed.'.$this->folder);
+        $old_metadata = \Nos\Config_Data::get('app_installed.'.$this->folder);
         $new_metadata = array();
 
         // Check if the installation is compatible with other applications
@@ -268,7 +268,7 @@ class Application
 
         if ($this->unsymlink('static') && $this->unsymlink('htdocs')) {
             // Remove the application
-            $config['app_installed'] = \Config::get('data::app_installed', array());
+            $config['app_installed'] = \Nos\Config_Data::get('app_installed', array());
             unset($config['app_installed'][$this->folder]);
             $this->save_config($config);
         }
@@ -279,11 +279,9 @@ class Application
     protected function prepare_config($old_metadata, $new_metadata)
     {
         // Load current data
-        $data_path = APPPATH.'metadata'.DS;
         $config = array();
         foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section) {
-            \Config::load($data_path.$section.'.php', 'data::'.$section);
-            $config[$section] = \Config::get('data::'.$section, array());
+            $config[$section] = \Nos\Config_Data::get($section, array());
         }
 
         foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section) {
@@ -400,10 +398,8 @@ class Application
 
     protected function save_config($config)
     {
-        $data_path = APPPATH.'metadata'.DS;
         foreach ($config as $file => $content) {
-            \Config::save($data_path.$file.'.php', $content);
-            \Config::set('data::'.$file, $content);
+            \Nos\Config_Data::save($file, $content);
         }
     }
 
@@ -464,8 +460,7 @@ class Application
             }
         }
 
-        \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
-        $app_installed = \Config::get('data::app_installed', array());
+        $app_installed = \Nos\Config_Data::get('app_installed', array());
 
         foreach ($app_installed as $app_name => $app) {
             if ($app_refresh !== $app_name) {
@@ -479,8 +474,7 @@ class Application
             }
         }
 
-        \Config::set('app_dependencies', $dependencies);
-        \Config::save(APPPATH.'metadata'.DS.'app_dependencies.php', $dependencies);
+        \Nos\Config_Data::save('app_dependencies', $dependencies);
     }
 
     public function addPermission()

@@ -129,6 +129,7 @@ spl_autoload_register(
         }
 
         // Try to load the application
+        // Not use \Nos\Config_Data, not yet defined
         \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
         $namespaces = \Config::get('data::app_namespaces');
         $application = array_search($namespace, $namespaces);

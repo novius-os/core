@@ -79,10 +79,10 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         try {
             $application = \Nos\Application::forge($app_name);
             if ($application->uninstall()) {
-                $app_installed = \Config::get('data::app_installed', array());
+                $app_installed = \Nos\Config_Data::get('app_installed', array());
                 unset($app_installed[$app_name]);
 
-                \Config::save(APPPATH.'metadata/app_installed.php', $app_installed);
+                \Nos\Config_Data::save('app_installed', $app_installed);
             }
         } catch (\Exception $e) {
             $this->response(

@@ -14,16 +14,10 @@ use Fuel\Core\Config;
 
 class Controller_Admin_Ajax extends \Controller
 {
-    public function before()
-    {
-        Config::load(APPPATH.'metadata'.DS.'templates.php', 'data::templates');
-        parent::before();
-    }
-
     public function action_wysiwyg($page_id = null)
     {
         $id = $_GET['template_id'];
-        $data = \Config::get('data::templates', array());
+        $data = \Nos\Config_Data::get('templates', array());
         $data = $data[$id];
 
         $data['layout'] = (array) $data['layout'];

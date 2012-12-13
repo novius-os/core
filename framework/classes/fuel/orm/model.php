@@ -311,8 +311,7 @@ class Model extends \Orm\Model
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
             if ($application !== 'nos') {
-                \Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
-                $apps = \Config::get('data::app_installed', array());
+                $apps = \Nos\Config_Data::get('app_installed', array());
                 foreach ($apps as $app => $conf) {
                     if (!empty($conf['namespace']) && $conf['namespace'] === $namespace) {
                         $application = $app;
@@ -322,8 +321,7 @@ class Model extends \Orm\Model
 
             \Config::load($application.'::'.$file_name, true);
             $config = \Config::get($application.'::'.$file_name);
-            \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
-            $dependencies = \Config::get('data::app_dependencies', array());
+            $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
             if (!empty($dependencies[$application])) {
                 foreach ($dependencies[$application] as $dependency) {

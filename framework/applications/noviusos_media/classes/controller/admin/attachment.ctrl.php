@@ -97,8 +97,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
         if ($match) {
             list(, $alias, $attached) = $m;
 
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
-            $attachments = \Config::get("data::attachments", array());
+            $attachments = \Nos\Config_Data::get('attachments', array());
             if (isset($attachments[$alias])) {
                 $config = $attachments[$alias];
                 $attachment = \Nos\Attachment::forge($attached, $config);

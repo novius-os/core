@@ -214,14 +214,11 @@ class Attachment
     public function save()
     {
         if (!empty($this->new_file)) {
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
-
-            $attachments = \Config::get("data::attachments", array());
+            $attachments = \Nos\Config_Data::get('attachments', array());
             if (!isset($attachments[$this->config['alias']])) {
                 $attachments[$this->config['alias']] = $this->config;
 
-                \Config::save(APPPATH.'data'.DS.'config'.DS.'attachments.php', $attachments);
-                \Config::set('data::attachments', $attachments);
+                \Nos\Config_Data::save('attachments', $attachments);
             }
 
             $this->delete();
@@ -251,14 +248,11 @@ class Attachment
     {
         $alias = rtrim($alias, '/').'/';
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
-
-        $attachments = \Config::get("data::attachments", array());
+        $attachments = \Nos\Config_Data::get('attachments', array());
         if (!isset($attachments[$alias])) {
             unset($attachments[$alias]);
 
-            \Config::save(APPPATH.'data'.DS.'config'.DS.'attachments.php', $attachments);
-            \Config::set('data::attachments', $attachments);
+            \Nos\Config_Data::save('attachments', $attachments);
         }
     }
 
