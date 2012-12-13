@@ -626,7 +626,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     /**
      * Check if it's possible to delete an item, i.e. if it's not a new one.
-     * @param type $action
+     * @param string $action
      * @throws \Exception
      */
     protected function check_permission($action)

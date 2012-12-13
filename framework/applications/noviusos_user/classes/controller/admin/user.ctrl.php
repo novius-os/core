@@ -20,14 +20,6 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
         parent::before();
     }
 
-    protected function check_permission($action)
-    {
-        parent::check_permission($action);
-        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $this->item)) {
-            throw new \Exception('Permission denied');
-        }
-    }
-
     protected function fields($fields)
     {
         $fields = parent::fields($fields);
@@ -78,21 +70,9 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
                 $access->perm_application   = $application;
                 $access->save();
             }
-
-            \Config::load('applications', true);
-            $apps = \Config::get('applications', array());
-
-            \Config::load("$application::permissions", true);
-            $permissions = \Config::get("$application::permissions", array());
-            /*
-            foreach ($permissions as $identifier => $whatever) {
-                $driver = $role->get_permission_driver($application, $identifier);
-                $driver->save($role, (array) $_POST['permission'][$application][$identifier]);
-            }
-            */
         }
         \Response::json(array(
-            'notify' => 'Permissions successfully saved.',
+            'notify' => __('Permissions successfully saved.'),
         ));
 
     }

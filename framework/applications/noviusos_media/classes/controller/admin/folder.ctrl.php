@@ -15,14 +15,12 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
     protected function check_permission($action)
     {
         parent::check_permission($action);
-        if ($action === 'insert' && !static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
-            throw new \Exception('Permission denied');
+        // Can't edit or delete the root
+        if ($action === 'update' && empty($this->item->medif_parent_id)) {
+            throw new \Exception(__('Permission denied'));
         }
-        if ($action === 'update' && !static::check_permission_action('add', 'controller/admin/media/inspector/folder')) {
-            throw new \Exception('Permission denied');
-        }
-        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/media/inspector/folder', $this->item)) {
-            throw new \Exception('Permission denied');
+        if ($action === 'delete' && empty($this->item->medif_parent_id)) {
+            throw new \Exception(__('Permission denied'));
         }
     }
 
@@ -57,9 +55,9 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
     public function delete()
     {
         $count_medias = $this->item->count_media();
-        // Basic check to prevent false supression
+        // Basic check to prevent false suppression
         if (!is_dir($this->item->path()) && $count_medias > 0) {
-            throw new \Exception(strtr('{count} medias were found, but folder was nonexistent.', array(
+            throw new \Exception(strtr(__('{count} medias were found, but folder was nonexistent.'), array(
                 '{count}' => $count_medias,
             )));
         }
@@ -80,8 +78,6 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         $escaped_folder_ids = array_filter($escaped_folder_ids);
         $escaped_folder_ids = implode(',', $escaped_folder_ids);
 
-        $pk = Model_Media::primary_key();
-        $pk = $pk[0];
         $table_folder = Model_Folder::table();
         $table_media  = Model_Media::table();
         $table_link   = Model_Link::table();
@@ -103,7 +99,7 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         $this->item->delete_from_disk();
         $this->item->delete_public_cache();
 
-            // Delete folder entries
+        // Delete folder entries
         \DB::query("
             DELETE $table_folder.* FROM $table_folder
             WHERE

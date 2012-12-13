@@ -20,6 +20,9 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         \Nos\I18n::current_dictionary('noviusos_page::common', 'nos::common');
     }
 
+    /**
+     *  Set up the first page created in a context as the homepage.
+     */
     protected function init_item()
     {
         parent::init_item();
@@ -36,6 +39,12 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         $this->item->page_entrance = 1 - $context_has_home;
     }
 
+    /**
+     * Saves the wysiwyg. They're not part of the fields and handled automatically, because we don't know how much there are.
+     *
+     * @param $page
+     * @param $data
+     */
     public function before_save($page, $data)
     {
         parent::before_save($page, $data);
@@ -75,8 +84,8 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     protected function check_permission($action)
     {
         parent::check_permission($action);
-        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/page/appdesk/list', $this->item)) {
-            throw new \Exception('Permission denied');
+        if ($action === 'delete' && $this->item->page_lock == Model_Page::LOCK_DELETION) {
+            throw new \Exception(__('Permission denied'));
         }
     }
 

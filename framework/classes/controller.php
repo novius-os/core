@@ -125,20 +125,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         return \Config::application($application);
     }
 
-    /* @todo TO BE MOVED */
-    protected static function check_permission_action($action, $dataset_location, $item = null)
-    {
-        \Config::load($dataset_location, true);
-        $dataset = \Config::get($dataset_location.'.dataset');
-        // An unknown action is authorized
-        // This is for consistency with client-side, where actions are visible by default (not greyed out)
-        if (empty($dataset['actions']) || empty($dataset['actions'][$action])) {
-            return true;
-        }
-
-        return $dataset['actions'][$action]($item);
-    }
-
     protected function items(array $config, $only_count = false)
     {
         $config = array_merge(
@@ -156,7 +142,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $items = array();
 
         $model = $config['model'];
-        $pk = \Arr::get($model::primary_key(), 0);
 
         $query = \Nos\Orm\Query::forge($model, $model::connection());
         foreach ($config['related'] as $related) {

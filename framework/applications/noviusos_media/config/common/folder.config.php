@@ -38,12 +38,12 @@ return array(
     'actions' => array(
         'Nos\Media\Model_Folder.edit' => array(
             'disabled' => function($item) {
-                return !!empty($item->medif_parent_id);
+                return empty($item->medif_parent_id);
             },
         ),
         'Nos\Media\Model_Folder.delete' => array(
             'disabled' => function($item) {
-                return !!empty($item->medif_parent_id);
+                return empty($item->medif_parent_id);
             },
         ),
         'Nos\Media\Model_Folder.add_media' => array(
