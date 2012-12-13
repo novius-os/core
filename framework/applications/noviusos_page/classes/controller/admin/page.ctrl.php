@@ -185,7 +185,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         $contexts_list = $page->find_context('all');
         return \View::forge('noviusos_page::admin/popup_clone', array(
             'item' => $page,
-            'action' => 'admin/noviusos_page/page/'.($recursive ? 'clone_tree' : 'tree').'/'.$id,
+            'action' => 'admin/noviusos_page/page/'.($recursive ? 'clone_tree' : 'clone').'/'.$id,
             'crud' => $this->config,
             'contexts_list' => $contexts_list,
         ), false);
