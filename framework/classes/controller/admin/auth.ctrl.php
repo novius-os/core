@@ -18,7 +18,7 @@ class Controller_Admin_Auth extends Controller
         // Because our routine doesn't need anything from the parent, and we define the language, which may affect the parent too (config file).
         if (!\Nos\Auth::check()) {
             if (\Input::is_ajax()) {
-                $lang = \Input::get('lang', 'en_GB');
+                $lang = \Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
                 I18n::setLocale($lang);
                 I18n::current_dictionary('nos::common');
                 $this->response = \Response::forge();
@@ -61,7 +61,7 @@ class Controller_Admin_Auth extends Controller
 
     public function prepare_i18n()
     {
-        $locale = \Session::get('lang', 'en_GB');
+        $locale = \Session::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
         I18n::setLocale($locale);
         // Also configure Fuel to use appropriate locale settings
         \Config::set('language', substr($locale, 0, 2));

@@ -224,6 +224,24 @@ return array(
         'cache_duration_page' => 5,
         'cache_duration_function' => 10,
 
+        'locales' => array(
+            'en_GB' => array(
+                'title' => 'English',
+                'flag' => 'gb',
+            ),
+            'fr_FR' => array(
+                'title' => 'Français',
+                'flag' => 'fr',
+            ),
+            // @todo uncomment when the translations will be available
+            /*'ja_JP' =>  array(
+                'title' => '日本語'
+                'flag' => 'jp',
+            ),*/
+        ),
+
+        'default_locale' => 'en_GB',
+
         'allow_plugin_upload' => false,
 
         'upload' => array(
