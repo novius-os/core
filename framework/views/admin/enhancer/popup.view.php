@@ -11,6 +11,7 @@
 ?>
 <div id="<?= $id = uniqid('temp_') ?>">
     <form method="POST" action="<?= $url ?>">
+        <input type="hidden" name="enhancer" value="<?= $enhancer_args['enhancer'] ?>" />
         <div class="line myBody">
             <div class="col c1"></div>
             <div class="col c10 ui-widget">

@@ -197,6 +197,9 @@
             if (s.theme_nos_enhancers) {
                 each(s.theme_nos_enhancers, function(f, id) {
                     s.theme_nos_enhancers[id].id = id;
+                    if (!s.theme_nos_enhancers[id].previewUrl) {
+                        s.theme_nos_enhancers[id].previewUrl = 'admin/nos/enhancer/preview';
+                    }
                 });
             }
 
@@ -265,7 +268,7 @@
 
 					var enhancer_id = $(this).data('enhancer');
 					var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
-					var data      = $(this).data('config');
+					var data      = $.extend(true, {enhancer: enhancer_id}, $(this).data('config'));
 					$.ajax({
 						url: metadata.previewUrl,
 						type: 'POST',
@@ -1908,7 +1911,13 @@
 			// Keep reference to the wijnosDialog node, so we can close the popup manually
 			var dialog = null,
 			    self   = this,
-                data_config = edit ? $.extend(true, {nosContext : self.settings.theme_nos_context}, edit.data('config') || {}) : {nosContext : self.settings.theme_nos_context},
+                data_config = edit ? $.extend(true, {
+                        nosContext : self.settings.theme_nos_context,
+                        enhancer: metadata.id
+                    }, edit.data('config') || {}) : {
+                        nosContext : self.settings.theme_nos_context,
+                        enhancer: metadata.id
+                    },
                 save = function(json) {
 
                     var pr = $(json.preview);
@@ -1958,6 +1967,9 @@
                     url: metadata.previewUrl,
                     type: 'POST',
                     dataType: 'json',
+                    data: {
+                        enhancer: metadata.id
+                    },
                     success: save,
                     error: function() {
                         console.log('Error: unable to add the enhancer in the Wysiwyg (no popup)');

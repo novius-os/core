@@ -22,10 +22,7 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
         'preview' => array(
             'view' => 'nos::admin/enhancer/preview',
             'layout' => array(),
-            'params' => array(
-                'icon' => 'static/apps/noviusos_appmanager/img/64/app-manager.png',
-                'title' => 'Application',
-            ),
+            'params' => array(),
         ),
     );
 
@@ -71,8 +68,21 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
         if (empty($args)) {
             $args = $_POST;
         }
+        if (!empty($args['enhancer'])) {
+            \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
+            $enhancers = \Config::get('data::enhancers', array());
+            if (!empty($enhancers[$args['enhancer']])) {
+                $enhancer = $enhancers[$args['enhancer']];
+                $icon = \Config::icon($enhancer['application'], 64);
+                $this->config['preview']['params'] = array_merge(array(
+                        'icon' => !empty($icon) ? $icon : 'static/apps/noviusos_appmanager/img/64/app-manager.png',
+                        'title' => \Arr::get($enhancer, 'title', __('Application')),
+                    ), $this->config['preview']['params']);
+            }
+        }
 
         $body = array(
+            'debug'  => \Format::forge()->to_json($this->config['preview']),
             'config'  => \Format::forge()->to_json($args),
             'preview' => \View::forge($this->config['preview']['view'], array(
                 'layout' => $this->config['preview']['layout'],

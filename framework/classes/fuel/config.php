@@ -120,6 +120,13 @@ class Config extends \Fuel\Core\Config
                 }
             }
         }
+        if (isset($metadata['enhancers'])) {
+            foreach ($metadata['enhancers'] as $key => $enhancer) {
+                if (!isset($metadata['enhancers'][$key]['application'])) {
+                    $metadata['enhancers'][$key]['application'] = $application_name;
+                }
+            }
+        }
 
         return $metadata;
     }
@@ -217,8 +224,13 @@ class Config extends \Fuel\Core\Config
     public static function icon($application_name, $icon_key)
     {
         $metadata = \Config::get('data::app_installed');
-        $metadata = $metadata[$application_name];
-        return $metadata['icons'][$icon_key];
+        if (!empty($metadata[$application_name])) {
+            $metadata = $metadata[$application_name];
+            if (!empty($metadata['icons'][$icon_key])) {
+                return $metadata['icons'][$icon_key];
+            }
+        }
+        return '';
     }
 
 }
