@@ -60,17 +60,26 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         exit();
     }
 
+    /**
+     * Changes the lang of the user
+     *
+     * @param $lang The new locale code (like en_GB, fr_FR or ja_JP)
+     */
     public function action_lang($lang)
     {
         $languages =\Config::get('novius-os.locales', array());
         if (array_key_exists($lang, $languages)) {
-            \Session::set('lang', $lang);
+            $user = \Session::user();
+            $user->user_lang = $lang;
+            $user->save();
             $label = $languages[$lang]['title'];
             \Response::json(array(
                 'notify' => strtr(__('Language has been set to {{language}}, please <a>refresh</a> to see changes.'), array('{{language}}' => $label, '<a>' => '<a href="javascript:document.location.reload();">')),
             ));
         }
-        $this->send_error('Invalid lang '.$lang);
+        $this->send_error(strtr(__('Language {{code}} is not available.'), array(
+            '{{code}}' => $lang,
+        )));
     }
 
     public static function fieldset_display($user)

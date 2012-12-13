@@ -38,26 +38,12 @@ $uniqid = uniqid('id_');
         <ul style="width: 15%;">
             <li><a href="#infos"><?= __('Your account') ?></a></li>
             <li><a href="#display"><?= __('Theme') ?></a></li>
-            <li><a href="#lang"><?= __('Language') ?></a></li>
         </ul>
         <div id="infos">
             <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
         </div>
         <div id="display">
             <?= $fieldset_display ?>
-        </div>
-        <div id="lang">
-<?php
-foreach (\Config::get('novius-os.locales', array()) as $code => $locale) {
-    ?>
-            <form action="admin/noviusos_user/account/lang/<?= $code ?>">
-                <button class="primary" data-icon-url="static/novius-os/admin/novius-os/img/flags/<?= $locale['flag'] ?>.png"><?= strtr(__('Switch to {lang}'), array(
-                    '{lang}' => $locale['title'],
-                )); ?></button>
-            </form>
-    <?php
-}
-?>
         </div>
     </div>
 </div>
@@ -71,7 +57,6 @@ foreach (\Config::get('novius-os.locales', array()) as $code => $locale) {
         ],
         function($) {
             $(function() {
-                $('#lang').nosFormUI().nosFormAjax();
                 var $container = $('#<?= $uniqid ?>');
                 $('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
                     if (json.wallpaper_url) {

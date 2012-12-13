@@ -69,6 +69,18 @@ return array(
                 'empty' => '0',
             ),
         ),
+        'user_lang' => array(
+            'label' => __('Language:'),
+            'form' => array(
+                'type' => 'select',
+                'options' => array_map(
+                    function($val) {
+                        return $val['title'];
+                    },
+                    \Config::get('novius-os.locales', array())
+                ),
+            ),
+        ),
         'user_password' => array(
             'label' => __('Password: '),
             'form' => array(

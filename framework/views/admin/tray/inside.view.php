@@ -1,4 +1,6 @@
-<li><a href="#" data-action='{"action":"nosTabs","method":"open","tab":{"url":"admin/noviusos_user/account","app":true,"iconSize":32,"labelDisplay":false,"iconUrl":"static/apps/noviusos_user/img/32/myaccount.png","label":<?= htmlentities(\Format::forge(__('My account'))->to_json()) ?>}}'><?= __('My account') ?></a></li>
+<?php
+Nos\I18n::current_dictionary('nos::common');
+?><li><a href="#" data-action='{"action":"nosTabs","method":"open","tab":{"url":"admin/noviusos_user/account","app":true,"iconSize":32,"labelDisplay":false,"iconUrl":"static/apps/noviusos_user/img/32/myaccount.png","label":<?= htmlentities(\Format::forge(__('My account'))->to_json()) ?>}}'><?= __('My account') ?></a></li>
 <li><a href="#"><?= __('Switch language') ?></a>
     <ul>
 <?php

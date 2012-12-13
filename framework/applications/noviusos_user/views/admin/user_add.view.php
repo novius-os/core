@@ -37,7 +37,7 @@ $uniqid = uniqid('id_');
                 'nomargin' => false,
                 'content' => \View::forge('form/fields', array(
                     'fieldset' => $fieldset,
-                    'fields' => array('user_email', 'user_password', 'password_confirmation', 'user_expert'),
+                    'fields' => array('user_email', 'user_password', 'password_confirmation', 'user_lang', 'user_expert'),
                 ), false)
             ), false),
         ),

@@ -27,7 +27,7 @@
             'nomargin' => false,
             'content' => \View::forge('form/fields', array(
                 'fieldset' => $fieldset,
-                'fields' => array('user_email', 'user_last_connection', 'user_expert'),
+                'fields' => array('user_email', 'user_last_connection', 'user_lang', 'user_expert'),
             ), false)
         ), false),
         \View::forge('form/expander', array(

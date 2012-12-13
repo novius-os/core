@@ -46,8 +46,7 @@ class I18n
         $available = \Config::get('novius-os.locales', array());
         // Check the language is supported (because it can be injected via GET on the login screens)
         if (!isset($available[$language.'_'.$country])) {
-            $language = 'en';
-            $country = 'GB';
+            list($language, $country) =  explode('_', \Config::get('novius-os.default_locale', 'en_GB'));
             $encoding = null;
             $variant = null;
         }

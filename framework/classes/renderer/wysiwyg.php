@@ -25,7 +25,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
             $attributes['id'] = uniqid('wysiwyg_');
         }
 
-        $this->options['language'] = substr(\Session::get('lang', \Config::get('novius-os.default_locale', 'en_GB')), 0, 2);
+        $this->options['language'] = substr(\Session::user()->user_lang, 0, 2);
 
         if (!empty($attributes['renderer_options'])) {
             $this->options = \Arr::merge($this->options, $attributes['renderer_options']);

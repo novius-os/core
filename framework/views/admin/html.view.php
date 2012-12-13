@@ -428,7 +428,7 @@ if ($assets_minified) {
 </script>
 <script type="text/javascript">
     require(['jquery-nos'], function($) {
-        $.nosLang = '<?= \Session::get('lang', \Config::get('novius-os.default_locale', 'en_GB')); ?>';
+        $.nosLang = '<?= \Session::user()->user_lang; ?>';
     });
 </script>
 <?= $js ?>

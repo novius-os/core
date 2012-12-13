@@ -61,7 +61,7 @@ class Controller_Admin_Auth extends Controller
 
     public function prepare_i18n()
     {
-        $locale = \Session::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
+        $locale = \Session::user()->user_lang;
         I18n::setLocale($locale);
         // Also configure Fuel to use appropriate locale settings
         \Config::set('language', substr($locale, 0, 2));
