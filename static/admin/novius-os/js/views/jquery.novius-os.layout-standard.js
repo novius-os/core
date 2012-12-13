@@ -61,6 +61,8 @@ define('jquery-nos-layout-standard',
                                         $container.closest('form').find('.input-context').val(context.code);
                                         $contextButton.button('option', 'label', context.label);
                                         $li.nosTabs('update', tabParams);
+
+                                        $container.closest('.nos-dispatcher, body').data('nosContext', context.code).trigger('contextChange');
                                     }
                                 }
                             });

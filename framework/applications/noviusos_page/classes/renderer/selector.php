@@ -62,6 +62,7 @@ class Renderer_Selector extends \Nos\Renderer_Selector
             ),
             'height' => '150px',
             'width' => null,
+            'contextChange' => true,
         ), $options);
 
         return (string) \Request::forge('admin/noviusos_page/inspector/page/list')->execute(
