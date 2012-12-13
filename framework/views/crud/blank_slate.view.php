@@ -34,9 +34,9 @@ if (!in_array($context, $possible)) {
         ));
         ?>
         <script type="text/javascript">
-            require(['jquery-nos'], function($nos) {
-               $nos('#<?= $uniqid_parent ?>').click(function() {
-                   $nos(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_insert_update.'/'.$parent->id.'?context='.$context)) ?>);
+            require(['jquery-nos'], function($) {
+               $('#<?= $uniqid_parent ?>').click(function() {
+                   $(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_insert_update.'/'.$parent->id.'?context='.$context)) ?>);
                });
             });
         </script>

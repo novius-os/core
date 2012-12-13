@@ -83,8 +83,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
     public function data_catchers($item)
     {
-        \Config::load(APPPATH.'metadata'.DS.'data_catchers.php', 'data::data_catchers');
-        $data_catchers = \Config::get('data::data_catchers', array());
+        $data_catchers = \Nos\Config_Data::get('data_catchers', array());
         $catchers = array();
         $default_nugget = $this->get_default_nuggets($item);
         foreach ($data_catchers as $id => $config) {
@@ -121,12 +120,12 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
             $set_data_catcher($data_catcher, $id);
         }
 
-        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
+        \Nos\Config_Data::load('enhancers');
         foreach ($item->wysiwygs as $wysiwyg) {
             \Nos\Nos::parse_enhancers(
                 $wysiwyg,
                 function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
-                    $params = \Config::get('data::enhancers.'.$enhancer, false);
+                    $params = \Nos\Config_Data::get('enhancers.'.$enhancer, false);
                     if ($params !== false) {
                         if (isset($params['data_catchers_added']) && is_array($params['data_catchers_added'])) {
                             foreach ($params['data_catchers_added'] as $id => $data_catcher) {

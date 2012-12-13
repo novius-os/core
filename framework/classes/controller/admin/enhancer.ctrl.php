@@ -69,8 +69,7 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
             $args = $_POST;
         }
         if (!empty($args['enhancer'])) {
-            \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
-            $enhancers = \Config::get('data::enhancers', array());
+            $enhancers = \Nos\Config_Data::get('enhancers', array());
             if (!empty($enhancers[$args['enhancer']])) {
                 $enhancer = $enhancers[$args['enhancer']];
                 $icon = \Config::icon($enhancer['application'], 64);

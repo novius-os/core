@@ -42,8 +42,7 @@ class Config extends \Fuel\Core\Config
         $file = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
         if ($application !== 'nos') {
-            \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
-            $namespaces = Config::get('data::app_namespaces', null);
+            $namespaces = \Nos\Config_Data::get('app_namespaces', null);
             if ($app = array_search($namespace, $namespaces)) {
                 $application = $app;
             }
@@ -56,8 +55,7 @@ class Config extends \Fuel\Core\Config
     {
         \Config::load($app_name.'::'.$file_name, true);
         $config = \Config::get($app_name.'::'.$file_name);
-        \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
-        $dependencies = \Config::get('data::app_dependencies', array());
+        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$app_name])) {
             foreach ($dependencies[$app_name] as $dependency) {
@@ -87,8 +85,7 @@ class Config extends \Fuel\Core\Config
     {
         \Config::load($module_name.'::'.$file_name, true);
         $config = \Config::get($module_name.'::'.$file_name);
-        \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
-        $dependencies = \Config::get('data::app_dependencies', array());
+        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$module_name])) {
             foreach ($dependencies[$module_name] as $dependency) {
@@ -223,7 +220,7 @@ class Config extends \Fuel\Core\Config
 
     public static function icon($application_name, $icon_key)
     {
-        $metadata = \Config::get('data::app_installed');
+        $metadata = \Nos\Config_Data::get('app_installed');
         if (!empty($metadata[$application_name])) {
             $metadata = $metadata[$application_name];
             if (!empty($metadata['icons'][$icon_key])) {

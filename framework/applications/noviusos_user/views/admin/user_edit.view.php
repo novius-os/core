@@ -37,8 +37,7 @@ echo View::forge('nos::crud/toolbar', $view_params, false);
 $role = reset($item->roles);
 
 \Config::load('nos::admin/permissions', 'permissions');
-\Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
-$applications = array_merge(\Config::get('data::app_installed', array()), \Config::get('permissions', array()));
+$applications = array_merge(\Nos\Config_Data::get('app_installed', array()), \Config::get('permissions', array()));
 foreach ($applications as $app => $params) {
     if (isset($params['permission'])) {
         $apps[$app] = array_merge($params, $params['permission']);

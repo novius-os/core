@@ -108,8 +108,7 @@ if ($is_attachment) {
     if ($match) {
         list(, $alias, $attached, $filename, $extension) = $m;
 
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'attachments.php', 'data::attachments');
-        $attachments = \Config::get("data::attachments", array());
+        $attachments = \Nos\Config_Data::get("attachments", array());
         if (isset($attachments[$alias])) {
             $config = $attachments[$alias];
             $attachment = \Nos\Attachment::forge($attached, $config);

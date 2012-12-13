@@ -89,8 +89,7 @@ class Controller_Front extends Controller
 
             $cache->start();
 
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-            $url_enhanced = \Config::get('data::url_enhanced', array());
+            $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
             $url_enhanced = array_filter($url_enhanced, function ($v) use ($contexts_possibles) {
                 return in_array($v['context'], array_keys($contexts_possibles));
             });
@@ -539,8 +538,7 @@ class Controller_Front extends Controller
     protected function _find_template()
     {
         // Find the template
-        Config::load(APPPATH.'metadata'.DS.'templates.php', 'data::templates');
-        $templates = Config::get('data::templates', array());
+        $templates = \Nos\Config_Data::get('templates', array());
 
         if (!isset($templates[$this->_page->page_template])) {
             throw new \Exception('The template '.$this->_page->page_template.' is not configured.');

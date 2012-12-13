@@ -31,8 +31,7 @@ class Controller_Admin_Wysiwyg extends \Controller
     {
         $urlEnhancers = \Input::get('urlEnhancers', false);
 
-        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
-        $enhancers = \Config::get('data::enhancers', array());
+        $enhancers = \Nos\Config_Data::get('enhancers', array());
 
         if (!$urlEnhancers) {
             $enhancers = array_filter($enhancers, function($enhancer) {

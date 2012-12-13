@@ -15,15 +15,13 @@ class Tools_Enhancer
     public static function url_item($enhancer_name, $item, $params = array())
     {
         // Check if any page contains this enhancer
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-        $page_enhanced = \Config::get('data::page_enhanced.'.$enhancer_name, array());
+        $page_enhanced = \Nos\Config_Data::get('page_enhanced.'.$enhancer_name, array());
         if (empty($page_enhanced)) {
             return array();
         }
 
         // Check if this enhancer exists
-        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
-        $enhancer = \Config::get('data::enhancers.'.$enhancer_name, array());
+        $enhancer = \Nos\Config_Data::get('enhancers.'.$enhancer_name, array());
         if (empty($enhancer)) {
             return array();
         }
@@ -43,15 +41,13 @@ class Tools_Enhancer
         $controller_name = \Inflector::words_to_upper($controller_name);
 
         // Check if the application exists
-        \Config::load(APPPATH.'metadata'.DS.'app_namespaces.php', 'data::app_namespaces');
-        $namespace = \Config::get('data::app_namespaces.'.$application_name, '');
+        $namespace = \Nos\Config_Data::get('app_namespaces.'.$application_name, '');
         if (empty($namespace)) {
             return array();
         }
 
         // This files contains all the urlPath for the pages containing an URL enhancer
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-        $url_enhanced = \Config::get('data::url_enhanced', array());
+        $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
 
         $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
         $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable', false);
@@ -82,8 +78,7 @@ class Tools_Enhancer
     public static function urls($enhancer_name, $params = array())
     {
         // Check if any page contains this enhancer
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-        $page_enhanced = \Config::get('data::page_enhanced.'.$enhancer_name, array());
+        $page_enhanced = \Nos\Config_Data::get('page_enhanced.'.$enhancer_name, array());
         if (empty($page_enhanced)) {
             return array();
         }
@@ -92,8 +87,7 @@ class Tools_Enhancer
         // @todo: check if the application exists?
 
         // This files contains all the urlPath for the pages containing an URL enhancer
-        \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-        $url_enhanced = \Config::get('data::url_enhanced', array());
+        $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
 
         // Now fetch all the possible URLS
         $urls = array();
