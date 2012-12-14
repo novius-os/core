@@ -276,7 +276,7 @@ define('jquery-nos-ostabs',
                         var $li = $(this),
                             tab = $li.data( 'ui-ostab') || {};
 
-                        if (tab.openRank !== false) {
+                        if (!$li.hasClass('nos-ostabs-appstab') && tab.openRank !== false) {
                             tabOpenRank[tab.openRank] = $li;
                         }
                     });
@@ -555,7 +555,9 @@ define('jquery-nos-ostabs',
                                 });
                             }
                             self.element.queue( "tabs", function() {
-                                tab.openRank = self.openRank++;
+                                if (!$li.hasClass('nos-ostabs-appstab')) {
+                                    tab.openRank = self.openRank++;
+                                }
                                 showTab( el, $show );
                             });
 
@@ -877,6 +879,7 @@ define('jquery-nos-ostabs',
                 $li.removeClass( "ui-state-active ui-state-open" );
 
                 if (!notSelectAfter) {
+                    openIndex = index > 2 ? index - 1 : (self.lis.length > 2 ? 2 : 0);
                     // Open the last tab in stack opening or the 0 index
                     self.lis.each(function(i) {
                         var $litemp = $(this),
@@ -1131,6 +1134,7 @@ define('jquery-nos-ostabs',
                     .each(function() {
                         var tab = $.extend({}, $(this).data('ui-ostab'));
                         delete tab.actions;
+                        delete tab.openRank;
                         tabs.push(tab);
                     });
                 return tabs;

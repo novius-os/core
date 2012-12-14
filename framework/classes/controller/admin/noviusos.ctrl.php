@@ -61,7 +61,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             if (!isset($user_configuration['tabs']['tabs'])) {
                 $user_configuration['tabs']['tabs'] = array();
             }
-            $openRank = null;
             $found = false;
 
             // Native = OS + tray
@@ -79,8 +78,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             if (!$found) {
                 foreach ($user_configuration['tabs']['tabs'] as $i => &$tab) {
                     if ($tab['url'] == $deep_linking_url) {
-                        $openRank = $tab['openRank'];
-                        $tab['openRank'] = 0;
                         $user_configuration['tabs']['selected'] = $i + 1;
                         $found = true;
                     }
@@ -91,19 +88,9 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             // Tab was not found found, add it
             if (!$found) {
                 $user_configuration['tabs']['selected'] = count($user_configuration['tabs']['tabs']) + 1;
-                $openRank = 1;
                 $user_configuration['tabs']['tabs'][] = array(
                     'url' => $deep_linking_url,
-                    'openRank' => 1,
                 );
-
-                // Rank from every tab goes up
-                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab) {
-                    if ($tab['openRank'] < $openRank) {
-                        $tab['openRank']++;
-                    }
-                }
-                unset($tab);
             }
         }
 
