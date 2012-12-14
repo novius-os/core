@@ -5,13 +5,13 @@ Nos\I18n::current_dictionary(array('noviusos_user::common', 'nos::common'));
 return array(
     'data_mapping' => array(
         'fullname' => array(
-            'headerText' => __('Name'),
+            'title' => __('Name'),
             'value' => function($item) {
                 return $item->fullname();
             },
         ),
         'user_email' => array(
-            'headerText' => __('Email'),
+            'title' => __('Email'),
         ),
         'id_permission' => array(
             'visible' => false,
