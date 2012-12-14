@@ -121,6 +121,9 @@ return array(
             'visible' => function($params) {
                 return !isset($params['item']) || !$params['item']->is_new();
             },
+            'disabled' => function() {
+                return false;
+            },
         ),
     ),
 );

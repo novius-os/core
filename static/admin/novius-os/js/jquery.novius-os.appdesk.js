@@ -1689,12 +1689,17 @@ define('jquery-nos-appdesk',
                                             showFilter : false,
                                             setupkey: 'actions'
                                         };
-                                    } else if (object[key][i].cellFormatter && !$.isFunction(object[key][i].cellFormatter)) {
+                                    } else if (object[key][i].cellFormatters) {
                                         (function() {
-                                            var cellFormatters = $.isArray(object[key][i].cellFormatter) ? object[key][i].cellFormatter : [object[key][i].cellFormatter];
+                                            var cellFormatters = $.isPlainObject(object[key][i].cellFormatters) ? object[key][i].cellFormatters : [object[key][i].cellFormatter];
+                                            var oldCellFormatter = object[key][i].cellFormatter;
                                             object[key][i] = $.extend(object[key][i], {
                                                 cellFormatter : function(args) {
                                                     if (args.row.type & $.wijmo.wijgrid.rowType.data) {
+                                                        args.$container.html(args.formattedValue);
+                                                        if ($.isFunction(oldCellFormatter)) {
+                                                            oldCellFormatter.call(this, args);
+                                                        }
                                                         $.each(cellFormatters, function(i, formatter) {
                                                             formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
                                                             switch (formatter.type) {
@@ -1709,20 +1714,21 @@ define('jquery-nos-appdesk',
                                                                     break;
 
                                                                 case 'link':
-                                                                    args.formattedValue = $('<a href="#"></a>').text(args.formattedValue)
-                                                                        .click(function(e) {
-                                                                            e.preventDefault();
-                                                                            if (formatter.action && $.type(formatter.action) !== 'object' && config.appdesk.actions && config.appdesk.actions[formatter.action]) {
-                                                                                formatter.action = config.appdesk.actions[formatter.action].action;
-                                                                            }
-                                                                            if ($.type(formatter.action) === 'object') {
-                                                                                $(this).nosAction(formatter.action, args.row.data);
-                                                                            }
-                                                                        });
+                                                                    args.$container.wrapInner(
+                                                                        $('<a href="#"></a>')
+                                                                            .click(function(e) {
+                                                                                e.preventDefault();
+                                                                                if (formatter.action && $.type(formatter.action) !== 'object' && config.appdesk.actions && config.appdesk.actions[formatter.action]) {
+                                                                                    formatter.action = config.appdesk.actions[formatter.action].action;
+                                                                                }
+                                                                                if ($.type(formatter.action) === 'object') {
+                                                                                    $(this).nosAction(formatter.action, args.row.data);
+                                                                                }
+                                                                            })
+                                                                        )
                                                                     break;
                                                             }
                                                         });
-                                                        args.$container.html(args.formattedValue);
 
                                                         return true;
                                                     }

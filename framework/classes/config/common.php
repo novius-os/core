@@ -3,9 +3,9 @@ namespace Nos;
 
 class Config_Common
 {
-    public static function load($class, $filter_data_mapping)
+    public static function load($model, $filter_data_mapping)
     {
-        list($application_name, $file) = \Config::configFile($class);
+        list($application_name, $file) = \Config::configFile($model);
         $file = 'common'.substr($file, strrpos($file, '/'));
 
         $config = \Config::loadConfiguration($application_name, $file);
@@ -25,22 +25,33 @@ class Config_Common
             $config['actions']['order'] = array();
         }
 
-        $config['actions']['list'] = static::process_actions($application_name, $class, $config);
+        $config['actions']['list'] = static::process_actions($application_name, $model, $config);
 
         if (!isset($config['data_mapping'])) {
             $config['data_mapping'] = array();
         }
 
-        $config['data_mapping'] = static::process_data_mapping($application_name, $class, $config);
+        $config['data_mapping'] = static::process_data_mapping($model, $config);
         $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
 
         return $config;
     }
 
+    /**
+     * Generates default actions and add them into the common configuration.
+     * Default actions are: add, edit, visualise, share and delete.
+     *
+     * @param  string  $application_name
+     * @param  string  $model
+     * @param  array   $config
+     * @return  array  The default actions
+     */
     public static function process_actions($application_name, $model, $config)
     {
         \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
 
+        // Which keys contains the URL of the action
+        // The controller's base URL will be prepended automatically
         $urls = array(
             'add' => 'action.tab.url',
             'edit' => 'action.tab.url',
@@ -48,7 +59,7 @@ class Config_Common
         );
 
         $actions_template = array(
-            'add' => array(
+            $model.'.add' => array(
                 'label' => __('Add :model_label'),
                 'action' => array(
                     'action' => 'nosTabs',
@@ -62,7 +73,7 @@ class Config_Common
                     'toolbar-grid' => true,
                 ),
             ),
-            'edit' => array(
+            $model.'.edit' => array(
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
@@ -77,13 +88,13 @@ class Config_Common
                     'grid' => true,
                 ),
             ),
-            'visualise' => array(
+            $model.'.visualise' => array(
                 'label' => __('Visualise'),
                 'primary' => true,
                 'iconClasses' => 'nos-icon16 nos-icon16-eye',
                 'action' => array(
                     'action' => 'window.open',
-                    'url' => '{{preview_url}}?_preview=1'
+                    'url' => '{{preview_url}}?_preview=1',
                 ),
                 'disabled' =>
                     function($item)
@@ -96,7 +107,7 @@ class Config_Common
                     },
                 'targets' => array(
                     'grid' => true,
-                    'toolbar-edit' => true
+                    'toolbar-edit' => true,
                 ),
                 'visible' =>
                 function($params) {
@@ -110,18 +121,18 @@ class Config_Common
                     return false;
                 },
             ),
-            'share' => array(
+            $model.'.share' => array(
                 'label' => __('Share'),
                 'iconClasses' => 'nos-icon16 nos-icon16-share',
                 'action' => array(
                     'action' => 'share',
                     'data' => array(
                         'model_id' => '{{_id}}',
-                        'model_name' => '',
+                        'model_name' => $model,
                     ),
                 ),
                 'targets' => array(
-                    'toolbar-edit' => true
+                    'toolbar-edit' => true,
                 ),
                 'visible' =>
                 function($params) {
@@ -129,7 +140,7 @@ class Config_Common
                     return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 },
             ),
-            'delete' => array(
+            $model.'.delete' => array(
                 'action' => array(
                     'action' => 'confirmationDialog',
                     'dialog' => array(
@@ -143,7 +154,7 @@ class Config_Common
                 'red' => true,
                 'targets' => array(
                     'grid' => true,
-                    'toolbar-edit' => true
+                    'toolbar-edit' => true,
                 ),
                 'visible' =>
                 function($params) {
@@ -152,10 +163,7 @@ class Config_Common
             ),
         );
 
-
-        $model_label = explode('/', $model);
-        $model_label = $model_label[count($model_label) - 1];
-        $model_label = explode('_', $model_label);
+        $model_label = explode('_', $model);
         $model_label = $model_label[count($model_label) - 1];
 
         if (!isset($config['controller'])) {
@@ -170,32 +178,30 @@ class Config_Common
             unset($actions_template['visualise']);
         }
 
-        $generated_actions = array();
         foreach ($actions_template as $name => $template) {
-            $generated_actions[$model.'.'.$name] = $template;
 
-            if (isset($urls[$name])) {
+            list(, $action_name) = explode('.', $name);
+
+            if (isset($urls[$action_name])) {
                 \Arr::set(
-                    $generated_actions[$model.'.'.$name],
-                    $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.
-                    \Arr::get($generated_actions[$model.'.'.$name], $urls[$name])
+                    $actions_template[$name],
+                    $urls[$action_name], 'admin/'.$application_name.'/'.$config['controller'].'/'.
+                    \Arr::get($actions_template[$name], $urls[$action_name])
                 );
             }
 
-            if (isset($config['labels'][$name])) {
-                $generated_actions[$model.'.'.$name]['label'] = $config['labels'][$name];
+            if (isset($config['labels'][$action_name])) {
+                $actions_template[$name]['label'] = $config['labels'][$action_name];
             }
-            $generated_actions[$model.'.'.$name]['label'] = \Str::tr(
-                $generated_actions[$model.'.'.$name]['label'],
-                array('model_label' => $model_label)
+            $actions_template[$name]['label'] = \Str::tr(
+                $actions_template[$name]['label'],
+                array(
+                    'model_label' => $model_label,
+                )
             );
-
-            if ($name == 'share') {
-                $generated_actions[$model.'.'.$name]['action']['data']['model_name'] = $model;
-            }
         }
 
-        $actions = \Arr::merge($generated_actions, $config['actions']['list']);
+        $actions = \Arr::merge($actions_template, $config['actions']['list']);
 
         foreach ($actions as $key => $action) {
             if ($action === false) {
@@ -208,7 +214,14 @@ class Config_Common
         return $actions;
     }
 
-    protected static function process_data_mapping($application_name, $class, $config)
+    /**
+     * Transforms a "simplified" data_mappping from a config array into a data_mapping usable by the wijgrid.
+     *
+     * @param   string  $class
+     * @param   array   $config
+     * @return  array   The modified data_mapping
+     */
+    protected static function process_data_mapping($model, $config)
     {
         if (!isset($config['data_mapping'])) {
             return array();
@@ -226,6 +239,7 @@ class Config_Common
                 // @todo two keys to process : appdesk and fieldset
                 if (!isset($item['headerText']) && isset($item['title'])) {
                     $item['headerText'] = $item['title'];
+                    unset($item['title']);
                 }
                 if (!isset($item['column']) && !isset($item['value'])) {
                     $item['column'] = str_replace('->', '.', $key);
@@ -238,6 +252,17 @@ class Config_Common
                     // @todo: support multilevel relations ?
                     $item['search_relation'] = $relations[0];
                 }
+                if (!isset($item['cellFormatters'])) {
+                    $item['cellFormatters'] = array();
+                }
+                if (!isset($item['cellFormatters']['link']) && isset($item['column'])) {
+                    if ($item['column'] == $model::title_property()) {
+                        $item['cellFormatters']['link'] = array(
+                            'type' => 'link',
+                            'action' => $model.'.edit',
+                        );
+                    }
+                }
                 $data_mapping[$key] = $item;
             }
         }
@@ -245,6 +270,14 @@ class Config_Common
         return $data_mapping;
     }
 
+    /**
+     * Filter a data_mapping to keep only keys / columns defined by the $filter argument
+     * Used by inspectors to hide most columns.
+     *
+     * @param  array  $initial_data_mapping  Data mapping from the config file
+     * @param  array  $filter                Keys to be filtered (can be column a name)
+     * @return array  A new data mapping containing only they keys to be filtered.
+     */
     protected static function filter_data_mapping($initial_data_mapping, $filter)
     {
         if ($filter != null) {
