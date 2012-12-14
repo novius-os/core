@@ -223,11 +223,14 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      *
      * @return array
      */
-    public function get_all_context($item)
+    public function get_all_context($item, array $filter = array())
     {
         $all = array();
         foreach ($item->find_context('all') as $item) {
-            $all[$item->id] = $item->get($this->_properties['context_property']);
+            $context = $item->get($this->_properties['context_property']);
+            if (empty($filter) || in_array($context, $filter)) {
+                $all[$item->id] = $context;
+            }
         }
 
         return $all;

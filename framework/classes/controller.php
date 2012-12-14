@@ -609,9 +609,9 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_Twinnable')) {
+                if ((empty($params['context']) || (is_array($params['context']) && count($params['context']) > 1)) && $model::behaviours('Nos\Orm_Behaviour_Twinnable')) {
                     $item = $model::find($params['id']);
-                    $contexts = $item->get_all_context();
+                    $contexts = $item->get_all_context($params['context']);
                     $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));
                 } else {
                     $child['where'] = array(array($child['fk'] => $params['id']));
