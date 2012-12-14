@@ -90,6 +90,9 @@ return array(
                 'action' => 'window.open',
                 'url' => '{{previewUrl}}',
             ),
+            'disabled' => function() {
+                return false;
+            },
             'targets' => array(
                 'grid' => true,
                 'toolbar-edit' => true,
