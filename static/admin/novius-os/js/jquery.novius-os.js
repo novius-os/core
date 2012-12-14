@@ -159,7 +159,7 @@ define('jquery-nos',
                             .find('img')
                             .attr({
                                 src : media.path,
-                                title : media.media_title
+                                title : media.title
                             })
                             .css({
                                 width : 0,
@@ -235,7 +235,7 @@ define('jquery-nos',
                         }
                         break;
                 }
-                if (element.disabled) {
+                if (element.disabled && element.disabled === true) {
                     $element.attr('disabled', true);
                 }
 

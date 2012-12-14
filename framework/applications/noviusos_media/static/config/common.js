@@ -50,14 +50,13 @@ define(
                         preview : {
                             options : {
                                 dataParser : function(item) {
-                                    var data = {
+                                    return $.extend(true, {}, item, {
                                         title : item.media_title,
                                         thumbnail : (item.image ? item.thumbnail.replace(/64/g, 256) : item.thumbnailAlternate),
                                         thumbnailAlternate : (item.image ? item.thumbnailAlternate : ''),
-                                        fileName : item.media_file,
+                                        fileName : item.file,
                                         pathFolder : item.path_folder + '/'
-                                    };
-                                    return data;
+                                    });
                                 }
                             }
                         }

@@ -21,7 +21,7 @@ return array(
         'preview' => array(
             'appdesk' => array(
                 'vertical' => true,
-                'reloadEvent' => 'Nos\\Media\\Model_Media',
+                'reloadEvent' => 'Nos\Media\Model_Media',
                 'label' => __('Preview'),
                 'preview' => true,
                 'options' => array(
@@ -30,11 +30,11 @@ return array(
                             'label' => __('File name:'),
                         ),
                         'pathFolder' => array(
-                            'label' => __('Path:')
+                            'label' => __('Path:'),
                         ),
                     ),
-                    'actions' => array('Nos\\Media\\Model_Media.edit', 'Nos\\Media\\Model_Media.delete', 'visualise'),
-                    'actionThumbnail' => 'visualise',
+                    'actions' => array('Nos\Media\Model_Media.edit', 'Nos\Media\Model_Media.delete', 'Nos\Media\Model_Media.visualise'),
+                    'actionThumbnail' => 'Nos\Media\Model_Media.visualise',
                 ),
             )
         )

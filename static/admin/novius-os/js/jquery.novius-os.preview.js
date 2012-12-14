@@ -93,7 +93,9 @@ define('jquery-nos-preview',
                         var action = this,
                             element = $.extend(true, {
                                     type: action.primary ? 'button' : 'link'
-                                }, action),
+                                }, action, {
+                                    disabled : data && data.actions && data.actions[action.name] == false
+                                }),
                             $element = $.nosUIElement(element, data)
                                 .appendTo(self.uiFooter)
                                 .css({marginBottom : '5px'})
@@ -164,7 +166,7 @@ define('jquery-nos-preview',
                                     .click(function(e) {
                                         e.preventDefault();
                                         e.stopImmediatePropagation();
-                                        action.action.apply(this, [self.data]);
+                                        self.element.nosAction(action.action, self.data);
                                     });
                             }
                         img.remove();
