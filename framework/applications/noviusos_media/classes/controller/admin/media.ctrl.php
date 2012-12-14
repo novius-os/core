@@ -12,20 +12,6 @@ namespace Nos\Media;
 
 class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
 {
-    protected function check_permission($action)
-    {
-        parent::check_permission($action);
-        if ($action === 'insert' && !static::check_permission_action('add', 'controller/admin/media/appdesk/list')) {
-            throw new \Exception('Permission denied');
-        }
-        if ($action === 'update' && !static::check_permission_action('add', 'controller/admin/media/appdesk/list')) {
-            throw new \Exception('Permission denied');
-        }
-        if ($action === 'delete' && !static::check_permission_action('delete', 'controller/admin/media/appdesk/list', $this->item)) {
-            throw new \Exception('Permission denied');
-        }
-    }
-
     protected function init_item()
     {
         parent::init_item();
