@@ -19,13 +19,10 @@ define(
                             page_title : {
                                 cellFormatter : function(args) {
                                     if ($.isPlainObject(args.row.data)) {
-                                        var text = "";
                                         if (args.row.data.is_home) {
-                                            text += ' <span class="ui-icon ui-icon-home" style="float:left;"></span> ';
+                                            args.$container.prepend(' <span class="ui-icon ui-icon-home" style="float:left;"></span> ');
                                         }
-                                        text += args.row.data.page_title;
 
-                                        args.$container.html(text);
 
                                         return true;
                                     }

@@ -3,9 +3,9 @@ namespace Nos;
 
 class Config_Common
 {
-    public static function load($class, $filter_data_mapping)
+    public static function load($model, $filter_data_mapping)
     {
-        list($application_name, $file) = \Config::configFile($class);
+        list($application_name, $file) = \Config::configFile($model);
         $file = 'common'.substr($file, strrpos($file, '/'));
 
         $config = \Config::loadConfiguration($application_name, $file);
@@ -25,13 +25,13 @@ class Config_Common
             $config['actions']['order'] = array();
         }
 
-        $config['actions']['list'] = static::process_actions($application_name, $class, $config);
+        $config['actions']['list'] = static::process_actions($application_name, $model, $config);
 
         if (!isset($config['data_mapping'])) {
             $config['data_mapping'] = array();
         }
 
-        $config['data_mapping'] = static::process_data_mapping($config);
+        $config['data_mapping'] = static::process_data_mapping($model, $config);
         $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
 
         return $config;
@@ -217,12 +217,11 @@ class Config_Common
     /**
      * Transforms a "simplified" data_mappping from a config array into a data_mapping usable by the wijgrid.
      *
-     * @param   string  $application_name
      * @param   string  $class
      * @param   array   $config
      * @return  array   The modified data_mapping
      */
-    protected static function process_data_mapping($config)
+    protected static function process_data_mapping($model, $config)
     {
         if (!isset($config['data_mapping'])) {
             return array();
@@ -252,6 +251,17 @@ class Config_Common
                 if (!isset($item['search_relation']) && count($relations) > 1) {
                     // @todo: support multilevel relations ?
                     $item['search_relation'] = $relations[0];
+                }
+                if (!isset($item['cellFormatters'])) {
+                    $item['cellFormatters'] = array();
+                }
+                if (!isset($item['cellFormatters']['link']) && isset($item['column'])) {
+                    if ($item['column'] == $model::title_property()) {
+                        $item['cellFormatters']['link'] = array(
+                            'type' => 'link',
+                            'action' => $model.'.edit',
+                        );
+                    }
                 }
                 $data_mapping[$key] = $item;
             }
