@@ -22,7 +22,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Fill in the context_common_id and context properties when creating the object
      *
-     * @param   Model  The object
+     * @param Orm\Model $item
+     * @internal param \Nos\The $Model object
      * @return void
      */
     public function before_insert(\Nos\Orm\Model $item)
@@ -33,9 +34,11 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $item->set($common_id_property, 0);
         }
     }
+
     /**
      * Updates the context_common_id property
-     * @param  Model $item
+     *
+     * @param \Nos\Orm\Model $item
      * @return void
      */
     public function after_insert(\Nos\Orm\Model $item)
@@ -108,6 +111,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Check if the parent exists in all the contexts of the child
      * @param \Nos\Orm\Model $item
+     * @throws \Exception
      */
     public function change_parent(\Nos\Orm\Model $item)
     {
@@ -125,7 +129,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
                     )));
                 }
             } else {
-                $contexts_self= $this->get_all_context($item);
+                $contexts_self = $this->get_all_context($item);
 
                 $missing_contexts = array_diff($contexts_self, $contexts_parent);
                 if (!empty($missing_contexts)) {
@@ -139,19 +143,18 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         static $in_progress = array();
 
         // Prevents looping in the observer
-        $items = $this->find_context($item, 'all');
-        if (in_array($item->id, $in_progress)) {
-            return;
-        }
-        $in_progress = array_keys($items);
+        $items = $this->find_other_context($item);
+        if (!in_array($item->id, $in_progress)) {
+            $in_progress = array_keys($items);
 
-        foreach ($items as $item) {
-            $parent = $new_parent === null ? null : $new_parent->find_context($item->get_context());
-            $item->set_parent($parent);
+            foreach ($items as $it) {
+                $parent = $new_parent === null ? null : $new_parent->find_context($it->get_context());
+                $it->set_parent($parent);
 
-            $item->save();
+                $it->save();
+            }
+            $in_progress = array();
         }
-        $in_progress = array();
     }
 
     /**
@@ -159,7 +162,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      *
      * @param \Nos\Orm\Model $item
      */
-    public function delete_all_context($item)
+    public function delete_all_context(\Nos\Orm\Model $item)
     {
         foreach ($item->find_context('all') as $item) {
             // This is to trick the is_main_context() method
@@ -172,9 +175,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Returns null if the Model is not twinnable. Returns true or false whether the object is in the main context.
      *
+     * @param \Nos\Orm\Model $item
      * @return bool
      */
-    public function is_main_context($item)
+    public function is_main_context(\Nos\Orm\Model $item)
     {
         // use !! for cast to boolean
         return !!$item->get($this->_properties['is_main_property']);
@@ -183,32 +187,38 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Find the object in the main context
      *
+     * @param \Nos\Orm\Model $item
      * @return \Nos\Orm\Model
      */
-    public function find_main_context($item)
+    public function find_main_context(\Nos\Orm\Model $item)
     {
         return $item->find_context('main');
     }
 
     /**
-     * Find the object in the specified locale. Won't create it when it doesn't exists
+     * Find the object in the specified context. Won't create it when it doesn't exists
      *
-     * @param string | true $context Which locale to retrieve.
+     * @param \Nos\Orm\Model $item
+     * @param string | array $context Which locale to retrieve.
      *  - 'main' will return the main context
      *  - 'all'  will return all the available objects
      *  - any valid locale
+     *  - array  if not empty, return only contexts specified
+     * @return \Nos\Orm\Model | array(\Nos\Orm\Model)
      */
-    public function find_context($item, $context = null)
+    public function find_context(\Nos\Orm\Model $item, $context)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $common_id          = $item->get($common_id_property);
 
-        if ($context == 'all') {
-            return $item->find('all', array(
-                'where' => array(
-                    array($common_id_property, $common_id),
-                ),
-            ));
+        if ($context == 'all' || is_array($context)) {
+            $where = array(
+                array($common_id_property, $common_id),
+            );
+            if (is_array($context) && !empty($context)) {
+                $where[] = array($this->_properties['context_property'], 'IN', $context);
+            }
+            return $item->find('all', array('where' => $where));
         }
 
         return $item->find('first', array(
@@ -219,39 +229,61 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Returns all other available locale for this object
+     * Find objects in other context that the item
      *
+     * @param \Nos\Orm\Model $item
+     * @param array $filter if not empty, return only contexts specified
+     * @return array(\Nos\Orm\Model)
+     */
+    public function find_other_context(\Nos\Orm\Model $item, array $filter = array())
+    {
+        $common_id_property = $this->_properties['common_id_property'];
+        $common_id          = $item->get($common_id_property);
+
+        $where = array(
+            array($common_id_property, $common_id),
+            array($this->_properties['context_property'], '!=', $item->get_context()),
+        );
+        if (!empty($filter)) {
+            $where[] = array($this->_properties['context_property'], 'IN', $filter);
+        }
+        return $item->find('all', array('where' => $where));
+    }
+
+    /**
+     * Returns all available context for this object
+     *
+     * @param \Nos\Orm\Model $item
+     * @param array $filter if not empty, return only contexts specified
      * @return array
      */
-    public function get_all_context($item, array $filter = array())
+    public function get_all_context(\Nos\Orm\Model $item, array $filter = array())
     {
         $all = array();
-        foreach ($item->find_context('all') as $item) {
+        foreach ($item->find_context($filter) as $item) {
             $context = $item->get($this->_properties['context_property']);
-            if (empty($filter) || in_array($context, $filter)) {
-                $all[$item->id] = $context;
-            }
+            $all[$item->id] = $context;
         }
 
         return $all;
     }
 
     /**
-     * Returns all other available locale for this object
+     * Returns all other available context for this object
      *
+     * @param \Nos\Orm\Model $item
+     * @param array $filter if not empty, return only contexts specified
      * @return array
      */
-    public function get_other_context($item)
+    public function get_other_context(\Nos\Orm\Model $item, array $filter = array())
     {
-        $current_context = $item->get_context();
-        $all = $this->get_all_context($item);
-        foreach ($all as $k => $context) {
-            if ($context == $current_context) {
-                unset($all[$k]);
-            }
+        $other = array();
+        foreach ($item->find_other_context($filter) as $item) {
+            $context = $item->get($this->_properties['context_property']);
+            $other[$item->id] = $context;
         }
 
-        return $all;
+        return $other;
     }
 
     /**
