@@ -95,7 +95,7 @@ define('jquery-nos-link-wysiwyg',
                                     .wijtabs('select', 2);
                             })
                             .bind('select_page', function(e, page) {
-                                $real_url.text(params.base_url + page.url);
+                                $real_url.text(page.url);
                                 $input_url.val('nos://page/' + page.id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
