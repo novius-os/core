@@ -14,6 +14,7 @@ define('jquery-nos-link-wysiwyg',
         $.fn.extend({
             nosLinkWysiwyg : function(params) {
                 params = params || {
+                    expert: false,
                     newlink: true,
                     base_url: '',
                     texts: {
@@ -81,6 +82,7 @@ define('jquery-nos-link-wysiwyg',
                                 $input_url.val(value ? 'tel:' + value : '');
                             }),
                         $real_url = $container.find('#' + id + '_url_real'),
+                        $title = $container.find('#' + id + '_title'),
                         $ul = $container.find('> ul')
                             .css({
                                 width : '18%'
@@ -89,12 +91,14 @@ define('jquery-nos-link-wysiwyg',
 
                         $dialog = $container.closest('.ui-dialog-content')
                             .bind('select_media', function(e, media) {
+                                $title.text(media.tilte);
                                 $real_url.text(params.base_url + media.path);
                                 $input_url.val('nos://media/' + media.id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
                             })
                             .bind('select_page', function(e, page) {
+                                $title.text(page.page_title);
                                 $real_url.text(page.url);
                                 $input_url.val('nos://page/' + page.id);
                                 $container.wijtabs('enableTab', 2)
@@ -132,11 +136,11 @@ define('jquery-nos-link-wysiwyg',
                                 }
                             },
 
-                        properties = ['url', 'anchor', 'email', 'phone', 'url_params', 'tooltip', 'target'],
+                        properties = ['title', 'url', 'anchor', 'email', 'phone', 'url_params', 'tooltip', 'target'],
                         types_properties = {
-                                internal : ['url', 'url_params', 'tooltip', 'target'],
+                                internal : ['title', 'url', 'url_params', 'tooltip', 'target'],
                                 external : ['url', 'tooltip', 'target'],
-                                media : ['url', 'tooltip', 'target'],
+                                media : ['title', 'url', 'tooltip', 'target'],
                                 anchor : ['anchor', 'tooltip'],
                                 email : ['email', 'tooltip'],
                                 phone : ['phone', 'tooltip']
@@ -212,54 +216,58 @@ define('jquery-nos-link-wysiwyg',
                     }
 
                     $container.wijtabs({
-                        alignment: 'left',
-                        load: function(e, ui) {
-                            var margin = $(ui.panel).outerHeight(true) - $(ui.panel).innerHeight();
-                            $(ui.panel).height($dialog.height() - margin);
-                        },
-                        disabledIndexes: params.newlink ? [1] : [],
-                        select: function(e, ui) {
-                            var $panel = $(ui.panel);
-                            if ($panel.attr('id') === (id + '_appdesk')) {
-                                $panel.addClass('box-sizing-border');
-                                if (appdesk_loaded != link_type) {
-                                    $panel.empty()
-                                        .show()
-                                        .css({
-                                            width : '100%',
-                                            padding: 0,
-                                            margin: 0
-                                        })
-                                        .load(link_type === 'internal' ? 'admin/noviusos_page/appdesk/index/link_pick' : 'admin/noviusos_media/appdesk/index/media_pick');
-                                    appdesk_loaded = link_type;
-                                }
-                            } else if (ui.panel === $panel_properties[0]) {
-                                var visible_properties = types_properties[link_type],
-                                    $target = $panel_properties.find(':radio[name=target]:checked');
+                            alignment: 'left',
+                            load: function(e, ui) {
+                                var margin = $(ui.panel).outerHeight(true) - $(ui.panel).innerHeight();
+                                $(ui.panel).height($dialog.height() - margin);
+                            },
+                            disabledIndexes: params.newlink ? [1] : [],
+                            select: function(e, ui) {
+                                var $panel = $(ui.panel);
+                                if ($panel.attr('id') === (id + '_appdesk')) {
+                                    $panel.addClass('box-sizing-border');
+                                    if (appdesk_loaded != link_type) {
+                                        $panel.empty()
+                                            .show()
+                                            .css({
+                                                width : '100%',
+                                                padding: 0,
+                                                margin: 0
+                                            })
+                                            .load(link_type === 'internal' ? 'admin/noviusos_page/appdesk/index/link_pick' : 'admin/noviusos_media/appdesk/index/media_pick');
+                                        appdesk_loaded = link_type;
+                                    }
+                                } else if (ui.panel === $panel_properties[0]) {
+                                    var visible_properties = types_properties[link_type],
+                                        $target = $panel_properties.find(':radio[name=target]:checked');
 
-                                $select_anchors.add($input_email).add($input_phone).removeClass('required');
-                                $container.find('#' + id + '_' + visible_properties[0]).addClass('required');
+                                    $select_anchors.add($input_email).add($input_phone).removeClass('required');
+                                    $container.find('#' + id + '_' + visible_properties[0]).addClass('required');
 
-                                $.each(properties, function(i, property) {
-                                    $panel_properties.find('#tr_' + id + '_' + property)
-                                        [$.inArray(property, visible_properties) === -1 ? 'hide' : 'show']();
-                                });
-                                if (!$target.size()) {
-                                    $panel_properties.find(':radio[name=target]').eq(link_type === 'internal' ? 1 : 0).prop('checked', true);
+                                    $.each(properties, function(i, property) {
+                                        $panel_properties.find('#tr_' + id + '_' + property)
+                                            [$.inArray(property, visible_properties) === -1 ? 'hide' : 'show']();
+                                    });
+                                    if (!params.expert) {
+                                        $panel_properties.find('#tr_' + id + '_url').hide();
+                                        $panel_properties.find('#tr_' + id + '_url_params').hide();
+                                    }
+                                    if (!$target.size()) {
+                                        $panel_properties.find(':radio[name=target]').eq(link_type === 'internal' ? 1 : 0).prop('checked', true);
+                                    }
+                                    if ($.inArray(link_type, ['media', 'internal']) !== -1) {
+                                        $real_url.show();
+                                        $input_url.hide();
+                                    } else {
+                                        $real_url.hide();
+                                        $input_url.show();
+                                    }
                                 }
-                                if ($.inArray(link_type, ['media', 'internal']) !== -1) {
-                                    $real_url.show();
-                                    $input_url.hide();
-                                } else {
-                                    $real_url.hide();
-                                    $input_url.show();
-                                }
+                            },
+                            show: function(e, ui) {
+                                $(ui.panel).nosOnShow();
                             }
-                        },
-                        show: function(e, ui) {
-                            $(ui.panel).nosOnShow();
-                        }
-                    })
+                        })
                         .find('.wijmo-wijtabs-content')
                         .css('width', '81%')
                         .addClass('box-sizing-border')

@@ -52,6 +52,10 @@ $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties'
     <div id="<?= $id_properties ?>">
         <form action="#">
             <table class="fieldset" >
+                <tr id="tr_<?= $uniqid ?>_title">
+                    <th><?= __('Title:') ?></th>
+                    <td colspan="6"><span id="<?= $uniqid ?>_title"></span></td>
+                </tr>
                 <tr id="tr_<?= $uniqid ?>_url">
                     <th><label for="<?= $uniqid ?>_url"><?= __('URL:') ?> </label></th>
                     <td colspan="6"><span id="<?= $uniqid ?>_url_real"></span><input name="url" type="text" value="" size="60" id="<?= $uniqid ?>_url" class="required" /></td>
@@ -96,6 +100,7 @@ require(
     function($) {
         $(function() {
             $('#<?= $uniqid ?>').nosLinkWysiwyg({
+                expert: <?= \Format::forge((bool) \Session::user()->user_expert)->to_json() ?>,
                 newlink: !'<?= $edit ?>',
                 base_url: '<?= \Uri::base(true) ?>',
                 texts: {
