@@ -879,7 +879,7 @@ define('jquery-nos-ostabs',
                 $li.removeClass( "ui-state-active ui-state-open" );
 
                 if (!notSelectAfter) {
-                    openIndex = index > 2 ? index - 1 : (self.lis.length > 2 ? 2 : 0);
+                    openIndex = index > 2 ? index - 1 : (self.lis.length > 3 ? 1 : 0);
                     // Open the last tab in stack opening or the 0 index
                     self.lis.each(function(i) {
                         var $litemp = $(this),
