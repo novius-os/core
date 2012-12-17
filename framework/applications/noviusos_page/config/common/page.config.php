@@ -42,9 +42,7 @@ return array(
 
         // Blank slate
         'error added in context not parent' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language) #new var
-        'error added in context' => __('This page cannot be added in {{context}}.'), #wtf what's this string for? #new var
-        'item inexistent in context yet' => __('This page has not been added in {{context}} yet.'), #new var
-        'add an item in context' => __('Add a new page in {{context}}'), #new var
+        'error added in context' => __('This page cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'), #new var
 
         // Deletion popup
         'delete an item' => __('Deleting the page ‘{{title}}’'), #new var

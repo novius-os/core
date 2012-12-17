@@ -14,8 +14,7 @@ return array(
 
     // Blank slate
     'error added in context not parent' => 'We’re afraid this item cannot be added in {{context}} because its <a>parent</a> is not available in this context yet.', #wtf two strings needed here (this context / this language) #new var
-    'error added in context' => 'This item cannot be added {{context}}.', #wtf what's this string for? #new var
-    'add an item in context' => 'Add a new item in {{context}}', #new var
+    'error added in context' => 'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)', #new var
 
     // Deletion popup
     'delete an item' => 'Deleting the item {{title}}', #new var
