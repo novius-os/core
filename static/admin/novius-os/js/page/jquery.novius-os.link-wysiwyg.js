@@ -271,7 +271,10 @@ define('jquery-nos-link-wysiwyg',
                             }
                         })
                         .find('.wijmo-wijtabs-content')
-                        .css('width', '81%')
+                        .css({
+                            width: '81%',
+                            position: 'relative'
+                        })
                         .addClass('box-sizing-border')
                         .end()
                         .nosFormUI();

@@ -184,7 +184,10 @@ define('jquery-nos-image-wysiwyg',
                                 }
                             })
                             .find('.wijmo-wijtabs-content')
-                            .css('width', '81%')
+                            .css({
+                                width: '81%',
+                                position: 'relative'
+                            })
                             .addClass('box-sizing-border')
                             .end()
                             .nosFormUI();
