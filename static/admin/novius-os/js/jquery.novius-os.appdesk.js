@@ -805,7 +805,8 @@ define('jquery-nos-appdesk',
                             clearTimeout(self.timeoutSearchInput);
                         }
 
-                        if ($.inArray(event.keyCode, [keyCode.ENTER, keyCode.NUMPAD_ENTER]) != -1) {
+                        // Don't ever use keyCode.NUMPAD_ENTER here, it conflicts with "L" minuscule
+                        if (event.keyCode === keyCode.ENTER) {
                             if (o.defaultView === 'treeGrid') {
                                 self.uiViewsButtons.find('#view_grid').click().blur();
                             } else {
