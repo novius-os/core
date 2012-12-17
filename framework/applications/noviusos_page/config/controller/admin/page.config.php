@@ -24,7 +24,7 @@ return array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
         'labels' => array(
             'insert' => __('Add a page'),
-            'blankSlate' => __('Translate a page'),
+            'blankSlate' => __('Translate a page'), #wtf
         ),
     ),
     'layout' => array(
@@ -58,7 +58,7 @@ return array(
                                         <div data-id="internal" style="display:none;">
                                             <p style="padding:1em;">We\'re sorry, internal links are not supported yet. We need a nice page selector before that.</p>
                                         </div>
-                                        <div data-id="wysiwyg" style="display:none;"></div>',
+                                        <div data-id="wysiwyg" style="display:none;"></div>', #wtf
                                 ),
                             ),
                         ),
@@ -74,7 +74,7 @@ return array(
                     __('SEO') => array(
                         'page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords',
                     ),
-                    __('Admin') => array(
+                    __('Advanced options') => array(
                         'header_class' => 'faded',
                         'content_class' => 'faded',
                         'fields' => array('page_cache_duration', 'page_lock'),
@@ -175,13 +175,13 @@ return array(
             ),
         ),
         'page_external_link_type' => array(
-            'label' => __('Target: '),
+            'label' => __('Opens in: '), #wtf final space to be trimmed
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Page\Model_Page::EXTERNAL_TARGET_NEW => __('New window'),
-                    Nos\Page\Model_Page::EXTERNAL_TARGET_POPUP => __('Popup'),
-                    Nos\Page\Model_Page::EXTERNAL_TARGET_SAME => __('Same window'),
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_NEW => __('A new window or tab'),
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_POPUP => __('A pop-up window'), #wtf
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_SAME => __('The same window or tab'),
                 ),
             ),
         ),
@@ -192,25 +192,25 @@ return array(
                 'options' => array(
                     Nos\Page\Model_Page::TYPE_CLASSIC => __('Page'),
                     /*Nos\Model_Page::TYPE_FOLDER => __('Folder / Chapter'),
-                 Nos\Model_Page::TYPE_INTERNAL_LINK => __('Internal link'),*/
+                 Nos\Model_Page::TYPE_INTERNAL_LINK => __('Internal link'),*/ #wtf
                     Nos\Page\Model_Page::TYPE_EXTERNAL_LINK => __('External link'),
                 ),
             ),
         ),
         'page_lock' => array(
-            'label' => __('Lock status: '),
+            'label' => __('Lock the page: '),
             'form' => array(
                 'type' => 'select',
                 'options' => array(
-                    Nos\Page\Model_Page::LOCK_UNLOCKED => __('Unlocked'),
-                    Nos\Page\Model_Page::LOCK_DELETION => __('Deletion'),
-                    Nos\Page\Model_Page::LOCK_EDITION => __('Modification'),
+                    Nos\Page\Model_Page::LOCK_UNLOCKED => __('No, leave unlocked'),
+                    Nos\Page\Model_Page::LOCK_DELETION => __('Prevent deletion'),
+                    Nos\Page\Model_Page::LOCK_EDITION => __('Prevent update'), #wtf
                 ),
             ),
             'expert' => true,
         ),
         'page_cache_duration' => array(
-            'label' => __('Regenerate every {duration} seconds'),
+            'label' => __('Regenerate the cache every {duration} seconds'),
             'form' => array(
                 'type' => 'text',
                 'size' => 4,

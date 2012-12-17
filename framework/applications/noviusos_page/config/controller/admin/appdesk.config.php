@@ -32,9 +32,9 @@ return array(
         'item' => __('page'),
         'items' => __('pages'),
         'showNbItems' => __('Showing {{x}} pages out of {{y}}'),
-        'showOneItem' => __('Show 1 page'),
+        'showOneItem' => __('Showing 1 page'),
         'showNoItem' => __('No pages'),
-        'showAll' => __('Show all pages'),
+        'showAll' => __('Showing all pages'),
     ),
     'appdesk' => array(
         'appdesk' => array(

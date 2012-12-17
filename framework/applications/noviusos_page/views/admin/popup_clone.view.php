@@ -12,7 +12,7 @@ $id = $uniqid = uniqid('form_');
 
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
-<p><?= strtr($crud['i18n']['exists in multiple context'], array(
+<p><?= strtr($crud['i18n']['exists in multiple context'], array( #deconstruction
     '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
     '{count}' => count($contexts_list),
 )) ?></p>
