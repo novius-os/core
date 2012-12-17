@@ -13,5 +13,18 @@ if ($save_field) {
 } else {
     throw new \Exception('The save field is not present or incorrectly configured.');
 }
+$unique_id = uniqid('cancel_');
 ?>
-&nbsp; <?= __('or') ?> &nbsp; <a href="#" onclick="javascript:$nos(this).nosTabs('close');return false;"><?= __('Cancel') ?></a>
+&nbsp; <?= __('or') ?> &nbsp; <a id="<?= $unique_id ?>" href="#"><?= __('Cancel') ?></a>
+<script type="text/javascript">
+    require(['jquery-nos'], function ($) {
+        $(function () {
+            $('#<?= $unique_id ?>').click(function(e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                $(this).nosTabs('close');
+            });
+        });
+    });
+</script>

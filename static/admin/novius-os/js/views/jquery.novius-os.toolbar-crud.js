@@ -90,6 +90,7 @@ define('jquery-nos-toolbar-crud',
                         };
 
                     $container.nosToolbar('add', params.saveField)
+                        .filter('button:first')
                         .click(function() {
                             if ($container.is('form')) {
                                 $container.submit();
