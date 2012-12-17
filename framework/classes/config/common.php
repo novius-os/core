@@ -227,43 +227,35 @@ class Config_Common
             return array();
         }
         $data_mapping = array();
-        foreach ($config['data_mapping'] as $key => $item) {
-            if (is_string($item)) {
-                $key = $item;
-                $item = array();
+        foreach ($config['data_mapping'] as $key => $data) {
+            if (is_string($data)) {
+                $key = $data;
+                $data = array();
             }
             if ($key === 'context') {
-                $data_mapping[$key] = $item;
+                $data_mapping[$key] = $data;
             }
-            if (is_array($item)) {
+            if (is_array($data)) {
                 // @todo two keys to process : appdesk and fieldset
-                if (!isset($item['headerText']) && isset($item['title'])) {
-                    $item['headerText'] = $item['title'];
-                    unset($item['title']);
+                if (!isset($data['headerText']) && isset($data['title'])) {
+                    $data['headerText'] = $data['title'];
+                    unset($data['title']);
                 }
-                if (!isset($item['column']) && !isset($item['value'])) {
-                    $item['column'] = str_replace('->', '.', $key);
+                if (!isset($data['column']) && !isset($data['value'])) {
+                    $data['column'] = str_replace('->', '.', $key);
                 }
-                if (!isset($item['search_column']) && isset($item['column'])) {
-                    $item['search_column'] = $item['column'];
+                if (!isset($data['search_column']) && isset($data['column'])) {
+                    $data['search_column'] = $data['column'];
                 }
                 $relations = explode('->', $key);
-                if (!isset($item['search_relation']) && count($relations) > 1) {
+                if (!isset($data['search_relation']) && count($relations) > 1) {
                     // @todo: support multilevel relations ?
-                    $item['search_relation'] = $relations[0];
+                    $data['search_relation'] = $relations[0];
                 }
-                if (!isset($item['cellFormatters'])) {
-                    $item['cellFormatters'] = array();
+                if (!isset($data['cellFormatters'])) {
+                    $data['cellFormatters'] = array();
                 }
-                if (!isset($item['cellFormatters']['link']) && isset($item['column'])) {
-                    if ($item['column'] == $model::title_property()) {
-                        $item['cellFormatters']['link'] = array(
-                            'type' => 'link',
-                            'action' => $model.'.edit',
-                        );
-                    }
-                }
-                $data_mapping[$key] = $item;
+                $data_mapping[$key] = $data;
             }
         }
 
