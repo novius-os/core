@@ -28,21 +28,21 @@ if (!in_array($context, $possible)) {
     $parent = $crud['behaviours']['tree'] ? $item->get_parent() : null;
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
-        echo strtr(__('error added in context not parent'), array(
-            '{context}' => \Nos\Tools_Context::contextLabel($context),
-            '{parent}' => '<a href="javascript:void;" id="'.$uniqid_parent.'">'.__('parent').'</a>',
+        echo strtr($crud['config']['i18n']['error added in context not parent'], array(
+            '{{context}}' => \Nos\Tools_Context::contextLabel($context),
+            '<a>' => '<a href="javascript:void;" id="'.$uniqid_parent.'">',
         ));
         ?>
         <script type="text/javascript">
             require(['jquery-nos'], function($) {
                $('#<?= $uniqid_parent ?>').click(function() {
-                   $(this).tab('open', <?= \Format::forge()->to_json(array('url' => $url_insert_update.'/'.$parent->id.'?context='.$context)) ?>);
+                   $(this).nosTabs('open', <?= \Format::forge()->to_json(array('url' => $crud['url_insert_update'].'/'.$parent->id.'?context='.$context)) ?>);
                });
             });
         </script>
         <?php
     } else {
-        echo strtr(__('error added in context'), array('{context}' => \Nos\Tools_Context::contextLabel($context)));
+        echo strtr($crud['config']['i18n']['error added in context'], array('{{context}}' => \Nos\Tools_Context::contextLabel($context)));
     }
 } else {
     foreach ($possible as $possible_context) {
