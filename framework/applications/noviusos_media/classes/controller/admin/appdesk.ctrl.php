@@ -29,8 +29,14 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
                     $data = $data['value'];
                 }
 
+                if ($data === true) {
+                    continue;
+                }
+
                 if (is_callable($data)) {
                     $item[$key] = call_user_func($data, $media);
+                } else if (is_array($data)) {
+                    $item[$key] = $media->get($data['column']);
                 } else {
                     $item[$key] = $media->get($data);
                 }

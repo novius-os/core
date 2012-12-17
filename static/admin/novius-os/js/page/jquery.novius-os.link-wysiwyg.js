@@ -91,7 +91,7 @@ define('jquery-nos-link-wysiwyg',
 
                         $dialog = $container.closest('.ui-dialog-content')
                             .bind('select_media', function(e, media) {
-                                $title.text(media.tilte);
+                                $title.text(media.title);
                                 $real_url.text(params.base_url + media.path);
                                 $input_url.val('nos://media/' + media.id);
                                 $container.wijtabs('enableTab', 2)
@@ -182,7 +182,8 @@ define('jquery-nos-link-wysiwyg',
                                     url: params.base_url + 'admin/noviusos_page/appdesk/info/' + found[1],
                                     dataType: 'json',
                                     success: function(page) {
-                                        $real_url.text(params.base_url + page.url);
+                                        $title.text(page.page_title);
+                                        $real_url.text(page.url);
                                     }
                                 });
                                 $input_url_params.val(found[2]);
@@ -196,6 +197,7 @@ define('jquery-nos-link-wysiwyg',
                                     url: params.base_url + 'admin/noviusos_media/appdesk/info/' + found[1],
                                     dataType: 'json',
                                     success: function(media) {
+                                        $title.text(media.title);
                                         $real_url.text(params.base_url + media.path);
                                     }
                                 });

@@ -1453,9 +1453,291 @@ define('jquery-nos-appdesk',
 
         $.extend({
             appdeskAdd: function(id, config) {
-                var self = this;
-                var onCustom = false;
-                var jsonFile = "";
+                var self = this,
+                    onCustom = false,
+                    jsonFile = "",
+                    appdesk,
+                    appdeskSetup = function(config) {
+                        var configToUse = $.extend({}, true, config);
+                        var i18n = config.i18n || {};
+
+                        var self = {},
+                            objectToArray = function(val, i) {
+                                val['setupkey'] = i;
+                                return val;
+                            },
+
+                            keyToOrderedArray = function(object, key) {
+                                if (object[key + 'Order']) {
+                                    var keys = object[key + 'Order'].split(',');
+                                    var ordered = [];
+                                    for (var i = 0; i < keys.length; i++) {
+                                        // Remove null values
+                                        if (object[key][keys[i]] != null) {
+                                            object[key][keys[i]]['setupkey'] = keys[i];
+                                            ordered.push(object[key][keys[i]]);
+                                        }
+                                    }
+                                    return ordered;
+                                } else {
+                                    return $.map(object[key], objectToArray);
+                                }
+                            },
+
+                            recursive = function(object) {
+                                $.each(object, function(key, val) {
+                                    var actions = [];
+                                    if ($.isPlainObject(val)) {
+                                        if ($.isFunction(val._)) {
+                                            // Translate value
+                                            object[key] = val._();
+                                        } else {
+                                            recursive(val);
+                                        }
+                                    } else if ($.isArray(val)) {
+                                        recursive(val);
+                                    }
+
+                                    // Build actions columns if any, and translate columns properties
+                                    if (key === 'columns') {
+                                        object[key] = keyToOrderedArray(object, key);
+                                        for (var i = 0; i < object[key].length; i++) {
+                                            if (object[key][i].context) {
+                                                if (configToUse.hideContexts) {
+                                                    object[key].splice(i, 1);
+                                                    continue;
+                                                }
+                                                object[key][i] = {
+                                                    headerText : i18n.contexts || 'Contexts',
+                                                    dataKey    : 'context',
+                                                    setupkey   : 'context',
+                                                    showFilter : false,
+                                                    cellFormatter : function(args) {
+                                                        if (args.row.type & $.wijmo.wijgrid.rowType.data) {
+                                                            args.$container.css("text-align", "center").html(args.row.data.context);
+                                                            return true;
+                                                        }
+                                                    },
+                                                    width : 1
+                                                };
+                                            } else if (object[key][i].actions) {
+                                                actions = object[key][i].actions;
+                                                var width;
+                                                var showOnlyArrow = object[key][i].showOnlyArrow ? true : false;
+
+                                                if (showOnlyArrow) {
+                                                    width = 20;
+                                                } else {
+                                                    width = $.grid.getActionWidth(actions);
+
+                                                    if (actions.length > 1) {
+                                                        // Reserve space for the dropdown actions menu
+                                                        //width -= 20;
+                                                    }
+                                                    // At least 80px wide
+                                                    //width = Math.max(width, 80);
+                                                }
+
+                                                // Make the drop-down actions columns
+                                                object[key][i] = {
+                                                    headerText : showOnlyArrow ? '' : '',
+                                                    cellFormatter : function(args) {
+                                                        var buttons;
+                                                        if ($.isPlainObject(args.row.data)) {
+
+                                                            buttons = $.appdeskActions(actions, args.row.data, {
+                                                                showOnlyArrow : showOnlyArrow
+                                                            });
+
+                                                            buttons.appendTo(args.$container);
+                                                            args.$container.parent().addClass('buttontd').css({width: width + 1});
+
+                                                            return true;
+                                                        }
+                                                    },
+                                                    allowSizing : false,
+                                                    allowSort : false,
+                                                    width : width,
+                                                    ensurePxWidth : true,
+                                                    showFilter : false,
+                                                    setupkey: 'actions'
+                                                };
+                                            } else if (object[key][i].cellFormatters) {
+                                                (function() {
+                                                    var cellFormatters = $.isPlainObject(object[key][i].cellFormatters) ? object[key][i].cellFormatters : [object[key][i].cellFormatter];
+                                                    var oldCellFormatter = object[key][i].cellFormatter;
+                                                    object[key][i] = $.extend(object[key][i], {
+                                                        cellFormatter : function(args) {
+                                                            if (args.row.type & $.wijmo.wijgrid.rowType.data) {
+                                                                args.$container.html(args.formattedValue);
+                                                                if ($.isFunction(oldCellFormatter)) {
+                                                                    oldCellFormatter.call(this, args);
+                                                                }
+                                                                $.each(cellFormatters, function(i, formatter) {
+                                                                    formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
+                                                                    switch (formatter.type) {
+                                                                        case 'bold':
+                                                                            args.$container.css('font-weight', 'bold');
+                                                                            break;
+
+                                                                        case 'css':
+                                                                            if ($.type(formatter.css) === 'object') {
+                                                                                args.$container.css(formatter.css);
+                                                                            }
+                                                                            break;
+
+                                                                        case 'link':
+                                                                            args.$container.wrapInner(
+                                                                                $('<a href="#"></a>')
+                                                                                    .click(function(e) {
+                                                                                        e.preventDefault();
+                                                                                        if (formatter.action === 'default' && actions.length && actions[0].action) {
+                                                                                            formatter.action = actions[0].action;
+                                                                                        }
+                                                                                        if (formatter.action && $.type(formatter.action) !== 'object' && appdesk.actions && appdesk.actions[formatter.action]) {
+                                                                                            formatter.action = appdesk.actions[formatter.action].action;
+                                                                                        }
+                                                                                        if ($.type(formatter.action) === 'object') {
+                                                                                            $(this).nosAction(formatter.action, args.row.data);
+                                                                                        }
+                                                                                    })
+                                                                            )
+                                                                            break;
+                                                                    }
+                                                                });
+
+                                                                return true;
+                                                            }
+                                                        }
+                                                    });
+                                                })();
+                                            }
+                                        }
+                                    }
+                                });
+                            },
+
+                            self = {
+                                tab : null,
+                                appdesk : {
+                                    buttons : {},
+                                    grid : {
+                                        urlJson : '',
+                                        columns : {}
+                                    },
+                                    thumbnails : null,
+                                    defaultView : 'grid',
+                                    inspectors : {},
+                                    splittersVertical : null,
+                                    splittersHorizontal : null
+                                },
+
+                                i18nMessages : {},
+
+                                i18n : function(label) {
+                                    var o = {};
+                                    var self = this;
+
+                                    $.extend(o, {
+                                        label : label,
+                                        _ : function() {
+                                            return self.i18nMessages[o.label] || o.label;
+                                        }
+                                    });
+
+                                    return o;
+                                },
+
+                                build : function() {
+                                    // Clone object
+                                    var params = $.extend(true, {
+                                        appdesk : {
+                                            texts : this.i18nMessages,
+                                            splitters : {},
+                                            slidersChange : function(e, rapport) {
+                                                //$.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
+                                            }
+                                        }
+                                    }, this);
+
+                                    if (params.appdesk.splittersVertical) {
+                                        params.appdesk.splitters.vertical = {splitterDistance : params.appdesk.splittersVertical};
+                                    }
+                                    if (params.appdesk.splittersHorizontal) {
+                                        params.appdesk.splitters.horizontal = {splitterDistance : params.appdesk.splittersHorizontal};
+                                    }
+                                    params.appdesk.buttons = $.map(params.appdesk.buttons, objectToArray);
+
+
+                                    params.appdesk.inspectors = keyToOrderedArray(params.appdesk, 'inspectors');
+
+                                    // 'actions' is an object containing all the possible actions
+                                    // 'appdesk.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
+                                    if (params.actions) {
+                                        var gridActions = params.actions;
+                                        if (params.appdesk.grid.columns.actions && params.appdesk.grid.columns.actions.actions) {
+                                            $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
+                                                if ($.type(val) == 'string') {
+                                                    params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
+                                                }
+                                            });
+                                        }
+                                        if (params.appdesk.treeGrid && params.appdesk.treeGrid.columns && params.appdesk.treeGrid.columns.actions && params.appdesk.treeGrid.columns.actions.actions) {
+                                            $.each(params.appdesk.treeGrid.columns.actions.actions, function(i, val) {
+                                                if ($.type(val) == 'string') {
+                                                    params.appdesk.treeGrid.columns.actions.actions[i] = gridActions[val];
+                                                }
+                                            });
+                                        }
+                                        if (params.appdesk.thumbnails && params.appdesk.thumbnails.actions) {
+                                            $.each(params.appdesk.thumbnails.actions, function(i, val) {
+                                                if ($.type(val) == 'string') {
+                                                    params.appdesk.thumbnails.actions[i] = gridActions[val];
+                                                }
+                                            });
+                                        }
+                                        $.each(params.appdesk.inspectors, function(i, inspector) {
+                                            if (inspector.preview && inspector.options.actions) {
+                                                $.each(inspector.options.actions, function(i, val) {
+                                                    if ($.type(val) == 'string') {
+                                                        inspector.options.actions[i] = gridActions[val];
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+
+                                    //
+                                    configToUse = params.appdesk;
+
+                                    // Translate clone object
+                                    recursive(params);
+
+                                    // Build properties for preview inspector
+                                    for (var i = 0; i < params.appdesk.inspectors.length; i++) {
+                                        if (params.appdesk.inspectors[i].preview) {
+                                            params.appdesk.inspectors[i].url = function($li) {
+                                                var inspectorData = $li.data('inspector'),
+                                                    widget = $('<div></div>')
+                                                        .appendTo($li)
+                                                        .preview(inspectorData.options)
+                                                        .parent()
+                                                        .on({
+                                                            widgetResize: function() {
+                                                                widget.preview('resize');
+                                                            }
+                                                        })
+                                                        .end();
+                                            };
+                                        }
+                                    }
+
+                                    return params;
+                                }
+                            };
+                        return self;
+                    };
+
 
                 if (config.selectedView == 'custom') {
                     if (config.custom) {
@@ -1470,7 +1752,7 @@ define('jquery-nos-appdesk',
                     jsonFile = config.views[config.selectedView].json;
                 }
 
-                var appdesk = $.appdeskSetup(config);
+                appdesk = appdeskSetup(config);
                 $.extend(true, appdesk.i18nMessages, config.i18n);
 
                 if ($.isPlainObject(config.appdesk)) {
@@ -1583,283 +1865,6 @@ define('jquery-nos-appdesk',
                 } else {
                     init();
                 }
-            },
-
-            appdeskSetup : function(config) {
-                var configToUse = $.extend({}, true, config);
-                var i18n = config.i18n || {};
-
-                var self = {},
-                    objectToArray = function(val, i) {
-                        val['setupkey'] = i;
-                        return val;
-                    },
-
-                    keyToOrderedArray = function(object, key) {
-                        if (object[key + 'Order']) {
-                            var keys = object[key + 'Order'].split(',');
-                            var ordered = [];
-                            for (var i = 0; i < keys.length; i++) {
-                                // Remove null values
-                                if (object[key][keys[i]] != null) {
-                                    object[key][keys[i]]['setupkey'] = keys[i];
-                                    ordered.push(object[key][keys[i]]);
-                                }
-                            }
-                            return ordered;
-                        } else {
-                            return $.map(object[key], objectToArray);
-                        }
-                    },
-
-                    recursive = function(object) {
-                        $.each(object, function(key, val) {
-                            if ($.isPlainObject(val)) {
-                                if ($.isFunction(val._)) {
-                                    // Translate value
-                                    object[key] = val._();
-                                } else {
-                                    recursive(val);
-                                }
-                            } else if ($.isArray(val)) {
-                                recursive(val);
-                            }
-
-                            // Build actions columns if any, and translate columns properties
-                            if (key === 'columns') {
-                                object[key] = keyToOrderedArray(object, key);
-                                for (var i = 0; i < object[key].length; i++) {
-                                    if (object[key][i].context) {
-                                        if (configToUse.hideContexts) {
-                                            object[key].splice(i, 1);
-                                            continue;
-                                        }
-                                        object[key][i] = {
-                                            headerText : i18n.contexts || 'Contexts',
-                                            dataKey    : 'context',
-                                            setupkey   : 'context',
-                                            showFilter : false,
-                                            cellFormatter : function(args) {
-                                                if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                    args.$container.css("text-align", "center").html(args.row.data.context);
-                                                    return true;
-                                                }
-                                            },
-                                            width : 1
-                                        };
-                                    } else if (object[key][i].actions) {
-                                        var actions = object[key][i].actions;
-                                        var width;
-                                        var showOnlyArrow = object[key][i].showOnlyArrow ? true : false;
-
-                                        if (showOnlyArrow) {
-                                            width = 20;
-                                        } else {
-                                            width = $.grid.getActionWidth(actions);
-
-                                            if (actions.length > 1) {
-                                                // Reserve space for the dropdown actions menu
-                                                //width -= 20;
-                                            }
-                                            // At least 80px wide
-                                            //width = Math.max(width, 80);
-                                        }
-
-                                        // Make the drop-down actions columns
-                                        object[key][i] = {
-                                            headerText : showOnlyArrow ? '' : '',
-                                            cellFormatter : function(args) {
-                                                var buttons;
-                                                if ($.isPlainObject(args.row.data)) {
-
-                                                    buttons = $.appdeskActions(actions, args.row.data, {
-                                                        showOnlyArrow : showOnlyArrow
-                                                    });
-
-                                                    buttons.appendTo(args.$container);
-                                                    args.$container.parent().addClass('buttontd').css({width: width + 1});
-
-                                                    return true;
-                                                }
-                                            },
-                                            allowSizing : false,
-                                            allowSort : false,
-                                            width : width,
-                                            ensurePxWidth : true,
-                                            showFilter : false,
-                                            setupkey: 'actions'
-                                        };
-                                    } else if (object[key][i].cellFormatters) {
-                                        (function() {
-                                            var cellFormatters = $.isPlainObject(object[key][i].cellFormatters) ? object[key][i].cellFormatters : [object[key][i].cellFormatter];
-                                            var oldCellFormatter = object[key][i].cellFormatter;
-                                            object[key][i] = $.extend(object[key][i], {
-                                                cellFormatter : function(args) {
-                                                    if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                        args.$container.html(args.formattedValue);
-                                                        if ($.isFunction(oldCellFormatter)) {
-                                                            oldCellFormatter.call(this, args);
-                                                        }
-                                                        $.each(cellFormatters, function(i, formatter) {
-                                                            formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
-                                                            switch (formatter.type) {
-                                                                case 'bold':
-                                                                    args.$container.css('font-weight', 'bold');
-                                                                    break;
-
-                                                                case 'css':
-                                                                    if ($.type(formatter.css) === 'object') {
-                                                                        args.$container.css(formatter.css);
-                                                                    }
-                                                                    break;
-
-                                                                case 'link':
-                                                                    args.$container.wrapInner(
-                                                                        $('<a href="#"></a>')
-                                                                            .click(function(e) {
-                                                                                e.preventDefault();
-                                                                                if (formatter.action && $.type(formatter.action) !== 'object' && config.appdesk.actions && config.appdesk.actions[formatter.action]) {
-                                                                                    formatter.action = config.appdesk.actions[formatter.action].action;
-                                                                                }
-                                                                                if ($.type(formatter.action) === 'object') {
-                                                                                    $(this).nosAction(formatter.action, args.row.data);
-                                                                                }
-                                                                            })
-                                                                        )
-                                                                    break;
-                                                            }
-                                                        });
-
-                                                        return true;
-                                                    }
-                                                }
-                                            });
-                                        })();
-                                    }
-                                }
-                            }
-                        });
-                    },
-
-                    self = {
-                        tab : null,
-                        appdesk : {
-                            buttons : {},
-                            grid : {
-                                urlJson : '',
-                                columns : {}
-                            },
-                            thumbnails : null,
-                            defaultView : 'grid',
-                            inspectors : {},
-                            splittersVertical : null,
-                            splittersHorizontal : null
-                        },
-
-                        i18nMessages : {},
-
-                        i18n : function(label) {
-                            var o = {};
-                            var self = this;
-
-                            $.extend(o, {
-                                label : label,
-                                _ : function() {
-                                    return self.i18nMessages[o.label] || o.label;
-                                }
-                            });
-
-                            return o;
-                        },
-
-                        build : function() {
-                            // Clone object
-                            var params = $.extend(true, {
-                                appdesk : {
-                                    texts : this.i18nMessages,
-                                    splitters : {},
-                                    slidersChange : function(e, rapport) {
-                                        //$.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
-                                    }
-                                }
-                            }, this);
-
-                            if (params.appdesk.splittersVertical) {
-                                params.appdesk.splitters.vertical = {splitterDistance : params.appdesk.splittersVertical};
-                            }
-                            if (params.appdesk.splittersHorizontal) {
-                                params.appdesk.splitters.horizontal = {splitterDistance : params.appdesk.splittersHorizontal};
-                            }
-                            params.appdesk.buttons = $.map(params.appdesk.buttons, objectToArray);
-
-
-                            params.appdesk.inspectors = keyToOrderedArray(params.appdesk, 'inspectors');
-
-                            // 'actions' is an object containing all the possible actions
-                            // 'appdesk.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
-                            if (params.actions) {
-                                var gridActions = params.actions;
-                                if (params.appdesk.grid.columns.actions && params.appdesk.grid.columns.actions.actions) {
-                                    $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
-                                        if ($.type(val) == 'string') {
-                                            params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
-                                        }
-                                    });
-                                }
-                                if (params.appdesk.treeGrid && params.appdesk.treeGrid.columns && params.appdesk.treeGrid.columns.actions && params.appdesk.treeGrid.columns.actions.actions) {
-                                    $.each(params.appdesk.treeGrid.columns.actions.actions, function(i, val) {
-                                        if ($.type(val) == 'string') {
-                                            params.appdesk.treeGrid.columns.actions.actions[i] = gridActions[val];
-                                        }
-                                    });
-                                }
-                                if (params.appdesk.thumbnails && params.appdesk.thumbnails.actions) {
-                                    $.each(params.appdesk.thumbnails.actions, function(i, val) {
-                                        if ($.type(val) == 'string') {
-                                            params.appdesk.thumbnails.actions[i] = gridActions[val];
-                                        }
-                                    });
-                                }
-                                $.each(params.appdesk.inspectors, function(i, inspector) {
-                                    if (inspector.preview && inspector.options.actions) {
-                                        $.each(inspector.options.actions, function(i, val) {
-                                            if ($.type(val) == 'string') {
-                                                inspector.options.actions[i] = gridActions[val];
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-                            //
-                            configToUse = params.appdesk;
-
-                            // Translate clone object
-                            recursive(params);
-
-                            // Build properties for preview inspector
-                            for (var i = 0; i < params.appdesk.inspectors.length; i++) {
-                                if (params.appdesk.inspectors[i].preview) {
-                                    params.appdesk.inspectors[i].url = function($li) {
-                                        var inspectorData = $li.data('inspector'),
-                                            widget = $('<div></div>')
-                                                .appendTo($li)
-                                                .preview(inspectorData.options)
-                                                .parent()
-                                                .on({
-                                                    widgetResize: function() {
-                                                        widget.preview('resize');
-                                                    }
-                                                })
-                                                .end();
-                                    };
-                                }
-                            }
-
-                            return params;
-                        }
-                    };
-                return self;
             },
 
             // Keep track of all created menus so we can hide them when

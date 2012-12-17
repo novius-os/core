@@ -17,7 +17,7 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
         $page = Model_Page::find($id);
 
         if (!empty($page)) {
-            $dataset = \Arr::get($this->appdesk, 'dataset');
+            $dataset = \Arr::get($this->config, 'dataset');
             $page->import_dataset_behaviours($dataset);
             unset($dataset['actions']);
             $item = array();
@@ -27,8 +27,14 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
                     $data = $data['value'];
                 }
 
+                if ($data === true) {
+                    continue;
+                }
+
                 if (is_callable($data)) {
                     $item[$key] = call_user_func($data, $page);
+                } else if (is_array($data)) {
+                    $item[$key] = $page->get($data['column']);
                 } else {
                     $item[$key] = $page->get($data);
                 }
