@@ -28,6 +28,10 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
 
     public function before()
     {
+        list($application) = \Config::configFile(get_called_class());
+        if ($application === 'nos') {
+            $this->bypass = true;
+        }
         parent::before();
         $this->config_build();
     }
