@@ -130,7 +130,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             );
 
             $body = array(
-                'notify' => __('Homepage successfully changed.'),
+                'notify' => __('No sooner said than done. The home page is now ‘{{page}}’.'), #new var
                 'dispatchEvent' => $dispatchEvent,
             );
 
@@ -163,7 +163,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                     'dialog' => array(
                         'ajax' => true,
                         'contentUrl' => 'admin/noviusos_page/page/'.($recursive ? 'popup_clone_tree' : 'popup_clone').'/'.$id,
-                        'title' => strtr(__('Duplicate the page "{{title}}"'), array(
+                        'title' => strtr(__('Duplicating the page ‘{{title}}’'), array(
                             '{{title}}' => $page->title_item(),
                         )),
                         'width' => 500,
@@ -181,7 +181,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                     'action' => 'insert',
                     'context' => $page->get_context(),
                 ),
-                'notify' => $recursive ? __('The page and its children have been cloned successfully.') : __('The page has been cloned successfully.'),
+                'notify' => $recursive ? __('Here you are! The page and its subpages have just been duplicated.') : __('Here you are! The page has just been duplicated.'),
             ));
         } catch (\Exception $e) {
             $this->send_error($e);
@@ -254,13 +254,13 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                 }
                 $try++;
                 if ($try > 5) {
-                    throw new \Exception(__('You already duplicated this page 5 times. Please edit them before duplicating more.'));
+                    throw new \Exception(__('Slow down, slow down. You have duplicated this page 5 times already. Edit them first before creating more duplicates.'));
                 }
             }
         } while ($try <= 5);
 
         if ($failed) {
-            throw new \Exception(__('An unidentified error occurred during duplication.').' - '.$try.', '.$parent->id);
+            throw new \Exception(__('Something went wrong. Please refresh your browser window. If the page has not been duplicated, please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.').' - '.$try.', '.$parent->id);
         }
 
         $parents[$clone->get_context()] = $clone;
@@ -289,7 +289,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             try {
                 $clone->save();
             } catch (\Nos\BehaviourDuplicateException $e) {
-                throw new \Exception('Unexpected error');
+                throw new \Exception(__('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'));
             }
             $parents[$clone->get_context()] = $clone;
         }
