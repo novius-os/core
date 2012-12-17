@@ -728,6 +728,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
         $item['_id'] = $object->{$pk};
         $item['_model'] = $model;
+        $item['_title'] = $object->title_item();
 
         return $item;
     }

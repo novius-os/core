@@ -40,7 +40,7 @@ if ($crud['behaviours']['twinnable']) {
                 ?>
                 <p><?= strtr($crud['config']['i18n']['exists in multiple context'], array(
                     '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
-                    '{count}' => $context_count,
+                    '{{count}}' => $context_count,
                 )) ?></p>
                     <?= $crud['config']['i18n']['delete in the following contexts'] ?>
                 <select name="context">
@@ -57,10 +57,10 @@ if ($crud['behaviours']['twinnable']) {
             }
             if ($children_count > 0) {
                 ?>
-                <p><?= $children_count == 1 ? $crud['config']['i18n']['item has 1 sub-item'] : strtr($crud['config']['i18n']['item has multiple sub-items'], array('{count}' => $children_count)) ?></p>
+                <p><?= $children_count == 1 ? $crud['config']['i18n']['item has 1 sub-item'] : strtr($crud['config']['i18n']['item has multiple sub-items'], array('{{count}}' => $children_count)) ?></p>
                 <p><?= $crud['config']['i18n']['confirm deletion, enter number'] ?></p>
                 <p><?= strtr($crud['config']['i18n']['yes delete sub-items'], array(
-                    '{count}' => '<input class="verification" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
+                    '{{count}}' => '<input class="verification" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
                 )); ?></p>
                 <?php
             }
@@ -78,7 +78,7 @@ if ($crud['behaviours']['twinnable']) {
             <p><?= Str::tr($crud['config']['i18n']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
             <p><?= strtr($crud['config']['i18n']['exists in multiple context'], array(
                     '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
-                    '{count}' => $context_count,
+                    '{{count}}' => $context_count,
                 )) ?></p>
                     <?= $crud['config']['i18n']['delete in the following contexts'] ?>
                 <select name="context">
@@ -102,10 +102,10 @@ if ($crud['behaviours']['twinnable']) {
         } else {
             ?>
             <p><?= Str::tr($crud['config']['i18n']['you are about to delete'], array('title' =>  $item->title_item())) ?></p>
-            <p><?= $children_count == 1 ? $crud['config']['i18n']['item has 1 sub-item'] : strtr($crud['config']['i18n']['item has multiple sub-items'], array('{count}' => $children_count)) ?></p>
+            <p><?= $children_count == 1 ? $crud['config']['i18n']['item has 1 sub-item'] : strtr($crud['config']['i18n']['item has multiple sub-items'], array('{{count}}' => $children_count)) ?></p>
             <p><?= $crud['config']['i18n']['confirm deletion, enter number'] ?></p>
             <p><?= strtr($crud['config']['i18n']['yes delete sub-items'], array(
-                '{count}' => '<input class="verification" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
+                '{{count}}' => '<input class="verification" data-verification="'.$children_count.'" size="'.(mb_strlen($children_count) + 1).'" />',
             )); ?></p>
         <?php
         }

@@ -24,14 +24,14 @@ if ($media_count == 0) {
 } else {
     ?>
     <p><?= strtr(__(
-            $media_count == 1 ? 'There is <strong>one media</strong> in this folder.'
-                              : 'There are <strong>{count} medias</strong> in this folder.'
+            $media_count == 1 ? __('There is <strong>one media</strong> in this folder.')
+                              : __('There are <strong>{{count}} medias</strong> in this folder.')
     ), array(
-        '{count}' => $media_count,
+        '{{count}}' => $media_count,
     )) ?></p>
     <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
-    <p><?= strtr(__('Yes, I want to delete all {count} files from the media centre.'), array(
-        '{count}' => '<input class="verification" data-verification="'.$media_count.'" size="'.(mb_strlen($media_count) + 1).'" />',
+    <p><?= strtr(__('Yes, I want to delete all {{count}} files from the media centre.'), array(
+        '{{count}}' => '<input class="verification" data-verification="'.$media_count.'" size="'.(mb_strlen($media_count) + 1).'" />',
     )); ?></p>
     <?php
 }

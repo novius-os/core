@@ -145,7 +145,9 @@ class Config_Common
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => 'delete/{{_id}}',
-                        'title' => $config['i18n']['delete an item'],
+                        'title' => strtr($config['i18n']['delete an item'], array(
+                            '{{title}}' => '{{_title}}',
+                        )),
                     ),
                 ),
                 'label' => __('Delete'),

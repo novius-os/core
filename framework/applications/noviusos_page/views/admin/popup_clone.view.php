@@ -12,9 +12,9 @@ $id = $uniqid = uniqid('form_');
 
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
-<p><?= strtr($crud['i18n']['exists in multiple context'], array( #wtf deconstruction
+<p><?= strtr($crud['i18n']['exists in multiple context'], array(
     '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
-    '{count}' => count($contexts_list),
+    '{{count}}' => count($contexts_list),
 )) ?></p>
 <?= __('Which one would you like to clone?'); ?>
  <select name="context">
