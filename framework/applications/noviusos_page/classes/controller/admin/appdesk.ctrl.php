@@ -58,7 +58,7 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
         }
         $__ = \Nos\I18n::dictionary('noviusos_page::common');
         \Response::json(array(
-            'notify' => $__('Cache has been renewed.'),
+            'notify' => $__('The cache has been renewed. All ready for you to enjoy!'),
         ));
     }
 

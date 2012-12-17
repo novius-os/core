@@ -14,10 +14,10 @@ $uniqid = uniqid('tabs_');
 $id_type = $uniqid.'_type';
 $id_appdesk = $uniqid.'_appdesk';
 $id_properties = $uniqid.'_properties';
-$title_appdesk_page = $edit ? __('Pick a new link') : __('2. Pick a link');
-$title_appdesk_media = $edit ? __('Pick a new media') : __('2. Pick a media');
-$title_properties_2 = $edit ? __('Edit properties') : __('2. Set the properties');
-$title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties');
+$title_appdesk_page = $edit ? __('Select a new link') : __('2. Select a link');
+$title_appdesk_media = $edit ? __('Select a new media') : __('2. Select a media');
+$title_properties_2 = $edit ? __('Edit the properties') : __('2. Set the properties');
+$title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the properties');
 
 ?>
 <style type="text/css">
@@ -33,7 +33,7 @@ $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties'
 </style>
 <div id="<?= $uniqid ?>" class="box-sizing-border">
     <ul>
-        <li><a href="#<?= $id_type ?>"><?= $edit ? __('Choose a new link type') : __('1. Choose a link type') ?></a></li>
+        <li><a href="#<?= $id_type ?>"><?= $edit ? __('Choose a new link type') : __('1. Choose the link type') ?></a></li>
         <li><a href="#<?= $id_properties ?>"><?= $title_properties_2 ?></a></li>
     </ul>
     <div id="<?= $id_type ?>">
@@ -42,9 +42,9 @@ $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties'
                 <tr><td><label><input type="radio" value="internal" name="link_type" /> <?= __('Internal link') ?></label></td></tr>
                 <tr><td><label><input type="radio" value="external" name="link_type" /> <?= __('External link') ?></label></td></tr>
                 <tr><td><label><input type="radio" value="media" name="link_type" /> <?= __('Link to a media') ?></label></td></tr>
-                <tr><td><label><input type="radio" value="anchor" name="link_type" /> <?= __('Link to anchor') ?></label></td></tr>
-                <tr><td><label><input type="radio" value="email" name="link_type" /> <?= __('Link to an email') ?></label></td></tr>
-                <tr><td><label><input type="radio" value="phone" name="link_type" /> <?= __('Link to a phone') ?></label></td></tr>
+                <tr><td><label><input type="radio" value="anchor" name="link_type" /> <?= __('Link to an anchor') ?></label></td></tr>
+                <tr><td><label><input type="radio" value="email" name="link_type" /> <?= __('Link to an email address') ?></label></td></tr>
+                <tr><td><label><input type="radio" value="phone" name="link_type" /> <?= __('Link to a phone number') ?></label></td></tr>
             </table>
         </form>
     </div>
@@ -65,11 +65,11 @@ $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties'
                     <td colspan="6"><select name="anchorlist" id="<?= $uniqid ?>_anchor"><option value="">---</option></select></td>
                 </tr>
                 <tr id="tr_<?= $uniqid ?>_email">
-                    <th><label for="<?= $uniqid ?>_email"><?= __('Email:') ?> </label></th>
+                    <th><label for="<?= $uniqid ?>_email"><?= __('Email address:') ?> </label></th>
                     <td colspan="6"><input type="text" name="email" size="60" id="<?= $uniqid ?>_email" class="email" /></td>
                 </tr>
                 <tr id="tr_<?= $uniqid ?>_phone">
-                    <th><label for="<?= $uniqid ?>_phone"><?= __('Phone:') ?> </label></th>
+                    <th><label for="<?= $uniqid ?>_phone"><?= __('Phone number:') ?> </label></th>
                     <td colspan="6"><input type="text" name="phone" size="60" id="<?= $uniqid ?>_phone" /></td>
                 </tr>
                 <tr id="tr_<?= $uniqid ?>_url_params">
@@ -77,14 +77,14 @@ $title_properties_3 = $edit ? __('Edit properties') : __('3. Set the properties'
                     <td colspan="6"><input type="text" name="url_params" size="60" id="<?= $uniqid ?>_url_params" /></td>
                 </tr>
                 <tr id="tr_<?= $uniqid ?>_tooltip">
-                    <th><label for="<?= $uniqid ?>_tooltip"><?= __('Tooltip:') ?> </label></th>
+                    <th><label for="<?= $uniqid ?>_tooltip"><?= __('Hint (tooltip):') ?> </label></th>
                     <td colspan="6"><input type="text" name="title" size="60" id="<?= $uniqid ?>_tooltip" /></td>
                 </tr>
 
                 <tr id="tr_<?= $uniqid ?>_target">
-                    <th><label><?= __('Opening type:') ?> </label></th>
-                    <td colspan="2"><label><input type="radio" name="target" value="_blank" /> <?= __('New window') ?></label></td>
-                    <td colspan="2"><label><input type="radio" name="target" value="" /> <?= __('Same window') ?></label></td>
+                    <th><label><?= __('Opens in:') ?> </label></th>
+                    <td colspan="2"><label><input type="radio" name="target" value="_blank" /> <?= __('A new window or tab') ?></label></td>
+                    <td colspan="2"><label><input type="radio" name="target" value="" /> <?= __('The same window or tab') ?></label></td>
                 </tr>
                 <tr>
                     <th></th>
