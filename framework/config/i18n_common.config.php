@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 Nos\I18n::current_dictionary('nos::common');
 
@@ -19,7 +19,7 @@ return array(
 
     // Deletion popup
     'delete an item' => 'Deleting the item {{title}}', #new var
-    'you are about to delete, confim' => 'Last chance, there’s no undo. Do you really want to delete this item?', 
+    'you are about to delete, confim' => 'Last chance, there’s no undo. Do you really want to delete this item?',
     'you are about to delete' => 'You are about to delete the item <span style=\"font-weight: bold;\">":title"</span>.', #to be deleted
     'exists in multiple context' => 'This item exists in <strong>{{count}} contexts</strong>.', #new var
     'delete in the following contexts' => 'Delete this item in the following contexts:', #to be deleted

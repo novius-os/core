@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::application', 'nos::common'));
 
