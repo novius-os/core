@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::application', 'nos::common'));
 
@@ -32,30 +32,30 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'successfully added' => __('And voilà! The page has been added.'),
+        'successfully added' => __('And voilÃ ! The page has been added.'),
         'successfully saved' => __('OK, all changes are saved.'),
         'successfully deleted' => __('The page has been deleted.'),
 
         // General errors
-        'item deleted' => __('This page doesn’t exist any more. It has been deleted.'),
+        'item deleted' => __('This page doesnâ€™t exist any more. It has been deleted.'),
         'not found' => __('We cannot find this page.'),
 
         // Blank slate
-        'error added in context not parent' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language) #new var
+        'error added in context not parent' => __('Weâ€™re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language) #new var
         'error added in context' => __('This page cannot be added in {{context}}.'), #wtf what's this string for? #new var
         'item inexistent in context yet' => __('This page has not been added in {{context}} yet.'), #new var
         'add an item in context' => __('Add a new page in {{context}}'), #new var
 
         // Deletion popup
-        'delete an item' => __('Deleting the page ‘{{title}}’'), #new var
-        'you are about to delete, confim' => __('Last chance, there’s no undo. Do you really want to delete this page?'),
+        'delete an item' => __('Deleting the page â€˜{{title}}â€™'), #new var
+        'you are about to delete, confim' => __('Last chance, thereâ€™s no undo. Do you really want to delete this page?'),
         'you are about to delete' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>.'), #to be deleted
         'exists in multiple context' => __('This page exists in <strong>{{count}} contexts</strong>.'), #new var
         'delete in the following contexts' => __('Delete this page in the following contexts:'), #to be deleted
         'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
         'item has multiple sub-items' => __('This page has <strong>{{count}} sub-pages</strong>.'), #new var
         'yes delete sub-items' => __('Yes, I want to delete this page and all of its {{count}} sub-pages.'),
-        'confirm deletion wrong_confirmation' => __('We cannot delete this page as the number of sub-items you’ve entered is wrong. Please amend it.'),
+        'confirm deletion wrong_confirmation' => __('We cannot delete this page as the number of sub-items youâ€™ve entered is wrong. Please amend it.'),
     ),
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(

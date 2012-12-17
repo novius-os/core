@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * NOVIUS OS - Web OS for digital communication
  *
@@ -23,7 +23,7 @@ return array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
         'labels' => array(
             'insert' => __('Add a page'),
-            'blankSlate' => __('Translate a page'), #wtf
+            'blankSlate' => __('Translate a page'), #wtf what's this string for?
         ),
     ),
     'layout' => array(
@@ -57,7 +57,7 @@ return array(
                                         <div data-id="internal" style="display:none;">
                                             <p style="padding:1em;">We\'re sorry, internal links are not supported yet. We need a nice page selector before that.</p>
                                         </div>
-                                        <div data-id="wysiwyg" style="display:none;"></div>', #wtf
+                                        <div data-id="wysiwyg" style="display:none;"></div>', #wtf dead code
                                 ),
                             ),
                         ),
@@ -179,7 +179,7 @@ return array(
                 'type' => 'select',
                 'options' => array(
                     Nos\Page\Model_Page::EXTERNAL_TARGET_NEW => __('A new window or tab'),
-                    Nos\Page\Model_Page::EXTERNAL_TARGET_POPUP => __('A pop-up window'), #wtf
+                    Nos\Page\Model_Page::EXTERNAL_TARGET_POPUP => __('A pop-up window'), #wtf unexisting feature
                     Nos\Page\Model_Page::EXTERNAL_TARGET_SAME => __('The same window or tab'),
                 ),
             ),
@@ -191,7 +191,7 @@ return array(
                 'options' => array(
                     Nos\Page\Model_Page::TYPE_CLASSIC => __('Page'),
                     /*Nos\Model_Page::TYPE_FOLDER => __('Folder / Chapter'),
-                 Nos\Model_Page::TYPE_INTERNAL_LINK => __('Internal link'),*/ #wtf
+                 Nos\Model_Page::TYPE_INTERNAL_LINK => __('Internal link'),*/ #wtf dead code
                     Nos\Page\Model_Page::TYPE_EXTERNAL_LINK => __('External link'),
                 ),
             ),
@@ -203,7 +203,7 @@ return array(
                 'options' => array(
                     Nos\Page\Model_Page::LOCK_UNLOCKED => __('No, leave unlocked'),
                     Nos\Page\Model_Page::LOCK_DELETION => __('Prevent deletion'),
-                    Nos\Page\Model_Page::LOCK_EDITION => __('Prevent update'), #wtf
+                    Nos\Page\Model_Page::LOCK_EDITION => __('Prevent update'), #wtf unexisting feature?
                 ),
             ),
             'expert' => true,

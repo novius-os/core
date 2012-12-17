@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * NOVIUS OS - Web OS for digital communication
  *
@@ -12,7 +12,7 @@ $id = $uniqid = uniqid('form_');
 
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
-<p><?= strtr($crud['i18n']['exists in multiple context'], array( #deconstruction
+<p><?= strtr($crud['i18n']['exists in multiple context'], array( #wtf deconstruction
     '<strong>' => '<strong title="'.implode(', ', $contexts_list).'">',
     '{count}' => count($contexts_list),
 )) ?></p>

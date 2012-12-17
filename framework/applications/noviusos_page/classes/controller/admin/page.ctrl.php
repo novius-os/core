@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 /**
  * NOVIUS OS - Web OS for digital communication
  *
@@ -130,7 +130,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             );
 
             $body = array(
-                'notify' => __('No sooner said than done. The home page is now ‘{{page}}’.'), #new var
+                'notify' => __('No sooner said than done. The home page is now â€˜{{page}}â€™.'), #new var
                 'dispatchEvent' => $dispatchEvent,
             );
 
@@ -163,7 +163,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                     'dialog' => array(
                         'ajax' => true,
                         'contentUrl' => 'admin/noviusos_page/page/'.($recursive ? 'popup_clone_tree' : 'popup_clone').'/'.$id,
-                        'title' => strtr(__('Duplicating the page ‘{{title}}’'), array(
+                        'title' => strtr(__('Duplicating the page â€˜{{title}}â€™'), array(
                             '{{title}}' => $page->title_item(),
                         )),
                         'width' => 500,
