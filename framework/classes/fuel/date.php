@@ -14,7 +14,7 @@ class Date extends \Fuel\Core\Date
      * Compare two dates without regard to hours.
      *
      * @param   int|Date    first date to compare.
-     * @param   int|Date    seconda date to compare.
+     * @param   int|Date    second date to compare.
      * @return  int			-1 If the first date is earlier, 1 if it's after, 0 if both dates are equal
      */
     public static function compare($date1, $date2)
@@ -68,6 +68,12 @@ class Date extends \Fuel\Core\Date
     public function wijmoFormat()
     {
         return '/Date('.($this->timestamp * 1000).')/';
+    }
+
+    public static function formatPattern($date, $pattern = 'normal')
+    {
+        $dictionary = \Nos\I18n::dictionary('nos::common');
+        return static::forge(strtotime($date))->format($dictionary('date_format.'.$pattern));
     }
 }
 
