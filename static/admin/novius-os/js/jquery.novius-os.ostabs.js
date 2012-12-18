@@ -29,8 +29,7 @@ define('jquery-nos-ostabs',
                     closeTab: 'Close tab',
                     closeOtherTabs: 'Close all other tabs',
                     confirmCloseOtherTabs: 'Are you sure to want to close all other tabs?',
-                    reloadTab: 'Reload tab',
-                    spinner: 'Loading...'
+                    reloadTab: 'Reload tab'
                 },
 
                 // callbacks
@@ -113,17 +112,7 @@ define('jquery-nos-ostabs',
                             $(this).loadspinner( 'destroy' );
                         }
                     })
-                    .html( ' ' )
-                    .parent()
-                    .find( "span.nos-ostabs-label" )
-                    .each(function() {
-                        var el = $( this ),
-                            html = el.data( "label.tabs" );
-
-                        if ( html ) {
-                            el.html( html ).removeData( "label.tabs" );
-                        }
-                    });
+                    .html( ' ' );
 
                 return self;
             },
@@ -1041,12 +1030,6 @@ define('jquery-nos-ostabs',
 
                 // load remote from here on
                 self.lis.eq( index ).addClass( "ui-state-processing" );
-
-                $( "span.nos-ostabs-label", a ).each(function() {
-                    var $a = $( this );
-                    $a.data( "label.tabs", $a.html() )
-                        .html( $a.data("label.tabs") ? o.texts.spinner : '' );
-                });
 
                 if ( $.isFunction($.fn.loadspinner) ) {
                     $( "span.nos-ostabs-icon", a ).each(function() {
