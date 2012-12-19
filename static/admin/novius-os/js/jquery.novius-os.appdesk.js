@@ -1512,6 +1512,7 @@ define('jquery-nos-appdesk',
                                                     headerText : i18n.contexts || 'Contexts',
                                                     dataKey    : 'context',
                                                     setupkey   : 'context',
+                                                    allowSort : false,
                                                     showFilter : false,
                                                     cellFormatter : function(args) {
                                                         if (args.row.type & $.wijmo.wijgrid.rowType.data) {
