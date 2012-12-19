@@ -106,8 +106,8 @@ $publishable = (string) \View::forge('form/publishable', array(
 
 if (!empty($subtitle) || !empty($publishable)) {
     ?>
-                    <div class="line" style="overflow:visible;">
-                        <table style="width:100%;margin-bottom:1em;">
+                    <div class="line" style="overflow:visible;margin-bottom:1em;">
+                        <table style="width:100%;">
                             <tr>
     <?php
     if (!empty($publishable)) {
