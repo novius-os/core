@@ -60,12 +60,12 @@ class Config_Common
 
         $actions_template = array(
             $model.'.add' => array(
-                'label' => __('Add :model_label'),
+                'label' => __('Add {{model_label}}'),
                 'action' => array(
                     'action' => 'nosTabs',
                     'method' => 'add',
                     'tab' => array(
-                        'url' => 'insert_update?context={{context}}',
+                        'url' => '{{controller_base_url}}insert_update?context={{context}}',
                     ),
                 ),
                 'targets' => array(
@@ -76,7 +76,7 @@ class Config_Common
                 'action' => array(
                     'action' => 'nosTabs',
                     'tab' => array(
-                        'url' => "insert_update/{{_id}}",
+                        'url' => "{{controller_base_url}}insert_update/{{_id}}",
                         'label' => '{{_title}}',
                     ),
                 ),
@@ -143,7 +143,7 @@ class Config_Common
                 'action' => array(
                     'action' => 'confirmationDialog',
                     'dialog' => array(
-                        'contentUrl' => 'delete/{{_id}}',
+                        'contentUrl' => '{{controller_base_url}}delete/{{_id}}',
                         'title' => strtr($config['i18n']['delete an item'], array(
                             '{{title}}' => '{{_title}}',
                         )),
@@ -164,6 +164,12 @@ class Config_Common
             ),
         );
 
+        if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
+            unset($actions_template['visualise']);
+        }
+
+        $actions = \Arr::merge($actions_template, $config['actions']['list']);
+
         $model_label = explode('_', $model);
         $model_label = $model_label[count($model_label) - 1];
 
@@ -171,39 +177,18 @@ class Config_Common
             $config['controller'] = strtolower($model_label);
         }
 
-        if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
-            unset($actions_template['visualise']);
-        }
-
-        foreach ($actions_template as $name => $template) {
-
-            list(, $action_name) = explode('.', $name);
-
-            if (isset($urls[$action_name])) {
-                \Arr::set(
-                    $actions_template[$name],
-                    $urls[$action_name], 'admin/'.$application_name.'/'.$config['controller'].'/'.
-                    \Arr::get($actions_template[$name], $urls[$action_name])
-                );
-            }
-
-            $actions_template[$name]['label'] = \Str::tr(
-                $actions_template[$name]['label'],
-                array(
-                    'model_label' => $model_label,
-                )
-            );
-        }
-
-        $actions = \Arr::merge($actions_template, $config['actions']['list']);
+        $actions = \Config::placeholderReplace($actions, array(
+            'controller_base_url' => 'admin/'.$application_name.'/'.$config['controller'].'/',
+            'model_label' => $model_label,
+        ), false);
 
         // Copy the action label into the tab or dialog label when necessary
         foreach ($actions as $name => $action) {
             if (isset($action['action']['tab']) && empty($action['action']['tab']['label'])) {
                 $actions[$name]['action']['tab']['label'] = $action['label'];
             }
-            if (isset($action['action']['dialog']) && empty($action['action']['dialog']['label'])) {
-                $actions[$name]['action']['dialog']['label'] = $action['label'];
+            if (isset($action['action']['dialog']) && empty($action['action']['dialog']['title'])) {
+                $actions[$name]['action']['dialog']['title'] = $action['label'];
             }
         }
 

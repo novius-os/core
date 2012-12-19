@@ -177,42 +177,52 @@ class Config extends \Fuel\Core\Config
         return !isset($action['visible']) || $action['visible']($params);
     }
 
-    public static function placeholderReplace($obj, $data)
+    /**
+     * Replace placeholders recursively in an array
+     *
+     * @param  array  $array  Array to look placeholders inside
+     * @param  mixed  $data   Array or object used to fetch placeholders
+     * @param  bool   $remove_unset  Should placeholders not found in data be removed?
+     * @return array  A new array with replacement done
+     */
+    public static function placeholderReplace($array, $data, $remove_unset = true)
     {
-        $retrieveFromData = function($arg, $data) {
-            if (isset($data[$arg])) {
-                return $data[$arg];
-            }
-            if (isset($data->{$arg})) {
-                return $data->{$arg};
-            }
-            try {
-                return $data->{$arg}();
-            } catch (\Exception $e) {
-                return '';
-            }
-        };
+        if (is_string($array)) {
+            $retrieveFromData = function($placeholder, $fallback) use ($data) {
+                if (is_array($data) && isset($data[$placeholder])) {
+                    return $data[$placeholder];
+                }
+                if (is_object($data)) {
+                    if (isset($data->{$placeholder})) {
+                        return $data->{$placeholder};
+                    }
+                    try {
+                        return $data->{$placeholder}();
+                    } catch (\Exception $e) {
+                    }
+                }
+                return $fallback;
+            };
 
-        if (is_string($obj)) {
-            $obj = preg_replace_callback('/\[\:([\w]+)\]/', function($matches) use($data, $retrieveFromData) {
-                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
-            }, $obj);
-            $obj = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
-                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
-            }, $obj);
-            $obj = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
-                return urlencode(isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '');
-            }, $obj);
-        } else if (is_array($obj)) {
-            foreach ($obj as $key => $value) {
-                $new_key = static::placeholderReplace($key, $data);
-                $obj[$new_key] = static::placeholderReplace($value, $data);
+            $array = preg_replace_callback('/\[\:([\w]+)\]/', function($matches) use($retrieveFromData, $remove_unset) {
+                return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
+            }, $array);
+            $array = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
+            }, $array);
+            $array = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                return urlencode($retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]));
+            }, $array);
+        } else if (is_array($array)) {
+            foreach ($array as $key => $value) {
+                $new_key = static::placeholderReplace($key, $data, $remove_unset);
+                $array[$new_key] = static::placeholderReplace($value, $data, $remove_unset);
                 if ($new_key !== $key) {
-                    unset($obj[$key]);
+                    unset($array[$key]);
                 }
             }
         }
-        return $obj;
+        return $array;
     }
 
     public static function icon($application_name, $icon_key)
