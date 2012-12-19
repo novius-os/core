@@ -717,7 +717,11 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             if (is_callable($data)) {
                 $item[$key] = call_user_func($data, $object);
             } else if (is_array($data)) {
-                $item[$key] = $object->get($data['column']);
+                if (isset($data['method'])) {
+                    $item[$key] = $object->{$data['method']}();
+                } else if (isset($data['column'])) {
+                    $item[$key] = $object->get($data['column']);
+                }
             } else {
                 $item[$key] = $object->get($data);
             }
