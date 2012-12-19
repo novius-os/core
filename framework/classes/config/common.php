@@ -77,7 +77,7 @@ class Config_Common
                     'action' => 'nosTabs',
                     'tab' => array(
                         'url' => "insert_update/{{_id}}",
-                        'label' => __('Edit'),
+                        'label' => '{{_title}}',
                     ),
                 ),
                 'label' => __('Edit'),
