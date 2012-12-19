@@ -36,6 +36,9 @@ return array(
         'delete an item' => __('Delete a folder'),
     ),
     'actions' => array(
+        'Nos\Media\Model_Folder.add' => array(
+            'label' => __('Add a folder'),
+        ),
         'Nos\Media\Model_Folder.edit' => array(
             'disabled' => function($item) {
                 return empty($item->medif_parent_id);
@@ -76,7 +79,6 @@ return array(
             ),
             'targets' => array(
                 'grid' => true,
-                'toolbar-grid' => true,
             ),
         ),
     ),
