@@ -66,7 +66,6 @@ class Config_Common
                     'method' => 'add',
                     'tab' => array(
                         'url' => 'insert_update?context={{context}}',
-                        'label' => __('Add a new item'),
                     ),
                 ),
                 'targets' => array(
@@ -204,6 +203,16 @@ class Config_Common
         }
 
         $actions = \Arr::merge($actions_template, $config['actions']['list']);
+
+        // Copy the action label into the tab or dialog label when necessary
+        foreach ($actions as $name => $action) {
+            if (isset($action['action']['tab']) && empty($action['action']['tab']['label'])) {
+                $actions[$name]['action']['tab']['label'] = $action['label'];
+            }
+            if (isset($action['action']['dialog']) && empty($action['action']['dialog']['label'])) {
+                $actions[$name]['action']['dialog']['label'] = $action['label'];
+            }
+        }
 
         foreach ($actions as $key => $action) {
             if ($action === false) {
