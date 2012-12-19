@@ -592,9 +592,25 @@ table.title-fields {
 
 
 .login_popup {
-  margin: 0 auto;
+    margin: 0 auto;
 }
 
 .login_popup p {
-  margin: 1em auto;
+    margin: 1em auto;
+}
+
+label.tooltip {
+    cursor: pointer;
+
+    div.content {
+        display: none;
+    }
+}
+div.wijmo-wijtooltip.tooltip {
+
+  line-height: 1.3em;
+
+  p {
+      margin-bottom: 0.5em;
+  }
 }
