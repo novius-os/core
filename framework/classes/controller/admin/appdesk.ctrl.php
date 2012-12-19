@@ -256,7 +256,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $inspector_config = $inspector_name::process_config($application, $inspector_config);
                 $inspectors[$inspector_key] = $inspector_config;
                 if (isset($inspector_config['model']) && !$wasToolbarModelsSet) {
-                    $inspector_model_namespace = substr($inspector_config['model'], 0, strrpos($inspector_config['model'], '\\'));
+                    $inspector_model_namespace = \Inflector::get_namespace($inspector_config['model']);
                     $models[] = $inspector_config['model'];
                     if ($inspector_model_namespace == $namespace_model) {
                         $config['toolbar']['models'][] = $inspector_config['model'];
