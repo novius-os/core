@@ -10,9 +10,7 @@ return array(
         ),
         'context' => true,
         'url' => array(
-            'value' => function($page) {
-                return $page->url();
-            },
+            'method' => 'url',
         ),
         'previewUrl' => array(
             'value' => function($page) {
@@ -24,9 +22,9 @@ return array(
                 return (bool) (int) $page->page_entrance;
             }
         ),
-        'published' => array(
+        'page_published' => array(
             'title' => __('Status'),
-            'dataKey' => 'publication_status',
+            'method' => 'publication_status',
             'multiContextHide' => true,
         ),
     ),
@@ -46,9 +44,8 @@ return array(
         // Deletion popup
         'delete an item' => __('Deleting the page ‘{{title}}’'), #new var
         'you are about to delete, confim' => __('Last chance, there’s no undo. Do you really want to delete this page?'),
-        'you are about to delete' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>.'), #to be deleted
         'exists in multiple context' => __('This page exists in <strong>{{count}} contexts</strong>.'),
-        'delete in the following contexts' => __('Delete this page in the following contexts:'), #to be deleted
+        'delete in the following contexts' => __('Delete this page in the following contexts:'),
         'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
         'item has multiple sub-items' => __('This page has <strong>{{count}} sub-pages</strong>.'),
         'yes delete sub-items' => __('Yes, I want to delete this page and all of its {{count}} sub-pages.'),
