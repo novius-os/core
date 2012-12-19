@@ -69,7 +69,7 @@ return array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_media/folder/insert_update?environment_id={{id}}',
+                    'url' => '{{controller_base_url}}insert_update?environment_id={{id}}',
                     'label' => __('Add a sub-folder in "{{title}}"'),
                 ),
                 'dialog' => array(

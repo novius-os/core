@@ -68,7 +68,7 @@ return array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_page/page/insert_update?environment_id={{_id}}&context={{_context}}',
+                    'url' => '{{controller_base_url}}insert_update?environment_id={{_id}}&context={{_context}}',
                     'label' => __('Add a page'),
                     'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                 ),
@@ -104,7 +104,7 @@ return array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => 'admin/noviusos_page/page/set_homepage',
+                    'url' => '{{controller_base_url}}set_homepage',
                     'method' => 'POST',
                     'data' => array(
                         'id' => '{{_id}}',
@@ -123,7 +123,7 @@ return array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => 'admin/noviusos_page/page/clone/{{_id}}',
+                    'url' => '{{controller_base_url}}clone/{{_id}}',
                 ),
             ),
             'label' => __('Duplicate'),
@@ -137,7 +137,7 @@ return array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => 'admin/noviusos_page/page/clone_tree/{{_id}}',
+                    'url' => '{{controller_base_url}}clone_tree/{{_id}}',
                 ),
             ),
             'label' => __('Duplicate including the sub-pages'),
