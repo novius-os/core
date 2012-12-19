@@ -386,11 +386,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 foreach ($config['dataset'] as $key => $value) {
                     if ($key == 'context') {
                         $config['appdesk']['appdesk']['grid']['columns'][$key] = array('context' => true);
-                    } else if ($key == 'published') {
-                        $config['appdesk']['appdesk']['grid']['columns']['published'] = array(
-                            'headerText' => __('Status'),
-                            'dataKey' => 'publication_status'
-                        );
                     } else if (isset($value['headerText'])) {
                         $config['appdesk']['appdesk']['grid']['columns'][$key] = $value;
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;
