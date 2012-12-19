@@ -171,10 +171,6 @@ class Config_Common
             $config['controller'] = strtolower($model_label);
         }
 
-        if (!isset($config['labels'])) {
-            $config['labels'] = array();
-        }
-
         if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
             unset($actions_template['visualise']);
         }
@@ -191,9 +187,6 @@ class Config_Common
                 );
             }
 
-            if (isset($config['labels'][$action_name])) {
-                $actions_template[$name]['label'] = $config['labels'][$action_name];
-            }
             $actions_template[$name]['label'] = \Str::tr(
                 $actions_template[$name]['label'],
                 array(
