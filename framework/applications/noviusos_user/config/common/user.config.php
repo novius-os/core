@@ -9,6 +9,13 @@ return array(
             'value' => function($item) {
                 return $item->fullname();
             },
+            'search_column' => 'user_firstname',
+            'cellFormatters' => array(
+                'link' => array(
+                    'type' => 'link',
+                    'action' => 'Nos\User\Model_User.edit',
+                ),
+            ),
         ),
         'user_email' => array(
             'title' => __('Email'),
@@ -33,11 +40,17 @@ return array(
 
         // Deletion popup
         'delete an item' => __('Delete a user'),
-        //'you are about to delete' => __('You are about to delete the user <span style="font-weight: bold;">":title"</span>.'),
     ),
     'actions' => array(
         'Nos\User\Model_User.add' => array(
             'label' => __('Add a user'),
+        ),
+        'Nos\User\Model_User.edit' => array(
+            'action' => array(
+                'tab' => array(
+                    'label' => '{{fullname}}',
+                ),
+            ),
         ),
     ),
 );

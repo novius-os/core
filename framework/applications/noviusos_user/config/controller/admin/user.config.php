@@ -14,6 +14,9 @@ return array(
         //'iconUrl' => 'static/apps/noviusos_user/img/16/user.png',
         'labels' => array(
             'insert' => __('Add a user'),
+            'update' => function($user) {
+                return $user->fullname();
+            },
         ),
     ),
     'layout_insert' => array(
