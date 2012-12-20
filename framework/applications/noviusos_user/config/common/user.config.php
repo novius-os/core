@@ -29,17 +29,16 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'successfully added' => __('User successfully added.'),
-        'successfully saved' => __('User successfully saved.'),
-        'successfully deleted' => __('The user has successfully been deleted!'),
+        'successfully added' => __('Done, the user has been added.'),
+        'successfully saved' => __('OK, all changes are saved.'),
+        'successfully deleted' => __('The user has been deleted.'),
 
         // General errors
-        // State deleted
-        'item deleted' => __('This user has been deleted.'),
-        'not found' => __('User not found'),
+        'item deleted' => __('This user doesn’t exist any more. It has been deleted.'),
+        'not found' => __('We cannot find this user.'),
 
         // Deletion popup
-        'delete an item' => __('Delete a user'),
+        'delete an item' => __('Deleting the user ‘{{title}}’'),
     ),
     'actions' => array(
         'Nos\User\Model_User.add' => array(

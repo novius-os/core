@@ -17,7 +17,7 @@ return array(
     'error added in context' => __('This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'),
 
     // Deletion popup
-    'delete an item' => __('Deleting the item {{title}}'),
+    'delete an item' => __('Deleting the item ‘{{title}}’'),
     'you are about to delete, confim' => __('Last chance, there’s no undo. Do you really want to delete this item?'),
     'you are about to delete' => __('You are about to delete the item <span style=\"font-weight: bold;\">":title"</span>.'), #to be deleted
     'exists in multiple context' => __('This item exists in <strong>{{count}} contexts</strong>.'),

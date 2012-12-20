@@ -31,7 +31,6 @@ return array(
     'i18n' => array(
         // Crud
         'successfully added' => __('And voilà! The page has been added.'),
-        'successfully saved' => __('OK, all changes are saved.'),
         'successfully deleted' => __('The page has been deleted.'),
 
         // General errors
@@ -42,7 +41,7 @@ return array(
         'error added in context not parent' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language)
 
         // Deletion popup
-        'delete an item' => __('Deleting the page ‘{{title}}’'), #new var
+        'delete an item' => __('Deleting the page ‘{{title}}’'),
         'you are about to delete, confim' => __('Last chance, there’s no undo. Do you really want to delete this page?'),
         'exists in multiple context' => __('This page exists in <strong>{{count}} contexts</strong>.'),
         'delete in the following contexts' => __('Delete this page in the following contexts:'),
