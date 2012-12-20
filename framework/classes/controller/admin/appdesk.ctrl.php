@@ -256,7 +256,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $inspector_config = $inspector_name::process_config($application, $inspector_config);
                 $inspectors[$inspector_key] = $inspector_config;
                 if (isset($inspector_config['model']) && !$wasToolbarModelsSet) {
-                    $inspector_model_namespace = substr($inspector_config['model'], 0, strrpos($inspector_config['model'], '\\'));
+                    $inspector_model_namespace = \Inflector::get_namespace($inspector_config['model']);
                     $models[] = $inspector_config['model'];
                     if ($inspector_model_namespace == $namespace_model) {
                         $config['toolbar']['models'][] = $inspector_config['model'];
@@ -386,11 +386,6 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 foreach ($config['dataset'] as $key => $value) {
                     if ($key == 'context') {
                         $config['appdesk']['appdesk']['grid']['columns'][$key] = array('context' => true);
-                    } else if ($key == 'published') {
-                        $config['appdesk']['appdesk']['grid']['columns']['published'] = array(
-                            'headerText' => __('Status'),
-                            'dataKey' => 'publication_status'
-                        );
                     } else if (isset($value['headerText'])) {
                         $config['appdesk']['appdesk']['grid']['columns'][$key] = $value;
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['dataKey'] = $key;

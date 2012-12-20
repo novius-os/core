@@ -10,9 +10,7 @@ return array(
         ),
         'context' => true,
         'url' => array(
-            'value' => function($page) {
-                return $page->url();
-            },
+            'method' => 'url',
         ),
         'previewUrl' => array(
             'value' => function($page) {
@@ -24,16 +22,15 @@ return array(
                 return (bool) (int) $page->page_entrance;
             }
         ),
-        'published' => array(
+        'page_published' => array(
             'title' => __('Status'),
-            'dataKey' => 'publication_status',
+            'method' => 'publication_status',
             'multiContextHide' => true,
         ),
     ),
     'i18n' => array(
         // Crud
         'successfully added' => __('And voilà! The page has been added.'),
-        'successfully saved' => __('OK, all changes are saved.'),
         'successfully deleted' => __('The page has been deleted.'),
 
         // General errors
@@ -41,19 +38,15 @@ return array(
         'not found' => __('We cannot find this page.'),
 
         // Blank slate
-        'error added in context not parent' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language) #new var
-        'error added in context' => __('This page cannot be added in {{context}}.'), #wtf what's this string for? #new var
-        'item inexistent in context yet' => __('This page has not been added in {{context}} yet.'), #new var
-        'add an item in context' => __('Add a new page in {{context}}'), #new var
+        'error added in context not parent' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language)
 
         // Deletion popup
-        'delete an item' => __('Deleting the page ‘{{title}}’'), #new var
+        'delete an item' => __('Deleting the page ‘{{title}}’'),
         'you are about to delete, confim' => __('Last chance, there’s no undo. Do you really want to delete this page?'),
-        'you are about to delete' => __('You are about to delete the page <span style="font-weight: bold;">":title"</span>.'), #to be deleted
-        'exists in multiple context' => __('This page exists in <strong>{{count}} contexts</strong>.'), #new var
-        'delete in the following contexts' => __('Delete this page in the following contexts:'), #to be deleted
+        'exists in multiple context' => __('This page exists in <strong>{{count}} contexts</strong>.'),
+        'delete in the following contexts' => __('Delete this page in the following contexts:'),
         'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
-        'item has multiple sub-items' => __('This page has <strong>{{count}} sub-pages</strong>.'), #new var
+        'item has multiple sub-items' => __('This page has <strong>{{count}} sub-pages</strong>.'),
         'yes delete sub-items' => __('Yes, I want to delete this page and all of its {{count}} sub-pages.'),
         'confirm deletion wrong_confirmation' => __('We cannot delete this page as the number of sub-items you’ve entered is wrong. Please amend it.'),
     ),
@@ -74,7 +67,7 @@ return array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_page/page/insert_update?environment_id={{_id}}&context={{_context}}',
+                    'url' => '{{controller_base_url}}insert_update?environment_id={{_id}}&context={{_context}}',
                     'label' => __('Add a page'),
                     'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                 ),
@@ -110,7 +103,7 @@ return array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => 'admin/noviusos_page/page/set_homepage',
+                    'url' => '{{controller_base_url}}set_homepage',
                     'method' => 'POST',
                     'data' => array(
                         'id' => '{{_id}}',
@@ -129,7 +122,7 @@ return array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => 'admin/noviusos_page/page/clone/{{_id}}',
+                    'url' => '{{controller_base_url}}clone/{{_id}}',
                 ),
             ),
             'label' => __('Duplicate'),
@@ -143,7 +136,7 @@ return array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => 'admin/noviusos_page/page/clone_tree/{{_id}}',
+                    'url' => '{{controller_base_url}}clone_tree/{{_id}}',
                 ),
             ),
             'label' => __('Duplicate including the sub-pages'),

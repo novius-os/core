@@ -575,24 +575,20 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
             $item_context = $this->item->find_context($context);
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
-            if (empty($main_context)) {
-                $label = $this->config['i18n']['add an item in context'];
-            } else {
-                if (empty($item_context)) {
-                    if (count($sites) === 1) {
-                        $label = __('Translate in {context}');
-                    } elseif (count($locales) === 1) {
+            if (empty($item_context)) {
+                if (count($sites) === 1) {
+                    $label = __('Translate in {context}');
+                } elseif (count($locales) === 1) {
+                    $label = __('Add to {context}');
+                } else {
+                    if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
                         $label = __('Add to {context}');
                     } else {
-                        if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
-                            $label = __('Add to {context}');
-                        } else {
-                            $label = __('Translate into {context}');
-                        }
+                        $label = __('Translate into {context}');
                     }
-                } else {
-                    $label = __('Edit {context}');
                 }
+            } else {
+                $label = __('Edit {context}');
             }
             $label = strtr($label, array('{context}' => Tools_Context::contextLabel($context)));
             $actions[] = array(

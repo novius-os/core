@@ -24,18 +24,21 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'successfully added' => __('Folder successfully added.'),
-        'successfully saved' => __('Folder successfully saved.'),
-        'successfully deleted' => __('The folder has successfully been deleted!'),
+        'successfully added' => __('Done, the folder has been added.'),
+        'successfully saved' => __('OK, all changes are saved.'),
+        'successfully deleted' => __('The folder has been deleted.'),
 
         // General errors
-        'item deleted' => __('This folder has been deleted.'),
-        'not found' => __('Folder not found'),
+        'item deleted' => __('This folder doesn’t exist any more. It has been deleted.'),
+        'not found' => __('We cannot find this folder.'),
 
         // Deletion popup
-        'delete an item' => __('Delete a folder'),
+        'delete an item' => __('Deleting the folder ‘{{title}}’'),
     ),
     'actions' => array(
+        'Nos\Media\Model_Folder.add' => array(
+            'label' => __('Add a folder'),
+        ),
         'Nos\Media\Model_Folder.edit' => array(
             'disabled' => function($item) {
                 return empty($item->medif_parent_id);
@@ -66,7 +69,7 @@ return array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'url' => 'admin/noviusos_media/folder/insert_update?environment_id={{id}}',
+                    'url' => '{{controller_base_url}}insert_update?environment_id={{id}}',
                     'label' => __('Add a sub-folder in "{{title}}"'),
                 ),
                 'dialog' => array(
@@ -76,7 +79,6 @@ return array(
             ),
             'targets' => array(
                 'grid' => true,
-                'toolbar-grid' => true,
             ),
         ),
     ),

@@ -24,14 +24,14 @@ if ($usage_count == 0) {
 } else {
     ?>
     <p><?= strtr(__(
-            $usage_count == 1 ? 'The media is used <strong>one time</strong> by your applications.'
-                              : 'The media is used <strong>{count} times</strong> by your applications.'
+            $usage_count == 1 ? __('The media is used <strong>one time</strong> by your applications.')
+                              : __('The media is used <strong>{{count}} times</strong> by your applications.')
     ), array(
-        '{count}' => $usage_count,
+        '{{count}}' => $usage_count,
     )) ?></p>
     <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
-    <p><?= strtr(__('Yes, I want to delete all {count} usage of the media.'), array(
-        '{count}' => '<input class="verification" data-verification="'.$usage_count.'" size="'.(mb_strlen($usage_count) + 1).'" />',
+    <p><?= strtr(__('Yes, I want to delete all {{count}} usage of the media.'), array(
+        '{{count}}' => '<input class="verification" data-verification="'.$usage_count.'" size="'.(mb_strlen($usage_count) + 1).'" />',
     )); ?></p>
     <?php
 }

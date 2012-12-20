@@ -57,8 +57,8 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         $count_medias = $this->item->count_media();
         // Basic check to prevent false suppression
         if (!is_dir($this->item->path()) && $count_medias > 0) {
-            throw new \Exception(strtr(__('{count} medias were found, but folder was nonexistent.'), array(
-                '{count}' => $count_medias,
+            throw new \Exception(strtr(__('{{count}} medias were found, but folder was nonexistent.'), array(
+                '{{count}}' => $count_medias,
             )));
         }
 

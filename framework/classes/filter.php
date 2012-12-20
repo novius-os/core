@@ -42,12 +42,10 @@ class Filter
             if (!empty($config['dataset'][$key]['search_relation'])) {
                 $query->related($config['dataset'][$key]['search_relation']);
             }
-            $column = $key;//$config['dataset'][$key]['search_column'];
+            return isset($config['dataset'][$key]['search_column']) ? $config['dataset'][$key]['search_column'] : null;
         } else {
-            $column = $config['dataset'][$key];
+            return $config['dataset'][$key];
         }
-
-        return $column;
     }
 
     /** Apply sorting on list from parameters sent by wijmo grid
@@ -61,7 +59,9 @@ class Filter
         for ($i = 0; $i < count($sorting); $i++) {
             $key = $sorting[$i]['dataKey'];
             $column = self::getColumnFromKey($query, $key, $config);
-            if ($column != null) {
+            if (isset($config['dataset'][$key]['sorting_callback'])) {
+                $config['dataset'][$key]['sorting_callback']($query, $sorting[$i]['sortDirection'] == 'ascending' ? 'ASC' : 'DESC');
+            } else if ($column != null) {
                 $query->order_by($column, $sorting[$i]['sortDirection'] == 'ascending' ? 'ASC' : 'DESC');
             }
         }
@@ -100,23 +100,18 @@ class Filter
                     break;
                 case 'Equals':
                     $operator = '=';
-                    $value = $value;
                     break;
                 case 'Greater':
                     $operator = '>';
-                    $value = $value;
                     break;
                 case 'Less':
                     $operator = '<';
-                    $value = $value;
                     break;
                 case 'GreaterOrEqual':
                     $operator = '>=';
-                    $value = $value;
                     break;
                 case 'LessOrEqual':
                     $operator = '<=';
-                    $value = $value;
                     break;
                 case 'IsEmpty':
                     $operator = 'IS NULL';
