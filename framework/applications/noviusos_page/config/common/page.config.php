@@ -70,8 +70,8 @@ return array(
         'deleting following languages' => __('Delete this page in the following languages:'),
 
         # Keep only if the model has the behaviour Tree
-        'deleting with children following contexts' => __('Delete this page and all its sub-items in the following contexts:'),
-        'deleting with children following languages' => __('Delete this page and all its sub-items in the following languages:'),
+        'deleting with children following contexts' => __('Delete this page and all its sub-pages in the following contexts:'),
+        'deleting with children following languages' => __('Delete this page and all its sub-pages in the following languages:'),
     ),
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(
