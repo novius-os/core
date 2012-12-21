@@ -204,9 +204,6 @@ class Config extends \Fuel\Core\Config
                 return $fallback;
             };
 
-            $array = preg_replace_callback('/\[\:([\w]+)\]/', function($matches) use($retrieveFromData, $remove_unset) {
-                return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
-            }, $array);
             $array = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
                 return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
             }, $array);

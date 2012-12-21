@@ -318,9 +318,7 @@ define('jquery-nos',
 
             nosDataReplace : function (obj, data) {
                 if ($.type(obj) === 'string') {
-                    return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
-                        return data[p1] || '';
-                    }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
+                    return obj.replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
                             return data[p1] || '';
                         }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
                             return encodeURIComponent(data[p1] || '');
