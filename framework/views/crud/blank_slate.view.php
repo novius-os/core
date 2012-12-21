@@ -50,7 +50,10 @@ if (!in_array($context, $possible)) {
     foreach ($possible as $possible_context) {
         $item_context = $item->find_context($possible_context);
         if (!empty($item_context)) {
-            $labels[$item_context->id] = \Nos\Tools_Context::contextLabel($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
+            $context_label = \Nos\Tools_Context::contextLabel($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
+            $labels[$item_context->id] = strtr(__('Translate {{context}}'), array(
+                '{{context}}' => $context_label,
+            ));
         }
     }
     $locale_item = \Nos\Tools_Context::localeCode($item->get_context());
@@ -85,18 +88,24 @@ if (!in_array($context, $possible)) {
                         <?= Form::hidden('context', $context) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
     <?php
+    $uniqid_create_from_id = 'create_from_id_'.$uniqid;
+    $uniqid_wijmenu = 'wijmenu_'.$uniqid;
+    echo '<input id="'.$uniqid_create_from_id.'" type="hidden" name="create_from_id" value="'.htmlspecialchars(key($labels)).'" />';
     if (count($labels) == 1) {
-        echo Form::hidden('create_from_id', key($labels));
-        $selected_context = current($labels);
+        echo '<button type="submit" class="primary" data-icon="plus">'.current($labels).'</button>';
     } else {
-        $selected_context = Form::select('create_from_id', null, $labels);
+        echo '<div class="buttonset">
+            <button type="submit" class="primary" data-icon="plus">'.current($labels).'</button>
+            <button id="'.$uniqid_wijmenu.'" type="button" class="primary without-text" data-icon="carat-1-s primary">&nbsp;</button>
+        </div>';
+
+        echo '<ul class="wijmenu">';
+        foreach ($labels as $context => $label) {
+            echo '<li data-create_from_id="'.htmlspecialchars($context).'"><a>'.htmlspecialchars($label).'</a></li>';
+        }
+        echo '</ul>';
     }
 
-    $button = '<button type="submit" class="primary" data-icon="plus">'.($locale_item === $locale_new ? __('Copy') : __('Translate')).'</button>';
-    echo strtr(__('{translate} the {context} version'), array(
-        '{translate}' => $button,
-        '{context}' => $selected_context,
-    ));
     ?>
                     </form>
                     <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Form filled with the content from the original version)') ?></p>
@@ -111,6 +120,32 @@ if (!in_array($context, $possible)) {
 require(['jquery-nos'], function ($) {
     $(function () {
         var $container = $('#<?= $uniqid ?>').nosFormUI();
+        $container.find('.buttonset').buttonset();
+        $container.find('ul.wijmenu').wijmenu({
+            orientation: 'vertical',
+            animation: {
+                animated:"slide",
+                option: {
+                    direction: "up"
+                },
+                duration: 50,
+                easing: null
+            },
+            hideAnimation: {
+                animated:"slide",
+                option: {
+                    direction: "up"
+                },
+                duration: 0,
+                easing: null
+            },
+            direction: 'rtl',
+            trigger: '#<?= $uniqid_wijmenu ?>',
+            select: function(e, data) {
+                $('#<?= $uniqid_create_from_id ?>').val($(data.item.element).data('create_from_id'));
+                $container.find('form').submit();
+            }
+        });
         $container.find('form').submit(function(e) {
             e.preventDefault();
             var $form = $(this);
