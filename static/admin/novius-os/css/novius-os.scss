@@ -277,6 +277,15 @@ input.ui-widget.primary, button.ui-widget.primary {
 	border-style : outset;
 	font-size    : 1.2em;
 
+    &.without-text {
+        .ui-button-icon-primary {
+            left: 0.7em;
+        }
+        .ui-button-text {
+            padding: 0.2em 1em 0.2em 1em;
+        }
+    }
+
     .ui-button-text {
         line-height  : 1.9em;
     }
@@ -285,10 +294,20 @@ input.ui-widget.primary.ui-state-active, button.ui-widget.ui-state-active.primar
 	border-style : inset;
 }
 
+button.ui-widget.without-text {
+    .ui-button-text {
+        padding: 0.2em 1em 0.2em 1em;
+    }
+}
+
 
 div.blank_slate {
     font-size : 150%;
     margin: 2em;
+
+    li {
+        list-style: none;
+    }
 }
 
 span.optional {
