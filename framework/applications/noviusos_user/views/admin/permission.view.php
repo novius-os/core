@@ -39,8 +39,8 @@ foreach ($apps as $app => $perms) {
         </div>
         <div class="icon">
     <?php
-    if (!empty($apps[$app]['icon64'])) {
-        echo '<img src="'.$apps[$app]['icon64'].'" />';
+    if (!empty($apps[$app]['icons'][64])) {
+        echo '<img src="'.$apps[$app]['icons'][64].'" />';
     }
     ?>
         </div>

@@ -15,9 +15,7 @@ return array(
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
-    'permission' => array(
-        'icon64'  => 'static/apps/noviusos_appmanager/img/64/app-manager.png',
-    ),
+    'permission' => array(),
     'launchers' => array(
         'noviusos_appmanager' => array(
             'name' => 'Application manager',
@@ -29,8 +27,6 @@ return array(
                     'iconUrl' => 'static/apps/noviusos_appmanager/img/32/app-manager.png',
                 ),
             ),
-            'iconUrl' => 'static/apps/noviusos_appmanager/img/32/app-manager.png',
-            'icon64' => 'static/apps/noviusos_appmanager/img/64/app-manager.png',
         ),
     ),
     'icons' => array(

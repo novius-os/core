@@ -15,9 +15,7 @@ return array(
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
-    'permission' => array(
-        'icon64'  => 'static/apps/noviusos_user/img/64/user.png',
-    ),
+    'permission' => array(),
     'launchers' => array(
         'noviusos_user' => array(
             'name'    => 'Users',
@@ -29,8 +27,6 @@ return array(
                     'iconUrl' => 'static/apps/noviusos_user/img/32/user.png',
                 ),
             ),
-            'icon64' => 'static/apps/noviusos_user/img/64/user.png',
-            'iconUrl' => 'static/apps/noviusos_user/img/32/user.png',
         ),
         'noviusos_account' => array(
             'name' => 'My account',
@@ -42,8 +38,7 @@ return array(
                     'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
                 ),
             ),
-            'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
-            'icon64' => 'static/apps/noviusos_user/img/64/myaccount.png',
+            'icon' => 'static/apps/noviusos_user/img/64/myaccount.png',
             'application' => false
         ),
     ),

@@ -64,7 +64,7 @@ foreach ($installed as $app) {
     $metadata = $app->metadata;
     ?>
                         <tr>
-                            <td>&nbsp;<img src="<?= isset($metadata['icon16']) ? $metadata['icon16'] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e($app->name) ?></td>
+                            <td>&nbsp;<img src="<?= isset($metadata['icons'][16]) ? $metadata['icons'][16] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e($app->name) ?></td>
                             <td>
                                 <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
     <?php

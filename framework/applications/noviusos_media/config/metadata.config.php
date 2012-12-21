@@ -15,9 +15,7 @@ return array(
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
-    'permission' => array(
-        'icon64'  => 'static/apps/noviusos_media/img/media-64.png',
-    ),
+    'permission' => array(),
     'launchers' => array(
         'noviusos_media' => array(
             'name' => 'Media centre',
