@@ -13,16 +13,16 @@ Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application',
 return array(
     'i18n' => array(
         // Crud
-        'successfully added' => __('Media successfully added.'),
-        'successfully saved' => __('Media successfully saved.'),
-        'successfully deleted' => __('The media has successfully been deleted!'),
+        'notification item added' => __('Done! The media has been added.'),
+        'notification item deleted' => __('The media has been deleted.'),
 
         // General errors
-        'item deleted' => __('This media has been deleted.'),
-        'not found' => __('Media not found'),
+        'notification item does not exist anymore' => __('This media doesn’t exist any more. It has been deleted.'),
+        'notification item not found' => __('We cannot find this media.'),
 
         // Deletion popup
-        'delete an item' => __('Delete a media'),
+        'deleting item title' => __('Deleting the media ‘{{title}}’'),
+        'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this media?'),
     ),
     'data_mapping' => array(
         'ext' => array(

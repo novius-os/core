@@ -24,16 +24,16 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'successfully added' => __('Done, the folder has been added.'),
-        'successfully saved' => __('OK, all changes are saved.'),
-        'successfully deleted' => __('The folder has been deleted.'),
+        'notification item added' => __('Done! The folder has been added.'),
+        'notification item deleted' => __('The folder has been deleted.'),
 
         // General errors
-        'item deleted' => __('This folder doesn’t exist any more. It has been deleted.'),
-        'not found' => __('We cannot find this folder.'),
+        'notification item does not exist anymore' => __('This folder doesn’t exist any more. It has been deleted.'),
+        'notification item not found' => __('We cannot find this folder.'),
 
         // Deletion popup
-        'delete an item' => __('Deleting the folder ‘{{title}}’'),
+        'deleting item title' => __('Deleting the folder ‘{{title}}’'),
+        'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this folder?'),
     ),
     'actions' => array(
         'Nos\Media\Model_Folder.add' => array(
