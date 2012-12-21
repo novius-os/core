@@ -15,9 +15,7 @@ return array(
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
-    'permission' => array(
-        'icon64'  => 'static/apps/noviusos_help/img/64/help.png',
-    ),
+    'permission' => array(),
     'launchers' => array(
         'noviusos_help' => array(
             'name' => 'Help',
@@ -29,8 +27,6 @@ return array(
                     'iconUrl' => 'static/apps/noviusos_help/img/32/help.png',
                 ),
             ),
-            'iconUrl' => 'static/apps/noviusos_help/img/32/help.png',
-            'icon64' => 'static/apps/noviusos_help/img/64/help.png',
         ),
     ),
     'icons' => array(
