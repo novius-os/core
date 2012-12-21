@@ -130,7 +130,9 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             );
 
             $body = array(
-                'notify' => __('No sooner said than done. The home page is now ‘{{page}}’.'), #new var
+                'notify' => strtr(__('No sooner said than done. The home page is now ‘{{page}}’.'), array(
+                    '{{page}}' => $this->item->title_item(),
+                )),
                 'dispatchEvent' => $dispatchEvent,
             );
 

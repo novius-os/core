@@ -35,7 +35,6 @@ $id = $uniqid = uniqid('form_');
                     $cancelButton = $form.find('a:last');
 
 
-
                 $table.wijgrid({
                     selectionMode: 'none',
                     highlightCurrentCell: false,
@@ -70,7 +69,13 @@ $id = $uniqid = uniqid('form_');
                             'count': sum.toString()
                         })
                     );
+                    $(this).removeClass('ui-state-focus');
                 }).trigger('change');
+
+
+                $table.find('tr').css({cursor: 'pointer'}).click(function() {
+                    $(this).find(':checkbox').click().wijcheckbox('refresh');
+                });
 
                 $confirmButton.click(function(e) {
                     e.preventDefault();
