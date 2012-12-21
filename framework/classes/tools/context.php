@@ -261,11 +261,12 @@ class Tools_Context
         $site_code = self::siteCode($context);
         if (empty($sites[$site_code])) {
             return array(
+                'code' => $site_code,
                 'title' => $site_code,
                 'alias' => $site_code,
             );
         } else {
-            return $sites[$site_code];
+            return array_merge(array('code' => $site_code), $sites[$site_code]);
         }
     }
 }

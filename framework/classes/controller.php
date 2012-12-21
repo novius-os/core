@@ -286,10 +286,20 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                             continue;
                         }
                         $site_params = Tools_Context::site($context);
+                        // When the site change
                         if ($sites_count > 1 && $site !== $site_params['alias']) {
                             $flags .= $site_flag.(empty($site_flag) ? '' : '&nbsp;&nbsp;');
                             $site = $site_params['alias'];
-                            $site_flag = ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
+                            $in = false;
+                            // Check if the any context of the item exists in the site
+                            foreach ($contexts as $temp_context) {
+                                if (Tools_Context::siteCode($temp_context) === $site_params['code']) {
+                                    $in = true;
+                                    break;
+                                }
+                            }
+
+                            $site_flag = ' <span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
                         }
                         if ($locales_count > 1) {
                             if (in_array($context, $contexts)) {
