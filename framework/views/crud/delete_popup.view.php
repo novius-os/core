@@ -90,7 +90,7 @@ if ($context_count > 1) {
     ?>
     </table>
     <?php
-} else {
+} else if ($crud['behaviours']['twinnable']) {
     ?>
     <input type="checkbox" name="contexts[]" data-count="<?= $children_count + 1 ?>" value="<?= $item->get_context() ?>" checked style="display:none;" />
     <?php
