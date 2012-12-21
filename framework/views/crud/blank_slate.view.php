@@ -19,6 +19,8 @@ $view_params['container_id'] = $uniqid;
 
 echo View::forge('nos::crud/tab', $view_params, false);
 
+$context_or_language = count(Nos\Tools_Context::sites()) == 1 ? 'language' : 'context';
+
 ?>
 <div id="<?= $uniqid ?>" class="" style="padding:0;">
     <div class="blank_slate">
@@ -28,8 +30,8 @@ if (!in_array($context, $possible)) {
     $parent = $crud['behaviours']['tree'] ? $item->get_parent() : null;
     if (!empty($parent)) {
         $uniqid_parent = uniqid('parent_');
-        echo strtr($crud['config']['i18n']['error added in context not parent'], array(
-            '{{context}}' => \Nos\Tools_Context::contextLabel($context),
+        echo strtr($crud['config']['i18n']['translate error parent not available in '.$context_or_language], array(
+            '{{'.$context_or_language.'}}' => \Nos\Tools_Context::contextLabel($context),
             '<a>' => '<a href="javascript:void;" id="'.$uniqid_parent.'">',
         ));
         ?>
@@ -42,7 +44,7 @@ if (!in_array($context, $possible)) {
         </script>
         <?php
     } else {
-        echo strtr($crud['config']['i18n']['error added in context'], array('{{context}}' => \Nos\Tools_Context::contextLabel($context)));
+        echo strtr($crud['config']['i18n']['translate error impossible context'], array('{{context}}' => \Nos\Tools_Context::contextLabel($context)));
     }
 } else {
     foreach ($possible as $possible_context) {

@@ -144,7 +144,7 @@ class Config_Common
                     'action' => 'confirmationDialog',
                     'dialog' => array(
                         'contentUrl' => '{{controller_base_url}}delete/{{_id}}',
-                        'title' => strtr($config['i18n']['delete an item'], array(
+                        'title' => strtr($config['i18n']['deleting item title'], array(
                             '{{title}}' => '{{_title}}',
                         )),
                     ),

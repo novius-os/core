@@ -12,9 +12,9 @@ $uniqid_close = uniqid('close_');
 if (!$item->is_new()) {
     ?>
     <div id="<?= $uniqid_close ?>" style="display:none;">
-        <p><?= $crud['config']['i18n']['item deleted'] ?></p>
+        <p><?= $crud['config']['i18n']['deleted popup title'] ?></p>
         <p>&nbsp;</p>
-        <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
+        <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?=$crud['config']['i18n']['deleted popup close'] ?></button></p>
     </div>
     <?php
 }
@@ -34,7 +34,7 @@ if (!$item->is_new()) {
 <?php
 // Popup notification state deleted title
 ?>
-                                titleClose: <?= Format::forge()->to_json(__('Bye bye')) ?>
+                                titleClose: <?= Format::forge()->to_json($crud['config']['i18n']['deleted popup title']) ?>
                             }
                         }),
                     context = <?= \Format::forge()->to_json(isset($crud['context']) ? $crud['context'] : false) ?>;

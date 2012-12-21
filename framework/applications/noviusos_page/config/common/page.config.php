@@ -29,26 +29,6 @@ return array(
         ),
     ),
     'i18n' => array(
-        // Crud
-        'successfully added' => __('And voilà! The page has been added.'),
-        'successfully deleted' => __('The page has been deleted.'),
-
-        // General errors
-        'item deleted' => __('This page doesn’t exist any more. It has been deleted.'),
-        'not found' => __('We cannot find this page.'),
-
-        // Blank slate
-        'error added in context not parent' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context.'), #wtf two strings needed here (this context / this language)
-
-        // Deletion popup
-        'delete an item' => __('Deleting the page ‘{{title}}’'),
-        'you are about to delete, confim' => __('Last chance, there’s no undo. Do you really want to delete this page?'),
-        'exists in multiple context' => __('This page exists in <strong>{{count}} contexts</strong>.'),
-        'delete in the following contexts' => __('Delete this page in the following contexts:'),
-        'item has 1 sub-item' => __('This page has <strong>1 sub-page</strong>.'),
-        'item has multiple sub-items' => __('This page has <strong>{{count}} sub-pages</strong>.'),
-        'yes delete sub-items' => __('Yes, I want to delete this page and all of its {{count}} sub-pages.'),
-        'confirm deletion wrong_confirmation' => __('We cannot delete this page as the number of sub-items you’ve entered is wrong. Please amend it.'),
     ),
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(

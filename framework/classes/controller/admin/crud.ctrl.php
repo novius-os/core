@@ -357,7 +357,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $return = array(
-            'notify' => $this->is_new ? $this->config['i18n']['successfully added'] : $this->config['i18n']['successfully saved'],
+            'notify' => $this->is_new ? $this->config['i18n']['notification item added'] : $this->config['i18n']['notification item saved'],
             'closeDialog' => true,
             'dispatchEvent' => $dispatchEvent,
         );
@@ -417,7 +417,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception($this->config['i18n']['item deleted']));
+            return $this->send_error(new \Exception($this->config['i18n']['notification item not found']));
         }
 
         $this->is_new = $this->item->is_new();
@@ -681,62 +681,42 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $dispatchEvent['id'] = array();
             $dispatchEvent['context'] = array();
 
-            // Delete all contexts by default
-            $context = \Input::post('context', 'all');
+            $contexts = \Input::post('contexts', array());
+            $contexts_item = $this->item->get_all_context();
 
-            // Delete children for all contexts
-            if ($context === 'all') {
-                foreach ($this->item->find_context('all') as $item_context) {
-                    $dispatchEvent['id'][] = (int) $item_context->{$this->pk};
-                    $dispatchEvent['context'][] = $item_context->{$this->behaviours['twinnable']['context_property']};
+            $count_1 = count($contexts);
+            $count_2 = count($contexts_item);
+            $count_3 = count(array_intersect($contexts, $contexts_item));
 
-                    if ($this->behaviours['tree']) {
-                        foreach ($item_context->get_ids_children(false) as $item_id) {
-                            $dispatchEvent['id'][] = (int) $item_id;
-                        }
-                    }
-                }
+            $delete_all_contexts = ($count_1 == $count_3 && $count_2 == $count_3);
 
-                // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                // Optimised operation for deleting all contexts
-                $this->item->delete_all_context();
+            // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
+            foreach ($this->item->find_context($contexts) as $item_context) {
+                $dispatchEvent['id'][] = (int) $item_context->{$this->pk};
+                $dispatchEvent['context'][] = $item_context->{$this->behaviours['twinnable']['context_property']};
 
-            } else {
-                // Search for the appropriate page
-                if ($this->item->get_context() != $context) {
-                    $this->item = $this->item->find_context($context);
-                }
-                $this->check_permission('delete');
-
-                $dispatchEvent['id'][] = $this->item->{$this->pk};
-                $dispatchEvent['context'][] = $this->item->{$this->behaviours['twinnable']['context_property']};
                 if ($this->behaviours['tree']) {
-                    foreach ($this->item->get_ids_children(false) as $item_id) {
+                    foreach ($item_context->get_ids_children(false) as $item_id) {
                         $dispatchEvent['id'][] = (int) $item_id;
                     }
                 }
 
-                // Reassigns common_id if this item is the main context (with the 'after_delete' event from the Twinnable behaviour)
-                // Children will be deleted recursively (with the 'after_delete' event from the Tree behaviour)
-                $this->item->delete();
-            }
-        } else {
-            if ($this->behaviours['contextable']) {
-                $dispatchEvent['context'] = $this->item{$this->behaviours['contextable']['context_property']};
-            }
-            if ($this->behaviours['tree']) {
-                $dispatchEvent['id'] = array($this->item->{$this->pk});
-                foreach ($this->item->get_ids_children(false) as $item_id) {
-                    $dispatchEvent['id'][] = (int) $item_id;
+                // Delete only selected contexts
+                if (!$delete_all_contexts) {
+                    // Reassigns common_id if this item is the main context (with the 'after_delete' event from the Twinnable behaviour)
+                     $item_context->delete();
                 }
             }
 
-            $this->item->delete();
+            // Optimised operation for deleting all contexts
+            if ($delete_all_contexts) {
+                $this->item->delete_all_context();
+            }
         }
 
         $this->response(
             array(
-                'notify' => $this->config['i18n']['successfully deleted'],
+                'notify' => $this->config['i18n']['notification item deleted'],
                 'dispatchEvent' => $dispatchEvent,
             )
         );
