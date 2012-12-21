@@ -30,6 +30,8 @@ return array(
     'deleting button 1 item' => __('Delete this item'),
     'deleting button N items' => __('Delete these {{count}} items'),
 
+    'deleting wrong confirmation' => __('We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.'),
+
     '1 item' => __('1 item'),
     'N items' => __('{{count}} items'),
 

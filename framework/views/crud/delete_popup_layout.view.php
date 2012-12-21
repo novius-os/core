@@ -32,7 +32,8 @@ $id = $uniqid = uniqid('form_');
                     $table = $form.find('table'),
                     $checkboxes,
                     $confirmButton = $form.find(':submit'),
-                    $cancelButton = $form.find('a:last');
+                    $cancelButton = $form.find('a:last'),
+                    $verifications = $form.find('.verification');;
 
 
                 $table.wijgrid({
@@ -82,14 +83,27 @@ $id = $uniqid = uniqid('form_');
                     if ($(this).hasClass('ui-state-disabled')) {
                         return;
                     }
-                    $form.nosAjax({
-                        url : <?= \Format::forge($crud['config']['controller_url'].'/delete')->to_json() ?>,
-                        method : 'POST',
-                        data : $form.serialize(),
-                        success: function() {
-                            $form.nosDialog('close');
+
+                    var allVerificationPassed = true;
+                    $verifications.each(function() {
+                        if ($verifications.val().length == 0 || $verifications.val() != $verifications.data('verification')) {
+                            allVerificationPassed = false;
+
+                            return false;
                         }
                     });
+                    if (allVerificationPassed) {
+                        $form.nosAjax({
+                            url : <?= \Format::forge($crud['config']['controller_url'].'/delete')->to_json() ?>,
+                            method : 'POST',
+                            data : $form.serialize(),
+                            success: function() {
+                                $form.nosDialog('close');
+                            }
+                        });
+                    } else {
+                        $.nosNotify(<?= \Format::forge($crud['config']['i18n']['deleting wrong confirmation'])->to_json() ?>, 'error');
+                    }
                 });
 
                 $cancelButton.click(function(e) {
