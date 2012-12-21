@@ -69,7 +69,7 @@ define('jquery-nos-inspector-tree-model',
                                 data = row ? row.data : false;
 
                             if (data && rendered) {
-                                inspectorData.selectionChanged(data.id, data.title);
+                                inspectorData.selectionChanged(data.id, data._title);
                             }
                             inspector.nostreegrid("currentCell", -1, -1);
                         },

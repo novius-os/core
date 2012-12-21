@@ -103,7 +103,7 @@ define('jquery-nos-inspector-model',
                                     data = row ? row.data : false;
 
                                 if (data && rendered) {
-                                    inspectorData.selectionChanged(data.id, data.title);
+                                    inspectorData.selectionChanged(data.id, data._title);
                                 }
                                 inspector.noslistgrid("currentCell", -1, -1);
                             },
