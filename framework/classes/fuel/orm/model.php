@@ -297,7 +297,7 @@ class Model extends \Orm\Model
             }
 
             \Config::load($application.'::'.$file_name, true);
-            $config = \Config::get($application.'::'.$file_name, array();
+            $config = \Config::get($application.'::'.$file_name, array());
             \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
             $dependencies = \Config::get('data::app_dependencies', array());
 
