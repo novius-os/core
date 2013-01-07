@@ -141,11 +141,11 @@ return array(
                     return !!$page->page_home;
                 },
         ),
-        'Nos\Page\Model_Page.clone' => array(
+        'Nos\Page\Model_Page.duplicate' => array(
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(
-                    'url' => '{{controller_base_url}}clone/{{_id}}',
+                    'url' => '{{controller_base_url}}duplicate/{{_id}}',
                 ),
             ),
             'label' => __('Duplicate'),

@@ -57,7 +57,7 @@ if ($context_count > 1) {
     $contexts = \Nos\Tools_Context::contexts();
     $contexts_list = array();
     ?>
-    <p><label><input type="checkbox" class="include_children" name="include_children" value="1" checked /> <?= __('Include sub-pages'); ?></label></p>
+    <p><label><input type="checkbox" class="include_children" name="include_children" value="1" checked /> <?= __('Duplicate sub-pages'); ?></label></p>
     <div class="single">
         <p style="margin: 1em 0;"><?= __('Duplicate this page in the following following contexts:') ?></p>
         <table>
