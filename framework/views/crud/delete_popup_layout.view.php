@@ -33,7 +33,7 @@ $id = $uniqid = uniqid('form_');
                     $checkboxes,
                     $confirmButton = $form.find(':submit'),
                     $cancelButton = $form.find('a:last'),
-                    $verifications = $form.find('.verification');;
+                    $verifications = $form.find('.verification');
 
 
                 $table.wijgrid({
@@ -58,7 +58,7 @@ $id = $uniqid = uniqid('form_');
                 });
                 $form.nosFormUI();
 
-                $checkboxes = $form.find(':checkbox');
+                $checkboxes = $table.find(':checkbox');
                 $checkboxes.change(function() {
                     var sum = 0;
                     $checkboxes.filter(':checked').each(function() {
@@ -71,7 +71,7 @@ $id = $uniqid = uniqid('form_');
                         })
                     );
                     $(this).removeClass('ui-state-focus');
-                }).trigger('change');
+                }).first().trigger('change');
 
 
                 $table.find('tr').css({cursor: 'pointer'}).click(function() {

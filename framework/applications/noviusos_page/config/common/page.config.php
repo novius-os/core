@@ -155,20 +155,6 @@ return array(
                 'grid' => true,
             ),
         ),
-        'Nos\Page\Model_Page.clone_tree' => array(
-            'action' => array(
-                'action' => 'nosAjax',
-                'params' => array(
-                    'url' => '{{controller_base_url}}clone_tree/{{_id}}',
-                ),
-            ),
-            'label' => __('Duplicate including the sub-pages'),
-            'primary' => false,
-            'icon' => 'circle-plus',
-            'targets' => array(
-                'grid' => true,
-            ),
-        ),
         'Nos\Page\Model_Page.renew_cache' => array(
             'label' => __('Renew pages\' cache'),
             'action' => array(
