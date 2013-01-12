@@ -75,7 +75,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 }
             }
 
-            if (!isset($config['order_by'])) {
+            if (!isset($config['order_by']) && !!$config['model']::behaviours('Nos\Orm_Behaviour_Sortable', false)) {
                 $config['order_by'] = $config['model']::prefix().'sort';
             }
 
@@ -87,7 +87,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 $config['models'][0]['model'] = $config['model'];
             }
 
-            if (!isset($config['models'][0]['order_by'])) {
+            if (!isset($config['models'][0]['order_by']) && isset($config['order_by'])) {
                 $config['models'][0]['order_by'] = $config['order_by'];
             }
 
@@ -111,7 +111,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 $config['roots'][0]['where'] = array(array($config['model']::prefix().'parent_id', 'IS', \DB::expr('NULL')));
             }
 
-            if (!isset($config['roots'][0]['order_by'])) {
+            if (!isset($config['roots'][0]['order_by']) && isset($config['order_by'])) {
                 $config['roots'][0]['order_by'] = $config['order_by'];
             }
 
