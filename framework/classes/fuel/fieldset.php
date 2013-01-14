@@ -464,13 +464,10 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (\Arr::get($this->config_used, "$k.dont_populate", false) == true) {
                 continue;
             }
-            if (!isset($instance->{$k})) {
-                continue;
-            }
 
-            //if (isset($instance->{$k})) {
-            $populate[$k] = $instance->{$k};
-            //}
+            if (isset($instance->{$k})) {
+                $populate[$k] = $instance->{$k};
+            }
         }
 
         $this->populate($populate);
