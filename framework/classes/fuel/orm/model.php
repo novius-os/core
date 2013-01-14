@@ -305,12 +305,8 @@ class Model extends \Orm\Model
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
             if ($application !== 'nos') {
-                $apps = \Nos\Config_Data::get('app_installed', array());
-                foreach ($apps as $app => $conf) {
-                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace) {
-                        $application = $app;
-                    }
-                }
+                $namespaces = \Nos\Config_Data::get('app_namespaces', array());
+                $application = array_search($namespace, $namespaces);
             }
 
             $config = \Config::load($application.'::'.$file_name, true);
