@@ -50,14 +50,6 @@ class Config_Common
     {
         \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
 
-        // Which keys contains the URL of the action
-        // The controller's base URL will be prepended automatically
-        $urls = array(
-            'add' => 'action.tab.url',
-            'edit' => 'action.tab.url',
-            'delete' => 'action.dialog.contentUrl',
-        );
-
         $actions_template = array(
             $model.'.add' => array(
                 'label' => __('Add {{model_label}}'),
