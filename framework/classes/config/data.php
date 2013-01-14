@@ -32,9 +32,9 @@ class Config_Data
      * @var array List of files in local/data/config directory
      */
     protected static $data_files = array(
-        'attachments',
-        'page_enhanced',
-        'url_enhanced',
+        'attachments' => false,
+        'page_enhanced' => false,
+        'url_enhanced' => false,
     );
 
     /**
