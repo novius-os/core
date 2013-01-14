@@ -19,13 +19,13 @@ class Config_Data
      * @var array List of files in local/metadata directory
      */
     protected static $metadata_files = array(
-        'app_dependencies',
-        'app_installed',
-        'app_namespaces',
-        'data_catchers',
-        'enhancers',
-        'launchers',
-        'templates',
+        'app_dependencies' => false,
+        'app_installed' => 'onLoadAppInstalled',
+        'app_namespaces' => false,
+        'data_catchers' => false,
+        'enhancers' => 'onLoadEnhancer',
+        'launchers' => 'onLoadLauncher',
+        'templates' => 'onLoadTemplate',
     );
 
     /**
@@ -73,7 +73,13 @@ class Config_Data
      */
     public static function load($name)
     {
-        return \Config::load(static::getFile($name), 'data::'.$name);
+        list($file, $callback) = static::getFile($name);
+        if (!empty($callback)) {
+            \Event::register_function('config|'.$file, function(&$config) use($callback, $name, $file) {
+                Config_Data::$callback($config, $name);
+            });
+        }
+        return \Config::load($file, 'data::'.$name);
     }
 
     /**
@@ -87,23 +93,90 @@ class Config_Data
     {
         static::load($name);
         \Config::set('data::'.$name, $data);
-        return \Config::save(static::getFile($name), $data);
+        list($file, $callback) = static::getFile($name);
+        return \Config::save($file, $data);
     }
 
     /**
      * Get the path on disc of a config data file
      *
      * @param   string          $name      string file name of config data
-     * @return string                      the path on disc of a config data file
+     * @return array(string, string) the path on disc of a config data file, the callback function to run
      * @throws \FuelException If name is not a valid config data file
      */
-    protected static function getFile($name)
+    public static function getFile($name)
     {
-        if (in_array($name, static::$data_files)) {
-            return APPPATH.'data'.DS.'config'.DS.$name.'.php';
-        } elseif (in_array($name, static::$metadata_files)) {
-            return APPPATH.'metadata'.DS.$name.'.php';
+        if (isset(static::$data_files[$name])) {
+            return array(APPPATH.'data'.DS.'config'.DS.$name.'.php', static::$data_files[$name]);
+        } elseif (isset(static::$metadata_files[$name])) {
+            return array(APPPATH.'metadata'.DS.$name.'.php', static::$metadata_files[$name]);
         }
         throw new \FuelException('Invalid data file');
+    }
+
+    /**
+     * Translate the appropriate keys for app_installed
+     *
+     * @param  array  $config  The loaded app_installed configuration
+     */
+    public static function onLoadAppInstalled(&$config)
+    {
+        foreach ($config as &$app) {
+            $i18n_file = \Arr::get($app, 'i18n_file', false);
+            if (!empty($i18n_file)) {
+                $i18n = \Nos\I18n::dictionary($i18n_file);
+                $app['name'] = $i18n($app['name']);
+            }
+        }
+    }
+
+    /**
+     * Translate the appropriate keys for enhancers
+     *
+     * @param  array  $config  The loaded enhancer configuration
+     */
+    public static function onLoadEnhancer(&$config)
+    {
+        static::_translate($config, array('title'));
+    }
+
+    /**
+     * Translate the appropriate keys for templates
+     *
+     * @param  array  $config  The loaded template configuration
+     */
+    public static function onLoadTemplate(&$config)
+    {
+        static::_translate($config, array('title'));
+    }
+
+    /**
+     * Translate the appropriate keys for launchers
+     *
+     * @param  array  $config  The loaded launcher configuration
+     */
+    public static function onLoadLauncher(&$config)
+    {
+        static::_translate($config, array('name'));
+    }
+
+    /**
+     * Translate the appropriate keys for a configuration array
+     *
+     * @param  array  $config  The loaded launcher configuration
+     * @param  array  $keys    Which keys are to be translated
+     */
+    protected static function _translate(&$config, $keys)
+    {
+        foreach ($config as &$item) {
+            $application = $item['application'];
+            $i18n_file = static::get('app_installed.'.$application.'.i18n_file', false);
+            if (!empty($i18n_file)) {
+                $i18n = \Nos\I18n::dictionary($i18n_file);
+                foreach ($keys as $key) {
+                    $item[$key] = $i18n($item[$key]);
+                }
+            }
+        }
     }
 }

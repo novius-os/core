@@ -13,10 +13,12 @@ namespace Nos;
 class Application
 {
     protected static $repositories;
+    protected static $rawAppInstalled;
 
     public static function _init()
     {
-        \Nos\Config_Data::load('app_installed');
+        list($file) = \Nos\Config_Data::getFile('app_installed');
+        static::$rawAppInstalled = \Fuel::load($file);
 
         static::$repositories = array(
             'local' => array(
@@ -81,8 +83,7 @@ class Application
 
     public static function cleanApplications()
     {
-        $metadata = \Nos\Config_Data::get('app_installed');
-        foreach ($metadata as $key => $application) {
+        foreach (static::$rawAppInstalled as $key => $application) {
             \Module::exists($key);
         }
     }
@@ -127,7 +128,7 @@ class Application
     public function __construct($folder, $metadata = array(), $real_metadata = array())
     {
         $this->folder = $folder;
-        $this->metadata = \Nos\Config_Data::get('app_installed.'.$this->folder, array());
+        $this->metadata = \Arr::get(static::$rawAppInstalled, $this->folder, array());
         $this->real_metadata = $real_metadata;
     }
 
@@ -173,7 +174,7 @@ class Application
      */
     public function is_installed()
     {
-        return!empty($this->metadata);
+        return !empty($this->metadata);
     }
 
     /**
@@ -227,8 +228,7 @@ class Application
         if ($add_permission) {
             $this->addPermission();
         }
-
-        $old_metadata = \Nos\Config_Data::get('app_installed.'.$this->folder, array());
+        $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder, array());
         $new_metadata = $this->getRealMetadata();
 
         // Check if the installation is compatible with other applications
@@ -241,7 +241,7 @@ class Application
         }
 
         // Cache the metadata used to install the application
-        $config['app_installed'] = \Nos\Config_Data::get('app_installed', array());
+        $config['app_installed'] = static::$rawAppInstalled;
         $config['app_installed'][$this->folder] = $new_metadata;
         $this->save_config($config);
 
@@ -258,7 +258,7 @@ class Application
      */
     public function uninstall()
     {
-        $old_metadata = \Nos\Config_Data::get('app_installed.'.$this->folder);
+        $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder);
         $new_metadata = array();
 
         // Check if the installation is compatible with other applications
@@ -266,7 +266,7 @@ class Application
 
         if ($this->unsymlink('static') && $this->unsymlink('htdocs')) {
             // Remove the application
-            $config['app_installed'] = \Nos\Config_Data::get('app_installed', array());
+            $config['app_installed'] = static::$rawAppInstalled;
             unset($config['app_installed'][$this->folder]);
             $this->save_config($config);
         }
@@ -458,9 +458,7 @@ class Application
             }
         }
 
-        $app_installed = \Nos\Config_Data::get('app_installed', array());
-
-        foreach ($app_installed as $app_name => $app) {
+        foreach (static::$rawAppInstalled as $app_name => $app) {
             if ($app_refresh !== $app_name) {
                 $config = \Config::metadata($app_name);
                 if (isset($config['extends'])) {
