@@ -20,17 +20,11 @@ class Application
         list($file) = \Nos\Config_Data::getFile('app_installed');
         static::$rawAppInstalled = \Fuel::load($file);
 
-        static::$repositories = array(
-            'local' => array(
-                'path' => APPPATH.'applications'.DS,
-                'visible' => true,
-                'native' => false,
-            ),
-            'natives' => array(
-                'path' => NOSPATH.'applications'.DS,
-                'visible' => false,
-                'native' => true,
-            ),
+        \Config::load('nos::applications_repositories', true);
+        \Config::load('local::applications_repositories', true);
+        static::$repositories = \Arr::merge(
+            \Config::get('nos::applications_repositories', array()),
+            \Config::get('local::applications_repositories', array())
         );
     }
 
@@ -106,6 +100,7 @@ class Application
      */
     public static function search_all()
     {
+        $applications = array();
         foreach (static::$repositories as $where => $repository) {
             if ($repository['visible']) {
                 $list = \File::read_dir($repository['path'], 1);
