@@ -712,6 +712,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             if ($delete_all_contexts) {
                 $this->item->delete_all_context();
             }
+        } else {
+            if ($this->behaviours['contextable']) {
+                $dispatchEvent['context'] = $this->item{$this->behaviours['contextable']['context_property']};
+            }
+            if ($this->behaviours['tree']) {
+                $dispatchEvent['id'] = array($this->item->{$this->pk});
+                foreach ($this->item->get_ids_children(false) as $item_id) {
+                    $dispatchEvent['id'][] = (int) $item_id;
+                }
+            }
+
+            $this->item->delete();
         }
 
         $this->response(
