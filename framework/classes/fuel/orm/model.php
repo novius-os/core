@@ -754,8 +754,6 @@ class Model extends \Orm\Model
                         and $new_pk = $val->implode_pk($val)
                             and $this->_original_relations[$key] !== $new_pk)
                 ) {
-                    //print_r(debug_backtrace());
-                    //exit();
                     $diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
                     $diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
                 }
