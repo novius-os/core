@@ -99,7 +99,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             $inspectors_class_prefix[count($inspectors_class_prefix) - 1] = 'Inspector';
             $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
 
-            $application_config = \Config::metadata($application);
+            $application_config = \Nos\Config_Data::get('app_installed.'.$application);
 
             $behaviours = array(
                 'contextable' => $config['model']::behaviours('Nos\Orm_Behaviour_Contextable', false),
