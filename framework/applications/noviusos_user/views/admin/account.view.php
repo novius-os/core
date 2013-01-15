@@ -24,7 +24,7 @@ $uniqid = uniqid('id_');
                     $container.find('form:visible').submit();
                 });
 
-            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_user/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Disconnect'))->to_json() ?> + '</button></a>', true);
+            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_user/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Log out'))->to_json() ?> + '</button></a>', true);
         });
     });
 </script>
