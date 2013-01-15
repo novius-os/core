@@ -18,7 +18,7 @@ if (empty($publishable)) {
     return;
 }
 ?>
-<td>
+<td class="c3">
     <?php $published = !empty($item) ? $item->published() : false; ?>
     <table style="margin:0 2em 0 1em;" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
