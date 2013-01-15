@@ -91,9 +91,7 @@ class Nos
             )
         );
 
-        foreach (\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
-            is_callable($c) && call_user_func_array($c, array(&$content));
-        }
+        \Event::trigger_function('front.parse_wysiwyg', array(&$content));
 
         return $content;
     }
