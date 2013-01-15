@@ -74,8 +74,6 @@ return array(
                         'page_meta_noindex', 'page_meta_title', 'page_meta_description', 'page_meta_keywords',
                     ),
                     __('Advanced options') => array(
-                        'header_class' => 'faded',
-                        'content_class' => 'faded',
                         'fields' => array('page_cache_duration', 'page_lock'),
                     ),
                 ),
