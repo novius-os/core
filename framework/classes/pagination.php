@@ -200,7 +200,7 @@ class Pagination
         if ($this->total_pages == 1) {
             return '';
         }
-        
+
         $pagination = $value.$this->template['next_mark'];
 
         if ($this->current_page != $this->total_pages) {
