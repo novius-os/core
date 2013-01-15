@@ -641,7 +641,9 @@ define('jquery-nos',
                     });
                 });
                 $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
-                    $(this).wijdropdown();
+                    var $wijdropdown = $(this).wijdropdown().closest('.wijmo-wijdropdown');
+                    // Cross browser compatibility: prevent the dropdown from protruding over 2 lines
+                    $wijdropdown.width($wijdropdown.width() + 3);
                 });
                 $context.find(":input[type=checkbox]").nosOnShow('one', function() {
                     $(this).wijcheckbox();
