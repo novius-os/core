@@ -49,11 +49,17 @@ class Module extends Fuel\Core\Module
 
     public static function exists($module)
     {
+        if ($module == 'admin') {
+            return false;
+        }
         $exists = static::loaded($module) ? static::$modules[$module] : parent::exists($module);
 
         if (!$exists) {
+            // Application folder does not exists
             $application = \Nos\Application::forge($module);
+            // But metadata exists, so the folder was deleted
             if ($application->is_installed()) {
+                // Cleanup the cached metadata
                 $application->uninstall();
             }
         }

@@ -33,14 +33,21 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      *
      * If there's no result, the function will return empty array()
      *
-     * @param  \Nos\Model        $item
+     * @param  \Nos\Orm\Model    $item
      * @param  array             $params
      * @return array
      */
     public function urls($item, $params = array())
     {
         $urls = array();
-        foreach ($this->_properties['enhancers'] as $enhancer_name) {
+        $enhancers = $this->_properties['enhancers'];
+        if (!empty($params['enhancer'])) {
+            if (in_array($params['enhancer'], $enhancers)) {
+                $enhancers = array($params['enhancer']);
+            }
+            unset($params['enhancer']);
+        }
+        foreach ($enhancers as $enhancer_name) {
             foreach (\Nos\Tools_Enhancer::url_item($enhancer_name, $item, $params) as $key => $url) {
                 $urls[$key] = $url;
             }
@@ -68,7 +75,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     /**
      * Returns a valid URL for the item.
      *
-     * @param  \Nos\Model        $item
+     * @param  \Nos\Orm\Model    $item
      * @param  array             $params
      * @return null|string       Full URL (relative to base). null if the item is not displayed.
      */

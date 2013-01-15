@@ -201,14 +201,16 @@ class Pagination
             return '';
         }
 
-        if ($this->current_page == $this->total_pages) {
-            return $value.$this->template['next_mark'];
-        } else {
+        $pagination = $value.$this->template['next_mark'];
+
+        if ($this->current_page != $this->total_pages) {
             $next_page = $this->current_page + 1;
             $url = call_user_func($this->pagination_url, $next_page);
 
-            return '<a href="'.$url.'">'.$value.$this->template['next_mark'].'</a>';
+            $pagination = '<a href="'.$url.'">'.$pagination.'</a>';
         }
+
+        return $this->template['next_start'].$pagination.$this->template['next_end'];
     }
 
     // --------------------------------------------------------------------
@@ -226,13 +228,15 @@ class Pagination
             return '';
         }
 
-        if ($this->current_page == 1) {
-            return $this->template['previous_mark'].$value;
-        } else {
+        $pagination = $this->template['previous_mark'].$value;
+
+        if ($this->current_page != 1) {
             $previous_page = $this->current_page - 1;
             $url = call_user_func($this->pagination_url, $previous_page);
 
-            return '<a href="'.$url.'">'.$this->template['previous_mark'].$value.'</a>';
+            $pagination = '<a href="'.$url.'">'.$pagination.'</a>';
         }
+
+        return $this->template['previous_start'].$pagination.$this->template['previous_end'];
     }
 }

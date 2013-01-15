@@ -107,17 +107,13 @@ class Config extends \Fuel\Core\Config
         // More treatment for launchers
         // Small fix relative to permissions
         // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
-        if (isset($metadata['launchers'])) {
-            foreach ($metadata['launchers'] as $key => $launcher) {
-                if (!isset($metadata['launchers'][$key]['application'])) {
-                    $metadata['launchers'][$key]['application'] = $application_name;
-                }
+        foreach (array('launchers', 'enhancers', 'templates') as $section) {
+            if (!isset($metadata[$section])) {
+                continue;
             }
-        }
-        if (isset($metadata['enhancers'])) {
-            foreach ($metadata['enhancers'] as $key => $enhancer) {
-                if (!isset($metadata['enhancers'][$key]['application'])) {
-                    $metadata['enhancers'][$key]['application'] = $application_name;
+            foreach ($metadata[$section] as &$item) {
+                if (!isset($item['application'])) {
+                    $item['application'] = $application_name;
                 }
             }
         }

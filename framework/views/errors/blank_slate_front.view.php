@@ -24,7 +24,7 @@ html {
     height : 100%;
 }
 body {
-  background: url("static/novius-os/admin/novius-os/img/wallpapers/circles.jpg");
+  background: url("static/novius-os/admin/novius-os/img/wallpapers/default.jpg");
   background-size: cover;
   font-family: franklin gothic medium,arial,verdana,helvetica,sans-serif;
 }

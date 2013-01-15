@@ -34,7 +34,7 @@ define('jquery-nos-inspector-tree-model',
                                     inspector.nostreegrid('reload');
                                 }
                             }),
-                        inspectorData = parent.data('inspector'),
+                        inspectorData = parent.data('inspector') || {},
                         rendered = false,
                         listenReloadEvent = function() {
                             if (inspectorData.reloadEvent) {
@@ -56,7 +56,7 @@ define('jquery-nos-inspector-tree-model',
                         height : '100%',
                         width : '100%'
                     })
-                        .nostreegrid($.extend({
+                    .nostreegrid($.extend({
                         treeOptions : {
                             context : connector.data('nosContext') || ''
                         },

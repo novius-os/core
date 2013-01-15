@@ -111,7 +111,7 @@ define(
 
                 // 0 = Classic, 2 = Folder
                 if (val == 0 || val == 2) {
-                    $wysiwyg.show().siblings().hide();
+                    $wysiwyg.show().nosOnShow().siblings().hide();
                     $template_unit.show().end().change();
 
                     // Show .accordion-header
@@ -121,7 +121,7 @@ define(
 
                 // 3 = External link
                 if (val == 3) {
-                    $external.show().siblings().hide();
+                    $external.show().nosOnShow().siblings().hide();
                     $template_unit.hide();
 
                     // We need to select the appropriate index with wijaccordion() prior to changing the style or it's all messed up
@@ -138,7 +138,7 @@ define(
 
                 // 4 = Internal link
                 if (val == 4) {
-                    $internal.show().siblings().hide();
+                    $internal.show().nosOnShow().siblings().hide();
                     $template_unit.hide();
                 }
             }).change();

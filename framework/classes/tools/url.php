@@ -32,7 +32,7 @@ class Tools_Url
                 return Tools_Url::context($page_params['context']).$page_params['url'];
             }
 
-            $page = static::find($page_id);
+            $page = Model_Page::find($page_id);
             if (!empty($page)) {
                 return $page->url();
             }

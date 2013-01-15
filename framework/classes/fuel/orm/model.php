@@ -305,12 +305,8 @@ class Model extends \Orm\Model
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
             if ($application !== 'nos') {
-                $apps = \Nos\Config_Data::get('app_installed', array());
-                foreach ($apps as $app => $conf) {
-                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace) {
-                        $application = $app;
-                    }
-                }
+                $namespaces = \Nos\Config_Data::get('app_namespaces', array());
+                $application = array_search($namespace, $namespaces);
             }
 
             $config = \Config::load($application.'::'.$file_name, true);
@@ -587,7 +583,7 @@ class Model extends \Orm\Model
                     $this->linked_wysiwygs[] = $wysiwyg;
                 }
 
-                return $value;
+                return $this;
             }
 
             if (static::linked_medias() && $arr_name[0] == 'medias') {
@@ -616,23 +612,44 @@ class Model extends \Orm\Model
                     $this->linked_medias[] = $medil;
                 }
 
-                return $value;
+                return $this;
             }
-
-            $obj = $this;
 
             // We need to access the relation and not the final object
             // So we don't want to use the provider but the __get({"medias->key"}) instead
             //$arr_name[0] = $arr_name[0].'->'.$arr_name[1];
-            for ($i = 0; $i < count($arr_name); $i++) {
-                $obj = &$obj->{$arr_name[$i]};
-            }
-            return $obj = $value;
+            $this->setOrCreateRelation($name, $value);
+            return $this;
         }
 
         // No special setter for ID: immutable
 
         return parent::__set($name, $value);
+    }
+
+    protected function &setOrCreateRelation($name, $value)
+    {
+        $arr_name = explode('->', $name);
+        $obj = $this;
+        foreach ($arr_name as $val_name) {
+            $rel = $obj->relations($val_name);
+            if (!empty($rel)) {
+                $obj = &$obj->get($val_name);
+                if (empty($obj)) {
+                    $model_to = $rel->model_to;
+                    $related = $model_to::forge();
+                    if ($rel->singular) {
+                        $obj->{$val_name} = $related;
+                    } else {
+                        $obj->{$val_name}[] = $related;
+                    }
+                    $obj = $related;
+                }
+            } else if (array_key_exists($val_name, $obj::properties())) {
+                $obj->set($val_name, $value);
+            }
+        }
+        return $obj;
     }
 
     public function & get($name)
@@ -646,7 +663,6 @@ class Model extends \Orm\Model
 
     public function & __get($name)
     {
-
         $arr_name = explode('->', $name);
         if (count($arr_name) > 1) {
             $class = get_called_class();
@@ -689,6 +705,9 @@ class Model extends \Orm\Model
             $obj = $this;
             for ($i = 0; $i < count($arr_name); $i++) {
                 $obj = $obj->{$arr_name[$i]};
+                if (empty($obj)) {
+                    return $obj;
+                }
             }
             return $obj;
         }

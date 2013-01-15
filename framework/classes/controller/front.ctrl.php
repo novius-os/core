@@ -140,9 +140,7 @@ class Controller_Front extends Controller
                     $content = $this->_view->render();
 
                     $this->_handle_head($content);
-                    foreach (\Event::trigger('front.display', null, 'array') as $c) {
-                        is_callable($c) && call_user_func_array($c, array(&$content));
-                    }
+                    \Event::trigger_function('front.display', array(&$content));
 
                     echo $content;
 
