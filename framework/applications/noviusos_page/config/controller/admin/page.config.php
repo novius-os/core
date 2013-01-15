@@ -47,7 +47,7 @@ return array(
                             'content' => array(
                                 'view' => 'nos::form/fields',
                                 'params' => array(
-                                    'begin' => '<div data-id="external"><table>',
+                                    'begin' => '<div data-id="external" style="display:none;"><table>',
                                     'fields' => array(
                                         'page_external_link',
                                         'page_external_link_type',
