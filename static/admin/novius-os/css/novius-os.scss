@@ -371,51 +371,54 @@ img.publication_status {
 	left: 16px;
 }
 
+#apps {
+    padding: 0 15px;
 
-#apps .icon {
-	width: 90px;
-	height: 90px;
-	background: rgba(255, 255, 255, 0.4);
-	display: block;
-	margin: 0 auto;
-	border-radius: 45px;
-	overflow:hidden;
-	box-shadow: 0 0 5px 0px #888;
-	margin-bottom: 5px;
-	position:relative;
-}
+    .icon {
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.4);
+        display: block;
+        margin: 0 auto;
+        border-radius: 45px;
+        overflow:hidden;
+        box-shadow: 0 0 5px 0px #888;
+        margin-bottom: 4px;
+        position:relative;
+    }
 
-#apps .icon img {
-	position:absolute;
-	top: 13px;
-	left: 13px;
-	z-index: 1;
+    .icon img {
+        position:absolute;
+        top: 13px;
+        left: 13px;
+        z-index: 1;
+    }
+    .icon img.gloss {
+        z-index: 2;
+        border-radius: 45px 45px 0 0;
+        overflow: hidden;
+        top: 0; /* Need to keep 0 for the radius/hidden to operate properly */
+        left: 0;
+    }
+    a {
+        vertical-align: top;
+    }
+    .text {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.6);
+        color: #333;
+        font-weight: bold;
+        padding: 4px 5px;
+        border-radius: 4px;
+    }
+    .app {
+        display: inline-block;
+        text-align: center;
+        margin: 20px 20px 5px;
+        padding: 10px;
+        width: 90px;
+    }
 }
-#apps .icon img.gloss {
-	z-index: 2;
-	border-radius: 45px 45px 0 0;
-	overflow: hidden;
-	top: 0; /* Need to keep 0 for the radius/hidden to operate properly */
-	left: 0;
-}
-#apps a {
-	vertical-align: top;
-}
-#apps .text {
-	display: inline-block;
-	background: rgba(255, 255, 255, 0.6);
-	color: #333;
-	font-weight: bold;
-	padding: 2px 5px;
-	border-radius: 4px;
-}
-#apps .app {
-	display: inline-block;
-	text-align: center;
-	margin: 20px 45px 20px;
-	width: 90px;
-}
-
 
 /*+-++-++-++-+
  * |F||O||R||M|
