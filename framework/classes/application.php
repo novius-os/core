@@ -265,6 +265,7 @@ class Application
             $config['app_installed'] = static::$rawAppInstalled;
             unset($config['app_installed'][$this->folder]);
             $this->save_config($config);
+            static::$rawAppInstalled = $config['app_installed'];
         }
 
         return true;
