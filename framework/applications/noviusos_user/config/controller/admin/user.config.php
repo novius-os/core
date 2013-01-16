@@ -26,11 +26,10 @@ return array(
     ),
     'views' => array(
         'update' => 'noviusos_user::admin/user_edit',
-        'delete' => 'noviusos_user::admin/delete_popup',
     ),
     'fields' => array(
         'user_id' => array(
-            'label' => __('ID: '),
+            'label' => __('ID:'),
             'renderer' => 'Nos\Renderer_Text',
         ),
         'user_name' => array(
@@ -48,7 +47,7 @@ return array(
             ),
         ),
         'user_email' => array(
-            'label' => __('Email: '),
+            'label' => __('Email:'),
             'renderer' => '',
             'validation' => array(
                 'required',

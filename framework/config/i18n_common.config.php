@@ -21,14 +21,14 @@ return array(
 
     // Deletion popup
     'deleting item title' => __('Deleting the item ‘{{title}}’'),
-    'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this item?'),
+    'deleting confirmation' => __('Last chance, there’s no undo. Are you sure you want to do this?'),
 
     # Delete action's labels
-    'deleting confirmation button' => __('{{Button}} or <a>cancel</a>'),
+    'deleting confirmation button' => __('{{Button}} or <a>No, cancel</a>'),
     'deleting confirmation item' => __('Confirm deletion'),
     'deleting button 0 items' => __('Nothing to delete'),
-    'deleting button 1 item' => __('Delete this item'),
-    'deleting button N items' => __('Delete these {{count}} items'),
+    'deleting button 1 item' => __('Yes, delete this item'),
+    'deleting button N items' => __('Yes, delete these {{count}} items'),
 
     'deleting wrong confirmation' => __('We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.'),
 
@@ -48,13 +48,6 @@ return array(
     # Keep only if the model has the behaviour Tree
     'deleting with 1 child' => __('This item has <strong>1 sub-item</strong>.'),
     'deleting with N children' => __('This item has <strong>{{children_count}} sub-items</strong>.'),
-
-    'deleting following contexts' => __('Delete this item in the following contexts:'),
-    'deleting following languages' => __('Delete this item in the following languages:'),
-
-    # Keep only if the model has the behaviour Tree
-    'deleting with children following contexts' => __('Delete this item and all its sub-items in the following contexts:'),
-    'deleting with children following languages' => __('Delete this item and all its sub-items in the following languages:'),
 
     // Appdesk: allLanguages
     'allLanguages' =>__('All'),

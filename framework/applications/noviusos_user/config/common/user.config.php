@@ -38,6 +38,9 @@ return array(
 
         // Deletion popup
         'deleting item title' => __('Deleting the user ‘{{title}}’'),
+
+        # Delete action's labels
+        'deleting button 1 item' => __('Yes, delete this user'),
     ),
     'actions' => array(
         'Nos\User\Model_User.add' => array(

@@ -156,6 +156,8 @@ class Config_Common
             ),
         );
 
+
+
         if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
             unset($actions_template['visualise']);
         }
