@@ -8,11 +8,15 @@ class View extends \Fuel\Core\View
 
     public function __construct($file = null, $data = null, $filter = null)
     {
+        $is_redirection_allowed = substr($file, 0, 1) !== '!';
+        if (!$is_redirection_allowed) {
+            $file = substr($file, 1);
+        }
+
         if (strpos($file, '::') === false && static::$application !== null) {
             $file = static::$application.'::'.$file;
         }
-        if (isset(static::$redirects[$file])) {
-
+        if ($is_redirection_allowed && isset(static::$redirects[$file])) {
             $file = static::$redirects[$file];
         }
 
