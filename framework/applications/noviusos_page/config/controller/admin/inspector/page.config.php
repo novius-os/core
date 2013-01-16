@@ -27,4 +27,7 @@ return array(
             'order_by' => 'page_sort',
         ),
     ),
+    'root_node' => array(
+        'title' => __('Root'),
+    ),
 );

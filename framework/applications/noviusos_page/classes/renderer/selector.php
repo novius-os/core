@@ -55,7 +55,7 @@ class Renderer_Selector extends \Nos\Renderer_Selector
             'columns' => array(
                 array(
                     'dataKey' => 'title',
-                )
+                ),
             ),
             'treeOptions' => array(
                 'context' => null

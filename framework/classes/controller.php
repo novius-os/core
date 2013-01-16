@@ -401,7 +401,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
     protected function tree(array $tree_config)
     {
-        $id = \Input::get('id');
+        $id = \Input::get('id', null);
         $model = \Input::get('model');
         $selected = \Input::get('selected');
         $deep = intval(\Input::get('deep', 1));
@@ -475,6 +475,34 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $json = array(
                 'items' => $items,
                 'total' => count($items),
+            );
+        }
+
+        // If we're requesting the root
+        if ($id === null && !empty($tree_config['root_node'])) {
+
+            $model = !empty($model) ? $model : \Arr::get($tree_config, 'model', null);
+            $actions = array();
+            // Sometimes no model is defined (example: the page selector is never shown within an inspector, so has no model/action defined).
+            if (!empty($model)) {
+                foreach (array_keys(\Config::actions(array(
+                    'models' => array(!empty($model) ? $model : $tree_config['model']),
+                    'target' => 'grid',
+                    'class' => get_class(),
+                ))) as $action) {
+                    $actions[$action] = false;
+                }
+            }
+
+            $json['total'] = 0;
+            $json['items'] = array(
+                $tree_config['root_node'] + array(
+                    '_id' => 0,
+                    '_model' => $model,
+                    'id' => '0',
+                    'actions' => $actions,
+                    'treeChilds' => $json['items'],
+                ),
             );
         }
 
