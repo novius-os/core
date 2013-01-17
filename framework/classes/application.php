@@ -142,6 +142,26 @@ class Application
     }
 
     /**
+     * Computes the application name (from cached metadata, real metadata or folder basename)
+     * @return string
+     */
+    public function get_name_translated()
+    {
+        $metadata = $this->metadata;
+        if (empty($metadata)) {
+            $metadata = $this->getRealMetadata();
+        }
+        $i18n_file = \Arr::get($metadata, 'i18n_file', false);
+        $name = isset($metadata['name']) ? $metadata['name'] : $this->folder;
+        if (!empty($i18n_file)) {
+            $i18n = \Nos\I18n::dictionary($i18n_file);
+            $name = $i18n($name);
+        }
+
+        return $name;
+    }
+
+    /**
      * Returns the cached metadata for this application
      * @return array
      */
