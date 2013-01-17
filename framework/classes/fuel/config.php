@@ -112,6 +112,7 @@ class Config extends \Fuel\Core\Config
                 continue;
             }
             foreach ($metadata[$section] as &$item) {
+                $item['i18n_application'] = $application_name;
                 if (!isset($item['application'])) {
                     $item['application'] = $application_name;
                 }
