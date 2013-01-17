@@ -34,6 +34,8 @@ define('jquery-ui.effects.scale');
 define('jquery-ui.effects.transfer');
 define('jquery-ui.effects.fade');
 
+define('jquery-ui.datepicker.i18n');
+
 define('wijmo.wijtextselection');
 define('wijmo.wijutil');
 define('wijmo.wijinputcore');
