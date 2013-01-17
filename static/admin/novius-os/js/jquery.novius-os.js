@@ -130,7 +130,8 @@ define('jquery-nos',
 
                     siteLabel: function(site, options) {
                         options = $.extend({
-                            short: false
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false
                         }, options || {});
 
                         if ($.type(site) !== 'object') {
@@ -140,7 +141,7 @@ define('jquery-nos',
                             alias: site
                         }, site);
 
-                        if (options.short) {
+                        if (options['short']) {
                             return '<span title="' + site.title + '">' + site.alias  + '</span>';
                         } else {
                             return site.title;
@@ -149,7 +150,8 @@ define('jquery-nos',
 
                     localeLabel: function(locale, options) {
                         options = $.extend({
-                            short: false
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false
                         }, options || {});
 
                         if ($.type(locale) !== 'object') {
@@ -159,7 +161,7 @@ define('jquery-nos',
                             flag: locale.code.substr(0, 2).toLowerCase()
                         }, locale);
 
-                        if (options.short) {
+                        if (options['short']) {
                             return '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" style="vertical-align:middle;" />';
                         } else {
                             return locale.title + ' <img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" style="vertical-align:middle;" />';
@@ -172,7 +174,8 @@ define('jquery-nos',
                             label;
 
                         options = $.extend({
-                            short: false,
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false,
                             template: '{site} {locale}'
                         }, options || {});
 
@@ -182,7 +185,7 @@ define('jquery-nos',
                             label = this.siteLabel(site, options);
                         } else {
                             label = options.template
-                                .replace('{locale}', this.localeLabel(locale, {short: true}))
+                                .replace('{locale}', this.localeLabel(locale, {'short': true}))
                                 .replace('{site}', this.siteLabel(site, options));
                         }
 
