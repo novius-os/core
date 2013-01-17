@@ -14,17 +14,6 @@ define(
         return function(appDesk) {
             return {
                 appdesk : {
-                    thumbnails : {
-                        dataParser : function(size, item) {
-                            var data = {
-                                title : item.title,
-                                thumbnail : (item.image ? item.thumbnail : item.thumbnailAlternate).replace(/64/g, size),
-                                thumbnailAlternate : (item.image ? item.thumbnailAlternate : '').replace(/64/g, size),
-                                actions : []
-                            };
-                            return data;
-                        }
-                    },
                     inspectors : {
                         extension : {
                             grid : {

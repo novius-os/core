@@ -183,19 +183,15 @@ define('jquery-nos-thumbnailsgrid',
 
                 self.uiContainer.detach();
                 $.each(items, function(i) {
-                    var data = this;
-
-                    if ($.isFunction(o.dataParser)) {
-                        data = {
-                            item : o.dataParser(o.thumbnailSize, data, i),
-                            noParseData : data
-                        };
-                    } else {
-                        data = {
-                            item : data,
-                            noParseData : data
-                        };
-                    }
+                    var data = {
+                        item : {
+                            title : this._title,
+                            thumbnail : (this.thumbnail ? this.thumbnail : this.thumbnailAlternate).replace(/64/g, o.thumbnailSize),
+                            thumbnailAlternate : this.thumbnailAlternate.replace(/64/g, o.thumbnailSize),
+                            actions : []
+                        },
+                        noParseData : this
+                    };
                     self._displayItem(data, i);
                 });
                 self.uiContainer.appendTo(parent);
