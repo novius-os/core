@@ -167,7 +167,7 @@ define('jquery-nos-preview',
                                     .click(function(e) {
                                         e.preventDefault();
                                         e.stopImmediatePropagation();
-                                        self.element.nosAction(action.action, self.data);
+                                        $(this).nosAction(action.action, self.data);
                                     });
                             }
                         img.remove();
