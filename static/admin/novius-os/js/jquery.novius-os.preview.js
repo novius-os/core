@@ -143,7 +143,8 @@ define('jquery-nos-preview',
                         var div = $('<div></div>')
                             .addClass('nos-preview-thumb')
                             .css({
-                                backgroundImage :'url("' + img.attr('src') +'")',
+                                background :'url("' + img.attr('src') +'") no-repeat center center',
+                                backgroundSize: 'contains',
                                 height : (height <= 100 ? height : 100) + 'px'
                             })
                             .prependTo(self.uiContainer);
