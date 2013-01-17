@@ -18,7 +18,7 @@ return array(
             ),
         ),
         'user_email' => array(
-            'title' => __('Email'),
+            'title' => __('Email address'),
         ),
         'id_permission' => array(
             'visible' => false,
@@ -29,7 +29,7 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'notification item added' => __('Done, the user has been added.'),
+        'notification item added' => __('New user added. We look forward to see her/him soon.'),
         'notification item deleted' => __('The user has been deleted.'),
 
         // General errors

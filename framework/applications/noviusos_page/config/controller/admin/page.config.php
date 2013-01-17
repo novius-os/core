@@ -23,7 +23,7 @@ return array(
         'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
         'labels' => array(
             'insert' => __('Add a page'),
-            'blankSlate' => __('Translate a page'), #wtf what's this string for?
+            'blankSlate' => __('Translate a page'),
         ),
     ),
     'layout' => array(

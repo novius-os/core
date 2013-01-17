@@ -9,16 +9,17 @@
  */
 
 return array(
-    'name'      => 'Pages',
+    'name'      => 'Webpages',
     'namespace' => 'Nos\Page',
     'version'   => '0.1',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
     'permission' => array(),
+    'i18n_file' => 'noviusos_page::metadata',
     'launchers' => array(
         'noviusos_page' => array(
-            'name' => 'Pages',
+            'name' => 'Webpages',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(

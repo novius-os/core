@@ -14,8 +14,8 @@ $uniqid = uniqid('tabs_');
 $id_type = $uniqid.'_type';
 $id_appdesk = $uniqid.'_appdesk';
 $id_properties = $uniqid.'_properties';
-$title_appdesk_page = $edit ? __('Select a new link') : __('2. Select a link');
-$title_appdesk_media = $edit ? __('Select a new media') : __('2. Select a media');
+$title_appdesk_page = $edit ? __('Select another page') : __('2. Select a page');
+$title_appdesk_media = $edit ? __('Select another media') : __('2. Select a media');
 $title_properties_2 = $edit ? __('Edit the properties') : __('2. Set the properties');
 $title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the properties');
 
@@ -33,7 +33,7 @@ $title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the propert
 </style>
 <div id="<?= $uniqid ?>" class="box-sizing-border">
     <ul>
-        <li><a href="#<?= $id_type ?>"><?= $edit ? __('Choose a new link type') : __('1. Choose the link type') ?></a></li>
+        <li><a href="#<?= $id_type ?>"><?= $edit ? __('Change the link type') : __('1. Select the link type') ?></a></li>
         <li><a href="#<?= $id_properties ?>"><?= $title_properties_2 ?></a></li>
     </ul>
     <div id="<?= $id_type ?>">
