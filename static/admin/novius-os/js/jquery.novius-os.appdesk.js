@@ -1615,6 +1615,25 @@ define('jquery-nos-appdesk',
                                                                             }
                                                                             break;
 
+                                                                        case 'icon':
+                                                                            if ($.isPlainObject(args.row.data)) {
+                                                                                if (formatter.column && !args.row.data[formatter.column]) {
+                                                                                    break;
+                                                                                }
+                                                                                var size = (formatter.size ? ' width="' + formatter.size + '" height="' + formatter.size + '"' : '');
+                                                                                args.$container.prepend(' <img src="' + (formatter.column ? args.row.data[formatter.column] : formatter.src) + '" ' + size + ' style="vertical-align: middle;" /> ');
+                                                                            }
+                                                                            break;
+
+                                                                        case 'iconClasses':
+                                                                            if ($.isPlainObject(args.row.data)) {
+                                                                                if (formatter.column && !args.row.data[formatter.column]) {
+                                                                                    break;
+                                                                                }
+                                                                                args.$container.prepend(' <span class="' + (formatter.column ? args.row.data[formatter.column] : formatter.classes) + '" style="float:left;"></span> ');
+                                                                            }
+                                                                            break;
+
                                                                         case 'link':
                                                                             args.$container.wrapInner(
                                                                                 $('<a href="#"></a>')
