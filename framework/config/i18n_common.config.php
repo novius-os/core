@@ -57,7 +57,9 @@ return array(
     'deleting with children following languages' => __('Delete this item and all its sub-items in the following languages:'),
 
     // Appdesk: allLanguages
-    'allLanguages' =>__('All'),
+    'allLanguages' =>__('All languages'),
+    'allSites' =>__('All sites'),
+    'allContexts' =>__('All contexts'),
     'viewGrid' => __('Grid'),
     'viewTreeGrid' => __('Tree grid'),
     'viewThumbnails' => __('Thumbnails'),
@@ -65,4 +67,15 @@ return array(
     'loading' => _('Loading...'),
     'languages' => __('Languages'),
     'search' => __('Search'),
+    'selectSites' => __('Select the site(s) to work in'),
+    'selectLanguages' => __('Select the language(s) to work in'),
+    'selectContexts' => __('Select the context(s) to work in'),
+    'workInContext' => __('Work in {{context}}'),
+    'otherSites' => __('Other sites'),
+    'otherLanguages' => __('Other languages'),
+    'otherContexts' => __('Other contexts'),
+    'contexts' => __('Contexts'),
+    'sites' => __('Sites'),
+    'languages' => __('Languages'),
+
 );

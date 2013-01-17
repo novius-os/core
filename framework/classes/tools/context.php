@@ -156,7 +156,7 @@ class Tools_Context
     public static function flag($context)
     {
         $locale = self::locale($context);
-        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" /> ';
+        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" />';
     }
 
     /**
@@ -177,22 +177,19 @@ class Tools_Context
     public static function contextLabel($context, array $options = array())
     {
         $options = array_merge(array(
-                'alias' => false,
+                'short' => false,
                 'template' => '{site} {locale}',
-                'flag' => true,
-                'force_flag' => false,
             ), $options);
 
         $site = self::site($context);
         $locale = self::locale($context);
-        $site_label = $options['alias'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : '';
-        $site_label = empty($site_label) ? $site['title'] : $site_label;
+        $site_label = $options['short'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : $site['title'];
         if (count(static::sites()) === 1) {
-            $label = $options['force_flag'] ? static::flag($context) : $locale['title'];
+            $label = $options['short'] ? static::flag($context) : $locale['title'].' '.static::flag($context);
         } elseif (count(static::locales()) === 1) {
             $label = $site_label;
         } else {
-            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? static::flag($context) : $locale['title'], '{site}' => $site_label));
+            $label = strtr($options['template'], array('{locale}' => static::flag($context), '{site}' => $site_label));
         }
 
         return $label;

@@ -37,8 +37,12 @@ define('jquery-nos-appdesk',
                     viewGrid : 'Grid',
                     viewTreeGrid : 'Tree grid',
                     viewThumbnails : 'Thumbnails',
+                    selectSites : 'Select the site(s) to work in',
+                    selectLanguages : 'Select the language(s) to work in',
                     selectContexts : 'Select the context(s) to work in',
                     workInContext : 'Work in {{context}}',
+                    otherSites : 'Other sites',
+                    otherLanguages : 'Other languages',
                     otherContexts : 'Other contexts',
                     contextsPopinOk : 'Ok',
                     loading : 'Loading...',
@@ -62,6 +66,7 @@ define('jquery-nos-appdesk',
             pageIndex : 0,
             showFilter : false,
             gridRendered : false,
+            nosContext : false,
             resizing : true,
             init : false,
             itemSelected : null,
@@ -146,6 +151,12 @@ define('jquery-nos-appdesk',
                         thumbnailSize : 128
                     }, o.thumbnails);
                 }
+
+                self.nosContext = $.nosContext({
+                    locales: o.locales,
+                    sites: o.sites,
+                    contexts: o.contexts
+                });
 
                 if (!$.isEmptyObject(o.contexts)) {
 
@@ -285,7 +296,11 @@ define('jquery-nos-appdesk',
                     });
                 });
                 self.uiToolbarContextsDialog.wijdialog({
-                        title:o.texts.selectContexts,
+                        title: self.nosContext.label({
+                                oneSite: o.texts.selectLanguages,
+                                oneLocale: o.texts.selectSites,
+                                defaultLabel: o.texts.selectContexts
+                            }),
                         autoOpen: false,
                         buttons: [
                             {
@@ -416,7 +431,11 @@ define('jquery-nos-appdesk',
                     .end()
                     .find('button:last')
                     .attr('id', id)
-                    .text(o.texts.selectContexts)
+                    .text(self.nosContext.label({
+                            oneSite: o.texts.selectLanguages,
+                            oneLocale: o.texts.selectSites,
+                            defaultLabel: o.texts.selectContexts
+                        }))
                     .data({
                         text: false,
                         icons: {
@@ -431,29 +450,32 @@ define('jquery-nos-appdesk',
                 $('<li><a></a></li>')
                     .appendTo($ul)
                     .find('a')
-                    .text(o.texts.selectContexts);
+                    .text(self.nosContext.label({
+                            oneSite: o.texts.selectLanguages,
+                            oneLocale: o.texts.selectSites,
+                            defaultLabel: o.texts.selectContexts
+                        }));
 
                 $('<li></li>')
                     .appendTo($ul);
 
                 $.each(o.contexts, function(context) {
-                    var site_locale = context.split('::', 2),
-                        site = o.sites[site_locale[0]],
-                        locale = o.locales[site_locale[1]],
-                        content = o.texts.workInContext.replace('{{context}}', site.title + ' ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" />');
-
                     count++;
                     $('<li><a></a></li>')
                         .data('context', context)
                         .appendTo($ul)
                         .find('a')
-                        .append(content);
+                        .append(o.texts.workInContext.replace('{{context}}', self.nosContext.contextLabel(context)));
 
                     if (count > 10 && Object.key(o.contexts).length > 12) {
                         $('<li><a></a></li>')
                             .appendTo($ul)
                             .find('a')
-                            .text(o.texts.otherContexts);
+                            .text(self.nosContext.label({
+                                    oneSite: o.texts.otherLanguages,
+                                    oneLocale: o.texts.otherSites,
+                                    defaultLabel: o.texts.otherContexts
+                                }));
 
                         return false
                     }
@@ -498,25 +520,21 @@ define('jquery-nos-appdesk',
             },
 
             _uiToolbarContextsButtonLabel : function() {
-                var self = this,
+                var label = '',
+                    nbSites = 0,
+                    nbLocales = 0,
+                    sites = {},
+                    locales = {},
+                    self = this,
                     o = self.options,
                     $button = self.uiToolbarContextsButton.find('button:first');
 
                 if (o.selectedContexts.length === 1) {
-                    var site_locale = o.selectedContexts[0].split('::', 2),
-                        site = o.sites[site_locale[0]],
-                        locale = o.locales[site_locale[1]];
-
-                    $button.button('option', 'label', (Object.keys(o.sites).length > 1 ? '<span title="' + site.title + '">' + site.alias + '</span>' : '') + ' ' + (Object.keys(o.locales).length > 1 ? '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" />' : ''));
+                    $button.button('option', 'label', self.nosContext.contextLabel(o.selectedContexts[0]));
                 } else {
-                    var nbSites = 0,
-                        nbLocales = 0,
-                        sites = {},
-                        locales = {};
                     $.each(o.selectedContexts, function(i, context) {
-                        var site_locale = context.split('::', 2),
-                            site = site_locale[0],
-                            locale = site_locale[1];
+                        var site = self.nosContext.siteCode(context),
+                            locale = self.nosContext.localeCode(context);
 
                         if (!sites[site]) {
                             nbSites++;
@@ -532,28 +550,27 @@ define('jquery-nos-appdesk',
                     });
 
                     if (Object.keys(o.contexts).length === o.selectedContexts.length) {
-                        $button.button('option', 'label', o.texts.allContexts);
-                    } else if (Object.keys(o.sites).length === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
-                        $button.button('option', 'label', o.texts.allLanguages);
-                    } else if (Object.keys(o.locales).length === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
-                        $button.button('option', 'label', o.texts.allSites);
+                        $button.button('option', 'label', self.nosContext.label({
+                            oneSite: o.texts.allLanguages,
+                            oneLocale: o.texts.allSites,
+                            defaultLabel: o.texts.allContexts
+                        }));
                     } else if (nbSites === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
-                        $button.button('option', 'label', '<span title="' + o.sites[Object.keys(sites)[0]].title + '">' + o.sites[Object.keys(sites)[0]].alias  + '</span>' + ', ' + o.texts.allLanguages);
+                        $button.button('option', 'label', self.nosContext.siteLabel(Object.keys(sites)[0]) + ', ' + o.texts.allLanguages);
                     } else if (nbLocales === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
-                        $button.button('option', 'label', o.texts.allSites + ', ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[Object.keys(locales)[0]].flag + '.png" title="' + o.locales[Object.keys(locales)[0]].title + '" style="vertical-align:middle;" /> ')
+                        $button.button('option', 'label', o.texts.allSites + ', ' + self.nosContext.localeLabel(Object.keys(locales)[0]));
                     } else {
-                        var label = '';
                         $.each(sites, function(site, locales) {
                             if (label !== '') {
                                 label += '&nbsp;&nbsp;';
                             }
-                            if (Object.keys(o.sites).length > 1) {
-                                label += '<span title="' + o.sites[site].title + '">' + o.sites[site].alias  + '</span> ';
-                            }
                             if (Object.keys(o.locales).length > 1) {
                                 $.each(locales, function(i, locale) {
-                                    label += '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" /> ';
+                                    label += self.nosContext.localeLabel(locale, {short: true}) + ' ';
                                 });
+                            }
+                            if (Object.keys(o.sites).length > 1) {
+                                label += self.nosContext.siteLabel(site, {short: true}) + ' ';
                             }
                         });
                         $button.button('option', 'label', label);
@@ -1487,7 +1504,8 @@ define('jquery-nos-appdesk',
 
                             recursive = function(object) {
                                 $.each(object, function(key, val) {
-                                    var actions = [];
+                                    var i, nosContext,
+                                        actions = [];
                                     if ($.isPlainObject(val)) {
                                         if ($.isFunction(val._)) {
                                             // Translate value
@@ -1502,14 +1520,23 @@ define('jquery-nos-appdesk',
                                     // Build actions columns if any, and translate columns properties
                                     if (key === 'columns') {
                                         object[key] = keyToOrderedArray(object, key);
-                                        for (var i = 0; i < object[key].length; i++) {
+                                        for (i = 0; i < object[key].length; i++) {
                                             if (object[key][i].context) {
                                                 if (configToUse.hideContexts) {
                                                     object[key].splice(i, 1);
                                                     continue;
                                                 }
+                                                nosContext = $.nosContext({
+                                                    locales: config.locales,
+                                                    sites: config.sites,
+                                                    contexts: config.contexts
+                                                });
                                                 object[key][i] = {
-                                                    headerText : i18n.contexts || 'Contexts',
+                                                    headerText : nosContext.label({
+                                                        oneLocale: i18n.sites,
+                                                        oneSite: i18n.languages,
+                                                        defaultLabel: i18n.contexts || 'Contexts'
+                                                    }),
                                                     dataKey    : 'context',
                                                     setupkey   : 'context',
                                                     allowSort : false,
