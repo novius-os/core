@@ -62,19 +62,11 @@ if ($children_count > 0 || $context_count > 1) {
     <?php
 }
 
-if ($context_count == 1) {
-    ?>
-    <p><?= $crud['config']['i18n']['deleting confirmation'] ?></p>
-    <?php
-}
-
-
 if ($context_count > 1) {
     $contexts = \Nos\Tools_Context::contexts();
     $contexts_list = array();
     ?>
-    <p><?= $crud['config']['i18n']['deleting '.($children_count > 0 ? 'with children ' : '').'following contexts'] ?></p>
-    <table>
+    <table class="grid">
     <?php
     foreach ($item_contexts as $item_context) {
         $context = $item_context->get_context();
@@ -83,15 +75,15 @@ if ($context_count > 1) {
         <tr>
             <td><?= Nos\Tools_Context::contextLabel($item_context->get_context()) ?></td>
             <td><?= strtr($crud['config']['i18n'][$count == 1 ? '1 item' : 'N items'], array('{{count}}' => $count)) ?></td>
-            <td><input type="checkbox" name="contexts[]" data-count="<?= $children_context[$context] ?>" value="<?= $context ?>" checked /></td>
+            <td><input type="checkbox" name="contexts[]" class="count" data-count="<?= $children_context[$context] ?>" value="<?= $context ?>" checked /></td>
         </tr>
         <?php
     }
     ?>
     </table>
     <?php
-} else if ($crud['behaviours']['twinnable']) {
+} else {
     ?>
-    <input type="checkbox" name="contexts[]" data-count="<?= $children_count + 1 ?>" value="<?= $item->get_context() ?>" checked style="display:none;" />
+    <input type="checkbox" name="contexts[]" class="count" data-count="<?= $children_count + 1 ?>" value="<?= $crud['behaviours']['twinnable'] ? $item->get_context() : 'all' ?>" checked style="display:none;" />
     <?php
 }

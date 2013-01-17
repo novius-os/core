@@ -8,12 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos\Help;
-
-class Controller_Admin_Help extends \Controller
-{
-    public function action_index()
-    {
-        return \View::forge('noviusos_help::admin/help');
-    }
-}
+return array(
+    'Users' => 'Utilisateurs',
+    'My account' => 'Mon compte',
+);

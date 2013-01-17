@@ -43,11 +43,10 @@ return array(
 
         // Deletion popup
         'deleting item title' => __('Deleting the page ‘{{title}}’'),
-        'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this page?'),
 
         # Delete action's labels
-        'deleting button 1 item' => __('Delete this page'),
-        'deleting button N items' => __('Delete these {{count}} pages'),
+        'deleting button 1 item' => __('Yes, delete this page'),
+        'deleting button N items' => __('Yes, delete these {{count}} pages'),
 
         '1 item' => __('1 page'),
         'N items' => __('{{count}} pages'),
@@ -65,13 +64,6 @@ return array(
         # Keep only if the model has the behaviour Tree
         'deleting with 1 child' => __('This page has <strong>1 sub-page</strong>.'),
         'deleting with N children' => __('This page has <strong>{{children_count}} sub-pages</strong>.'),
-
-        'deleting following contexts' => __('Delete this page in the following contexts:'),
-        'deleting following languages' => __('Delete this page in the following languages:'),
-
-        # Keep only if the model has the behaviour Tree
-        'deleting with children following contexts' => __('Delete this page and all its sub-pages in the following contexts:'),
-        'deleting with children following languages' => __('Delete this page and all its sub-pages in the following languages:'),
     ),
     'actions' => array(
         'Nos\Page\Model_Page.delete' => array(

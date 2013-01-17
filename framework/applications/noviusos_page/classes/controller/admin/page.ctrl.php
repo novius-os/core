@@ -317,8 +317,6 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                     $child_common_id = $child->page_context_common_id;
                     $clone_common_id = \Arr::get($child_common_ids, $child_common_id, null);
                     $child_common_ids[$child_common_id] = static::duplicate_page($child, $child->get_context(), $recursive, $parents[$child->get_context()], $clone_common_id);
-                    \Log::error('logging');
-                    \Log::error(print_r($child_common_ids, true));
                 }
             }
         }

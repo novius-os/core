@@ -12,6 +12,7 @@ $id = $uniqid = uniqid('form_');
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
 <?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
+<p><?= $crud['config']['i18n']['deleting confirmation'] ?></p>
 <p>
     <?= strtr($crud['config']['i18n']['deleting confirmation button'], array(
         '{{Button}}' => '
@@ -58,7 +59,7 @@ $id = $uniqid = uniqid('form_');
                 });
                 $form.nosFormUI();
 
-                $checkboxes = $table.find(':checkbox');
+                $checkboxes = $form.find(':checkbox.count');
                 $checkboxes.change(function() {
                     var sum = 0;
                     $checkboxes.filter(':checked').each(function() {
