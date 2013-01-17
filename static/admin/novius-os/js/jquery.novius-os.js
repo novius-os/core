@@ -279,6 +279,12 @@ define('jquery-nos',
                     return;
                 }
 
+                var position = this.offset();
+                position = {
+                    top: position.top + this.height() / 2 - 16,
+                    left: position.left + this.width() / 2
+                }
+
                 require([
                     'wijmo.wijlightbox'
                 ], function() {
@@ -307,11 +313,10 @@ define('jquery-nos',
                             .end()
                             .css({
                                 position : 'absolute',
-                                dislplay : 'none',
-                                width : 1,
-                                height: 1
+                                width : 0,
+                                height: 0
                             })
-                            .css($(this).offset())
+                            .css(position)
                             .appendTo(document.body)
                             .wijlightbox({
                                 zIndex : 1201,
@@ -510,7 +515,7 @@ define('jquery-nos',
                                 break;
 
                             case 'nosMediaVisualise' :
-                                $.nosMediaVisualise(data);
+                                $.nosMediaVisualise.call(this, data);
                                 break;
 
                             case 'dialogPick' :
