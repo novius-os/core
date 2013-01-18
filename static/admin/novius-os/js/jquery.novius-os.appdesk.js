@@ -30,6 +30,7 @@ define('jquery-nos-appdesk',
                     settings : 'Settings',
                     item : 'item',
                     items : 'items',
+                    //gridTitle: 'Items', // Don't set it here, will use texts.items as default value
                     showNbItems : 'Showing {{x}} items out of {{y}}',
                     showOneItem : 'Show 1 item',
                     showNoItem : 'No item',
@@ -150,6 +151,10 @@ define('jquery-nos-appdesk',
                     o.thumbnails = $.extend({
                         thumbnailSize : 128
                     }, o.thumbnails);
+                }
+
+                if (!o.texts.gridTitle) {
+                    o.texts.gridTitle = o.texts.items;
                 }
 
                 self.nosContext = $.nosContext({
@@ -928,7 +933,7 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 self.gridRendered = false;
-                self.uiGridTitle.text(o.texts.items);
+                self.uiGridTitle.text(o.texts.gridTitle);
 
                 self.uiThumbnail.thumbnailsgrid('destroy')
                     .empty()
