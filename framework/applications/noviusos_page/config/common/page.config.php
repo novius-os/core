@@ -7,6 +7,12 @@ return array(
         'page_title' => array(
             'title' => __('Title'),
             'sortDirection' => 'ascending',
+            'cellFormatters' => array(
+                'is_home' => array(
+                    'type' => 'iconClasses',
+                    'column' => 'iconClasses',
+                ),
+            ),
         ),
         'context' => true,
         'url' => array(
@@ -26,6 +32,11 @@ return array(
             'title' => __('Status'),
             'method' => 'publication_status',
             'multiContextHide' => true,
+        ),
+        'iconClasses' => array(
+            'value' => function($page) {
+                return $page->page_entrance ? 'ui-icon ui-icon-home' : false;
+            }
         ),
     ),
     'i18n' => array(

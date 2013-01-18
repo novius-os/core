@@ -157,7 +157,7 @@ class Config_Data
      */
     public static function onLoadLauncher(&$config)
     {
-        static::_translate($config, array('name'));
+        static::_translate($config, array('name', 'action.tab.label'));
     }
 
     /**
@@ -169,12 +169,15 @@ class Config_Data
     protected static function _translate(&$config, $keys)
     {
         foreach ($config as &$item) {
-            $application = $item['application'];
+            $application = \Arr::get($item, 'i18n_application', false);
             $i18n_file = static::get('app_installed.'.$application.'.i18n_file', false);
             if (!empty($i18n_file)) {
                 $i18n = \Nos\I18n::dictionary($i18n_file);
                 foreach ($keys as $key) {
-                    $item[$key] = $i18n($item[$key]);
+                    $val = \Arr::get($item, $key, false);
+                    if ($val !== false) {
+                        \Arr::set($item, $key, $i18n($val));
+                    }
                 }
             }
         }

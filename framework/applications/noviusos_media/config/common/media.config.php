@@ -10,6 +10,45 @@
 
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
 
+$media_icon = function ($size) {
+    return function ($item) use($size) {
+        $extensions = array(
+            'gif' => 'image.png',
+            'png' => 'image.png',
+            'jpg' => 'image.png',
+            'jpeg' => 'image.png',
+            'bmp' => 'image.png',
+            'doc' => 'document.png',
+            'xls' => 'document.png',
+            'ppt' => 'document.png',
+            'docx' => 'document.png',
+            'xlsx' => 'document.png',
+            'pptx' => 'document.png',
+            'odt' => 'document.png',
+            'odf' => 'document.png',
+            'odp' => 'document.png',
+            'pdf' => 'document.png',
+            'mp3' => 'music.png',
+            'wav' => 'music.png',
+            'avi' => 'video.png',
+            'mkv' => 'video.png',
+            'mpg' => 'video.png',
+            'mpeg' => 'video.png',
+            'mov' => 'video.png',
+            'zip' => 'archive.png',
+            'rar' => 'archive.png',
+            'tar' => 'archive.png',
+            'gz' => 'archive.png',
+            '7z' => 'archive.png',
+            'txt' => 'text.png',
+            'xml' => 'text.png',
+            'htm' => 'text.png',
+            'html' => 'text.png',
+        );
+        return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/'.$size.'/'.$extensions[$item->media_ext] : '';
+    };
+};
+
 return array(
     'i18n' => array(
         // Crud
@@ -25,16 +64,17 @@ return array(
         'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this media?'),
     ),
     'data_mapping' => array(
-        'ext' => array(
-            'title' => __('Ext.'),
-            'column' => 'media_ext',
-            'width' => 60,
-            'ensurePxWidth' => true,
-            'allowSizing' => false,
-        ),
+        'ext' => 'media_ext',
         'title' => array(
             'column' => 'media_title',
             'title' => __('Title'),
+            'cellFormatters' => array(
+                'icon' => array(
+                    'type' => 'icon',
+                    'column' => 'icon',
+                    'size' => 16,
+                ),
+            ),
         ),
         'file' => array(
             'column' => 'media_file',
@@ -66,42 +106,10 @@ return array(
             'column' => 'media_width',
         ),
         'thumbnailAlternate' => array(
-            'value' => function ($item) {
-                $extensions = array(
-                    'gif' => 'image.png',
-                    'png' => 'image.png',
-                    'jpg' => 'image.png',
-                    'jpeg' => 'image.png',
-                    'bmp' => 'image.png',
-                    'doc' => 'document.png',
-                    'xls' => 'document.png',
-                    'ppt' => 'document.png',
-                    'docx' => 'document.png',
-                    'xlsx' => 'document.png',
-                    'pptx' => 'document.png',
-                    'odt' => 'document.png',
-                    'odf' => 'document.png',
-                    'odp' => 'document.png',
-                    'pdf' => 'document.png',
-                    'mp3' => 'music.png',
-                    'wav' => 'music.png',
-                    'avi' => 'video.png',
-                    'mkv' => 'video.png',
-                    'mpg' => 'video.png',
-                    'mpeg' => 'video.png',
-                    'mov' => 'video.png',
-                    'zip' => 'archive.png',
-                    'rar' => 'archive.png',
-                    'tar' => 'archive.png',
-                    'gz' => 'archive.png',
-                    '7z' => 'archive.png',
-                    'txt' => 'text.png',
-                    'xml' => 'text.png',
-                    'htm' => 'text.png',
-                    'html' => 'text.png',
-                );
-                return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/64/'.$extensions[$item->media_ext] : '';
-            },
+            'value' => $media_icon(64),
+        ),
+        'icon' => array(
+            'value' => $media_icon(16),
         ),
     ),
     'actions' => array(

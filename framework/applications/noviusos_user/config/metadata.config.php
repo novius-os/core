@@ -16,6 +16,7 @@ return array(
         'name'  => 'Novius OS',
     ),
     'permission' => array(),
+    'i18n_file' => 'noviusos_user::metadata',
     'launchers' => array(
         'noviusos_user' => array(
             'name'    => 'Users',
@@ -33,7 +34,7 @@ return array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'label' => __('Account'),
+                    'label' => 'My account',
                     'url' => 'admin/noviusos_user/account',
                     'iconUrl' => 'static/apps/noviusos_user/img/32/myaccount.png',
                 ),

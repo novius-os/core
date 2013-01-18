@@ -1,3 +1,4 @@
+<?php
 /**
  * NOVIUS OS - Web OS for digital communication
  *
@@ -7,11 +8,8 @@
  * @link http://www.novius-os.org
  */
 
-define([
-    'jquery-nos-appdesk'
-], function() {
-    "use strict";
-    return function(appDesk) {
-        return {};
-    };
-});
+return array(
+    'title_property'  => function($item) {
+        return $item->fullname();
+    },
+);

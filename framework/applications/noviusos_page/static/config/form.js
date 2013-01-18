@@ -102,15 +102,12 @@ define(
                 var val = $(this).val();
                 var $wysiwyg = $container.find('[data-id=wysiwyg]');
                 var $external = $container.find('[data-id=external]');
-                var $internal = $container.find('[data-id=internal]');
 
                 // 0 = Classic
-                // 2 = Folder
                 // 3 = External link
-                // 4 = Internal link
 
-                // 0 = Classic, 2 = Folder
-                if (val == 0 || val == 2) {
+                // 0 = Classic
+                if (val == 0) {
                     $wysiwyg.show().nosOnShow().siblings().hide();
                     $template_unit.show().end().change();
 
@@ -134,12 +131,6 @@ define(
                     // Hide .accordion-header and .accordion-content
                     $page_virtual_name_container.hide().prev().hide();
                     $page_meta_title_container.hide().prev().hide();
-                }
-
-                // 4 = Internal link
-                if (val == 4) {
-                    $internal.show().nosOnShow().siblings().hide();
-                    $template_unit.hide();
                 }
             }).change();
 

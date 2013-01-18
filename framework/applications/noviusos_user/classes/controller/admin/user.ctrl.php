@@ -39,7 +39,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
     public function save($item, $data)
     {
         if (!$this->is_new && $item->is_changed('user_password')) {
-            $this->config['messages']['successfully saved'] = __('New password successfully set.');
+            $this->config['messages']['successfully saved'] = __('Done, your password has been changed.');
         }
 
         return parent::save($item, $data);
@@ -72,7 +72,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             }
         }
         \Response::json(array(
-            'notify' => __('Permissions successfully saved.'),
+            'notify' => __('OK, permissions saved.'),
         ));
 
     }

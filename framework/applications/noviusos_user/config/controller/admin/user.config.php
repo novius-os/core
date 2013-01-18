@@ -28,10 +28,6 @@ return array(
         'update' => 'noviusos_user::admin/user_edit',
     ),
     'fields' => array(
-        'user_id' => array(
-            'label' => __('ID:'),
-            'renderer' => 'Nos\Renderer_Text',
-        ),
         'user_name' => array(
             'label' => __('Family name'),
             'renderer' => '',
@@ -47,7 +43,7 @@ return array(
             ),
         ),
         'user_email' => array(
-            'label' => __('Email:'),
+            'label' => __('Email address:'),
             'renderer' => '',
             'validation' => array(
                 'required',
@@ -55,7 +51,7 @@ return array(
             ),
         ),
         'user_last_connection' => array(
-            'label' => __('Last login: '),
+            'label' => __('Last signed in on:'),
             'add' => false,
             'renderer' => 'Nos\Renderer_Date_Select',
             'form' => array(
@@ -64,7 +60,7 @@ return array(
             ),
         ),
         'user_expert' => array(
-            'label' => __('Expert view '),
+            'label' => __('Expert view'),
             'form' => array(
                 'type' => 'checkbox',
                 'value' => '1',
@@ -84,7 +80,7 @@ return array(
             ),
         ),
         'user_password' => array(
-            'label' => __('Password: '),
+            'label' => __('Password:'),
             'form' => array(
                 'type' => 'password',
                 'size' => 20,
@@ -95,7 +91,7 @@ return array(
             ),
         ),
         'password_reset' => array(
-            'label' => __('Password: '),
+            'label' => __('Password:'),
             'form' => array(
                 'type' => 'password',
                 'size' => 20,
@@ -113,7 +109,7 @@ return array(
             ),
         ),
         'password_confirmation' => array(
-            'label' => 'Password (confirmation)',
+            'label' => __('Password (confirmation):'),
             'form' => array(
                 'type' => 'password',
                 'size' => 20,

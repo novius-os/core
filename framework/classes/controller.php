@@ -254,7 +254,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $item = static::dataset_item($object, $config['dataset']);
 
                 if ($contextable && !$twinnable) {
-                    $item['context'] = Tools_Context::contextLabel($object->{$contextable['context_property']}, array('force_flag' => true));
+                    $item['context'] = Tools_Context::contextLabel($object->{$contextable['context_property']}, array('short' => true));
                 }
                 $items[] = $item;
                 if ($twinnable) {
@@ -303,14 +303,14 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                         }
                         if ($locales_count > 1) {
                             if (in_array($context, $contexts)) {
-                                $flags .= \Nos\Tools_Context::flag($context);
+                                $flags .= ' '.\Nos\Tools_Context::flag($context);
                             } else {
-                                $flags .= '<span style="display:inline-block; width:16px;"></span> ';
+                                $flags .= ' <span style="display:inline-block; width:16px;"></span>';
                             }
                         }
                     }
                     if ($sites_count > 1) {
-                        $flags .= $site_flag;
+                        $flags = $site_flag.$flags;
                     }
                     $item['context'] = $flags;
                 }

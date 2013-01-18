@@ -143,7 +143,8 @@ define('jquery-nos-preview',
                         var div = $('<div></div>')
                             .addClass('nos-preview-thumb')
                             .css({
-                                backgroundImage :'url("' + img.attr('src') +'")',
+                                background :'url("' + img.attr('src') +'") no-repeat center center',
+                                backgroundSize: 'contains',
                                 height : (height <= 100 ? height : 100) + 'px'
                             })
                             .prependTo(self.uiContainer);
@@ -166,7 +167,7 @@ define('jquery-nos-preview',
                                     .click(function(e) {
                                         e.preventDefault();
                                         e.stopImmediatePropagation();
-                                        self.element.nosAction(action.action, self.data);
+                                        $(this).nosAction(action.action, self.data);
                                     });
                             }
                         img.remove();

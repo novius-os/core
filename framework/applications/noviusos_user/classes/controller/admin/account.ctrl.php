@@ -74,10 +74,10 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
             $user->save();
             $label = $languages[$lang]['title'];
             \Response::json(array(
-                'notify' => strtr(__('Language has been set to {{language}}, please <a>refresh</a> to see changes.'), array('{{language}}' => $label, '<a>' => '<a href="javascript:document.location.reload();">')),
+                'notify' => strtr(__('Your Novius OS has switched to {{language}}. Okay, not quite. Actually it needs a <a>quick refresh</a>.'), array('{{language}}' => $label, '<a>' => '<a href="javascript:document.location.reload();">')),
             ));
         }
-        $this->send_error(strtr(__('Language {{code}} is not available.'), array(
+        $this->send_error(strtr(__('Sorry but your Novius OS doesn’t speak {{code}}.'), array(
             '{{code}}' => $lang,
         )));
     }
@@ -111,26 +111,26 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
                                 if (!empty($media)) {
                                     \Arr::set($configuration, 'misc.display.background', $data['background']);
                                     $notify = strtr(
-                                        __('Your wallpaper is now "{title}"'),
+                                        __('‘{{title}}’ is your new gorgeous wallpaper. Go quick to the home tab to see it.'),
                                         array(
-                                            '{title}' => $media->media_title,
+                                            '{{title}}' => $media->media_title,
                                         )
                                     );
                                     $body['wallpaper_url'] = \Uri::create($media->get_public_path());
                                 } else {
                                     $data['background'] = null;
-                                    $error = __('The selected image does not exists.');
+                                    $error = __('This is unexpected: The selected image doesn’t exist any more. It must have been deleted while you were selecting it.');
                                 }
                             }
                             if (empty($data['background'])) {
                                 \Arr::delete($configuration, 'misc.display.background');
-                                $notify = __('Your wallpaper has been removed.');
+                                $notify = __('Your wallpaper is now the default one.');
                             }
 
                             $user->user_configuration = serialize($configuration);
                             $user->save();
                         } catch (\Exception $e) {
-                            $error = \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : 'An error occured.';
+                            $error = \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.');
                         }
 
                         if (!empty($notify)) {

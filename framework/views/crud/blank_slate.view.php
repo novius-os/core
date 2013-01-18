@@ -50,7 +50,7 @@ if (!in_array($context, $possible)) {
     foreach ($possible as $possible_context) {
         $item_context = $item->find_context($possible_context);
         if (!empty($item_context)) {
-            $context_label = \Nos\Tools_Context::contextLabel($possible_context, array('template' => '{site} - {locale}', 'flag' => false));
+            $context_label = \Nos\Tools_Context::contextLabel($possible_context);
             $labels[$item_context->id] = strtr(__('Translate {{context}}'), array(
                 '{{context}}' => $context_label,
             ));
@@ -101,7 +101,7 @@ if (!in_array($context, $possible)) {
 
         echo '<ul class="wijmenu">';
         foreach ($labels as $context => $label) {
-            echo '<li data-create_from_id="'.htmlspecialchars($context).'"><a>'.htmlspecialchars($label).'</a></li>';
+            echo '<li data-create_from_id="'.htmlspecialchars($context).'"><a>'.$label.'</a></li>';
         }
         echo '</ul>';
     }
