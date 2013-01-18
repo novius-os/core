@@ -44,9 +44,9 @@ class Validation_Error extends Fuel\Core\Validation_Error
             }
         }
         if ($msg == false) {
-            return $open.strtr(__('Validation rule {rule} failed for {field}'), array(
-                '{rule}' => $this->rule,
-                '{field}' => $this->field->label,
+            return $open.strtr(__('The field ‘{{field}}’ doesn’t respect the rule ‘{{rule}}’'), array(
+                '{{rule}}' => $this->rule,
+                '{{field}}' => $this->field->label,
             )).$close;
         }
 
