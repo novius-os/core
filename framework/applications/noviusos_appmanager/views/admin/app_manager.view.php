@@ -52,15 +52,19 @@ foreach ($installed as $app) {
     ?>
                     <tr>
                         <td>&nbsp;<img src="<?= isset($metadata['icons'][16]) ? $metadata['icons'][16] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e(Nos\Config_Data::get('app_installed.'.$app->folder.'.name', $app->name)); ?></td>
-                        <td><?= ($app->is_dirty()) ? __('Some recent changes') : __('Up-to-date') ?></td>
                         <td>
     <?php
     if ($app->is_dirty()) {
         ?>
-                            <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Apply changes') ?></button></a>
+        <?= __('Some recent changes') ?>
+        <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Apply changes') ?></button></a>
         <?php
+    } else {
+        echo __('Up-to-date');
     }
     ?>
+                        </td>
+                        <td>
                             <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
                         </td>
                     </tr>
