@@ -37,7 +37,6 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
                 'local' => \Nos\Application::forge('local'),
                 'installed' => $app_installed,
                 'others' => $app_others,
-                'allow_upload' => \Config::get('novius-os.allow_plugin_upload'),
             ),
             false,
             false
@@ -53,9 +52,11 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         try {
             if ($app_name === 'nos') {
                 \Nos\Application::installNativeApplications();
+                $notify = __('OK, changes have been applied.');
             } else {
                 $application = \Nos\Application::forge($app_name);
                 $application->install();
+                $notify = $application->is_installed() ? __('OK, changes have been applied.') : __('Great, a new app! Installed and ready to use.');
             }
         } catch (\Exception $e) {
             $this->response(
@@ -68,7 +69,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         }
         $this->response(
             array(
-                'notify' => __('Installation successful'),
+                'notify' => $notify,
                 // The tab will be refreshed by the javaScript within the view
             )
         );
@@ -96,151 +97,9 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
 
         $this->response(
             array(
-                'notify' => __('Uninstallation successful'),
+                'notify' => __('The application has been uninstalled.'),
                 // The tab will be refreshed by the javaScript within the view
             )
         );
     }
-
-    public function action_upload()
-    {
-        if (\Config::get('allow_plugin_upload', false) == false) {
-            Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-
-        if (empty($_FILES['zip'])) {
-            \Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-
-        if (!is_uploaded_file($_FILES['zip']['tmp_name'])) {
-            \Session::forge()->set_flash(
-                'notification.plugins',
-                array(
-                    'title' => 'Upload error.',
-                    'type' => 'error',
-                )
-            );
-            \Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-
-        if ($_FILES['zip']['error'] != UPLOAD_ERR_OK) {
-            \Session::forge()->set_flash(
-                'notification.plugins',
-                array(
-                    'title' => 'Upload error n°'.$_FILES['zip']['error'].'.',
-                    'type' => 'error',
-                )
-            );
-            \Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-
-        $files = array();
-        $za = new \ZipArchive();
-        $zip_file = $_FILES['zip']['tmp_name'];
-        $za->open($zip_file);
-        for ($i = 0; $i < $za->numFiles; $i++) {
-            $files[] = $za->getNameIndex($i);
-        }
-
-        $root_files = array();
-        foreach ($files as $k => $f) {
-            if (mb_substr($f, -1) == '/' && substr_count($f, '/') <= 1) {
-                $root_files[] = $f;
-            }
-        }
-
-        $count = count($root_files);
-        if ($count == 0) {
-            \Session::forge()->set_flash(
-                'notification.plugins',
-                array(
-                    'title' => $name.' already exists in you module directory.',
-                    'type' => 'error',
-                )
-            );
-            \Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-        $root = ($count == 1 ? $root_files[0] : '');
-
-        $metadata_file = $root.'config/metadata.php';
-        $metadata = \Fuel::load('zip://'.$zip_file.'#'.$metadata_file);
-
-        if (empty($metadata['install_folder'])) {
-            \Session::forge()->set_flash(
-                'notification.plugins',
-                array(
-                    'title' => 'This is not a valid application archive.',
-                    'type' => 'error',
-                )
-            );
-            \Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-
-        $path = APPPATH.'applications'.DS.$metadata['install_folder'];
-        if (is_dir($path.$name)) {
-            \Session::forge()->set_flash(
-                'notification.plugins',
-                array(
-                    'title' => $metadata['install_folder'].' already exists in you module directory.',
-                    'type' => 'error',
-                )
-            );
-            \Response::redirect('admin/noviusos_appmanager/appmanager');
-        }
-
-        usort(
-            $files,
-            function ($a, $b) {
-                return mb_strlen($a) > mb_strlen($b);
-            }
-        );
-
-        // @todo better error handling ?
-        // @todo skip stupid files ?
-        // @todo appropriate chmod ?
-        try {
-            $old = umask(0);
-            @mkdir($path, 0777);
-            umask($old);
-
-            $root_length = mb_strlen($root);
-
-            foreach ($files as $file) {
-                $dest = $path.DS.mb_substr($file, $root_length);
-                if (mb_substr($file, -1) == '/') {
-                    is_dir($dest) || @mkdir($dest, 0777);
-                } else {
-                    copy('zip://'.$zip_file.'#'.$file, $dest);
-                }
-            }
-        } catch (\Exception $e) {
-            \Fuel\Core\File::delete_dir($path, true, true);
-        }
-        \Response::redirect('admin/noviusos_appmanager/appmanager');
-    }
-
-    public function after($response)
-    {
-        foreach (array(
-                     'title' => __('Administration'),
-                     'base' => \Uri::base(false),
-                     'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
-                 ) as $var => $default) {
-            if (empty($this->template->$var)) {
-                $this->template->$var = $default;
-            }
-        }
-        $ret = parent::after($response);
-        $this->template->set(
-            array(
-                'css' => \Asset::render('css'),
-                'js' => \Asset::render('js'),
-            ),
-            false,
-            false
-        );
-
-        return $ret;
-    }
-
 }

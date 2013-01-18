@@ -30,6 +30,7 @@ define('jquery-nos-appdesk',
                     settings : 'Settings',
                     item : 'item',
                     items : 'items',
+                    //gridTitle: 'Items', // Don't set it here, will use texts.items as default value
                     showNbItems : 'Showing {{x}} items out of {{y}}',
                     showOneItem : 'Show 1 item',
                     showNoItem : 'No item',
@@ -150,6 +151,10 @@ define('jquery-nos-appdesk',
                     o.thumbnails = $.extend({
                         thumbnailSize : 128
                     }, o.thumbnails);
+                }
+
+                if (!o.texts.gridTitle) {
+                    o.texts.gridTitle = o.texts.items;
                 }
 
                 self.nosContext = $.nosContext({
@@ -859,37 +864,39 @@ define('jquery-nos-appdesk',
                     });
 
                 var presentations = [
-                    {
-                        id : 'treeGrid',
-                        text : o.texts.viewTreeGrid,
-                        icon : 'view-tree'
-                    },
-                    {
-                        id : 'grid',
-                        text : o.texts.viewGrid,
-                        icon : 'view-list'
-                    },
-                    {
-                        id : 'thumbnails',
-                        size : 64,
-                        text : o.texts.viewThumbnails,
-                        icon : 'view-thumbs-small'
-                    },
-                    {
-                        id : 'thumbnails',
-                        size : 128,
-                        text : o.texts.viewThumbnails,
-                        icon : 'view-thumbs-big'
-                    }
-                ];
+                        {
+                            id : 'treeGrid',
+                            text : o.texts.viewTreeGrid,
+                            icon : 'view-tree'
+                        },
+                        {
+                            id : 'grid',
+                            text : o.texts.viewGrid,
+                            icon : 'view-list'
+                        },
+                        {
+                            id : 'thumbnails',
+                            size : 64,
+                            text : o.texts.viewThumbnails,
+                            icon : 'view-thumbs-small'
+                        },
+                        {
+                            id : 'thumbnails',
+                            size : 128,
+                            text : o.texts.viewThumbnails,
+                            icon : 'view-thumbs-big'
+                        }
+                    ],
+                    date = new Date(),
+                    id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
 
                 $.each(presentations, function() {
                     var presentation = this;
                     if (o[presentation.id]) {
-                        $('<label for="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
+                        $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
                             .text(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
-                        $('<input type="radio" id="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
+                        $('<input type="radio" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
                             .appendTo(self.uiViewsButtons)
                             .button({
                                 text : false,
@@ -928,7 +935,7 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 self.gridRendered = false;
-                self.uiGridTitle.text(o.texts.items);
+                self.uiGridTitle.text(o.texts.gridTitle);
 
                 self.uiThumbnail.thumbnailsgrid('destroy')
                     .empty()

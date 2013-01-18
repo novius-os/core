@@ -84,11 +84,10 @@ class Nos
         static::_parse_medias($content);
         static::_parse_internals($content);
 
-        $content = strtr(
-            $content,
-            array(
-                'nos://anchor/' => static::main_controller()->getUrl(),
-            )
+        $content = preg_replace(
+            '`href="#([^"])`iUu',
+            'href="'.static::main_controller()->getUrl().(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
+            $content
         );
 
         \Event::trigger_function('front.parse_wysiwyg', array(&$content));

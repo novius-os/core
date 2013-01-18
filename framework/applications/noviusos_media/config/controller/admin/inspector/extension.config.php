@@ -21,32 +21,32 @@ return array(
         array(
             'id' => 'document',
             'title' => __('Documents'),
-            'icon' => 'document-office.png',
+            'icon' => 'document.png',
         ),
         array(
             'id' => 'music',
             'title' => __('Music'),
-            'icon' => 'music-beam.png',
+            'icon' => 'music.png',
         ),
         array(
             'id' => 'video',
             'title' => __('Videos'),
-            'icon' => 'film.png',
+            'icon' => 'video.png',
         ),
         array(
             'id' => 'archive',
             'title' => __('Compressed archive'),
-            'icon' => 'folder-zipper.png',
+            'icon' => 'archive.png',
         ),
         array(
             'id' => 'text',
             'title' => __('Textual content'),
-            'icon' => 'document-text.png',
+            'icon' => 'text.png',
         ),
         array(
             'id' => 'other',
             'title' => __('Other'),
-            'icon' => 'book-question.png',
+            'icon' => 'misc.png',
         ),
     ),
     'input' => array(
@@ -54,14 +54,8 @@ return array(
         'query' =>
             function ($value, $query)
             {
-                static $extensions = array(
-                    'image' => 'gif,png,jpg,jpeg,bmp',
-                    'document' => 'doc,xls,ppt,docx,xlsx,pptx,odt,odf,odp,pdf',
-                    'music' => 'mp3,wav',
-                    'video' => 'avi,mkv,mpg,mpeg,mov',
-                    'archive' => 'zip,rar,tar,gz,7z',
-                    'text' => 'txt,xml,htm,html',
-                );
+                \Config::load('noviusos_media::icons', true);
+                $extensions = \Config::get('noviusos_media::icons.extensions', array());
                 $ext = array();
                 $other = array();
                 $value = (array) $value;

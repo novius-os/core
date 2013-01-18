@@ -10,42 +10,18 @@
 
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::application', 'nos::common'));
 
-$media_icon = function ($size) {
-    return function ($item) use($size) {
-        $extensions = array(
-            'gif' => 'image.png',
-            'png' => 'image.png',
-            'jpg' => 'image.png',
-            'jpeg' => 'image.png',
-            'bmp' => 'image.png',
-            'doc' => 'document.png',
-            'xls' => 'document.png',
-            'ppt' => 'document.png',
-            'docx' => 'document.png',
-            'xlsx' => 'document.png',
-            'pptx' => 'document.png',
-            'odt' => 'document.png',
-            'odf' => 'document.png',
-            'odp' => 'document.png',
-            'pdf' => 'document.png',
-            'mp3' => 'music.png',
-            'wav' => 'music.png',
-            'avi' => 'video.png',
-            'mkv' => 'video.png',
-            'mpg' => 'video.png',
-            'mpeg' => 'video.png',
-            'mov' => 'video.png',
-            'zip' => 'archive.png',
-            'rar' => 'archive.png',
-            'tar' => 'archive.png',
-            'gz' => 'archive.png',
-            '7z' => 'archive.png',
-            'txt' => 'text.png',
-            'xml' => 'text.png',
-            'htm' => 'text.png',
-            'html' => 'text.png',
-        );
-        return isset($extensions[$item->media_ext]) ? 'static/novius-os/admin/novius-os/img/'.$size.'/'.$extensions[$item->media_ext] : '';
+$icons = \Config::load('noviusos_media::icons', true);
+$extensions = array();
+foreach ($icons['icons'] as $size => $images) {
+    foreach ($images as $image => $ext_list) {
+        foreach (explode(',', $ext_list) as $ext) {
+            $extensions[$size][$ext] = $image;
+        }
+    }
+}
+$media_icon = function ($size) use ($extensions) {
+    return function ($item) use($size, $extensions) {
+        return isset($extensions[$size][$item->media_ext]) ? 'static/apps/noviusos_media/icons/'.$size.'/'.$extensions[$size][$item->media_ext] : '';
     };
 };
 

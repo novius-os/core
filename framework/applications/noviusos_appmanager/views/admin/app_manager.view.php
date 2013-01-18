@@ -10,146 +10,129 @@
 
 ?>
 
-<div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+<div class="page line ui-widget app_manager" id="<?= $uniqid = uniqid('id_'); ?>">
 
     <style type="text/css">
-        .app_list {
-            width : 500px;
-            margin: 1em 0 0;
+        .app_manager p {
+            margin: 0.5em 0 0;
+        }
+        .app_manager .line {
+            margin: 1em 0 2em;
+        }
+        .app_manager h1 {
+            margin-bottom: 0.5em;
+        }
+        .app_manager .app_list_available {
+            width : 600px;
         }
     </style>
 
     <div class="col c1"></div>
-    <div class="col c10" id="line_first" style="position:relative;;">
-        <div class="line" style="overflow:visible;">
-            <h1 class="title"><?= __('Novius OS framework configuration'); ?></h1>
+    <div class="col c10" style="position:relative;">
+        <div class="line native_apps">
+            <h1 class="title"><?= __('Native applications'); ?></h1>
             <p>
 <?php
 if (\Nos\Application::areNativeApplicationsDirty()) {
-    echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'nos', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
+    echo __('It appears you’ve made some recent changes.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'nos', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Apply changes').'</button></a>';
 } else {
-    echo __('Up to date!');
+    echo __('All applications up-to-date.');
 }
 ?>
             </p>
         </div>
-        <p>&nbsp;</p>
-        <div class="line" style="overflow:visible;">
-            <h1 class="title"><?= __('Local configuration'); ?></h1>
-            <p>
-<?php
-if ($local->is_dirty()) {
-    echo __('It looks like you made some changes recently.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Update configuration').'</button></a>';
-} else {
-    echo __('Up to date!');
-}
-?>
-            </p>
-        </div>
-        <p>&nbsp;</p>
-        <div class="line" style="overflow:visible;">
-            <h1 class="title"><?= __('Applications'); ?></h1>
 
-            <div class="app_list">
-                <table>
-                    <thead>
-                        <tr>
-                            <td><?= __('Installed and ready to use') ?></td>
-                            <td><?= __('Actions') ?></td>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div class="line app_list_installed">
+            <h1 class="title"><?= __('Installed applications'); ?></h1>
+            <table>
+                <tbody>
 <?php
 foreach ($installed as $app) {
     $metadata = $app->metadata;
     ?>
-                        <tr>
-                            <td>&nbsp;<img src="<?= isset($metadata['icons'][16]) ? $metadata['icons'][16] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e(Nos\Config_Data::get('app_installed.'.$app->folder.'.name', $app->name)); ?></td>
-                            <td>
-                                <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
+                    <tr>
+                        <td>&nbsp;<img src="<?= isset($metadata['icons'][16]) ? $metadata['icons'][16] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e(Nos\Config_Data::get('app_installed.'.$app->folder.'.name', $app->name)); ?></td>
+                        <td>
     <?php
     if ($app->is_dirty()) {
         ?>
-                                    <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Update') ?></button></a>
+        <?= __('Some recent changes') ?>
+        <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Apply changes') ?></button></a>
         <?php
+    } else {
+        echo __('Up-to-date');
     }
     ?>
-                            </td>
-                        </tr>
+                        </td>
+                        <td>
+                            <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
+                        </td>
+                    </tr>
     <?php
 }
 ?>
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
 
 <?php
 if (empty($installed)) {
     ?>
-                <em><?php echo __('No applications found') ?>.</em>
+            <em><?php echo __('No applications found.') ?>.</em>
     <?php
 }
 ?>
-            </div>
+        </div>
 
-            <p>&nbsp;</p>
-
-            <div class="app_list">
-                <table>
-                    <thead>
-                        <tr>
-                            <td><?= __('Available for installation') ?></td>
-                            <td><?= __('Actions') ?></td>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div class="line app_list_available">
+            <h1 class="title"><?= __('Available applications'); ?></h1>
+            <table>
+                <tbody>
 <?php
 foreach ($others as $app) {
     $metadata = $app->getRealMetadata();
     ?>
-                        <tr>
-                            <td><?= e($app->get_name_translated()) ?> </td>
-                            <td>
+                    <tr>
+                        <td><?= e($app->get_name_translated()) ?> </td>
+                        <td>
     <?php
     if (empty($metadata)) {
         ?>
-                                <em><?php echo __('No metadata found') ?>.</em>
+                            <em><?php echo __('No metadata found') ?>.</em>
         <?php
     } else {
         ?>
-                                 <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
+                             <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
         <?php
     }
     ?>
-                        </tr>
+                    </tr>
     <?php
 }
 ?>
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
 
 <?php
 if (empty($others)) {
     ?>
-                <em><?= __('No applications found') ?></em>
+            <em><?= __('No applications found') ?></em>
     <?php
 }
 ?>
 
-            </div>
+        </div>
 
+        <div class="line" style="overflow:visible;">
+            <h1 class="title"><?= __('Website configuration'); ?></h1>
+            <p>
 <?php
-if ($allow_upload) {
-    ?>
-                <p>&nbsp;</p>
-                <h1 class="title"><?= __('Install from a .zip file') ?></h1>
-
-                <form method="post" action="/admin/noviusos_appmanager/appmanager/upload" enctype="multipart/form-data">
-                    <input type="file" name="zip" />
-                    <input type="submit" value="<?= __('Upload the application') ?>" />
-                </form>
-    <?php
+if ($local->is_dirty()) {
+    echo __('It appears you’ve made some recent changes.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Apply changes').'</button></a>';
+} else {
+    echo __('The website’s configuration is up-to-date.');
 }
 ?>
+            </p>
         </div>
     </div>
     <div class="col c1"></div>
@@ -171,11 +154,21 @@ if ($allow_upload) {
                         labelDisplay: false
                     })
 
-                    $(".app_list table").wijgrid({
-                        columns: [
-                            {  },
-                            { width: 200, ensurePxWidth: true }
-                        ] });
+                    $(".app_list_installed table").wijgrid({
+                        rendered: function(args) {
+                            $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
+                        },
+                        selectionMode: 'none',
+                        highlightCurrentCell: false
+                    });
+
+                    $(".app_list_available table").wijgrid({
+                        rendered: function(args) {
+                            $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
+                        },
+                        selectionMode: 'none',
+                        highlightCurrentCell: false
+                    });
 
                     $container.find('a').click(function(e) {
                         e.preventDefault();
