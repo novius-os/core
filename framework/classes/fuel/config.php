@@ -219,14 +219,16 @@ class Config extends \Fuel\Core\Config
         return $array;
     }
 
-    public static function icon($application_name, $icon_key)
+    public static function icon($application_or_model_name, $icon_key)
     {
-        $metadata = \Nos\Config_Data::get('app_installed');
-        if (!empty($metadata[$application_name])) {
-            $metadata = $metadata[$application_name];
-            if (!empty($metadata['icons'][$icon_key])) {
-                return $metadata['icons'][$icon_key];
-            }
+        if (strpos($application_or_model_name, '\\') === false) {
+            $metadata = \Nos\Config_Data::get('app_installed.'.$application_or_model_name);
+        } else {
+            $metadata = \Nos\Config_Common::load($application_or_model_name);
+        }
+
+        if (!empty($metadata['icons'][$icon_key])) {
+            return $metadata['icons'][$icon_key];
         }
         return '';
     }

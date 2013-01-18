@@ -291,10 +291,15 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['tab'])) {
-                $config['appdesk']['tab'] = array(
-                    'label' => $application_config['name'],
-                    'iconUrl' => \Config::icon($application, 32),
-                );
+                $config['appdesk']['tab'] = array();
+            }
+
+            if (!isset($config['appdesk']['label'])) {
+                $config['appdesk']['label'] = $common_config['tab']['label'];
+            }
+
+            if (!isset($config['appdesk']['iconUrl'])) {
+                $config['appdesk']['iconUrl'] = \Config::icon($config['model'], 32);
             }
 
             if (!isset($config['appdesk']['reloadEvent'])) {
