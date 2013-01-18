@@ -57,7 +57,7 @@ return array(
     'viewTreeGrid' => __('Tree grid'),
     'viewThumbnails' => __('Thumbnails'),
     'preview' => __('Preview'),
-    'loading' => _('Loading...'),
+    'loading' => __('Loading...'),
     'languages' => __('Languages'),
     'search' => __('Search'),
     'selectSites' => __('Select the site(s) to work in'),
