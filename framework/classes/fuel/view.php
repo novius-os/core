@@ -16,8 +16,18 @@ class View extends \Fuel\Core\View
         if (strpos($file, '::') === false && static::$application !== null) {
             $file = static::$application.'::'.$file;
         }
+
         if ($is_redirection_allowed && isset(static::$redirects[$file])) {
-            $file = static::$redirects[$file];
+            for ($i = 0; $i < count(static::$redirects[$file]); $i++) {
+                $callback = static::$redirects[$file][$i]['callback'];
+                if (is_callable($callback)) {
+                    $callback = $callback($data, $filter);
+                }
+                if ($callback === true || is_string($callback)) {
+                    $file = is_string($callback) ? $callback : static::$redirects[$file][$i]['view'];
+                    break;
+                }
+            }
         }
 
         parent::__construct($file, $data, $filter);
@@ -29,9 +39,12 @@ class View extends \Fuel\Core\View
         static::$application = $application;
     }
 
-    public static function redirect($from, $to)
+    public static function redirect($from, $to, $callback = true)
     {
-        static::$redirects[$from] = $to;
+        if (!isset(static::$redirects[$from])) {
+            static::$redirects[$from] = array();
+        }
+        static::$redirects[$from][] = array('view' => $to, 'callback' => $callback);
     }
 
 }
