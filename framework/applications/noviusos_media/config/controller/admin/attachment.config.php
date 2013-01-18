@@ -22,19 +22,19 @@ return array(
             'form' => array(
                 'type'  => 'hidden',
             ),
-            'label' => __('Choose a folder where to put your media:'),
+            'label' => __('Select a folder where to put your media file:'),
         ),
         'media_title' => array(
             'form' => array(
                 'type' => 'text',
             ),
-            'label' => __('Title: '),
+            'label' => __('Title:'),
         ),
         'media_file' => array(
             'form' => array(
                 'type' => 'text',
             ),
-            'label' => __('SEO, Media URL: '),
+            'label' => __('SEO, Media URL:'),
         ),
         'save' => array(
             'label' => '',

@@ -24,7 +24,7 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'notification item added' => __('Done! The folder has been added.'),
+        'notification item added' => __('Right, your new folder is ready.'),
         'notification item deleted' => __('The folder has been deleted.'),
 
         // General errors
@@ -33,7 +33,9 @@ return array(
 
         // Deletion popup
         'deleting item title' => __('Deleting the folder ‘{{title}}’'),
-        'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this folder?'),
+
+        # Delete action's labels
+        'deleting button 1 item' => __('Yes, delete this folder'),
     ),
     'actions' => array(
         'Nos\Media\Model_Folder.add' => array(
@@ -50,13 +52,12 @@ return array(
             },
         ),
         'Nos\Media\Model_Folder.add_media' => array(
-            'label' => __('Add a media in this folder'),
+            'label' => __('Add a media file in this folder'),
             'icon' => 'plus',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
                     'url' => 'admin/noviusos_media/media/insert_update?environment_id={{id}}',
-                    'label' => __('Add a media in the "{{title}}" folder'),
                 ),
             ),
             'targets' => array(
@@ -70,7 +71,6 @@ return array(
                 'action' => 'nosTabs',
                 'tab' => array(
                     'url' => '{{controller_base_url}}insert_update?environment_id={{id}}',
-                    'label' => __('Add a sub-folder in "{{title}}"'),
                 ),
                 'dialog' => array(
                     'width' => 800,

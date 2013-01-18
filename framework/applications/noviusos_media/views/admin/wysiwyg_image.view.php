@@ -27,7 +27,7 @@ $id_properties = $uniqid.'_properties';
 </style>
 <div id="<?= $uniqid ?>" class="box-sizing-border">
     <ul>
-        <li><a href="#<?= $id_library ?>"><?= $edit ? __('Pick a new image') : __('1. Pick your image') ?></a></li>
+        <li><a href="#<?= $id_library ?>"><?= $edit ? __('Pick another image') : __('1. Pick an image') ?></a></li>
         <li><a href="#<?= $id_properties ?>"><?= $edit ? __('Edit properties') : __('2. Set the properties') ?></a></li>
     </ul>
     <div id="<?= $id_library ?>" class="box-sizing-border"></div>
@@ -41,7 +41,7 @@ $id_properties = $uniqid.'_properties';
                     <td><input type="text" name="title" data-id="title" size="30" id="<?= $uniqid ?>_title" /></td>
                 </tr>
                 <tr>
-                    <th><label for="<?= $uniqid ?>_alt"><?= __('Description:') ?> </label></th>
+                    <th><label for="<?= $uniqid ?>_alt"><?= __('Alternative text (for accessibility):') ?> </label></th>
                     <td><input type="text" name="alt" data-id="alt" size="30" id="<?= $uniqid ?>_alt" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= strtr(__('Use {field}'), array('{field}' => __('title'))) ?></label></td>
                 </tr>
                 <tr>
@@ -74,7 +74,7 @@ require(
                 appdeskView: <?= \Format::forge()->to_json($appdeskview) ?>,
                 base_url: '<?= \Uri::base(true) ?>',
                 texts: {
-                    imageFirst: <?= \Format::forge()->to_json(__('Please choose an image first')) ?>
+                    imageFirst: <?= \Format::forge()->to_json(__('This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.')) ?>
                 }
             });
         });

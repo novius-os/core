@@ -32,6 +32,9 @@ return array(
                         'pathFolder' => array(
                             'label' => __('Path:'),
                         ),
+                        'extension' => array(
+                            'label' => __('Extension:'),
+                        ),
                     ),
                     'actions' => array('Nos\Media\Model_Media.edit', 'Nos\Media\Model_Media.delete', 'Nos\Media\Model_Media.visualise'),
                     'actionThumbnail' => 'Nos\Media\Model_Media.visualise',
@@ -54,7 +57,6 @@ return array(
             ),
         ),
         'image_pick' => array(
-            'name' => __('Image'),
             'virtual' => true,
             'json' => array(
                 'static/apps/noviusos_media/config/common.js',
@@ -62,7 +64,6 @@ return array(
             ),
         ),
         'media_pick' => array(
-            'name' => __('Media'),
             'virtual' => true,
             'json' => array(
                 'static/apps/noviusos_media/config/common.js',
@@ -71,12 +72,12 @@ return array(
         )
     ),
     'i18n' => array(
-        'item' => __('media'),
-        'items' => __('medias'),
-        'showNbItems' => __('Showing {{x}} medias out of {{y}}'),
-        'showOneItem' => __('Show 1 media'),
-        'showNoItem' => __('No medias'),
-        'showAll' => __('Show all medias'),
+        'item' => __('media file'),
+        'items' => __('media files'),
+        'showNbItems' => __('Showing {{x}} media files out of {{y}}'),
+        'showOneItem' => __('Show 1 media file'),
+        'showNoItem' => __('No media files'),
+        'showAll' => __('Show all media files'),
     ),
     'thumbnails' => true,
     'appdesk' => array(

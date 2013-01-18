@@ -35,17 +35,17 @@ if (!$item->is_new()) {
 }
 ?>
     <table class="fieldset">
-        <tr>
-            <th><?= $fieldset->field('medif_title')->label; ?></th>
+        <tr class="title">
+            <th></th>
             <td><?= $fieldset->field('medif_title')->build(); ?></td>
         </tr>
         <tr>
             <th style="vertical-align: top;"><?= $fieldset->field('medif_dir_name')->label; ?></th>
             <td style="vertical-align: top;">
                 <span style="vertical-align:middle;">
-                    http://yoursite.com/media/<span data-id="path_prefix"><?= $item->is_new() ? (!empty($crud['environment']) ? $crud['environment']->medif_path : '') : $item->parent->medif_path ?></span>
+                    http://yoursite.com/media<span data-id="path_prefix"><?= $item->is_new() ? (!empty($crud['environment']) ? $crud['environment']->medif_path : '/') : $item->parent->medif_path ?></span>
                 </span>
-                <?= $fieldset->field('medif_dir_name')->build(); ?> &nbsp; <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Generate from title') ?></label>
+                <?= $fieldset->field('medif_dir_name')->build(); ?> &nbsp; <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Use title') ?></label>
             </td>
         </tr>
 <?php

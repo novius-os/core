@@ -28,22 +28,24 @@ $media_icon = function ($size) use ($extensions) {
 return array(
     'i18n' => array(
         // Crud
-        'notification item added' => __('Done! The media has been added.'),
-        'notification item deleted' => __('The media has been deleted.'),
+        'notification item added' => __('Spot on! One more media file in your Centre.'),
+        'notification item deleted' => __('The media file has been deleted.'),
 
         // General errors
-        'notification item does not exist anymore' => __('This media doesn’t exist any more. It has been deleted.'),
-        'notification item not found' => __('We cannot find this media.'),
+        'notification item does not exist anymore' => __('This media file doesn’t exist any more. It has been deleted.'),
+        'notification item not found' => __('We cannot find this media file.'),
 
         // Deletion popup
         'deleting item title' => __('Deleting the media ‘{{title}}’'),
-        'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this media?'),
+
+        # Delete action's labels
+        'deleting button 1 item' => __('Yes, delete this media file'),
     ),
     'data_mapping' => array(
-        'ext' => 'media_ext',
         'title' => array(
             'column' => 'media_title',
             'title' => __('Title'),
+            '' => '',
             'cellFormatters' => array(
                 'icon' => array(
                     'type' => 'icon',
@@ -51,6 +53,19 @@ return array(
                     'size' => 16,
                 ),
             ),
+        ),
+        'ext' => array(
+            'column' => 'media_ext',
+            'title' => __('Extension'),
+            'cellFormatters' => array(
+                'center' => array(
+                    'type' => 'css',
+                    'css' => array('text-align' => 'center'),
+                ),
+            ),
+            'width' => 100,
+            'ensurePxWidth' => true,
+            'allowSizing' => false,
         ),
         'file' => array(
             'column' => 'media_file',
@@ -90,7 +105,7 @@ return array(
     ),
     'actions' => array(
         'Nos\Media\Model_Media.add' => array(
-            'label' => __('Add a media'),
+            'label' => __('Add a media file'),
         ),
         'Nos\Media\Model_Media.visualise' => array(
             'iconClasses' => 'nos-icon16 nos-icon16-eye',

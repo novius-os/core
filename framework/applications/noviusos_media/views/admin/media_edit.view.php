@@ -15,6 +15,10 @@ $uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
 $pathinfo = pathinfo($item->media_file);
 $filename = $pathinfo['filename'];
+
+$media_title = $fieldset->field('media_title');
+
+$media_title->set_attribute('placeholder', $media_title->label);
 ?>
 
 <div class="page line ui-widget" id="<?= $uniqid ?>">
@@ -33,7 +37,7 @@ if ($item->is_image()) {
             <table class="fieldset standalone">
                 <tr class="title">
                     <th></th>
-                    <td><?= $fieldset->field('media_title')->build() ?></td>
+                    <td><?= $media_title->build() ?></td>
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media')->label ?></th>
@@ -41,7 +45,7 @@ if ($item->is_image()) {
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media_file')->label ?></th>
-                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $item->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Generate from title') ?></label></span></td>
+                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $item->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Use title') ?></label></span></td>
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media_folder_id')->label; ?></th>

@@ -40,7 +40,7 @@ define('jquery-nos-media-folder-form',
                     var $path_prefix = $container.find('span[data-id=path_prefix]');
                     if (params.containerParentId) {
                         $container.find(params.containerParentId).delegate('input[name=medif_parent_id]', 'selectionChanged', function(e, row_data) {
-                            $path_prefix.text(row_data && row_data.path && row_data.path != '/' ? row_data.path : '');
+                            $path_prefix.text(row_data && row_data.path ? row_data.path : '');
                         });
                     }
 

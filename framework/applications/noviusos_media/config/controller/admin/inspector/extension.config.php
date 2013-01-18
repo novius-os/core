@@ -35,17 +35,17 @@ return array(
         ),
         array(
             'id' => 'archive',
-            'title' => __('Compressed archive'),
+            'title' => __('Archives (e.g. ZIP)'),
             'icon' => 'archive.png',
         ),
         array(
             'id' => 'text',
-            'title' => __('Textual content'),
+            'title' => __('Text files'),
             'icon' => 'text.png',
         ),
         array(
             'id' => 'other',
-            'title' => __('Other'),
+            'title' => __('Others'),
             'icon' => 'misc.png',
         ),
     ),
@@ -85,13 +85,13 @@ return array(
     ),
     'appdesk' => array(
         'vertical' => true,
-        'label' => __('Type of file'),
+        'label' => __('Types'),
         'url' => 'admin/noviusos_media/inspector/extension/list',
         'inputName' => 'media_extension[]',
         'grid' => array(
             'columns' => array(
                 'title' => array(
-                    'headerText' => __('Type of file'),
+                    'headerText' => __('Types'),
                     'dataKey' => 'title',
                 ),
                 'id' => array(
