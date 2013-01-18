@@ -40,10 +40,10 @@ return array(
         'deleting confirmation' => __('Last chance, there’s no undo. Do you really want to delete this media?'),
     ),
     'data_mapping' => array(
-        'ext' => 'media_ext',
         'title' => array(
             'column' => 'media_title',
             'title' => __('Title'),
+            '' => '',
             'cellFormatters' => array(
                 'icon' => array(
                     'type' => 'icon',
@@ -51,6 +51,19 @@ return array(
                     'size' => 16,
                 ),
             ),
+        ),
+        'ext' => array(
+            'column' => 'media_ext',
+            'title' => __('Extension'),
+            'cellFormatters' => array(
+                'center' => array(
+                    'type' => 'css',
+                    'css' => array('text-align' => 'center'),
+                ),
+            ),
+            'width' => 100,
+            'ensurePxWidth' => true,
+            'allowSizing' => false,
         ),
         'file' => array(
             'column' => 'media_file',

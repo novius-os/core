@@ -255,7 +255,7 @@ class Config_Common
         $data_mapping = array();
         foreach ($config['data_mapping'] as $key => $data) {
             if (is_string($data)) {
-                $key = $data;
+                $key = is_int($key) ? $data : $key;
                 $data = array();
             }
             if ($key === 'context') {
