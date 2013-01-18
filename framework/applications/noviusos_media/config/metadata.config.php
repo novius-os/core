@@ -16,6 +16,7 @@ return array(
         'name'  => 'Novius OS',
     ),
     'permission' => array(),
+    'i18n_file' => 'noviusos_media::metadata',
     'launchers' => array(
         'noviusos_media' => array(
             'name' => 'Media Centre',

@@ -31,7 +31,7 @@ class Config_Common
             $config['data_mapping'] = array();
         }
 
-        $config['data_mapping'] = static::process_data_mapping($model, $config);
+        $config['data_mapping'] = static::process_data_mapping($config);
         $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
         $config['icons']        = static::process_icons($application_name, $config);
         $config['tab']          = static::process_tab($application_name, $config);
@@ -247,7 +247,7 @@ class Config_Common
      * @param   array   $config
      * @return  array   The modified data_mapping
      */
-    protected static function process_data_mapping($model, $config)
+    public static function process_data_mapping($config)
     {
         if (!isset($config['data_mapping'])) {
             return array();
@@ -299,6 +299,7 @@ class Config_Common
     protected static function filter_data_mapping($initial_data_mapping, $filter)
     {
         if ($filter != null) {
+            $filter = static::process_data_mapping(array('data_mapping' => $filter));
             $data_mapping = array();
             foreach ($filter as $key => $value) {
                 $data_mapping_key = null;
