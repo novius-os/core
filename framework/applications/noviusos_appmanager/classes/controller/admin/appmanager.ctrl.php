@@ -52,9 +52,11 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         try {
             if ($app_name === 'nos') {
                 \Nos\Application::installNativeApplications();
+                $notify = __('OK, changes have been applied.');
             } else {
                 $application = \Nos\Application::forge($app_name);
                 $application->install();
+                $notify = $application->is_installed() ? __('OK, changes have been applied.') : __('Great, a new app! Installed and ready to use.');
             }
         } catch (\Exception $e) {
             $this->response(
@@ -67,7 +69,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         }
         $this->response(
             array(
-                'notify' => __('Great, a new app! Installed and ready to use.'),
+                'notify' => $notify,
                 // The tab will be refreshed by the javaScript within the view
             )
         );

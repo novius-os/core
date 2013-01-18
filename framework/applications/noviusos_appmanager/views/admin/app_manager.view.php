@@ -14,25 +14,16 @@
 
     <style type="text/css">
         .app_manager p {
-            margin: 0.5em 0 1em;
+            margin: 0.5em 0 0;
         }
         .app_manager .line {
-            margin: 1em 0 0;
+            margin: 1em 0 2em;
         }
         .app_manager h1 {
             margin-bottom: 0.5em;
         }
-        .app_manager .native_apps {
-
-        }
-        .app_manager .app_list_installed {
-            width : 700px;
-        }
         .app_manager .app_list_available {
-            width : 500px;
-        }
-        .app_manager .website_config {
-
+            width : 600px;
         }
     </style>
 
@@ -70,7 +61,6 @@ foreach ($installed as $app) {
         <?php
     }
     ?>
-
                             <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
                         </td>
                     </tr>
@@ -161,26 +151,19 @@ if ($local->is_dirty()) {
                     })
 
                     $(".app_list_installed table").wijgrid({
-                        columns: [
-                            {  },
-                            {  },
-                            { width: 200, ensurePxWidth: true }
-                        ],
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
                         },
-                        columnSelectionMode: 'none'
+                        selectionMode: 'none',
+                        highlightCurrentCell: false
                     });
 
                     $(".app_list_available table").wijgrid({
-                        columns: [
-                            {  },
-                            { width: 200, ensurePxWidth: true }
-                        ],
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
                         },
-                        columnSelectionMode: 'none'
+                        selectionMode: 'none',
+                        highlightCurrentCell: false
                     });
 
                     $container.find('a').click(function(e) {
