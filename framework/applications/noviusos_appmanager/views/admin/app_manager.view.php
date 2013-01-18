@@ -10,18 +10,35 @@
 
 ?>
 
-<div class="page line ui-widget" id="<?= $uniqid = uniqid('id_'); ?>">
+<div class="page line ui-widget app_manager" id="<?= $uniqid = uniqid('id_'); ?>">
 
     <style type="text/css">
-        .app_list {
-            width : 500px;
+        .app_manager p {
+            margin: 0.5em 0 1em;
+        }
+        .app_manager .line {
             margin: 1em 0 0;
+        }
+        .app_manager h1 {
+            margin-bottom: 0.5em;
+        }
+        .app_manager .native_apps {
+
+        }
+        .app_manager .app_list_installed {
+            width : 700px;
+        }
+        .app_manager .app_list_available {
+            width : 500px;
+        }
+        .app_manager .website_config {
+
         }
     </style>
 
     <div class="col c1"></div>
-    <div class="col c10" id="line_first" style="position:relative;;">
-        <div class="line" style="overflow:visible;">
+    <div class="col c10" style="position:relative;">
+        <div class="line native_apps">
             <h1 class="title"><?= __('Native applications'); ?></h1>
             <p>
 <?php
@@ -33,89 +50,82 @@ if (\Nos\Application::areNativeApplicationsDirty()) {
 ?>
             </p>
         </div>
-        <p>&nbsp;</p>
-        <div class="line" style="overflow:visible;">
+        <div class="line app_list_installed">
             <h1 class="title"><?= __('Installed applications'); ?></h1>
-
-            <div class="app_list">
-                <table>
-                    <tbody>
+            <table>
+                <tbody>
 <?php
 foreach ($installed as $app) {
     $metadata = $app->metadata;
     ?>
-                        <tr>
-                            <td>&nbsp;<img src="<?= isset($metadata['icons'][16]) ? $metadata['icons'][16] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e(Nos\Config_Data::get('app_installed.'.$app->folder.'.name', $app->name)); ?></td>
-                            <td><?= ($app->is_dirty()) ? __('Some recent changes') : __('Up-to-date') ?></td>
-                            <td>
+                    <tr>
+                        <td>&nbsp;<img src="<?= isset($metadata['icons'][16]) ? $metadata['icons'][16] : 'static/novius-os/admin/novius-os/img/16/application.png' ?>" style="vertical-align:top;" alt="" title="" /> <?= e(Nos\Config_Data::get('app_installed.'.$app->folder.'.name', $app->name)); ?></td>
+                        <td><?= ($app->is_dirty()) ? __('Some recent changes') : __('Up-to-date') ?></td>
+                        <td>
     <?php
     if ($app->is_dirty()) {
         ?>
-                                <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Apply changes') ?></button></a>
+                            <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="wrench"><?= __('Apply changes') ?></button></a>
         <?php
     }
     ?>
 
-                                <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
-                            </td>
-                        </tr>
+                            <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
+                        </td>
+                    </tr>
     <?php
 }
 ?>
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
 
 <?php
 if (empty($installed)) {
     ?>
-                <em><?php echo __('No applications found.') ?>.</em>
+            <em><?php echo __('No applications found.') ?>.</em>
     <?php
 }
 ?>
-            </div>
+        </div>
 
-            <p>&nbsp;</p>
-
-
+        <div class="line app_list_available">
             <h1 class="title"><?= __('Available applications'); ?></h1>
-
-            <div class="app_list">
-                <table>
-                    <tbody>
+            <table>
+                <tbody>
 <?php
 foreach ($others as $app) {
     $metadata = $app->getRealMetadata();
     ?>
-                        <tr>
-                            <td><?= e($app->get_name_translated()) ?> </td>
-                            <td>
+                    <tr>
+                        <td><?= e($app->get_name_translated()) ?> </td>
+                        <td>
     <?php
     if (empty($metadata)) {
         ?>
-                                <em><?php echo __('No metadata found') ?>.</em>
+                            <em><?php echo __('No metadata found') ?>.</em>
         <?php
     } else {
         ?>
-                                 <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
+                             <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
         <?php
     }
     ?>
-                        </tr>
+                    </tr>
     <?php
 }
 ?>
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
 
 <?php
 if (empty($others)) {
     ?>
-                <em><?= __('No applications found') ?></em>
+            <em><?= __('No applications found') ?></em>
     <?php
 }
 ?>
 
-            </div>
+        </div>
 
 <?php
 if ($allow_upload) {
@@ -130,19 +140,16 @@ if ($allow_upload) {
     <?php
 }
 ?>
-        </div>
-
-        <p>&nbsp;</p>
         <div class="line" style="overflow:visible;">
             <h1 class="title"><?= __('Website configuration'); ?></h1>
             <p>
-                <?php
-                if ($local->is_dirty()) {
-                    echo __('It appears you’ve made some recent changes.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Apply changes').'</button></a>';
-                } else {
-                    echo __('The website’s configuration is up-to-date.');
-                }
-                ?>
+<?php
+if ($local->is_dirty()) {
+    echo __('It appears you’ve made some recent changes.').' <a href="#" data-app="'.htmlspecialchars(\Format::forge(array('name' => 'local', 'action' => 'add'))->to_json()).'" onclick="return false;"><button data-icon="wrench">'.__('Apply changes').'</button></a>';
+} else {
+    echo __('The website’s configuration is up-to-date.');
+}
+?>
             </p>
         </div>
     </div>
@@ -165,14 +172,27 @@ if ($allow_upload) {
                         labelDisplay: false
                     })
 
-                    $(".app_list table").wijgrid({
+                    $(".app_list_installed table").wijgrid({
+                        columns: [
+                            {  },
+                            {  },
+                            { width: 200, ensurePxWidth: true }
+                        ],
+                        rendered: function(args) {
+                            $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
+                        },
+                        columnSelectionMode: 'none'
+                    });
+
+                    $(".app_list_available table").wijgrid({
                         columns: [
                             {  },
                             { width: 200, ensurePxWidth: true }
                         ],
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
-                        }
+                        },
+                        columnSelectionMode: 'none'
                     });
 
                     $container.find('a').click(function(e) {
