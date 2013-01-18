@@ -35,8 +35,8 @@ if (!$item->is_new()) {
 }
 ?>
     <table class="fieldset">
-        <tr>
-            <th><?= $fieldset->field('medif_title')->label; ?></th>
+        <tr class="title">
+            <th></th>
             <td><?= $fieldset->field('medif_title')->build(); ?></td>
         </tr>
         <tr>
