@@ -84,19 +84,13 @@ class Model_Page extends \Nos\Orm\Model
     protected $_page_id_for_delete = null;
 
     const TYPE_CLASSIC       = 0;
-    const TYPE_POPUP         = 1;
-    const TYPE_FOLDER        = 2;
     const TYPE_EXTERNAL_LINK = 3;
-    const TYPE_INTERNAL_LINK = 4;
-    const TYPE_OTHER_PAGE    = 5;
 
     const EXTERNAL_TARGET_NEW   = 0;
-    const EXTERNAL_TARGET_POPUP = 1;
     const EXTERNAL_TARGET_SAME  = 2;
 
     const LOCK_UNLOCKED = 0;
     const LOCK_DELETION = 1;
-    const LOCK_EDITION  = 2;
 
     public static function find($id = null, array $options = array())
     {
