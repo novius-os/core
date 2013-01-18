@@ -162,7 +162,18 @@ class Config_Common
             unset($actions_template['visualise']);
         }
 
-        $actions = \Arr::merge($actions_template, $config['actions']['list']);
+        $list_actions = array();
+        $original_list_actions = $config['actions']['list'];
+        foreach ($original_list_actions as $original_name => $action) {
+            $name = $original_name;
+            if (strpos($original_name, '\\') === false) {
+                $name = $model.'.'.$original_name;
+            }
+            $list_actions[$name] = $original_list_actions[$original_name];
+        }
+
+
+        $actions = \Arr::merge($actions_template, $list_actions);
 
         $model_label = explode('_', $model);
         $model_label = $model_label[count($model_label) - 1];

@@ -97,6 +97,144 @@ define('jquery-nos',
 
 
         $.extend({
+            nosContext : function(contexts) {
+                contexts = $.extend({
+                    locales: {},
+                    sites: {},
+                    contexts: {}
+                }, contexts || {});
+
+                return {
+                    locales: contexts.locales,
+                    sites: contexts.sites,
+                    contexts: contexts.contexts,
+
+                    label: function(labels) {
+                        if ($.type(labels) === 'string') {
+                            labels = {
+                                defaultLabel: labels
+                            };
+                        }
+                        labels = $.extend({
+                            oneLocale: labels.allContexts,
+                            oneSite: labels.allContexts
+                        }, labels);
+
+                        if (Object.keys(this.sites).length === 1) {
+                            return labels.oneSite;
+                        } else if (Object.keys(this.locales).length === 1) {
+                            return labels.oneLocale;
+                        }
+                        return labels.defaultLabel;
+                    },
+
+                    siteLabel: function(site, options) {
+                        options = $.extend({
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false
+                        }, options || {});
+
+                        if ($.type(site) !== 'object') {
+                            site = this.site(site);
+                        }
+                        site = $.extend({
+                            alias: site
+                        }, site);
+
+                        if (options['short']) {
+                            return '<span title="' + site.title + '">' + site.alias  + '</span>';
+                        } else {
+                            return site.title;
+                        }
+                    },
+
+                    localeLabel: function(locale, options) {
+                        options = $.extend({
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false
+                        }, options || {});
+
+                        if ($.type(locale) !== 'object') {
+                            locale = this.locale(locale);
+                        }
+                        locale = $.extend({
+                            flag: locale.code.substr(0, 2).toLowerCase()
+                        }, locale);
+
+                        if (options['short']) {
+                            return '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" style="vertical-align:middle;" />';
+                        } else {
+                            return locale.title + ' <img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" style="vertical-align:middle;" />';
+                        }
+                    },
+
+                    contextLabel: function(context, options) {
+                        var site = this.site(context),
+                            locale = this.locale(context),
+                            label;
+
+                        options = $.extend({
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false,
+                            template: '{site} {locale}'
+                        }, options || {});
+
+                        if (Object.keys(this.sites).length === 1) {
+                            label = this.localeLabel(locale, options);
+                        } else if (Object.keys(this.locales).length === 1) {
+                            label = this.siteLabel(site, options);
+                        } else {
+                            label = options.template
+                                .replace('{locale}', this.localeLabel(locale, {'short': true}))
+                                .replace('{site}', this.siteLabel(site, options));
+                        }
+
+                        return label;
+                    },
+
+                    localeCode: function(context) {
+                        var split = context.split('::', 2);
+                        if (!split[1]) {
+                            return context;
+                        }
+                        return split[1];
+                    },
+
+                    locale: function(context) {
+                        var locale_code = this.localeCode(context);
+                        if (!this.locales[locale_code]) {
+                            return {
+                                code: locale_code,
+                                title: locale_code,
+                                flag: locale_code.substr(0, 2).toLowerCase()
+                            };
+                        }
+                        return $.extend({
+                            code: locale_code
+                        }, this.locales[locale_code]);
+                    },
+
+                    siteCode: function (context) {
+                        var split = context.split('::', 2);
+                        return split[0];
+                    },
+
+                    site: function (context) {
+                        var site_code = this.siteCode(context);
+                        if (!this.sites[site_code]) {
+                            return {
+                                code: site_code,
+                                title: site_code,
+                                alias: site_code
+                            };
+                        }
+                        return $.extend({
+                            code: site_code
+                        }, this.sites[site_code]);
+                    }
+                };
+            },
+
             nosDispatchEvent : function(event) {
                 if (window.parent != window && window.parent.$nos) {
                     return window.parent.$nos.nosDispatchEvent(event);
@@ -141,6 +279,12 @@ define('jquery-nos',
                     return;
                 }
 
+                var position = this.offset();
+                position = {
+                    top: position.top + this.height() / 2 - 16,
+                    left: position.left + this.width() / 2
+                }
+
                 require([
                     'wijmo.wijlightbox'
                 ], function() {
@@ -169,11 +313,10 @@ define('jquery-nos',
                             .end()
                             .css({
                                 position : 'absolute',
-                                dislplay : 'none',
-                                width : 1,
-                                height: 1
+                                width : 0,
+                                height: 0
                             })
-                            .css($(this).offset())
+                            .css(position)
                             .appendTo(document.body)
                             .wijlightbox({
                                 zIndex : 1201,
@@ -372,7 +515,7 @@ define('jquery-nos',
                                 break;
 
                             case 'nosMediaVisualise' :
-                                $.nosMediaVisualise(data);
+                                $.nosMediaVisualise.call(this, data);
                                 break;
 
                             case 'dialogPick' :

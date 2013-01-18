@@ -17,13 +17,11 @@ return array(
     'views' => array(
         'default' => array(
             'name' => __('Default view'),
-            'json' => array('static/apps/noviusos_page/config/page.js'),
         ),
         'link_pick' => array(
             'name' => __('Link'),
             'virtual' => true,
             'json' => array(
-                'static/apps/noviusos_page/config/page.js',
                 'static/apps/noviusos_page/config/link_pick.js'
             ),
         ),

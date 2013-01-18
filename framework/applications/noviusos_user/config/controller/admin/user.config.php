@@ -28,10 +28,6 @@ return array(
         'update' => 'noviusos_user::admin/user_edit',
     ),
     'fields' => array(
-        'user_id' => array( #wtf no longer used
-            'label' => __('ID:'),
-            'renderer' => 'Nos\Renderer_Text',
-        ),
         'user_name' => array(
             'label' => __('Family name'),
             'renderer' => '',

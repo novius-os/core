@@ -50,7 +50,9 @@ return array(
     'deleting with N children' => __('This item has <strong>{{children_count}} sub-items</strong>.'),
 
     // Appdesk: allLanguages
-    'allLanguages' =>__('All'),
+    'allLanguages' =>__('All languages'),
+    'allSites' =>__('All sites'),
+    'allContexts' =>__('All contexts'),
     'viewGrid' => __('Grid'),
     'viewTreeGrid' => __('Tree grid'),
     'viewThumbnails' => __('Thumbnails'),
@@ -58,4 +60,15 @@ return array(
     'loading' => _('Loading...'),
     'languages' => __('Languages'),
     'search' => __('Search'),
+    'selectSites' => __('Select the site(s) to work in'),
+    'selectLanguages' => __('Select the language(s) to work in'),
+    'selectContexts' => __('Select the context(s) to work in'),
+    'workInContext' => __('Work in {{context}}'),
+    'otherSites' => __('Other sites'),
+    'otherLanguages' => __('Other languages'),
+    'otherContexts' => __('Other contexts'),
+    'contexts' => __('Contexts'),
+    'sites' => __('Sites'),
+    'languages' => __('Languages'),
+
 );

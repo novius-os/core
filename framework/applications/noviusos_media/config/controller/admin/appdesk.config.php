@@ -44,7 +44,6 @@ return array(
             'name' => __('Default view'),
             'json' => array(
                 'static/apps/noviusos_media/config/common.js',
-                'static/apps/noviusos_media/config/media.js'
             ),
         ),
         'flick_through' => array(
@@ -59,7 +58,6 @@ return array(
             'virtual' => true,
             'json' => array(
                 'static/apps/noviusos_media/config/common.js',
-                'static/apps/noviusos_media/config/media.js',
                 'static/apps/noviusos_media/config/image_pick.js'
             ),
         ),
@@ -68,7 +66,6 @@ return array(
             'virtual' => true,
             'json' => array(
                 'static/apps/noviusos_media/config/common.js',
-                'static/apps/noviusos_media/config/media.js',
                 'static/apps/noviusos_media/config/media_pick.js'
             ),
         )
