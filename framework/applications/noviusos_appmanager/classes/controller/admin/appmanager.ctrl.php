@@ -68,7 +68,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         }
         $this->response(
             array(
-                'notify' => __('Installation successful'),
+                'notify' => __('Great, a new app! Installed and ready to use.'),
                 // The tab will be refreshed by the javaScript within the view
             )
         );
@@ -96,7 +96,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
 
         $this->response(
             array(
-                'notify' => __('Uninstallation successful'),
+                'notify' => __('The application has been uninstalled.'),
                 // The tab will be refreshed by the javaScript within the view
             )
         );
@@ -222,7 +222,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
     public function after($response)
     {
         foreach (array(
-                     'title' => __('Administration'),
+                     'title' => 'Administration',
                      'base' => \Uri::base(false),
                      'require' => 'static/novius-os/admin/vendor/requirejs/require.js',
                  ) as $var => $default) {

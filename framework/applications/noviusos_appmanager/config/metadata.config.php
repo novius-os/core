@@ -9,20 +9,21 @@
  */
 
 return array(
-    'name'      => 'Applications Manager',
+    'name'      => 'Applications manager',
     'namespace' => 'Nos\Appmanager',
     'version'   => '0.2',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
+    'i18n_file' => 'noviusos_appmanager::metadata',
     'permission' => array(),
     'launchers' => array(
         'noviusos_appmanager' => array(
-            'name' => 'Application manager',
+            'name' => 'Applications manager',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
-                    'label' => __('Application manager'),
+                    'label' => 'Applications manager',
                     'url' => 'admin/noviusos_appmanager/appmanager',
                     'iconUrl' => 'static/apps/noviusos_appmanager/img/32/app-manager.png',
                 ),
