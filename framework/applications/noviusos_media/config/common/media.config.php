@@ -42,10 +42,10 @@ return array(
         'deleting button 1 item' => __('Yes, delete this media file'),
     ),
     'data_mapping' => array(
-        'ext' => 'media_ext',
         'title' => array(
             'column' => 'media_title',
             'title' => __('Title'),
+            '' => '',
             'cellFormatters' => array(
                 'icon' => array(
                     'type' => 'icon',
@@ -53,6 +53,19 @@ return array(
                     'size' => 16,
                 ),
             ),
+        ),
+        'ext' => array(
+            'column' => 'media_ext',
+            'title' => __('Extension'),
+            'cellFormatters' => array(
+                'center' => array(
+                    'type' => 'css',
+                    'css' => array('text-align' => 'center'),
+                ),
+            ),
+            'width' => 100,
+            'ensurePxWidth' => true,
+            'allowSizing' => false,
         ),
         'file' => array(
             'column' => 'media_file',

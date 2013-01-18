@@ -15,6 +15,10 @@ $uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
 $pathinfo = pathinfo($item->media_file);
 $filename = $pathinfo['filename'];
+
+$media_title = $fieldset->field('media_title');
+
+$media_title->set_attribute('placeholder', $media_title->label);
 ?>
 
 <div class="page line ui-widget" id="<?= $uniqid ?>">
@@ -33,7 +37,7 @@ if ($item->is_image()) {
             <table class="fieldset standalone">
                 <tr class="title">
                     <th></th>
-                    <td><?= $fieldset->field('media_title')->build() ?></td>
+                    <td><?= $media_title->build() ?></td>
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media')->label ?></th>

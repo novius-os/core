@@ -32,6 +32,9 @@ return array(
                         'pathFolder' => array(
                             'label' => __('Path:'),
                         ),
+                        'extension' => array(
+                            'label' => __('Extension:'),
+                        ),
                     ),
                     'actions' => array('Nos\Media\Model_Media.edit', 'Nos\Media\Model_Media.delete', 'Nos\Media\Model_Media.visualise'),
                     'actionThumbnail' => 'Nos\Media\Model_Media.visualise',

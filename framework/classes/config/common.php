@@ -3,7 +3,7 @@ namespace Nos;
 
 class Config_Common
 {
-    public static function load($model, $filter_data_mapping)
+    public static function load($model, $filter_data_mapping = array())
     {
         list($application_name, $file) = \Config::configFile($model);
         $file = 'common'.substr($file, strrpos($file, '/'));
@@ -33,8 +33,40 @@ class Config_Common
 
         $config['data_mapping'] = static::process_data_mapping($model, $config);
         $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
+        $config['icons']        = static::process_icons($application_name, $config);
+        $config['tab']          = static::process_tab($application_name, $config);
 
         return $config;
+    }
+
+    public static function process_icons($application_name, $config)
+    {
+        $application_config = \Nos\Config_Data::get('app_installed.'.$application_name);
+        if (!isset($config['icons'])) {
+            $config['icons'] = array();
+        }
+
+        foreach ($application_config['icons'] as $key => $value) {
+            if (!isset($config['icons'][$key])) {
+                $config['icons'][$key] = $application_config['icons'][$key];
+            }
+        }
+
+        return $config['icons'];
+    }
+
+    public static function process_tab($application_name, $config)
+    {
+        $application_config = \Nos\Config_Data::get('app_installed.'.$application_name);
+        if (!isset($config['tab'])) {
+            $config['tab'] = array();
+        }
+
+        if (!isset($config['tab']['label'])) {
+            $config['tab']['label'] = $application_config['name'];
+        }
+
+        return $config['tab'];
     }
 
     /**
@@ -223,7 +255,7 @@ class Config_Common
         $data_mapping = array();
         foreach ($config['data_mapping'] as $key => $data) {
             if (is_string($data)) {
-                $key = $data;
+                $key = is_int($key) ? $data : $key;
                 $data = array();
             }
             if ($key === 'context') {

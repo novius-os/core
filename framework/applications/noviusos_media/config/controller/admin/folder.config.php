@@ -44,8 +44,8 @@ return array(
         'medif_title' => array(
             'form' => array(
                 'type' => 'text',
+                'placeholder' => __('Title'),
             ),
-            'label' => __('Title: '),
             'validation' => array(
                 'required',
                 'min_length' => array(2),
