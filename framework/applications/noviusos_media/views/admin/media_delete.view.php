@@ -19,21 +19,21 @@ $usage_count = count($item->link);
 if ($usage_count == 0) {
     ?>
     <p><?= __('The media is not used anywhere and can be safely deleted.') ?></p>
-    <p><?= __('Please confirm the suppression below.') ?></p>
     <?php
 } else {
     ?>
     <p><?= strtr(__(
-            $usage_count == 1 ? __('The media is used <strong>one time</strong> by your applications.')
+            $usage_count == 1 ? __('The media is used <strong>once</strong> by an application.')
                               : __('The media is used <strong>{{count}} times</strong> by your applications.')
     ), array(
         '{{count}}' => $usage_count,
     )) ?></p>
-    <p><?= __('To confirm the deletion, you need to enter this number in the field below') ?></p>
-    <p><?= strtr(__('Yes, I want to delete all {{count}} usage of the media.'), array(
+    <p><?= __('To confirm the deletion, you need to enter this number in the field below:') ?></p>
+    <p><?= strtr(__('Yes, I want to delete this media file even though it is used {{count}} times.'), array(
         '{{count}}' => '<input class="verification" data-verification="'.$usage_count.'" size="'.(mb_strlen($usage_count) + 1).'" />',
     )); ?></p>
     <?php
 }
 ?></p>
+    <input type="checkbox" name="contexts[]" class="count" data-count="1" value="all" checked style="display:none;" />
 </div>

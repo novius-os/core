@@ -46,13 +46,13 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
                             is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
 
                             if (!is_writeable($dest_dir)) {
-                                throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                                throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
                             }
                         }
                         if (\File::copy($attachment->path(), $dest)) {
                             chmod($dest, 0664);
                         } else {
-                            throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                            throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
                         }
                     },
                     'success' => function() use ($item) {
@@ -63,7 +63,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
                         );
 
                         $return = array(
-                            'notify' => __('This attachment is successfully save in media center'),
+                            'notify' => __('Here you go, this attachment is now available in the Media Center.'),
                             'closeDialog' => true,
                             'dispatchEvent' => $dispatchEvent,
                         );
@@ -113,7 +113,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
             }
         }
         if (!$file) {
-            throw new \Exception(__('File not found'));
+            throw new \Exception(__('This is unexpected: We cannot find the file. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'));
         }
         return $attachment;
     }

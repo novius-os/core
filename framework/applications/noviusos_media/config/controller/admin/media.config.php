@@ -17,7 +17,7 @@ return array(
     'tab' => array(
         'iconUrl' => 'static/apps/noviusos_media/img/media-16.png',
         'labels' => array(
-            'insert' => __('Add a media'),
+            'insert' => __('Add a media file'),
         ),
     ),
     'layout_insert' => array(
@@ -43,7 +43,7 @@ return array(
             'form' => array(
                 'type'  => 'hidden',
             ),
-            'label' => __('Choose a folder where to put your media:'),
+            'label' => __('Select a folder where to put your media file:'),
         ),
         'media' => array(
             'dont_save' => true,

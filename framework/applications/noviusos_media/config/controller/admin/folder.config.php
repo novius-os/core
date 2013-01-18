@@ -39,7 +39,7 @@ return array(
             'form' => array(
                 'type'  => 'hidden',
             ),
-            'label' => __('Choose a folder where to put your sub-folder:'),
+            'label' => __('Select a folder where to put your sub-folder:'),
         ),
         'medif_title' => array(
             'form' => array(

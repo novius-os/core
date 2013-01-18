@@ -17,10 +17,10 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         parent::check_permission($action);
         // Can't edit or delete the root
         if ($action === 'update' && empty($this->item->medif_parent_id)) {
-            throw new \Exception(__('Permission denied'));
+            throw new \Exception(__('You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'));
         }
         if ($action === 'delete' && empty($this->item->medif_parent_id)) {
-            throw new \Exception(__('Permission denied'));
+            throw new \Exception(__('You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'));
         }
     }
 
@@ -57,9 +57,7 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         $count_medias = $this->item->count_media();
         // Basic check to prevent false suppression
         if (!is_dir($this->item->path()) && $count_medias > 0) {
-            throw new \Exception(strtr(__('{{count}} medias were found, but folder was nonexistent.'), array(
-                '{{count}}' => $count_medias,
-            )));
+            throw new \Exception(__('This is strange: This folder should be empty but isn’t. Contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.'));
         }
 
         // Strategy : try to delete the database records first, as we can sometimes (if supported) rollback with the transaction

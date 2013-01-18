@@ -9,7 +9,7 @@
  */
 
 return array(
-    'name'      => 'Media centre',
+    'name'      => 'Media Centre',
     'namespace' => 'Nos\Media',
     'version'   => '0.1',
     'provider'  => array(
@@ -18,7 +18,7 @@ return array(
     'permission' => array(),
     'launchers' => array(
         'noviusos_media' => array(
-            'name' => 'Media centre',
+            'name' => 'Media Centre',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(

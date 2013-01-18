@@ -87,7 +87,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
 
             if (!is_writeable($dest_dir)) {
-                throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
             }
         } else {
             if ($this->clone->get_private_path() != $media->get_private_path()) {
@@ -106,7 +106,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
                     is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
 
                     if (!is_writeable($dest_dir)) {
-                        throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                        throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
                     }
                     \File::rename(APPPATH.$this->clone->get_private_path(), $dest);
                 }
@@ -118,7 +118,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             if (move_uploaded_file($_FILES['media']['tmp_name'], $dest)) {
                 chmod($dest, 0664);
             } else {
-                throw new \Exception(__('No write permission. This is not your fault, but rather a misconfiguration from the server admin. Tell her/him off!'));
+                throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
             }
         }
     }
