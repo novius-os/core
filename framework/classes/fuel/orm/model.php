@@ -34,6 +34,10 @@ class Model extends \Orm\Model
     );
 
     protected static $_has_many = array();
+    protected static $_belongs_to = array();
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+    protected static $_attachment = array();
 
     /**
      * @var  array  cached behaviours
