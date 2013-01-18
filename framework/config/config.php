@@ -242,8 +242,6 @@ return array(
 
         'default_locale' => 'en_GB',
 
-        'allow_plugin_upload' => false,
-
         'upload' => array(
             'disabled_extensions' => array('php'),
         ),

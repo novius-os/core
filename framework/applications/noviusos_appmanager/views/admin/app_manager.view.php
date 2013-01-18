@@ -50,6 +50,7 @@ if (\Nos\Application::areNativeApplicationsDirty()) {
 ?>
             </p>
         </div>
+
         <div class="line app_list_installed">
             <h1 class="title"><?= __('Installed applications'); ?></h1>
             <table>
@@ -127,19 +128,6 @@ if (empty($others)) {
 
         </div>
 
-<?php
-if ($allow_upload) {
-    ?>
-                <p>&nbsp;</p>
-                <h1 class="title"><?= __('Install from a .zip file') ?></h1>
-
-                <form method="post" action="/admin/noviusos_appmanager/appmanager/upload" enctype="multipart/form-data">
-                    <input type="file" name="zip" />
-                    <input type="submit" value="<?= __('Upload the application') ?>" />
-                </form>
-    <?php
-}
-?>
         <div class="line" style="overflow:visible;">
             <h1 class="title"><?= __('Website configuration'); ?></h1>
             <p>
