@@ -43,10 +43,10 @@ return array(
         'deleting button 1 item' => __('Yes, delete this user'),
     ),
     'actions' => array(
-        'Nos\User\Model_User.add' => array(
+        'add' => array(
             'label' => __('Add a user'),
         ),
-        'Nos\User\Model_User.edit' => array(
+        'edit' => array(
             'action' => array(
                 'tab' => array(
                     'label' => '{{fullname}}',

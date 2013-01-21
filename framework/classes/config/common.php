@@ -204,7 +204,6 @@ class Config_Common
             $list_actions[$name] = $original_list_actions[$original_name];
         }
 
-
         $actions = \Arr::merge($actions_template, $list_actions);
 
         $model_label = explode('_', $model);
