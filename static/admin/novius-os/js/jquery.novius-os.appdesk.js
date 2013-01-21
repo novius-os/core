@@ -335,6 +335,7 @@ define('jquery-nos-appdesk',
                                 self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
                             });
                             self.uiToolbarContextsDialog.find(':checkbox').wijcheckbox('refresh');
+                            self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
                         }
                     })
                     .nosOnShow('one', function() {
