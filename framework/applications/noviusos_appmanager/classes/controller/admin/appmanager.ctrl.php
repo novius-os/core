@@ -15,6 +15,11 @@ use View;
 
 class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
 {
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary('noviusos_appmanager::common');
+    }
 
     public function action_index()
     {

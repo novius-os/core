@@ -13,7 +13,7 @@ return array(
     'namespace' => 'Nos\Page',
     'version'   => '0.1',
     'provider'  => array(
-        'name'  => 'Novius OS',
+        'name'  => 'Novius OS 1',
     ),
     'permission' => array(),
     'i18n_file' => 'noviusos_page::metadata',
