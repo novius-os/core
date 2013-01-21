@@ -48,7 +48,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
 
     public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid')
     {
-        if (isset($config['model'])) {
+        if (!empty($config['model'])) {
             if (!isset($config['data_mapping'])) {
                 $config['data_mapping'] = null;
             }

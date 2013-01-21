@@ -384,7 +384,8 @@ define('jquery-nos',
 
                 if ($element) {
                     $.each(element.bind, function(event, action) {
-                        $element.bind(event, function() {
+                        $element.bind(event, function(e) {
+                            e.preventDefault();
                             $element.nosAction(action, data);
                         });
                     });

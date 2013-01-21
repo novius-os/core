@@ -18,13 +18,13 @@ class View extends \Fuel\Core\View
         }
 
         if ($is_redirection_allowed && isset(static::$redirects[$file])) {
-            for ($i = 0; $i < count(static::$redirects[$file]); $i++) {
-                $callback = static::$redirects[$file][$i]['callback'];
+            foreach (static::$redirects[$file] as $redirect) {
+                $callback = $redirect['callback'];
                 if (is_callable($callback)) {
                     $callback = $callback($data, $filter);
                 }
                 if ($callback === true || is_string($callback)) {
-                    $file = is_string($callback) ? $callback : static::$redirects[$file][$i]['view'];
+                    $file = is_string($callback) ? $callback : $redirect['view'];
                     break;
                 }
             }
@@ -41,6 +41,10 @@ class View extends \Fuel\Core\View
 
     public static function redirect($from, $to, $callback = true)
     {
+        if (is_callable($to)) {
+            $callback = $to;
+            $to = false;
+        }
         if (!isset(static::$redirects[$from])) {
             static::$redirects[$from] = array();
         }
