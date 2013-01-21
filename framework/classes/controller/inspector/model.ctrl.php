@@ -70,7 +70,7 @@ class Controller_Inspector_Model extends Controller_Inspector
 
     public static function process_config($application, $config, $item_actions = array(), $gridKey = 'grid')
     {
-        if (isset($config['model'])) {
+        if (!empty($config['model'])) {
             if (!isset($config['data_mapping'])) {
                 $config['data_mapping'] = null;
             }
