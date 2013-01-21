@@ -487,7 +487,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($options['error'])) {
             $options['error'] = function(\Exception $e, $item, $data) {
                 return array(
-                    'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : 'An error occured.',
+                    'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('An error occured.'),
                 );
             };
         }
@@ -549,7 +549,7 @@ class Fieldset extends \Fuel\Core\Fieldset
                 $json_response = \Arr::merge($json_response, $json_user);
             } else {
                 $item->save();
-                $json_response['notify'] = __('Operation completed successfully.');
+                $json_response['notify'] = __('OK, it’s done.');
             }
 
             foreach ($fields as $name => $config) {

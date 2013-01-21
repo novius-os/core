@@ -79,7 +79,7 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
                 $icon = \Config::icon($enhancer['application'], 64);
                 $this->config['preview']['params'] = array_merge(array(
                         'icon' => !empty($icon) ? $icon : 'static/apps/noviusos_appmanager/img/64/app-manager.png',
-                        'title' => \Arr::get($enhancer, 'title', __('Application')),
+                        'title' => \Arr::get($enhancer, 'title', __('I’m an application. Give me a name!')),
                     ), $this->config['preview']['params']);
             }
         }

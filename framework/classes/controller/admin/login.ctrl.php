@@ -111,6 +111,6 @@ class Controller_Admin_Login extends Controller
             \Event::trigger('user_login');
             return true;
         }
-        return __('Access denied');
+        return __('These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.');
     }
 }

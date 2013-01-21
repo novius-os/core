@@ -388,9 +388,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $existing = $this->item->find_context($item_context);
             if (!empty($existing)) {
                 $message = strtr(
-                    __('This item already exists in {context}. Therefore your item cannot be added.'),
+                    __('This item already exists in {{context}}. Therefore your item cannot be added.'),
                     array(
-                        '{context}' => Tools_Context::contextLabel($item_context),
+                        '{{context}}' => Tools_Context::contextLabel($item_context),
                     )
                 );
                 $this->send_error(new \Exception($message));
@@ -524,7 +524,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         $tabInfos = array(
-            'iconUrl' => empty($this->config['tab']['iconUrl']) ? \Config::icon($this->config['model'], 16) : $this->config['tab']['iconUrl'],
+            'iconUrl' => empty($this->config['tab']['iconUrl']) ? \Config::icon($application_name, 16) : $this->config['tab']['iconUrl'],
             'label' => $this->is_new ? $this->config['tab']['labels']['insert'] : (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
             'url' => $url,
         );
@@ -586,20 +586,20 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
             if (empty($item_context)) {
                 if (count($sites) === 1) {
-                    $label = __('Translate in {context}');
+                    $label = __('Translate into {{context}}');
                 } elseif (count($locales) === 1) {
-                    $label = __('Add to {context}');
+                    $label = __('Add to {{context}}');
                 } else {
                     if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
-                        $label = __('Add to {context}');
+                        $label = __('Add to {{context}}');
                     } else {
-                        $label = __('Translate into {context}');
+                        $label = __('Translate into {{context}}');
                     }
                 }
             } else {
-                $label = __('Edit {context}');
+                $label = __('Edit {{context}}');
             }
-            $label = strtr($label, array('{context}' => Tools_Context::contextLabel($context)));
+            $label = strtr($label, array('{{context}}' => Tools_Context::contextLabel($context)));
             $actions[] = array(
                 'content' => $label,
                 'action' => array(

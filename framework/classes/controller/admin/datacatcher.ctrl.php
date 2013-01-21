@@ -40,7 +40,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
             }
 
             \Response::json(array(
-                'notify' => __('Shared data successfully saved.'),
+                'notify' => __('OK, all changes are saved.'),
                 'applications' => (string) \View::forge('nos::admin/data_catcher/applications', array(
                     'data_catchers' => $data_catchers,
                     'item' => $item,
@@ -64,28 +64,28 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 
         if (empty($params['model']) or empty($params['id']) or empty($params['view']) or empty($params['catcher_name'])) {
             \Response::json(array(
-                'error' => 'Insufficient parameters.',
+                'error' => __('Insufficient parameters.'),
             ));
         }
 
         try {
             $item = $params['model']::find($params['id']);
             if (empty($item)) {
-                throw new \Exception(Str::tr(__("Can't find item {item}"), array(
-                    '{item}' => $params['model'].'('.$params['id'].')',
+                throw new \Exception(Str::tr(__("Can't find item {{item}}"), array(
+                    '{{item}}' => $params['model'].'('.$params['id'].')',
                 )));
             }
             $data_catchers = $item->data_catchers();
             $data_nugget   = $data_catchers[$params['catcher_name']];
             if (empty($item)) {
-                throw new \Exception(Str::tr(__("Can't find catcher {catcher} on {item}"), array(
-                    '{catcher}' => $params['catcher_name'],
-                    '{item}'    => $params['model'],
+                throw new \Exception(Str::tr(__("Can't find catcher {{catcher}} on {{item}}"), array(
+                    '{{catcher}}' => $params['catcher_name'],
+                    '{{item}}'    => $params['model'],
                 )));
             }
         } catch (\Exception $e) {
             \Response::json(array(
-                'error' => 'Wrong parameters.',
+                'error' => __('Wrong parameters.'),
             ));
         }
 
