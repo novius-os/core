@@ -19,7 +19,7 @@ class Controller_Inspector extends Controller_Admin_Application
 
     public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
     {
-        if (isset($config['model'])) {
+        if (!empty($config['model'])) {
             $inspector_path = static::get_path();
             $model = $config['model'];
 
