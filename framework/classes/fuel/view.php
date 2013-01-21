@@ -41,6 +41,10 @@ class View extends \Fuel\Core\View
 
     public static function redirect($from, $to, $callback = true)
     {
+        if (is_callable($to)) {
+            $callback = $to;
+            $to = false;
+        }
         if (!isset(static::$redirects[$from])) {
             static::$redirects[$from] = array();
         }
