@@ -42,7 +42,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
 
             // If it's still empty, we have an error
             if (empty($item->{$this->_properties['virtual_name_property']})) {
-                throw new \Exception(__('URL (SEO) was empty.'));
+                throw new \Exception(__('An URL is needed.'));
             }
 
             // Check uniqueness if needed
@@ -60,7 +60,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
 
                 $duplicate = $item::find('all', (array('where' => $where)));
                 if (!empty($duplicate)) {
-                    throw new BehaviourDuplicateException(__('A item with the same virtual name already exists.'));
+                    throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
                 }
             }
         }

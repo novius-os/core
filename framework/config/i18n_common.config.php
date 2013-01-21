@@ -15,8 +15,8 @@ return array(
     'deleted popup close' => __('Close tab'),
 
     // Blank slate
-    'translate error parent not available in context' => __('We’re afraid this item cannot be added in {{context}} because its <a>parent</a> is not available in this context yet.'),
-    'translate error parent not available in language' => __('We’re afraid this item cannot be added in {{language}} because its <a>parent</a> is not available in this language yet.'),
+    'translate error parent not available in context' => __('We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.'),
+    'translate error parent not available in language' => __('We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.'),
     'translate error impossible context' => __('This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'),
 
     // Deletion popup
@@ -25,7 +25,7 @@ return array(
 
     # Delete action's labels
     'deleting confirmation button' => __('{{Button}} or <a>No, cancel</a>'),
-    'deleting confirmation item' => __('Confirm deletion'),
+    'deleting confirmation item' => __('Yes, delete'),
     'deleting button 0 items' => __('Nothing to delete'),
     'deleting button 1 item' => __('Yes, delete this item'),
     'deleting button N items' => __('Yes, delete these {{count}} items'),
@@ -53,8 +53,8 @@ return array(
     'allLanguages' =>__('All languages'),
     'allSites' =>__('All sites'),
     'allContexts' =>__('All contexts'),
-    'viewGrid' => __('Grid'),
-    'viewTreeGrid' => __('Tree grid'),
+    'viewGrid' => __('List'),
+    'viewTreeGrid' => __('Tree'),
     'viewThumbnails' => __('Thumbnails'),
     'preview' => __('Preview'),
     'loading' => __('Loading...'),

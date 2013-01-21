@@ -124,8 +124,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             if ($item->is_new()) {
                 $context_self = $item->get_context();
                 if (!in_array($context_self, $contexts_parent)) {
-                    throw new \Exception(strtr(__('Cannot create this element here because the parent does not exists in {context}.'), array(
-                        '{context}' => $context_self,
+                    throw new \Exception(strtr(__('We’re afraid it cannot be added to {{context}} because its parent is not available in this context yet.'), array(
+                        '{{context}}' => $context_self,
                     )));
                 }
             } else {
@@ -133,7 +133,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
                 $missing_contexts = array_diff($contexts_self, $contexts_parent);
                 if (!empty($missing_contexts)) {
-                    throw new \Exception(strtr(__('Cannot move this element here because the parent does not exists in the following contexts: {contexts}'), array(
+                    throw new \Exception(strtr(__('We’re afraid it cannot be moved here because the parent is not available in the following contexts: {{contexts}}'), array(
                         '{contexts}' => implode(', ', $missing_contexts),
                     )));
                 }

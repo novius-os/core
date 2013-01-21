@@ -61,7 +61,7 @@ if (!empty($item) && count($contexts) > 1) {
                 <ul style="display: none;">
             <?php
             foreach (\Nos\Tools_Context::contexts() as $context => $domains) {
-                echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::contextLabel($context, array('template' => '{site}<br />{locale}', 'short' => true))))->to_json()).'"><a>'.\Str::tr(__('Add in :context'), array('context' => \Nos\Tools_Context::contextLabel($context))).'</a></li>';
+                echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::contextLabel($context, array('template' => '{site}<br />{locale}', 'short' => true))))->to_json()).'"><a>'.strtr(__('Add to {{context}}'), array('{{context}}' => \Nos\Tools_Context::contextLabel($context))).'</a></li>';
             }
             ?>
                 </ul>

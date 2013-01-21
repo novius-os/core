@@ -30,13 +30,13 @@ class Tools_Image
     public static function resize($source, $max_width = null, $max_height = null, $dest = null)
     {
         if (!is_file($source)) {
-            throw new \Exception(__('This image doesn\'t exist.'));
+            throw new \Exception('This image doesn’t exist.');
         }
         $image_info = @getimagesize($source);
         list($width, $height, $image_type, ) = $image_info;
 
         if (!in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
-            throw new \Exception(__('The format of this image is not allowed.'));
+            throw new \Exception('Only GIF, JPG and PNG are allowed.');
         }
 
         list($new_width, $new_height, $ratio) = static::calculate_ratio($width, $height, $max_width, $max_height);
@@ -51,10 +51,10 @@ class Tools_Image
             return true;
         }
         if (!is_writeable(dirname($dest))) {
-            throw new \Exception(__('Destination directory is not writeable.'));
+            throw new \Exception('Files cannot be saved in this directory.');
         }
         if (!$resize && !@copy($source, $dest)) {
-            throw new \Exception(__('An error occured when copying the image.'));
+            throw new \Exception('An error has occured when resizing the image.');
         }
 
         // Use the convert command-line binary when available

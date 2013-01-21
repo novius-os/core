@@ -56,7 +56,7 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
         $onDemande = true;
         echo '<div>', htmlspecialchars(strtr(__('"{item}" can be shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
         echo '<h4>', htmlspecialchars(__('Click to share:')) ,'</h4>';
-        echo '<small>', htmlspecialchars(__('(Don\'t worry, you\'ll get a preview first)')) ,'</small>';
+        echo '<small>', htmlspecialchars(__('(Don’t worry, you’ll get a preview first)')) ,'</small>';
     } elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto) {
         echo '<div>', htmlspecialchars(strtr(__('"{item}" is automatically shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
         echo '<h4>', htmlspecialchars(__('No action required, click to customise:')) ,'</h4>';
@@ -75,5 +75,5 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
 }
 
 if (!$one) {
-    echo '<div>', htmlspecialchars(strtr(__('How sad! "{item}" cannot be shared with any application yet. Ask your developer to set you up some nice sharing applications.'), array('{item}' => $item->title_item()))) ,'</div>';
+    echo '<div>', htmlspecialchars(strtr(__('How sad! ‘{{item}}’ cannot be shared with any application yet. Ask your developer to set up content sharing for you.'), array('{{item}}' => $item->title_item()))) ,'</div>';
 }

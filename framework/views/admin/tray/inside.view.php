@@ -12,5 +12,5 @@ foreach (\Config::get('novius-os.locales', array()) as $code => $locale) {
 ?>
     </ul>
 </li>
-<li><a href="#" data-action='{"action":"document.location","url":"admin/noviusos_user/account/disconnect"}'><?= __('Log out') ?></a></li>
+<li><a href="#" data-action='{"action":"document.location","url":"admin/noviusos_user/account/disconnect"}'><?= __('Sign out (see you!)') ?></a></li>
 <li><a href="#" data-action='{"action":"nosDialog","dialog":{"contentUrl":"admin/nos/about","ajax":true,"width":620,"height":370,"title":<?= htmlentities(\Format::forge(__('About Novius OS'))->to_json()) ?>}}'><?= __('About Novius OS') ?></a></li>

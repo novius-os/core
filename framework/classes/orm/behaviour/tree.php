@@ -131,7 +131,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                 $children_ids = $this->get_ids_children($item, true);
                 if (in_array($parent->id, $children_ids)) {
                     // Dev details : Cannot move an element inside of its own children
-                    throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
+                    throw new \Exception(__('No, it cannot be moved here. Why? Because you cannot put something into itself.'));
                 }
             }
         }
