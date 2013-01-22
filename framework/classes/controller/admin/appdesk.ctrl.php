@@ -373,7 +373,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             $new_inspectors = array();
             foreach ($config['appdesk']['appdesk']['inspectors'] as $key => $inspector_config) {
-                $new_inspectors[$key] = $inspector_config['appdesk'];
+                $new_inspectors[$key] = \Arr::get($inspector_config, 'appdesk', $inspector_config);
             }
             $config['appdesk']['appdesk']['inspectors'] = $new_inspectors;
 
