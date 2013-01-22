@@ -23,12 +23,12 @@ define('jquery-nos-ostabs',
                 selected : null,
 
                 texts : {
-                    scrollLeft : 'Scroll left',
-                    scrollRight : 'Scroll right',
                     newTab: 'New tab',
                     closeTab: 'Close tab',
+                    closeTabs: 'Close all tabs',
                     closeOtherTabs: 'Close all other tabs',
                     confirmCloseOtherTabs: 'Are you sure to want to close all other tabs?',
+                    confirmCloseTabs: 'Are you sure to want to close all tabs?',
                     reloadTab: 'Reload tab'
                 },
 
@@ -639,7 +639,7 @@ define('jquery-nos-ostabs',
                 closeOtherTabs = $( '<a href="#"></a>' )
                     .addClass( 'nos-ostabs-close-allothers' )
                     .click(function() {
-                        if (confirm(o.texts.confirmCloseOtherTabs)) {
+                        if (confirm(closable ? o.texts.confirmCloseOtherTabs : o.texts.confirmCloseTabs)) {
                             self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
                                 var $liTemp = this;
                                 if ($liTemp !== li[0]) {
@@ -651,9 +651,9 @@ define('jquery-nos-ostabs',
                     })
                     .appendTo( links );
                 $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
-                    .text( o.texts.closeOtherTabs )
+                    .text(closable ? o.texts.closeOtherTabs : o.texts.closeTabs)
                     .appendTo( closeOtherTabs );
-                $( '<span></span>' ).text( o.texts.closeOtherTabs )
+                $( '<span></span>' ).text(closable ? o.texts.closeOtherTabs : o.texts.closeTabs)
                     .appendTo( closeOtherTabs );
 
                 if ( reloadable ) {
