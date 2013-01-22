@@ -99,6 +99,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $response = $this->response;
         }
 
+        if ($response instanceof \Response && \Input::is_ajax()) {
+            $response->set_header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+            $response->set_header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT');
+            $response->set_header('Pragma', 'no-cache');
+        }
+
         // <--
         return parent::after($response);
     }

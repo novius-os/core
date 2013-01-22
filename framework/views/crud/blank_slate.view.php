@@ -60,11 +60,11 @@ if (!in_array($context, $possible)) {
     $locale_new = \Nos\Tools_Context::localeCode($context);
 
     if ($locale_item === $locale_new) {
-        $label = __('Add "{item}" to {context}');
+        $label = __('Add ‘{{item}}’ to {{context}}');
     } else {
-        $label = __('Translate "{item}" into {context}');
+        $label = __('Translate ‘{{item}}’ into {{context}}');
     }
-    echo '<h1>', strtr($label, array('{item}' => $item->title_item(), '{context}' => \Nos\Tools_Context::contextLabel($context))), '</h1>';
+    echo '<h1>', strtr($label, array('{{item}}' => $item->title_item(), '{{context}}' => \Nos\Tools_Context::contextLabel($context))), '</h1>';
     ?>
             <p>&nbsp;</p>
 
@@ -108,7 +108,7 @@ if (!in_array($context, $possible)) {
 
     ?>
                     </form>
-                    <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Form filled with the content from the original version)') ?></p>
+                    <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Form filled with the contents from the original version)') ?></p>
                 </li>
             </ul>
     <?php

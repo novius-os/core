@@ -21,25 +21,9 @@ if ($twinnable) {
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">
     <a href="#" class="nos-datacatchers-close"><img src="static/novius-os/admin/novius-os/img/icons/close.png" /></a>
-    <div class="col c4">
-        <div class="accordion catchers">
-            <h3><?= __('Applications') ?></h3>
-            <div>
-    <?php
-                echo \View::forge('nos::admin/data_catcher/applications', array(
-                    'data_catchers' => $data_catchers,
-                    'item' => $item,
-                    'model_id' => $model_id,
-                    'model_name' => $model_name,
-                    'nuggets' => $default_nuggets,
-                ), false);
-    ?>
-            </div>
-        </div>
-    </div>
     <div class="col c8">
         <div class="nos-datacatchers-default-nuggets accordion">
-            <h3><?= __('What is shared - Default settings') ?></h3>
+            <h3><?= __('What is shared - Default properties') ?></h3>
             <div>
                 <?php
                 echo \View::forge('nos::admin/data_catcher/form', array(
@@ -53,6 +37,22 @@ if ($twinnable) {
             </div>
         </div>
         <div class="nos-datacatchers-catecherform">
+        </div>
+    </div>
+    <div class="col c4">
+        <div class="accordion catchers">
+            <h3><?= __('Applications') ?></h3>
+            <div>
+                <?php
+                echo \View::forge('nos::admin/data_catcher/applications', array(
+                    'data_catchers' => $data_catchers,
+                    'item' => $item,
+                    'model_id' => $model_id,
+                    'model_name' => $model_name,
+                    'nuggets' => $default_nuggets,
+                ), false);
+                ?>
+            </div>
         </div>
     </div>
 </div>

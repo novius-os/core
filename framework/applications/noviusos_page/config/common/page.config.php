@@ -49,8 +49,8 @@ return array(
         'notification item not found' => __('We cannot find this page.'),
 
         // Blank slate
-        'translate error parent not available in context' => __('We’re afraid this page cannot be added in {{context}} because its <a>parent</a> is not available in this context yet.'),
-        'translate error parent not available in language' => __('We’re afraid this page cannot be added in {{language}} because its <a>parent</a> is not available in this language yet.'),
+        'translate error parent not available in context' => __('We’re afraid this page cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.'),
+        'translate error parent not available in language' => __('We’re afraid this page cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.'),
 
         // Deletion popup
         'deleting item title' => __('Deleting the page ‘{{title}}’'),

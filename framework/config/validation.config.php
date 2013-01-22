@@ -10,11 +10,11 @@
  */
 
 return array(
-    'required' => __('This field is required.'),
-    'min_length' => __('This field has to contain at least :param:1 characters.'),
-    'max_length' => __('This field may not contain more than :param:1 characters.'),
-    'valid_date' => __('The entered date is invalid.'),
-    'valid_email' => __('The entered email is invalid.'),
+    'required' => __('We need you to fill in this field.'),
+    'min_length' => __('This field’s value must be at least {{param:1}} characters long.'),
+    'max_length' => __('This field’s value musn’t be longer than {{param:1}} characters.'),
+    'valid_date' => __('This isn’t a valid date.'),
+    'valid_email' => __('This isn’t a valid email address.'),
     'check_old_password' => __('The old password is incorrect.'),
-    'match_field' =>  __('This field doesn\'t match.'),
+    'match_field' =>  __('They don’t match. Are you sure you’ve typed the same thing?'),
 );

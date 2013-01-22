@@ -16,10 +16,10 @@ require(
         $(function() {
             $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>').nosContextableinvariantFields({
                 texts : {
-                    popin_title: <?= \Format::forge(__('This field is common to all contexts/languages/sites'))->to_json() ?>,
-                    popin_content: <?= \Format::forge(__('When you modify the value of this field, the change is also applied to the following contexts/languages/sites:'))->to_json() ?>,
-                    popin_ok: <?= \Format::forge(__('OK, I understand'))->to_json() ?>,
-                    popin_cancel: <?= \Format::forge(__('Cancel, I won\'t modify it'))->to_json() ?>,
+                    popin_title: <?= \Format::forge(__('This field is common to all contexts'))->to_json() ?>,
+                    popin_content: <?= \Format::forge(__('When you modify the value of this field, the change applies to the following contexts:'))->to_json() ?>,
+                    popin_ok: <?= \Format::forge(__('Go ahead, I understand'))->to_json() ?>,
+                    popin_cancel: <?= \Format::forge(__('Cancel, I won’t modify it'))->to_json() ?>,
                 }
             });
         });

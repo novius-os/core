@@ -18,6 +18,9 @@ class Response extends \Fuel\Core\Response
         }
         static::forge(\Format::forge()->to_json($data), $status, array(
             'Content-Type' => 'application/json',
+            'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
+            'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
+            'Pragma' => 'no-cache',
         ))->send(true);
         Event::shutdown();
         exit();

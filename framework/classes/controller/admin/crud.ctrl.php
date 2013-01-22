@@ -612,9 +612,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             );
         }
 
+        if (count($sites) === 1) {
+            $label = __('Translate');
+        } elseif (count($locales) === 1) {
+            $label = __('Add to another context');
+        } else {
+            $label = __('Translate / Add to another context');
+        }
+
         return array(
             array(
-                'label' => __('Translate / Add to another context'),
+                'label' => $label,
                 'menu' => array(
                     'options' => array(
                         'orientation' => 'vertical',
