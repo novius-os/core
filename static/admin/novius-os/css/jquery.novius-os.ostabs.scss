@@ -320,7 +320,7 @@ body {
 	.nos-ostabs-header {
 		position : relative;
 		z-index : 3;
-		@include background(linear-gradient(#222222, #111111));
+		@include background-with-css2-fallback(linear-gradient(#222222, #111111), #222);
 
 		li.nos-ostabs-appstab {
 			margin : 0px 35px 0 0px;
