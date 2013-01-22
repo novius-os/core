@@ -570,13 +570,13 @@ define('jquery-nos-appdesk',
                             if (label !== '') {
                                 label += '&nbsp;&nbsp;';
                             }
+                            if (Object.keys(o.sites).length > 1) {
+                                label += self.nosContext.siteLabel(site, {'short': true}) + ' ';
+                            }
                             if (Object.keys(o.locales).length > 1) {
                                 $.each(locales, function(i, locale) {
                                     label += self.nosContext.localeLabel(locale, {'short': true}) + ' ';
                                 });
-                            }
-                            if (Object.keys(o.sites).length > 1) {
-                                label += self.nosContext.siteLabel(site, {'short': true}) + ' ';
                             }
                         });
                         $button.button('option', 'label', label);
