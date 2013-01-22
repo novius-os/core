@@ -123,6 +123,7 @@ define('jquery-nos-appdesk',
                 self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
                     .appendTo(self.uiInputContainer);
                 self.uiResetSearch = $('<a href="#"></a>').text(o.texts.showAll)
+                    .attr('title', o.texts.showAll)
                     .addClass('nos-appdesk-reset-search')
                     .appendTo(self.uiInputContainer);
                 self.uiuiResetSearchIcon = $('<span></span>').text(o.texts.showAll)
