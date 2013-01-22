@@ -7,7 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-
+if (!isset($options)) {
+    $options = array();
+}
 ?>
 <label class="tooltip" id="<?= $uniqid = uniqid('tooltip_') ?>" title="<?= empty($title) ? '' : e($title) ?>">
     <img src="static/novius-os/admin/novius-os/img/24/help.png" />
@@ -20,7 +22,7 @@
     require(['jquery-nos', 'wijmo.wijtooltip'], function($) {
         $(function() {
             var $this = $('#<?= $uniqid ?>');
-            $this.wijtooltip({
+            var defaultOptions = {
                 showCallout: false,
                 calloutFilled : true,
                 closeBehavior: 'sticky',
@@ -45,7 +47,8 @@
                 hiding: function(e, ui) {
                     $('body').off('click.wijtooltip');
                 }
-            });
+            };
+            $this.wijtooltip($.extend(defaultOptions, <?= \Format::forge($options)->to_json() ?>));
         })
     })
 </script>
