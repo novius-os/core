@@ -12,6 +12,12 @@ namespace Nos\Media;
 
 class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
 {
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary('noviusos_media::common');
+    }
+
     protected function init_item()
     {
         parent::init_item();

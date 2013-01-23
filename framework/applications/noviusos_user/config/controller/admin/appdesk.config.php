@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('noviusos_user::common');
+
 return array(
     'model' => 'Nos\User\Model_User',
     'query' => array(

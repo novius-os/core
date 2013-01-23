@@ -189,7 +189,7 @@ return array(
             ),
         ),
         'page_lock' => array(
-            'label' => __('Lock the page: '),
+            'label' => __('Lock the page:'),
             'form' => array(
                 'type' => 'select',
                 'options' => array(

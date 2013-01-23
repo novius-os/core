@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('nos::common');
+
 if ($save_field) {
     echo $save_field->set_template('{field}')->build();
 } else {

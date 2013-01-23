@@ -71,8 +71,12 @@ return array(
     #: config/i18n_common.config.php:15
     'Close tab' => 'Fermer l’onglet',
 
+    'Close all tabs' => 'Fermer tous les onglets',
+
     #: classes/controller/admin/noviusos.ctrl.php:114
     'Close all other tabs' => 'Fermer tous les autres onglets',
+
+    'Are you sure to want to close all tabs?' => __('Êtes-vous sûr(e) de vouloir fermer tous les onglets&nbsp;?'),
 
     #: classes/controller/admin/noviusos.ctrl.php:115
     'Are you sure to want to close all other tabs?' => 'Êtes-vous sûr(e) de vouloir fermer tous ces onglets&nbsp;?',
@@ -261,7 +265,7 @@ return array(
     'Deleting the item ‘{{title}}’' => 'Supprimer l’item «&nbsp;{{title}}&nbsp;»',
 
     #: config/i18n_common.config.php:24
-    'Last chance, there’s no undo. Are you sure you want to do this?' => 'Attention, vous ne pouvez revenir en arrière. Êtes-vous bien sûr(e) devouloir faire ça ?',
+    'Last chance, there’s no undo. Are you sure you want to do this?' => 'Attention, vous ne pouvez revenir en arrière. Êtes-vous bien sûr(e) de vouloir faire ça ?',
 
     #. Delete action's labels
     #: config/i18n_common.config.php:27
@@ -351,7 +355,7 @@ return array(
     'Select the context(s) to show' => 'Sélectionner quel(s) contexte(s) afficher',
 
     #: config/i18n_common.config.php:66
-    'Show {{context}}' => 'Afficher {{contexte}}',
+    'Show {{context}}' => 'Afficher {{context}}',
 
     #: config/i18n_common.config.php:67
     'Other sites' => 'Autres sites',

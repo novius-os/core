@@ -52,6 +52,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->config_build();
     }
 
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
+    }
+
     /**
      * Set properties from the config
      */

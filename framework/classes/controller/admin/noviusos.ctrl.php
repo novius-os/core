@@ -14,6 +14,12 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 {
     public $template = 'nos::admin/html';
 
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        I18n::current_dictionary('nos::common');
+    }
+
     public function after($response)
     {
         foreach (array(

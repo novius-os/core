@@ -13,7 +13,7 @@ return array(
     'Permission denied' => 'Vous n’avez pas le droit',
 
     #: classes/controller/admin/page.ctrl.php:133
-    'No sooner said than done. The home page is now ‘{{page}}’.' => 'C’est tout bon. La page d’accueil est désormais «&nbsp;{{title}}&nbsp;».',
+    'No sooner said than done. The home page is now ‘{{title}}’.' => 'C’est tout bon. La page d’accueil est désormais «&nbsp;{{title}}&nbsp;».',
 
     #: classes/controller/admin/page.ctrl.php:163
     'Duplicating the page ‘{{title}}’' => 'Dupliquer la page «&nbsp;{{title}}&nbsp;»',
