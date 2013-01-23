@@ -6,10 +6,10 @@
 // 3 out of 3 words are translated (100%).
 
 return array(
-    #. Overwritten
+    #: metadata
     'Users' => 'Utilisateurs',
 
-    #. Overwritten
+    #: metadata
     'My account' => 'Mon compte',
 
 );

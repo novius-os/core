@@ -6,7 +6,7 @@
 // 2 out of 2 words are translated (100%).
 
 return array(
-    #. Overwritten
-    'Applications manager' => 'Gestion des applications',
+    #: metadata
+    'Media Centre' => 'Médiathèque',
 
 );
