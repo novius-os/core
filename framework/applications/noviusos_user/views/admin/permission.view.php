@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('noviusos_user::common');
+
 ?>
 
 <div class="permissions fill-parent" id="<?= $uniqid = uniqid('id_') ?>" style="overflow:auto;">
@@ -22,7 +24,7 @@
                 <input type="checkbox" name="access_to_everything" value="1" class="access_to_everything" />
             </div>
             <div class="infos">
-                <?= __('Full access for everything') ?>
+                <?= __('Full access to everything') ?>
             </div>
         </div>
 
@@ -44,8 +46,8 @@ foreach ($apps as $app => $perms) {
     }
     ?>
         </div>
-        <div class="infos" title="<?= strtr(__('Application provided by {provider_name}'), array(
-                '{provider_name}' => $apps[$app]['provider']['name'],
+        <div class="infos" title="<?= strtr(__('Application provided by {{provider_name}}'), array(
+                '{{provider_name}}' => $apps[$app]['provider']['name'],
             )) ?>">
             <?= !empty($apps[$app]['name']) ? $apps[$app]['name'] : $app ?>
         </div>

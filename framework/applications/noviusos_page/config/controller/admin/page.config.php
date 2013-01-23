@@ -82,7 +82,7 @@ return array(
     ),
     'fields' => array(
         'page_id' => array(
-            'label' => __('ID: '),
+            'label' => __('ID:'),
             'form' => array(
                 'type' => 'hidden',
             ),
@@ -102,18 +102,18 @@ return array(
             'renderer_options' => array(
                 'height' => '250px',
             ),
-            'label' => __('Location: '),
+            'label' => __('Location:'),
             'form' => array(),
         ),
         'page_template' => array(
-            'label' => __('Template: '),
+            'label' => __('Template:'),
             'form' => array(
                 'type' => 'select',
                 'options' => $templates,
             ),
         ),
         'page_virtual_name' => array(
-            'label' => __('URL: '),
+            'label' => __('URL:'),
             'renderer' => 'Nos\Renderer_Virtualname',
             'validation' => array(
                 'required',
@@ -121,27 +121,27 @@ return array(
             ),
         ),
         'page_meta_title' => array(
-            'label' => __('SEO title: '),
+            'label' => __('SEO title:'),
             'form' => array(
                 'type' => 'text',
             ),
         ),
         'page_meta_description' => array(
-            'label' => __('Description: '),
+            'label' => __('Description:'),
             'form' => array(
                 'type' => 'textarea',
                 'rows' => 6,
             ),
         ),
         'page_meta_keywords' => array(
-            'label' => __('Keywords: '),
+            'label' => __('Keywords:'),
             'form' => array(
                 'type' => 'textarea',
                 'rows' => 3,
             ),
         ),
         'page_meta_noindex' => array(
-            'label' => __("Don't index on search engines"),
+            'label' => __("Don’t index on search engines"),
             'form' => array(
                 'type' => 'checkbox',
                 'value' => '1',
@@ -157,7 +157,7 @@ return array(
             ),
         ),
         'page_menu_title' => array(
-            'label' => __('What\'s the page called in the menu: '),
+            'label' => __('What’s the page called in the menu:'),
             'form' => array(
                 'type' => 'text',
             ),
@@ -189,7 +189,7 @@ return array(
             ),
         ),
         'page_lock' => array(
-            'label' => __('Lock the page: '),
+            'label' => __('Lock the page:'),
             'form' => array(
                 'type' => 'select',
                 'options' => array(
@@ -200,7 +200,7 @@ return array(
             'expert' => true,
         ),
         'page_cache_duration' => array(
-            'label' => __('Regenerate the cache every {duration} seconds'),
+            'label' => __('Regenerate the cache every {{duration}} seconds'),
             'form' => array(
                 'type' => 'text',
                 'size' => 4,
@@ -212,6 +212,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
+                // Note to translator: This is a submit button
                 'value' => __('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',

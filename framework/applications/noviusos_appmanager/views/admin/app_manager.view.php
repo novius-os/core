@@ -117,7 +117,7 @@ foreach ($others as $app) {
 <?php
 if (empty($others)) {
     ?>
-            <em><?= __('No applications found') ?></em>
+            <em><?= __('No applications found.') ?></em>
     <?php
 }
 ?>

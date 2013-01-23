@@ -7,6 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+\Nos\I18n::current_dictionary('nos::common');
+
 ?>
 <div id="<?= $id = uniqid('temp_') ?>" class="line blank_slate" style="margin:0.5em;">
     <div class="col c7"><a href="http://www.novius-os.org" tager="_blank"><img src="static/novius-os/img/noviusos.png" border="0" width="288" height="288" /></a></div>

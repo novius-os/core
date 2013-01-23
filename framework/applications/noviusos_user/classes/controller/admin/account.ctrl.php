@@ -14,6 +14,12 @@ use View;
 
 class Controller_Admin_Account extends \Nos\Controller_Admin_Application
 {
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary('noviusos_user::common');
+    }
+
     public function before()
     {
         try {
@@ -87,7 +93,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         $configuration = $user->getConfiguration();
         $fields = array(
             'background' => array(
-                'label' => 'Wallpaper',
+                'label' => __('Wallpaper'),
                 'renderer' => 'Nos\Renderer_Media',
                 'form' => array(
                     'value' => \Arr::get($configuration, 'misc.display.background', ''),

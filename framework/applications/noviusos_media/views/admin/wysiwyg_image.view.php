@@ -42,7 +42,7 @@ $id_properties = $uniqid.'_properties';
                 </tr>
                 <tr>
                     <th><label for="<?= $uniqid ?>_alt"><?= __('Alternative text (for accessibility):') ?> </label></th>
-                    <td><input type="text" name="alt" data-id="alt" size="30" id="<?= $uniqid ?>_alt" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= strtr(__('Use {field}'), array('{field}' => __('title'))) ?></label></td>
+                    <td><input type="text" name="alt" data-id="alt" size="30" id="<?= $uniqid ?>_alt" /> &nbsp; <label><input type="checkbox" data-id="same_title_alt" checked> &nbsp;<?= __('Use title') ?></label></td>
                 </tr>
                 <tr>
                     <th><label for="<?= $uniqid ?>_width"><?= __('Width:') ?> </label></th>

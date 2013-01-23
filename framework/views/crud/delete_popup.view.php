@@ -70,12 +70,12 @@ if ($context_count > 1) {
     <?php
     foreach ($item_contexts as $item_context) {
         $context = $item_context->get_context();
-        $count = $children_context[$context];
+        $count = isset($children_context[$context]) ? $children_context[$context] : 1;
         ?>
         <tr>
             <td><?= Nos\Tools_Context::contextLabel($item_context->get_context()) ?></td>
             <td><?= strtr($crud['config']['i18n'][$count == 1 ? '1 item' : 'N items'], array('{{count}}' => $count)) ?></td>
-            <td><input type="checkbox" name="contexts[]" class="count" data-count="<?= $children_context[$context] ?>" value="<?= $context ?>" checked /></td>
+            <td><input type="checkbox" name="contexts[]" class="count" data-count="<?= $count ?>" value="<?= $context ?>" checked /></td>
         </tr>
         <?php
     }

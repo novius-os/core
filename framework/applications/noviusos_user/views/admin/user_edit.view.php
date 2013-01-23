@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('noviusos_user::common');
+
 $uniqid = uniqid('id_');
 
 echo View::forge('nos::crud/tab', $view_params, false);

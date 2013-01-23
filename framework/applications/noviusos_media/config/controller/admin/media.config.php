@@ -50,25 +50,26 @@ return array(
             'form' => array(
                 'type' => 'file',
             ),
-            'label' => __('File from your hard drive: '),
+            'label' => __('File from your hard drive:'),
         ),
         'media_title' => array(
             'form' => array(
                 'type' => 'text',
             ),
-            'label' => __('Title: '),
+            'label' => __('Title:'),
         ),
         'media_file' => array(
             'form' => array(
                 'type' => 'text',
             ),
-            'label' => __('SEO, Media URL: '),
+            'label' => __('SEO, Media URL:'),
         ),
         'save' => array(
             'label' => '',
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
+                // Note to translator: This is a submit button
                 'value' => __('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',

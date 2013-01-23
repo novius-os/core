@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 21/01/2013 18:42:08
+// Generated on 23/01/2013 11:25:53
 
-// 18 out of 19 messages are translated (94%).
-// 58 out of 61 words are translated (94%).
+// 18 out of 18 messages are translated (100%).
+// 58 out of 58 words are translated (100%).
 
 return array(
     #: classes/controller/admin/appmanager.ctrl.php:55
@@ -54,9 +54,6 @@ return array(
 
     #: views/admin/app_manager.view.php:104
     'Install' => 'Installer',
-
-    #: views/admin/app_manager.view.php:118
-    'No applications found' => '',
 
     #: views/admin/app_manager.view.php:126
     'Website configuration' => 'Configuration du site web',

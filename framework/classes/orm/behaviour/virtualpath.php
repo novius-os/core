@@ -106,7 +106,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
 
             $duplicate = $item::find('all', (array('where' => $where)));
             if (!empty($duplicate)) {
-                throw new BehaviourDuplicateException(__('A item with the same path already exists.'));
+                throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
             }
         }
     }

@@ -15,7 +15,7 @@ $id_type = $uniqid.'_type';
 $id_appdesk = $uniqid.'_appdesk';
 $id_properties = $uniqid.'_properties';
 $title_appdesk_page = $edit ? __('Select another page') : __('2. Select a page');
-$title_appdesk_media = $edit ? __('Select another media') : __('2. Select a media');
+$title_appdesk_media = $edit ? __('Select another media file') : __('2. Select a media file');
 $title_properties_2 = $edit ? __('Edit the properties') : __('2. Set the properties');
 $title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the properties');
 
@@ -41,7 +41,7 @@ $title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the propert
             <table class="fieldset">
                 <tr><td><label><input type="radio" value="internal" name="link_type" /> <?= __('Internal link') ?></label></td></tr>
                 <tr><td><label><input type="radio" value="external" name="link_type" /> <?= __('External link') ?></label></td></tr>
-                <tr><td><label><input type="radio" value="media" name="link_type" /> <?= __('Link to a media') ?></label></td></tr>
+                <tr><td><label><input type="radio" value="media" name="link_type" /> <?= __('Link to a media file') ?></label></td></tr>
                 <tr><td><label><input type="radio" value="anchor" name="link_type" /> <?= __('Link to an anchor') ?></label></td></tr>
                 <tr><td><label><input type="radio" value="email" name="link_type" /> <?= __('Link to an email address') ?></label></td></tr>
                 <tr><td><label><input type="radio" value="phone" name="link_type" /> <?= __('Link to a phone number') ?></label></td></tr>

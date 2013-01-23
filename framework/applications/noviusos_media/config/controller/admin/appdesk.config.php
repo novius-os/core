@@ -22,7 +22,6 @@ return array(
             'appdesk' => array(
                 'vertical' => true,
                 'reloadEvent' => 'Nos\Media\Model_Media',
-                'label' => __('Preview'),
                 'preview' => true,
                 'options' => array(
                     'meta' => array(
@@ -38,6 +37,11 @@ return array(
                     ),
                     'actions' => array('Nos\Media\Model_Media.edit', 'Nos\Media\Model_Media.delete', 'Nos\Media\Model_Media.visualise'),
                     'actionThumbnail' => 'Nos\Media\Model_Media.visualise',
+                    'texts' => array(
+                        // Note to translator: 'Preview' here is a label, not an action
+                        'headerDefault' => __('Preview'),
+                        'selectItem' => __('No media selected.'),
+                    ),
                 ),
             )
         )
@@ -75,9 +79,12 @@ return array(
         'item' => __('media file'),
         'items' => __('media files'),
         'showNbItems' => __('Showing {{x}} media files out of {{y}}'),
-        'showOneItem' => __('Show 1 media file'),
+        'showOneItem' => __('Showing 1 media file'),
         'showNoItem' => __('No media files'),
+        // Note to translator: This is the action that clears the 'Search' field
         'showAll' => __('Show all media files'),
+
+        'Pick' => __('Pick'),
     ),
     'thumbnails' => true,
     'appdesk' => array(

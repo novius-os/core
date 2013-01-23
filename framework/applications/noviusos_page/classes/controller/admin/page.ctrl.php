@@ -65,7 +65,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         $checkbox_menu = '<label><input type="checkbox" data-id="same_menu_title">'.__('Use title').'</label>';
 
         $cache_duration = $fieldset->field('page_cache_duration');
-        $cache_duration->set_template(str_replace('{duration}', '{field} {required}', $cache_duration->label));
+        $cache_duration->set_template(str_replace('{{duration}}', '{field} {required}', $cache_duration->label));
         $fieldset->field('page_lock')->set_template('{label} {field} {required}');
 
         $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} <br />$checkbox_menu {error_msg}</span>\n");
@@ -130,8 +130,8 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             );
 
             $body = array(
-                'notify' => strtr(__('No sooner said than done. The home page is now ‘{{page}}’.'), array(
-                    '{{page}}' => $this->item->title_item(),
+                'notify' => strtr(__('No sooner said than done. The home page is now ‘{{title}}’.'), array(
+                    '{{title}}' => $this->item->title_item(),
                 )),
                 'dispatchEvent' => $dispatchEvent,
             );

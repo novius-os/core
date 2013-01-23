@@ -7,6 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+\Nos\I18n::current_dictionary('noviusos_user::common');
+
 ?>
 <?= $fieldset->open('admin/noviusos_user/user/insert_update/'.$user->user_id); ?>
 <?= View::forge('form/layout_standard', array(
@@ -23,7 +26,7 @@
 
     'content' => array(
         \View::forge('form/expander', array(
-            'title'   => 'Details',
+            'title'   => __('Details'),
             'nomargin' => false,
             'content' => \View::forge('form/fields', array(
                 'fieldset' => $fieldset,
@@ -31,7 +34,7 @@
             ), false)
         ), false),
         \View::forge('form/expander', array(
-            'title'   => 'Set a new password',
+            'title'   => __('Set a new password'),
             'nomargin' => false,
             'content' => \View::forge('form/fields', array(
                 'fieldset' => $fieldset,
