@@ -391,6 +391,6 @@ return array(
     'The old password is incorrect.' => 'L’ancien mot de passe est incorrect.',
 
     #: config/validation.config.php:19
-    'They don’t match. Are you sure you’ve typed the same thing?' => 'La valeur n’est pas la même. Êtes-vous sûr(e) d’avoir tapé la mêmechose&nbsp;?',
+    'They don’t match. Are you sure you’ve typed the same thing?' => 'La valeur n’est pas la même. Êtes-vous sûr(e) d’avoir tapé la même chose&nbsp;?',
 
 );

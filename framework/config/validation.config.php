@@ -9,6 +9,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('nos::common'));
+
 return array(
     'required' => __('We need you to fill in this field.'),
     'min_length' => __('This field’s value must be at least {{param:1}} characters long.'),

@@ -1,6 +1,6 @@
 <?php
 
-Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
+Nos\I18n::current_dictionary(array('noviusos_page::common'));
 
 return array(
     'behaviours' => array (

@@ -26,7 +26,7 @@
 
     'content' => array(
         \View::forge('form/expander', array(
-            'title'   => 'Details',
+            'title'   => __('Details'),
             'nomargin' => false,
             'content' => \View::forge('form/fields', array(
                 'fieldset' => $fieldset,
@@ -34,7 +34,7 @@
             ), false)
         ), false),
         \View::forge('form/expander', array(
-            'title'   => 'Set a new password',
+            'title'   => __('Set a new password'),
             'nomargin' => false,
             'content' => \View::forge('form/fields', array(
                 'fieldset' => $fieldset,
