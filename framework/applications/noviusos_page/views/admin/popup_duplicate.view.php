@@ -59,7 +59,6 @@ if ($context_count > 1) {
     ?>
     <p><label><input type="checkbox" class="include_children" name="include_children" value="1" checked /> <?= __('Duplicate sub-pages'); ?></label></p>
     <div class="single">
-        <p style="margin: 1em 0;"><?= __('Duplicate this page in the following following contexts:') ?></p>
         <table>
     <?php
     foreach ($item_contexts as $item_context) {
@@ -77,7 +76,6 @@ if ($context_count > 1) {
         </table>
     </div>
     <div class="multi">
-        <p style="margin: 1em 0;"><?= __('Duplicate this page and all its sub-pages in the following following contexts:') ?></p>
     <table>
     <?php
     foreach ($item_contexts as $item_context) {

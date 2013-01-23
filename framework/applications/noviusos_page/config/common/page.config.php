@@ -159,7 +159,7 @@ return array(
             ),
         ),
         'Nos\Page\Model_Page.renew_cache' => array(
-            'label' => __('Renew pages\' cache'),
+            'label' => __('Renew pages’ cache'),
             'action' => array(
                 'action' => 'nosAjax',
                 'params' => array(

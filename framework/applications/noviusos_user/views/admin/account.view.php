@@ -24,7 +24,7 @@ $uniqid = uniqid('id_');
                     $container.find('form:visible').submit();
                 });
 
-            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_user/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Log out'))->to_json() ?> + '</button></a>', true);
+            $container.nosToolbar('add', '<a style="overflow:auto;" href="admin/noviusos_user/account/disconnect"><button data-icon="power">' + <?= \Format::forge(__('Sign out (see you!)'))->to_json() ?> + '</button></a>', true);
         });
     });
 </script>
@@ -36,7 +36,7 @@ $uniqid = uniqid('id_');
 
     <div class="tabs fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;display:none;padding:0;">
         <ul style="width: 15%;">
-            <li><a href="#infos"><?= __('Your account') ?></a></li>
+            <li><a href="#infos"><?= __('My account') ?></a></li>
             <li><a href="#display"><?= __('Theme') ?></a></li>
         </ul>
         <div id="infos">

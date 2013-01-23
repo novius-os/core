@@ -23,8 +23,9 @@ return array(
         'item' => __('user'),
         'items' => __('users'),
         'showNbItems' => __('Showing {{x}} users out of {{y}}'),
-        'showOneItem' => __('Show 1 user'),
+        'showOneItem' => __('Showing 1 user'),
         'showNoItem' => __('No users'),
+        // Note to translator: This is the action that clears the 'Search' field
         'showAll' => __('Show all users'),
     ),
 );

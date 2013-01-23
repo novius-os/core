@@ -84,6 +84,7 @@ class Config_Common
 
         $actions_template = array(
             $model.'.add' => array(
+                // Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
                 'label' => __('Add {{model_label}}'),
                 'action' => array(
                     'action' => 'nosTabs',
@@ -104,6 +105,7 @@ class Config_Common
                         'label' => '{{_title}}',
                     ),
                 ),
+                // Standard, most frequent actions (Edit, Visualise, Share, etc.)
                 'label' => __('Edit'),
                 'primary' => true,
                 'icon' => 'pencil',

@@ -129,6 +129,7 @@ return array(
                 'tag' => 'button',
                 'data-icon' => 'check',
                 'class' => 'primary',
+                // Note to translator: This is a submit button
                 'value' => __('Save'),
             ),
         ),

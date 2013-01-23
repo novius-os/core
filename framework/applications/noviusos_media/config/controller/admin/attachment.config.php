@@ -41,6 +41,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
+                // Note to translator: This is a submit button
                 'value' => __('Add'),
                 'class' => 'primary',
                 'data-icon' => 'check',

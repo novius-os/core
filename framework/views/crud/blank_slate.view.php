@@ -51,7 +51,8 @@ if (!in_array($context, $possible)) {
         $item_context = $item->find_context($possible_context);
         if (!empty($item_context)) {
             $context_label = \Nos\Tools_Context::contextLabel($possible_context);
-            $labels[$item_context->id] = strtr(__('Translate {{context}}'), array(
+            // Note to translator: this is an action (button)
+            $labels[$item_context->id] = strtr(__('Translate from {{context}}'), array(
                 '{{context}}' => $context_label,
             ));
         }
@@ -68,7 +69,7 @@ if (!in_array($context, $possible)) {
     ?>
             <p>&nbsp;</p>
 
-            <p><?= __('You have two options: ') ?></p>
+            <p><?= __('You have two options:') ?></p>
 
             <p>&nbsp;</p>
 
@@ -78,7 +79,7 @@ if (!in_array($context, $possible)) {
                     <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
                         <?= Form::hidden('context', $context) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
-                        <button type="submit" class="primary" data-icon="plus"><?= __('Start from scratch ') ?></button>
+                        <button type="submit" class="primary" data-icon="plus"><?= __('Start from scratch') ?></button>
                     </form>
                     <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Blank form)') ?></p>
                 </li>

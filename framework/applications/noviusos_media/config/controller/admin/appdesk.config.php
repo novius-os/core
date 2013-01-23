@@ -22,6 +22,7 @@ return array(
             'appdesk' => array(
                 'vertical' => true,
                 'reloadEvent' => 'Nos\Media\Model_Media',
+                // Note to translator: 'Preview' here is a label, not an action
                 'label' => __('Preview'),
                 'preview' => true,
                 'options' => array(
@@ -75,8 +76,9 @@ return array(
         'item' => __('media file'),
         'items' => __('media files'),
         'showNbItems' => __('Showing {{x}} media files out of {{y}}'),
-        'showOneItem' => __('Show 1 media file'),
+        'showOneItem' => __('Showing 1 media file'),
         'showNoItem' => __('No media files'),
+        // Note to translator: This is the action that clears the 'Search' field
         'showAll' => __('Show all media files'),
     ),
     'thumbnails' => true,
