@@ -542,6 +542,7 @@ define('jquery-nos',
 
             nosAjax : function(params) {
                 var options = $.extend({
+                        cache    : false,
                         dataType : 'json',
                         type     : 'POST',
                         data     : {}

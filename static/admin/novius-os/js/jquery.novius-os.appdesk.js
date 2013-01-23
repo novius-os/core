@@ -123,6 +123,7 @@ define('jquery-nos-appdesk',
                 self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
                     .appendTo(self.uiInputContainer);
                 self.uiResetSearch = $('<a href="#"></a>').text(o.texts.showAll)
+                    .attr('title', o.texts.showAll)
                     .addClass('nos-appdesk-reset-search')
                     .appendTo(self.uiInputContainer);
                 self.uiuiResetSearchIcon = $('<span></span>').text(o.texts.showAll)
@@ -335,6 +336,7 @@ define('jquery-nos-appdesk',
                                 self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
                             });
                             self.uiToolbarContextsDialog.find(':checkbox').wijcheckbox('refresh');
+                            self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
                         }
                     })
                     .nosOnShow('one', function() {
@@ -569,13 +571,13 @@ define('jquery-nos-appdesk',
                             if (label !== '') {
                                 label += '&nbsp;&nbsp;';
                             }
+                            if (Object.keys(o.sites).length > 1) {
+                                label += self.nosContext.siteLabel(site, {'short': true}) + ' ';
+                            }
                             if (Object.keys(o.locales).length > 1) {
                                 $.each(locales, function(i, locale) {
                                     label += self.nosContext.localeLabel(locale, {'short': true}) + ' ';
                                 });
-                            }
-                            if (Object.keys(o.sites).length > 1) {
-                                label += self.nosContext.siteLabel(site, {'short': true}) + ' ';
                             }
                         });
                         $button.button('option', 'label', label);
@@ -784,7 +786,7 @@ define('jquery-nos-appdesk',
                         });
 
                         if (o.defaultView === 'treeGrid') {
-                            self.uiViewsButtons.find('#view_grid').click().blur();
+                            self.uiViewsButtons.find('.view_grid').click().blur();
                         } else {
                             self.gridReload();
                         }
@@ -830,7 +832,7 @@ define('jquery-nos-appdesk',
                         // Don't ever use keyCode.NUMPAD_ENTER here, it conflicts with "L" minuscule
                         if (event.keyCode === keyCode.ENTER) {
                             if (o.defaultView === 'treeGrid') {
-                                self.uiViewsButtons.find('#view_grid').click().blur();
+                                self.uiViewsButtons.find('.view_grid').click().blur();
                             } else {
                                 self.gridReload();
                             }
@@ -839,7 +841,7 @@ define('jquery-nos-appdesk',
 
                         self.timeoutSearchInput = setTimeout(function() {
                             if (o.defaultView === 'treeGrid') {
-                                self.uiViewsButtons.find('#view_grid').click().blur();
+                                self.uiViewsButtons.find('.view_grid').click().blur();
                             } else {
                                 self.gridReload();
                             }
@@ -896,7 +898,7 @@ define('jquery-nos-appdesk',
                         $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
                             .text(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
-                        $('<input type="radio" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
+                        $('<input type="radio" class="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
                             .appendTo(self.uiViewsButtons)
                             .button({
                                 text : false,
@@ -1130,7 +1132,7 @@ define('jquery-nos-appdesk',
                                     column.sortDirection = 'none';
                                 }
                             });
-                            self.uiViewsButtons.find('#view_grid').click().blur();
+                            self.uiViewsButtons.find('.view_grid').click().blur();
                             return false;
                         },
                         cellStyleFormatter: function(args) {

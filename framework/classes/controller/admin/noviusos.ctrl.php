@@ -107,11 +107,11 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             'user_configuration' => $user_configuration,
 
             'texts' => array(
-                'scrollLeft' => __('Scroll left'),
-                'scrollRight' => 'Scroll right',
                 'newTab' => __('New tab'),
                 'closeTab' => __('Close tab'),
+                'closeTabs' => __('Close all tabs'),
                 'closeOtherTabs' => __('Close all other tabs'),
+                'confirmCloseTabs' => __('Are you sure to want to close all tabs?'),
                 'confirmCloseOtherTabs' => __('Are you sure to want to close all other tabs?'),
                 'reloadTab' => __('Reload tab'),
                 'spinner' => __('Loading...')

@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary('noviusos_appmanager::common');
+
 ?>
 
 <div class="page line ui-widget app_manager" id="<?= $uniqid = uniqid('id_'); ?>">

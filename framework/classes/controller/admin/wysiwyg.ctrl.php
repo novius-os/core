@@ -39,6 +39,12 @@ class Controller_Admin_Wysiwyg extends \Controller
             });
         }
 
+        foreach ($enhancers as $key => $enhancer) {
+            if (empty($enhancer['iconUrl']) && !empty($enhancer['application'])) {
+                $enhancers[$key]['iconUrl'] = \Config::icon($enhancer['application'], 16);
+            }
+        }
+
         \Response::json($enhancers);
     }
 }

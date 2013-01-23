@@ -33,17 +33,25 @@ define('jquery-nos-publishable',
                 return this.each(function() {
                     var $container = $(this),
                         $label = $container.find('td:last'),
-                        $buttonset = $container.find('td:first');
+                        $buttonset = $container.find('td:first'),
+                        changeAlt = function() {
+                            $buttonset.find(':radio').each(function() {
+                                var $radio = $(this),
+                                    $img = $buttonset.find('label[for=' + $radio.attr('id') + '] img');
 
-                    $buttonset.buttonset({
-                            text : false,
-                            icons : {
-                                primary:'ui-icon-locked'
-                            }
-                        });
+                                $img.attr({
+                                    title: params.texts[params.initialStatus][$radio.val()],
+                                    alt: params.texts[params.initialStatus][$radio.val()]
+                                });
+                            });
+                        };
+
+                    changeAlt();
+                    $buttonset.buttonset();
                     $buttonset.find(':radio')
                         .change(function() {
                             $label.text(params.texts[params.initialStatus][$(this).val()]);
+                            changeAlt();
                         });
                     $buttonset.find(':checked')
                         .triggerHandler('change');
