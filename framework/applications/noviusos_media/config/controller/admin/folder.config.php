@@ -44,6 +44,7 @@ return array(
         'medif_title' => array(
             'form' => array(
                 'type' => 'text',
+                // Note to translator: This is a placeholder, i.e. a field’s label shown within the field
                 'placeholder' => __('Title'),
             ),
             'validation' => array(
@@ -67,6 +68,7 @@ return array(
             'form' => array(
                 'type' => 'submit',
                 'tag' => 'button',
+                // Note to translator: This is a submit button
                 'value' => __('Save'),
                 'class' => 'primary',
                 'data-icon' => 'check',

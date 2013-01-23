@@ -4,6 +4,7 @@ Nos\I18n::current_dictionary('nos::common');
 
 return array(
     // Crud
+    // Note to translator: Default copy meant to be overwritten by applications (e.g. The item has been deleted > The page has been deleted). The word 'item' is not to feature in Novius OS.
     'notification item added' => __('Done! The item has been added.'),
     'notification item saved' => __('OK, all changes are saved.'),
     'notification item deleted' => __('The item has been deleted.'),
@@ -60,10 +61,10 @@ return array(
     'loading' => __('Loading...'),
     'languages' => __('Languages'),
     'search' => __('Search'),
-    'selectSites' => __('Select the site(s) to work in'),
-    'selectLanguages' => __('Select the language(s) to work in'),
-    'selectContexts' => __('Select the context(s) to work in'),
-    'workInContext' => __('Work in {{context}}'),
+    'selectSites' => __('Select the site(s) to show'),
+    'selectLanguages' => __('Select the language(s) to show'),
+    'selectContexts' => __('Select the context(s) to show'),
+    'workInContext' => __('Show {{context}}'),
     'otherSites' => __('Other sites'),
     'otherLanguages' => __('Other languages'),
     'otherContexts' => __('Other contexts'),
