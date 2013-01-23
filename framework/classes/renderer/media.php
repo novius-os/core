@@ -21,7 +21,7 @@ class Renderer_Media extends \Fieldset_Field
     public static function renderer($renderer = array())
     {
         list($attributes, $renderer_options) = static::parse_options($renderer);
-        static::hydrate_options($renderer_options, isset($attributes['value']) ? $attributes['value'] : null);
+        static::hydrate_options($renderer_options, $attributes);
         $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
 
         return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id']);
@@ -43,7 +43,10 @@ class Renderer_Media extends \Fieldset_Field
     {
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
-        static::hydrate_options($this->options, $this->value);
+        static::hydrate_options($this->options, array(
+            'value' => $this->value,
+            'required' => isset($this->rules['required']),
+        ));
         $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
 
         return (string) parent::build();
@@ -89,13 +92,16 @@ class Renderer_Media extends \Fieldset_Field
      * @param array $options
      * @param int   $media_id
      */
-    protected static function hydrate_options(&$options, $media_id = null)
+    protected static function hydrate_options(&$options, $attributes = array())
     {
-        if (!empty($media_id)) {
-            $media = \Nos\Media\Model_Media::find($media_id);
+        if (!empty($attributes['value'])) {
+            $media = \Nos\Media\Model_Media::find($attributes['value']);
             if (!empty($media)) {
                 $options['inputFileThumb']['file'] = $media->is_image() ? $media->get_public_path_resized(64, 64) : $media->get_public_path();
             }
+        }
+        if (!empty($attributes['required'])) {
+            $options['inputFileThumb']['allowDelete'] = false;
         }
     }
 
