@@ -257,6 +257,17 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     public function add_renderers($properties, $options = array())
     {
+        // Compatibility with 0.1 configuration (widgets have been renamed to renderers)
+        foreach ($properties as &$property) {
+            if (isset($property['widget'])) {
+                $property['renderer'] = preg_replace('`^Nos(.+)Widget_(.+)$`', 'Nos$1Renderer_$2', $property['widget']);
+                unset($property['widget']);
+            }
+            if (isset($property['widget_options'])) {
+                $property['renderer_options'] =& $property['widget_options'];
+                unset($property['widget_options']);
+            }
+        }
         $this->config_used = $properties;
 
         foreach ($properties as $p => $settings) {
