@@ -50,6 +50,9 @@ class Validation_Error extends Fuel\Core\Validation_Error
             )).$close;
         }
 
+        // Translator placeholder is '{{param:1}}', internal Fuel placeholder is ':param:1'
+        $msg = preg_replace('`{{param:(\d+)}}`', ':param:$1', $msg);
+
         // only parse when there's tags in the message
         return $open.(strpos($msg, ':') === false ? $msg : $this->_replace_tags($msg)).$close;
     }
