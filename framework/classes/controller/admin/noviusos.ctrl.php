@@ -132,12 +132,33 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $apps = array();
         foreach ($launchers as $key => $app) {
-            if (empty($app['icon']) && !empty($app['application'])) {
-                $app['icon'] = \Config::icon($app['application'], 64);
-            }
             $app['key'] = $key;
 
+
+            if (!empty($app['icon64']) && empty($app['icon'])) {
+                $app['icon'] = $app['icon64'];
+                unset($app['icon64']);
+            }
+
+            // Compatibility with 0.1
+            if (!empty($app['url']) && empty($app['action'])) {
+                $app['action'] = array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => $app['url'],
+                    ),
+                );
+                unset($app['url']);
+                if (!empty($app['iconUrl'])) {
+                    $app['action']['tab']['iconUrl'] = $app['iconUrl'];
+                    unset($app['iconUrl']);
+                }
+            }
+
             if (!empty($app['action'])) {
+                if (empty($app['icon']) && !empty($app['application'])) {
+                    $app['icon'] = \Config::icon($app['application'], 64);
+                }
 
                 if (!empty($app['application']) && isset($app['action']['tab']) && !isset($app['action']['tab']['iconUrl'])) {
                     $app['action']['tab']['iconUrl'] = \Config::icon($app['application'], 32);
