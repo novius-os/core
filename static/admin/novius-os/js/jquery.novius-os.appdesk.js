@@ -1273,12 +1273,12 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (Object.keys(o.contexts).length > 1 && !o.hideContexts) {
+                if (!o.hideContexts) {
                     $.each(columns, function(i, column) {
                         if (column.dataKey === 'context') {
                             column.visible = o.selectedContexts.length > 1;
-                        } else if (column.multiContextHide && o.selectedContexts.length > 1) {
-                            column.visible = false;
+                        } else if (column.multiContextHide) {
+                            column.visible = o.selectedContexts.length === 1;
                         }
                     });
                 }
