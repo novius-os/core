@@ -15,6 +15,7 @@ return array(
     'query' => array(
         'limit' => 10,
     ),
+    'search_text' => 'media_title',
     'inspectors' => array(
         'folder',
         'extension',
