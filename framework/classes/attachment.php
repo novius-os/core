@@ -258,7 +258,7 @@ class Attachment
 
     public static function implode_pk($data)
     {
-        $new_file = $data->new_file();
+        $new_file = $data->newFile();
         $path = $data->path();
         return $new_file ? $new_file : ($path ? $path : null);
     }
