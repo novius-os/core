@@ -152,8 +152,10 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     {
         $page = $this->crud_item($id);
         $contexts_list = $page->find_context('all');
+        $has_children = $page->find_children();
+        $has_children = !empty($has_children);
         $contexts = \Input::post( ($recursive ? 'contexts_multi' : 'contexts_single'), null);
-        if (count($contexts_list) > 1 && empty($contexts)) {
+        if (empty($contexts) && (count($contexts_list) > 1 || $has_children)) {
             \Response::json(array(
                 'action' => array(
                     'action' => 'nosDialog',

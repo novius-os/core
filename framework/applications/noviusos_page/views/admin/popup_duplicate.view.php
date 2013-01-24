@@ -8,11 +8,9 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('noviusos_page::common', 'nos::common');
+
 $id = $uniqid = uniqid('form_');
-
-?>
-
-<?php
 
 $item_contexts = $item->find_context('all');
 $context_count = count($item_contexts);
@@ -53,7 +51,7 @@ if ($children_count > 0 || $context_count > 1) {
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
 <?php
-if ($context_count > 1) {
+if ($context_count > 1 || $children_count > 0) {
     $contexts = \Nos\Tools_Context::contexts();
     $contexts_list = array();
     ?>
@@ -99,7 +97,7 @@ if ($context_count > 1) {
     <p style="margin: 1em 0;">
     <button type="submit" class="primary ui-state-default" data-texts="<?= htmlspecialchars(\Format::forge()->to_json(array(
                     '0' => __('Nothing to duplicate'),
-                    '1' => _('Duplicate this page'),
+                    '1' => __('Duplicate this page'),
                     '+' => __('Duplicate these {{count}} pages'),
                 ))) ?>"><?= __('Duplicate') ?></button>
     <span><?= __('or') ?></span>
