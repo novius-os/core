@@ -21,7 +21,7 @@ $media_title = $fieldset->field('media_title');
 $media_title->set_attribute('placeholder', $media_title->label);
 ?>
 
-<div class="page line ui-widget" id="<?= $uniqid ?>">
+<div class="media_form page line ui-widget" id="<?= $uniqid ?>">
     <?= $fieldset->build_hidden_fields(); ?>
     <div class="col c1" ></div>
     <div class="col c3" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
@@ -48,7 +48,7 @@ if ($item->is_image()) {
                     <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $item->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Use title') ?></label></span></td>
                 </tr>
                 <tr>
-                    <th><?= $fieldset->field('media_folder_id')->label; ?></th>
+                    <th style="vertical-align: top;"><?= $fieldset->field('media_folder_id')->label; ?></th>
                     <td><?= $fieldset->field('media_folder_id')->build(); ?></td>
                 </tr>
             </table>
@@ -58,7 +58,10 @@ if ($item->is_image()) {
 
 <script type="text/javascript">
 require(
-    ['jquery-nos-media-edit-form'],
+    [
+        'jquery-nos-media-edit-form',
+        'link!static/apps/noviusos_media/css/admin.css'
+    ],
     function($) {
         $(function() {
             $('#<?= $uniqid ?>').nosFormUI().nosMediaEditForm();
