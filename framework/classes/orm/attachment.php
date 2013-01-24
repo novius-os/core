@@ -55,10 +55,10 @@ class Orm_Attachment extends \Orm\Relation
 
     private function attached($from)
     {
-        reset($this->key_to);
+        reset($this->key_from);
         $attached = '';
         foreach ($this->key_from as $key) {
-            $attached .= (empty($attached) ? : '-').$from->{$key};
+            $attached .= (empty($attached) ? '' : '-').$from->{$key};
         }
         return $attached;
     }
@@ -66,11 +66,11 @@ class Orm_Attachment extends \Orm\Relation
     public function get(\Orm\Model $from)
     {
         $attached = $this->attached($from);
-        if (empty(static::$cache[$attached])) {
-            static::$cache[$attached] = \Nos\Attachment::forge($this->attached($from), $this->attachment_config);
+        if (empty(static::$cache[$this->attachment_config['dir'].'::'.$attached])) {
+            static::$cache[$this->attachment_config['dir'].'::'.$attached] = \Nos\Attachment::forge($this->attached($from), $this->attachment_config);
         }
 
-        return static::$cache[$attached];
+        return static::$cache[$this->attachment_config['dir'].'::'.$attached];
     }
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
