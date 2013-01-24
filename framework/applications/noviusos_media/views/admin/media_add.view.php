@@ -15,7 +15,7 @@ $uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
 ?>
 
-<div class="page line ui-widget" id="<?= $uniqid ?>">
+<div class="media_form page line ui-widget" id="<?= $uniqid ?>">
     <?= $fieldset->build_hidden_fields(); ?>
     <div class="col c1" style="z-index:99;"></div>
     <div class="col c11" style="z-index:99;">
@@ -34,7 +34,7 @@ $fieldset->set_config('field_template', '{field}');
                     <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Use title') ?></label></span></td>
                 </tr>
                 <tr>
-                    <th><?= $fieldset->field('media_folder_id')->label ?></th>
+                    <th style="vertical-align: top;"><?= $fieldset->field('media_folder_id')->label ?></th>
                     <td><?= $fieldset->field('media_folder_id')->build() ?></td>
                 </tr>
             </table>
@@ -44,7 +44,10 @@ $fieldset->set_config('field_template', '{field}');
 
 <script type="text/javascript">
 require(
-    ['jquery-nos-media-add-form'],
+    [
+        'jquery-nos-media-add-form',
+        'link!static/apps/noviusos_media/css/admin.css'
+    ],
     function($) {
         $(function() {
             $('#<?= $uniqid ?>').nosFormUI().nosMediaAddForm();

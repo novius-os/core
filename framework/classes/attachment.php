@@ -157,7 +157,7 @@ class Attachment
             return false;
         }
 
-        return 'files/'.$this->config['alias'].$this->attached.'/'.$filename;
+        return 'data/files/'.$this->config['alias'].$this->attached.'/'.$filename;
 
     }
 
@@ -176,7 +176,7 @@ class Attachment
         $filename = $this->filename();
         $extension = $this->extension();
 
-        return 'cache/files/'.$this->config['alias'].$this->attached.'/'.rtrim($filename, '.'.$extension).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$extension;
+        return 'cache/data/files/'.$this->config['alias'].$this->attached.'/'.rtrim($filename, '.'.$extension).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$extension;
     }
 
     /**
@@ -258,7 +258,7 @@ class Attachment
 
     public static function implode_pk($data)
     {
-        $new_file = $data->new_file();
+        $new_file = $data->newFile();
         $path = $data->path();
         return $new_file ? $new_file : ($path ? $path : null);
     }

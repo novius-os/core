@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_Wysiwyg extends \Controller
+class Controller_Admin_Wysiwyg extends Controller_Admin_Auth
 {
     public function action_image($edit = false)
     {

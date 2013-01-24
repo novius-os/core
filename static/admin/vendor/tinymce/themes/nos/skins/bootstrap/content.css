@@ -113,7 +113,8 @@ font[face=mceinline] {font-family:inherit !important}
 .mcePageBreak {display:block;border:0;width:100%;height:12px;border-top:1px dotted #ccc;margin-top:15px;background:#fff url(../../img/pagebreak.gif) no-repeat center top;}
 
 .nosEnhancer {
-    border:1px dotted red;
+    margin: 0 0 10px;
+    border:1px solid #A8A8A8;
     padding:5px;
 }
 .nos_enhancer_action {
@@ -122,7 +123,7 @@ font[face=mceinline] {font-family:inherit !important}
     width : 16px;
     height : 16px;
     vertical-align: middle;
-    margin-right: 3px;
+    margin-right: 8px;
     background-position:center; background-repeat:no-repeat;
 }
 .nos_enhancer_action_block {
