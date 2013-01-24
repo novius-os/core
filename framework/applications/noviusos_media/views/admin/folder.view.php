@@ -16,7 +16,7 @@ $uniqid_radio = uniqid('radio_');
 <div class="page media_form" id="<?= $uniqid = uniqid('id_') ?>">
 <?php
 $basename = pathinfo($item->medif_path, PATHINFO_BASENAME);
-$checked = $basename === \Nos\Orm_Behaviour_Virtualname::friendly_slug($item->medif_title);
+$checked = $item->is_new();
 
 $fieldset->set_config('field_template', '{field}');
 

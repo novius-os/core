@@ -20,29 +20,6 @@ define('jquery-nos-media-edit-form',
                         $slug       = $container.find('input[name=media_file]'),
                         $same_title = $container.find('input[data-id=same_title]');
 
-                    $file.change(function() {
-                        var path = $file.val();
-
-                        // Get the filename only
-                        // Remove the dirname
-                        path = path.replace(/^.*[\/\\]/g, '');
-                        // Remove the extension
-                        path = path.split('.');
-                        if (path.length > 1) {
-                            path.pop();
-                        }
-                        path = path.join('.');
-
-                        // Format a bit the title
-                        // Cleanup
-                        path = path.replace(/[^a-z0-9A-Z]/g, ' ').replace(/\s+/g, ' ');
-                        // Ucwords
-                        path = path.replace(/^([a-z])|\s+([a-z])/g, function ($1) {
-                            return $1.toUpperCase();
-                        });
-                        $title.val(path).triggerHandler('change');
-                    });
-
                     // Same title and description (alt)
                     $title.bind('change keyup', function() {
                         if ($same_title.is(':checked')) {

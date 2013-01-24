@@ -15,6 +15,7 @@ return array(
     'query' => array(
         'limit' => 10,
     ),
+    'search_text' => 'media_title',
     'inspectors' => array(
         'folder',
         'extension',
@@ -40,7 +41,7 @@ return array(
                     'texts' => array(
                         // Note to translator: 'Preview' here is a label, not an action
                         'headerDefault' => __('Preview'),
-                        'selectItem' => __('No media selected.'),
+                        'selectItem' => __('Click on a media file to preview it.'),
                     ),
                 ),
             )

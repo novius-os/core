@@ -639,7 +639,7 @@ define('jquery-nos-ostabs',
                 closeOtherTabs = $( '<a href="#"></a>' )
                     .addClass( 'nos-ostabs-close-allothers' )
                     .click(function() {
-                        if (confirm(closable ? o.texts.confirmCloseOtherTabs : o.texts.confirmCloseTabs)) {
+                        if (confirm($.nosCleanupTranslation(closable ? o.texts.confirmCloseOtherTabs : o.texts.confirmCloseTabs))) {
                             self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
                                 var $liTemp = this;
                                 if ($liTemp !== li[0]) {

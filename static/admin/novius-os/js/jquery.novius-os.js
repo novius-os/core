@@ -290,7 +290,7 @@ define('jquery-nos',
                 ], function() {
                     var image = new Image();
                     image.onerror = function() {
-                        $.nosNotify('Image not found', 'error');
+                        $.nosNotify('We’re afraid we cannot find this image.', 'error');
                     };
                     image.onload = function() {
                         // Create the lightbox
@@ -473,6 +473,13 @@ define('jquery-nos',
                     });
                 }
                 return obj;
+            },
+
+            /**
+             * Removes &nbsp; entities
+             */
+            nosCleanupTranslation : function (text) {
+                return text.replace(/&nbsp;/g, ' ');
             }
     });
 
