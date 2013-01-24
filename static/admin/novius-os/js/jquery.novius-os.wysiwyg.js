@@ -32,7 +32,8 @@ define('jquery-nos-wysiwyg',
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',
                         paste_text_use_dialog : true,
                         theme_nos_enhancers : enhancers,
-                        theme_nos_context: self.closest('.nos-dispatcher').data('nosContext')
+                        theme_nos_context: self.closest('.nos-dispatcher').data('nosContext'),
+                        auto_focus : false
                     }, options || {});
 
                     $(self).tinymce(options);

@@ -1908,7 +1908,7 @@
         _nosEnhancer : function(ui, metadata, edit) {
             var ed = tinyMCE.activeEditor;
 
-			// Keep reference to the wijnosDialog node, so we can close the popup manually
+			// Keep reference to the nosDialog node, so we can close the popup manually
 			var dialog = null,
 			    self   = this,
                 data_config = edit ? $.extend(true, {
@@ -1920,46 +1920,32 @@
                     },
                 save = function(json) {
 
-                    var pr = $(json.preview);
-                    // We set a temporary ID so we can fetch the node later
-                    pr.attr({
-                        'id': '__mce_tmp',
+                    if (edit) {
+                        edit = edit[0];
+                    } else {
+                        // @todo inserts div or span depending on enhancer
+                        ed.execCommand('mceInsertContent', false, ed.dom.createHTML('div', {
+                            id : '__mce_tmp',
+                            'class' : 'mceNonEditable'
+                        }), {skip_undo : 1});
+                        edit = ed.dom.get('__mce_tmp');
+                    }
+                    ed.dom.setAttribs(edit, {
                         'data-config': json.config,
                         'data-enhancer': metadata.id
-                    }).addClass('mceNonEditable');
-
-                    if (edit) {
-                        // @todo needs review!
-                        edit.empty().removeClass('mceNonEditable nosEnhancer').data('config', '').data('enhancer', '');
-                        ed.selection.select(edit.get(0), true);
-                        ed.focus(false);
-                        ed.execCommand('mceSelectNode', false, edit.get(0), {skip_undo : 1});
-                        ed.execCommand('mceReplaceContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
-                    } else {
-                        ed.execCommand('mceInsertContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
-                    }
-
-                    // Retrieve the preview node from the tinyMce document context, or we get this error:
-                    // "Node cannot be used in a document other than the one in which it was created"
-                    var preview = $(ed.dom.get('__mce_tmp'));
-                    // We don't need the id anymore now
-                    preview.attr('id', '');
+                    });
+                    edit.id = null;
+                    $(edit).html($(json.preview).html());
 
                     // Add special links (this is also called onInit())
-                    self.onEnhancerAdd(preview, metadata);
+                    self.onEnhancerAdd(edit, metadata);
 
                     // @todo search why this doesn't work
-                    // This is an uncessfull attempt to refocus the editor after the nonEditable block content has been added
+                    // This is an unsuccessful attempt to refocus the editor after the nonEditable block content has been added
                     // Right now, the undo/redo buttons are disabled after insertion, which is a bug
-                    ed.selection.select(preview.get(0), true);
+                    ed.selection.select(edit, true);
                     ed.selection.collapse(true);
-                    ed.focus(false);
-                    ed.execCommand('mceSelectNode', false, preview.get(0), {skip_undo : 1});
-                    ed.execCommand('mceStartTyping');
-
-                    // mceAddUndoLevel has been removed in 3.3, we don't need it anymore
-                    // mceEndUndoLevel calls mceAddUndoLevel
-                    ed.execCommand("mceEndUndoLevel");
+                    //ed.focus(false);
                 };
 
             if (!$.isPlainObject(metadata.dialog) || !metadata.dialog.contentUrl) {
