@@ -8,7 +8,6 @@
  * @link http://www.novius-os.org
  */
 
-
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 
 $uniqid = uniqid('id_');
@@ -24,15 +23,17 @@ $media_title->set_attribute('placeholder', $media_title->label);
 <div class="media_form page line ui-widget" id="<?= $uniqid ?>">
     <?= $fieldset->build_hidden_fields(); ?>
     <div class="col c1" ></div>
-    <div class="col c3" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
 <?php
+$main_col_size = 11;
 if ($item->is_image()) {
-    list($src, $width, $height, $ratio) = $item->get_img_infos(128, null);
+    $main_col_size -= 3;
+    echo '<div class="col c3" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">';
+    list($src, $width, $height, $ratio) = $item->get_img_infos(280, 280);
     printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
+    echo '</div>';
 }
 ?>
-    </div>
-    <div class="col c8" style="z-index:99;">
+    <div class="col c<?= $main_col_size ?>" style="z-index:99;">
         <div class="line" style="margin-bottom:1em;">
             <table class="fieldset standalone">
                 <tr class="title">
