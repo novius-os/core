@@ -290,7 +290,7 @@ define('jquery-nos',
                 ], function() {
                     var image = new Image();
                     image.onerror = function() {
-                        $.nosNotify('Image not found', 'error');
+                        $.nosNotify('We’re afraid we cannot find this image.', 'error');
                     };
                     image.onload = function() {
                         // Create the lightbox

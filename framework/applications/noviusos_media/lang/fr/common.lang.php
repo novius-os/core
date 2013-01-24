@@ -191,6 +191,9 @@ return array(
     #: config/controller/admin/appdesk.config.php:25
     'Preview' => 'Prévisualisation',
 
+    #: config/controller/admin/appdesk.config.php:43 added manually
+    'Click on a media file to preview it.' => 'Cliquez sur un média pour le prévisualiser.',
+
     #: config/controller/admin/appdesk.config.php:30
     'File name:' => 'Nom du fichier&nbsp;:',
 

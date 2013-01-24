@@ -13,13 +13,16 @@ return array(
     'OK, permissions saved.' => 'OK, droits enregistrés.',
 
     #: classes/controller/admin/account.ctrl.php:77
-    'Your Novius OS has switched to {{language}}. Okay, not quite. Actually it needs a <a>quick refresh</a>.' => 'Votre Novius OS est passé à {{language}}. Enfin presque. Il ne vous manqueplus qu’<a>actualiser</a>.',
+    'Your Novius OS has switched to {{language}}. Okay, not quite. Actually it needs a <a>quick refresh</a>.' => 'Votre Novius OS est passé à {{language}}. Enfin presque. Il ne vous manque plus qu’<a>actualiser</a>.',
 
     #: classes/controller/admin/account.ctrl.php:80
     'Sorry but your Novius OS doesn’t speak {{code}}.' => 'Désolés mais votre Novius OS ne parle pas {{code}}.',
 
+    #: classes/controller/admin/account.ctrl.php:96 added manually
+    'Wallpaper' => 'Fond d’écran',
+
     #: classes/controller/admin/account.ctrl.php:114
-    '‘{{title}}’ is your new gorgeous wallpaper. Go quick to the home tab to see it.' => '«&nbsp;{{title}}&nbsp;» est votre nouveau fond d’écran. Allez vite surl’onglet d’accueil pour l’admirer.',
+    '‘{{title}}’ is your new gorgeous wallpaper. Go quick to the home tab to see it.' => '«&nbsp;{{title}}&nbsp;» est votre nouveau fond d’écran. Allez vite sur l’onglet d’accueil pour l’admirer.',
 
     #: classes/controller/admin/account.ctrl.php:122
     'This is unexpected: The selected image doesn’t exist any more. It must have been deleted while you were selecting it.' => 'Voilà qui est inattendu&nbsp; L’image sélectionnée n’existe plus. Elle a dûêtre supprimée alors que vous la sélectionniez.',
