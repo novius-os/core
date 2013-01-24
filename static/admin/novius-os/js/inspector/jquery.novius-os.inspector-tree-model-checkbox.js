@@ -20,6 +20,7 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                 height: params.height || '150px',
                                 width: params.width || ''
                             }),
+                        temp,
                         id = container.attr('id'),
                         table = container.find('table'),
                         connector = container.closest('.nos-dispatcher, body')
@@ -83,10 +84,9 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                     if ($.isPlainObject(params.selected)) {
                                         $.each(params.selected, function(i, selected) {
                                             if ($.isPlainObject(selected) && selected.id) {
-                                                container.find(':checkbox[value=' + selected.id + ']').prop('checked', true);
-                                                table.data('nostreegrid');
+                                                var $checkbox = container.find(':checkbox[value=' + selected.id + ']').prop('checked', true);
                                                 if (selected.disable_check) {
-                                                    container.find(':checkbox[value=' + selected.id + ']').attr('disabled', selected.disable_check);
+                                                    $checkbox.attr('disabled', selected.disable_check);
                                                 }
                                             }
                                         });
@@ -95,7 +95,6 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                         $.each(params.disabled, function(i, disabled) {
                                             if ($.isPlainObject(disabled) && disabled.id) {
                                                 container.find(':checkbox[value=' + disabled.id + ']').attr('disabled', true);
-                                                table.data('nostreegrid');
                                             }
                                         });
                                     }
@@ -113,9 +112,9 @@ define('jquery-nos-inspector-tree-model-checkbox',
                             if ($.isPlainObject(args.row.data)) {
 
                                 $('<input type="checkbox" />').attr({
-                                    name : params.input_name + '[]',
-                                    value : args.row.data._id
-                                })
+                                        name : params.input_name + '[]',
+                                        value : args.row.data._id
+                                    })
                                     .click(function() {
                                         // Save the selected in params in cas of a refresh tree event
                                         var checkbox = $(this),
@@ -137,13 +136,22 @@ define('jquery-nos-inspector-tree-model-checkbox',
                         }
                     });
 
+                    if ($.isArray(params.selected)) {
+                        temp = {};
+                        $.each(params.selected, function(i, selected) {
+                            if ($.isPlainObject(selected) && selected.id && selected.model) {
+                                temp[selected.model + '|' + selected.id] = selected;
+                            }
+                        });
+                        params.selected = temp;
+                    }
                     if ($.isPlainObject(params.selected)) {
                         $.each(params.selected, function(i, selected) {
                             if ($.isPlainObject(selected) && selected.id) {
                                 $('<input type="hidden" />').attr({
-                                    name : params.input_name + '[]',
-                                    value : selected.id
-                                })
+                                        name : params.input_name + '[]',
+                                        value : selected.id
+                                    })
                                     .appendTo(container);
                             }
                         });
