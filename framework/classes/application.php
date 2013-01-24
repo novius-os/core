@@ -532,7 +532,7 @@ class Application
         }
     }
 
-    static function getCurrent()
+    public static function getCurrent()
     {
         // Get current application called on controllers
         return \Nos\Controller::getCurrentApplication();
