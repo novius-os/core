@@ -90,16 +90,16 @@ if ($is_media) {
     }
 }
 
-$is_attachment = preg_match('`^(?:cache/)?files/`', $redirect_url);
+$is_attachment = preg_match('`^(?:cache/)?data/files/`', $redirect_url);
 if ($is_attachment) {
-    $is_resized = preg_match('`cache/files/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`Uu', $redirect_url, $m);
+    $is_resized = preg_match('`cache/data/files/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`Uu', $redirect_url, $m);
 
     if ($is_resized) {
         list($target_resized, $path, $max_width, $max_height, $verification, $extension) = $m;
         $attachment_url = str_replace("/$max_width-$max_height-$verification", '', $path);
         $attachment_url = str_replace("/$max_width-$max_height", '', $attachment_url);
     } else {
-        $attachment_url = str_replace('files/', '', $redirect_url);
+        $attachment_url = str_replace('data/files/', '', $redirect_url);
     }
 
     $send_file = false;

@@ -286,7 +286,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $global_contexts = array_keys(Tools_Context::contexts());
                 foreach ($items as &$item) {
                     $flags = '';
-                    $site_flag = '';
                     $contexts = $item['context'];
 
                     $site = false;
@@ -297,7 +296,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                         $site_params = Tools_Context::site($context);
                         // When the site change
                         if ($sites_count > 1 && $site !== $site_params['alias']) {
-                            $flags .= $site_flag.(empty($site_flag) ? '' : '&nbsp;&nbsp;');
                             $site = $site_params['alias'];
                             $in = false;
                             // Check if the any context of the item exists in the site
@@ -307,8 +305,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                     break;
                                 }
                             }
+                            $flags .= (empty($flags) ? '' : '&nbsp;&nbsp;&nbsp;').'<span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span> ';
 
-                            $site_flag = ' <span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
                         }
                         if ($locales_count > 1) {
                             if (in_array($context, $contexts)) {
@@ -317,9 +315,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                                 $flags .= ' <span style="display:inline-block; width:16px;"></span>';
                             }
                         }
-                    }
-                    if ($sites_count > 1) {
-                        $flags = $site_flag.$flags;
                     }
                     $item['context'] = $flags;
                 }
