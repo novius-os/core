@@ -306,16 +306,16 @@ return array(
 
     #. Keep only if the model has the behaviours Contextable + Tree
     #: config/common/page.config.php:70
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a<strong>{{children_count}} sous-pages</strong>.',
+    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a <strong>{{children_count}} sous-pages</strong>.',
 
     #: config/common/page.config.php:71
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a<strong>une sous-page</strong>.',
+    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a <strong>une sous-page</strong>.',
 
     #: config/common/page.config.php:72
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a<strong>{{children_count}} sous-pages</strong>.',
+    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a <strong>{{children_count}} sous-pages</strong>.',
 
     #: config/common/page.config.php:73
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a<strong>une sous-page</strong>.',
+    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a <strong>une sous-page</strong>.',
 
     #. Keep only if the model has the behaviour Tree
     #: config/common/page.config.php:76
