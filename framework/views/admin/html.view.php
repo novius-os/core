@@ -28,6 +28,7 @@ $config = array(
         'jquery-ui.datetimepicker' => 'static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon',
         'jquery-ui.datetimepicker.i18n' => 'static/novius-os/admin/vendor/jquery/ui-datetimepicker/i18n/jquery-ui-i18n',
         'jquery.passwordstrength' => 'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
+        'jquery.validate' => 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate.min',
 
         'jquery-ui.core' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.widget' => 'static/novius-os/admin/bundle/vendor.min',
@@ -260,6 +261,7 @@ if (!$assets_minified) {
         'jquery.globalize.cultures' => 'static/novius-os/admin/vendor/jquery/globalize/cultures/globalize.cultures',
         'jquery.mousewheel' => 'static/novius-os/admin/vendor/jquery/mousewheel/jquery.mousewheel.min',
         'jquery-form' => 'static/novius-os/admin/vendor/jquery/jquery-form/jquery.form',
+        'jquery.validate' => 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate',
 
         'jquery-ui.core' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.core',
         'jquery-ui.widget' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.widget',

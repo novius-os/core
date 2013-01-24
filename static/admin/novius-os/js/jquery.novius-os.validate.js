@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-validate',
-    ['jquery', 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate.min', 'wijmo.wijtooltip'],
+    ['jquery', 'jquery.validate', 'wijmo.wijtooltip'],
     function($) {
         // This replaces the showLabel function
         var showLabel = function (element, message) {
