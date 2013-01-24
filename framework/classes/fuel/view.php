@@ -21,7 +21,7 @@ class View extends \Fuel\Core\View
             foreach (static::$redirects[$file] as $redirect) {
                 $callback = $redirect['callback'];
                 if (is_callable($callback)) {
-                    $callback = $callback($data, $filter);
+                    $callback = $callback($data, static::$global_data, $filter);
                 }
                 if ($callback === true || is_string($callback)) {
                     $file = is_string($callback) ? $callback : $redirect['view'];

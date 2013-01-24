@@ -16,6 +16,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 {
     protected $config = array();
     protected $app_config = array();
+    protected static $current_application = null;
 
     /**
      * @var string page template
@@ -34,6 +35,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             // auto-detect the format
             $this->format = array_key_exists(\Input::extension(), $this->_supported_formats) ? \Input::extension() : 'json';
         }
+
+        list(static::$current_application) = \Config::configFile(get_called_class());
 
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
         $this->app_config = \Arr::merge($this->app_config, static::getGlobalConfiguration());
@@ -779,5 +782,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $item['_title'] = $object->title_item();
 
         return $item;
+    }
+
+    public static function getCurrentApplication()
+    {
+        return static::$current_application;
     }
 }

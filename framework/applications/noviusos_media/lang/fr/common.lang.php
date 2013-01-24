@@ -56,6 +56,8 @@ return array(
     #: views/admin/media_delete.view.php:31
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
 
+    'Pick' => 'Choisir',
+
     #: views/admin/wysiwyg_image.view.php:29
     'Pick another image' => 'Sélectionner une autre image',
 

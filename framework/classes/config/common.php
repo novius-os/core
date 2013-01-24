@@ -25,7 +25,7 @@ class Config_Common
             $config['actions']['order'] = array();
         }
 
-        $config['actions']['list'] = static::process_actions($application_name, $model, $config);
+        static::process_actions($application_name, $model, $config);
 
         if (!isset($config['data_mapping'])) {
             $config['data_mapping'] = array();
@@ -78,7 +78,7 @@ class Config_Common
      * @param  array   $config
      * @return  array  The default actions
      */
-    public static function process_actions($application_name, $model, $config)
+    public static function process_actions($application_name, $model, &$config)
     {
         \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
 
@@ -206,6 +206,18 @@ class Config_Common
             $list_actions[$name] = $original_list_actions[$original_name];
         }
 
+        $orders = array();
+        $original_orders = $config['actions']['order'];
+        foreach ($original_orders as $original_order) {
+            $order = $original_order;
+            if (strpos($order, '\\') === false) {
+                $order = $model.'.'.$original_order;
+            }
+            $orders[] = $order;
+        }
+
+        $config['actions']['order'] = $orders;
+
         $actions = \Arr::merge($actions_template, $list_actions);
 
         $model_label = explode('_', $model);
@@ -237,6 +249,8 @@ class Config_Common
                 $actions[$key]['name'] = $key;
             }
         }
+
+        $config['actions']['list'] = $actions;
 
         return $actions;
     }
