@@ -142,6 +142,9 @@ class Config extends \Fuel\Core\Config
             $params['model'] = $model;
 
             foreach ($actions_order as $key) {
+                if (!isset($actions[$key])) {
+                    throw new \Exception('You are trying to order an action which key would be "'.$key.'" but such an action doesn\'t seem to exist.');
+                }
                 $action = $actions[$key];
                 if (static::can_add_action($action, $params)) {
                     $selected_actions[$key] = $action;
