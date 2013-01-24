@@ -13,7 +13,7 @@ Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 
 $uniqid_radio = uniqid('radio_');
 ?>
-<div class="page" id="<?= $uniqid = uniqid('id_') ?>">
+<div class="page media_form" id="<?= $uniqid = uniqid('id_') ?>">
 <?php
 $basename = pathinfo($item->medif_path, PATHINFO_BASENAME);
 $checked = $basename === \Nos\Orm_Behaviour_Virtualname::friendly_slug($item->medif_title);
@@ -40,9 +40,9 @@ if (!$item->is_new()) {
             <td><?= $fieldset->field('medif_title')->build(); ?></td>
         </tr>
         <tr>
-            <th style="vertical-align: top;"><?= $fieldset->field('medif_dir_name')->label; ?></th>
+            <th style="vertical-align: middle;"><?= $fieldset->field('medif_dir_name')->label; ?></th>
             <td style="vertical-align: top;">
-                <span style="vertical-align:middle;">
+                <span>
                     http://yoursite.com/media<span data-id="path_prefix"><?= $item->is_new() ? (!empty($crud['environment']) ? $crud['environment']->medif_path : '/') : $item->parent->medif_path ?></span>
                 </span>
                 <?= $fieldset->field('medif_dir_name')->build(); ?> &nbsp; <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Use title') ?></label>
@@ -52,7 +52,7 @@ if (!$item->is_new()) {
 if ($item->is_new()) {
     ?>
         <tr>
-            <th><?= !empty($crud['environment']) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
+            <th style="vertical-align: top;"><?= !empty($crud['environment']) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
             <td id="<?= $uniqid_radio ?>"><?= $fieldset->field('medif_parent_id')->build(); ?></td>
         </tr>
     <?php
@@ -63,7 +63,10 @@ if ($item->is_new()) {
 
 <script type="text/javascript">
     require(
-        ['jquery-nos-media-folder-form'],
+        [
+            'jquery-nos-media-folder-form',
+            'link!static/apps/noviusos_media/css/admin.css'
+        ],
         function($) {
             $(function() {
                 $('#<?= $uniqid ?>').nosMediaFolderForm({
