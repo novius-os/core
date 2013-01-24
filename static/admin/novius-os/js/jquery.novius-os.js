@@ -473,6 +473,13 @@ define('jquery-nos',
                     });
                 }
                 return obj;
+            },
+
+            /**
+             * Removes &nbsp; entities
+             */
+            nosCleanupTranslation : function (text) {
+                return text.replace(/&nbsp;/g, ' ');
             }
     });
 
