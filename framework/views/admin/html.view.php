@@ -432,8 +432,8 @@ if ($assets_minified) {
     require(['jquery-nos'], function($) {
         $.nosLang = '<?= \Session::user()->user_lang; ?>';
         $.nosTexts = $.extend($.nosTexts, {
-            'chooseMediaFile' : <?= \Format::forge(__('Choose a media file !'))->to_json() ?>,
-            'chooseMediaImage' : <?= \Format::forge(__('Choose a image !'))->to_json() ?>,
+            chooseMediaFile : <?= \Format::forge(__('Choose a media file'))->to_json() ?>,
+            chooseMediaImage : <?= \Format::forge(__('Choose a image'))->to_json() ?>,
             errorImageNotfind : <?= \Format::forge(__('We’re afraid we cannot find this image.'))->to_json() ?>
         });
     });

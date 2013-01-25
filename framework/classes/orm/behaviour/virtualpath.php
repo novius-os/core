@@ -25,6 +25,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     public function __construct($class)
     {
         parent::__construct($class);
+        $this->_properties['unique_path'] = $this->_properties['unique'];
         $this->_properties['unique'] = false;
         if (is_array($this->_properties['extension_property'])) {
             $this->_properties['extension_property'] = array_merge(array(
@@ -100,18 +101,23 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         }
 
         // Check uniqueness
-        if (!empty($diff[0][$this->_properties['virtual_path_property']])) {
-            $where = array(
-                array($this->_properties['virtual_path_property'], $item->{$this->_properties['virtual_path_property']})
-            );
-            if (!$item->is_new()) {
-                $pk = \Arr::get($item::primary_key(), 0);
-                $where[] = array($pk, '!=', $item->{$pk});
-            }
+        if ($this->_properties['unique_path']) {
+            if (!empty($diff[0][$this->_properties['virtual_path_property']])) {
+                $where = array(
+                    array($this->_properties['virtual_path_property'], $item->{$this->_properties['virtual_path_property']})
+                );
+                if (is_array($this->_properties['unique_path']) && !empty($this->_properties['unique_path']['context_property'])) {
+                    $where[] = array($this->_properties['unique_path']['context_property'], '=', $item->{$this->_properties['unique_path']['context_property']});
+                }
+                if (!$item->is_new()) {
+                    $pk = \Arr::get($item::primary_key(), 0);
+                    $where[] = array($pk, '!=', $item->{$pk});
+                }
 
-            $duplicate = $item::find('all', (array('where' => $where)));
-            if (!empty($duplicate)) {
-                throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
+                $duplicate = $item::find('all', (array('where' => $where)));
+                if (!empty($duplicate)) {
+                    throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
+                }
             }
         }
     }

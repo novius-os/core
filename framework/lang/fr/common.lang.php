@@ -271,6 +271,8 @@ return array(
     #: config/i18n_common.config.php:27
     '{{Button}} or <a>No, cancel</a>' => '{{Button}} ou <a>Non, annuler</a>',
 
+    '{{Save}} or <a>Cancel</a>' => '{{Save}} ou <a>Annuler</a>',
+
     #: config/i18n_common.config.php:28
     'Yes, delete' => 'Oui, supprimer',
 
