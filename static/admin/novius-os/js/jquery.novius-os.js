@@ -97,6 +97,12 @@ define('jquery-nos',
 
 
         $.extend({
+            nosTexts: {
+                chooseMediaFile : 'Choose a media file',
+                chooseMediaImage : 'Choose a image',
+                errorImageNotfind : 'We’re afraid we cannot find this image.'
+            },
+
             nosContext : function(contexts) {
                 contexts = $.extend({
                     locales: {},
@@ -290,7 +296,7 @@ define('jquery-nos',
                 ], function() {
                     var image = new Image();
                     image.onerror = function() {
-                        $.nosNotify('We’re afraid we cannot find this image.', 'error');
+                        $.nosNotify($.nosTexts.errorImageNotfind, 'error');
                     };
                     image.onload = function() {
                         // Create the lightbox
@@ -704,6 +710,10 @@ define('jquery-nos',
                         'all'   : 'admin/noviusos_media/appdesk?view=media_pick',
                         'image' : 'admin/noviusos_media/appdesk?view=image_pick'
                     },
+                    titles = {
+                        'all'   : $.nosTexts.chooseMediaFile,
+                        'image' : $.nosTexts.chooseMediaImage
+                    },
                     $input = this;
 
                 var options = $.extend({
@@ -715,7 +725,7 @@ define('jquery-nos',
                                 destroyOnClose : true,
                                 contentUrl: contentUrls[data.mode],
                                 ajax: true,
-                                title: 'Choose a media file'
+                                title: titles[data.mode]
                             }).bind('select_media', function(e, item) {
                                 $input.inputFileThumb({
                                     file: item.image ? item.thumbnail : item.path
