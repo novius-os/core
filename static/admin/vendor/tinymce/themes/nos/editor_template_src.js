@@ -1898,10 +1898,12 @@
 			    self   = this,
                 data_config = edit ? $.extend(true, {
                         nosContext : self.settings.theme_nos_context,
-                        enhancer: metadata.id
+                        enhancer: metadata.id,
+                        enhancerAction: 'edit'
                     }, edit.data('config') || {}) : {
                         nosContext : self.settings.theme_nos_context,
-                        enhancer: metadata.id
+                        enhancer: metadata.id,
+                        enhancerAction: 'add'
                     },
                 save = function(json) {
 
