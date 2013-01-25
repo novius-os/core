@@ -122,11 +122,11 @@ define('jquery-nos-appdesk',
                     .appendTo(self.uiInputContainer);
                 self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
                     .appendTo(self.uiInputContainer);
-                self.uiResetSearch = $('<a href="#"></a>').text(o.texts.showAll)
+                self.uiResetSearch = $('<a href="#"></a>').html(o.texts.showAll)
                     .attr('title', o.texts.showAll)
                     .addClass('nos-appdesk-reset-search')
                     .appendTo(self.uiInputContainer);
-                self.uiuiResetSearchIcon = $('<span></span>').text(o.texts.showAll)
+                self.uiuiResetSearchIcon = $('<span></span>').html(o.texts.showAll)
                     .addClass('ui-icon')
                     .appendTo(self.uiResetSearch);
 
@@ -236,7 +236,7 @@ define('jquery-nos-appdesk',
                 $.each(o.buttons, function(i, button) {
                     var $el;
                     if (button.primary) {
-                        $el = $('<button></button>').text(button.label)
+                        $el = $('<button></button>').html(button.label)
                             .data('icon', button.icon || 'plus')
                             .addClass('primary')
                             .click(function(e) {
@@ -249,7 +249,7 @@ define('jquery-nos-appdesk',
                     } else {
                         $el = $('<a href="#"></a>')
                             .addClass('nos-appdesk-action-secondary')
-                            .text(button.label)
+                            .html(button.label)
                             .click(function(e) {
                                 e.preventDefault();
                                 e.stopImmediatePropagation();
@@ -280,7 +280,7 @@ define('jquery-nos-appdesk',
                     $trHeader = $table.find('tr');
 
                 $.each(o.locales, function(locale, locale_params) {
-                    $('<th></th>').text(locale_params.title)
+                    $('<th></th>').html(locale_params.title)
                         .append('<br /><img src="static/novius-os/admin/novius-os/img/flags/' + locale_params.flag + '.png" />')
                         .appendTo($trHeader)
                 });
@@ -288,7 +288,7 @@ define('jquery-nos-appdesk',
                 $.each(o.sites, function(site, site_params) {
                     var $tr = $('<tr></tr>').appendTo($tbody);
 
-                    $('<th></th>').text(site_params.title)
+                    $('<th></th>').html(site_params.title)
                         .appendTo($tr);
 
                     $.each(o.locales, function(locale, locale_params) {
@@ -438,7 +438,7 @@ define('jquery-nos-appdesk',
                     .end()
                     .find('button:last')
                     .attr('id', id)
-                    .text(self.nosContext.label({
+                    .html(self.nosContext.label({
                             oneSite: o.texts.selectLanguages,
                             oneLocale: o.texts.selectSites,
                             defaultLabel: o.texts.selectContexts
@@ -457,7 +457,7 @@ define('jquery-nos-appdesk',
                 $('<li><a></a></li>')
                     .appendTo($ul)
                     .find('a')
-                    .text(self.nosContext.label({
+                    .html(self.nosContext.label({
                             oneSite: o.texts.selectLanguages,
                             oneLocale: o.texts.selectSites,
                             defaultLabel: o.texts.selectContexts
@@ -478,7 +478,7 @@ define('jquery-nos-appdesk',
                         $('<li><a></a></li>')
                             .appendTo($ul)
                             .find('a')
-                            .text(self.nosContext.label({
+                            .html(self.nosContext.label({
                                     oneSite: o.texts.otherLanguages,
                                     oneLocale: o.texts.otherSites,
                                     defaultLabel: o.texts.otherContexts
@@ -764,7 +764,7 @@ define('jquery-nos-appdesk',
                         self.uiInspectorsTags.wijsuperpanel('destroy');
 
                         var span = $('<span></span>').addClass('nos-appdesk-inspectorstag ui-state-default ui-corner-all ' + name)
-                            .text(label)
+                            .html(label)
                             .appendTo(self.uiInspectorsTags);
 
                         $('<input type="hidden" name="' + inspector.inputName + '" />').val(value)
@@ -896,7 +896,7 @@ define('jquery-nos-appdesk',
                     var presentation = this;
                     if (o[presentation.id]) {
                         $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
-                            .text(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
+                            .html(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
                         $('<input type="radio" class="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
                             .appendTo(self.uiViewsButtons)
@@ -937,7 +937,7 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 self.gridRendered = false;
-                self.uiGridTitle.text(o.texts.gridTitle);
+                self.uiGridTitle.html(o.texts.gridTitle);
 
                 self.uiThumbnail.thumbnailsgrid('destroy')
                     .empty()
@@ -1013,14 +1013,14 @@ define('jquery-nos-appdesk',
                             },
                             loaded: function(dataSource, data) {
                                 if (dataSource.data.totalRows === 0) {
-                                    self.uiPaginationLabel.text(o.texts.showNoItem);
-                                    self.uiNbResult.text(o.texts.showNoItem);
+                                    self.uiPaginationLabel.html(o.texts.showNoItem);
+                                    self.uiNbResult.html(o.texts.showNoItem);
                                 } else if (dataSource.data.totalRows === 1) {
-                                    self.uiPaginationLabel.text(o.texts.showOneItem);
-                                    self.uiNbResult.text('1 ' + o.texts.item);
+                                    self.uiPaginationLabel.html(o.texts.showOneItem);
+                                    self.uiNbResult.html('1 ' + o.texts.item);
                                 } else {
-                                    self.uiPaginationLabel.text(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
-                                    self.uiNbResult.text(dataSource.data.totalRows + ' ' + o.texts.items);
+                                    self.uiPaginationLabel.html(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
+                                    self.uiNbResult.html(dataSource.data.totalRows + ' ' + o.texts.items);
                                 }
                                 self.uiNbResult.show();
 
@@ -1212,14 +1212,14 @@ define('jquery-nos-appdesk',
                         },
                         loaded: function(dataSource, data) {
                             if (dataSource.data.totalRows === 0) {
-                                self.uiPaginationLabel.text(o.texts.showNoItem);
-                                self.uiNbResult.text(o.texts.showNoItem);
+                                self.uiPaginationLabel.html(o.texts.showNoItem);
+                                self.uiNbResult.html(o.texts.showNoItem);
                             } else if (dataSource.data.totalRows === 1) {
-                                self.uiPaginationLabel.text(o.texts.showOneItem);
-                                self.uiNbResult.text('1 ' + o.texts.item);
+                                self.uiPaginationLabel.html(o.texts.showOneItem);
+                                self.uiNbResult.html('1 ' + o.texts.item);
                             } else {
-                                self.uiPaginationLabel.text(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
-                                self.uiNbResult.text(dataSource.data.totalRows + ' ' + o.texts.items);
+                                self.uiPaginationLabel.html(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
+                                self.uiNbResult.html(dataSource.data.totalRows + ' ' + o.texts.items);
                             }
                             self.uiNbResult.show();
 

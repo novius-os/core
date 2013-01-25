@@ -48,16 +48,18 @@ if (!$item->is_new()) {
                 <?= $fieldset->field('medif_dir_name')->build(); ?> &nbsp; <label><input type="checkbox" data-id="same_title" <?= $checked ? 'checked' : '' ?>> <?= __('Use title') ?></label>
             </td>
         </tr>
-<?php
-if ($item->is_new()) {
-    ?>
         <tr>
-            <th style="vertical-align: top;"><?= !empty($crud['environment']) ? '' :  $fieldset->field('medif_parent_id')->label; ?></th>
-            <td id="<?= $uniqid_radio ?>"><?= $fieldset->field('medif_parent_id')->build(); ?></td>
-        </tr>
-    <?php
+            <th style="vertical-align: top;"><?= !empty($crud['environment']) ? '' : ($item->is_new() ? $fieldset->field('medif_parent_id')->label : __('Change the folder\'s location:')); ?></th>
+            <td id="<?= $uniqid_radio ?>">
+
+                <?= $fieldset->field('medif_parent_id')->build(); ?>
+<?php
+if (!$item->is_new()) {
+    echo ('<strong class="warning_folder">'.__('Warning: moving a folder changes the URL of all the files it contains.').'</strong>');
 }
 ?>
+            </td>
+        </tr>
     </table>
 </div>
 

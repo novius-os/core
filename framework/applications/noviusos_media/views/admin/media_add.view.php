@@ -34,7 +34,7 @@ $fieldset->set_config('field_template', '{field}');
                     <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Use title') ?></label></span></td>
                 </tr>
                 <tr>
-                    <th style="vertical-align: top;"><?= $fieldset->field('media_folder_id')->label ?></th>
+                    <th><?= $fieldset->field('media_folder_id')->label ?></th>
                     <td><?= $fieldset->field('media_folder_id')->build() ?></td>
                 </tr>
             </table>
