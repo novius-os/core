@@ -37,6 +37,6 @@ return array(
     'appdesk' => array(
         'appdesk' => array(
             'defaultView' => 'treeGrid',
-        )
+        ),
     ),
 );

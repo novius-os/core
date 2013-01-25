@@ -1533,6 +1533,7 @@ define('jquery-nos-appdesk',
                                             if (object[key][i].context) {
                                                 if (configToUse.hideContexts) {
                                                     object[key].splice(i, 1);
+                                                    i--;
                                                     continue;
                                                 }
                                                 nosContext = $.nosContext({

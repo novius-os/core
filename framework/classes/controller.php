@@ -40,7 +40,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
         $this->app_config = \Arr::merge($this->app_config, static::getGlobalConfiguration());
-        \View::set_global('app_config', $this->app_config);
+        \View::set_global(static::$current_application.'_config', $this->app_config);
         $this->trigger('before', $this, 'boolean');
 
         parent::before();
