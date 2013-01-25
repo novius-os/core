@@ -34,8 +34,24 @@ foreach ($layout as $view) {
         <div class="line">
             <div class="col c1"></div>
             <div class="col c10 ui-widget">
+<?php
+$enhancerAction = \Arr::get($enhancer_args, 'enhancerAction', null);
+switch ($enhancerAction) {
+    case 'update' :
+        $submit_label = __('Update');
+        break;
+
+    case 'insert' :
+        $submit_label = __('Insert');
+        break;
+
+    default :
+        $submit_label = __('Save');
+        break;
+}
+?>
                 <?= strtr(__('{{Save}} or <a>Cancel</a>'), array(
-                    '{{Save}}' => '<button type="submit" data-icon="check">'.__('Save').'</button>',
+                    '{{Save}}' => '<button type="submit" data-icon="check">'.$submit_label.'</button>',
                     '<a>' => '<a data-id="close" href="#">',
                 )) ?>
             </div>
