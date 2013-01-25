@@ -1135,11 +1135,12 @@ define('jquery-nos',
                 if ($.isArray(listens)) {
                     listens = $.extend(true, [], listens);
                     // Loop on original array, remove on clone : not change index inside the loop
-                    $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
-                        if (listen.caller === caller) {
+                    for (var index_listen = 0; index_listen < listens.length; index_listen++) {
+                        if (listens[index_listen].caller === caller) {
                             listens.splice(index_listen, 1);
+                            index_listen--;
                         }
-                    });
+                    }
                     $dispatcher.data('noviusos-listens', listens);
                 }
 
