@@ -645,7 +645,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         );
 
         $childs = array();
-        if (!$params['model']) {
+        if (!$params['model'] || empty($params['id'])) {
             $childs = $tree_config['roots'];
         } else {
             $tree_model = $tree_config['models'][$params['model']];
