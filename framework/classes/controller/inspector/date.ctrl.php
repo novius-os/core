@@ -10,19 +10,21 @@
 
 namespace Nos;
 
-use View;
-use Fuel\Core\Config;
-use Date;
+use Date, View;
 
 class Controller_Inspector_Date extends Controller_Inspector
 {
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        I18n::current_dictionary('nos::common');
+    }
 
     public function action_list()
     {
         $view = View::forge('inspector/date');
 
         $content = array();
-        $custom = array();
         $since = array();
         $month = array();
         $year = array();
@@ -122,7 +124,7 @@ class Controller_Inspector_Date extends Controller_Inspector
             }
         }
 
-        $view->set('content', \Format::forge($content)->to_json(), false);
+        $view->set('content', $content, false);
         $view->set('label_custom', $this->config['label_custom_inputs']);
 
         $view->set('date_begin', \Nos\Renderer_Date_Picker::renderer(array(
@@ -142,31 +144,31 @@ class Controller_Inspector_Date extends Controller_Inspector
         $default_config = array(
             'input_begin'           => 'date_begin',
             'input_end'             => 'date_end',
-            'label_custom'          => 'Custom dates',
-            'label_custom_inputs'   => 'from xxxbeginxxx to xxxendxxx',
+            'label_custom'          => __('Custom dates'),
+            'label_custom_inputs'   => __('from {{begin}} to {{end}}'),
             'options'               => array('custom', 'since', 'month', 'year'),
             'since'                 => array(
-                'optgroup'  => 'Since',
+                'optgroup'  => __('Since'),
                 'options'   => array(
-                    '-3 day'            => '3 last days',
-                    'previous monday'   => 'Week beginning',
-                    '-1 week'           => 'Less than a week',
-                    'current month'     => 'Month beginning',
-                    '-1 month'          => 'Less than one month',
-                    '-2 month'          => 'Less than two months',
-                    '-3 month'          => 'Less than three months',
-                    '-6 month'          => 'Less than six months',
-                    '-1 year'           => 'Less than one year',
+                    '-3 day'            => __('3 last days'),
+                    'previous monday'   => __('Week beginning'),
+                    '-1 week'           => __('Less than a week'),
+                    'current month'     => __('Month beginning'),
+                    '-1 month'          => __('Less than one month'),
+                    '-2 month'          => __('Less than two months'),
+                    '-3 month'          => __('Less than three months'),
+                    '-6 month'          => __('Less than six months'),
+                    '-1 year'           => __('Less than one year'),
                 ),
             ),
             'month'                 => array(
-                'optgroup'      => 'Previous months',
+                'optgroup'      => __('Previous months'),
                 'first_month'   => 'now',
                 'limit_type'    => 'year',
                 'limit_value'   => 1,
             ),
             'year'                  => array(
-                'optgroup'      => 'Years',
+                'optgroup'      => __('Years'),
                 'first_year'    => 'now',
                 'limit'         => 4,
             ),
@@ -174,7 +176,7 @@ class Controller_Inspector_Date extends Controller_Inspector
                 'vertical'  => true,
                 'url'       => $inspector_path.'/list',
                 'inputName' => $config['input']['key']
-            )
+            ),
         );
 
         $config = \Arr::merge($default_config, $config);
@@ -200,6 +202,4 @@ class Controller_Inspector_Date extends Controller_Inspector
 
         return $config;
     }
-
-
 }

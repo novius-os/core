@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('nos::application');
+
 $uniqid = uniqid(str_replace(':', '_', $context).'_');
 
 $labels = array();

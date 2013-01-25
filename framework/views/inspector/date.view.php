@@ -10,7 +10,10 @@
 
     $id = uniqid('temp_');
 ?>
-<div id="<?= $id ?>" style="display:none;"><?= str_replace(array('xxxbeginxxx', 'xxxendxxx'), array($date_begin, $date_end), $label_custom) ?></div>
+<div id="<?= $id ?>" style="display:none;"><?= strtr($label_custom, array(
+    '{{begin}}' => $date_begin,
+    '{{end}}' => $date_end,
+)) ?></div>
 <script type="text/javascript">
 require(
     ['jquery-nos-inspector-date'],
@@ -18,9 +21,9 @@ require(
         $(function() {
             $('#<?= $id ?>').nosInspectorDate({
                 texts: {
-                    labelCustom: "<?= $label_custom ?>"
+                    labelCustom: <?= \Format::forge()->to_json(''.$label_custom) ?>
                 },
-                content: <?= $content ?>
+                content: <?= \Format::forge()->to_json($content) ?>
             });
         });
     });
