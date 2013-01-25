@@ -12,6 +12,11 @@ namespace Nos;
 
 class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 {
+    public static function _init()
+    {
+        I18n::current_dictionary('nos::orm');
+    }
+
     /**
      * common_id_property
      * is_main_property
