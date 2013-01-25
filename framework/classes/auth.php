@@ -28,6 +28,8 @@ class Auth
             return false;
         }
         $user = current($user);
+        $user->user_last_connection = \Date::forge()->format('mysql');
+        $user->save();
         if ($user->check_password($password)) {
             \Session::set('logged_user_id', $user->id);
             \Session::set('logged_user_md5', $user->user_md5);
