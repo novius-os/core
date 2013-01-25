@@ -250,7 +250,7 @@ define('jquery-nos-link-wysiwyg',
                                         $panel_properties.find('#tr_' + id + '_' + property)
                                             [$.inArray(property, visible_properties) === -1 ? 'hide' : 'show']();
                                     });
-                                    if (!params.expert) {
+                                    if (!params.expert && link_type !== 'external') {
                                         $panel_properties.find('#tr_' + id + '_url').hide();
                                         $panel_properties.find('#tr_' + id + '_url_params').hide();
                                     }
