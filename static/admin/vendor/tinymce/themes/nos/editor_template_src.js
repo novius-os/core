@@ -440,9 +440,6 @@
                 case "justifycontrols" :
                     return this._createJustify();
 
-                case "file" :
-                    return this._createFileButton();
-
                 case "pastecontrols":
                     return this._createPaste();
 
@@ -553,18 +550,6 @@
                     m.items['unlink'].setDisabled(!link);
                 });
             });
-            return c;
-        },
-
-        _createFileButton : function() {
-            var c, t = this, s = t.settings, o = {}, v;
-
-            c = t.editor.controlManager.createButton('file', {
-                title : 'nos.file_title',
-                label : 'nos.file_label',
-                'class' : 'mce_file'
-            });
-
             return c;
         },
 

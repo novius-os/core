@@ -91,8 +91,6 @@ tinyMCE.addI18n('fr.nos', {
     enhancer_p_before:"Nouveau paragraph avant",
     enhancer_new_paragraph : "Nouveau paragraphe",
     enhancer_loading : "Chargement...",
-    file_title:"Insert document / Not yet implement",
-    file_label:"Document",
     visualthml_desc : "Montrer les paragraphes",
     media_title: "Ins\u00e9rer / Modifier un m\u00e9dia externe",
     media_label: "M\u00e9dia externe",
