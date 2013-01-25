@@ -83,8 +83,6 @@ tinyMCE.addI18n('en.nos',{
     enhancer_options:"Options",
     enhancer_p_after:"New paragraph after",
     enhancer_p_before:"New paragraph before",
-    file_title:"Insert document / Not yet implement",
-    file_label:"Document",
     visualthml_desc : "Show paragraphs",
     media_title: "Insert/Edit Embedded Media",
     media_label: "Embedded Media",
