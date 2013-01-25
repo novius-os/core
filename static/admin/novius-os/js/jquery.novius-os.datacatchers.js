@@ -100,7 +100,7 @@ define('jquery-nos-datacatchers',
                                         $('<div><h3></h3><div></div></div>')
                                             .appendTo(self.uiCatcherForm)
                                             .find('h3')
-                                            .text(params.title)
+                                            .html(params.title)
                                             .end()
                                             .find('div')
                                             .html(data)
