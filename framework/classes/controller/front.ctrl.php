@@ -467,6 +467,8 @@ class Controller_Front extends Controller
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
         $this->_view->set('title', $this->_title, false);
+        $this->_view->set('page', $this->_page, false);
+        $this->_view->set('main_controller', $this, false);
     }
 
     /**
