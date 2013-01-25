@@ -153,8 +153,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         static $in_progress_check = array();
 
         // Prevents looping in the observer
-        $items = $this->find_other_context($item);
         if (!in_array($item->id, $in_progress_check)) {
+            $items = $this->find_other_context($item);
             $in_progress_check = array_keys($items);
 
             foreach ($items as $it) {
@@ -162,11 +162,11 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
                 $it->set_parent($parent);
                 $it->observe('check_change_parent');
             }
-            $in_progress_check = array();
-        }
 
-        foreach ($items as $it) {
-            $it->save();
+            foreach ($items as $it) {
+                $it->save();
+            }
+            $in_progress_check = array();
         }
     }
 
