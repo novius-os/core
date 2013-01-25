@@ -27,9 +27,9 @@ $media_title->set_attribute('placeholder', $media_title->label);
 $main_col_size = 11;
 if ($item->is_image()) {
     $main_col_size -= 3;
-    echo '<div class="col c3" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">';
-    list($src, $width, $height, $ratio) = $item->get_img_infos(280, 280);
-    printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
+    echo '<div class="col c3 preview_zone">';
+    list($src, $width, $height, $ratio) = $item->get_img_infos(512, 512);
+    echo '<img src="'.$src.'" />';
     echo '</div>';
 }
 ?>
