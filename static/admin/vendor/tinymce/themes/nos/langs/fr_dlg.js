@@ -1,4 +1,4 @@
-tinyMCE.addI18n('fr.nos', {
+tinyMCE.addI18n('fr.nos_dlg', {
     "link_list": "Liste de liens",
     "link_is_external": "L\'URL que vous avez saisie semble \u00eatre une adresse web externe. Souhaitez-vous ajouter le pr\u00e9fixe \u00ab http:// \u00bb ?",
     "link_is_email": "L\'URL que vous avez saisie semble \u00eatre une adresse e-mail, souhaitez-vous ajouter le pr\u00e9fixe \u00ab mailto: \u00bb ?",
