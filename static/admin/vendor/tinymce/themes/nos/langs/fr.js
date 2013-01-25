@@ -89,6 +89,8 @@ tinyMCE.addI18n('fr.nos', {
     enhancer_options:"Options",
     enhancer_p_after:"Nouveau paragraphe apr\u00e8s",
     enhancer_p_before:"Nouveau paragraph avant",
+    enhancer_new_paragraph : "Nouveau paragraphe",
+    enhancer_loading : "Chargement...",
     file_title:"Insert document / Not yet implement",
     file_label:"Document",
     visualthml_desc : "Montrer les paragraphes",
