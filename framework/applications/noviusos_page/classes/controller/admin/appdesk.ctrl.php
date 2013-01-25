@@ -31,12 +31,17 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
                     continue;
                 }
 
-                if (is_callable($data)) {
-                    $item[$key] = call_user_func($data, $page);
-                } else if (is_array($data)) {
-                    $item[$key] = $page->get($data['column']);
+                $data_item = $data;
+                if (!is_callable($data_item) && is_array($data_item)) {
+                    $data_item = $data_item['column'];
+                }
+
+                if (is_callable($data_item)) {
+                    $item[$key] = call_user_func($data_item, $page);
+                } else if (method_exists($page, $data_item)) {
+                    $item[$key] = $page->{$data_item}();
                 } else {
-                    $item[$key] = $page->get($data);
+                    $item[$key] = $page->get($data_item);
                 }
             }
         } else {
