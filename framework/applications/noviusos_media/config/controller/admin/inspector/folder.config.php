@@ -18,5 +18,9 @@ return array(
     ),
     'appdesk' => array(
         'label'     => __('Folder'),
+        'treeGrid' => array(
+            'movable'   => false,
+            'sortable'  => false,
+        ),
     ),
 );

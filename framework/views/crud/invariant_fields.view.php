@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('nos::application');
+
 ?>
 <script type="text/javascript">
 require(

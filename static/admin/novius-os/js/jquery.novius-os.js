@@ -357,7 +357,7 @@ define('jquery-nos',
                     case 'button' :
                         $element = $('<button></button>').data(element);
                         if (element.label) {
-                            $element.text(element.label);
+                            $element.html(element.label);
                         }
                         break;
 
@@ -418,7 +418,7 @@ define('jquery-nos',
                                         }
                                         if (menu.label) {
                                             $('<span></span>').addClass('wijmo-wijmenu-text')
-                                                .text(menu.label)
+                                                .html(menu.label)
                                                 .appendTo($a);
                                         }
                                     }
@@ -473,6 +473,13 @@ define('jquery-nos',
                     });
                 }
                 return obj;
+            },
+
+            /**
+             * Removes &nbsp; entities
+             */
+            nosCleanupTranslation : function (text) {
+                return text.replace(/&nbsp;/g, ' ');
             }
     });
 

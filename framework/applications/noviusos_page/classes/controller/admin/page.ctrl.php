@@ -243,6 +243,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         $clone->page_home = 0;
         $clone->page_published = 0;
         $clone->page_context_common_id = $common_id;
+        $clone->page_context_is_main = empty($common_id) ? 1 : 0;
         // Change the title for the root item only (children path will inherit from their parent)
         if (!empty($parent)) {
             $clone->set_parent($parent);
@@ -297,6 +298,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             $clone->page_context_common_id = $common_id;
             $clone->page_virtual_name = null;
             $clone->page_virtual_url = null;
+            $clone->page_context_is_main = empty($common_id) ? 1 : 0;
             if (empty($parent)) {
                 $clone->page_title = $clone->page_title.$title_append;
             } else {

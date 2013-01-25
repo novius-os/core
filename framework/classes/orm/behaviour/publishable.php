@@ -21,7 +21,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 
     public static function _init()
     {
-        I18n::current_dictionary(array('nos::common'));
+        I18n::current_dictionary(array('nos::orm', 'nos::common'));
     }
 
     public static function dataset(&$dataset)

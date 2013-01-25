@@ -1,3 +1,23 @@
 .media_form th {
     vertical-align: middle;
 }
+
+.warning_folder {
+    display: block;
+    margin-top: 5px;
+}
+
+.preview_zone {
+    z-index:99;
+    border:1px solid gray;
+    min-height:300px;
+    line-height:300px;
+    text-align:center;
+    padding: 1em;
+}
+
+.preview_zone img {
+    vertical-align:middle;
+    max-width: 100%;
+    max-height: 100%;
+}

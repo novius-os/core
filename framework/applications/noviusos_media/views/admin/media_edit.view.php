@@ -8,7 +8,6 @@
  * @link http://www.novius-os.org
  */
 
-
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 
 $uniqid = uniqid('id_');
@@ -24,15 +23,17 @@ $media_title->set_attribute('placeholder', $media_title->label);
 <div class="media_form page line ui-widget" id="<?= $uniqid ?>">
     <?= $fieldset->build_hidden_fields(); ?>
     <div class="col c1" ></div>
-    <div class="col c3" style="z-index:99;border:1px solid gray;height:300px;line-height:300px;text-align:center;">
 <?php
+$main_col_size = 11;
 if ($item->is_image()) {
-    list($src, $width, $height, $ratio) = $item->get_img_infos(128, null);
-    printf('<img src="%s" width="%s", height="%s" style="vertical-align:middle;" />', $src, $width, $height);
+    $main_col_size -= 3;
+    echo '<div class="col c3 preview_zone">';
+    list($src, $width, $height, $ratio) = $item->get_img_infos(512, 512);
+    echo '<img src="'.$src.'" />';
+    echo '</div>';
 }
 ?>
-    </div>
-    <div class="col c8" style="z-index:99;">
+    <div class="col c<?= $main_col_size ?>" style="z-index:99;">
         <div class="line" style="margin-bottom:1em;">
             <table class="fieldset standalone">
                 <tr class="title">
@@ -45,7 +46,7 @@ if ($item->is_image()) {
                 </tr>
                 <tr>
                     <th><?= $fieldset->field('media_file')->label ?></th>
-                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $item->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" checked /> <?= __('Use title') ?></label></span></td>
+                    <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<?= $item->media_ext ?> &nbsp; <label><input type="checkbox" data-id="same_title" /> <?= __('Use title') ?></label></span></td>
                 </tr>
                 <tr>
                     <th style="vertical-align: top;"><?= $fieldset->field('media_folder_id')->label; ?></th>

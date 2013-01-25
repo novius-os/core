@@ -74,7 +74,7 @@ define('jquery-nos-preview',
                     .addClass('wijmo-wijgrid-innercell')
                     .find('span')
                     .addClass('wijmo-wijgrid-headertext')
-                    .text(title);
+                    .html(title);
 
                 return self;
             },
@@ -205,7 +205,7 @@ define('jquery-nos-preview',
                         .appendTo(tr)
                         .find('div')
                         .addClass('wijmo-wijgrid-innercell')
-                        .text(meta.label || '');
+                        .html(meta.label || '');
 
                     $('<td><div></div></td>').addClass('wijgridtd wijdata-type-string')
                         .appendTo(tr)
@@ -229,7 +229,7 @@ define('jquery-nos-preview',
 
                 self.uiContainer = $('<div></div>')
                     .addClass('nos-preview-noitem')
-                    .text(o.texts.selectItem)
+                    .html(o.texts.selectItem)
                     .appendTo(self.element);
 
                 self.element.wijsuperpanel({

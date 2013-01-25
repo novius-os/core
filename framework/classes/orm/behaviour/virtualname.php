@@ -12,6 +12,11 @@ namespace Nos;
 
 class Orm_Behaviour_Virtualname extends Orm_Behaviour
 {
+    public static function _init()
+    {
+        I18n::current_dictionary('nos::orm');
+    }
+
     protected $_properties = array();
 
     public function __construct($class)
