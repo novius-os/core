@@ -66,7 +66,7 @@ class Model_Page extends \Nos\Orm\Model
             'level_property' => 'page_level',
         ),
         'Nos\Orm_Behaviour_Virtualpath' => array(
-            'events' => array('before_save', 'after_save', 'change_parent'),
+            'events' => array('before_save', 'after_save', 'check_change_parent'),
             'virtual_name_property' => 'page_virtual_name',
             'virtual_path_property' => 'page_virtual_url',
             'extension_property' => '.html',
