@@ -462,7 +462,7 @@ class Controller_Front extends Controller
 
         // Scan all wysiwyg
         foreach ($this->_template['layout'] as $wysiwyg_name => $layout) {
-            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->_page->wysiwygs->{$wysiwyg_name}, $this);
+            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->_page->wysiwygs->{$wysiwyg_name});
         }
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
