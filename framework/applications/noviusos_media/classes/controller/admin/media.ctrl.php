@@ -106,9 +106,16 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         }
 
         // Delete old files
-        if (!$this->is_new && ($is_uploaded || $is_renamed)) {
-            $this->clone->delete_from_disk();
-            $this->clone->delete_public_cache();
+        if (!$this->is_new) {
+            // A new file will be copied, we don't need the old one
+            if ($is_uploaded) {
+                $this->clone->delete_from_disk();
+                $this->clone->delete_public_cache();
+            }
+            // Don't delete the old file, we'll rename it
+            if ($is_renamed) {
+                $this->clone->delete_public_cache();
+            }
         }
 
         // Write the file
