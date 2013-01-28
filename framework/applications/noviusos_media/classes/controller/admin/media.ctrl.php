@@ -125,6 +125,14 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         }
     }
 
+    public function save($item, $data)
+    {
+        return parent::save($item, $data) + array(
+            'thumbnailUrl' => $this->item->get_public_path_resized(512, 512),
+            'media_file' => $this->item->media_file,
+        );
+    }
+
     public function delete()
     {
         // Delete database & relations (link)
