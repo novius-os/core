@@ -51,7 +51,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
             $this->_parent_relation = $class::relations($this->_properties['parent_relation']);
         }
 
-        if (false === $this->_parent_relation) {
+        if (empty($this->_parent_relation)) {
             throw new \Exception('Relation "parent" not found by virtualname behaviour: '.$this->_class);
         }
     }
@@ -99,67 +99,73 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         parent::before_save($item);
         $diff = $item->get_diff();
 
+        $virtual_path_property = $this->_properties['virtual_path_property'];
+        $virtual_name_property = $this->_properties['virtual_name_property'];
+
         // If the parent changes, then the virtual path changes
-        if (!empty($this->_parent_relation)) {
-            $key_from = $this->_parent_relation->key_from[0];
-            // Compare $diff[0] and $diff[1] because the former can be (string) and latter (int), even if it's the same value
-            $parent_has_changed = array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from];
-            if ($item->is_new() || $parent_has_changed) {
-                $class = $this->_parent_relation->model_to;
-                $parent = null;
-                if (!empty($item->{$this->_parent_relation->key_from[0]})) {
-                    $parent = $class::find($item->{$this->_parent_relation->key_from[0]});
-                }
-                $item->{$this->_properties['virtual_path_property']} = ($parent !== null ? $parent->virtual_path(true) : '') . $this->virtual_name($item) . $this->extension($item);
-                $this->_data_diff[$item->{$this->_properties['virtual_path_property']}] = $diff;
-            }
-        }
+        $key_from = $this->_parent_relation->key_from[0];
+        // Compare $diff[0] and $diff[1] because the former can be (string) and latter (int), even if it's the same value
+        $parent_has_changed = array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from];
 
-        if (!empty($diff[1][$this->_properties['virtual_name_property']])) {
-            $virtual_path = $this->_properties['virtual_path_property'];
-            $diff[0][$virtual_path] = $item->{$virtual_path};
-            $old_name = $diff[0][$virtual_path];
-            $new_name = $item->{$virtual_path}.$this->extension($item);
-            if (!empty($old_name)) {
-                $old_name .= $this->extension($item, true);
-                $item->{$this->_properties['virtual_path_property']} = preg_replace('`'.preg_quote($old_name).'$`iUu', $new_name, $item->{$virtual_path});
+        $dir_name_virtual_path = false;
+        if ($item->is_new() || $parent_has_changed) {
+            // Item is new or its parent has changed : retrieve virtual path dir name
+            $class = $this->_parent_relation->model_to;
+            $parent = null;
+            if (!empty($item->{$this->_parent_relation->key_from[0]})) {
+                $parent = $class::find($item->{$this->_parent_relation->key_from[0]});
             }
-            $diff[1][$virtual_path] = $item->{$this->_properties['virtual_path_property']};
-            $this->_data_diff[$item->{$virtual_path}] = $diff;
+            $dir_name_virtual_path = ($parent !== null ? $parent->virtual_path(true) : '');
+        } else if (!empty($diff[1][$virtual_name_property])) {
+            // Item's virtual name has changed : set virtual path dir name
+            $dir_name_virtual_path = dirname(rtrim($item->{$virtual_path_property}, '/')).'/';
         }
+        // Item's virtual path has changed : set is new virtual path, update and save diff array, check uniqueness
+        if ($dir_name_virtual_path !== false) {
+            $diff[0][$virtual_path_property] = $item->{$virtual_path_property};
+            $item->{$virtual_path_property} = $dir_name_virtual_path.$this->virtual_name($item).$this->extension($item);
+            $diff[1][$virtual_path_property] = $item->{$virtual_path_property};
+            $this->_data_diff[$item::implode_pk($item)] = $diff;
 
-        if (!empty($diff[0][$this->_properties['virtual_path_property']])) {
             $this->check_uniqueness($item);
         }
     }
 
     public function after_save(\Nos\Orm\Model $item)
     {
-        if (isset($this->_data_diff[$item->{$this->_properties['virtual_path_property']}])) {
-            $diff = $this->_data_diff[$item->{$this->_properties['virtual_path_property']}];
+        $tree = $item::behaviours('Nos\Orm_Behaviour_Tree', false);
+        // Class not have tree behaviour, don't have children to update
+        if (empty($tree)) {
+            return;
+        }
 
-            $old_virtual_path = \Arr::get($diff[0], $this->_properties['virtual_path_property'], $item->{$this->_properties['virtual_path_property']});
+        $virtual_path_property = $this->_properties['virtual_path_property'];
+        if (isset($this->_data_diff[$item::implode_pk($item)])) {
+            $diff = $this->_data_diff[$item::implode_pk($item)];
+
+            $old_virtual_path = $diff[0][$virtual_path_property];
             if (!empty($this->_properties['extension_property'])) {
-                $old_virtual_path = preg_replace('`'.$this->extension($item).'$`iUu', '/', $old_virtual_path);
+                $old_virtual_path = preg_replace('`'.preg_quote($this->extension($item, true)).'$`iUu', '/', $old_virtual_path);
             }
             $new_virtual_path = $this->virtual_path($item, true);
 
             // Change the virtual path for all items
             $replaces = array(
-                $this->_properties['virtual_path_property'] => \DB::expr('REPLACE('.$this->_properties['virtual_path_property'].', '.\DB::escape($old_virtual_path).', '.\DB::escape($new_virtual_path).')'),
+                $virtual_path_property => \DB::expr('REPLACE('.$virtual_path_property.', '.\DB::escape($old_virtual_path).', '.\DB::escape($new_virtual_path).')'),
             );
 
             // Level property also could have to be updated
-            if (!empty($this->_properties['level_property'])) {
-                $diff_level = \Arr::get($diff[0], $this->_properties['level_property'], $item->{$this->_properties['level_property']}) - $item->{$this->_properties['level_property']};
+            $level_property = \Arr::get($this->_properties, 'level_property', null);
+            if (!empty($level_property)) {
+                $diff_level = \Arr::get($diff[0], $level_property, $item->{$level_property}) - $item->{$level_property};
                 if ($diff_level != 0) {
-                    $replaces[$this->_properties['level_property']] = \DB::expr($this->_properties['level_property'].' '.($diff_level > 0 ? '-' : '+').' '.abs($diff_level));
+                    $replaces[$level_property] = \DB::expr($level_property.' '.($diff_level > 0 ? '-' : '+').' '.abs($diff_level));
                 }
             }
 
             \DB::update($item->table())
                 ->set($replaces)
-                ->where($this->_properties['virtual_path_property'], 'LIKE', $old_virtual_path.'%')
+                ->where($virtual_path_property, 'LIKE', $old_virtual_path.'%')
                 ->execute();
         }
     }
