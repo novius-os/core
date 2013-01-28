@@ -81,7 +81,7 @@ class Model_Media extends \Nos\Orm\Model
     {
         // Delete cached media entries
         $path_public     = DOCROOT.$this->get_public_path();
-        $path_thumbnails = DOCROOT.str_replace('media/', 'cache/media/', static::$public_path).$this->media_path;
+        $path_thumbnails = dirname(DOCROOT.str_replace('media/', 'cache/media', static::$public_path).$this->media_path);
         try {
             // delete_dir($path, $recursive, $delete_top)
             is_link($path_public)    and \File::delete($path_public);

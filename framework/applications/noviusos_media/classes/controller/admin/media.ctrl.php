@@ -48,6 +48,13 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
     public function before_save($media, $data)
     {
         $is_uploaded = isset($_FILES['media']) and is_uploaded_file($_FILES['media']['tmp_name']);
+
+        // File must be provided for a new media
+        if ($this->is_new && !$is_uploaded) {
+            throw new \Exception(__('Please pick a file from your hard drive.'));
+        }
+
+        // Retrieve pathinfo, either from uploaded or existing file
         if ($is_uploaded) {
             $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
@@ -55,10 +62,8 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             if (in_array($pathinfo['extension'], $disallowed_extensions)) {
                 throw new \Exception(__('This extension is not allowed due to security reasons.'));
             }
-        } elseif (!$media->is_new()) {
+        } elseif (!$this->is_new) {
             $pathinfo = pathinfo(APPPATH.$media->get_private_path());
-        } else {
-            throw new \Exception(__('Please pick a file from your hard drive.'));
         }
 
         // Empty title = auto-generated from file name
@@ -78,54 +83,45 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
 
         $media->observe('before_save');
         $dest = APPPATH.$media->get_private_path();
+        $is_renamed = $this->clone->get_private_path() != $media->get_private_path();
 
-        if ($media->is_new()) {
-
+        // Check duplicate / write permissions
+        if ($this->is_new || $is_renamed) {
             if (is_file($dest)) {
                 throw new \Exception(__('A file with the same name already exists.'));
             }
 
-            // Create the directory if needed
-            $dest_dir = dirname($dest).'/';
-            $base_dir = APPPATH.\Nos\Media\Model_Media::$private_path;
-            $remaining_dir = str_replace($base_dir, '', $dest_dir);
-            // chmod  is 0777 here because it should be restricted with by the umask
-            is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
+            if ($this->is_new || !$is_uploaded) {
+                // Create the directory if needed
+                $dest_dir = dirname($dest);
+                $base_dir = APPPATH.\Nos\Media\Model_Media::$private_path;
+                $remaining_dir = str_replace($base_dir, '', $dest_dir);
+                // chmod  is 0777 here because it should be restricted with by the umask
+                is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
 
-            if (!is_writeable($dest_dir)) {
-                throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
-            }
-        } else {
-            if ($this->clone->get_private_path() != $media->get_private_path()) {
-                if (is_file($dest)) {
-                    throw new \Exception(__('A file with the same name already exists.'));
+                if (!is_writeable($dest_dir)) {
+                    throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
                 }
-
-                if ($is_uploaded) {
-                    $this->clone->delete_from_disk();
-                } else {
-                    // Create the directory if needed
-                    $dest_dir = dirname($dest);
-                    $base_dir = APPPATH.\Nos\Media\Model_Media::$private_path;
-                    $remaining_dir = str_replace($base_dir, '', $dest_dir);
-                    // chmod  is 0777 here because it should be restricted with by the umask
-                    is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
-
-                    if (!is_writeable($dest_dir)) {
-                        throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
-                    }
-                    \File::rename(APPPATH.$this->clone->get_private_path(), $dest);
-                }
-                $this->clone->delete_public_cache();
             }
         }
+
+        // Delete old files
+        if (!$this->is_new && ($is_uploaded || $is_renamed)) {
+            $this->clone->delete_from_disk();
+            $this->clone->delete_public_cache();
+        }
+
+        // Write the file
         if ($is_uploaded) {
-            // Move the file
+            // From upload
             if (move_uploaded_file($_FILES['media']['tmp_name'], $dest)) {
                 chmod($dest, 0664);
             } else {
                 throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
             }
+        } else if ($is_renamed) {
+            // From existing file
+            \File::rename(APPPATH.$this->clone->get_private_path(), $dest);
         }
     }
 
