@@ -49,10 +49,6 @@ return array(
     #: views/admin/media_delete.view.php:26
     'The media is used <strong>{{count}} times</strong> by your applications.' => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
 
-    #: views/admin/media_delete.view.php:30
-    #: views/admin/folder_delete.view.php:30
-    'To confirm the deletion, you need to enter this number in the field below:' => 'Pour confirmer la suppression, vous devez entrer ce nombre dans le champ ci-dessous&nbsp;:',
-
     #: views/admin/media_delete.view.php:31
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
 

@@ -288,6 +288,8 @@ return array(
     #: config/i18n_common.config.php:33
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Nous ne pouvons supprimer cet item car le nombre de sous-items indiqué estfaux. Merci de le corriger.',
 
+    'To confirm the deletion, you need to enter this number in the field below:' => 'Pour confirmer la suppression, vous devez entrer ce nombre dans le champ ci-dessous&nbsp;:',
+
     #: config/i18n_common.config.php:35
     '1 item' => '1 item',
 
