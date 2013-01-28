@@ -43,6 +43,10 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
             $this->_properties['level_property'] = \Arr::get($tree, 'level_property', false);
         }
 
+        if (!empty($tree) && empty($this->_properties['parent_relation'])) {
+            $this->_properties['parent_relation'] = \Arr::get($tree, 'parent_relation', false);
+        }
+
         if (!empty($this->_properties['parent_relation'])) {
             $this->_parent_relation = $class::relations($this->_properties['parent_relation']);
         }
