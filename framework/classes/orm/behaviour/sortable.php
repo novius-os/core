@@ -75,10 +75,10 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
     {
         $sort_property = $this->_properties['sort_property'];
         if (empty($item->{$sort_property})) {
-            $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-            if (!empty($translatable)) {
-                if (!empty($item->{$translatable['common_id_property']})) {
-                    $obj_main = $item->find_main_lang();
+            $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
+            if (!empty($twinnable)) {
+                if (!empty($item->{$twinnable['common_id_property']})) {
+                    $obj_main = $item->find_main_context();
                     $item->{$sort_property} = $obj_main->{$sort_property};
                     return;
                 }
@@ -119,9 +119,10 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         if ($this->_sort_change) {
             $this->_sort_change = false;
             $sort_property = $this->_properties['sort_property'];
-            $translatable = $item->behaviours('Nos\Orm_Behaviour_Translatable');
-            if (!empty($translatable) && !$item->is_main_lang()) {
-                $obj_main = $item->find_main_lang();
+            $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
+            $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
+            if (!empty($twinnable) && !$item->is_main_context()) {
+                $obj_main = $item->find_main_context();
                 $obj_main->set($sort_property, $item->get($sort_property));
                 $obj_main->save();
                 return;
@@ -130,52 +131,48 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
             $item->observe('before_sort');
 
             $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
+            $params = array(
+                'order_by' => array($sort_property => 'ASC'),
+            );
             if (!empty($tree)) {
                 $parent = $item->get_parent();
-                if (!empty($translatable)) {
+                if (!empty($twinnable)) {
                     if (!empty($parent)) {
-                        $unsorted = $item::find()->related($tree['parent_relation'], array(
+                        $parents = $item::find('all', array(
                             'where' => array(
-                                array($translatable['common_id_property'], $parent->{$translatable['common_id_property']}),
-                                array($translatable['is_main_property'], true),
+                                array($twinnable['common_id_property'], $parent->{$twinnable['common_id_property']}),
                             ),
-                        ))->order_by(array($sort_property => 'ASC'))->get();
-                    } else {
-                        $unsorted = $item::find('all', array(
-                            'where' => array(
-                                array('parent', $parent),
-                                array($translatable['is_main_property'], true),
-                            ),
-                            'order_by' => array($sort_property => 'ASC'),
                         ));
+                        $parents_id = array_keys($parents);
+                        $params['where'] =  array(
+                            array($item->parent_relation()->key_from[0], 'IN', $parents_id),
+                            array($twinnable['is_main_property'], true),
+                        );
+                    } else {
+                        $params['where'] = array(
+                            array('parent', $parent),
+                            array($twinnable['is_main_property'], true),
+                        );
                     }
                 } else {
-                    $unsorted = $item::find('all', array(
-                        'where' => array(
-                            array('parent', $parent),
-                        ),
-                        'order_by' => array($sort_property => 'ASC'),
-                    ));
+                    $params['where'] = array(array('parent', $parent));
+                    if (!empty($contextable)) {
+                        $params['where'][] = array($contextable['context_property'], $item->{$contextable['context_property']});
+                    }
                 }
             } else {
-                if (!empty($translatable)) {
-                    $unsorted = $item::find('all', array(
-                        'where' => array(
-                            array($translatable['is_main_property'], true),
-                        ),
-                        'order_by' => array($sort_property => 'ASC'),
-                    ));
-                } else {
-                    $unsorted = $item::find('all', array(
-                        'order_by' => array($sort_property => 'ASC'),
-                    ));
+                if (!empty($twinnable)) {
+                    $params['where'] = array(array($twinnable['is_main_property'], true));
+                } elseif (!empty($contextable)) {
+                    $params['where'] = array(array($contextable['context_property'], $item->{$contextable['context_property']}));
                 }
             }
+            $unsorted = $item::find('all', $params);
             $i = 1;
             $pk = \Arr::get($item->primary_key(), 0);
             foreach ($unsorted as $u) {
-                if (!empty($translatable)) {
-                    $item::query()->set($sort_property, $i)->where($translatable['common_id_property'], $u->{$translatable['common_id_property']})->update();
+                if (!empty($twinnable)) {
+                    $item::query()->set($sort_property, $i)->where($twinnable['common_id_property'], $u->{$twinnable['common_id_property']})->update();
                 } else {
                     $item::query()->set($sort_property, $i)->where($pk, $u->{$pk})->update();
                 }

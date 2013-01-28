@@ -559,6 +559,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $behaviour_tree = $model_from::behaviours('Nos\Orm_Behaviour_Tree');
             if (!empty($behaviour_tree)) {
                 $parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
+                $behaviour_twinnable = $model_from::behaviours('Nos\Orm_Behaviour_Twinnable');
+                if (!empty($behaviour_twinnable) && !empty($parent)) {
+                    $parent = $parent->find_context($from->get_context());
+                }
                 $from->set_parent($parent);
             }
 
