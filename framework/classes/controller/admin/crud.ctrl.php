@@ -208,7 +208,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             // Translation: we have a common_id and can determine the parent
             if (!empty($this->item->{$this->behaviours['twinnable']['common_id_property']})) {
                 $model = $this->config['model'];
-                $item_context_common = $model::find($this->item->{$this->behaviours['twinnable']['common_id_property']});
+                $common_id_property = $this->behaviours['twinnable']['common_id_property'];
+                $item_context_common = $model::find('first', array(
+                    'where' => array(
+                        array($common_id_property, $this->item->{$common_id_property}),
+                    ),
+                ));
                 $item_parent = $item_context_common->get_parent();
 
                 // Fetch in the appropriate context

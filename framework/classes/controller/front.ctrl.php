@@ -47,6 +47,8 @@ class Controller_Front extends Controller
     protected $_page;
     protected $_page_id;
 
+    protected $_wysiwyg_name = null;
+
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
@@ -185,6 +187,14 @@ class Controller_Front extends Controller
     public function getPage()
     {
         return $this->_page;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWysiwygName()
+    {
+        return $this->_wysiwyg_name;
     }
 
     /**
@@ -462,8 +472,10 @@ class Controller_Front extends Controller
 
         // Scan all wysiwyg
         foreach ($this->_template['layout'] as $wysiwyg_name => $layout) {
+            $this->_wysiwyg_name = $wysiwyg_name;
             $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->_page->wysiwygs->{$wysiwyg_name});
         }
+        $this->_wysiwyg_name = null;
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
         $this->_view->set('title', $this->_title, false);
