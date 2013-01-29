@@ -137,6 +137,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         return parent::save($item, $data) + array(
             'thumbnailUrl' => $this->item->get_public_path_resized(512, 512),
             'media_file' => $this->item->media_file,
+            'media_ext' => $this->item->media_ext,
         );
     }
 

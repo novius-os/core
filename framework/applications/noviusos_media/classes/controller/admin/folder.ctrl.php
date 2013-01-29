@@ -53,6 +53,13 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         }
     }
 
+    public function save($item, $data)
+    {
+        return parent::save($item, $data) + array(
+            'medif_dir_name' => $item->medif_dir_name,
+        );
+    }
+
     public function delete()
     {
         $count_medias = $this->item->count_media();
