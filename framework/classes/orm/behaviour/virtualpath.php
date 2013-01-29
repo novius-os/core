@@ -124,7 +124,9 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         }
         // Item's virtual path has changed : set is new virtual path, update and save diff array, check uniqueness
         if ($dir_name_virtual_path !== false) {
-            $diff[0][$virtual_path_property] = $item->{$virtual_path_property};
+            if (!isset($diff[0][$virtual_path_property])) {
+                $diff[0][$virtual_path_property] = $item->{$virtual_path_property};
+            }
             $item->{$virtual_path_property} = $dir_name_virtual_path.$this->virtual_name($item).$new_extension;
             $diff[1][$virtual_path_property] = $item->{$virtual_path_property};
             $this->_data_diff[$item::implode_pk($item)] = $diff;
