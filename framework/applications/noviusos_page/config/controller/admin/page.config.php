@@ -179,7 +179,7 @@ return array(
             ),
         ),
         'page_type' => array(
-            'label' => __('Type: '),
+            'label' => __('Type:'),
             'form' => array(
                 'type' => 'select',
                 'options' => array(
