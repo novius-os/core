@@ -108,6 +108,8 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         $parent_has_changed = array_key_exists($key_from, $diff[0]) && $diff[0][$key_from] != $diff[1][$key_from];
 
         $dir_name_virtual_path = false;
+        $old_extension = $this->extension($item, true);
+        $new_extension = $this->extension($item);
         if ($item->is_new() || $parent_has_changed) {
             // Item is new or its parent has changed : retrieve virtual path dir name
             $class = $this->_parent_relation->model_to;
@@ -116,14 +118,14 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 $parent = $class::find($item->{$this->_parent_relation->key_from[0]});
             }
             $dir_name_virtual_path = ($parent !== null ? $parent->virtual_path(true) : '');
-        } else if (!empty($diff[1][$virtual_name_property])) {
+        } else if (!empty($diff[1][$virtual_name_property]) || $old_extension != $new_extension) {
             // Item's virtual name has changed : set virtual path dir name
             $dir_name_virtual_path = rtrim(dirname($item->{$virtual_path_property}), '/').'/';
         }
         // Item's virtual path has changed : set is new virtual path, update and save diff array, check uniqueness
         if ($dir_name_virtual_path !== false) {
             $diff[0][$virtual_path_property] = $item->{$virtual_path_property};
-            $item->{$virtual_path_property} = $dir_name_virtual_path.$this->virtual_name($item).$this->extension($item);
+            $item->{$virtual_path_property} = $dir_name_virtual_path.$this->virtual_name($item).$new_extension;
             $diff[1][$virtual_path_property] = $item->{$virtual_path_property};
             $this->_data_diff[$item::implode_pk($item)] = $diff;
 
