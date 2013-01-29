@@ -21,25 +21,6 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     }
 
     /**
-     *  Set up the first page created in a context as the homepage.
-     */
-    protected function init_item()
-    {
-        parent::init_item();
-
-        // The first page we create is a homepage
-        $context_has_home = (int) (bool) Model_Page::count(array(
-            'where' => array(
-                array('page_entrance', '=', 1),
-                array('page_context', $this->item->page_context),
-            ),
-        ));
-        // $context_has_home is either 0 or 1 with the double cast
-        $this->item->page_home     = 1 - $context_has_home;
-        $this->item->page_entrance = 1 - $context_has_home;
-    }
-
-    /**
      * Saves the wysiwyg. They're not part of the fields and handled automatically, because we don't know how much there are.
      *
      * @param $page
@@ -48,6 +29,20 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     public function before_save($page, $data)
     {
         parent::before_save($page, $data);
+
+        //Set up the first page created in a context as the homepage.
+        if ($this->is_new) {
+            // The first page we create is a homepage
+            $context_has_home = (int) (bool) Model_Page::count(array(
+                'where' => array(
+                    array('page_entrance', '=', 1),
+                    array('page_context', $this->item->page_context),
+                ),
+            ));
+            // $context_has_home is either 0 or 1 with the double cast
+            $page->page_home     = 1 - $context_has_home;
+            $page->page_entrance = 1 - $context_has_home;
+        }
 
         foreach (\Input::post('wysiwyg', array()) as $key => $text) {
             $page->wysiwygs->$key = $text;
