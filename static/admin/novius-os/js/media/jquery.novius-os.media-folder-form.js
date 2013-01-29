@@ -44,8 +44,10 @@ define('jquery-nos-media-folder-form',
                         });
                     }
 
-                    $container.find('form').bind('ajax_success', function() {
-                        $(this).nosDialog('close');
+                    $container.closest('form').bind('ajax_success', function(e, json) {
+                        if (json.medif_dir_name) {
+                            $seo_title.val(json.medif_dir_name);
+                        }
                     });
                 });
             }

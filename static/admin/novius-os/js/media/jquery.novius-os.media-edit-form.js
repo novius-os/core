@@ -44,6 +44,9 @@ define('jquery-nos-media-edit-form',
                         if (json.media_file) {
                             $slug.val(json.media_file);
                         }
+                        if (json.media_ext) {
+                            $container.find('.media_extension').text(json.media_ext);
+                        }
                     });
                 });
             }
