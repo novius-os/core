@@ -72,7 +72,7 @@ class Controller_Front extends Controller
         }
 
         \Event::trigger('front.start');
-        \Event::trigger_function('front.start', array(&$url));
+        \Event::trigger_function('front.start', array(array('url' => &$url)));
 
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
