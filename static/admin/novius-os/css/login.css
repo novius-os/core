@@ -33,8 +33,7 @@ body {
 #login .wijmo-checkbox label  {
 	display: inline-block;
 	text-align: right;
-	width: 150px;
-    padding-left: 0.4em;
+    padding-left: 1em;
 }
 
 .nos-login-error {

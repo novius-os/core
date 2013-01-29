@@ -15,7 +15,11 @@ $uniqid = uniqid(str_replace(':', '_', $context).'_');
 $labels = array();
 $possible = $item->get_possible_context();
 $main_context = $item->find_main_context();
-$common_id = $main_context ? $main_context->id : false;
+if (!empty($main_context)) {
+    $common_id = $main_context->{$crud['behaviours']['twinnable']['common_id_property']};
+} else {
+    $common_id = false;
+}
 
 $view_params['container_id'] = $uniqid;
 

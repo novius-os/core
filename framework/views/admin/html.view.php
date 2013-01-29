@@ -430,7 +430,10 @@ if ($assets_minified) {
 </script>
 <script type="text/javascript">
     require(['jquery-nos'], function($) {
-        $.nosLang = '<?= \Session::user()->user_lang; ?>';
+        $.nosLang = '<?php
+            $user = \Session::user();
+            echo !empty($user) ? $user->user_lang : \Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
+            ?>';
         $.nosTexts = $.extend($.nosTexts, {
             chooseMediaFile : <?= \Format::forge(__('Choose a media file'))->to_json() ?>,
             chooseMediaImage : <?= \Format::forge(__('Choose a image'))->to_json() ?>,

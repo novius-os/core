@@ -148,20 +148,25 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
         }
 
-        static $in_progress = array();
+        $item->observe('check_change_parent');
+
+        static $in_progress_check = array();
 
         // Prevents looping in the observer
-        $items = $this->find_other_context($item);
-        if (!in_array($item->id, $in_progress)) {
-            $in_progress = array_keys($items);
+        if (!in_array($item->id, $in_progress_check)) {
+            $items = $this->find_other_context($item);
+            $in_progress_check = array_keys($items);
 
             foreach ($items as $it) {
                 $parent = $new_parent === null ? null : $new_parent->find_context($it->get_context());
                 $it->set_parent($parent);
+                $it->observe('check_change_parent');
+            }
 
+            foreach ($items as $it) {
                 $it->save();
             }
-            $in_progress = array();
+            $in_progress_check = array();
         }
     }
 

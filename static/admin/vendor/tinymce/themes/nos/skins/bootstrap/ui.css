@@ -1103,7 +1103,7 @@
     background-position: 0 -40px !important;
 }
 
-.bootstrapSkin .mce_spellchecker span.mceAction {
+.bootstrapSkin span.mce_spellchecker {
     background-position: -540px -20px !important;
 }
 

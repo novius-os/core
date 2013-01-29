@@ -28,7 +28,7 @@ if ($usage_count == 0) {
     ), array(
         '{{count}}' => $usage_count,
     )) ?></p>
-    <p><?= __('To confirm the deletion, you need to enter this number in the field below:') ?></p>
+    <p><?= $crud['config']['i18n']['deleting confirmation number'] ?></p>
     <p><?= strtr(__('Yes, I want to delete this media file even though it is used {{count}} times.'), array(
         '{{count}}' => '<input class="verification" data-verification="'.$usage_count.'" size="'.(mb_strlen($usage_count) + 1).'" />',
     )); ?></p>

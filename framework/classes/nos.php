@@ -78,9 +78,9 @@ class Nos
      * @param  \Nos\Controller $controller Context for the execution
      * @return string
      */
-    public static function parse_wysiwyg($content, $controller)
+    public static function parse_wysiwyg($content)
     {
-        static::_parse_enhancers($content, $controller);
+        static::_parse_enhancers($content);
         static::_parse_medias($content);
         static::_parse_internals($content);
 
@@ -95,7 +95,7 @@ class Nos
         return $content;
     }
 
-    protected static function _parse_enhancers(&$content, $controller)
+    protected static function _parse_enhancers(&$content)
     {
         // Fetch the available functions
         \Nos\Config_Data::load('enhancers');
@@ -105,8 +105,8 @@ class Nos
         $callback = array(get_called_class(), 'get_enhancer_content');
         static::parse_enhancers(
             $content,
-            function ($enhancer, $config, $tag) use (&$content, $controller, $callback) {
-                $function_content = call_user_func($callback, $enhancer, $config, $controller);
+            function ($enhancer, $config, $tag) use (&$content, $callback) {
+                $function_content = call_user_func($callback, $enhancer, $config);
                 $content = str_replace($tag, $function_content, $content);
             }
         );
@@ -125,7 +125,7 @@ class Nos
         }
     }
 
-    public static function get_enhancer_content($enhancer, $args, $controller)
+    public static function get_enhancer_content($enhancer, $args)
     {
         $args = json_decode(
             strtr(
@@ -144,7 +144,6 @@ class Nos
         false && \Fuel::$profiling && \Profiler::console(
             array(
                 'enhancer' => $enhancer,
-                'controller' => get_class($controller),
             )
         );
 
@@ -159,8 +158,8 @@ class Nos
                 $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
             }
         } else {
-            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found in '.get_class($controller).'.' : '';
-            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found in '.get_class($controller).'.');
+            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found.' : '';
+            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found.');
         }
 
         return $function_content;

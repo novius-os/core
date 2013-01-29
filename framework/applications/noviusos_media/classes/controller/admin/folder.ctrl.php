@@ -38,6 +38,7 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
     public function before_save($folder, $data)
     {
         parent::before_save($folder, $data);
+        $folder->observe('before_save');
 
         if (!$folder->is_new()) {
             if ($folder->path() != $this->clone->path()) {
@@ -50,6 +51,13 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
                 $this->clone->delete_public_cache();
             }
         }
+    }
+
+    public function save($item, $data)
+    {
+        return parent::save($item, $data) + array(
+            'medif_dir_name' => $item->medif_dir_name,
+        );
     }
 
     public function delete()

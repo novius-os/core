@@ -35,8 +35,18 @@ define('jquery-nos-media-edit-form',
                         }
                     }).triggerHandler('change');
 
-                    $container.find('form').bind('ajax_success', function() {
-                        $(this).nosDialog('close');
+                    $container.closest('form').bind('ajax_success', function(e, json) {
+                        if (json.thumbnailUrl) {
+                            $container.find('.preview_zone img').attr({
+                                src: json.thumbnailUrl
+                            });
+                        }
+                        if (json.media_file) {
+                            $slug.val(json.media_file);
+                        }
+                        if (json.media_ext) {
+                            $container.find('.media_extension').text(json.media_ext);
+                        }
                     });
                 });
             }

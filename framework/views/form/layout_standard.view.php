@@ -39,7 +39,7 @@ $large = !empty($large) && $large == true;
         <div class="col <?= $large ? 'c12' : 'c10' ?>">
             <div class="line ui-widget" style="margin:2em 0 1em;">
                 <table class="title-fields" style="margin-bottom:1em;">
-                    <tr verti>
+                    <tr>
 <?php
 if (!empty($medias)) {
     $medias = (array) $medias;
@@ -75,7 +75,7 @@ if (!empty($item) && count($contexts) > 1) {
     }
 }
 ?>
-                        <td class="table-field" style="<?= !empty($medias) ? 'line-height:60px;' : '' ?>">
+                        <td style="<?= !empty($medias) ? 'line-height:60px;' : '' ?>">
 <?php
 if (!empty($title)) {
     $title = (array) $title;

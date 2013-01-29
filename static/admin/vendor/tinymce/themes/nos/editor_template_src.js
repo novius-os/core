@@ -264,7 +264,7 @@
 				// Rebuilds the enhancer, as if we just inserted them (adds the action links like delete)
 				$body.find('.nosEnhancer, .nosEnhancerInline').each(function() {
 					var enhancer = $(this);
-                    enhancer.html('Loading...');
+                    enhancer.html(ed.getLang('nos.enhancer_loading'));
 
 					var enhancer_id = $(this).data('enhancer');
 					var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
@@ -360,7 +360,7 @@
 
 				// Add a new paragraph before a display:block enhancer
 				if (action == 'addParagraphBefore') {
-					p = $('<p>New paragraph</p>');
+					p = $('<p></p>').text(ed.getLang('nos.enhancer_new_paragraph'));
 					target.closest('.nosEnhancer, .nosEnhancerInline').before(p);
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
@@ -373,7 +373,7 @@
 
 				// Add a new paragraph after a display:block enhancer
 				if (action == 'addParagraphAfter') {
-					p = $('<p>New paragraph</p>');
+					p = $('<p></p>').text(ed.getLang('nos.enhancer_new_paragraph'));
 					target.closest('.nosEnhancer, .nosEnhancerInline').after(p);
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
@@ -1521,9 +1521,10 @@
 				c.setActive(!co && !!p && n.className.indexOf('mceItem') == -1);
 
 			if (c = cm.get('styleselect')) {
-                c.showMenu();
-                c.hideMenu();
-                ed.focus();
+                if (!c.isMenuRendered) {
+                    c.renderMenu();
+                    c.isMenuRendered = true;
+                }
 
 				formatNames = [];
 				each(c.items, function(item) {
@@ -1898,10 +1899,12 @@
 			    self   = this,
                 data_config = edit ? $.extend(true, {
                         nosContext : self.settings.theme_nos_context,
-                        enhancer: metadata.id
+                        enhancer: metadata.id,
+                        enhancerAction: 'update'
                     }, edit.data('config') || {}) : {
                         nosContext : self.settings.theme_nos_context,
-                        enhancer: metadata.id
+                        enhancer: metadata.id,
+                        enhancerAction: 'insert'
                     },
                 save = function(json) {
 
@@ -2094,16 +2097,20 @@
 			// Don't bind click handlers here, it will mess up when using undo/redo, which only tracks the HTML content
 			// Instead, use a global click handler and detect the action using data-action="..."
 			// Ctrf + F using an action name (removeEnhancer or addParagraphAfter) to find where this is :)
-			var deleteLink = $('<a href="#" data-action="removeEnhancer">Delete</a>')
+			var deleteLink = $('<a href="#" data-action="removeEnhancer"></a>')
+                    .text(ed.getLang('nos.enhancer_delete'))
                     .attr('title', ed.getLang('nos.enhancer_delete'))
                     .addClass('nos_enhancer_action nos_enhancer_action_delete'),
-			    editLink = $('<a href="#" data-action="editEnhancer">Options</a>')
+			    editLink = $('<a href="#" data-action="editEnhancer"></a>')
+                    .text(ed.getLang('nos.enhancer_options'))
                     .attr('title', ed.getLang('nos.enhancer_options'))
-                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),
-			    insertAfter = $('<a href="#" data-action="addParagraphAfter">New paragraph after</a>')
+                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),f
+			    insertAfter = $('<a href="#" data-action="addParagraphAfter"></a>')
+                    .text(ed.getLang('nos.enhancer_p_after'))
                     .attr('title', ed.getLang('nos.enhancer_p_after'))
                     .addClass('nos_enhancer_action nos_enhancer_action_after'),
-			    insertBefore = $('<a href="#" data-action="addParagraphBefore">New paragraph before</a>')
+			    insertBefore = $('<a href="#" data-action="addParagraphBefore"></a>')
+                    .text(ed.getLang('nos.enhancer_p_before'))
                     .attr('title', ed.getLang('nos.enhancer_p_before'))
                     .addClass('nos_enhancer_action nos_enhancer_action_before');
 

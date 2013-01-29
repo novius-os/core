@@ -12,7 +12,6 @@ $uniqid_close = uniqid('close_');
 if (!$item->is_new()) {
     ?>
     <div id="<?= $uniqid_close ?>" style="display:none;">
-        <p><?= $crud['config']['i18n']['deleted popup title'] ?></p>
         <p>&nbsp;</p>
         <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?=$crud['config']['i18n']['deleted popup close'] ?></button></p>
     </div>

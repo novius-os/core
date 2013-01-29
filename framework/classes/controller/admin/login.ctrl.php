@@ -23,7 +23,7 @@ class Controller_Admin_Login extends Controller
             $this->redirect();
         }
 
-        I18n::setLocale(\Input::get('lang', 'en_GB'));
+        I18n::setLocale(\Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB')));
         I18n::current_dictionary('nos::common');
     }
 

@@ -81,8 +81,9 @@ class Model_Folder extends \Nos\Orm\Model
     public function delete_public_cache()
     {
         // Delete cached media entries
-        $path_public     = DOCROOT.Model_Media::$public_path.$this->medif_path;
+        $path_public     = DOCROOT.Model_Media::$public_path.ltrim($this->medif_path, '/');
         $path_thumbnails = str_replace(DOCROOT.'media/', DOCROOT.'cache/media/', $path_public);
+
         try {
             // delete_dir($path, $recursive, $delete_top)
             is_dir($path_public) and \File::delete_dir($path_public, true, true);
@@ -101,7 +102,7 @@ class Model_Folder extends \Nos\Orm\Model
         $path = $this->path();
         if (is_dir($path)) {
             // delete_dir($path, $recursive, $delete_top)
-            return \File::delete_dir($path, true, true);
+            return is_dir($path) and \File::delete_dir($path, true, true);
         }
 
         return true;
@@ -109,7 +110,7 @@ class Model_Folder extends \Nos\Orm\Model
 
     public function path($file = '')
     {
-        return APPPATH.'data/media/'.$this->medif_path.$file;
+        return APPPATH.'data/media'.$this->medif_path.$file;
     }
 
     public function count_media()
