@@ -84,7 +84,7 @@ ob_start();
         function($) {
             $(function() {
                 $('#wrapper').nosTabs('update', {
-                    label : 'Error - We\'re working on it'
+                    label : <?= \Format::forge(__('Something went wrong'))->to_json() ?>
                     //iconUrl : 'static/novius-os/admin/novius-os/img/icons/exclamation--frame.png'
                 });
             });
@@ -96,17 +96,8 @@ ob_end_clean();
 ob_start();
 ?>
     <div id="wrapper">
-        <h1>Oops, I'm hurt</h1>
-        <a href="#" onclick="javascript:fuel_toggle('error');return false;" style="float:left;text-align: center;"><img src="static/novius-os/admin/novius-os/img/wip.png"/><br /><span style="position:relative;top:-2em;">Click me if you're not afraid</span></a>
-        <br /><br /><br />
-        <p class="wip">
-            <img src="static/novius-os/admin/novius-os/img/flags/fr.png" />&nbsp; Novius OS n'est pas encore stable.
-        </p>
-        <br />
-        <p class="wip">
-            <img src="static/novius-os/admin/novius-os/img/flags/gb.png" />&nbsp; We're sorry Novius OS has been a bad boy.
-        </p>
-        <br style="clear:left;" />
+        <h1><?= __('You won’t like this: Something went wrong') ?></h1>
+        <p><?= strtr(__('What went wrong? <a>If you’re a developer, just click to find out</a>. If you’re not, go ask a developer to help you.'), array('<a>' => '<a href="#" onclick="javascript:fuel_toggle(\'error\');return false;">')) ?></p>
 
         <div id="error" style="display:none;">
 

@@ -67,7 +67,7 @@ a:hover {
         <p><a href="https://github.com/novius-os/novius-os/wiki/%28EN%29-Applications" target="_blank">Have a look at the documentation</a> and <a href="https://github.com/novius-os/noviusos_monkey" target="_blank">copy the sample application</a> to get started.</p>
 
         <h2>I don't know</h2>
-        <p><a href="admin">Go to the administration panel</a>, it's a good place to start.</p>
+        <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
     </div>
 </body>
 </html>
