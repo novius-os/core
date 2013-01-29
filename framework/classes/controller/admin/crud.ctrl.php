@@ -625,11 +625,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         if (count($sites) === 1) {
+            // Note to translator: action (button)
             $label = __('Translate');
         } elseif (count($locales) === 1) {
-            $label = __('Add to another context');
+            $label = __('Add to another site');
         } else {
-            $label = __('Translate / Add to another context');
+            $label = __('Translate / Add to another site');
         }
 
         return array(

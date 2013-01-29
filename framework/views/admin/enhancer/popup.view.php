@@ -38,6 +38,7 @@ foreach ($layout as $view) {
 $enhancerAction = \Arr::get($enhancer_args, 'enhancerAction', null);
 switch ($enhancerAction) {
     case 'update' :
+        // Note to translator: action (button)
         $submit_label = __('Update');
         break;
 

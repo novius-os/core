@@ -435,8 +435,8 @@ if ($assets_minified) {
             echo !empty($user) ? $user->user_lang : \Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
             ?>';
         $.nosTexts = $.extend($.nosTexts, {
-            chooseMediaFile : <?= \Format::forge(__('Choose a media file'))->to_json() ?>,
-            chooseMediaImage : <?= \Format::forge(__('Choose a image'))->to_json() ?>,
+            chooseMediaFile : <?= \Format::forge(__('Select a media file'))->to_json() ?>,
+            chooseMediaImage : <?= \Format::forge(__('Pick an image'))->to_json() ?>,
             errorImageNotfind : <?= \Format::forge(__('We’re afraid we cannot find this image.'))->to_json() ?>
         });
     });

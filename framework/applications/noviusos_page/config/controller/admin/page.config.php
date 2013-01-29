@@ -163,7 +163,7 @@ return array(
             ),
         ),
         'page_external_link' => array(
-            'label' => __('URL: '),
+            'label' => __('URL:'),
             'form' => array(
                 'type' => 'text',
             ),
