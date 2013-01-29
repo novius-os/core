@@ -1521,9 +1521,10 @@
 				c.setActive(!co && !!p && n.className.indexOf('mceItem') == -1);
 
 			if (c = cm.get('styleselect')) {
-                c.showMenu();
-                c.hideMenu();
-                ed.focus();
+                if (!c.isMenuRendered) {
+                    c.renderMenu();
+                    c.isMenuRendered = true;
+                }
 
 				formatNames = [];
 				each(c.items, function(item) {
