@@ -77,8 +77,12 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
+            // Cache exist, retrieve his content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
+            // Cache not exist, try to found page for this URL
+
+            // Build array of possibles contexts for this absolute URL
             $contexts_possibles = array();
             foreach (Tools_Context::contexts() as $context => $domains) {
                 foreach ($domains as $domain) {
@@ -91,66 +95,69 @@ class Controller_Front extends Controller
 
             $cache->start();
 
+            // Filter URLs enhanced : remove if not in possibles contexts, remove if url not match
             $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
-            $url_enhanced = array_filter($url_enhanced, function ($v) use ($contexts_possibles) {
-                return in_array($v['context'], array_keys($contexts_possibles));
+            $base_href = $this->_base_href;
+            $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts_possibles, $base_href, $url) {
+                $url_absolute = $contexts_possibles[$page_params['context']].$page_params['url'];
+                return in_array($page_params['context'], array_keys($contexts_possibles)) && mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
             });
 
+            // Add current url to URLs enhanced
             $url_enhanced['current'] = array(
                 'url' => $url.'/',
             );
 
             $_404 = true;
+            // Loop URLs enhanced for one that not send a NotFoundException
             foreach ($url_enhanced as $page_id => $page_params) {
                 $temp_url = $page_params['url'];
-                if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-                    if ($page_id != 'current') {
-                        $this->_contexts_possibles = array($page_params['context']);
-                        $this->_page_id = $page_id;
 
-                        $temp_url = mb_substr(\Uri::base(false).$temp_url, mb_strlen($contexts_possibles[$page_params['context']]));
-                        if (!in_array($temp_url, array('', '/'))) {
-                            $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
-                            $this->_enhanced_url_path = $temp_url;
-                        } else {
-                            $this->_page_url = '';
-                            $this->_enhanced_url_path = '';
-                        }
-                        $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($contexts_possibles[$page_params['context']].$temp_url));
+                if ($page_id != 'current') {
+                    $this->_contexts_possibles = array($page_params['context']);
+                    $this->_page_id = $page_id;
+
+                    if (!in_array($temp_url, array('', '/'))) {
+                        $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
+                        $this->_enhanced_url_path = $temp_url;
                     } else {
-                        $this->_contexts_possibles = $contexts_possibles;
-                        $this->_page_id = null;
-                        $this->_page_url = $temp_url;
+                        $this->_page_url = '';
+                        $this->_enhanced_url_path = '';
                     }
-
-                    $_404 = false;
-                    try {
-                        $this->_generate_cache();
-                        $this->_context_url = $contexts_possibles[$this->_context];
-                    } catch (NotFoundException $e) {
-                        $_404 = true;
-                        $this->_page = null;
-                        $this->_enhanced_url_path = false;
-                        $this->_enhancer_url = false;
-                        continue;
-                    } catch (\Exception $e) {
-                        // Cannot generate cache: fatal error...
-                        //@todo : error page case
-                        exit($e->getMessage());
-                    }
-
-                    $content = $this->_view->render();
-
-                    $this->_handle_head($content);
-                    \Event::trigger_function('front.display', array(&$content));
-
-                    echo $content;
-
-                    $cache->save($no_cache ? -1 : \Config::get('novius-os.cache_duration_page', 5), $this);
-                    $content = $cache->execute();
-
-                    break;
+                    $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($contexts_possibles[$page_params['context']].$temp_url));
+                } else {
+                    $this->_contexts_possibles = $contexts_possibles;
+                    $this->_page_id = null;
+                    $this->_page_url = $temp_url;
                 }
+
+                $_404 = false;
+                try {
+                    $this->_generate_cache();
+                    $this->_context_url = $contexts_possibles[$this->_context];
+                } catch (NotFoundException $e) {
+                    $_404 = true;
+                    $this->_page = null;
+                    $this->_enhanced_url_path = false;
+                    $this->_enhancer_url = false;
+                    continue;
+                } catch (\Exception $e) {
+                    // Cannot generate cache: fatal error...
+                    //@todo : error page case
+                    exit($e->getMessage());
+                }
+
+                $content = $this->_view->render();
+
+                $this->_handle_head($content);
+                \Event::trigger_function('front.display', array(&$content));
+
+                echo $content;
+
+                $cache->save($no_cache ? -1 : \Config::get('novius-os.cache_duration_page', 5), $this);
+                $content = $cache->execute();
+
+                break;
             }
 
             if ($_404) {
