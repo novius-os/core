@@ -38,6 +38,7 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
     public function before_save($folder, $data)
     {
         parent::before_save($folder, $data);
+        $folder->observe('before_save');
 
         if (!$folder->is_new()) {
             if ($folder->path() != $this->clone->path()) {

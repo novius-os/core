@@ -118,7 +118,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
             $dir_name_virtual_path = ($parent !== null ? $parent->virtual_path(true) : '');
         } else if (!empty($diff[1][$virtual_name_property])) {
             // Item's virtual name has changed : set virtual path dir name
-            $dir_name_virtual_path = dirname(rtrim($item->{$virtual_path_property}, '/')).'/';
+            $dir_name_virtual_path = rtrim(dirname($item->{$virtual_path_property}), '/').'/';
         }
         // Item's virtual path has changed : set is new virtual path, update and save diff array, check uniqueness
         if ($dir_name_virtual_path !== false) {
