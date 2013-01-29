@@ -201,7 +201,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $this->item->{$this->config['environment_relation']->key_from[0]} = $this->item_environment->{$this->config['environment_relation']->key_to[0]};
         }
         if ($this->behaviours['contextable']) {
-            $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? : key(Tools_Context::contexts());
+            $this->item->{$this->behaviours['contextable']['context_property']} = \Input::get('context', false) ? :
+                (\Input::post($this->behaviours['contextable']['context_property']) ? : key(Tools_Context::contexts()));
         }
         if ($this->behaviours['twinnable'] && $this->behaviours['tree']) {
             // New page: no parent
