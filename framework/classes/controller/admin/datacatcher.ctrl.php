@@ -14,6 +14,12 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 {
     public $bypass   = true;
 
+    public function before()
+    {
+        parent::before();
+        \Nos\I18n::current_dictionary('nos::common');
+    }
+
     public function action_form()
     {
         $id = \Input::get('model_id');

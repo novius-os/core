@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 30/01/2013 14:07:42
+// Generated on 30/01/2013 16:59:25
 
-// 143 out of 145 messages are translated (98%).
-// 785 out of 801 words are translated (98%).
+// 145 out of 145 messages are translated (100%).
+// 801 out of 801 words are translated (100%).
 
 return array(
     #. Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
@@ -263,8 +263,7 @@ return array(
     'Search' => 'Recherche',
 
     #: views/admin/data_catcher/applications.view.php:57
-    #: 
-    '"{item}" can be shared with the following applications.' => '',
+    '‘{{item}}’ can be shared with the following applications.' => '«&nbsp;{{item}}&nbsp;» peut être partagé avec les applications suivantes.',
 
     #: views/admin/data_catcher/applications.view.php:58
     'Click to share:' => 'Cliquez pour partager&nbsp;:',
@@ -273,8 +272,7 @@ return array(
     '(Don’t worry, you’ll get a preview first)' => '(Cliquez sans crainte, il y a une étape de validation)',
 
     #: views/admin/data_catcher/applications.view.php:61
-    #: 
-    '"{item}" is automatically shared with the following applications.' => '',
+    '‘{{item}}’ is automatically shared with the following applications.' => '«&nbsp;{{item}}&nbsp;» est automatiquement partagé avec les applications suivantes.',
 
     #: views/admin/data_catcher/applications.view.php:62
     'No action required, click to customise:' => 'Vous n’avez rien à faire. Cliquez pour personnaliser&nbsp;:',
