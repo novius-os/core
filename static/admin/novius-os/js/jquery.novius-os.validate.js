@@ -31,6 +31,7 @@ define('jquery-nos-validate',
                         background : 'transparent',
                         border  : '0',
                         padding : '0 4px',
+                        width : '32px',
                         verticalAlign: 'middle'
                     })
                     .html('<span class="ui-icon ui-icon-alert nos-inline-icon16"></span>');
