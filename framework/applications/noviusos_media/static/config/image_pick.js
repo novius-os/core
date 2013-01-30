@@ -23,8 +23,6 @@ define(
             appDesk.appdesk.thumbnails.actions.unshift('pick');
             appDesk.appdesk.inspectors.preview.options.actions.unshift('pick');
 
-            log(appDesk, appDesk.i18n('Pick'), appDesk.i18n('Pick')._(), appDesk.i18n('Pick').label);
-
             return {
                 actions : {
                     pick : {
