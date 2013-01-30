@@ -47,7 +47,7 @@ if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget)) {
 }
 
 $image_id = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
-$options = array_keys($item->get_sharable_property(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
+$options = array_keys($item->get_sharable_property(\Nos\DataCatcher::TYPE_IMAGE.'.options', array()));
 
 $fields[\Nos\DataCatcher::TYPE_IMAGE] = array(
     'label' => __('Image:'),
