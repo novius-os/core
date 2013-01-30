@@ -832,7 +832,7 @@ class Model_Media_Provider implements \Iterator
         // Reuse the getter and fetch the media directly
         $media = $this->parent->{'medias->'.$value};
         if ($media === null) {
-            return $media;
+            return null;
         }
 
         return $media->get('media');
@@ -875,7 +875,9 @@ class Model_Media_Provider implements \Iterator
     {
         $keys = array();
         foreach ($this->parent->linked_medias as $media) {
-            $keys[] = $media->medil_key;
+            if ($this->__get($media->medil_key) !== null) {
+                $keys[] = $media->medil_key;
+            }
         }
         $this->iterator = $keys;
         reset($keys);
@@ -922,7 +924,7 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $wysiwyg = $this->parent->{'wysiwygs->'.$value};
         if ($wysiwyg === null) {
-            return $wysiwyg;
+            return null;
         }
 
         return $wysiwyg->get('wysiwyg_text');
@@ -956,9 +958,10 @@ class Model_Wysiwyg_Provider implements \Iterator
     public function rewind()
     {
         $keys = array();
-        $class = get_called_class();
         foreach ($this->parent->linked_wysiwygs as $wysiwyg) {
-            $keys[] = $wysiwyg->wysiwyg_key;
+            if ($this->__get($wysiwyg->wysiwyg_key) !== null) {
+                $keys[] = $wysiwyg->wysiwyg_key;
+            }
         }
         $this->iterator = $keys;
         reset($keys);
