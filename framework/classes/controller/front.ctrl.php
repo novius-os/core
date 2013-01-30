@@ -61,7 +61,6 @@ class Controller_Front extends Controller
         $this->_is_preview = \Input::get('_preview', false);
 
         $cache_path = (empty($url) ? 'index/' : $url);
-        $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
@@ -72,7 +71,9 @@ class Controller_Front extends Controller
         }
 
         \Event::trigger('front.start');
-        \Event::trigger_function('front.start', array(array('url' => &$url)));
+        \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
+
+        $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
