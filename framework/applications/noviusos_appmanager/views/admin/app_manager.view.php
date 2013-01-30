@@ -154,7 +154,7 @@ if ($local->is_dirty()) {
                         app: true,
                         iconSize: 32,
                         labelDisplay: false
-                    })
+                    });
 
                     $(".app_list_installed table").wijgrid({
                         rendered: function(args) {
