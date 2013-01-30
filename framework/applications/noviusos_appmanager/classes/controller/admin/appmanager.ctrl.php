@@ -74,8 +74,11 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         }
         $this->response(
             array(
-                'notify' => $notify,
                 // The tab will be refreshed by the javaScript within the view
+                'notify' => $notify,
+                'dispatchEvent' => array(
+                    'name' => 'Nos\Application',
+                ),
             )
         );
     }
@@ -102,8 +105,11 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
 
         $this->response(
             array(
-                'notify' => __('The application has been uninstalled.'),
                 // The tab will be refreshed by the javaScript within the view
+                'notify' => __('The application has been uninstalled.'),
+                'dispatchEvent' => array(
+                    'name' => 'Nos\Application',
+                ),
             )
         );
     }
