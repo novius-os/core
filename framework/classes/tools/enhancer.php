@@ -64,7 +64,7 @@ class Tools_Enhancer
                 if ((!$twinnable || $params['context'] == $item_context) && ($preview || $params['published'])) {
                     $page_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($page_params) {
-                        $urls[$page_id.'::'.$urlItem] = $page_params['url'].$urlItem;
+                        $urls[$page_id.'::'.$urlItem] = \Nos\Tools_Url::context($page_params['context']).$page_params['url'].$urlItem;
                     }
                 }
             }
