@@ -832,7 +832,8 @@ class Model_Media_Provider implements \Iterator
         // Reuse the getter and fetch the media directly
         $media = $this->parent->{'medias->'.$value};
         if ($media === null) {
-            return null;
+            // Don't return null, we need a reference here
+            return $media;
         }
 
         return $media->get('media');
@@ -924,7 +925,8 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $wysiwyg = $this->parent->{'wysiwygs->'.$value};
         if ($wysiwyg === null) {
-            return null;
+            // Don't return null, we need a reference here
+            return $wysiwyg;
         }
 
         return $wysiwyg->get('wysiwyg_text');
