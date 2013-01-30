@@ -75,7 +75,7 @@ if (!empty($item) && count($contexts) > 1) {
     }
 }
 ?>
-                        <td style="<?= !empty($medias) ? 'line-height:60px;' : '' ?>">
+                        <td style="<?= !empty($medias) ? 'line-height:60px;' : '' ?>"><div class="table-field">
 <?php
 if (!empty($title)) {
     $title = (array) $title;
@@ -85,7 +85,7 @@ if (!empty($title)) {
         if ($first) {
             $first = false;
         } else {
-            echo '</td><td>';
+            echo '</div></td><td><div class="table-field">';
         }
         $field = $fieldset->field($name);
         $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
@@ -98,7 +98,7 @@ if (!empty($title)) {
     }
 }
 ?>
-                        </td>
+                        </div></td>
                     </tr>
                 </table>
 <?php
