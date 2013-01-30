@@ -1,21 +1,19 @@
 <?php
 
-// Generated on 23/01/2013 11:25:53
+// Generated on 29/01/2013 19:08:29
 
-// 81 out of 81 messages are translated (100%).
-// 473 out of 473 words are translated (100%).
+// 84 out of 84 messages are translated (100%).
+// 485 out of 485 words are translated (100%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
-    #: classes/controller/admin/media.ctrl.php:79
-    #: classes/controller/admin/media.ctrl.php:95
+    #: classes/controller/admin/media.ctrl.php:91
     'A file with the same name already exists.' => 'Un fichier avec le même nom existe déjà.',
 
     #: classes/controller/admin/attachment.ctrl.php:49
     #: classes/controller/admin/attachment.ctrl.php:55
-    #: classes/controller/admin/media.ctrl.php:90
-    #: classes/controller/admin/media.ctrl.php:109
-    #: classes/controller/admin/media.ctrl.php:121
+    #: classes/controller/admin/media.ctrl.php:103
+    #: classes/controller/admin/media.ctrl.php:127
     'You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.' => 'Il y a un souci&nbsp;: Votre Novius OS n’est pas autorisé à enregistrer desfichiers sur ce serveur. Demandez à votre développeur ou administrateursystème de régler ce problème.',
 
     #: classes/controller/admin/attachment.ctrl.php:66
@@ -24,20 +22,20 @@ return array(
     #: classes/controller/admin/attachment.ctrl.php:116
     'This is unexpected: We cannot find the file. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inattendu&nbsp;: Nous n’arrivons pas à trouver ce fichier.Merci de ré-essayer. Contactez votre développeur ou Novius OS si le problèmepersiste. Nos excuses pour le désagrément occasionné.',
 
-    #: classes/controller/admin/media.ctrl.php:36
+    #: classes/controller/admin/media.ctrl.php:42
     'Change the file:' => 'Changer de fichier&nbsp;:',
 
-    #: classes/controller/admin/media.ctrl.php:50
-    'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
-
-    #: classes/controller/admin/media.ctrl.php:55
+    #: classes/controller/admin/media.ctrl.php:54
     'Please pick a file from your hard drive.' => 'Merci de sélectionner un fichier sur votre disque dur.',
+
+    #: classes/controller/admin/media.ctrl.php:63
+    'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
 
     #: classes/controller/admin/folder.ctrl.php:20
     #: classes/controller/admin/folder.ctrl.php:23
     'You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Vous ne pouvez modifier le fichier racine. (Mais comment avez-vous obtenu cemessage&nbsp;? Vous bidouillez le système, non&nbsp;?)',
 
-    #: classes/controller/admin/folder.ctrl.php:60
+    #: classes/controller/admin/folder.ctrl.php:68
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'Voilà qui est étrange&nbsp;: Ce dossier devrait être vide et ne l’est pas.Merci de contacter votre développeur ou Novius OS pour régler ce problème.Nos excuses pour le désagrément occasionné.',
 
     #: views/admin/media_delete.view.php:20
@@ -51,8 +49,6 @@ return array(
 
     #: views/admin/media_delete.view.php:31
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
-
-    'Pick' => 'Choisir',
 
     #: views/admin/wysiwyg_image.view.php:29
     'Pick another image' => 'Sélectionner une autre image',
@@ -73,6 +69,13 @@ return array(
 
     #: views/admin/wysiwyg_image.view.php:43
     'Alternative text (for accessibility):' => 'Texte alternatif (pour l’accessibilité)&nbsp;:',
+
+    #: views/admin/wysiwyg_image.view.php:44
+    #: views/admin/media_edit.view.php:49
+    #: views/admin/media_add.view.php:33
+    #: views/admin/attachment.view.php:46
+    #: views/admin/folder.view.php:47
+    'Use title' => 'Reprendre le titre',
 
     #: views/admin/wysiwyg_image.view.php:47
     'Width:' => 'Largeur&nbsp;:',
@@ -101,12 +104,6 @@ return array(
     #: views/admin/wysiwyg_image.view.php:76
     'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inhabituel&nbsp;: Il semble qu’aucune image n’ait étésélectionnée. Merci de ré-essayer. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
 
-    #: views/admin/media_edit.view.php:47
-    #: views/admin/media_add.view.php:33
-    #: views/admin/attachment.view.php:46
-    #: views/admin/folder.view.php:47
-    'Use title' => 'Reprendre le titre',
-
     #: views/admin/folder_delete.view.php:20
     'The folder is empty and can be safely deleted.' => 'Le dossier est vide et peut donc être supprimé sans problème.',
 
@@ -118,6 +115,12 @@ return array(
 
     #: views/admin/folder_delete.view.php:31
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Oui, je veux supprimer ce dossier et les {{count}} médias qu’il contient.',
+
+    #: views/admin/folder.view.php:51
+    'Change the folder\'s location:' => 'Changer l’emplacement du dossier&nbsp;:',
+
+    #: views/admin/folder.view.php:57
+    'Warning: moving a folder changes the URL of all the files it contains.' => 'Attention&nbsp;: déplacer un dossier change l’URL de tous les fichiers qu’il contient.',
 
     #: config/controller/admin/inspector/folder.config.php:20
     #: config/common/folder.config.php:17
@@ -156,7 +159,8 @@ return array(
     #: config/controller/admin/media.config.php:65
     'SEO, Media URL:' => 'Référencement, URL du média&nbsp;:',
 
-    #: config/controller/admin/attachment.config.php:44
+    #. Note to translator: This is a submit button
+    #: config/controller/admin/attachment.config.php:45
     'Add' => 'Ajouter',
 
     #: config/controller/admin/folder.config.php:20
@@ -166,15 +170,17 @@ return array(
     #: config/controller/admin/folder.config.php:42
     'Select a folder where to put your sub-folder:' => 'Sélectionner un dossier où ranger votre sous-dossier&nbsp;:',
 
-    #: config/controller/admin/folder.config.php:47
+    #. Note to translator: This is a placeholder, i.e. a field’s label shown within the field
+    #: config/controller/admin/folder.config.php:48
     #: config/common/media.config.php:47
     'Title' => 'Titre',
 
-    #: config/controller/admin/folder.config.php:59
+    #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'Référencement, URL du dossier&nbsp;:',
 
-    #: config/controller/admin/folder.config.php:70
-    #: config/controller/admin/media.config.php:72
+    #. Note to translator: This is a submit button
+    #: config/controller/admin/folder.config.php:72
+    #: config/controller/admin/media.config.php:73
     'Save' => 'Enregistrer',
 
     #: config/controller/admin/media.config.php:20
@@ -183,12 +189,6 @@ return array(
 
     #: config/controller/admin/media.config.php:53
     'File from your hard drive:' => 'Fichier sur votre disque dur&nbsp;:',
-
-    #: config/controller/admin/appdesk.config.php:25
-    'Preview' => 'Prévisualisation',
-
-    #: config/controller/admin/appdesk.config.php:43 added manually
-    'Click on a media file to preview it.' => 'Cliquez sur un média pour le prévisualiser.',
 
     #: config/controller/admin/appdesk.config.php:30
     'File name:' => 'Nom du fichier&nbsp;:',
@@ -199,29 +199,40 @@ return array(
     #: config/controller/admin/appdesk.config.php:36
     'Extension:' => 'Extension&nbsp;:',
 
-    #: config/controller/admin/appdesk.config.php:47
+    #. Note to translator: 'Preview' here is a label, not an action
+    #: config/controller/admin/appdesk.config.php:43
+    'Preview' => 'Prévisualisation',
+
+    #: config/controller/admin/appdesk.config.php:44
+    'Click on a media file to preview it.' => 'Cliquez sur un média pour le prévisualiser.',
+
+    #: config/controller/admin/appdesk.config.php:52
     'Default view' => 'Affichage par défaut',
 
-    #: config/controller/admin/appdesk.config.php:53
+    #: config/controller/admin/appdesk.config.php:58
     'Flick through view' => 'Feuilleter',
 
-    #: config/controller/admin/appdesk.config.php:75
+    #: config/controller/admin/appdesk.config.php:80
     'media file' => 'média',
 
-    #: config/controller/admin/appdesk.config.php:76
+    #: config/controller/admin/appdesk.config.php:81
     'media files' => 'médias',
 
-    #: config/controller/admin/appdesk.config.php:77
+    #: config/controller/admin/appdesk.config.php:82
     'Showing {{x}} media files out of {{y}}' => '{{x}} médias sur {{y}} affichés',
 
-    #: config/controller/admin/appdesk.config.php:78
+    #: config/controller/admin/appdesk.config.php:83
     'Showing 1 media file' => '1 média affiché',
 
-    #: config/controller/admin/appdesk.config.php:79
+    #: config/controller/admin/appdesk.config.php:84
     'No media files' => 'Pas de média',
 
-    #: config/controller/admin/appdesk.config.php:80
+    #. Note to translator: This is the action that clears the 'Search' field
+    #: config/controller/admin/appdesk.config.php:86
     'Show all media files' => 'Afficher tous les médias',
+
+    #: config/controller/admin/appdesk.config.php:88
+    'Pick' => 'Choisir',
 
     #. Crud
     #: config/common/folder.config.php:27
