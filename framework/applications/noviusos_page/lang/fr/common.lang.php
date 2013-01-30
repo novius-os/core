@@ -1,65 +1,65 @@
 <?php
 
-// Generated on 23/01/2013 11:25:53
+// Generated on 29/01/2013 19:08:29
 
 // 103 out of 103 messages are translated (100%).
 // 475 out of 475 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/page.ctrl.php:65
+    #: classes/controller/admin/page.ctrl.php:60
     'Use title' => 'Reprendre le titre',
 
-    #: classes/controller/admin/page.ctrl.php:88
+    #: classes/controller/admin/page.ctrl.php:83
     'Permission denied' => 'Vous n’avez pas le droit',
 
-    #: classes/controller/admin/page.ctrl.php:133
+    #: classes/controller/admin/page.ctrl.php:128
     'No sooner said than done. The home page is now ‘{{title}}’.' => 'C’est tout bon. La page d’accueil est désormais «&nbsp;{{title}}&nbsp;».',
 
-    #: classes/controller/admin/page.ctrl.php:163
+    #: classes/controller/admin/page.ctrl.php:160
     'Duplicating the page ‘{{title}}’' => 'Dupliquer la page «&nbsp;{{title}}&nbsp;»',
 
-    #: classes/controller/admin/page.ctrl.php:182
+    #: classes/controller/admin/page.ctrl.php:179
     'Here you are! The page and its subpages have just been duplicated.' => 'C’est parti&nbsp;! La page et ses sous-pages ont été dupliquées.',
 
-    #: classes/controller/admin/page.ctrl.php:182
+    #: classes/controller/admin/page.ctrl.php:179
     'Here you are! The page has just been duplicated.' => 'C’est parti&nbsp;! La page a été dupliquée.',
 
-    #: classes/controller/admin/page.ctrl.php:255
+    #: classes/controller/admin/page.ctrl.php:253
     ' (copy {{count}})' => ' (copie {{count}})',
 
-    #: classes/controller/admin/page.ctrl.php:271
+    #: classes/controller/admin/page.ctrl.php:269
     'Slow down, slow down. You have duplicated this page 5 times already. Edit them first before creating more duplicates.' => 'Mollo&nbsp;! Vous avez dupliqué cette page cinq fois déjà. Modifiez lescopies existantes avant d’en créer de nouvelles.',
 
-    #: classes/controller/admin/page.ctrl.php:277
+    #: classes/controller/admin/page.ctrl.php:275
     'Something went wrong. Please refresh your browser window. If the page has not been duplicated, please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Quelque chose n’a pas bien marché. Merci d’actualiser la fenêtre de votrenavigateur. Si la page n’a pas été dupliquée, essayez de nouveau. Contactezvotre développeur ou Novius OS si le problème persiste. Nos excuses pour ledésagrément occasionné.',
 
-    #: classes/controller/admin/page.ctrl.php:306
+    #: classes/controller/admin/page.ctrl.php:305
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Quelque chose n’a pas bien marché. Merci d’actualiser la fenêtre de votrenavigateur et d’essayer à nouveau. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
 
-    #: classes/controller/admin/appdesk.ctrl.php:61
+    #: classes/controller/admin/appdesk.ctrl.php:66
     'The cache has been renewed. All ready for you to enjoy!' => 'Et voici un beau cache tout neuf. Il vient d’être régénéré.',
 
-    #: views/admin/popup_duplicate.view.php:60
+    #: views/admin/popup_duplicate.view.php:58
     'Duplicate sub-pages' => 'Dupliquer les sous-pages',
 
-    #: views/admin/popup_duplicate.view.php:103
+    #: views/admin/popup_duplicate.view.php:99
     'Nothing to duplicate' => 'Rien à dupliquer',
 
-    #: views/admin/popup_duplicate.view.php:104
+    #: views/admin/popup_duplicate.view.php:100
     'Duplicate this page' => 'Dupliquer cette page',
 
-    #: views/admin/popup_duplicate.view.php:105
+    #: views/admin/popup_duplicate.view.php:101
     'Duplicate these {{count}} pages' => 'Dupliquer ces {{count}} pages',
 
-    #: views/admin/popup_duplicate.view.php:106
+    #: views/admin/popup_duplicate.view.php:102
     #: config/common/page.config.php:154
     'Duplicate' => 'Dupliquer',
 
-    #: views/admin/popup_duplicate.view.php:107
+    #: views/admin/popup_duplicate.view.php:103
     #: views/admin/wysiwyg_link.view.php:91
     'or' => 'ou',
 
-    #: views/admin/popup_duplicate.view.php:108
+    #: views/admin/popup_duplicate.view.php:104
     #: views/admin/wysiwyg_link.view.php:91
     'Cancel' => 'Annuler',
 
@@ -223,10 +223,11 @@ return array(
     #: config/controller/admin/page.config.php:203
     'Regenerate the cache every {{duration}} seconds' => 'Régénérer le cache toutes les {{duration}} secondes',
 
-    #: config/controller/admin/page.config.php:215
+    #. Note to translator: This is a submit button
+    #: config/controller/admin/page.config.php:216
     'Save' => 'Enregistrer',
 
-    #: config/controller/admin/inspector/page.config.php:31
+    #: config/controller/admin/inspector/page.config.php:33
     'Root' => 'Racine',
 
     #: config/controller/admin/appdesk.config.php:19

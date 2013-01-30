@@ -1,68 +1,76 @@
 <?php
 
-// Generated on 23/01/2013 11:25:53
+// Generated on 30/01/2013 14:07:42
 
-// 19 out of 19 messages are translated (100%).
-// 90 out of 90 words are translated (100%).
+// 21 out of 21 messages are translated (100%).
+// 95 out of 95 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/crud.ctrl.php:304
+    #. Note to translator: This is a submit button
+    #: classes/controller/admin/crud.ctrl.php:316
     'Add' => 'Ajouter',
 
-    #: classes/controller/admin/crud.ctrl.php:391
+    #: classes/controller/admin/crud.ctrl.php:403
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'Cet item existe déjà dans {{context}}. Votre item ne peut donc être ajouté.',
 
-    #: classes/controller/admin/crud.ctrl.php:589
-    #: classes/controller/admin/crud.ctrl.php:596
+    #: classes/controller/admin/crud.ctrl.php:601
+    #: classes/controller/admin/crud.ctrl.php:608
     'Translate into {{context}}' => 'Traduire en {{context}}',
 
-    #: classes/controller/admin/crud.ctrl.php:591
-    #: classes/controller/admin/crud.ctrl.php:594
+    #: classes/controller/admin/crud.ctrl.php:603
+    #: classes/controller/admin/crud.ctrl.php:606
     'Add to {{context}}' => 'Ajouter à {{context}}',
 
-    #: classes/controller/admin/crud.ctrl.php:600
+    #: classes/controller/admin/crud.ctrl.php:612
     'Edit {{context}}' => 'Modifier {{context}}',
 
-    #: classes/controller/admin/crud.ctrl.php:617
-    'Translate / Add to another context' => 'Traduire / Ajouter à un autre site',
+    #: classes/controller/admin/crud.ctrl.php:628
+    'Translate' => 'Traduire',
+
+    #: classes/controller/admin/crud.ctrl.php:630
+    'Add to another site' => 'Ajouter à un autre site',
+
+    #: classes/controller/admin/crud.ctrl.php:632
+    'Translate / Add to another site' => 'Traduire / Ajouter à un autre site',
 
     #: classes/controller/admin/appdesk.ctrl.php:156
     'Default view' => 'Affichage par défaut',
 
-    #: views/crud/blank_slate.view.php:54
+    #. Note to translator: this is an action (button)
+    #: views/crud/blank_slate.view.php:61
     'Translate from {{context}}' => 'Traduire à partir de {{context}}',
 
-    #: views/crud/blank_slate.view.php:63
+    #: views/crud/blank_slate.view.php:70
     'Add ‘{{item}}’ to {{context}}' => 'Ajouter «&nbsp;{{item}}&nbsp;» à {{context}}',
 
-    #: views/crud/blank_slate.view.php:65
+    #: views/crud/blank_slate.view.php:72
     'Translate ‘{{item}}’ into {{context}}' => 'Traduire «&nbsp;{{item}}&nbsp;» en {{context}}',
 
-    #: views/crud/blank_slate.view.php:71
+    #: views/crud/blank_slate.view.php:78
     'You have two options:' => 'Vous avez deux possibilités&nbsp;:',
 
-    #: views/crud/blank_slate.view.php:81
+    #: views/crud/blank_slate.view.php:88
     'Start from scratch' => 'Partir de zéro',
 
-    #: views/crud/blank_slate.view.php:83
+    #: views/crud/blank_slate.view.php:90
     '(Blank form)' => '(Formulaire vide)',
 
-    #: views/crud/blank_slate.view.php:86
+    #: views/crud/blank_slate.view.php:93
     'OR' => 'OU',
 
-    #: views/crud/blank_slate.view.php:111
+    #: views/crud/blank_slate.view.php:118
     '(Form filled with the contents from the original version)' => '(Formulaire rempli avec le contenu de la version originale)',
 
-    #: views/crud/invariant_fields.view.php:19
+    #: views/crud/invariant_fields.view.php:21
     'This field is common to all contexts' => 'Ce champ est commun à tous les contextes',
 
-    #: views/crud/invariant_fields.view.php:20
+    #: views/crud/invariant_fields.view.php:22
     'When you modify the value of this field, the change applies to the following contexts:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussiaux contextes suivants&nbsp;:',
 
-    #: views/crud/invariant_fields.view.php:21
+    #: views/crud/invariant_fields.view.php:23
     'Go ahead, I understand' => 'Allons-y, je comprends',
 
-    #: views/crud/invariant_fields.view.php:22
+    #: views/crud/invariant_fields.view.php:24
     'Cancel, I won’t modify it' => 'Annuler, je ne veux plus modifier',
 
 );
