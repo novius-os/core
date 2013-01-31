@@ -417,6 +417,8 @@ class Application
         foreach ($config as $file => $content) {
             list($file, $callback) = \Nos\Config_Data::getFile($file);
             \Config::save($file, $content);
+            // Force a reload to keep a clean cache (useful for migration)
+            \Config::load($file, true, true, true);
         }
     }
 
