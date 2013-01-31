@@ -41,14 +41,14 @@ class Config_Common
 
     public static function process_icons($application_name, $config)
     {
-        $application_config = \Nos\Config_Data::get('app_installed.'.$application_name);
+        $application_icons = \Nos\Config_Data::get('app_installed.'.$application_name.'.icons', array());
         if (!isset($config['icons'])) {
             $config['icons'] = array();
         }
 
-        foreach ($application_config['icons'] as $key => $value) {
+        foreach ($application_icons as $key => $value) {
             if (!isset($config['icons'][$key])) {
-                $config['icons'][$key] = $application_config['icons'][$key];
+                $config['icons'][$key] = $application_icons[$key];
             }
         }
 
