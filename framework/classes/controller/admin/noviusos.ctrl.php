@@ -134,7 +134,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
     {
         \Nos\Application::cleanApplications();
         $launchers = \Nos\Config_Data::get('launchers', array());
-        $launchers = \Config::mergeWithUser('misc.apps', $launchers);
+        $launchers = \Config::mergeWithUser('misc.apps', $launchers); // It retrieves order from user configuration
+        unset($launchers['configuration_id']); // Configuration id is automatically added
 
         $apps = array();
         foreach ($launchers as $key => $app) {
