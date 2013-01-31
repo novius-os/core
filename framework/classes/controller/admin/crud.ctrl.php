@@ -704,7 +704,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             'id' => (int) $id,
         );
 
-        $this->delete();
+        $json_delete = $this->delete();
 
         if ($this->behaviours['twinnable']) {
             $dispatchEvent['context_common_id'] = $this->item->{$this->behaviours['twinnable']['common_id_property']};
@@ -755,16 +755,27 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
             $this->item->delete();
         }
-
-        $this->response(
-            array(
-                'notify' => $this->config['i18n']['notification item deleted'],
-                'dispatchEvent' => $dispatchEvent,
-            )
+        $json = array(
+            'notify' => $this->config['i18n']['notification item deleted'],
+            'dispatchEvent' => array($dispatchEvent),
         );
+        if (is_array($json_delete)) {
+            $json = \Arr::merge($json, $json_delete);
+        }
+
+        $this->response($json);
     }
 
     public function delete()
     {
+        return array(
+            'dispatchEvent' => array(
+                array(
+                    'name' => 'Nos\User\Model_User',
+                    'action' => 'delete',
+                    'id' => array((int) 1),
+                ),
+            ),
+        );
     }
 }

@@ -296,7 +296,8 @@ class Application
         // Load current data
         $config = array();
         foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section) {
-            $config[$section] = \Nos\Config_Data::get($section, array());
+            list($file, $callback) = \Nos\Config_Data::getFile($section);
+            $config[$section] = \Config::load($file, true, true, true);
         }
 
         foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section) {
@@ -414,7 +415,8 @@ class Application
     protected function save_config($config)
     {
         foreach ($config as $file => $content) {
-            \Nos\Config_Data::save($file, $content);
+            list($file, $callback) = \Nos\Config_Data::getFile($file);
+            \Config::save($file, $content);
         }
     }
 

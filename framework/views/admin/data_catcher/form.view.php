@@ -7,6 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+\Nos\I18n::current_dictionary('nos::common');
+
 $uniqid = uniqid('container_');
 
 (!isset($nugget_db) || !is_array($nugget_db)) && $nugget_db = $item->get_default_nuggets();
