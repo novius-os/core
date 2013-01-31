@@ -10,5 +10,5 @@
 
 return array(
     'fullname' => '0.2.0.0',
-    'date'     => \Date::create_from_string('2012-12-05', 'mysql_date'),
+    'date'     => \Date::create_from_string('2012-01-31', 'mysql_date'),
 );
