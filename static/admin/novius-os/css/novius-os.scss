@@ -10,6 +10,11 @@
 @import "compass/css3/box-shadow";
 @import "compass/css3/text-shadow";
 
+.ui-dialog {
+    .wijmo-checkbox label, .wijmo-wijradio label {
+        z-index: inherit;
+    }
+}
 
 /* +-++-++-++-++-++-+
  * |C||O||M||M||O||N|
