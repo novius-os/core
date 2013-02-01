@@ -536,7 +536,6 @@ class Controller_Front extends Controller
                         'where' => $where,
                 ));
 
-
                 if (!empty($page)) {
                     $this->_page = $page;
                     $this->_page_url = $url;
@@ -554,8 +553,13 @@ class Controller_Front extends Controller
             throw new NotFoundException('The requested page was not found.');
         }
 
+        if ($this->_page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
+            \Response::redirect($this->_page->page_external_link, 'location', 301);
+            exit();
+        }
+
         $this->_context = $this->_page->get_context();
-        \Nos\I18n::setLocale($this->_page->get_context());
+        \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
     }
 
     protected function _find_template()

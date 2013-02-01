@@ -85,8 +85,8 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
         }
 
         $body = array(
-            'debug'  => \Format::forge()->to_json($this->config['preview']),
-            'config'  => \Format::forge()->to_json($args),
+            'debug'  => $this->config['preview'],
+            'config'  => $args,
             'preview' => \View::forge($this->config['preview']['view'], array(
                 'layout' => $this->config['preview']['layout'],
                 'params' => $this->config['preview']['params'],

@@ -1897,11 +1897,18 @@
 			// Keep reference to the nosDialog node, so we can close the popup manually
 			var dialog = null,
 			    self   = this,
+                config = (function() {
+                    var data = edit ? $(edit).attr('data-config') : {};
+                    if ($.type(data) === 'string') {
+                        data = $.parseJSON(data);
+                    }
+                    return data;
+                })(),
                 data_config = edit ? $.extend(true, {
                         nosContext : self.settings.theme_nos_context,
                         enhancer: metadata.id,
                         enhancerAction: 'update'
-                    }, edit.data('config') || {}) : {
+                    }, config) : {
                         nosContext : self.settings.theme_nos_context,
                         enhancer: metadata.id,
                         enhancerAction: 'insert'
@@ -1918,10 +1925,11 @@
                         }), {skip_undo : 1});
                         edit = ed.dom.get('__mce_tmp');
                     }
-                    ed.dom.setAttribs(edit, {
-                        'data-config': json.config,
+                    $(edit).attr({
+                        'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
                         'data-enhancer': metadata.id
                     });
+
                     edit.id = null;
                     $(edit).html($(json.preview).html());
 
