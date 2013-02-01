@@ -110,6 +110,7 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => $templates,
+                'style' => 'width: 300px;',
             ),
         ),
         'page_virtual_name' => array(
