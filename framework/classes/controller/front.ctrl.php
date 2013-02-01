@@ -559,7 +559,7 @@ class Controller_Front extends Controller
         }
 
         $this->_context = $this->_page->get_context();
-        \Nos\I18n::setLocale($this->_page->get_context());
+        \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
     }
 
     protected function _find_template()
