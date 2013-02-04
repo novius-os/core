@@ -69,17 +69,19 @@ class Config_Data
      * Loads a config data file.
      *
      * @param    mixed    $name         string file name of config data
+     * @param    bool     $reload       true to force a reload even if the file is already loaded
      * @return   array                  the (loaded) config data array
      */
-    public static function load($name)
+    public static function load($name, $event = true, $reload = false)
     {
         list($file, $callback) = static::getFile($name);
-        if (!empty($callback)) {
+        if ($event && !empty($callback)) {
             \Event::register_function('config|'.$file, function(&$config) use($callback, $name, $file) {
                 Config_Data::$callback($config, $name);
+                // @todo Event::unregister but now make a Notice with register_function
             });
         }
-        return \Config::load($file, 'data::'.$name);
+        return \Config::load($file, 'data::'.$name, $reload, $reload);
     }
 
     /**
@@ -91,7 +93,6 @@ class Config_Data
      */
     public static function save($name, array $data)
     {
-        static::load($name);
         \Config::set('data::'.$name, $data);
         list($file, $callback) = static::getFile($name);
         return \Config::save($file, $data);

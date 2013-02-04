@@ -296,8 +296,7 @@ class Application
         // Load current data
         $config = array();
         foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section) {
-            list($file, $callback) = \Nos\Config_Data::getFile($section);
-            $config[$section] = \Config::load($file, true, true, true);
+            $config[$section] = \Nos\Config_Data::load($section, false, true);
         }
 
         foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section) {
@@ -415,10 +414,7 @@ class Application
     protected function save_config($config)
     {
         foreach ($config as $file => $content) {
-            list($file, $callback) = \Nos\Config_Data::getFile($file);
-            \Config::save($file, $content);
-            // Force a reload to keep a clean cache (useful for migration)
-            \Config::load($file, true, true, true);
+            \Nos\Config_Data::save($file, $content);
         }
     }
 
@@ -459,39 +455,6 @@ class Application
         }
 
         return !is_link($public);
-    }
-
-    protected static function _refresh_dependencies(array $params = array())
-    {
-        $add = isset($params['add']) ? $params['add'] : false;
-        $remove = isset($params['remove']) ? $params['remove'] : false;
-        $app_refresh = $add ? $add : $remove;
-
-        $dependencies = array();
-        if ($add) {
-            $config = \Config::metadata($app_refresh);
-
-            if (isset($config['extends'])) {
-                if (!isset($dependencies[$config['extends']])) {
-                    $dependencies[$config['extends']] = array();
-                }
-                $dependencies[$config['extends']][] = $app_refresh;
-            }
-        }
-
-        foreach (static::$rawAppInstalled as $app_name => $app) {
-            if ($app_refresh !== $app_name) {
-                $config = \Config::metadata($app_name);
-                if (isset($config['extends'])) {
-                    if (!isset($dependencies[$config['extends']])) {
-                        $dependencies[$config['extends']] = array();
-                    }
-                    $dependencies[$config['extends']][] = $app_name;
-                }
-            }
-        }
-
-        \Nos\Config_Data::save('app_dependencies', $dependencies);
     }
 
     public function addPermission()
