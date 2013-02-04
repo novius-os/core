@@ -657,7 +657,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $model = $child['model'];
                 if ((empty($params['context']) || (is_array($params['context']) && count($params['context']) > 1)) && $model::behaviours('Nos\Orm_Behaviour_Twinnable')) {
                     $item = $model::find($params['id']);
-                    $contexts = $item->get_all_context($params['context']);
+                    $contexts = $item->get_all_context(empty($params['context']) ? array() : $params['context']);
                     $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));
                 } else {
                     $child['where'] = array(array($child['fk'] => $params['id']));
