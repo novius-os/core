@@ -807,7 +807,7 @@ define('jquery-nos',
                     // Cross browser compatibility: prevent the dropdown from protruding over 2 lines
                     $wijdropdown.width($wijdropdown.width() + 5);
                 });
-                $context.find(":input[type=checkbox]").nosOnShow('one', function() {
+                $context.find(":input[type=checkbox]").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijcheckbox();
                 });
                 $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
