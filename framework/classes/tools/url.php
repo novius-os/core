@@ -29,7 +29,7 @@ class Tools_Url
             $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
             $page_params = \Arr::get($url_enhanced, $page_id, false);
             if ($page_params) {
-                return Tools_Url::context($page_params['context']).$page_params['url'];
+                return Tools_Url::context($page_params['context']).(empty($page_params['url']) ? '' : substr($page_params['url'], 0, -1).'.html');
             }
 
             $page = \Nos\Page\Model_Page::find($page_id);

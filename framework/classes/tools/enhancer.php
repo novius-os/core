@@ -97,7 +97,7 @@ class Tools_Enhancer
             if (($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
                 $page_params = \Arr::get($url_enhanced, $page_id, false);
                 if ($page_params) {
-                    $urls[$page_id] = $page_params['url'];
+                    $urls[$page_id] = Tools_Url::page($page_id);
                 }
             }
         }
