@@ -122,7 +122,7 @@ return array(
                 {
                 },
             'validation' => array(
-                'match_field' => array('user_password'),
+                'match_field' => array('password_reset'),
             ),
         ),
         'save' => array(
