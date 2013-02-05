@@ -30,7 +30,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             $fields['user_last_connection']['dont_save'] = true;
         } else {
             unset($fields['user_password']);
-            $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
+            $this->config['i18n']['notification item saved'] = __('Done, your password has been changed.');
         }
 
         return $fields;
