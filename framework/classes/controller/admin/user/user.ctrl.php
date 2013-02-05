@@ -14,7 +14,7 @@ class Controller_Admin_User_User extends Controller_Admin_Crud
 {
     public function before()
     {
-        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->method_params[0] == $user->user_id) {
+        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->route->method_params[0] == $user->user_id) {
             $this->bypass = true;
         }
         parent::before();
