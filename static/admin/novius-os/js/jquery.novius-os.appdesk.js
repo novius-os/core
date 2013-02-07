@@ -2125,12 +2125,13 @@ define('jquery-nos-appdesk',
                             .appendTo($div)
                             .noslistgrid({
                                 scrollMode : 'auto',
+                                pageSize: 1,
                                 showFilter: true,
                                 allowPaging : true,
-                                data: [ ['test'] ]
+                                data: [ ['test'], ['test2'] ]
                             });
                         this.heights = {
-                            row : table.height(),
+                            row : table.find('tr:first').height(),
                             footer : $div.find('.wijmo-wijgrid-footer').outerHeight(),
                             header : $div.find('.wijmo-wijgrid-headerrow').outerHeight(),
                             filter : $div.find('.wijmo-wijgrid-filterrow').outerHeight()
