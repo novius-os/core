@@ -63,12 +63,15 @@ class Auth
                 return false;
             }
             \Session::setUser($logged_user);
-            \Session::set('logged_user_id', $logged_user_id);
-            \Session::set('logged_user_md5', $logged_user_md5);
-            \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
-            if ($remember_me) {
-                \Cookie::set('logged_user_id', $logged_user_id, static::$default_cookie_lasting);
-                \Cookie::set('logged_user_md5', $logged_user_md5, static::$default_cookie_lasting);
+            // Only extend the cookie duration for the main request (preventing N 'Set-Cookie' headers if we have N HMVC requests)
+            if (!\Request::is_hmvc()) {
+                \Session::set('logged_user_id', $logged_user_id);
+                \Session::set('logged_user_md5', $logged_user_md5);
+                \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
+                if ($remember_me) {
+                    \Cookie::set('logged_user_id', $logged_user_id, static::$default_cookie_lasting);
+                    \Cookie::set('logged_user_md5', $logged_user_md5, static::$default_cookie_lasting);
+                }
             }
             return true;
         }
