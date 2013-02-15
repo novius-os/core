@@ -8,6 +8,11 @@
  * @link http://www.novius-os.org
  */
 
+// For previous versions of PHP 5.3.6
+if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+    define('DEBUG_BACKTRACE_IGNORE_ARGS', false);
+}
+
 // Get the start time and memory for use later
 defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
 defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
