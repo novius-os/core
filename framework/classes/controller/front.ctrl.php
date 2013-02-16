@@ -454,7 +454,13 @@ class Controller_Front extends Controller
 
         $footer = array();
         $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
-        $this->_js_footer = array_diff($this->_js_footer, $this->_js_header);
+        for ($i = 0; $i < count($this->_js_footer); $i++) {
+            for ($j = 0; $j < count($this->_js_header); $j++) {
+                if ($this->_js_footer[$i] === $this->_js_header[$j]) {
+                    array_splice($this->_js_footer, $i, 1);
+                }
+            }
+        }
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
