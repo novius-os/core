@@ -137,7 +137,7 @@ class Controller_Inspector_Date extends Controller_Inspector
         return $view;
     }
 
-    public static function process_config($application, array $config, $item_actions = array(), $gridKey = null)
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
     {
         $inspector_path = static::get_path();
 
