@@ -92,7 +92,7 @@ if (!empty($title)) {
         echo ' '.$field
                 ->set_attribute('placeholder', $placeholder)
                 ->set_attribute('title', $placeholder)
-                ->set_attribute('class', 'title')
+                ->set_attribute('class', $field->get_attribute('class').' title')
                 ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
                 ->build();
     }
