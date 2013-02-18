@@ -427,9 +427,33 @@ class Application
                 if (is_link($public)) {
                     unlink($public);
                 }
-                if (!symlink(Tools_File::relativePath(dirname($public), $private), $public)) {
-                    throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
+
+                // It seems that symlink() does not work every time (confs, right?)
+                // Several trials with native version and exec(), in relative and absolute
+                // http://forums.novius-os.org/support-forums/contributions/petit-probleme,feed,98.html
+
+                $dirname = dirname($public);
+                $relative = Tools_File::relativePath($dirname, $private);
+                if (symlink($relative, $public)) {
+                    return true;
                 }
+
+                exec('cd '.$dirname.'; ln -s '.$relative.' '.$this->folder);
+                if (is_link($public)) {
+                    return true;
+                }
+
+                if (symlink($private, $public)) {
+                    return true;
+                }
+
+                exec('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
+                if (is_link($public)) {
+                    return true;
+                }
+
+                \Log::error('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
+                throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
             }
         }
 
@@ -451,7 +475,10 @@ class Application
         $private =  static::get_application_path($this->folder).DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private)) {
-            return is_link($public) && readlink($public) == Tools_File::relativePath(dirname($public), $private);
+            return is_link($public) && in_array(readlink($public), array(
+                $private,
+                Tools_File::relativePath(dirname($public), $private)
+            ));
         }
 
         return !is_link($public);
