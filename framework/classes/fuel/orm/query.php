@@ -19,14 +19,16 @@ class Query extends \Orm\Query
         static $count = 99;
         $relation = call_user_func($this->model.'::relations', $relation_name);
         // Ask the relation to generate the join for us
-        $join = $relation->join($this->alias, $relation_name, $count);
+        $joins = (array) $relation->join($this->alias, $relation_name, $count);
         // Keep only the relevant part
-        $join = array_intersect_key($join[$relation_name], array(
-            'table' => true,
-            'join_type' => true,
-            'join_on' => true,
-        ));
-        $this->_join($join);
+        foreach ($joins as $join) {
+            $join = array_intersect_key($join, array(
+                'table' => true,
+                'join_type' => true,
+                'join_on' => true,
+            ));
+            $this->_join($join);
+        }
 
         $infos = array(
             'alias_from' => $this->alias,
