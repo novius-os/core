@@ -11,35 +11,33 @@
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
-// Remove "public/" when DOCUMENT_ROOT is public parent's folder
-// Else remove leading /
-$redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), defined('NOS_RELATIVE_DIR') ? 8 + mb_strlen(NOS_RELATIVE_DIR) : 1);
+$nos_url = Input::server('NOS_URL');
 
-if (in_array($redirect_url, array(
-        'favicon.ico',
-        'robots.txt',
-        'humans.txt',
-    ))) {
-    is_file(DOCROOT.$redirect_url) && Nos\Tools_File::send(DOCROOT.$redirect_url);
+if (in_array($nos_url, array(
+    'favicon.ico',
+    'robots.txt',
+    'humans.txt',
+))) {
+    is_file(DOCROOT.$nos_url) && Nos\Tools_File::send(DOCROOT.$nos_url);
     exit();
 }
 
-$is_media = preg_match('`^(?:cache/)?media/`', $redirect_url);
+$is_media = preg_match('`^(?:cache/)?media/`', $nos_url);
 if ($is_media) {
-    $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $redirect_url, $m);
+    $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m);
 
     if ($is_resized) {
         list(, $path, $max_width, $max_height, $verification, $extension) = $m;
         $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
         $media_url = str_replace("/$max_width-$max_height", '', $media_url);
     } else {
-        $media_url = str_replace('media/', '', $redirect_url);
+        $media_url = str_replace('media/', '', $nos_url);
     }
 
     $media = false;
     $res = \DB::select()->from(\Nos\Media\Model_Media::table())->where(array(
-            array('media_path', '=', '/'.$media_url),
-        ))->execute()->as_array();
+        array('media_path', '=', '/'.$media_url),
+    ))->execute()->as_array();
 
     if (!empty($res)) {
         $media = \Nos\Media\Model_Media::forge(reset($res));
@@ -90,16 +88,16 @@ if ($is_media) {
     }
 }
 
-$is_attachment = preg_match('`^(?:cache/)?data/files/`', $redirect_url);
+$is_attachment = preg_match('`^(?:cache/)?data/files/`', $nos_url);
 if ($is_attachment) {
-    $is_resized = preg_match('`cache/data/files/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`Uu', $redirect_url, $m);
+    $is_resized = preg_match('`cache/data/files/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`Uu', $nos_url, $m);
 
     if ($is_resized) {
         list($target_resized, $path, $max_width, $max_height, $verification, $extension) = $m;
         $attachment_url = str_replace("/$max_width-$max_height-$verification", '', $path);
         $attachment_url = str_replace("/$max_width-$max_height", '', $attachment_url);
     } else {
-        $attachment_url = str_replace('data/files/', '', $redirect_url);
+        $attachment_url = str_replace('data/files/', '', $nos_url);
     }
 
     $send_file = false;
@@ -167,7 +165,7 @@ if ($is_attachment) {
 }
 
 // real 404
-if (!$is_attachment && !$is_media && pathinfo($redirect_url, PATHINFO_EXTENSION) == 'html') {
+if (!$is_attachment && !$is_media && pathinfo($nos_url, PATHINFO_EXTENSION) == 'html') {
     $response = Request::forge('nos/front/index', false)->execute()->response();
     $response->send(true);
 }
