@@ -90,7 +90,7 @@ return array(
     'Welcome back, {{user}}.' => 'Re-bonjour {{user}}',
 
     #: classes/controller/admin/login.ctrl.php:114
-    'These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.' => 'Il doit y avoir une erreur, vous ne pouvez entrer. Êtes-vous sûr(e) que cesont les bons email et mot de passe&nbsp;? Merci de ré-essayer.',
+    'These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.' => 'Il doit y avoir une erreur, vous ne pouvez entrer. Êtes-vous sûr(e) que ce sont les bons email et mot de passe&nbsp;? Merci de ré-essayer.',
 
     #: classes/controller/admin/datacatcher.ctrl.php:43
     #: config/i18n_common.config.php:9
