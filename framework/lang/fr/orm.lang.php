@@ -9,9 +9,8 @@ return array(
     #: classes/orm/behaviour/virtualname.php:50
     'An URL is needed.' => 'Une URL est nécessaire.',
 
-    #: classes/orm/behaviour/virtualname.php:68
-    #: classes/orm/behaviour/virtualpath.php:75
-    'This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.' => 'Cette URL est déjà utilisée. Or, les URL sont uniques. Il faut donc enchoisir une autre.',
+    #: classes/orm/behaviour/virtualname.php:63
+    'This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.' => 'Cette URL est déjà utilisée. Or, les URL sont uniques. Il faut donc en choisir une autre.',
 
     #: classes/orm/behaviour/publishable.php:36
     'Published' => 'Publié',

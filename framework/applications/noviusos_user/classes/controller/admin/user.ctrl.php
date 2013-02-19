@@ -12,6 +12,12 @@ namespace Nos\User;
 
 class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 {
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary('noviusos_user::common');
+    }
+
     public function before()
     {
         if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->route->method_params[0] == $user->user_id) {
