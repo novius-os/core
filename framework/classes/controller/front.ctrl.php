@@ -67,7 +67,7 @@ class Controller_Front extends Controller
         if (\Input::method() == 'POST' || $this->_is_preview) {
             $no_cache = true;
         } else {
-            $no_cache = \Fuel::$env === \Fuel::DEVELOPMENT && \Input::get('_cache', 0) != 1;
+            $no_cache = \Fuel::$env === \Fuel::DEVELOPMENT && \Input::get('_cache', 1) != 1;
         }
 
         \Event::trigger('front.start');
@@ -78,7 +78,10 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
-            // Cache exist, retrieve his content
+            if ($no_cache) {
+                throw new CacheNotFoundException();
+            }
+            // Cache exist, retrieve its content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
             // Cache not exist, try to found page for this URL
@@ -612,6 +615,5 @@ class Controller_Front extends Controller
         }
         $this->_page->freeze();
         unset($cache['page']);
-        //return parent::rebuild_cache($cache); @todo: to be reviewed
     }
 }

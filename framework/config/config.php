@@ -221,8 +221,8 @@ return array(
     ),
 
     'novius-os' => array(
-        'cache_duration_page' => 5,
-        'cache_duration_function' => 10,
+        'cache_duration_page' => \Fuel::$env === \Fuel::DEVELOPMENT ? -1 : 5,
+        'cache_duration_function' => \Fuel::$env === \Fuel::DEVELOPMENT ? -1 : 10,
 
         'locales' => array(
             'en_GB' => array(
