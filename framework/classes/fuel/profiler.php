@@ -12,5 +12,6 @@ class Profiler extends \Fuel\Core\Profiler
         exit();*/
         \Log::info('SQL Request executed: "'.$sql."\"\nLocal backtrace:\n".implode("\n", $profiled)."\n\n");
 
+        return parent::start($dbname, $sql);
     }
 }
