@@ -11,6 +11,8 @@
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
+Fuel::$profiling = false;
+
 // Remove "public/" when DOCUMENT_ROOT is public parent's folder
 // Else remove leading /
 $redirect_url = mb_substr(Input::server('REDIRECT_SCRIPT_URL', Input::server('REDIRECT_URL')), defined('NOS_RELATIVE_DIR') ? 8 + mb_strlen(NOS_RELATIVE_DIR) : 1);

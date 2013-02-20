@@ -11,10 +11,13 @@
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
+Fuel::$profiling = false;
+
 $uri = \Input::uri();
 if (mb_substr($uri, 0, 6) != '/admin') {
     $uri = '/admin'.$uri;
 }
+
 
 // Generate the request, execute it and send the output.
 try {
