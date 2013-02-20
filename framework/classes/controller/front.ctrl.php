@@ -606,12 +606,12 @@ class Controller_Front extends Controller
 
     public function rebuild_cache($cache)
     {
-        $this->_page = new \Nos\Page\Model_Page();
+        $page = array();
         foreach ($cache['page'] as $field => $value) {
-            $this->_page->{'page_'.$field} = $value;
+            $page['page_'.$field] = $value;
         }
+        $this->_page = new \Nos\Page\Model_Page($page, false);
         $this->_page->freeze();
         unset($cache['page']);
-        //return parent::rebuild_cache($cache); @todo: to be reviewed
     }
 }
