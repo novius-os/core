@@ -13,6 +13,24 @@ namespace Nos;
 class Nos
 {
     /**
+     * @var  string  constant used for when entry point is back-office
+     */
+    const ENTRY_POINT_ADMIN = 'admin';
+    /**
+     * @var  string  constant used for when entry point is front-office
+     */
+    const ENTRY_POINT_FRONT = 'front';
+    /**
+     * @var  string  constant used for when entry point is 404
+     */
+    const ENTRY_POINT_404 = '404';
+
+    /**
+     * @var  string  The Novius OS entry point
+     */
+    public static $entry_point = NOS_ENTRY_POINT;
+
+    /**
      * Returns the controller instance from the main request
      *
      * @return \Nos\Controller
