@@ -24,6 +24,10 @@ class Nos
      * @var  string  constant used for when entry point is 404
      */
     const ENTRY_POINT_404 = '404';
+    /**
+     * @var  string  constant used for when entry point is install
+     */
+    const ENTRY_POINT_INSTALL = 'install';
 
     /**
      * @var  string  The Novius OS entry point
