@@ -133,11 +133,17 @@ class Model extends \Orm\Model
         $init = array_key_exists($class, static::$_properties_cached);
 
         if (!$init) {
-            parent::properties();
+            try {
+                static::$_properties_cached[$class] = \Cache::get('tables.'.static::table());
+            } catch (\CacheNotFoundException $e) {
+                parent::properties();
 
-            $config = static::_config();
-            if (!empty($config) && !empty($config['properties'])) {
-                static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+                $config = static::_config();
+                if (!empty($config) && !empty($config['properties'])) {
+                    static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+                }
+
+                \Cache::set('tables.'.static::table(), static::$_properties_cached[$class]);
             }
         }
 
@@ -660,6 +666,15 @@ class Model extends \Orm\Model
     {
         if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
             $name = static::prefix().$name;
+        }
+
+        try {
+            return parent::get($name);
+        } catch (\OutOfBoundsException $e) {
+            $class = get_called_class();
+            \Cache::delete('tables.'.static::table());
+            unset(static::$_properties_cached[$class]);
+            static::properties();
         }
 
         return parent::get($name);
