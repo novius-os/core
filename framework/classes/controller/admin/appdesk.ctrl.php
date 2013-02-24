@@ -182,8 +182,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
 
-            if (isset($config['tree'])) {
-
+            if (isset($config['tree']) && $config['tree'] !== false) {
 
                 if (!isset($config['tree']['models'])) {
                     $config['tree']['models'] = array();
@@ -419,7 +418,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
 
-            if (isset($config['tree'])) {
+            if (isset($config['tree']) && $config['tree'] !== false) {
                 if (!isset($config['appdesk']['appdesk']['treeGrid'])) {
                     $config['appdesk']['appdesk']['treeGrid'] = array();
                 }

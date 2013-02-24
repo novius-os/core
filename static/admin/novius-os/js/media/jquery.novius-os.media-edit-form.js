@@ -38,7 +38,7 @@ define('jquery-nos-media-edit-form',
                     $container.closest('form').bind('ajax_success', function(e, json) {
                         if (json.thumbnailUrl) {
                             $container.find('.preview_zone img').attr({
-                                src: json.thumbnailUrl
+                                src: json.thumbnailUrl + '?' + (new Date().getTime())
                             });
                         }
                         if (json.media_file) {

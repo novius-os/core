@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+define('NOS_ENTRY_POINT', 'front');
+
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 

@@ -13,7 +13,7 @@ if (!$item->is_new()) {
     ?>
     <div id="<?= $uniqid_close ?>" style="display:none;">
         <p>&nbsp;</p>
-        <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?=$crud['config']['i18n']['deleted popup close'] ?></button></p>
+        <p><button class="primary" type="button" data-icon="close"><?=$crud['config']['i18n']['deleted popup close'] ?></button></p>
     </div>
     <?php
 }

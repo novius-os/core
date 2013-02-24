@@ -18,10 +18,10 @@ define([
                     thumbnailSize : 128
                 },
                 inspectors : {
-                    folders : {
+                    folder : {
                         hide : true
                     },
-                    extensions : {
+                    extension : {
                         hide : true
                     },
                     preview : {
