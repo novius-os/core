@@ -134,7 +134,7 @@ class Model extends \Orm\Model
 
         if (!$init) {
             try {
-                static::$_properties_cached[$class] = \Cache::get('tables.'.static::table());
+                static::$_properties_cached[$class] = \Cache::get('model_properties.'.$class);
             } catch (\CacheNotFoundException $e) {
                 parent::properties();
 
@@ -143,7 +143,7 @@ class Model extends \Orm\Model
                     static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
                 }
 
-                \Cache::set('tables.'.static::table(), static::$_properties_cached[$class]);
+                \Cache::set('model_properties.'.$class, static::$_properties_cached[$class]);
             }
         }
 
@@ -672,7 +672,7 @@ class Model extends \Orm\Model
             return parent::get($name);
         } catch (\OutOfBoundsException $e) {
             $class = get_called_class();
-            \Cache::delete('tables.'.static::table());
+            \Cache::delete('model_properties.'.$class);
             unset(static::$_properties_cached[$class]);
             static::properties();
         }
