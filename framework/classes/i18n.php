@@ -43,12 +43,15 @@ class I18n
         if (!$country) {
             $country = mb_strtoupper($language);
         }
-        $available = \Config::get('novius-os.locales', array());
-        // Check the language is supported (because it can be injected via GET on the login screens)
-        if (!isset($available[$language.'_'.$country])) {
-            list($language, $country) =  explode('_', \Config::get('novius-os.default_locale', 'en_GB'));
-            $encoding = null;
-            $variant = null;
+        // Front-office can use any language
+        if (NOS_ENTRY_POINT === Nos::ENTRY_POINT_ADMIN) {
+            $available = \Config::get('novius-os.locales', array());
+            // Check the language is supported (because it can be injected via GET on the login screens)
+            if (!isset($available[$language.'_'.$country])) {
+                list($language, $country) =  explode('_', \Config::get('novius-os.default_locale', 'en_GB'));
+                $encoding = null;
+                $variant = null;
+            }
         }
         if (static::$_locale) {
             static::$_locale_stack[] = static::$_locale;
