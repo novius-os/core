@@ -25,25 +25,36 @@ class I18n
 
     private static $_loaded_files = array();
 
+    public static $_files_dict = array();
+
     public static $fallback;
 
     public static function _init()
     {
-        static::$fallback = (array) \Config::get('language_fallback', 'en');
+        static::$fallback = \Config::get('language_fallback', 'en');
         static::setLocale(\Fuel::$locale);
     }
 
     public static function setLocale($locale)
     {
-        if (static::$_locale) {
-            static::$_locale_stack[] = static::$_locale;
-        }
-
         list($remaining, $variant) = explode('@', $locale.'@');
         list($remaining, $encoding) = explode('.', $remaining.'.');
         list($language, $country) = explode('_', $remaining.'_');
         if (!$country) {
             $country = mb_strtoupper($language);
+        }
+        // Front-office can use any language
+        if (NOS_ENTRY_POINT === Nos::ENTRY_POINT_ADMIN) {
+            $available = \Config::get('novius-os.locales', array());
+            // Check the language is supported (because it can be injected via GET on the login screens)
+            if (!isset($available[$language.'_'.$country])) {
+                list($language, $country) =  explode('_', \Config::get('novius-os.default_locale', 'en_GB'));
+                $encoding = null;
+                $variant = null;
+            }
+        }
+        if (static::$_locale) {
+            static::$_locale_stack[] = static::$_locale;
         }
         static::$_locale = $language.'_'.$country;
         if (!empty($encoding)) {
@@ -65,33 +76,30 @@ class I18n
 
     public static function load($file, $group = null)
     {
-        $languages = static::$fallback;
-        array_unshift($languages, static::$_locale, mb_substr(static::$_locale, 0, 2));
+        $group = ($group === null) ? $file : $group;
+        static::$_group = $group;
 
-        $_messages = array();
-        foreach ($languages as $lang) {
-            if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
-                foreach ($path as $p) {
-                    if (array_key_exists($p, static::$_loaded_files)) {
-                        break;
-                    }
-                    $_messages = \Arr::merge(\Fuel::load($p), $_messages);
-                }
-                static::$_loaded_files[$p] = true;
-                break;
-            }
-        }
+        if (empty(static::$_loaded_files[static::$_locale][$file])) {
 
-        if (count($_messages)) {
             if ( ! isset(static::$_messages[static::$_locale])) {
                 static::$_messages[static::$_locale] = array();
             }
-            $group = ($group === null) ? $file : $group;
-            static::$_group = $group;
-            if ( ! isset(static::$_messages[$group])) {
+
+            if ( ! isset(static::$_messages[static::$_locale][$group])) {
                 static::$_messages[static::$_locale][$group] = array();
             }
-            static::$_messages[static::$_locale][$group] = \Arr::merge($_messages, static::$_messages[static::$_locale][$group]);
+
+            $languages = array(static::$_locale, mb_substr(static::$_locale, 0, 2), static::$fallback);
+
+            // Priority == 'en_GB', then 'en', then 'fallback'
+            foreach ($languages as $lang) {
+                if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
+                    foreach ($path as $p) {
+                        static::$_messages[static::$_locale][$group] = \Arr::merge(\Fuel::load($p), static::$_messages[static::$_locale][$group]);
+                    }
+                }
+            }
+            static::$_loaded_files[static::$_locale] = true;
         }
     }
 
@@ -100,11 +108,67 @@ class I18n
         return static::gget(static::$_group, $_message, $default);
     }
 
-    public static function gget($group, $_message, $default = null)
+    public static function group($group)
     {
-        $result = isset(static::$_messages[static::$_locale][$group][$_message]) ? static::$_messages[static::$_locale][$group][$_message] : $default;
-        $result = $result ? : $_message;
+        static::$_group = $group;
+    }
+
+    public static function gget($group, $message, $default = null)
+    {
+        $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
+
+        if (empty($result)) {
+            $result = $default === null ? $message : $default;
+        }
 
         return $result;
+    }
+
+    public static function current_dictionary($list)
+    {
+        $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $i = -1;
+        do {
+            $function = $dbg[++$i]['function'];
+        } while ($function == '{closure}');
+
+        static::$_files_dict[$dbg[$i]['file']] = call_user_func('static::dictionary', (array) $list);
+    }
+
+    public static function translate_from_file($file, $message, $default)
+    {
+        if (empty(static::$_files_dict[$file])) {
+            return static::get($message, $default);
+        }
+        $lookup = static::$_files_dict[$file];
+        return call_user_func($lookup, $message, $default);
+    }
+
+    public static function dictionary($list)
+    {
+        $list = (array) $list;
+
+        $active_group = static::$_group;
+        foreach ($list as $group) {
+            static::load($group);
+        }
+        static::$_group = $active_group;
+
+        $messages = static::$_messages[static::$_locale];
+
+        return function($message, $default = null) use ($list, $messages) {
+            foreach ($list as $group) {
+                $result = isset($messages[$group][$message]) ? $messages[$group][$message] : false;
+
+                // If translation exists, but is empty, then it's not translated
+                if (!empty($result)) {
+                    break;
+                }
+            }
+            if (empty($result)) {
+                $result = $default ?: $message;
+            }
+            return $result;
+        };
     }
 }

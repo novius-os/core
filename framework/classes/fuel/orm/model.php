@@ -10,6 +10,8 @@
 
 namespace Nos\Orm;
 
+\Package::load('orm');
+
 class UnknownBehaviourException extends \Exception
 {
 }
@@ -22,15 +24,21 @@ use Arr;
 
 class Model extends \Orm\Model
 {
+
     protected static $_valid_relations = array(
         'belongs_to'    => 'Orm\\BelongsTo',
         'has_one'       => 'Orm\\HasOne',
         'has_many'      => 'Orm\\HasMany',
         'many_many'     => 'Orm\\ManyMany',
+        'attachment' => 'Nos\\Orm_Attachment',
         'contextableandtwinnable_belongs_to'    => 'Nos\\Orm_ContextableAndTwinnable_BelongsTo',
     );
 
     protected static $_has_many = array();
+    protected static $_belongs_to = array();
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+    protected static $_attachment = array();
 
     /**
      * @var  array  cached behaviours
@@ -46,12 +54,6 @@ class Model extends \Orm\Model
 
     public $medias;
     public $wysiwygs;
-
-    public static function prefix()
-    {
-        // @todo: add cache
-        return static::get_prefix();
-    }
 
     /**
      * Get the class's title property
@@ -147,14 +149,14 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
 
-        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
+        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Media\Model_Link'));
     }
 
     public static function linked_medias()
     {
         $class = get_called_class();
 
-        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Model_Media_Link'));
+        return !in_array($class, array('Nos\Model_Wysiwyg', 'Nos\Media\Model_Link'));
     }
 
     /**
@@ -186,7 +188,7 @@ class Model extends \Orm\Model
             if (static::linked_medias()) {
                 static::$_has_many['linked_medias'] = array(
                     'key_from' => static::$_primary_key[0],
-                    'model_to' => 'Nos\Model_Media_Link',
+                    'model_to' => 'Nos\Media\Model_Link',
                     'key_to' => 'medil_foreign_id',
                     'cascade_save' => true,
                     'cascade_delete' => false,
@@ -308,19 +310,12 @@ class Model extends \Orm\Model
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
             if ($application !== 'nos') {
-                \Config::load(APPPATH.'metadata'.DS.'app_installed.php', 'data::app_installed');
-                $apps = \Config::get('data::app_installed', array());
-                foreach ($apps as $app => $conf) {
-                    if (!empty($conf['namespace']) && $conf['namespace'] === $namespace) {
-                        $application = $app;
-                    }
-                }
+                $namespaces = \Nos\Config_Data::get('app_namespaces', array());
+                $application = array_search($namespace, $namespaces);
             }
 
-            \Config::load($application.'::'.$file_name, true);
-            $config = \Config::get($application.'::'.$file_name);
-            \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
-            $dependencies = \Config::get('data::app_dependencies', array());
+            $config = \Config::load($application.'::'.$file_name, true);
+            $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
             if (!empty($dependencies[$application])) {
                 foreach ($dependencies[$application] as $dependency) {
@@ -341,10 +336,10 @@ class Model extends \Orm\Model
 
     public function get_possible_context()
     {
-        $contextableAndTwinnable = static::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
+        $twinnable = static::behaviours('Nos\Orm_Behaviour_Twinnable');
         $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
 
-        if (!$contextableAndTwinnable || !$tree) {
+        if (!$twinnable || !$tree) {
             return array_keys(\Nos\Tools_Context::contexts());
         }
 
@@ -422,10 +417,9 @@ class Model extends \Orm\Model
         $class = get_called_class();
         if (static::linked_wysiwygs()) {
             $w_keys = array_keys($this->linked_wysiwygs);
-            for ($j = 0; $j < count($this->linked_wysiwygs); $j++) {
-                $i = $w_keys[$j];
+            foreach ($w_keys as $i) {
                 // Remove empty wysiwyg
-                if ($this->linked_wysiwygs[$i]->wysiwyg_text == '') {
+                if (empty($this->linked_wysiwygs[$i]->wysiwyg_text)) {
                     $this->linked_wysiwygs[$i]->delete();
                     unset($this->linked_wysiwygs[$i]);
                 }
@@ -434,10 +428,9 @@ class Model extends \Orm\Model
 
         if (static::linked_medias()) {
             $w_keys = array_keys($this->linked_medias);
-            for ($j = 0; $j < count($this->linked_medias); $j++) {
-                $i = $w_keys[$j];
+            foreach ($w_keys as $i) {
                 // Remove empty medias
-                if ($this->linked_medias[$i]->medil_media_id == '') {
+                if (empty($this->linked_medias[$i]->medil_media_id)) {
                     $this->linked_medias[$i]->delete();
                     unset($this->linked_medias[$i]);
                 }
@@ -509,7 +502,7 @@ class Model extends \Orm\Model
         return Query::forge(get_called_class(), static::connection(), $options);
     }
 
-    public static function  get_prefix()
+    public static function prefix()
     {
         return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
     }
@@ -584,16 +577,18 @@ class Model extends \Orm\Model
                     }
                 }
                 // Create a new relation if it doesn't exist yet
-                $wysiwyg = new \Nos\Model_Wysiwyg();
-                $wysiwyg->wysiwyg_text = $value;
-                $wysiwyg->wysiwyg_join_table = static::$_table_name;
-                $wysiwyg->wysiwyg_key = $key;
-                $wysiwyg->wysiwyg_foreign_id = $this->id;
-                // Don't save the link here, it's done with cascade_save = true
-                //$wysiwyg->save();
-                $this->linked_wysiwygs[] = $wysiwyg;
+                if (!empty($value)) {
+                    $wysiwyg = new \Nos\Model_Wysiwyg();
+                    $wysiwyg->wysiwyg_text = $value;
+                    $wysiwyg->wysiwyg_join_table = static::$_table_name;
+                    $wysiwyg->wysiwyg_key = $key;
+                    $wysiwyg->wysiwyg_foreign_id = $this->id;
+                    // Don't save the link here, it's done with cascade_save = true
+                    //$wysiwyg->save();
+                    $this->linked_wysiwygs[] = $wysiwyg;
+                }
 
-                return $value;
+                return $this;
             }
 
             if (static::linked_medias() && $arr_name[0] == 'medias') {
@@ -612,31 +607,54 @@ class Model extends \Orm\Model
                 }
 
                 // Create a new relation if it doesn't exist yet
-                $medil = new \Nos\Model_Media_Link();
-                $medil->medil_from_table = static::$_table_name;
-                $medil->medil_key = $key;
-                $medil->medil_foreign_id = $this->id;
-                $medil->medil_media_id = $value;
-                // Don't save the link here, it's done with cascade_save = true
-                $this->linked_medias[] = $medil;
+                if (!empty($value)) {
+                    $medil = new \Nos\Media\Model_Link();
+                    $medil->medil_from_table = static::$_table_name;
+                    $medil->medil_key = $key;
+                    $medil->medil_foreign_id = $this->id;
+                    $medil->medil_media_id = $value;
+                    // Don't save the link here, it's done with cascade_save = true
+                    $this->linked_medias[] = $medil;
+                }
 
-                return $value;
+                return $this;
             }
-
-            $obj = $this;
 
             // We need to access the relation and not the final object
             // So we don't want to use the provider but the __get({"medias->key"}) instead
             //$arr_name[0] = $arr_name[0].'->'.$arr_name[1];
-            for ($i = 0; $i < count($arr_name); $i++) {
-                $obj = &$obj->{$arr_name[$i]};
-            }
-            return $obj = $value;
+            $this->setOrCreateRelation($name, $value);
+            return $this;
         }
 
         // No special setter for ID: immutable
 
         return parent::__set($name, $value);
+    }
+
+    protected function &setOrCreateRelation($name, $value)
+    {
+        $arr_name = explode('->', $name);
+        $obj = $this;
+        foreach ($arr_name as $val_name) {
+            $rel = $obj->relations($val_name);
+            if (!empty($rel)) {
+                $obj = &$obj->get($val_name);
+                if (empty($obj)) {
+                    $model_to = $rel->model_to;
+                    $related = $model_to::forge();
+                    if ($rel->singular) {
+                        $obj->{$val_name} = $related;
+                    } else {
+                        $obj->{$val_name}[] = $related;
+                    }
+                    $obj = $related;
+                }
+            } else if (array_key_exists($val_name, $obj::properties())) {
+                $obj->set($val_name, $value);
+            }
+        }
+        return $obj;
     }
 
     public function & get($name)
@@ -650,7 +668,6 @@ class Model extends \Orm\Model
 
     public function & __get($name)
     {
-
         $arr_name = explode('->', $name);
         if (count($arr_name) > 1) {
             $class = get_called_class();
@@ -693,6 +710,9 @@ class Model extends \Orm\Model
             $obj = $this;
             for ($i = 0; $i < count($arr_name); $i++) {
                 $obj = $obj->{$arr_name[$i]};
+                if (empty($obj)) {
+                    return $obj;
+                }
             }
             return $obj;
         }
@@ -770,11 +790,16 @@ class Model extends \Orm\Model
         parent::__clone();
         $wysiwygs = array();
         $medias = array();
+        // Don't copy empty wysiwygs and medias
         foreach ($this->wysiwygs as $key => $wysiwyg) {
-            $wysiwygs[$key] = $wysiwyg;
+            if (!empty($wysiwyg)) {
+                $wysiwygs[$key] = $wysiwyg;
+            }
         }
         foreach ($this->medias as $key => $media) {
-            $medias[$key] = $media;
+            if (!empty($media)) {
+                $medias[$key] = $media;
+            }
         }
         $this->initProviders();
         foreach ($wysiwygs as $key => $wysiwyg) {
@@ -790,176 +815,6 @@ class Model extends \Orm\Model
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
-
-    public static function admin_config()
-    {
-        list($application_name, $file) = \Config::configFile(get_called_class());
-        $file = explode('/', $file);
-
-        array_splice($file, count($file) - 1, 0, array('admin'));
-        $file = implode('/', $file);
-
-
-
-        $config = \Config::loadConfiguration($application_name, $file);
-
-        if (!isset($config['actions'])) {
-            $config['actions'] = array();
-        }
-        $config['actions'] = static::process_actions($application_name, get_called_class(), $config);
-
-        return $config;
-    }
-
-    public static function process_actions($application_name, $model, $config)
-    {
-        $urls = array(
-            'add' => 'action.tab.url',
-            'edit' => 'action.tab.url',
-            'delete' => 'action.dialog.contentUrl',
-        );
-
-        $actions_template = array(
-            'add' => array(
-                'label' => __('Add :model_label'),
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'method' => 'add',
-                    'tab' => array(
-                        'url' => 'insert_update?context={{context}}',
-                        'label' => __('Add a new monkey'),
-                    ),
-                ),
-                'context' => array(
-                    'appdeskToolbar' => true
-                ),
-            ),
-            'edit' => array(
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'tab' => array(
-                        'url' => "insert_update/{{id}}",
-                        'label' => __('Edit'),
-                    ),
-                ),
-                'label' => __('Edit'),
-                'primary' => true,
-                'icon' => 'pencil',
-                'context' => array(
-                    'list' => true
-                ),
-            ),
-            'delete' => array(
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => 'delete/{{id}}',
-                        'title' => __('Delete'),
-                    ),
-                ),
-                'label' => __('Delete'),
-                'primary' => true,
-                'icon' => 'trash',
-                'red' => true,
-                'context' => array(
-                    'item' => true,
-                    'list' => true
-                ),
-                'enabled' =>
-                    function($item) {
-                        return !$item->is_new();
-                    },
-            ),
-            'visualise' => array(
-                'label' => 'Visualise',
-                'primary' => true,
-                'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                'action' => array(
-                    'action' => 'window.open',
-                    'url' => '{{preview_url}}?_preview=1'
-                ),
-                'context' => array(
-                    'item' => true,
-                    'list' => true
-                ),
-                'enabled' =>
-                    function($item) {
-                        if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                            $url = $item->url_canonical(array('preview' => true));
-
-                            return !$item->is_new() && !empty($url);
-                        }
-                        return false;
-                    },
-            ),
-            'share' => array(
-                'label' => __('Share'),
-                'iconClasses' => 'nos-icon16 nos-icon16-share',
-                'action' => array(
-                    'action' => 'share',
-                    'data' => array(
-                        'model_id' => '{{id}}',
-                        'model_name' => '',
-                    ),
-                ),
-                'context' => array(
-                    'item' => true
-                ),
-                'enabled' =>
-                    function($item) {
-                        return !$item->is_new();
-                    },
-            )
-        );
-
-
-        $model_label = explode('/', $model);
-        $model_label = $model_label[count($model_label) - 1];
-        $model_label = explode('_', $model_label);
-        $model_label = $model_label[count($model_label) - 1];
-
-        if (!isset($config['controller'])) {
-            $config['controller'] = strtolower($model_label);
-        }
-
-        if (!isset($config['labels'])) {
-            $config['labels'] = array();
-        }
-
-        if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
-            unset($actions_template['visualise']);
-        }
-
-        $generated_actions = array();
-        foreach ($actions_template as $name => $template) {
-            $generated_actions[$model.'.'.$name] = $template;
-
-            if (isset($urls[$name])) {
-                \Arr::set($generated_actions[$model.'.'.$name], $urls[$name], 'admin/'.$application_name.'/'.$config['controller'].'/'.\Arr::get($generated_actions[$model.'.'.$name], $urls[$name]));
-            }
-
-            if (isset($config['labels'][$name])) {
-                $generated_actions[$model.'.'.$name]['label'] = $config['labels'][$name];
-            }
-            $generated_actions[$model.'.'.$name]['label'] = \Str::tr($generated_actions[$model.'.'.$name]['label'], array('model_label' => $model_label));
-
-            if ($name == 'share') {
-                $generated_actions[$model.'.'.$name]['action']['data']['model_name'] = $model;
-            }
-        }
-
-        $actions = \Arr::merge($generated_actions, $config['actions']);
-
-        foreach ($actions as $key => $action) {
-            if ($action === false) {
-                unset($actions[$key]);
-            }
-        }
-
-        return $actions;
-    }
-
-
 }
 
 
@@ -978,6 +833,7 @@ class Model_Media_Provider implements \Iterator
         // Reuse the getter and fetch the media directly
         $media = $this->parent->{'medias->'.$value};
         if ($media === null) {
+            // Don't return null, we need a reference here
             return $media;
         }
 
@@ -987,8 +843,8 @@ class Model_Media_Provider implements \Iterator
     public function __set($property, $value)
     {
         // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
-        $media_id = (string) ($value instanceof \Nos\Model_Media ? $value->media_id : $value);
-        $media = \Nos\Model_Media::find($media_id);
+        $media_id = (string) ($value instanceof \Nos\Media\Model_Media ? $value->media_id : $value);
+        $media = \Nos\Media\Model_Media::find($media_id);
         if (is_null($media)) {
             $pk = $this->parent->primary_key();
             throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
@@ -1020,8 +876,10 @@ class Model_Media_Provider implements \Iterator
     public function rewind()
     {
         $keys = array();
-        foreach ($this->parent->linked_medias as $wysiwyg) {
-            $keys[] = $wysiwyg->medil_key;
+        foreach ($this->parent->linked_medias as $media) {
+            if ($this->__get($media->medil_key) !== null) {
+                $keys[] = $media->medil_key;
+            }
         }
         $this->iterator = $keys;
         reset($keys);
@@ -1068,6 +926,7 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $wysiwyg = $this->parent->{'wysiwygs->'.$value};
         if ($wysiwyg === null) {
+            // Don't return null, we need a reference here
             return $wysiwyg;
         }
 
@@ -1102,9 +961,10 @@ class Model_Wysiwyg_Provider implements \Iterator
     public function rewind()
     {
         $keys = array();
-        $class = get_called_class();
         foreach ($this->parent->linked_wysiwygs as $wysiwyg) {
-            $keys[] = $wysiwyg->wysiwyg_key;
+            if ($this->__get($wysiwyg->wysiwyg_key) !== null) {
+                $keys[] = $wysiwyg->wysiwyg_key;
+            }
         }
         $this->iterator = $keys;
         reset($keys);

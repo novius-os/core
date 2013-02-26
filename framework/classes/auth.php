@@ -16,7 +16,7 @@ class Auth
 
     public static function login($login, $password, $remember_me = true)
     {
-        $user = Model_User::find(
+        $user = User\Model_User::find(
             'all',
             array(
                 'where' => array(
@@ -28,6 +28,8 @@ class Auth
             return false;
         }
         $user = current($user);
+        $user->user_last_connection = \Date::forge()->format('mysql');
+        $user->save();
         if ($user->check_password($password)) {
             \Session::set('logged_user_id', $user->id);
             \Session::set('logged_user_md5', $user->user_md5);
@@ -56,17 +58,20 @@ class Auth
         if (empty($logged_user_id)) {
             return false;
         } else {
-            $logged_user = Model_User::find_by_user_id($logged_user_id); // We reload the user
+            $logged_user = User\Model_User::find_by_user_id($logged_user_id); // We reload the user
             if (!$logged_user || $logged_user->user_md5 != $logged_user_md5) {
                 return false;
             }
             \Session::setUser($logged_user);
-            \Session::set('logged_user_id', $logged_user_id);
-            \Session::set('logged_user_md5', $logged_user_md5);
-            \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
-            if ($remember_me) {
-                \Cookie::set('logged_user_id', $logged_user_id, static::$default_cookie_lasting);
-                \Cookie::set('logged_user_md5', $logged_user_md5, static::$default_cookie_lasting);
+            // Only extend the cookie duration for the main request (preventing N 'Set-Cookie' headers if we have N HMVC requests)
+            if (!\Request::is_hmvc()) {
+                \Session::set('logged_user_id', $logged_user_id);
+                \Session::set('logged_user_md5', $logged_user_md5);
+                \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
+                if ($remember_me) {
+                    \Cookie::set('logged_user_id', $logged_user_id, static::$default_cookie_lasting);
+                    \Cookie::set('logged_user_md5', $logged_user_md5, static::$default_cookie_lasting);
+                }
             }
             return true;
         }

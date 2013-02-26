@@ -12,7 +12,7 @@ namespace Nos;
 
 class Tools_Wysiwyg
 {
-    public static function prepare_widget($content)
+    public static function prepare_renderer($content)
     {
         $replaces = array();
         static::parse_medias(
@@ -42,7 +42,7 @@ class Tools_Wysiwyg
             foreach ($matches[3] as $match_id => $media_id) {
                 $media_ids[] = $media_id;
             }
-            $medias = Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+            $medias = \Nos\Media\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
             foreach ($matches[3] as $match_id => $media_id) {
                 $closure(
                     \Arr::get($medias, $media_id, null),

@@ -13,6 +13,7 @@ define('jquery-nos',
         var undefined = void(0),
             $nos = window.$nos = $,
             $noviusos = undefined,
+            login_popup_opened = false,
             noviusos = function() {
                     if ($noviusos === undefined) {
                         $noviusos = $('.nos-ostabs');
@@ -96,6 +97,150 @@ define('jquery-nos',
 
 
         $.extend({
+            nosTexts: {
+                chooseMediaFile : 'Choose a media file',
+                chooseMediaImage : 'Choose a image',
+                errorImageNotfind : 'We’re afraid we cannot find this image.'
+            },
+
+            nosContext : function(contexts) {
+                contexts = $.extend({
+                    locales: {},
+                    sites: {},
+                    contexts: {}
+                }, contexts || {});
+
+                return {
+                    locales: contexts.locales,
+                    sites: contexts.sites,
+                    contexts: contexts.contexts,
+
+                    label: function(labels) {
+                        if ($.type(labels) === 'string') {
+                            labels = {
+                                defaultLabel: labels
+                            };
+                        }
+                        labels = $.extend({
+                            oneLocale: labels.allContexts,
+                            oneSite: labels.allContexts
+                        }, labels);
+
+                        if (Object.keys(this.sites).length === 1) {
+                            return labels.oneSite;
+                        } else if (Object.keys(this.locales).length === 1) {
+                            return labels.oneLocale;
+                        }
+                        return labels.defaultLabel;
+                    },
+
+                    siteLabel: function(site, options) {
+                        options = $.extend({
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false
+                        }, options || {});
+
+                        if ($.type(site) !== 'object') {
+                            site = this.site(site);
+                        }
+                        site = $.extend({
+                            alias: site
+                        }, site);
+
+                        if (options['short']) {
+                            return '<span title="' + site.title + '">' + site.alias  + '</span>';
+                        } else {
+                            return site.title;
+                        }
+                    },
+
+                    localeLabel: function(locale, options) {
+                        options = $.extend({
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false
+                        }, options || {});
+
+                        if ($.type(locale) !== 'object') {
+                            locale = this.locale(locale);
+                        }
+                        locale = $.extend({
+                            flag: locale.code.substr(0, 2).toLowerCase()
+                        }, locale);
+
+                        if (options['short']) {
+                            return '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" style="vertical-align:middle;" />';
+                        } else {
+                            return locale.title + ' <img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" style="vertical-align:middle;" />';
+                        }
+                    },
+
+                    contextLabel: function(context, options) {
+                        var site = this.site(context),
+                            locale = this.locale(context),
+                            label;
+
+                        options = $.extend({
+                            // Don't remove quote, cause yui-compressor fail minified
+                            'short': false,
+                            template: '{site} {locale}'
+                        }, options || {});
+
+                        if (Object.keys(this.sites).length === 1) {
+                            label = this.localeLabel(locale, options);
+                        } else if (Object.keys(this.locales).length === 1) {
+                            label = this.siteLabel(site, options);
+                        } else {
+                            label = options.template
+                                .replace('{locale}', this.localeLabel(locale, {'short': true}))
+                                .replace('{site}', this.siteLabel(site, options));
+                        }
+
+                        return label;
+                    },
+
+                    localeCode: function(context) {
+                        var split = context.split('::', 2);
+                        if (!split[1]) {
+                            return context;
+                        }
+                        return split[1];
+                    },
+
+                    locale: function(context) {
+                        var locale_code = this.localeCode(context);
+                        if (!this.locales[locale_code]) {
+                            return {
+                                code: locale_code,
+                                title: locale_code,
+                                flag: locale_code.substr(0, 2).toLowerCase()
+                            };
+                        }
+                        return $.extend({
+                            code: locale_code
+                        }, this.locales[locale_code]);
+                    },
+
+                    siteCode: function (context) {
+                        var split = context.split('::', 2);
+                        return split[0];
+                    },
+
+                    site: function (context) {
+                        var site_code = this.siteCode(context);
+                        if (!this.sites[site_code]) {
+                            return {
+                                code: site_code,
+                                title: site_code,
+                                alias: site_code
+                            };
+                        }
+                        return $.extend({
+                            code: site_code
+                        }, this.sites[site_code]);
+                    }
+                };
+            },
+
             nosDispatchEvent : function(event) {
                 if (window.parent != window && window.parent.$nos) {
                     return window.parent.$nos.nosDispatchEvent(event);
@@ -140,13 +285,18 @@ define('jquery-nos',
                     return;
                 }
 
+                var position = this.offset();
+                position = {
+                    top: position.top + this.height() / 2 - 16,
+                    left: position.left + this.width() / 2
+                }
+
                 require([
                     'wijmo.wijlightbox'
                 ], function() {
-
                     var image = new Image();
                     image.onerror = function() {
-                        $.nosNotify('Image not found', 'error');
+                        $.nosNotify($.nosTexts.errorImageNotfind, 'error');
                     };
                     image.onload = function() {
                         // Create the lightbox
@@ -169,11 +319,10 @@ define('jquery-nos',
                             .end()
                             .css({
                                 position : 'absolute',
-                                dislplay : 'none',
-                                width : 1,
-                                height: 1
+                                width : 0,
+                                height: 0
                             })
-                            .css($(this).offset())
+                            .css(position)
                             .appendTo(document.body)
                             .wijlightbox({
                                 zIndex : 1201,
@@ -197,8 +346,8 @@ define('jquery-nos',
                 });
             },
 
-            nosUIElement : function(element) {
-                var $element;
+            nosUIElement : function(element, data) {
+                var date, id, iconClass, $element;
 
                 element = $.extend({
                     type: 'button',
@@ -214,104 +363,147 @@ define('jquery-nos',
                     case 'button' :
                         $element = $('<button></button>').data(element);
                         if (element.label) {
-                            $element.text(element.label);
+                            $element.html(element.label);
                         }
-                        $.each(element.bind, function(event, action) {
-                            $element.bind(event, function() {
-                                $element.nosAction(action);
-                            });
-                        });
+                        break;
 
+                    case 'link' :
+                        if (element.iconClasses) {
+                            iconClass = element.iconClasses;
+                        } else if (element.icon) {
+                            iconClass = 'nos-inline-icon16 ui-icon ui-icon-' + element.icon;
+                        }
+                        $element = (iconClass ? '<span class="' + iconClass +'"></span> ' : '');
+                        $element += '<span class="ui-button-text">' + element.label + '</span>';
+                        $element = $('<a href="#"></a>')
+                            .css({display : 'inline-block'})
+                            .html($element);
+
+                        if (element.red) {
+                            $element.addClass('ui-state-error');
+                        }
                         break;
                 }
-
-                if (element.menu) {
-                    var date = new Date(),
-                        id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
-                    $element.attr('id', id)
-                        .nosOnShow('one', function() {
-                            var $ul = $('<ul></ul>');
-                            $.each(element.menu.menus, function() {
-                                var menu = this,
-                                    $a = $('<li><a></a></li>').data('action', menu.action)
-                                        .appendTo($ul)
-                                        .find('a');
-
-                                if (menu.content) {
-                                    $a.append(menu.content);
-                                } else {
-                                    if (menu.icon) {
-                                        $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
-                                            .appendTo($a);
-                                    } else if (menu.iconClasses) {
-                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
-                                            .appendTo($a);
-                                    } else if (menu.iconUrl) {
-                                        $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
-                                            .css('backgroundImage', 'url(' + menu.iconUrl + ')')
-                                            .appendTo($a);
-                                    }
-                                    if (menu.label) {
-                                        $('<span></span>').addClass('wijmo-wijmenu-text')
-                                            .text(menu.label)
-                                            .appendTo($a);
-                                    }
-                                }
-                            });
-
-                            $ul.insertAfter($element)
-                                .wijmenu($.extend(true, {
-                                        orientation: 'vertical'
-                                    },
-                                    element.menu.options || {},
-                                    {
-                                        trigger: '#' + id,
-                                        select: function(e, data) {
-                                            var $li = $(data.item.element);
-                                            $li.nosAction($li.data('action'));
-                                        }
-                                    }
-                                ));
-                        });
+                if (element.disabled && element.disabled === true) {
+                    $element.attr('disabled', true);
                 }
 
+                if ($element) {
+                    $.each(element.bind, function(event, action) {
+                        $element.bind(event, function(e) {
+                            e.preventDefault();
+                            $element.nosAction(action, data);
+                        });
+                    });
+
+                    if (element.menu) {
+                        date = new Date();
+                        id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                        $element.attr('id', id)
+                            .nosOnShow('one', function() {
+                                var $ul = $('<ul></ul>');
+                                $.each(element.menu.menus, function() {
+                                    var menu = this,
+                                        $a = $('<li><a></a></li>').data('action', menu.action)
+                                            .appendTo($ul)
+                                            .find('a');
+
+                                    if (menu.content) {
+                                        $a.append(menu.content);
+                                    } else {
+                                        if (menu.icon) {
+                                            $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
+                                                .appendTo($a);
+                                        } else if (menu.iconClasses) {
+                                            $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
+                                                .appendTo($a);
+                                        } else if (menu.iconUrl) {
+                                            $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
+                                                .css('backgroundImage', 'url(' + menu.iconUrl + ')')
+                                                .appendTo($a);
+                                        }
+                                        if (menu.label) {
+                                            $('<span></span>').addClass('wijmo-wijmenu-text')
+                                                .html(menu.label)
+                                                .appendTo($a);
+                                        }
+                                    }
+                                });
+
+                                $ul.insertAfter($element)
+                                    .wijmenu($.extend(true, {
+                                            orientation: 'vertical',
+                                            animation: {
+                                                animated:"slide",
+                                                option: {
+                                                    direction: "up"
+                                                },
+                                                duration: 50,
+                                                easing: null
+                                            },
+                                            hideAnimation: {
+                                                animated:"slide",
+                                                option: {
+                                                    direction: "up"
+                                                },
+                                                duration: 0,
+                                                easing: null
+                                            }
+                                        },
+                                        element.menu.options || {},
+                                        {
+                                            trigger: '#' + id,
+                                            select: function(e, data) {
+                                                var $li = $(data.item.element);
+                                                $li.nosAction($li.data('action'));
+                                            }
+                                        }
+                                    ));
+                            });
+                    }
+                }
 
                 return $element;
+            },
+
+            nosDataReplace : function (obj, data) {
+                if ($.type(obj) === 'string') {
+                    return obj.replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
+                            return data[p1] || '';
+                        }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
+                            return encodeURIComponent(data[p1] || '');
+                        });
+                } else if ($.isPlainObject(obj)) {
+                    $.each(obj, function(key, value) {
+                        obj[key] = $.nosDataReplace(value, data);
+                    });
+                }
+                return obj;
+            },
+
+            /**
+             * Removes &nbsp; entities
+             */
+            nosCleanupTranslation : function (text) {
+                return text.replace(/&nbsp;/g, ' ');
             }
-        });
+    });
 
         $.fn.extend({
             nosAction : function(obj, data) {
-                var params;
+                var url, params;
                 data = data || {};
                 try {
                     if ($.isFunction(obj)) {
                         obj($(this), data);
                     } else {
-                        var placeholderReplace = function (obj, data) {
-                            if ($.type(obj) === 'string') {
-                                return obj.replace(/\[\:([\w]+)\]/g, function(str, p1, offset, s) {
-                                        return data[p1] || '';
-                                    }).replace(/{{([\w]+)}}/g, function(str, p1, offset, s) {
-                                        return data[p1] || '';
-                                    }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
-                                        return encodeURIComponent(data[p1] || '');
-                                    });
-                            } else if ($.isPlainObject(obj)) {
-                                $.each(obj, function(key, value) {
-                                    obj[key] = placeholderReplace(value, data);
-                                });
-                            }
-                            return obj;
-                        };
-
                         switch(obj.action) {
                             case 'nosTabs' :
                                 var args = [];
                                 params = $.extend(true, {}, obj);
 
                                 params.method && args.push(params.method);
-                                args.push(placeholderReplace(params.tab, data));
+                                args.push($.nosDataReplace(params.tab, data));
                                 params.dialog && args.push(params.dialog);
                                 $.fn.nosTabs.apply($(this), args);
                                 break;
@@ -322,17 +514,22 @@ define('jquery-nos',
                                     width: 500,
                                     height: 'auto',
                                     'class': 'nos-confirmation-dialog'
-                                }, placeholderReplace($.extend(true, {}, obj.dialog), data));
+                                }, $.nosDataReplace($.extend(true, {}, obj.dialog), data));
+                                $(this).nosDialog(params);
+                                break;
+
+                            case 'nosDialog' :
+                                params = $.nosDataReplace($.extend(true, {}, obj.dialog), data);
                                 $(this).nosDialog(params);
                                 break;
 
                             case 'nosAjax' :
-                                params = placeholderReplace($.extend(true, {}, obj.params), data);
+                                params = $.nosDataReplace($.extend(true, {}, obj.params), data);
                                 $(this).nosAjax(params);
                                 break;
 
                             case 'nosMediaVisualise' :
-                                $.nosMediaVisualise(data);
+                                $.nosMediaVisualise.call(this, data);
                                 break;
 
                             case 'dialogPick' :
@@ -340,8 +537,13 @@ define('jquery-nos',
                                 break;
 
                             case 'window.open' :
-                                var url = placeholderReplace(obj.url, data);
+                                url = $.nosDataReplace(obj.url, data);
                                 window.open(url);
+                                break;
+
+                            case 'document.location' :
+                                url = $.nosDataReplace(obj.url, data);
+                                document.location  = url;
                                 break;
                         }
                     }
@@ -353,6 +555,7 @@ define('jquery-nos',
 
             nosAjax : function(params) {
                 var options = $.extend({
+                        cache    : false,
                         dataType : 'json',
                         type     : 'POST',
                         data     : {}
@@ -369,14 +572,14 @@ define('jquery-nos',
                         }
                         self.nosAjaxSuccess(json);
                     };
-
-                    options.error = function(json) {
-                        self.nosAjaxError(json);
-                        if ($.isFunction(old_error)) {
-                            old_error.call(this, params);
-                        }
-                    };
                 }
+
+                options.error = function(x, e) {
+                    self.nosAjaxError(x, e);
+                    if ($.isFunction(old_error)) {
+                        old_error.call(this, x, e);
+                    }
+                };
 
                 return $.ajax(options);
             },
@@ -411,6 +614,16 @@ define('jquery-nos',
                         });
                     } else {
                         $.nosNotify(json.notify);
+                    }
+                }
+                if (json.action) {
+                    var self = this;
+                    if ($.isArray(json.action)) {
+                        $.each(json.action, function() {
+                            $(self).nosAction(this);
+                        });
+                    } else {
+                        $(self).nosAction(json.action);
                     }
                 }
                 // Call user callback
@@ -451,6 +664,21 @@ define('jquery-nos',
             },
 
             nosAjaxError : function(x, e) {
+                if (x.status == 403) {
+                    try {
+                        // If it's valid JSON, then we'll open the reconnect popup
+                        var json =  $.parseJSON(x.responseText);
+                        if (json.login_popup && !login_popup_opened) {
+                            json.login_popup['close'] = function() {
+                                login_popup_opened = false;
+                            };
+                            json.login_popup.contentUrl += '?lang=' + $.nosLang;
+                            $('body').nosDialog('open', json.login_popup);
+                            login_popup_opened = true;
+                        }
+                        return;
+                    } catch(e) {}
+                }
                 // http://www.maheshchari.com/jquery-ajax-error-handling/
                 if (x.status != 0) {
                     $.nosNotify('Connection error!', 'error');
@@ -479,8 +707,12 @@ define('jquery-nos',
 
                 data = data || {};
                 var contentUrls = {
-                        'all'   : 'admin/nos/media/appdesk',
-                        'image' : 'admin/nos/media/appdesk?view=image_pick'
+                        'all'   : 'admin/noviusos_media/appdesk?view=media_pick',
+                        'image' : 'admin/noviusos_media/appdesk?view=image_pick'
+                    },
+                    titles = {
+                        'all'   : $.nosTexts.chooseMediaFile,
+                        'image' : $.nosTexts.chooseMediaImage
                     },
                     $input = this;
 
@@ -493,10 +725,10 @@ define('jquery-nos',
                                 destroyOnClose : true,
                                 contentUrl: contentUrls[data.mode],
                                 ajax: true,
-                                title: 'Choose a media file'
+                                title: titles[data.mode]
                             }).bind('select_media', function(e, item) {
                                 $input.inputFileThumb({
-                                    file: item.thumbnail
+                                    file: item.image ? item.thumbnail : item.path
                                 });
                                 $input.val(item.id).trigger('change', {
                                     item : item
@@ -522,8 +754,8 @@ define('jquery-nos',
             nosFormUI : function() {
                 var $context = this;
 
-                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").wijtextbox();
-                $context.find(":input[type='submit'],button").each(function() {
+                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").filter(':not(.notransform)').wijtextbox();
+                $context.find(":input[type='submit'],button").filter(':not(.notransform)').each(function() {
                     var data = $(this).data(),
                         options = $.extend(true, {
                             icons : {}
@@ -571,19 +803,21 @@ define('jquery-nos',
                     });
                 });
                 $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
-                    $(this).wijdropdown();
+                    var $wijdropdown = $(this).wijdropdown().closest('.wijmo-wijdropdown');
+                    // Cross browser compatibility: prevent the dropdown from protruding over 2 lines
+                    $wijdropdown.width($wijdropdown.width() + 5);
                 });
-                $context.find(":input[type=checkbox]").nosOnShow('one', function() {
+                $context.find(":input[type=checkbox]").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijcheckbox();
                 });
                 $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
                     $(this).wijradio();
                 });
-                $context.find('.expander').each(function() {
+                $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
                     $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
                 });
-                $context.find('.accordion').wijaccordion({
+                $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",
                     selectedIndexChanged : function(e, args) {
                         $(e.target).find('.ui-accordion-content').eq(args.newIndex).nosOnShow();
@@ -626,8 +860,8 @@ define('jquery-nos',
                             $context.nosAjaxSuccess(json)
                                 .triggerHandler('ajax_success', [json]);
                         },
-                        error: function() {
-                            $.nosNotify('An error occured', 'error');
+                        error: function(x, e) {
+                            $context.nosAjaxError(x, e);
                         }
                     });
                 });
@@ -780,7 +1014,7 @@ define('jquery-nos',
                             $dialog.wijdialog(options);
 
                             // Request the remote document
-                            $.ajax({
+                            $dialog.nosAjax({
                                 url: contentUrl,
                                 type: 'GET',
                                 dataType: "html",
@@ -901,11 +1135,12 @@ define('jquery-nos',
                 if ($.isArray(listens)) {
                     listens = $.extend(true, [], listens);
                     // Loop on original array, remove on clone : not change index inside the loop
-                    $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
-                        if (listen.caller === caller) {
+                    for (var index_listen = 0; index_listen < listens.length; index_listen++) {
+                        if (listens[index_listen].caller === caller) {
                             listens.splice(index_listen, 1);
+                            index_listen--;
                         }
-                    });
+                    }
                     $dispatcher.data('noviusos-listens', listens);
                 }
 
@@ -1024,7 +1259,7 @@ define('jquery-nos',
                     case 'current' :
                         return (function() {
                             if (window.parent != window && window.parent.$nos) {
-                                return window.parent.$nos(window.frameElement).tab('current');
+                                return window.parent.$nos(window.frameElement).nosTabs('current');
                             } else {
                                 if (noviusos().length) {
                                     return noviusos().ostabs('current');

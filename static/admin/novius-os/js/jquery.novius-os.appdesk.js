@@ -20,6 +20,7 @@ define('jquery-nos-appdesk',
                 defaultView : 'grid',
                 locales : {},
                 sites : {},
+                culture: 'en-GB',
                 contexts : {},
                 hideContexts : false,
                 texts : {
@@ -29,17 +30,24 @@ define('jquery-nos-appdesk',
                     settings : 'Settings',
                     item : 'item',
                     items : 'items',
+                    //gridTitle: 'Items', // Don't set it here, will use texts.items as default value
                     showNbItems : 'Showing {{x}} items out of {{y}}',
-                    showOneItem : 'Show 1 item',
-                    showNoItem : 'No item',
+                    showOneItem : 'Showing 1 item',
+                    showNoItem : 'No items',
                     showAll : 'Show all items',
-                    viewGrid : 'Grid',
-                    viewTreeGrid : 'Tree grid',
+                    viewGrid : 'List',
+                    viewTreeGrid : 'Tree',
                     viewThumbnails : 'Thumbnails',
-                    selectContexts : 'Select the context(s) to work in',
-                    workInContext : 'Work in {{context}}',
+                    selectSites : 'Select the site(s) to show',
+                    selectLanguages : 'Select the language(s) to show',
+                    selectContexts : 'Select the context(s) to show',
+                    workInContext : 'Show {{context}}',
+                    otherSites : 'Other sites',
+                    otherLanguages : 'Other languages',
                     otherContexts : 'Other contexts',
-                    contextsPopinOk : 'Ok'
+                    contextsPopinOk : 'OK',
+                    loading : 'Loading...',
+                    search: 'Search'
                 },
                 values: {},
                 //callbabks
@@ -59,6 +67,7 @@ define('jquery-nos-appdesk',
             pageIndex : 0,
             showFilter : false,
             gridRendered : false,
+            nosContext : false,
             resizing : true,
             init : false,
             itemSelected : null,
@@ -108,15 +117,16 @@ define('jquery-nos-appdesk',
 
                 self.uiSearchIcon = $('<div></div>').addClass('nos-appdesk-search-icon ui-icon ui-icon-search')
                     .appendTo(self.uiInputContainer);
-                self.uiSearchInput = $('<input type="search" name="search" placeholder="Search" value="" />')
+                self.uiSearchInput = $('<input type="search" name="search" placeholder="' + o.texts['search'] + '" value="" />')
                     .addClass('nos-appdesk-search-input ui-helper-reset')
                     .appendTo(self.uiInputContainer);
                 self.uiInspectorsTags = $('<div></div>').addClass('nos-appdesk-inspectorstags')
                     .appendTo(self.uiInputContainer);
-                self.uiResetSearch = $('<a href="#"></a>').text(o.texts.showAll)
+                self.uiResetSearch = $('<a href="#"></a>').html(o.texts.showAll)
+                    .attr('title', o.texts.showAll)
                     .addClass('nos-appdesk-reset-search')
                     .appendTo(self.uiInputContainer);
-                self.uiuiResetSearchIcon = $('<span></span>').text(o.texts.showAll)
+                self.uiuiResetSearchIcon = $('<span></span>').html(o.texts.showAll)
                     .addClass('ui-icon')
                     .appendTo(self.uiResetSearch);
 
@@ -143,6 +153,16 @@ define('jquery-nos-appdesk',
                         thumbnailSize : 128
                     }, o.thumbnails);
                 }
+
+                if (!o.texts.gridTitle) {
+                    o.texts.gridTitle = o.texts.items;
+                }
+
+                self.nosContext = $.nosContext({
+                    locales: o.locales,
+                    sites: o.sites,
+                    contexts: o.contexts
+                });
 
                 if (!$.isEmptyObject(o.contexts)) {
 
@@ -213,33 +233,32 @@ define('jquery-nos-appdesk',
                     return self;
                 }
 
-                var first = o.buttons.shift(),
-                    $button = $('<button></button>').text(first.label)
-                        .data('icon', first.icon || 'plus')
-                        .addClass('primary')
-                        .click(function(e) {
-                            e.preventDefault();
-                            e.stopImmediatePropagation();
-                            $(this).nosAction(first.action, {
+                $.each(o.buttons, function(i, button) {
+                    var $el;
+                    if (button.primary) {
+                        $el = $('<button></button>').html(button.label)
+                            .data('icon', button.icon || 'plus')
+                            .addClass('primary')
+                            .click(function(e) {
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                $(this).nosAction(button.action, {
                                     context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
-                        });
-
-                self.element.nosToolbar('add', $button);
-
-                $.each(o.buttons, function(i, add) {
-                    var $a = $('<a href="#"></a>')
-                        .addClass('nos-appdesk-action-secondary')
-                        .text(this.label)
-                        .click(function(e) {
-                            e.preventDefault();
-                            e.stopImmediatePropagation();
-                            $(this).nosAction(add.action, {
+                            });
+                    } else {
+                        $el = $('<a href="#"></a>')
+                            .addClass('nos-appdesk-action-secondary')
+                            .html(button.label)
+                            .click(function(e) {
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                $(this).nosAction(button.action, {
                                     context: o.selectedContexts.length ? o.selectedContexts[0] : ''
                                 });
-                        });
-
-                    self.element.nosToolbar('add', $a);
+                            });
+                    }
+                    self.element.nosToolbar('add', $el);
                 });
 
                 return self;
@@ -261,7 +280,7 @@ define('jquery-nos-appdesk',
                     $trHeader = $table.find('tr');
 
                 $.each(o.locales, function(locale, locale_params) {
-                    $('<th></th>').text(locale_params.title)
+                    $('<th></th>').html(locale_params.title)
                         .append('<br /><img src="static/novius-os/admin/novius-os/img/flags/' + locale_params.flag + '.png" />')
                         .appendTo($trHeader)
                 });
@@ -269,7 +288,7 @@ define('jquery-nos-appdesk',
                 $.each(o.sites, function(site, site_params) {
                     var $tr = $('<tr></tr>').appendTo($tbody);
 
-                    $('<th></th>').text(site_params.title)
+                    $('<th></th>').html(site_params.title)
                         .appendTo($tr);
 
                     $.each(o.locales, function(locale, locale_params) {
@@ -283,7 +302,11 @@ define('jquery-nos-appdesk',
                     });
                 });
                 self.uiToolbarContextsDialog.wijdialog({
-                        title:o.texts.selectContexts,
+                        title: self.nosContext.label({
+                                oneSite: o.texts.selectLanguages,
+                                oneLocale: o.texts.selectSites,
+                                defaultLabel: o.texts.selectContexts
+                            }),
                         autoOpen: false,
                         buttons: [
                             {
@@ -313,6 +336,7 @@ define('jquery-nos-appdesk',
                                 self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
                             });
                             self.uiToolbarContextsDialog.find(':checkbox').wijcheckbox('refresh');
+                            self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
                         }
                     })
                     .nosOnShow('one', function() {
@@ -414,7 +438,11 @@ define('jquery-nos-appdesk',
                     .end()
                     .find('button:last')
                     .attr('id', id)
-                    .text(o.texts.selectContexts)
+                    .html(self.nosContext.label({
+                            oneSite: o.texts.selectLanguages,
+                            oneLocale: o.texts.selectSites,
+                            defaultLabel: o.texts.selectContexts
+                        }))
                     .data({
                         text: false,
                         icons: {
@@ -429,29 +457,32 @@ define('jquery-nos-appdesk',
                 $('<li><a></a></li>')
                     .appendTo($ul)
                     .find('a')
-                    .text(o.texts.selectContexts);
+                    .html(self.nosContext.label({
+                            oneSite: o.texts.selectLanguages,
+                            oneLocale: o.texts.selectSites,
+                            defaultLabel: o.texts.selectContexts
+                        }));
 
                 $('<li></li>')
                     .appendTo($ul);
 
                 $.each(o.contexts, function(context) {
-                    var site_locale = context.split('::', 2),
-                        site = o.sites[site_locale[0]],
-                        locale = o.locales[site_locale[1]],
-                        content = o.texts.workInContext.replace('{{context}}', site.title + ' ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" />');
-
                     count++;
                     $('<li><a></a></li>')
                         .data('context', context)
                         .appendTo($ul)
                         .find('a')
-                        .append(content);
+                        .append(o.texts.workInContext.replace('{{context}}', self.nosContext.contextLabel(context)));
 
                     if (count > 10 && Object.key(o.contexts).length > 12) {
                         $('<li><a></a></li>')
                             .appendTo($ul)
                             .find('a')
-                            .text(o.texts.otherContexts);
+                            .html(self.nosContext.label({
+                                    oneSite: o.texts.otherLanguages,
+                                    oneLocale: o.texts.otherSites,
+                                    defaultLabel: o.texts.otherContexts
+                                }));
 
                         return false
                     }
@@ -460,6 +491,22 @@ define('jquery-nos-appdesk',
                 $ul.insertAfter(self.uiToolbarContextsButton)
                     .wijmenu({
                             orientation: 'vertical',
+                            animation: {
+                                animated:"slide",
+                                option: {
+                                    direction: "up"
+                                },
+                                duration: 50,
+                                easing: null
+                            },
+                            hideAnimation: {
+                                animated:"slide",
+                                option: {
+                                    direction: "up"
+                                },
+                                duration: 0,
+                                easing: null
+                            },
                             direction: 'rtl',
                             trigger: '#' + id,
                             select: function(e, data) {
@@ -480,25 +527,21 @@ define('jquery-nos-appdesk',
             },
 
             _uiToolbarContextsButtonLabel : function() {
-                var self = this,
+                var label = '',
+                    nbSites = 0,
+                    nbLocales = 0,
+                    sites = {},
+                    locales = {},
+                    self = this,
                     o = self.options,
                     $button = self.uiToolbarContextsButton.find('button:first');
 
                 if (o.selectedContexts.length === 1) {
-                    var site_locale = o.selectedContexts[0].split('::', 2),
-                        site = o.sites[site_locale[0]],
-                        locale = o.locales[site_locale[1]];
-
-                    $button.button('option', 'label', (Object.keys(o.sites).length > 1 ? '<span title="' + site.title + '">' + site.alias + '</span>' : '') + ' ' + (Object.keys(o.locales).length > 1 ? '<img src="static/novius-os/admin/novius-os/img/flags/' + locale.flag + '.png" title="' + locale.title + '" />' : ''));
+                    $button.button('option', 'label', self.nosContext.contextLabel(o.selectedContexts[0]));
                 } else {
-                    var nbSites = 0,
-                        nbLocales = 0,
-                        sites = {},
-                        locales = {};
                     $.each(o.selectedContexts, function(i, context) {
-                        var site_locale = context.split('::', 2),
-                            site = site_locale[0],
-                            locale = site_locale[1];
+                        var site = self.nosContext.siteCode(context),
+                            locale = self.nosContext.localeCode(context);
 
                         if (!sites[site]) {
                             nbSites++;
@@ -514,27 +557,26 @@ define('jquery-nos-appdesk',
                     });
 
                     if (Object.keys(o.contexts).length === o.selectedContexts.length) {
-                        $button.button('option', 'label', o.texts.allContexts);
-                    } else if (Object.keys(o.sites).length === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
-                        $button.button('option', 'label', o.texts.allLanguages);
-                    } else if (Object.keys(o.locales).length === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
-                        $button.button('option', 'label', o.texts.allSites);
+                        $button.button('option', 'label', self.nosContext.label({
+                            oneSite: o.texts.allLanguages,
+                            oneLocale: o.texts.allSites,
+                            defaultLabel: o.texts.allContexts
+                        }));
                     } else if (nbSites === 1 && o.sites[Object.keys(sites)[0]].locales.length === nbLocales) {
-                        $button.button('option', 'label', '<span title="' + o.sites[Object.keys(sites)[0]].title + '">' + o.sites[Object.keys(sites)[0]].alias  + '</span>' + ', ' + o.texts.allLanguages);
+                        $button.button('option', 'label', self.nosContext.siteLabel(Object.keys(sites)[0]) + ', ' + o.texts.allLanguages);
                     } else if (nbLocales === 1 && o.locales[Object.keys(locales)[0]].sites.length === nbSites) {
-                        $button.button('option', 'label', o.texts.allSites + ', ' + '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[Object.keys(locales)[0]].flag + '.png" title="' + o.locales[Object.keys(locales)[0]].title + '" style="vertical-align:middle;" /> ')
+                        $button.button('option', 'label', o.texts.allSites + ', ' + self.nosContext.localeLabel(Object.keys(locales)[0]));
                     } else {
-                        var label = '';
                         $.each(sites, function(site, locales) {
                             if (label !== '') {
                                 label += '&nbsp;&nbsp;';
                             }
                             if (Object.keys(o.sites).length > 1) {
-                                label += '<span title="' + o.sites[site].title + '">' + o.sites[site].alias  + '</span> ';
+                                label += self.nosContext.siteLabel(site, {'short': true}) + ' ';
                             }
                             if (Object.keys(o.locales).length > 1) {
                                 $.each(locales, function(i, locale) {
-                                    label += '<img src="static/novius-os/admin/novius-os/img/flags/' + o.locales[locale].flag + '.png" title="' + o.locales[locale].title + '" /> ';
+                                    label += self.nosContext.localeLabel(locale, {'short': true}) + ' ';
                                 });
                             }
                         });
@@ -722,7 +764,7 @@ define('jquery-nos-appdesk',
                         self.uiInspectorsTags.wijsuperpanel('destroy');
 
                         var span = $('<span></span>').addClass('nos-appdesk-inspectorstag ui-state-default ui-corner-all ' + name)
-                            .text(label)
+                            .html(label)
                             .appendTo(self.uiInspectorsTags);
 
                         $('<input type="hidden" name="' + inspector.inputName + '" />').val(value)
@@ -744,7 +786,7 @@ define('jquery-nos-appdesk',
                         });
 
                         if (o.defaultView === 'treeGrid') {
-                            self.uiViewsButtons.find('#view_grid').click().blur();
+                            self.uiViewsButtons.find('.view_grid').click().blur();
                         } else {
                             self.gridReload();
                         }
@@ -787,9 +829,10 @@ define('jquery-nos-appdesk',
                             clearTimeout(self.timeoutSearchInput);
                         }
 
-                        if ($.inArray(event.keyCode, [keyCode.ENTER, keyCode.NUMPAD_ENTER]) != -1) {
+                        // Don't ever use keyCode.NUMPAD_ENTER here, it conflicts with "L" minuscule
+                        if (event.keyCode === keyCode.ENTER) {
                             if (o.defaultView === 'treeGrid') {
-                                self.uiViewsButtons.find('#view_grid').click().blur();
+                                self.uiViewsButtons.find('.view_grid').click().blur();
                             } else {
                                 self.gridReload();
                             }
@@ -798,7 +841,7 @@ define('jquery-nos-appdesk',
 
                         self.timeoutSearchInput = setTimeout(function() {
                             if (o.defaultView === 'treeGrid') {
-                                self.uiViewsButtons.find('#view_grid').click().blur();
+                                self.uiViewsButtons.find('.view_grid').click().blur();
                             } else {
                                 self.gridReload();
                             }
@@ -823,37 +866,39 @@ define('jquery-nos-appdesk',
                     });
 
                 var presentations = [
-                    {
-                        id : 'treeGrid',
-                        text : o.texts.viewTreeGrid,
-                        icon : 'view-tree'
-                    },
-                    {
-                        id : 'grid',
-                        text : o.texts.viewGrid,
-                        icon : 'view-list'
-                    },
-                    {
-                        id : 'thumbnails',
-                        size : 64,
-                        text : o.texts.viewThumbnails,
-                        icon : 'view-thumbs-small'
-                    },
-                    {
-                        id : 'thumbnails',
-                        size : 128,
-                        text : o.texts.viewThumbnails,
-                        icon : 'view-thumbs-big'
-                    }
-                ];
+                        {
+                            id : 'treeGrid',
+                            text : o.texts.viewTreeGrid,
+                            icon : 'view-tree'
+                        },
+                        {
+                            id : 'grid',
+                            text : o.texts.viewGrid,
+                            icon : 'view-list'
+                        },
+                        {
+                            id : 'thumbnails',
+                            size : 64,
+                            text : o.texts.viewThumbnails,
+                            icon : 'view-thumbs-small'
+                        },
+                        {
+                            id : 'thumbnails',
+                            size : 128,
+                            text : o.texts.viewThumbnails,
+                            icon : 'view-thumbs-big'
+                        }
+                    ],
+                    date = new Date(),
+                    id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
 
                 $.each(presentations, function() {
                     var presentation = this;
                     if (o[presentation.id]) {
-                        $('<label for="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
-                            .text(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
+                        $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
+                            .html(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
-                        $('<input type="radio" id="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
+                        $('<input type="radio" class="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
                             .appendTo(self.uiViewsButtons)
                             .button({
                                 text : false,
@@ -892,7 +937,7 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 self.gridRendered = false;
-                self.uiGridTitle.text(o.texts.items);
+                self.uiGridTitle.html(o.texts.gridTitle);
 
                 self.uiThumbnail.thumbnailsgrid('destroy')
                     .empty()
@@ -933,12 +978,14 @@ define('jquery-nos-appdesk',
                         width : '100%'
                     })
                     .noslistgrid($.extend({
+                        loadingText: o.texts.loading,
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
                         showFilter: self.showFilter,
                         allowSorting: true,
                         scrollMode : 'auto',
                         allowPaging : true,
+                        culture: o.culture,
                         pageIndex : self.pageIndex,
                         pageSize: Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row),
                         allowColSizing : true,
@@ -966,14 +1013,14 @@ define('jquery-nos-appdesk',
                             },
                             loaded: function(dataSource, data) {
                                 if (dataSource.data.totalRows === 0) {
-                                    self.uiPaginationLabel.text(o.texts.showNoItem);
-                                    self.uiNbResult.text(o.texts.showNoItem);
+                                    self.uiPaginationLabel.html(o.texts.showNoItem);
+                                    self.uiNbResult.html(o.texts.showNoItem);
                                 } else if (dataSource.data.totalRows === 1) {
-                                    self.uiPaginationLabel.text(o.texts.showOneItem);
-                                    self.uiNbResult.text('1 ' + o.texts.item);
+                                    self.uiPaginationLabel.html(o.texts.showOneItem);
+                                    self.uiNbResult.html('1 ' + o.texts.item);
                                 } else {
-                                    self.uiPaginationLabel.text(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
-                                    self.uiNbResult.text(dataSource.data.totalRows + ' ' + o.texts.items);
+                                    self.uiPaginationLabel.html(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
+                                    self.uiNbResult.html(dataSource.data.totalRows + ' ' + o.texts.items);
                                 }
                                 self.uiNbResult.show();
 
@@ -1063,6 +1110,7 @@ define('jquery-nos-appdesk',
                         height : height,
                         width : '100%'
                     }).nostreegrid($.extend(true, { // True for recursive clone
+                        loadingText: o.texts.loading,
                         urlJson : o.treeGrid.urlJson,
                         treeOptions : {
                             context : o.selectedContexts || ''
@@ -1071,6 +1119,7 @@ define('jquery-nos-appdesk',
                         selectionMode: 'singleRow',
                         allowSorting: true,
                         scrollMode : 'auto',
+                        culture: o.culture,
                         allowColSizing : true,
                         allowColMoving : true,
                         columns : o.treeGrid.columns || o.grid.columns,
@@ -1083,7 +1132,7 @@ define('jquery-nos-appdesk',
                                     column.sortDirection = 'none';
                                 }
                             });
-                            self.uiViewsButtons.find('#view_grid').click().blur();
+                            self.uiViewsButtons.find('.view_grid').click().blur();
                             return false;
                         },
                         cellStyleFormatter: function(args) {
@@ -1148,6 +1197,9 @@ define('jquery-nos-appdesk',
 
                 self.uiThumbnail.css('height', height)
                     .thumbnailsgrid($.extend({
+                        texts: {
+                            loading: o.texts.loading
+                        },
                         pageIndex: 0,
                         url: o.grid.urlJson,
                         loading: function (dataSource, userData) {
@@ -1160,14 +1212,14 @@ define('jquery-nos-appdesk',
                         },
                         loaded: function(dataSource, data) {
                             if (dataSource.data.totalRows === 0) {
-                                self.uiPaginationLabel.text(o.texts.showNoItem);
-                                self.uiNbResult.text(o.texts.showNoItem);
+                                self.uiPaginationLabel.html(o.texts.showNoItem);
+                                self.uiNbResult.html(o.texts.showNoItem);
                             } else if (dataSource.data.totalRows === 1) {
-                                self.uiPaginationLabel.text(o.texts.showOneItem);
-                                self.uiNbResult.text('1 ' + o.texts.item);
+                                self.uiPaginationLabel.html(o.texts.showOneItem);
+                                self.uiNbResult.html('1 ' + o.texts.item);
                             } else {
-                                self.uiPaginationLabel.text(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
-                                self.uiNbResult.text(dataSource.data.totalRows + ' ' + o.texts.items);
+                                self.uiPaginationLabel.html(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
+                                self.uiNbResult.html(dataSource.data.totalRows + ' ' + o.texts.items);
                             }
                             self.uiNbResult.show();
 
@@ -1221,12 +1273,12 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                if (Object.keys(o.contexts).length > 1 && !o.hideContexts) {
+                if (!o.hideContexts) {
                     $.each(columns, function(i, column) {
                         if (column.dataKey === 'context') {
                             column.visible = o.selectedContexts.length > 1;
-                        } else if (column.multiContextHide && o.selectedContexts.length > 1) {
-                            column.visible = false;
+                        } else if (column.multiContextHide) {
+                            column.visible = o.selectedContexts.length === 1;
                         }
                     });
                 }
@@ -1428,9 +1480,329 @@ define('jquery-nos-appdesk',
 
         $.extend({
             appdeskAdd: function(id, config) {
-                var self = this;
-                var onCustom = false;
-                var jsonFile = "";
+                var self = this,
+                    onCustom = false,
+                    jsonFile = "",
+                    appdesk,
+                    appdeskSetup = function(config) {
+                        var configToUse = $.extend({}, true, config);
+                        var i18n = config.i18n || {};
+
+                        var self = {},
+                            objectToArray = function(val, i) {
+                                val['setupkey'] = i;
+                                return val;
+                            },
+
+                            keyToOrderedArray = function(object, key) {
+                                if (object[key + 'Order']) {
+                                    var keys = object[key + 'Order'].split(',');
+                                    var ordered = [];
+                                    for (var i = 0; i < keys.length; i++) {
+                                        // Remove null values
+                                        if (object[key][keys[i]] != null) {
+                                            object[key][keys[i]]['setupkey'] = keys[i];
+                                            ordered.push(object[key][keys[i]]);
+                                        }
+                                    }
+                                    return ordered;
+                                } else {
+                                    return $.map(object[key], objectToArray);
+                                }
+                            },
+
+                            recursive = function(object) {
+                                $.each(object, function(key, val) {
+                                    var i, nosContext,
+                                        actions = [];
+                                    if ($.isPlainObject(val)) {
+                                        if ($.isFunction(val._)) {
+                                            // Translate value
+                                            object[key] = val._();
+                                        } else {
+                                            recursive(val);
+                                        }
+                                    } else if ($.isArray(val)) {
+                                        recursive(val);
+                                    }
+
+                                    // Build actions columns if any, and translate columns properties
+                                    if (key === 'columns') {
+                                        object[key] = keyToOrderedArray(object, key);
+                                        for (i = 0; i < object[key].length; i++) {
+                                            if (object[key][i].context) {
+                                                if (configToUse.hideContexts) {
+                                                    object[key].splice(i, 1);
+                                                    i--;
+                                                    continue;
+                                                }
+                                                nosContext = $.nosContext({
+                                                    locales: config.locales,
+                                                    sites: config.sites,
+                                                    contexts: config.contexts
+                                                });
+                                                object[key][i] = {
+                                                    headerText : nosContext.label({
+                                                        oneLocale: i18n.sites,
+                                                        oneSite: i18n.languages,
+                                                        defaultLabel: i18n.contexts || 'Contexts'
+                                                    }),
+                                                    dataKey    : 'context',
+                                                    setupkey   : 'context',
+                                                    allowSort : false,
+                                                    showFilter : false,
+                                                    cellFormatter : function(args) {
+                                                        if (args.row.type & $.wijmo.wijgrid.rowType.data) {
+                                                            args.$container.css("text-align", "center").html(args.row.data.context);
+                                                            return true;
+                                                        }
+                                                    },
+                                                    width : 1
+                                                };
+                                            } else if (object[key][i].actions) {
+                                                actions = object[key][i].actions;
+                                                var width;
+                                                var showOnlyArrow = object[key][i].showOnlyArrow ? true : false;
+
+                                                if (showOnlyArrow) {
+                                                    width = 20;
+                                                } else {
+                                                    width = $.grid.getActionWidth(actions);
+
+                                                    if (actions.length > 1) {
+                                                        // Reserve space for the dropdown actions menu
+                                                        //width -= 20;
+                                                    }
+                                                    // At least 80px wide
+                                                    //width = Math.max(width, 80);
+                                                }
+
+                                                // Make the drop-down actions columns
+                                                object[key][i] = {
+                                                    headerText : showOnlyArrow ? '' : '',
+                                                    cellFormatter : function(args) {
+                                                        var buttons;
+                                                        if ($.isPlainObject(args.row.data)) {
+
+                                                            buttons = $.appdeskActions(actions, args.row.data, {
+                                                                showOnlyArrow : showOnlyArrow
+                                                            });
+
+                                                            buttons.appendTo(args.$container);
+                                                            args.$container.parent().addClass('buttontd').css({width: width + 1});
+
+                                                            return true;
+                                                        }
+                                                    },
+                                                    allowSizing : false,
+                                                    allowSort : false,
+                                                    width : width,
+                                                    ensurePxWidth : true,
+                                                    showFilter : false,
+                                                    setupkey: 'actions'
+                                                };
+                                            } else if (object[key][i].cellFormatters) {
+                                                (function() {
+                                                    var cellFormatters = $.isPlainObject(object[key][i].cellFormatters) ? object[key][i].cellFormatters : [object[key][i].cellFormatter];
+                                                    var oldCellFormatter = object[key][i].cellFormatter;
+                                                    object[key][i] = $.extend(object[key][i], {
+                                                        cellFormatter : function(args) {
+                                                            if (args.row.type & $.wijmo.wijgrid.rowType.data) {
+                                                                args.$container.html(args.formattedValue);
+                                                                if ($.isFunction(oldCellFormatter)) {
+                                                                    oldCellFormatter.call(this, args);
+                                                                }
+                                                                $.each(cellFormatters, function(i, formatter) {
+                                                                    formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
+                                                                    if (formatter.replace) {
+                                                                        args.$container.empty();
+                                                                    }
+                                                                    switch (formatter.type) {
+                                                                        case 'bold':
+                                                                            args.$container.css('font-weight', 'bold');
+                                                                            break;
+
+                                                                        case 'css':
+                                                                            if ($.type(formatter.css) === 'object') {
+                                                                                args.$container.css(formatter.css);
+                                                                            }
+                                                                            break;
+
+                                                                        case 'icon':
+                                                                            if ($.isPlainObject(args.row.data)) {
+                                                                                var src = '';
+                                                                                formatter.column && args.row.data[formatter.column] && (src = args.row.data[formatter.column]);
+                                                                                formatter.src && (src = formatter.src);
+                                                                                $.type(formatter.mapping) === 'object' && formatter.mapping[args.formattedValue] && (src = formatter.mapping[args.formattedValue]);
+                                                                                if (!src) {
+                                                                                    break;
+                                                                                }
+                                                                                var size = (formatter.size ? ' width="' + formatter.size + '" height="' + formatter.size + '"' : '');
+                                                                                args.$container.prepend(' <img src="' + src + '" ' + size + ' style="vertical-align: middle;" /> ');
+                                                                            }
+                                                                            break;
+
+                                                                        case 'iconClasses':
+                                                                            if ($.isPlainObject(args.row.data)) {
+                                                                                if (formatter.column && !args.row.data[formatter.column]) {
+                                                                                    break;
+                                                                                }
+                                                                                args.$container.prepend(' <span class="' + (formatter.column ? args.row.data[formatter.column] : formatter.classes) + '" style="float:left;"></span> ');
+                                                                            }
+                                                                            break;
+
+                                                                        case 'link':
+                                                                            args.$container.wrapInner(
+                                                                                $('<a href="#"></a>')
+                                                                                    .click(function(e) {
+                                                                                        e.preventDefault();
+                                                                                        if (formatter.action === 'default' && actions.length && actions[0].action) {
+                                                                                            formatter.action = actions[0].action;
+                                                                                        }
+                                                                                        if (formatter.action && $.type(formatter.action) !== 'object' && appdesk.actions && appdesk.actions[formatter.action]) {
+                                                                                            formatter.action = appdesk.actions[formatter.action].action;
+                                                                                        }
+                                                                                        if ($.type(formatter.action) === 'object') {
+                                                                                            $(this).nosAction(formatter.action, args.row.data);
+                                                                                        }
+                                                                                    })
+                                                                            )
+                                                                            break;
+                                                                    }
+                                                                });
+
+                                                                return true;
+                                                            }
+                                                        }
+                                                    });
+                                                })();
+                                            }
+                                        }
+                                    }
+                                });
+                            },
+
+                            self = {
+                                tab : null,
+                                appdesk : {
+                                    buttons : {},
+                                    grid : {
+                                        urlJson : '',
+                                        columns : {}
+                                    },
+                                    thumbnails : null,
+                                    defaultView : 'grid',
+                                    inspectors : {},
+                                    splittersVertical : null,
+                                    splittersHorizontal : null
+                                },
+
+                                i18nMessages : {},
+
+                                i18n : function(label) {
+                                    var o = {};
+                                    var self = this;
+
+                                    $.extend(o, {
+                                        label : label,
+                                        _ : function() {
+                                            return self.i18nMessages[o.label] || o.label;
+                                        }
+                                    });
+
+                                    return o;
+                                },
+
+                                build : function() {
+                                    // Clone object
+                                    var params = $.extend(true, {
+                                        appdesk : {
+                                            texts : this.i18nMessages,
+                                            splitters : {},
+                                            slidersChange : function(e, rapport) {
+                                                //$.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
+                                            }
+                                        }
+                                    }, this);
+
+                                    if (params.appdesk.splittersVertical) {
+                                        params.appdesk.splitters.vertical = {splitterDistance : params.appdesk.splittersVertical};
+                                    }
+                                    if (params.appdesk.splittersHorizontal) {
+                                        params.appdesk.splitters.horizontal = {splitterDistance : params.appdesk.splittersHorizontal};
+                                    }
+                                    params.appdesk.buttons = $.map(params.appdesk.buttons, objectToArray);
+
+
+                                    params.appdesk.inspectors = keyToOrderedArray(params.appdesk, 'inspectors');
+
+                                    // 'actions' is an object containing all the possible actions
+                                    // 'appdesk.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
+                                    if (params.actions) {
+                                        var gridActions = params.actions;
+                                        if (params.appdesk.grid.columns.actions && params.appdesk.grid.columns.actions.actions) {
+                                            $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
+                                                if ($.type(val) == 'string') {
+                                                    params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
+                                                }
+                                            });
+                                        }
+                                        if (params.appdesk.treeGrid && params.appdesk.treeGrid.columns && params.appdesk.treeGrid.columns.actions && params.appdesk.treeGrid.columns.actions.actions) {
+                                            $.each(params.appdesk.treeGrid.columns.actions.actions, function(i, val) {
+                                                if ($.type(val) == 'string') {
+                                                    params.appdesk.treeGrid.columns.actions.actions[i] = gridActions[val];
+                                                }
+                                            });
+                                        }
+                                        if (params.appdesk.thumbnails && params.appdesk.thumbnails.actions) {
+                                            $.each(params.appdesk.thumbnails.actions, function(i, val) {
+                                                if ($.type(val) == 'string') {
+                                                    params.appdesk.thumbnails.actions[i] = gridActions[val];
+                                                }
+                                            });
+                                        }
+                                        $.each(params.appdesk.inspectors, function(i, inspector) {
+                                            if (inspector.preview && inspector.options.actions) {
+                                                $.each(inspector.options.actions, function(i, val) {
+                                                    if ($.type(val) == 'string') {
+                                                        inspector.options.actions[i] = gridActions[val];
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+
+                                    //
+                                    configToUse = params.appdesk;
+
+                                    // Translate clone object
+                                    recursive(params);
+
+                                    // Build properties for preview inspector
+                                    for (var i = 0; i < params.appdesk.inspectors.length; i++) {
+                                        if (params.appdesk.inspectors[i].preview) {
+                                            params.appdesk.inspectors[i].url = function($li) {
+                                                var inspectorData = $li.data('inspector'),
+                                                    widget = $('<div></div>')
+                                                        .appendTo($li)
+                                                        .preview(inspectorData.options)
+                                                        .parent()
+                                                        .on({
+                                                            widgetResize: function() {
+                                                                widget.preview('resize');
+                                                            }
+                                                        })
+                                                        .end();
+                                            };
+                                        }
+                                    }
+
+                                    return params;
+                                }
+                            };
+                        return self;
+                    };
+
 
                 if (config.selectedView == 'custom') {
                     if (config.custom) {
@@ -1445,7 +1817,7 @@ define('jquery-nos-appdesk',
                     jsonFile = config.views[config.selectedView].json;
                 }
 
-                var appdesk = $.appdeskSetup(config);
+                appdesk = appdeskSetup(config);
                 $.extend(true, appdesk.i18nMessages, config.i18n);
 
                 if ($.isPlainObject(config.appdesk)) {
@@ -1558,237 +1930,6 @@ define('jquery-nos-appdesk',
                 } else {
                     init();
                 }
-            },
-
-            appdeskSetup : function(config) {
-                var configToUse = $.extend({}, true, config);
-                var i18n = config.i18n || {};
-
-                var self = {},
-                    objectToArray = function(val, i) {
-                        val['setupkey'] = i;
-                        return val;
-                    },
-
-                    keyToOrderedArray = function(object, key) {
-                        if (object[key + 'Order']) {
-                            var keys = object[key + 'Order'].split(',');
-                            var ordered = [];
-                            for (var i = 0; i < keys.length; i++) {
-                                // Remove null values
-                                if (object[key][keys[i]] != null) {
-                                    object[key][keys[i]]['setupkey'] = keys[i];
-                                    ordered.push(object[key][keys[i]]);
-                                }
-                            }
-                            return ordered;
-                        } else {
-                            return $.map(object[key], objectToArray);
-                        }
-                    },
-
-                    recursive = function(object) {
-                        $.each(object, function(key, val) {
-                            if ($.isPlainObject(val)) {
-                                if ($.isFunction(val._)) {
-                                    // Translate value
-                                    object[key] = val._();
-                                } else {
-                                    recursive(val);
-                                }
-                            } else if ($.isArray(val)) {
-                                recursive(val);
-                            }
-
-                            // Build actions columns if any, and translate columns properties
-                            if (key === 'columns') {
-                                object[key] = keyToOrderedArray(object, key);
-                                for (var i = 0; i < object[key].length; i++) {
-                                    if (object[key][i].context) {
-                                        if (configToUse.hideContexts) {
-                                            object[key].splice(i, 1);
-                                            continue;
-                                        }
-                                        object[key][i] = {
-                                            headerText : i18n.contexts || 'Contexts',
-                                            dataKey    : 'context',
-                                            setupkey   : 'context',
-                                            showFilter : false,
-                                            cellFormatter : function(args) {
-                                                if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                    args.$container.css("text-align", "center").html(args.row.data.context);
-                                                    return true;
-                                                }
-                                            },
-                                            width : 1
-                                        };
-                                    }
-                                    if (object[key][i].actions) {
-                                        var actions = object[key][i].actions;
-                                        var width;
-                                        var showOnlyArrow = object[key][i].showOnlyArrow ? true : false;
-
-                                        if (showOnlyArrow) {
-                                            width = 20;
-                                        } else {
-                                            width = $.grid.getActionWidth(actions);
-
-                                            if (actions.length > 1) {
-                                                // Reserve space for the dropdown actions menu
-                                                //width -= 20;
-                                            }
-                                            // At least 80px wide
-                                            //width = Math.max(width, 80);
-                                        }
-
-                                        // Make the drop-down actions columns
-                                        object[key][i] = {
-                                            headerText : showOnlyArrow ? '' : '',
-                                            cellFormatter : function(args) {
-                                                if ($.isPlainObject(args.row.data)) {
-
-                                                    var buttons = $.appdeskActions(actions, args.row.data, {
-                                                        showOnlyArrow : showOnlyArrow
-                                                    });
-
-                                                    buttons.appendTo(args.$container);
-                                                    args.$container.parent().addClass('buttontd').css({width: width + 1});
-
-                                                    return true;
-                                                }
-                                            },
-                                            allowSizing : false,
-                                            allowSort : false,
-                                            width : width,
-                                            ensurePxWidth : true,
-                                            showFilter : false,
-                                            setupkey: 'actions'
-                                        };
-                                    }
-                                }
-                            }
-                        });
-                    },
-
-                    self = {
-                        tab : null,
-                        appdesk : {
-                            buttons : {},
-                            grid : {
-                                urlJson : '',
-                                columns : {}
-                            },
-                            thumbnails : null,
-                            defaultView : 'grid',
-                            inspectors : {},
-                            splittersVertical : null,
-                            splittersHorizontal : null
-                        },
-
-                        i18nMessages : {},
-
-                        i18n : function(label) {
-                            var o = {};
-                            var self = this;
-
-                            $.extend(o, {
-                                label : label,
-                                _ : function() {
-                                    return self.i18nMessages[o.label] || o.label;
-                                }
-                            });
-
-                            return o;
-                        },
-
-                        build : function() {
-                            // Clone object
-                            var params = $.extend(true, {
-                                appdesk : {
-                                    texts : this.i18nMessages,
-                                    splitters : {},
-                                    slidersChange : function(e, rapport) {
-                                        //$.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
-                                    }
-                                }
-                            }, this);
-
-                            if (params.appdesk.splittersVertical) {
-                                params.appdesk.splitters.vertical = {splitterDistance : params.appdesk.splittersVertical};
-                            }
-                            if (params.appdesk.splittersHorizontal) {
-                                params.appdesk.splitters.horizontal = {splitterDistance : params.appdesk.splittersHorizontal};
-                            }
-                            params.appdesk.buttons = $.map(params.appdesk.buttons, objectToArray);
-
-
-                            params.appdesk.inspectors = keyToOrderedArray(params.appdesk, 'inspectors');
-
-                            // 'actions' is an object containing all the possible actions
-                            // 'appdesk.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
-                            if (params.actions) {
-                                var gridActions = params.actions;
-                                if (params.appdesk.grid.columns.actions && params.appdesk.grid.columns.actions.actions) {
-                                    $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
-                                        if ($.type(val) == 'string') {
-                                            params.appdesk.grid.columns.actions.actions[i] = gridActions[val];
-                                        }
-                                    });
-                                }
-                                if (params.appdesk.treeGrid && params.appdesk.treeGrid.columns && params.appdesk.treeGrid.columns.actions && params.appdesk.treeGrid.columns.actions.actions) {
-                                    $.each(params.appdesk.treeGrid.columns.actions.actions, function(i, val) {
-                                        if ($.type(val) == 'string') {
-                                            params.appdesk.treeGrid.columns.actions.actions[i] = gridActions[val];
-                                        }
-                                    });
-                                }
-                                if (params.appdesk.thumbnails && params.appdesk.thumbnails.actions) {
-                                    $.each(params.appdesk.thumbnails.actions, function(i, val) {
-                                        if ($.type(val) == 'string') {
-                                            params.appdesk.thumbnails.actions[i] = gridActions[val];
-                                        }
-                                    });
-                                }
-                                $.each(params.appdesk.inspectors, function(i, inspector) {
-                                    if (inspector.preview && inspector.options.actions) {
-                                        $.each(inspector.options.actions, function(i, val) {
-                                            if ($.type(val) == 'string') {
-                                                inspector.options.actions[i] = gridActions[val];
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-                            //
-                            configToUse = params.appdesk;
-
-                            // Translate clone object
-                            recursive(params);
-
-                            // Build properties for preview inspector
-                            for (var i = 0; i < params.appdesk.inspectors.length; i++) {
-                                if (params.appdesk.inspectors[i].preview) {
-                                    params.appdesk.inspectors[i].url = function($li) {
-                                        var inspectorData = $li.data('inspector'),
-                                            widget = $('<div></div>')
-                                                .appendTo($li)
-                                                .preview(inspectorData.options)
-                                                .parent()
-                                                .on({
-                                                    widgetResize: function() {
-                                                        widget.preview('resize');
-                                                    }
-                                                })
-                                                .end();
-                                    };
-                                }
-                            }
-
-                            return params;
-                        }
-                    };
-                return self;
             },
 
             // Keep track of all created menus so we can hide them when
@@ -1942,8 +2083,22 @@ define('jquery-nos-appdesk',
                                 trigger : dropDown,
                                 triggerEvent : 'click',
                                 orientation : 'vertical',
-                                showAnimation : {Animated:"slide", duration: 50, easing: null},
-                                hideAnimation : {Animated:"hide", duration: 0, easing: null},
+                                animation: {
+                                    animated:"slide",
+                                    option: {
+                                        direction: "up"
+                                    },
+                                    duration: 50,
+                                    easing: null
+                                },
+                                hideAnimation: {
+                                    animated:"slide",
+                                    option: {
+                                        direction: "up"
+                                    },
+                                    duration: 0,
+                                    easing: null
+                                },
                                 position : {
                                     my        : 'right top',
                                     at        : 'right bottom',
@@ -1977,12 +2132,13 @@ define('jquery-nos-appdesk',
                             .appendTo($div)
                             .noslistgrid({
                                 scrollMode : 'auto',
+                                pageSize: 1,
                                 showFilter: true,
                                 allowPaging : true,
-                                data: [ ['test'] ]
+                                data: [ ['test'], ['test2'] ]
                             });
                         this.heights = {
-                            row : table.height(),
+                            row : table.find('tr:first').height(),
                             footer : $div.find('.wijmo-wijgrid-footer').outerHeight(),
                             header : $div.find('.wijmo-wijgrid-headerrow').outerHeight(),
                             filter : $div.find('.wijmo-wijgrid-filterrow').outerHeight()

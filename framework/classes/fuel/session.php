@@ -14,7 +14,7 @@ class Session extends \Fuel\Core\Session
 
     /**
      * Returns the current logged user
-     * @return Nos\Model_User
+     * @return Nos\User\Model_User
      */
     public static function user()
     {

@@ -11,7 +11,10 @@
 
 <script type="text/javascript">
 require(
-    ["jquery-nos"],
+<?php
+array_unshift($require_js, 'jquery-nos');
+?>
+    <?= json_encode($require_js); ?>,
     function($) {
         $(function() {
             $("#<?= $id ?>").nosFormValidate(<?= $rules ?>)

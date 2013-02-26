@@ -10,7 +10,7 @@
 
 class Finder extends Fuel\Core\Finder
 {
-    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view');
+    protected static $_suffixed_directories = array('config' => 'config', 'views' => 'view', 'lang' => 'lang');
 
     public static function instance()
     {
@@ -21,59 +21,44 @@ class Finder extends Fuel\Core\Finder
         return static::$instance;
     }
 
-    public static function normalize_namespace($name)
+    public function add_path($paths, $pos = null)
     {
-        return implode(
-            '\\',
-            array_map(
-                function ($a) {
-                    return Inflector::words_to_upper($a);
-                },
-                explode('\\', $name)
-            )
-        );
+        if ($pos !== null && $pos !== -1) {
+            $pos++;
+        }
+
+        return parent::add_path($paths, $pos);
     }
 
     /**
+     * Locates a given file in the search paths.
      *
-     * @param   string  $directory  Directory to search into
-     * @param   string  $file       Base name of the file
-     * @param   string  $ext        .php
-     * @param   bool    $multiple   false
-     * @param   bool    $cache      true
-     * @return  string | array
+     * @param   string  $dir       Directory to look in
+     * @param   string  $file      File to find
+     * @param   string  $ext       File extension
+     * @param   bool    $multiple  Whether to find multiple files
+     * @param   bool    $cache     Whether to cache this path or not
+     * @return  mixed  Path, or paths, or false
      */
-    public function locate($directory, $file, $ext = '.php', $multiple = false, $cache = true, $alternative = false)
+    public function locate($dir, $file, $ext = '.php', $multiple = false, $cache = true)
     {
-        if ($alternative == false) {
-            foreach (static::$_suffixed_directories as $suffixed_directory => $suffix) {
-                if ($directory == $suffixed_directory) {
-                    $dots = explode('.', $file);
-                    array_splice($dots, count($dots) - ($dots[count($dots) - 1] == 'php' ? 1 : 0), 0, array($suffix));
-                    if ($dots[count($dots) - 1] != 'php') {
-                        $dots[] = 'php';
-                    }
-                    $finalName = implode('.', $dots);
+        $found = $multiple ? array() : false;
 
-                    $ret = $this->locate($directory, $finalName, $ext, $multiple, $cache, true);
-                    if (count($ret) > 0 && $ret !== false) {
-                        return $ret;
-                    }
-                }
+        // absolute path requested?
+        if ($file[0] === '/' or (isset($file[1]) and $file[1] === ':')) {
+            if ( ! is_file($file)) {
+                // at this point, found would be either empty array or false
+                return $found;
             }
+
+            return $multiple ? array($file) : $file;
         }
 
-        list($section,) = explode('/', $directory, 2);
 
-        // Do we need to override the default behaviour?
-        if ($file[0] === '/' or (isset($file[1]) and $file[1] === ':') or !in_array($section, array('views', 'config', 'lang'))) {
-            return parent::locate($directory, $file, $ext, $multiple, $cache);
-        }
-
+        // Novius OS : force load module if not already load
         $context = false;
-        if ($directory == 'config') {
-            // DEBUG_BACKTRACE_IGNORE_ARGS, 5
-            $dbt = debug_backtrace();
+        if ($dir === 'config') {
+            $dbt = debug_backtrace(defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? DEBUG_BACKTRACE_IGNORE_ARGS : false);
             foreach ($dbt as $context) {
                 if (!empty($context['class']) && $context['class'] == 'Fuel\Core\Config' && !empty($context['function'])) {
                     if (in_array($context['function'], array('load', 'save'))) {
@@ -84,92 +69,109 @@ class Finder extends Fuel\Core\Finder
             }
         }
 
-        $search = array();
-        $found = array();
+        $cache_id = $multiple ? 'M.' : 'S.';
+        $paths = array();
 
-        // Init namespace and active module
-        $is_namespaced = mb_strripos($file, '::');
+        // If a filename contains a :: then it is trying to be found in a namespace.
+        // This is sometimes used to load a view from a non-loaded module.
+        if ($pos = strripos($file, '::')) {
+            // Novius OS : force load module if not already load
+            $dir_app = substr($file, 0, $pos);
+            Module::load(strtolower($dir_app));
 
-        if (false === $is_namespaced) {
-            $request = class_exists('Request', false) ? $request = Request::active() : false;
-            $namespace = false;
-            $file_no_ns = $file;
-            $active_module = $request ? $request->module : false;
-            if ($active_module) {
-                $namespace_path = Module::exists($active_module);
+            if ($dir === 'views' && $dir_app !== 'local') {
+                // Novius OS : load view in local if exist
+                $local_file = substr($file, $pos + 2);
+                $found = \Finder::search('views', $dir_app === 'nos' ? 'local::novius-os'.DS.$local_file : 'local::apps'.DS.$dir_app.DS.$local_file, $ext, $multiple, $cache);
+                if ($found !== false) {
+                    return $found;
+                }
+            } else if ($dir === 'config') {
+                // Novius OS : load config in local if exist
+                $paths_add = array(APPPATH.'config'.DS.($dir_app === 'nos' ? 'novius-os'.DS : 'apps'.DS.$dir_app.DS));
+            }
+
+            // get the namespace path
+            if ($path = \Autoloader::namespace_path('\\'.ucfirst(substr($file, 0, $pos)))) {
+                $cache_id .= substr($file, 0, $pos);
+
+                // and strip the classes directory as we need the module root
+                $paths = array(substr($path, 0, -8));
+
+                // strip the namespace from the filename
+                $file = substr($file, $pos + 2);
             }
         } else {
-            $namespace = self::normalize_namespace(mb_substr($file, 0, $is_namespaced));
-            $file_no_ns = mb_substr($file, $is_namespaced + 2);
-            $active_module = false;
-            Module::load(mb_strtolower($namespace));
-            $namespace_path = Module::exists(mb_strtolower($namespace));
-        }
+            $paths = $this->paths;
 
-        $local_config_path = APPPATH.$directory.DS;
-        if ($is_namespaced) {
-            $local_config_path .= ($active_module != 'nos' ? 'applications'.DS.$active_module : 'novius-os').DS;
-        }
-        if ($context == 'config.save') {
-            $search = array($local_config_path);
-        } else {
-
-            if ($active_module == 'nos' && $directory == 'views') {
-                $search[] = $local_config_path.'novius-os'.DS;
-            }
-
-            // -8 = strip the classes directory
-            if (!empty($namespace_path)) {
-                $search[] = $namespace_path.$directory.DS;
-            }
-
-            if ($active_module && $active_module != 'nos') {
-                $search[] = NOSPATH.$directory.DS;
-            }
-            if ($context == 'config.load') {
-                $search[] = $local_config_path;
+            // get extra information of the active request
+            if (class_exists('Request', false) and ($uri = \Uri::string()) !== null) {
+                $cache_id .= $uri;
+                $paths = array_merge(\Request::active()->get_paths(), $paths);
             }
         }
 
-        $file_ext = pathinfo($file_no_ns, PATHINFO_EXTENSION);
-        if (!$file_ext) {
-            $file_no_ns .= $ext;
+        // Merge in the flash paths then reset the flash paths
+        $paths = array_merge($this->flash_paths, $paths);
+        // Novius OS : load config in local if exist
+        if (!empty($paths_add)) {
+            $paths = array_merge($paths_add, $paths);
+        }
+        $this->clear_flash();
+
+        $file_original = $file;
+        $file = $this->prep_path($dir).$file.$ext;
+        $cache_id .= $file;
+
+        if ($cache and $cached_path = $this->from_cache($cache_id)) {
+            return $cached_path;
         }
 
-        $files_to_search = array();
-        foreach (static::$_suffixed_directories as $suffixed_directory => $suffix) {
-            if ($directory == $suffixed_directory) {
-                $dots = explode('.', $file_no_ns);
-                array_splice($dots, count($dots) - 1, 0, array($suffix));
-                $files_to_search[] = implode('.', $dots);
+        list($section) = explode(DS, $dir);
+        $directory = $dir;
+        foreach ($paths as $dir) {
+            // Novius OS : load config in local if exist
+            if (!empty($paths_add) && in_array($dir, $paths_add)) {
+                $file_path = $dir.$file_original.$ext;
+            } else {
+                $file_path = $dir.$file;
             }
-        }
-        $files_to_search[] = $file_no_ns;
 
-        foreach ($search as $path) {
-            // We now only have absolute paths, search through them
-            foreach ($files_to_search as $file_search) {
-                if (is_file($path.$file_search)) {
-                    $found[] = $path.$file_search;
+            // Novius OS : somme file can have a sub-suffixe
+            if (!empty(static::$_suffixed_directories[$section])) {
+                if (!empty($paths_add) && in_array($dir, $paths_add)) {
+                    $file_path_alt = $dir.$file_original.'.'.static::$_suffixed_directories[$section].$ext;
+                } else {
+                    $file_path_alt = $dir.$this->prep_path($directory).$file_original.'.'.static::$_suffixed_directories[$section].$ext;
+                }
+
+                if (is_file($file_path_alt)) {
+                    if ( ! $multiple) {
+                        $found = $file_path_alt;
+                        break;
+                    }
+
+                    $found[] = $file_path_alt;
                 }
             }
-        }
-
-        // Fallback for standard search
-        if (!$found) {
-            // If a config has to be written it HAS to  be within the APPPATH
-            if ($context == 'config.save') {
-                if (!is_dir($search[0])) {
-                    File::create_dir(dirname($search[0]), basename($search[0]));
+            if (is_file($file_path)) {
+                if ( ! $multiple) {
+                    $found = $file_path;
+                    break;
                 }
-                return $search[0].$file_no_ns;
-            } elseif (!$is_namespaced) {
-                $found = parent::locate($directory, $file, $ext, $multiple, $cache);
+
+                $found[] = $file_path;
             }
         }
 
-        if (is_array($found) && !$multiple) {
-            $found = isset($found[0]) ? $found[0] : false;
+        if ( ! empty($found) and $cache) {
+            $this->add_to_cache($cache_id, $found);
+            $this->cache_valid = false;
+        }
+
+        // Novius OS : If a config has to be written it HAS to be within the APPPATH
+        if (empty($found) && $context == 'config.save') {
+            return Module::exists(!$pos ? 'local' : $dir_app).$this->prep_path($directory).$file_original.'.config'.$ext;
         }
 
         return $found;

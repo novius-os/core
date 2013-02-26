@@ -19,6 +19,11 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
      */
     protected $_properties = array();
 
+    public static function _init()
+    {
+        I18n::current_dictionary(array('nos::orm', 'nos::common'));
+    }
+
     public static function dataset(&$dataset)
     {
         $dataset['publication_status'] = array(__CLASS__, 'publication_status');
@@ -33,10 +38,6 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         if ($published === false) {
             return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
         }
-
-        return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-schedule.png"> '.strtr(__('From {date}'), array(
-            '{date}' => \Date::create_from_string($published)->format('local'),
-        ));
     }
 
     /**
@@ -59,15 +60,21 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     {
         if (array_key_exists('where', $options)) {
             $where = $options['where'];
+            if (isset($where['published'])) {
+                $where[$this->_properties['publication_bool_property']] = $where['published'];
+                unset($where['published']);
+            }
+
             foreach ($where as $k => $w) {
-                if ($w[0] == 'published') {
-                    $bool = $this->_properties['publication_bool_property'];
-                    if ($w[1] === true) {
-                        $where[$k] = array($bool, 1);
-                    } elseif ($w[1] === false) {
-                        $where[$k] = array($bool, 0);
-                    } else {
-                        unset($where[$k]);
+                if (is_int($k)) {
+                    $keys = array_keys($w);
+                    if (count($w) == 1 && $keys[0] == 'published') {
+                        $where[$k] = array($this->_properties['publication_bool_property'] => $w[$keys[0]]);
+                    }
+
+                    if (count($w) > 1 && $w[0] == 'published') {
+                        $w[0] = $this->_properties['publication_bool_property'];
+                        $where[$k] = $w;
                     }
                 }
             }

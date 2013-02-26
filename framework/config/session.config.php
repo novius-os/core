@@ -1,13 +1,11 @@
 <?php
 /**
- * Fuel is a fast, lightweight, community driven PHP5 framework.
+ * NOVIUS OS - Web OS for digital communication
  *
- * @package    Fuel
- * @version    1.0
- * @author     Fuel Development Team
- * @license    MIT License
- * @copyright  2010 - 2011 Fuel Development Team
- * @link       http://fuelphp.com
+ * @copyright  2011 Novius
+ * @license    GNU Affero General Public License v3 or (at your option) any later version
+ *             http://www.gnu.org/licenses/agpl-3.0.html
+ * @link http://www.novius-os.org
  */
 
 /**
@@ -68,37 +66,9 @@ return array(
     * specific driver configurations. to override a global setting, just add it to the driver config with a different value
     */
 
-    // special configuration settings for cookie based sessions
-    //'cookie'            => array(
-    //    'cookie_name'        => 'fuelcid',                // name of the session cookie for cookie based sessions
-    //),
-
     // specific configuration settings for file based sessions
     'file'                => array(
-        'cookie_name'        => ini_get('session.name'),                // name of the session cookie for file based sessions
         'path'                =>    session_save_path() ?: '/tmp',                    // path where the session files should be stored
         'gc_probability'    => round(ini_get('session.gc_probability') / ini_get('session.gc_divisor')),                        // probability % (between 0 and 100) for garbage collection
     ),
-
-    // specific configuration settings for memcached based sessions
-    //'memcached'            => array(
-    //    'cookie_name'        => 'fuelmid',                // name of the session cookie for memcached based sessions
-    //    'servers'            => array(                    // array of servers and portnumbers that run the memcached service
-    //                            array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100)
-    //	),
-    //),
-
-    // specific configuration settings for database based sessions
-    //'db'            => array(
-    //    'cookie_name'        => 'fueldid',                // name of the session cookie for database based sessions
-    //    'database'            => null,                    // name of the database name (as configured in config/db.php)
-    //    'table'                => 'sessions',                // name of the sessions table
-    //    'gc_probability'    => 5                        // probability % (between 0 and 100) for garbage collection
-    //),
-
-    // specific configuration settings for redis based sessions
-    //'redis'            => array(
-    //    'cookie_name'        => 'fuelrid',                // name of the session cookie for redis based sessions
-    //    'database'            => 'default'                // name of the redis database to use (as configured in config/db.php)
-    //)
 );

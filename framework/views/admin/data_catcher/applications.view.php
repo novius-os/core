@@ -8,8 +8,10 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('nos::common');
+
 if (isset($nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
-    $image = \Nos\Model_Media::find($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
+    $image = \Nos\Media\Model_Media::find($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
     if (empty($image)) {
         unset($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
     } else {
@@ -20,7 +22,7 @@ if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
     if (strpos($nuggets[\Nos\DataCatcher::TYPE_URL], '::') !== false) {
         list($page_id, $path) = preg_split("/\:\:/", $nuggets[\Nos\DataCatcher::TYPE_URL]);
         if (!empty($path)) {
-            $page = \Nos\Model_Page::find($page_id);
+            $page = \Nos\Page\Model_Page::find($page_id);
             if (empty($page)) {
                 unset($nuggets[\Nos\DataCatcher::TYPE_URL]);
             } else {
@@ -54,14 +56,12 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
 
     if (isset($data_catcher['onDemand']) && $data_catcher['onDemand'] && !$onDemande) {
         $onDemande = true;
-        echo '<div>', htmlspecialchars(strtr(__('"{item}" can be shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
-        echo '<h4>', htmlspecialchars(__('Click to share:')) ,'</h4>';
-        echo '<small>', htmlspecialchars(__('(Don\'t worry, you\'ll get a preview first)')) ,'</small>';
-    }
-    elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto)
-    {
-        echo '<div>', htmlspecialchars(strtr(__('"{item}" is automatically shared with the following applications.'), array('{item}' => $item->title_item()))) ,'</div>';
-        echo '<h4>', htmlspecialchars(__('No action required, click to customise:')) ,'</h4>';
+        echo '<div>', strtr(__('‘{{item}}’ can be shared with the following applications.'), array('{{item}}' => htmlspecialchars($item->title_item()))) ,'</div>';
+        echo '<h4>', __('Click to share:') ,'</h4>';
+        echo '<small>', __('(Don’t worry, you’ll get a preview first)') ,'</small>';
+    } elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto) {
+        echo '<div>', strtr(__('‘{{item}}’ is automatically shared with the following applications.'), array('{{item}}' => htmlspecialchars($item->title_item()))) ,'</div>';
+        echo '<h4>', __('No action required, click to customise:') ,'</h4>';
         $auto = true;
     }
 
@@ -73,9 +73,9 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
             ), '', '&');
     }
 
-    echo '<button class="catcher" data-params="', htmlspecialchars(\Format::forge($data_catcher)->to_json()) ,'" data-nuggets="', htmlspecialchars(\Format::forge($nuggets)->to_json()) ,'">', htmlspecialchars($data_catcher['title']),'</button>';
+    echo '<button class="catcher" data-params="', htmlspecialchars(\Format::forge($data_catcher)->to_json()) ,'" data-nuggets="', htmlspecialchars(\Format::forge($nuggets)->to_json()) ,'">', $data_catcher['title'],'</button>';
 }
 
 if (!$one) {
-    echo '<div>', htmlspecialchars(strtr(__('How sad! "{item}" cannot be shared with any application yet. Ask your developer to set you up some nice sharing applications.'), array('{item}' => $item->title_item()))) ,'</div>';
+    echo '<div>', strtr(__('How sad! ‘{{item}}’ cannot be shared with any application yet. Ask your developer to set up content sharing for you.'), array('{{item}}' => htmlspecialchars($item->title_item()))) ,'</div>';
 }

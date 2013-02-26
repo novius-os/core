@@ -13,6 +13,8 @@ class Fieldset extends \Fuel\Core\Fieldset
     protected $append = array();
     protected $config_used = array();
     protected $js_validation = false;
+    protected $require_js = array();
+    protected $instance = null;
 
     public function append($content)
     {
@@ -57,7 +59,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     {
         $output = '';
         foreach ($this->field() as $field) {
-            if (false != mb_strpos(get_class($field), 'Widget_')) {
+            if (false != mb_strpos(get_class($field), 'Renderer_')) {
                 continue;
             }
             if ($field->type == 'hidden') {
@@ -118,6 +120,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         $append[] = (string) \View::forge('form/fieldset_js', array(
             'id' => $form_attributes['id'],
             'rules' => \Format::forge()->to_json($json),
+            'require_js' => $this->require_js,
         ), false);
 
         return implode('', $append);
@@ -160,7 +163,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     }
 
     /**
-     * Override default populate() to allow widgets populate themselves
+     * Override default populate() to allow renderers populate themselves
      * @param   array|object  The whole input array
      * @param   bool          Also repopulate?
      * @return  Fieldset this, to allow chaining
@@ -169,7 +172,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     {
         foreach ($this->fields as $f) {
             $class = mb_strtolower(\Inflector::denamespace(get_class($f)));
-            if (mb_substr($class, 0, 6) == 'widget' && isset($input->{$f->name})) {
+            if (mb_substr($class, 0, 8) == 'renderer' && isset($input->{$f->name})) {
                 $f->populate($input);
             }
         }
@@ -177,7 +180,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     }
 
     /**
-     * Override default repopulate() to allow widgets populate themselves
+     * Override default repopulate() to allow renderers populate themselves
      *
      * @param   array|object  input for initial population of fields, this is deprecated - you should use populate() instea
      * @return  Fieldset  this, to allow chaining
@@ -195,8 +198,8 @@ class Fieldset extends \Fuel\Core\Fieldset
             if ($f->name === \Config::get('security.csrf_token_key', 'fuel_csrf_token')) {
                 continue;
             }
-            if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 6) == 'widget') {
-                // Widgets populates themselves
+            if (mb_substr(mb_strtolower(\Inflector::denamespace(get_class($f))), 0, 8) == 'renderer') {
+                // Renderers populates themselves
                 $f->repopulate($input);
             }
         }
@@ -236,7 +239,7 @@ class Fieldset extends \Fuel\Core\Fieldset
      * @param   Fieldset|null
      * @return  Fieldset
      */
-    public function add_model_widgets($class, $instance = null, $options = array())
+    public function add_model_renderers($class, $instance = null, $options = array())
     {
         if (is_object($class)) {
             $instance = $class;
@@ -245,15 +248,26 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
 
         $properties = is_object($instance) ? $instance->properties() : $class::properties();
-        $this->add_widgets($properties);
+        $this->add_renderers($properties);
 
         $instance and $this->populate($instance);
 
         return $this;
     }
 
-    public function add_widgets($properties, $options = array())
+    public function add_renderers($properties, $options = array())
     {
+        // Compatibility with 0.1 configuration (widgets have been renamed to renderers)
+        foreach ($properties as &$property) {
+            if (isset($property['widget'])) {
+                $property['renderer'] = preg_replace('`^Nos(.+)Widget_(.+)$`', 'Nos$1Renderer_$2', $property['widget']);
+                unset($property['widget']);
+            }
+            if (isset($property['widget_options'])) {
+                $property['renderer_options'] =& $property['widget_options'];
+                unset($property['widget_options']);
+            }
+        }
         $this->config_used = $properties;
 
         foreach ($properties as $p => $settings) {
@@ -263,9 +277,9 @@ class Fieldset extends \Fuel\Core\Fieldset
 
             $label      = isset($settings['label']) ? $settings['label'] : $p;
             $attributes = isset($settings['form']) ? $settings['form'] : array();
-            if (!empty($settings['widget'])) {
-                 $class = $settings['widget'];
-                 $attributes['widget_options'] = \Arr::get($settings, 'widget_options', array());
+            if (!empty($settings['renderer'])) {
+                 $class = $settings['renderer'];
+                 $attributes['renderer_options'] = \Arr::get($settings, 'renderer_options', array());
                  $field = new $class($p, $label, $attributes, array(), $this);
                  $this->add_field($field);
             } else {
@@ -328,9 +342,10 @@ class Fieldset extends \Fuel\Core\Fieldset
         return array($name, $args);
     }
 
-    public function js_validation($validation = true)
+    public function js_validation($require_js = array())
     {
-        $this->js_validation = $validation;
+        $this->js_validation = true;
+        $this->require_js = array_merge($this->require_js, $require_js);
     }
 
     public static function build_from_config($config, $model = null, $options = array())
@@ -370,7 +385,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             $instance->form_fieldset_fields($config);
         }
 
-        $fieldset->add_widgets($config, $options);
+        $fieldset->add_renderers($config, $options);
 
         if (!empty($options['extend']) && is_callable($options['extend'])) {
             call_user_func($options['extend'], $fieldset);
@@ -407,11 +422,11 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($instance)) {
             return;
         }
-        $behaviour_contextableAndTwinnable = $instance->behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
-        if (empty($behaviour_contextableAndTwinnable) || $instance->is_main_context()) {
+        $behaviour_twinnable = $instance->behaviours('Nos\Orm_Behaviour_Twinnable');
+        if (empty($behaviour_twinnable) || $instance->is_main_context()) {
             return;
         }
-        foreach ($behaviour_contextableAndTwinnable['invariant_fields'] as $f) {
+        foreach ($behaviour_twinnable['invariant_fields'] as $f) {
             $field = $this->field($f);
             if (!empty($field)) {
                 $field->set_attribute('readonly', true);
@@ -422,6 +437,8 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     public function populate_with_instance($instance = null, $generate_id = true)
     {
+        $this->instance = $instance;
+
         if ($generate_id) {
             $uniqid = uniqid();
             // Generate a new ID for the form
@@ -458,13 +475,10 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (\Arr::get($this->config_used, "$k.dont_populate", false) == true) {
                 continue;
             }
-            if (!isset($instance->{$k})) {
-                continue;
-            }
 
-            //if (isset($instance->{$k})) {
-            $populate[$k] = $instance->{$k};
-            //}
+            if (isset($instance->{$k})) {
+                $populate[$k] = $instance->{$k};
+            }
         }
 
         $this->populate($populate);
@@ -484,7 +498,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($options['error'])) {
             $options['error'] = function(\Exception $e, $item, $data) {
                 return array(
-                    'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : 'An error occured.',
+                    'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'),
                 );
             };
         }
@@ -497,7 +511,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         try {
 
             foreach ($fields as $name => $config) {
-                if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
+                if (!empty($config['renderer']) && in_array($config['renderer'], array('Nos\Renderer_Text', 'Nos\Renderer_Empty'))) {
                     continue;
                 }
                 $type = \Arr::get($config, 'form.type', null);
@@ -510,7 +524,7 @@ class Fieldset extends \Fuel\Core\Fieldset
                     continue;
                 }
 
-                if (!empty($config['widget']) && !$options['fieldset']->fields[$name]->before_save($item, $data)) {
+                if (!empty($config['renderer']) && !$options['fieldset']->fields[$name]->before_save($item, $data)) {
                     continue;
                 }
 
@@ -546,11 +560,11 @@ class Fieldset extends \Fuel\Core\Fieldset
                 $json_response = \Arr::merge($json_response, $json_user);
             } else {
                 $item->save();
-                $json_response['notify'] = __('Operation completed successfully.');
+                $json_response['notify'] = __('OK, it’s done.');
             }
 
             foreach ($fields as $name => $config) {
-                if (!empty($config['widget']) && in_array($config['widget'], array('Nos\Widget_Text', 'Nos\Widget_Empty'))) {
+                if (!empty($config['renderer']) && in_array($config['renderer'], array('Nos\Renderer_Text', 'Nos\Renderer_Empty'))) {
                     continue;
                 }
                 $type = \Arr::get($config, 'form.type', null);
@@ -574,5 +588,15 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
 
         return $json_response;
+    }
+
+    public function is_expert($field_name)
+    {
+        return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+    }
+
+    public function getInstance()
+    {
+        return $this->instance;
     }
 }

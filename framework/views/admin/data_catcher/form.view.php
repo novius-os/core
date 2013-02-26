@@ -7,6 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+\Nos\I18n::current_dictionary('nos::common');
+
 $uniqid = uniqid('container_');
 
 (!isset($nugget_db) || !is_array($nugget_db)) && $nugget_db = $item->get_default_nuggets();
@@ -47,7 +50,7 @@ if (array_key_exists(\Nos\DataCatcher::TYPE_URL, $nugget)) {
 }
 
 $image_id = \Arr::get($nugget, \Nos\DataCatcher::TYPE_IMAGE, 0);
-$options = array_keys($item->get_sharable_property(\Nos\DataCatcher::TYPE_IMAGE.'.options'));
+$options = array_keys($item->get_sharable_property(\Nos\DataCatcher::TYPE_IMAGE.'.options', array()));
 
 $fields[\Nos\DataCatcher::TYPE_IMAGE] = array(
     'label' => __('Image:'),
@@ -120,7 +123,7 @@ echo \View::forge(
                     $field->set_template('{field}');
                     $options = $item->get_sharable_property($field_name.'.options', array());
                     foreach ($options as $media_id => $idk) {
-                        $media = \Nos\Model_Media::find($media_id);
+                        $media = \Nos\Media\Model_Media::find($media_id);
                         $field->set_options(
                             array(
                                 $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
@@ -130,11 +133,11 @@ echo \View::forge(
                     $value = isset($nugget_db[$field_name]) ? $nugget_db[$field_name] : 0;
                     $field->set_options(
                         array(
-                            0 => '<div style="float:left;">'.\Nos\Widget_Media::widget(
+                            0 => '<div style="float:left;">'.\Nos\Renderer_Media::renderer(
                                 array(
                                     'name' => 'custom_image',
                                     'value' => isset($options[$value]) ? 0 : $value,
-                                    'widget_options' => array(
+                                    'renderer_options' => array(
                                         'inputFileThumb' => array(
                                             'title' => __('Pick a custom image'),
                                         ),

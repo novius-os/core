@@ -10,6 +10,11 @@
 @import "compass/css3/box-shadow";
 @import "compass/css3/text-shadow";
 
+.ui-dialog {
+    .wijmo-checkbox label, .wijmo-wijradio label {
+        z-index: inherit;
+    }
+}
 
 /* +-++-++-++-++-++-+
  * |C||O||M||M||O||N|
@@ -33,6 +38,11 @@ a, a:active, a:visited {
 }
 a:hover {
 	color   : #036;
+}
+
+ul {
+    margin: 0.5em 0;
+    list-style: disc none inside ;
 }
 
 .nos-dark-theme {
@@ -272,6 +282,15 @@ input.ui-widget.primary, button.ui-widget.primary {
 	border-style : outset;
 	font-size    : 1.2em;
 
+    &.without-text {
+        .ui-button-icon-primary {
+            left: 0.7em;
+        }
+        .ui-button-text {
+            padding: 0.2em 1em 0.2em 1em;
+        }
+    }
+
     .ui-button-text {
         line-height  : 1.9em;
     }
@@ -280,10 +299,20 @@ input.ui-widget.primary.ui-state-active, button.ui-widget.ui-state-active.primar
 	border-style : inset;
 }
 
+button.ui-widget.without-text {
+    .ui-button-text {
+        padding: 0.2em 1em 0.2em 1em;
+    }
+}
+
 
 div.blank_slate {
     font-size : 150%;
     margin: 2em;
+
+    li {
+        list-style: none;
+    }
 }
 
 span.optional {
@@ -347,51 +376,58 @@ img.publication_status {
 	left: 16px;
 }
 
-
-#apps .icon {
-	width: 90px;
-	height: 90px;
-	background: rgba(255, 255, 255, 0.4);
-	display: block;
-	margin: 0 auto;
-	border-radius: 45px;
-	overflow:hidden;
-	box-shadow: 0 0 5px 0px #888;
-	margin-bottom: 5px;
-	position:relative;
+.ui-state-highlight a {
+    text-shadow: none;
 }
 
-#apps .icon img {
-	position:absolute;
-	top: 13px;
-	left: 13px;
-	z-index: 1;
-}
-#apps .icon img.gloss {
-	z-index: 2;
-	border-radius: 45px 45px 0 0;
-	overflow: hidden;
-	top: 0; /* Need to keep 0 for the radius/hidden to operate properly */
-	left: 0;
-}
-#apps a {
-	vertical-align: top;
-}
-#apps .text {
-	display: inline-block;
-	background: rgba(255, 255, 255, 0.6);
-	color: #333;
-	font-weight: bold;
-	padding: 2px 5px;
-	border-radius: 4px;
-}
-#apps .app {
-	display: inline-block;
-	text-align: center;
-	margin: 20px 45px 20px;
-	width: 90px;
-}
+#apps {
+    padding: 0 15px;
 
+    .icon {
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.4);
+        display: block;
+        margin: 0 auto;
+        border-radius: 45px;
+        overflow:hidden;
+        box-shadow: 0 0 5px 0px #888;
+        margin-bottom: 4px;
+        position:relative;
+    }
+
+    .icon img {
+        position:absolute;
+        top: 13px;
+        left: 13px;
+        z-index: 1;
+    }
+    .icon img.gloss {
+        z-index: 2;
+        border-radius: 45px 45px 0 0;
+        overflow: hidden;
+        top: 0; /* Need to keep 0 for the radius/hidden to operate properly */
+        left: 0;
+    }
+    a {
+        vertical-align: top;
+    }
+    .text {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.6);
+        color: #333;
+        font-weight: bold;
+        padding: 4px 5px;
+        border-radius: 4px;
+    }
+    .app {
+        display: inline-block;
+        text-align: center;
+        margin: 20px 20px 5px;
+        padding: 10px;
+        width: 90px;
+    }
+}
 
 /*+-++-++-++-+
  * |F||O||R||M|
@@ -407,7 +443,7 @@ img.publication_status {
 }
 .fieldset {
     th, td {
-        padding-right: 6.7%; /* = .c7 .col */
+        padding-right: 2em; /* = .c7 .col */
         padding-top: 0.5em;
         padding-bottom: 0.5em;
     }
@@ -443,6 +479,7 @@ table.title-fields {
     }
 
     input {
+        display: inline-block;
         width : 100%;
         box-sizing : border-box;
         -moz-box-sizing : border-box;
@@ -452,6 +489,7 @@ table.title-fields {
 .table-field {
     display: table;
     width:100%;
+    border-collapse: separate;
 }
 
 .table-field, .row-field {
@@ -582,4 +620,29 @@ table.title-fields {
     font-size: 1.2em;
     line-height: 1;
     font-weight: bold;
+}
+
+
+.login_popup {
+    margin: 0 auto;
+}
+
+.login_popup p {
+    margin: 1em auto;
+}
+
+label.tooltip {
+    cursor: pointer;
+
+    div.content {
+        display: none;
+    }
+}
+div.wijmo-wijtooltip.tooltip {
+
+  line-height: 1.3em;
+
+  p {
+      margin-bottom: 0.5em;
+  }
 }

@@ -14,6 +14,12 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 {
     public $template = 'nos::admin/html';
 
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        I18n::current_dictionary('nos::common');
+    }
+
     public function after($response)
     {
         foreach (array(
@@ -61,7 +67,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             if (!isset($user_configuration['tabs']['tabs'])) {
                 $user_configuration['tabs']['tabs'] = array();
             }
-            $openRank = null;
             $found = false;
 
             // Native = OS + tray
@@ -79,8 +84,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             if (!$found) {
                 foreach ($user_configuration['tabs']['tabs'] as $i => &$tab) {
                     if ($tab['url'] == $deep_linking_url) {
-                        $openRank = $tab['openRank'];
-                        $tab['openRank'] = 0;
                         $user_configuration['tabs']['selected'] = $i + 1;
                         $found = true;
                     }
@@ -91,25 +94,15 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             // Tab was not found found, add it
             if (!$found) {
                 $user_configuration['tabs']['selected'] = count($user_configuration['tabs']['tabs']) + 1;
-                $openRank = 1;
                 $user_configuration['tabs']['tabs'][] = array(
                     'url' => $deep_linking_url,
-                    'openRank' => 1,
                 );
-
-                // Rank from every tab goes up
-                foreach ($user_configuration['tabs']['tabs'] as $i => &$tab) {
-                    if ($tab['openRank'] < $openRank) {
-                        $tab['openRank']++;
-                    }
-                }
-                unset($tab);
             }
         }
 
         $ostabs = array(
             'initTabs' => array(),
-            'trayView' => (string) \View::forge('admin/tray/right'),
+            'trayView' => (string) \View::forge('nos::admin/tray'),
             'appsTab' => $osTabs,
             'newTab' => array(
                 'panelId' => 'noviusospanel',
@@ -118,6 +111,17 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 'iconSize' => 16,
             ),
             'user_configuration' => $user_configuration,
+
+            'texts' => array(
+                'newTab' => __('New tab'),
+                'closeTab' => __('Close tab'),
+                'closeTabs' => __('Close all tabs'),
+                'closeOtherTabs' => __('Close all other tabs'),
+                'confirmCloseTabs' => __('Are you sure to want to close all tabs?'),
+                'confirmCloseOtherTabs' => __('Are you sure to want to close all other tabs?'),
+                'reloadTab' => __('Reload tab'),
+                'spinner' => __('Loading...')
+            ),
         );
 
         $view->set('ostabs', \Format::forge($ostabs)->to_json(), false);
@@ -128,23 +132,48 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
     public function action_appstab()
     {
-        \Config::load(APPPATH.'metadata'.DS.'launchers.php', 'data::launchers');
-        $launchers = \Config::get('data::launchers', array());
-        $launchers = \Config::mergeWithUser('misc.apps', $launchers);
+        \Nos\Application::cleanApplications();
+        $launchers = \Nos\Config_Data::get('launchers', array());
+        $launchers = \Config::mergeWithUser('misc.apps', $launchers); // It retrieves order from user configuration
+        unset($launchers['configuration_id']); // Configuration id is automatically added
 
         $apps = array();
         foreach ($launchers as $key => $app) {
-            if (empty($app['icon64']) && isset($app['application'])) {
-                $app['icon64'] = \Config::icon($app['application'], 64);
+            $app['key'] = $key;
+
+
+            if (!empty($app['icon64']) && empty($app['icon'])) {
+                $app['icon'] = $app['icon64'];
+                unset($app['icon64']);
             }
-            if (!empty($app['action']) && !empty($app['icon64'])) {
-                if (isset($app['application']) && isset($app['action']['tab']) && !isset($app['action']['tab']['iconUrl'])) {
+
+            // Compatibility with 0.1
+            if (!empty($app['url']) && empty($app['action'])) {
+                $app['action'] = array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => $app['url'],
+                    ),
+                );
+                unset($app['url']);
+                if (!empty($app['iconUrl'])) {
+                    $app['action']['tab']['iconUrl'] = $app['iconUrl'];
+                    unset($app['iconUrl']);
+                }
+            }
+
+            if (!empty($app['action'])) {
+                if (empty($app['icon']) && !empty($app['application'])) {
+                    $app['icon'] = \Config::icon($app['application'], 64);
+                }
+
+                if (!empty($app['application']) && isset($app['action']['tab']) && !isset($app['action']['tab']['iconUrl'])) {
                     $app['action']['tab']['iconUrl'] = \Config::icon($app['application'], 32);
                 }
+
                 // do we have to display the application?
-                if (!isset($app['application']) || Permission::check($app['application'], 'access')) {
+                if (empty($app['application']) || Permission::check($app['application'], 'access')) {
                     // do we have the rights to access the application?
-                    $app['key'] = $key;
                     $apps[] = $app;
                 }
             }
@@ -155,7 +184,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
         $user = \Session::user();
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
-        $background = $background_id ? Model_Media::find($background_id) : false;
+        $background = $background_id ? \Nos\Media\Model_Media::find($background_id) : false;
 
         $view = \View::forge(
             'admin/appstab',

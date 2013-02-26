@@ -17,6 +17,12 @@ class Autoloader extends Fuel\Core\Autoloader
         'controller' => 'ctrl'
     );
 
+    /**
+     * Loads a class.
+     *
+     * @param   string  $class  Class to load
+     * @return  bool    If it loaded the class
+     */
     public static function load($class)
     {
         // deal with funny is_callable('static::classname') side-effect

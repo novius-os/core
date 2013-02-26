@@ -124,7 +124,7 @@
 
                     if (!container.hasClass(_class) && level in settings.texts)
                     {
-                        container.text(settings.texts[level]).attr('class', 'password_strength ' + _class);
+                        container.html(settings.texts[level]).attr('class', 'password_strength ' + _class);
                     }
                     if ($bar && !$bar.hasClass(_barClass))
                     {

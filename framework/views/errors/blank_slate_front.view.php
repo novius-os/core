@@ -24,7 +24,7 @@ html {
     height : 100%;
 }
 body {
-  background: url("static/novius-os/admin/novius-os/img/wallpapers/circles.jpg");
+  background: url("static/novius-os/admin/novius-os/img/wallpapers/default.jpg");
   background-size: cover;
   font-family: franklin gothic medium,arial,verdana,helvetica,sans-serif;
 }
@@ -34,15 +34,26 @@ body {
   border-radius: 10px;
   padding: 20px 40px;
   position: absolute;
-  top: 50px;
-  left: 50px;
-  right: 50px;
-  bottom: 50px;
+  top: 45px;
+  left: 45px;
+  right: 45px;
+  bottom: 45px;
   overflow: auto;
 }
 #blank_slate h1, #blank_slate img {
     vertical-align: middle;
     padding: 0 2em 0 1em;
+}
+#blank_slate img {
+    float: left;
+}
+#blank_slate h1:after
+{
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
 }
 a {
     color: #555;
@@ -67,7 +78,7 @@ a:hover {
         <p><a href="https://github.com/novius-os/novius-os/wiki/%28EN%29-Applications" target="_blank">Have a look at the documentation</a> and <a href="https://github.com/novius-os/noviusos_monkey" target="_blank">copy the sample application</a> to get started.</p>
 
         <h2>I don't know</h2>
-        <p><a href="admin">Go to the administration panel</a>, it's a good place to start.</p>
+        <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
     </div>
 </body>
 </html>

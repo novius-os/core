@@ -10,6 +10,10 @@
 
 namespace Nos;
 
+class BehaviourDuplicateException extends \Exception
+{
+}
+
 abstract class Orm_Behaviour extends \Orm\Observer
 {
     protected $_class = null;

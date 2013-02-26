@@ -8,44 +8,37 @@
  * @link http://www.novius-os.org
  */
 $uniqid_close = uniqid('close_');
+
 if (!$item->is_new()) {
     ?>
     <div id="<?= $uniqid_close ?>" style="display:none;">
-        <p><?= $crud['config']['messages']['item deleted'] ?></p>
         <p>&nbsp;</p>
-        <p><button class="primary" data-icon="close" onclick="$(this).nosTabs('close');"><?= __('Close tab') ?></button></p>
+        <p><button class="primary" type="button" data-icon="close"><?=$crud['config']['i18n']['deleted popup close'] ?></button></p>
     </div>
     <?php
 }
 ?>
 <script type="text/javascript">
     require(
-        ['jquery-nos-ostabs'],
+        ['jquery-nos-update-tab-crud'],
         function ($) {
             $(function () {
-                var tabInfos = <?= \Format::forge()->to_json($crud['tab_params']) ?>,
-                    isNew = <?= \Format::forge()->to_json($item->is_new()) ?>;
-
-                var $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>');
-                $container.nosTabs('update', tabInfos);
-                if (!isNew) {
-                    $container.nosListenEvent({
-                            name: <?= \Format::forge()->to_json($crud['model']) ?>,
-                            action: 'delete',
-                            id: <?= (int) $item->{$crud['pk']} ?>
-                        }, function() {
-                            var $close = $('#<?= $uniqid_close ?>');
-                            $close.show().nosFormUI();
-                            $container.nosDialog({
-                                title: <?= Format::forge()->to_json(__('Bye bye')) ?>,
-                                content: $close,
-                                width: 300,
-                                height: 130,
-                                close: function() {
-                                    $container.nosTabs('close');
-                                }
-                            });
-                        });
+                var $container = $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>').nosUpdateTabCrud({
+                            tabParams: <?= \Format::forge()->to_json($crud['tab_params']) ?>,
+                            isNew: <?= \Format::forge()->to_json($item->is_new()) ?>,
+                            model: <?= \Format::forge()->to_json($crud['model']) ?>,
+                            itemId: <?= (int) $item->{$crud['pk']} ?>,
+                            closeEle: '#<?= $uniqid_close ?>',
+                            texts: {
+<?php
+// Popup notification state deleted title
+?>
+                                titleClose: <?= Format::forge()->to_json($crud['config']['i18n']['deleted popup title']) ?>
+                            }
+                        }),
+                    context = <?= \Format::forge()->to_json(isset($crud['context']) ? $crud['context'] : false) ?>;
+                if (context) {
+                    $container.closest('.nos-dispatcher').data('nosContext', context);
                 }
             });
         });

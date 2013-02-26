@@ -12,11 +12,74 @@ namespace Nos;
 
 class Application
 {
+    protected static $repositories;
+    protected static $rawAppInstalled;
+
     public static function _init()
     {
-        // @todo repair that
-        //\Module::load('data', APPPATH.'data');
-        \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
+        list($file) = \Nos\Config_Data::getFile('app_installed');
+        static::$rawAppInstalled = \Fuel::load($file);
+
+        \Config::load('nos::applications_repositories', true);
+        \Config::load('local::applications_repositories', true);
+        static::$repositories = \Arr::merge(
+            \Config::get('nos::applications_repositories', array()),
+            \Config::get('local::applications_repositories', array())
+        );
+    }
+
+    public static function get_application_path($application)
+    {
+        foreach (static::$repositories as $repository) {
+            $path = $repository['path'].$application;
+            if (is_dir($path)) {
+                return $path;
+            }
+        }
+        return false;
+    }
+
+    public static function installNativeApplications()
+    {
+
+        foreach (static::$repositories as $where => $repository) {
+            if ($repository['native']) {
+
+                $list = \File::read_dir($repository['path'], 1);
+
+                // idc = I don't care
+                foreach ($list as $folder => $idc) {
+                    $app_name = trim($folder, '/\\');
+                    $application = static::forge($app_name);
+                    $application->install(false);
+                }
+            }
+        }
+    }
+
+    public static function areNativeApplicationsDirty()
+    {
+        foreach (static::$repositories as $where => $repository) {
+            if ($repository['native']) {
+                $list = \File::read_dir($repository['path'], 1);
+                foreach ($list as $folder => $idc) {
+                    $app_name = trim($folder, '/\\');
+                    $application = static::forge($app_name);
+                    if ($application->is_dirty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static function cleanApplications()
+    {
+        foreach (static::$rawAppInstalled as $key => $application) {
+            \Module::exists($key);
+        }
     }
 
     /**
@@ -35,21 +98,18 @@ class Application
      * @param  string[]    $repositories
      * @return Application
      */
-    public static function search_all($repositories = array())
+    public static function search_all()
     {
-        $repositories = array(
-            'local' => APPPATH.'applications'.DS,
-        );
-        // @todo use config.modules_path?
-
         $applications = array();
-        foreach ($repositories as $where => $path) {
-            $list = \File::read_dir($path, 1);
+        foreach (static::$repositories as $where => $repository) {
+            if ($repository['visible']) {
+                $list = \File::read_dir($repository['path'], 1);
 
-            // idc = I don't care
-            foreach ($list as $folder => $idc) {
-                $app_name = trim($folder, '/\\');
-                $applications[$app_name] = static::forge($app_name);
+                // idc = I don't care
+                foreach ($list as $folder => $idc) {
+                    $app_name = trim($folder, '/\\');
+                    $applications[$app_name] = static::forge($app_name);
+                }
             }
         }
 
@@ -63,7 +123,7 @@ class Application
     public function __construct($folder, $metadata = array(), $real_metadata = array())
     {
         $this->folder = $folder;
-        $this->metadata = \Config::get('data::app_installed.'.$this->folder, array());
+        $this->metadata = \Arr::get(static::$rawAppInstalled, $this->folder, array());
         $this->real_metadata = $real_metadata;
     }
 
@@ -75,10 +135,30 @@ class Application
     {
         $metadata = $this->metadata;
         if (empty($metadata)) {
-            $metadata = $this->get_real_metadata();
+            $metadata = $this->getRealMetadata();
         }
 
         return isset($metadata['name']) ? $metadata['name'] : $this->folder;
+    }
+
+    /**
+     * Computes the application name (from cached metadata, real metadata or folder basename)
+     * @return string
+     */
+    public function get_name_translated()
+    {
+        $metadata = $this->metadata;
+        if (empty($metadata)) {
+            $metadata = $this->getRealMetadata();
+        }
+        $i18n_file = \Arr::get($metadata, 'i18n_file', false);
+        $name = isset($metadata['name']) ? $metadata['name'] : $this->folder;
+        if (!empty($i18n_file)) {
+            $i18n = \Nos\I18n::dictionary($i18n_file);
+            $name = $i18n($name);
+        }
+
+        return $name;
     }
 
     /**
@@ -94,11 +174,10 @@ class Application
      * Read the actual metadata from the application's config file
      * @return array
      */
-    public function get_real_metadata()
+    public function getRealMetadata()
     {
         if (empty($this->real_metadata)) {
-            \Config::load($this->folder.'::metadata', true);
-            $this->real_metadata = \Config::get($this->folder.'::metadata');
+            $this->real_metadata = \Config::metadata($this->folder);
         }
 
         return $this->real_metadata;
@@ -110,7 +189,7 @@ class Application
      */
     public function is_installed()
     {
-        return!empty($this->metadata);
+        return !empty($this->metadata);
     }
 
     /**
@@ -124,7 +203,7 @@ class Application
 
     protected function check_install()
     {
-        return is_dir(APPPATH.'applications'.DS.$this->folder) && $this->is_link('static') && $this->is_link('htdocs');
+        return static::get_application_path($this->folder) !== false && $this->is_link('static') && $this->is_link('htdocs');
     }
 
     /**
@@ -145,7 +224,7 @@ class Application
     public function diff_metadata()
     {
         $diff_metadata = array();
-        static::array_diff_key_assoc($this->get_metadata(), $this->get_real_metadata(), $diff_metadata);
+        static::array_diff_key_assoc($this->get_metadata(), $this->getRealMetadata(), $diff_metadata);
 
         return $diff_metadata;
     }
@@ -159,13 +238,13 @@ class Application
      * @return bool
      * @throws \Exception
      */
-    public function install()
+    public function install($add_permission = true)
     {
-        $this->addPermission();
-
-        $old_metadata = \Config::get('data::app_installed.'.$this->folder, array());
-        \Config::load($this->folder.'::metadata', true);
-        $new_metadata = \Config::get($this->folder.'::metadata');
+        if ($add_permission) {
+            $this->addPermission();
+        }
+        $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder, array());
+        $new_metadata = $this->getRealMetadata();
 
         // Check if the installation is compatible with other applications
         $config = $this->prepare_config($old_metadata, $new_metadata);
@@ -177,9 +256,10 @@ class Application
         }
 
         // Cache the metadata used to install the application
-        $config['app_installed'] = \Config::get('data::app_installed', array());
+        $config['app_installed'] = static::$rawAppInstalled;
         $config['app_installed'][$this->folder] = $new_metadata;
         $this->save_config($config);
+        static::$rawAppInstalled = $config['app_installed'];
 
         return true;
     }
@@ -194,7 +274,7 @@ class Application
      */
     public function uninstall()
     {
-        $old_metadata = \Config::get('data::app_installed.'.$this->folder);
+        $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder);
         $new_metadata = array();
 
         // Check if the installation is compatible with other applications
@@ -202,9 +282,10 @@ class Application
 
         if ($this->unsymlink('static') && $this->unsymlink('htdocs')) {
             // Remove the application
-            $config['app_installed'] = \Config::get('data::app_installed', array());
+            $config['app_installed'] = static::$rawAppInstalled;
             unset($config['app_installed'][$this->folder]);
             $this->save_config($config);
+            static::$rawAppInstalled = $config['app_installed'];
         }
 
         return true;
@@ -213,11 +294,9 @@ class Application
     protected function prepare_config($old_metadata, $new_metadata)
     {
         // Load current data
-        $data_path = APPPATH.'metadata'.DS;
         $config = array();
         foreach (array('templates', 'enhancers', 'launchers', 'app_dependencies', 'app_namespaces', 'data_catchers') as $section) {
-            \Config::load($data_path.$section.'.php', 'data::'.$section);
-            $config[$section] = \Config::get('data::'.$section, array());
+            $config[$section] = \Nos\Config_Data::load($section, false, true);
         }
 
         foreach (array('templates', 'enhancers', 'launchers', 'data_catchers') as $section) {
@@ -249,7 +328,7 @@ class Application
 
         if (!empty($removed['templates'])) {
             // Check template usage in the page
-            $pages = Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
+            $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
             if (count($pages) > 0) {
                 $usedTemplates = array();
                 $pageTitles = array();
@@ -297,15 +376,6 @@ class Application
             $config[$section] = array_diff_key($config[$section], $removed[$section]);
         }
 
-        // More treatment for launchers
-        // Small fix relative to permissions
-        // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
-        foreach ($added['launchers'] as $key => $launcher) {
-            if (empty($config['launchers'][$key]['application'])) {
-                $config['launchers'][$key]['application'] = $this->folder;
-            }
-        }
-
         // More treatment for enhancers
 
         $old_namespace = \Arr::get($old_metadata, 'namespace', '');
@@ -343,25 +413,47 @@ class Application
 
     protected function save_config($config)
     {
-        $data_path = APPPATH.'metadata'.DS;
         foreach ($config as $file => $content) {
-            \Config::save($data_path.$file.'.php', $content);
-            \Config::set('data::'.$file, $content);
+            \Nos\Config_Data::save($file, $content);
         }
     }
 
     protected function symlink($folder)
     {
         if (!$this->is_link($folder)) {
-            $private = APPPATH.'applications'.DS.$this->folder.DS.$folder;
+            $private = static::get_application_path($this->folder).DS.$folder;
             if (is_dir($private)) {
                 $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
                 if (is_link($public)) {
                     unlink($public);
                 }
-                if (!symlink(Tools_File::relativePath(dirname($public), $private), $public)) {
-                    throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
+
+                // It seems that symlink() does not work every time (confs, right?)
+                // Several trials with native version and exec(), in relative and absolute
+                // http://forums.novius-os.org/support-forums/contributions/petit-probleme,feed,98.html
+
+                $dirname = dirname($public);
+                $relative = Tools_File::relativePath($dirname, $private);
+                if (symlink($relative, $public)) {
+                    return true;
                 }
+
+                exec('cd '.$dirname.'; ln -s '.$relative.' '.$this->folder);
+                if (is_link($public)) {
+                    return true;
+                }
+
+                if (symlink($private, $public)) {
+                    return true;
+                }
+
+                exec('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
+                if (is_link($public)) {
+                    return true;
+                }
+
+                \Log::error('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
+                throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
             }
         }
 
@@ -380,52 +472,16 @@ class Application
 
     protected function is_link($folder)
     {
-        $private = APPPATH.'applications'.DS.$this->folder.DS.$folder;
+        $private =  static::get_application_path($this->folder).DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private)) {
-            return is_link($public) && readlink($public) == Tools_File::relativePath(dirname($public), $private);
+            return is_link($public) && in_array(readlink($public), array(
+                $private,
+                Tools_File::relativePath(dirname($public), $private)
+            ));
         }
 
         return !is_link($public);
-    }
-
-    protected static function _refresh_dependencies(array $params = array())
-    {
-        $add = isset($params['add']) ? $params['add'] : false;
-        $remove = isset($params['remove']) ? $params['remove'] : false;
-        $app_refresh = $add ? $add : $remove;
-
-        $dependencies = array();
-        if ($add) {
-            \Config::load($app_refresh.'::metadata', true);
-            $config = \Config::get($app_refresh.'::metadata', array());
-
-            if (isset($config['extends'])) {
-                if (!isset($dependencies[$config['extends']])) {
-                    $dependencies[$config['extends']] = array();
-                }
-                $dependencies[$config['extends']][] = $app_refresh;
-            }
-        }
-
-        \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed');
-        $app_installed = \Config::get('data::app_installed', array());
-
-        foreach ($app_installed as $app_name => $app) {
-            if ($app_refresh !== $app_name) {
-                \Config::load($app_name.'::metadata', true);
-                $config = \Config::get($app_name.'::metadata', array());
-                if (isset($config['extends'])) {
-                    if (!isset($dependencies[$config['extends']])) {
-                        $dependencies[$config['extends']] = array();
-                    }
-                    $dependencies[$config['extends']][] = $app_name;
-                }
-            }
-        }
-
-        \Config::set('app_dependencies', $dependencies);
-        \Config::save(APPPATH.'metadata'.DS.'app_dependencies.php', $dependencies);
     }
 
     public function addPermission()
@@ -468,6 +524,12 @@ class Application
                 $diff[$k] = array(null, $v);
             }
         }
+    }
+
+    public static function getCurrent()
+    {
+        // Get current application called on controllers
+        return \Nos\Controller::getCurrentApplication();
     }
 
 }

@@ -22,23 +22,59 @@ class Controller_Admin_Login extends Controller
         if (\Nos\Auth::check()) {
             $this->redirect();
         }
+
+        I18n::setLocale(\Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB')));
+        I18n::current_dictionary('nos::common');
     }
 
     protected function redirect()
     {
-        \Response::redirect(ltrim(urldecode(\Input::get('redirect', 'admin/')), '/'));
+        \Response::redirect(urldecode(\Input::get('redirect', 'admin/')));
         exit();
+    }
+
+    public function action_popup()
+    {
+        $error_msg = '';
+        if (\Input::method() == 'POST') {
+            $error_msg = $this->post_login();
+            if ($error_msg === true) {
+                \Response::json(
+                    array(
+                        'closeDialog' => true,
+                        'notify' => strtr(__('Welcome back, {{user}}.'), array(
+                            '{{user}}' => \Session::user()->user_firstname,
+                        )),
+                    )
+                );
+            } else {
+                \Response::json(
+                    array(
+                        'error' => $error_msg,
+                    )
+                );
+            }
+        }
+
+        // Bypass the template
+        return \View::forge('admin/login_popup');
     }
 
     public function action_index()
     {
-        $error = (\Input::method() == 'POST') ? $this->post_login() : '';
+        $error_msg = '';
+        if (\Input::method() == 'POST') {
+            $error_msg = $this->post_login();
+            if ($error_msg === true) {
+                $this->redirect();
+            }
+        }
 
         \Asset::add_path('static/novius-os/admin/novius-os/');
         \Asset::css('login.css', array(), 'css');
 
         $this->template->body = \View::forge('admin/login', array(
-            'error' => $error,
+            'error' => $error_msg,
         ));
 
         return $this->template;
@@ -71,10 +107,10 @@ class Controller_Admin_Login extends Controller
 
     protected function post_login()
     {
-        if (\Nos\Auth::login($_POST['email'], $_POST['password'], \Input::post('remember_me', false) ? true : false)) {
+        if (\Nos\Auth::login($_POST['email'], $_POST['password'], (bool) \Input::post('remember_me', false))) {
             \Event::trigger('user_login');
-            $this->redirect();
+            return true;
         }
-        return 'Access denied';
+        return __('These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.');
     }
 }

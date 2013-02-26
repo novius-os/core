@@ -43,12 +43,12 @@ class FrontCache
         }
 
         $params = \Arr::merge(
-            $params,
             array(
                 'callback_args' => array(),
-                'duration' => CACHE_DURATION_FUNCTION,
+                'duration' => \Config::get('novius-os.cache_duration_function', 10),
                 'controller' => null,
-            )
+            ),
+            $params
         );
 
         $cache = new static($path);

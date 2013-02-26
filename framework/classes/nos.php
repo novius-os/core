@@ -13,6 +13,28 @@ namespace Nos;
 class Nos
 {
     /**
+     * @var  string  constant used for when entry point is back-office
+     */
+    const ENTRY_POINT_ADMIN = 'admin';
+    /**
+     * @var  string  constant used for when entry point is front-office
+     */
+    const ENTRY_POINT_FRONT = 'front';
+    /**
+     * @var  string  constant used for when entry point is 404
+     */
+    const ENTRY_POINT_404 = '404';
+    /**
+     * @var  string  constant used for when entry point is install
+     */
+    const ENTRY_POINT_INSTALL = 'install';
+
+    /**
+     * @var  string  The Novius OS entry point
+     */
+    public static $entry_point = NOS_ENTRY_POINT;
+
+    /**
      * Returns the controller instance from the main request
      *
      * @return \Nos\Controller
@@ -78,38 +100,35 @@ class Nos
      * @param  \Nos\Controller $controller Context for the execution
      * @return string
      */
-    public static function parse_wysiwyg($content, $controller)
+    public static function parse_wysiwyg($content)
     {
-        static::_parse_enhancers($content, $controller);
+        static::_parse_enhancers($content);
         static::_parse_medias($content);
         static::_parse_internals($content);
 
-        $content = strtr(
-            $content,
-            array(
-                'nos://anchor/' => static::main_controller()->getUrl(),
-            )
+        $content = preg_replace(
+            '`href="#([^"])`iUu',
+            'href="'.static::main_controller()->getUrl().(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
+            $content
         );
 
-        foreach (\Event::trigger('front.parse_wysiwyg', null, 'array') as $c) {
-            is_callable($c) && call_user_func_array($c, array(&$content));
-        }
+        \Event::trigger_function('front.parse_wysiwyg', array(&$content));
 
         return $content;
     }
 
-    protected static function _parse_enhancers(&$content, $controller)
+    protected static function _parse_enhancers(&$content)
     {
         // Fetch the available functions
-        \Config::load(APPPATH.'metadata'.DS.'enhancers.php', 'data::enhancers');
+        \Nos\Config_Data::load('enhancers');
 
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
         $callback = array(get_called_class(), 'get_enhancer_content');
         static::parse_enhancers(
             $content,
-            function ($enhancer, $config, $tag) use (&$content, $controller, $callback) {
-                $function_content = call_user_func($callback, $enhancer, $config, $controller);
+            function ($enhancer, $config, $tag) use (&$content, $callback) {
+                $function_content = call_user_func($callback, $enhancer, $config);
                 $content = str_replace($tag, $function_content, $content);
             }
         );
@@ -128,7 +147,7 @@ class Nos
         }
     }
 
-    public static function get_enhancer_content($enhancer, $args, $controller)
+    public static function get_enhancer_content($enhancer, $args)
     {
         $args = json_decode(
             strtr(
@@ -140,14 +159,13 @@ class Nos
             true
         );
 
-        $config = \Config::get("data::enhancers.$enhancer", false);
+        $config = \Nos\Config_Data::get('enhancers.'.$enhancer, false);
 
         $found = $config !== false;
 
         false && \Fuel::$profiling && \Profiler::console(
             array(
                 'enhancer' => $enhancer,
-                'controller' => get_class($controller),
             )
         );
 
@@ -162,8 +180,8 @@ class Nos
                 $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
             }
         } else {
-            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found in '.get_class($controller).'.' : '';
-            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found in '.get_class($controller).'.');
+            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found.' : '';
+            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found.');
         }
 
         return $function_content;
@@ -204,9 +222,13 @@ class Nos
             foreach ($matches[1] as $match_id => $page_id) {
                 $page_ids[] = $page_id;
             }
-            $pages = Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
+            $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
             foreach ($matches[1] as $match_id => $page_id) {
-                $content = str_replace($matches[0][$match_id], $pages[$page_id]->url(), $content);
+                if (isset($pages[$page_id])) {
+                    $content = str_replace($matches[0][$match_id], $pages[$page_id]->url(), $content);
+                } else {
+                    $content = str_replace('href="'.$matches[0][$match_id].'"', '', $content);
+                }
             }
         }
     }

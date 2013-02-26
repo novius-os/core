@@ -55,16 +55,21 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field
             }
             $this->label = $label;
         }
-        if (isset($this->attributes['widget_options'])) {
-            $widget_options = $this->attributes['widget_options'];
-            unset($this->attributes['widget_options']);
+        if (isset($this->attributes['renderer_options'])) {
+            $renderer_options = $this->attributes['renderer_options'];
+            unset($this->attributes['renderer_options']);
         }
         $return = parent::build();
-        if (isset($widget_options)) {
-            $this->attributes['widget_options'] = $widget_options;
+        if (isset($renderer_options)) {
+            $this->attributes['renderer_options'] = $renderer_options;
         }
 
         return $return;
+    }
+
+    public function is_expert()
+    {
+        return $this->fieldset->is_expert($this->name);
     }
 
     public function before_save($item, $data)

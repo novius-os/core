@@ -23,13 +23,13 @@ define('jquery-nos-ostabs',
                 selected : null,
 
                 texts : {
-                    scrollLeft : 'Scroll left',
-                    scrollRight : 'Scroll right',
                     newTab: 'New tab',
-                    removeTab: 'Remove tab',
                     closeTab: 'Close tab',
-                    reloadTab: 'Reload tab',
-                    spinner: 'Loading...'
+                    closeTabs: 'Close all tabs',
+                    closeOtherTabs: 'Close all other tabs',
+                    confirmCloseOtherTabs: 'Are you sure to want to close all other tabs?',
+                    confirmCloseTabs: 'Are you sure to want to close all tabs?',
+                    reloadTab: 'Reload tab'
                 },
 
                 // callbacks
@@ -89,7 +89,7 @@ define('jquery-nos-ostabs',
                 var self = this,
                     index = self.lis.index( li );
                 if ( panel === undefined ) {
-                    panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash ) )[ 0 ];
+                    panel = self.element.find( self._sanitizeSelector( $(self.anchors[ index ]).data('anchor.tabs') ) )[ 0 ];
                 }
 
                 return {
@@ -112,17 +112,7 @@ define('jquery-nos-ostabs',
                             $(this).loadspinner( 'destroy' );
                         }
                     })
-                    .html( ' ' )
-                    .parent()
-                    .find( "span.nos-ostabs-label" )
-                    .each(function() {
-                        var el = $( this ),
-                            html = el.data( "label.tabs" );
-
-                        if ( html ) {
-                            el.html( html ).removeData( "label.tabs" );
-                        }
-                    });
+                    .html( ' ' );
 
                 return self;
             },
@@ -144,7 +134,7 @@ define('jquery-nos-ostabs',
                         .addClass('nos-ostabs-tabs')
                         .appendTo( self.uiOstabsHeader );
 
-                    self.uiOstabsTray = $( '<ul></ul>' )
+                    self.uiOstabsTray = $( '<div></div>' )
                         .addClass( 'nos-ostabs-tray nos-ostabs-nav' );
                     if ( o.trayView !== null ) {
                         self.uiOstabsTray.html(o.trayView);
@@ -249,12 +239,11 @@ define('jquery-nos-ostabs',
                         update: function() {
                             self._trigger( "drag", null );
                             self.lis = self.uiOstabsAppsTab
-                                .add( self.uiOstabsTray )
                                 .add( self.uiOstabsTabs )
-                                .find( "li:has(a[href])" );
+                                .find( "li" );
                             self.anchors = self.lis.map(function(i) {
                                 var anchor = $( "a", this )[ 0 ];
-                                self.element.find( self._sanitizeSelector( anchor.hash ) )
+                                self.element.find( self._sanitizeSelector( $(anchor).data('anchor.tabs') ) )
                                     .find( '.nos-ostabs-panel-content' )
                                     .data( 'nos-ostabs-index', i );
                                 return anchor;
@@ -271,12 +260,12 @@ define('jquery-nos-ostabs',
                 }
 
                 var tabOpenRank = [];
-                self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTray).add(self.uiOstabsTabs).find("li:has(a[href])")
+                self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTabs).find("li")
                     .each(function(i) {
                         var $li = $(this),
                             tab = $li.data( 'ui-ostab') || {};
 
-                        if (tab.openRank !== false) {
+                        if (!$li.hasClass('nos-ostabs-appstab') && tab.openRank !== false) {
                             tabOpenRank[tab.openRank] = $li;
                         }
                     });
@@ -294,7 +283,13 @@ define('jquery-nos-ostabs',
                 self.panels = $( [] );
 
                 self.anchors.each(function( i, a ) {
-                    var href = $( a ).attr( "href" );
+                    var $a = $(a),
+                        href = $a.attr( "href"),
+                        hash = $a.data('anchor.tabs');
+                    if (!href && hash) {
+                        a.href = hash;
+                        href = hash;
+                    }
                     // For dynamically created HTML that contains a hash as href IE < 8 expands
                     // such href to the full page url with hash and then misinterprets tab as ajax.
                     // Same consideration applies for an added tab with a fragment identifier
@@ -317,11 +312,11 @@ define('jquery-nos-ostabs',
                     // prevent loading the page itself if href is just "#"
                     } else if ( href && href !== "#" ) {
                         // required for restore on destroy
-                        $.data( a, "href.tabs", href );
+                        $a.data("href.tabs", href );
 
                         // TODO until #3808 is fixed strip fragment identifier from url
                         // (IE fails to load from such url)
-                        $.data( a, "load.tabs", href.replace( /#.*$/, "" ) );
+                        $a.data("load.tabs", href.replace( /#.*$/, "" ) );
 
                         var id = self._tabId( a );
                         a.href = "#" + id;
@@ -337,6 +332,8 @@ define('jquery-nos-ostabs',
                         }
                         self.panels = self.panels.add( $panel );
                     }
+                    $a.data('anchor.tabs', a.hash)
+                        .removeAttr('href');
                     $panel.find( '.nos-ostabs-panel-content' )
                         .data( 'nos-ostabs-index', i );
                 });
@@ -356,7 +353,7 @@ define('jquery-nos-ostabs',
                     if ( o.selected === undefined ) {
                         if ( location.hash ) {
                             self.anchors.each(function( i, a ) {
-                                if ( a.hash == location.hash ) {
+                                if ( $(a).data('anchor.tabs') == location.hash ) {
                                     o.selected = i;
                                     return false;
                                 }
@@ -378,7 +375,7 @@ define('jquery-nos-ostabs',
                     self.lis.removeClass( "nos-ostabs-selected ui-state-active" );
                     // check for length avoids error when initializing empty list
                     if ( o.selected >= 0 && self.anchors.length ) {
-                        self.element.find( self._sanitizeSelector( self.anchors[ o.selected ].hash ) ).removeClass( "nos-ostabs-hide" );
+                        self.element.find( self._sanitizeSelector( $(self.anchors[ o.selected ]).data('anchor.tabs') ) ).removeClass( "nos-ostabs-hide" );
                         self.lis.eq( o.selected ).addClass( "nos-ostabs-selected ui-state-active ui-state-open" );
 
                         // seems to be expected behaviour that the show callback is fired
@@ -515,58 +512,69 @@ define('jquery-nos-ostabs',
 
                 // attach tab event handler, unbind to avoid duplicates from former tabifying...
                 self.anchors.bind( "click.tabs", function() {
-                    var el = this,
-                        $li = $(el).closest( "li" ),
-                        $hide = self.panels.filter( ":not(.nos-ostabs-hide)" ),
-                        $show = self.element.find( self._sanitizeSelector( el.hash )),
-                        tab = $li.data( 'ui-ostab');
+                        var el = this,
+                            $li = $(el).closest( "li" ),
+                            $hide = self.panels.filter( ":not(.nos-ostabs-hide)" ),
+                            $show = self.element.find( self._sanitizeSelector( $(el).data('anchor.tabs') )),
+                            tab = $li.data( 'ui-ostab');
 
-                    $li.addClass( "ui-state-open" );
-                    self.uiOstabsNewTab.removeClass('ui-state-open');
+                        $li.addClass( "ui-state-open" );
+                        self.uiOstabsNewTab.removeClass('ui-state-open');
 
-                    o.selected = self.anchors.index( this );
+                        o.selected = self.anchors.index( this );
 
-                    // If tab selected or
-                    // or is already loading or click callback returns false stop here.
-                    // Check if click handler returns false last so that it is not executed for loading tab!
-                    if ($li.hasClass( "nos-ostabs-selected" ) ||
-                        $li.hasClass( "ui-state-processing" ) ||
-                        self.panels.filter( ":animated" ).length ||
-                        self._trigger( "select", null, self._ui( $li[ 0 ], $show[ 0 ] ) ) === false ) {
-                        this.blur();
-                        return false;
-                    }
+                        // If tab selected or
+                        // or is already loading or click callback returns false stop here.
+                        // Check if click handler returns false last so that it is not executed for loading tab!
+                        if ($li.hasClass( "nos-ostabs-selected" ) ||
+                            $li.hasClass( "ui-state-processing" ) ||
+                            self.panels.filter( ":animated" ).length ||
+                            self._trigger( "select", null, self._ui( $li[ 0 ], $show[ 0 ] ) ) === false ) {
+                            this.blur();
+                            return false;
+                        }
 
-                    self._abort();
+                        self._abort();
 
-                    // show new tab
-                    if ( $show.length ) {
-                        if ( $hide.length ) {
+                        // show new tab
+                        if ( $show.length ) {
+                            if ( $hide.length ) {
+                                self.element.queue( "tabs", function() {
+                                    hideTab( el, $hide );
+                                });
+                            }
                             self.element.queue( "tabs", function() {
-                                hideTab( el, $hide );
+                                if (!$li.hasClass('nos-ostabs-appstab')) {
+                                    tab.openRank = self.openRank++;
+                                }
+                                showTab( el, $show );
                             });
-                        }
-                        self.element.queue( "tabs", function() {
-                            tab.openRank = self.openRank++;
-                            showTab( el, $show );
-                        });
 
-                        $( 'title' ).text( $li.find( '.nos-ostabs-label' ).text() );
-                        var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
-                        if ('replaceState' in window.history) {
-                            window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
+                            $( 'title' ).html( $li.find( '.nos-ostabs-label' ).html() );
+                            var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
+                            if ('replaceState' in window.history) {
+                                window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
+                            } else {
+                                document.location.hash = 'tab=' + url;
+                            }
+
+
+                            self._load( self.anchors.index( this ) );
                         } else {
-                            document.location.hash = 'tab=' + url;
+                            throw "jQuery UI Tabs: Mismatching fragment identifier.";
                         }
 
-
-                        self._load( self.anchors.index( this ) );
-                    } else {
-                        throw "jQuery UI Tabs: Mismatching fragment identifier.";
-                    }
-
-                    this.blur();
-                });
+                        this.blur();
+                    }).bind( "mousedown.tabs", function(e) {
+                        if (e.which === 2) {
+                            var el = this,
+                                $li = $(el).closest( "li"),
+                                closable = $li.not( '.nos-ostabs-appstab' ).length;
+                            if (closable) {
+                                self.remove( self.lis.index($li), !$li.hasClass( "nos-ostabs-selected" ) );
+                            }
+                        }
+                    });
 
                 // disable click in any case
                 self.anchors.bind( "click.tabs", function(){
@@ -582,7 +590,12 @@ define('jquery-nos-ostabs',
                 // meta-function to give users option to provide a href string instead of a numerical index.
                 // also sanitizes numerical indexes to valid values.
                 if ( typeof index == "string" ) {
-                    index = self.anchors.index( self.anchors.filter( "[href$=" + index + "]" ) );
+                    self.anchors.each(function(i) {
+                        if ($(this).data('anchor.tabs') === index) {
+                            index = i;
+                            return false;
+                        }
+                    });
                 }
 
                 return index;
@@ -590,27 +603,26 @@ define('jquery-nos-ostabs',
 
             _actions: function( $panel, index, other_actions) {
                 var self = this,
-                    o = self.options;
-
-                var li = self.lis.eq(index),
+                    o = self.options,
+                    actions, links, closable, reloadable, close, closeOtherTabs, reload, reversed_actions,
+                    li = self.lis.eq(index),
                     a =  self.anchors.eq(index);
 
                 $panel.find('.nos-ostabs-actions').remove();
 
-                var actions = $( '<div></div>' )
+                actions = $( '<div></div>' )
                     .addClass( 'nos-ostabs-actions ui-state-active' )
                     .prependTo( $panel );
 
-                var links = $( '<div></div>' )
+                links = $( '<div></div>' )
                     .addClass( 'nos-ostabs-actions-links' )
                     .prependTo( actions );
 
-                var removable = li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length;
-                var closable = li.not( '.nos-ostabs-appstab' ).length;
-                var reloadable = a.data( "iframe.tabs" );
+                closable = li.not( '.nos-ostabs-appstab' ).length;
+                reloadable = a.data( "iframe.tabs" );
 
                 if ( closable ) {
-                    var close = $( '<a href="#"></a>' )
+                    close = $( '<a href="#"></a>' )
                         .addClass( 'nos-ostabs-close' )
                         .click(function() {
                             self.remove( self.lis.index(li) ); // On recalcule l'index au cas où l'onglet est été déplacé
@@ -618,14 +630,34 @@ define('jquery-nos-ostabs',
                         })
                         .appendTo( links );
                     $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
-                        .text( removable ? o.texts.removeTab : o.texts.closeTab )
+                        .html( o.texts.closeTab )
                         .appendTo( close );
-                    $( '<span></span>' ).text( removable ? o.texts.removeTab : o.texts.closeTab )
+                    $( '<span></span>' ).html( o.texts.closeTab )
                         .appendTo( close );
                 }
 
+                closeOtherTabs = $( '<a href="#"></a>' )
+                    .addClass( 'nos-ostabs-close-allothers' )
+                    .click(function() {
+                        if (confirm($.nosCleanupTranslation(closable ? o.texts.confirmCloseOtherTabs : o.texts.confirmCloseTabs))) {
+                            self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                var $liTemp = this;
+                                if ($liTemp !== li[0]) {
+                                    self.remove( self.lis.index($liTemp) );
+                                }
+                            });
+                        }
+                        return false;
+                    })
+                    .appendTo( links );
+                $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
+                    .html(closable ? o.texts.closeOtherTabs : o.texts.closeTabs)
+                    .appendTo( closeOtherTabs );
+                $( '<span></span>' ).html(closable ? o.texts.closeOtherTabs : o.texts.closeTabs)
+                    .appendTo( closeOtherTabs );
+
                 if ( reloadable ) {
-                    var reload = $( '<a href="#"></a>' )
+                    reload = $( '<a href="#"></a>' )
                         .addClass( 'nos-ostabs-reload' )
                         .click(function() {
                             var fr = $panel.find( 'iframe.nos-ostabs-panel-content' );
@@ -634,31 +666,31 @@ define('jquery-nos-ostabs',
                             }
                             return false;
                         })
-                        .text( o.texts.reloadTab )
+                        .html( o.texts.reloadTab )
                         .appendTo( links );
                     $( '<span></span>' ).addClass( 'ui-icon ui-icon-refresh' )
-                        .text( o.texts.reloadTab )
+                        .html( o.texts.reloadTab )
                         .appendTo( reload );
                 }
 
                 // slice() = clone()
-                var reversed_actions = other_actions.slice(0).reverse();
+                reversed_actions = other_actions.slice(0).reverse();
                 $.each(reversed_actions, function() {
-                    var action = this;
-
-                    var $el = $( '<a href="#"></a>' )
-                        .addClass( 'nos-ostabs-action' )
-                        .click(function(e) {
-                            e.preventDefault();
-                            $(this).nosAction(action.action);
-                        })
-                        .appendTo( links );
+                    var action = this,
+                        icon,
+                        $el = $( '<a href="#"></a>' )
+                            .addClass( 'nos-ostabs-action' )
+                            .click(function(e) {
+                                e.preventDefault();
+                                $(this).nosAction(action.action);
+                            })
+                            .appendTo( links );
 
                     if (action.faded) {
                        $el.addClass('faded');
                     }
-                    var icon = $( '<span></span>' ).addClass( 'ui-icon' )
-                        .text( action.label || '' )
+                    icon = $( '<span></span>' ).addClass( 'ui-icon' )
+                        .html( action.label || '' )
                         .appendTo( $el );
                     if ( action.iconUrl ) {
                         icon.css({
@@ -669,7 +701,7 @@ define('jquery-nos-ostabs',
                     } else {
                         icon.addClass( action.iconClasses );
                     }
-                    $( '<span></span>' ).text( action.label || '' )
+                    $( '<span></span>' ).html( action.label || '' )
                         .appendTo( $el );
 
                 });
@@ -786,13 +818,13 @@ define('jquery-nos-ostabs',
                 var icon = self._icon( tab ).appendTo( a );
 
                 var label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
-                    .text( tab.label ? tab.label : 'New tab' )
+                    .html( tab.label ? tab.label : 'New tab' )
                     .appendTo( a );
                 if ( !tab.labelDisplay ) {
                     label.hide();
                 }
                 var li = $( '<li></li>' ).append( a )
-                    .attr('title', tab.label)
+                    .attr('title', label.text())
                     .addClass( 'ui-corner-top ui-state-default').data( 'ui-ostab', tab )
                     .appendTo( target );
 
@@ -813,7 +845,7 @@ define('jquery-nos-ostabs',
                 index = self._getIndex( index );
                 var $li = self.lis.eq( index ),
                     $a = self.anchors.eq( index ),
-                    $panel = self.element.find( self._sanitizeSelector( self.anchors[ index ].hash )),
+                    $panel = self.element.find( self._sanitizeSelector( $(self.anchors[ index ]).data('anchor.tabs') )),
                     openIndex = 0,
                     openRank = 0;
 
@@ -824,7 +856,7 @@ define('jquery-nos-ostabs',
                     }
                 }
 
-                if ( $li.not( '.nos-ostabs-tray' ).not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
+                if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
                     $li.remove();
                     $panel.remove();
                 } else {
@@ -836,6 +868,7 @@ define('jquery-nos-ostabs',
                 $li.removeClass( "ui-state-active ui-state-open" );
 
                 if (!notSelectAfter) {
+                    openIndex = index > 2 ? index - 1 : (self.lis.length > 3 ? 1 : 0);
                     // Open the last tab in stack opening or the 0 index
                     self.lis.each(function(i) {
                         var $litemp = $(this),
@@ -846,7 +879,7 @@ define('jquery-nos-ostabs',
                             openIndex = i;
                         }
                     });
-                    openIndex = self.anchors.eq(openIndex).attr('href');
+                    openIndex = self.anchors.eq(openIndex).data('anchor.tabs');
                 }
 
                 if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
@@ -876,10 +909,10 @@ define('jquery-nos-ostabs',
                 if ( title === undefined ) {
                     return $li.find( '.nos-ostabs-label' ).text();
                 } else {
-                    $li.find( '.nos-ostabs-label' ).text( title );
+                    $li.find( '.nos-ostabs-label' ).html( title );
 
                     if ( o.selected == index ) {
-                        $( 'title' ).text( title );
+                        $( 'title' ).html( title );
                     }
 
                     self._trigger( "title", null, self._ui( $li[ 0 ] ) );
@@ -909,7 +942,7 @@ define('jquery-nos-ostabs',
                     this.select(index);
                 } else {
                     if ( self.options.selected == index ) {
-                        $( 'title' ).text( tab.label );
+                        $( 'title' ).html( tab.label );
                         var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
                         if ('replaceState' in window.history) {
                             window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
@@ -923,7 +956,7 @@ define('jquery-nos-ostabs',
                         $panel = self.panels.eq( index );
 
                     $li.data( 'ui-ostab', tab )
-                        .attr('title', tab.label || '')
+                        .attr('title', $newLi.find( '.nos-ostabs-label' ).text())
                         .addClass($newLi.attr('class'))
                         .css({
                             height: $newLi.css('height'),
@@ -987,7 +1020,7 @@ define('jquery-nos-ostabs',
                     return;
                 }
 
-                var panel = self.element.find( self._sanitizeSelector( a.hash )),
+                var panel = self.element.find( self._sanitizeSelector( $(a).data('anchor.tabs') )),
                     content = $( '> *', panel ).not( '.nos-ostabs-actions' ).length;
 
                 if (content !== 0) {
@@ -997,12 +1030,6 @@ define('jquery-nos-ostabs',
 
                 // load remote from here on
                 self.lis.eq( index ).addClass( "ui-state-processing" );
-
-                $( "span.nos-ostabs-label", a ).each(function() {
-                    var $a = $( this );
-                    $a.data( "label.tabs", $a.html() )
-                        .html( $a.data("label.tabs") ? o.texts.spinner : '' );
-                });
 
                 if ( $.isFunction($.fn.loadspinner) ) {
                     $( "span.nos-ostabs-icon", a ).each(function() {
@@ -1018,27 +1045,35 @@ define('jquery-nos-ostabs',
                 if (!iframe) {
                     self.xhr = $.ajax({
                         url: url,
-                        success: function( r ) {
+                        success: function( r, s, xhr ) {
+                            var json;
+
                             $( '<div></div>' ).addClass( 'nos-ostabs-panel-content nos-dispatcher' )
                                 .data( 'nos-ostabs-index', index )
                                 .prependTo( panel.data('callbacks.ostabs', {}) )
                                 .html( r );
 
                             $.data( a, "cache.tabs", true );
-                        },
-                        complete: function(xhr) {
 
+                            // case error, response not html but json (tab item was deleted)
                             // If response looks like JSON, execute standard success callback
                             try {
-                                var json = $.parseJSON(xhr.responseText)
-                                $(self).nosAjaxSuccess(json);
+                                json = $.parseJSON(xhr.responseText);
+                                self.element.nosAjaxSuccess(json);
 
                             } catch (e) {}
-
+                        },
+                        complete: function(xhr) {
                             // take care of tab labels
                             self._cleanup();
 
                             self._trigger( "load", null, self._ui( self.lis[index] ) );
+                        },
+                        error : function (xhr, s) {
+                            self.remove(index)
+
+                            // If response looks like JSON, execute standard success callback
+                            self.element.nosAjaxError(xhr, s);
                         }
                     });
                 } else {
@@ -1082,6 +1117,7 @@ define('jquery-nos-ostabs',
                     .each(function() {
                         var tab = $.extend({}, $(this).data('ui-ostab'));
                         delete tab.actions;
+                        delete tab.openRank;
                         tabs.push(tab);
                     });
                 return tabs;

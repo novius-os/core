@@ -16,6 +16,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 {
     protected $config = array();
     protected $app_config = array();
+    protected static $current_application = null;
 
     /**
      * @var string page template
@@ -35,9 +36,11 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $this->format = array_key_exists(\Input::extension(), $this->_supported_formats) ? \Input::extension() : 'json';
         }
 
+        list(static::$current_application) = \Config::configFile(get_called_class());
+
         $this->config = \Arr::merge($this->config, $this->getConfiguration());
         $this->app_config = \Arr::merge($this->app_config, static::getGlobalConfiguration());
-        \View::set_global('app_config', $this->app_config);
+        \View::set_global(static::$current_application.'_config', $this->app_config);
         $this->trigger('before', $this, 'boolean');
 
         parent::before();
@@ -99,6 +102,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $response = $this->response;
         }
 
+        if ($response instanceof \Response && \Input::is_ajax()) {
+            $response->set_header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+            $response->set_header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT');
+            $response->set_header('Pragma', 'no-cache');
+        }
+
         // <--
         return parent::after($response);
     }
@@ -125,20 +134,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         return \Config::application($application);
     }
 
-    /* @todo TO BE MOVED */
-    protected static function check_permission_action($action, $dataset_location, $item = null)
-    {
-        \Config::load($dataset_location, true);
-        $dataset = \Config::get($dataset_location.'.dataset');
-        // An unknown action is authorized
-        // This is for consistency with client-side, where actions are visible by default (not greyed out)
-        if (empty($dataset['actions']) || empty($dataset['actions'][$action])) {
-            return true;
-        }
-
-        return $dataset['actions'][$action]($item);
-    }
-
     protected function items(array $config, $only_count = false)
     {
         $config = array_merge(
@@ -156,7 +151,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $items = array();
 
         $model = $config['model'];
-        $pk = \Arr::get($model::primary_key(), 0);
 
         $query = \Nos\Orm\Query::forge($model, $model::connection());
         foreach ($config['related'] as $related) {
@@ -184,21 +178,21 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
 
         $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable');
-        $contextableAndTwinnable = $model::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable');
-        if ($contextableAndTwinnable || $contextable) {
+        $twinnable = $model::behaviours('Nos\Orm_Behaviour_Twinnable');
+        if ($twinnable || $contextable) {
             if (!$contextable) {
-                $contextable = $contextableAndTwinnable;
+                $contextable = $twinnable;
             }
             if (empty($config['context'])) {
-                if ($contextableAndTwinnable) {
+                if ($twinnable) {
                     // No inspector, we only search items in their primary context
-                    $query->where($contextableAndTwinnable['is_main_property'], 1);
+                    $query->where($twinnable['is_main_property'], 1);
                 }
             } elseif (is_array($config['context']) && count($config['context']) > 1) {
                 // Multiple contexts
-                if ($contextableAndTwinnable) {
-                    $query->where($contextableAndTwinnable['is_main_property'], 1);
-                    $query->where($contextableAndTwinnable['common_id_property'], 'IN', \DB::select($contextableAndTwinnable['common_id_property'])->from($model::table())->where($contextableAndTwinnable['context_property'], 'IN', $config['context']));
+                if ($twinnable) {
+                    $query->where($twinnable['is_main_property'], 1);
+                    $query->where($twinnable['common_id_property'], 'IN', \DB::select($twinnable['common_id_property'])->from($model::table())->where($twinnable['context_property'], 'IN', $config['context']));
                 } else {
                     $query->where($contextable['context_property'], 'IN', $config['context']);
                 }
@@ -266,46 +260,19 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             $objects = $query->get();
             foreach ($objects as $object) {
-                $item = array();
-                $dataset = $config['dataset'];
-                $actions = \Arr::get($dataset, 'actions', array());
-                unset($dataset['actions']);
-                $object->import_dataset_behaviours($dataset);
-                foreach ($dataset as $key => $data) {
-                    // Array with a 'value' key
-                    if (is_array($data) and !empty($data['value'])) {
-                        $data = $data['value'];
-                    }
+                $item = static::dataset_item($object, $config['dataset']);
 
-                    if ($data === true) {
-                        continue;
-                    }
-
-                    if (is_callable($data)) {
-                        $item[$key] = call_user_func($data, $object);
-                    } else if (is_array($data)) {
-                        $item[$key] = $object->get($data['column']);
-                    } else {
-                        $item[$key] = $object->get($data);
-                    }
-                }
-                $item['actions'] = array();
-                foreach ($actions as $action => $callback) {
-                    $item['actions'][$action] = $callback($object);
-                }
-                $item['_id'] = $object->{$pk};
-                $item['_model'] = $model;
-                if ($contextable && !$contextableAndTwinnable) {
-                    $item['context'] = Tools_Context::context_label($object->{$contextable['context_property']}, array('force_flag' => true));
+                if ($contextable && !$twinnable) {
+                    $item['context'] = Tools_Context::contextLabel($object->{$contextable['context_property']}, array('short' => true));
                 }
                 $items[] = $item;
-                if ($contextableAndTwinnable) {
-                    $common_id = $object->{$contextableAndTwinnable['common_id_property']};
+                if ($twinnable) {
+                    $common_id = $object->{$twinnable['common_id_property']};
                     $keys[] = $common_id;
-                    $common_ids[$contextableAndTwinnable['common_id_property']][] = $common_id;
+                    $common_ids[$twinnable['common_id_property']][] = $common_id;
                 }
             }
-            if ($contextableAndTwinnable) {
+            if ($twinnable) {
                 $contexts = $model::contexts($common_ids);
                 foreach ($contexts as $common_id => $list) {
                     $contexts[$common_id] = explode(',', $list);
@@ -319,7 +286,6 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $global_contexts = array_keys(Tools_Context::contexts());
                 foreach ($items as &$item) {
                     $flags = '';
-                    $site_flag = '';
                     $contexts = $item['context'];
 
                     $site = false;
@@ -328,21 +294,27 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                             continue;
                         }
                         $site_params = Tools_Context::site($context);
+                        // When the site change
                         if ($sites_count > 1 && $site !== $site_params['alias']) {
-                            $flags .= $site_flag.(empty($site_flag) ? '' : '&nbsp;&nbsp;');
                             $site = $site_params['alias'];
-                            $site_flag = ' <span style="'.(!in_array($context, $contexts) ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span>';
+                            $in = false;
+                            // Check if the any context of the item exists in the site
+                            foreach ($contexts as $temp_context) {
+                                if (Tools_Context::siteCode($temp_context) === $site_params['code']) {
+                                    $in = true;
+                                    break;
+                                }
+                            }
+                            $flags .= (empty($flags) ? '' : '&nbsp;&nbsp;&nbsp;').'<span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span> ';
+
                         }
                         if ($locales_count > 1) {
                             if (in_array($context, $contexts)) {
-                                $flags .= \Nos\Tools_Context::flag($context);
+                                $flags .= ' '.\Nos\Tools_Context::flag($context);
                             } else {
-                                $flags .= '<span style="display:inline-block; width:16px;"></span> ';
+                                $flags .= ' <span style="display:inline-block; width:16px;"></span>';
                             }
                         }
-                    }
-                    if ($sites_count > 1) {
-                        $flags .= $site_flag;
                     }
                     $item['context'] = $flags;
                 }
@@ -433,7 +405,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
     protected function tree(array $tree_config)
     {
-        $id = \Input::get('id');
+        $id = \Input::get('id', null);
         $model = \Input::get('model');
         $selected = \Input::get('selected');
         $deep = intval(\Input::get('deep', 1));
@@ -510,6 +482,34 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             );
         }
 
+        // If we're requesting the root
+        if ($id === null && !empty($tree_config['root_node'])) {
+
+            $model = !empty($model) ? $model : \Arr::get($tree_config, 'model', null);
+            $actions = array();
+            // Sometimes no model is defined (example: the page selector is never shown within an inspector, so has no model/action defined).
+            if (!empty($model)) {
+                foreach (array_keys(\Config::actions(array(
+                    'models' => array(!empty($model) ? $model : $tree_config['model']),
+                    'target' => 'grid',
+                    'class' => get_class(),
+                ))) as $action) {
+                    $actions[$action] = false;
+                }
+            }
+
+            $json['total'] = 0;
+            $json['items'] = array(
+                $tree_config['root_node'] + array(
+                    '_id' => 0,
+                    '_model' => $model,
+                    'id' => '0',
+                    'actions' => $actions,
+                    'treeChilds' => $json['items'],
+                ),
+            );
+        }
+
         return $json;
     }
 
@@ -559,6 +559,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             $behaviour_tree = $model_from::behaviours('Nos\Orm_Behaviour_Tree');
             if (!empty($behaviour_tree)) {
                 $parent = ($params['targetType'] === 'in' ? $to : $to->get_parent());
+                $behaviour_twinnable = $model_from::behaviours('Nos\Orm_Behaviour_Twinnable');
+                if (!empty($behaviour_twinnable) && !empty($parent)) {
+                    $parent = $parent->find_context($from->get_context());
+                }
                 $from->set_parent($parent);
             }
 
@@ -645,15 +649,15 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         );
 
         $childs = array();
-        if (!$params['model']) {
+        if (!$params['model'] || empty($params['id'])) {
             $childs = $tree_config['roots'];
         } else {
             $tree_model = $tree_config['models'][$params['model']];
             foreach ($tree_model['childs'] as $child) {
                 $model = $child['model'];
-                if (empty($params['context']) && $model::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable')) {
+                if ((empty($params['context']) || (is_array($params['context']) && count($params['context']) > 1)) && $model::behaviours('Nos\Orm_Behaviour_Twinnable')) {
                     $item = $model::find($params['id']);
-                    $contexts = $item->get_all_context();
+                    $contexts = $item->get_all_context(empty($params['context']) ? array() : $params['context']);
                     $child['where'] = array(array($child['fk'], 'IN', array_keys($contexts)));
                 } else {
                     $child['where'] = array(array($child['fk'] => $params['id']));
@@ -730,5 +734,57 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         }
 
         return $params['countProcess'] ? $count : $items;
+    }
+
+    static public function dataset_item(\Nos\Orm\Model $object, array $dataset = array())
+    {
+        $model = get_class($object);
+        $pk = \Arr::get($model::primary_key(), 0);
+
+        if (count($dataset) === 0) {
+            $common_config = \Nos\Config_Common::load($model, array());
+            $dataset = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array();
+        }
+
+        $item = array();
+        $actions = \Arr::get($dataset, 'actions', array());
+        unset($dataset['actions']);
+        $object->import_dataset_behaviours($dataset);
+        foreach ($dataset as $key => $data) {
+            // Array with a 'value' key
+            if (is_array($data) and !empty($data['value'])) {
+                $data = $data['value'];
+            }
+
+            if ($data === true) {
+                continue;
+            }
+
+            if (is_callable($data)) {
+                $item[$key] = call_user_func($data, $object);
+            } else if (is_array($data)) {
+                if (isset($data['method'])) {
+                    $item[$key] = $object->{$data['method']}();
+                } else if (isset($data['column'])) {
+                    $item[$key] = $object->get($data['column']);
+                }
+            } else {
+                $item[$key] = $object->get($data);
+            }
+        }
+        $item['actions'] = array();
+        foreach ($actions as $action => $callback) {
+            $item['actions'][$action] = !$callback($object);
+        }
+        $item['_id'] = $object->{$pk};
+        $item['_model'] = $model;
+        $item['_title'] = $object->title_item();
+
+        return $item;
+    }
+
+    public static function getCurrentApplication()
+    {
+        return static::$current_application;
     }
 }

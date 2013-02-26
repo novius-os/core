@@ -197,6 +197,9 @@
             if (s.theme_nos_enhancers) {
                 each(s.theme_nos_enhancers, function(f, id) {
                     s.theme_nos_enhancers[id].id = id;
+                    if (!s.theme_nos_enhancers[id].previewUrl) {
+                        s.theme_nos_enhancers[id].previewUrl = 'admin/nos/enhancer/preview';
+                    }
                 });
             }
 
@@ -261,11 +264,11 @@
 				// Rebuilds the enhancer, as if we just inserted them (adds the action links like delete)
 				$body.find('.nosEnhancer, .nosEnhancerInline').each(function() {
 					var enhancer = $(this);
-                    enhancer.html('Loading...');
+                    enhancer.html(ed.getLang('nos.enhancer_loading'));
 
 					var enhancer_id = $(this).data('enhancer');
 					var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
-					var data      = $(this).data('config');
+					var data      = $.extend(true, {enhancer: enhancer_id}, $(this).data('config'));
 					$.ajax({
 						url: metadata.previewUrl,
 						type: 'POST',
@@ -357,7 +360,7 @@
 
 				// Add a new paragraph before a display:block enhancer
 				if (action == 'addParagraphBefore') {
-					p = $('<p>New paragraph</p>');
+					p = $('<p></p>').text(ed.getLang('nos.enhancer_new_paragraph'));
 					target.closest('.nosEnhancer, .nosEnhancerInline').before(p);
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
@@ -370,7 +373,7 @@
 
 				// Add a new paragraph after a display:block enhancer
 				if (action == 'addParagraphAfter') {
-					p = $('<p>New paragraph</p>');
+					p = $('<p></p>').text(ed.getLang('nos.enhancer_new_paragraph'));
 					target.closest('.nosEnhancer, .nosEnhancerInline').after(p);
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
@@ -436,9 +439,6 @@
 
                 case "justifycontrols" :
                     return this._createJustify();
-
-                case "file" :
-                    return this._createFileButton();
 
                 case "pastecontrols":
                     return this._createPaste();
@@ -550,18 +550,6 @@
                     m.items['unlink'].setDisabled(!link);
                 });
             });
-            return c;
-        },
-
-        _createFileButton : function() {
-            var c, t = this, s = t.settings, o = {}, v;
-
-            c = t.editor.controlManager.createButton('file', {
-                title : 'nos.file_title',
-                label : 'nos.file_label',
-                'class' : 'mce_file'
-            });
-
             return c;
         },
 
@@ -1533,9 +1521,10 @@
 				c.setActive(!co && !!p && n.className.indexOf('mceItem') == -1);
 
 			if (c = cm.get('styleselect')) {
-                c.showMenu();
-                c.hideMenu();
-                ed.focus();
+                if (!c.isMenuRendered) {
+                    c.renderMenu();
+                    c.isMenuRendered = true;
+                }
 
 				formatNames = [];
 				each(c.items, function(item) {
@@ -1905,59 +1894,64 @@
         _nosEnhancer : function(ui, metadata, edit) {
             var ed = tinyMCE.activeEditor;
 
-			// Keep reference to the wijnosDialog node, so we can close the popup manually
-			var dialog = null;
-			var self   = this;
+			// Keep reference to the nosDialog node, so we can close the popup manually
+			var dialog = null,
+			    self   = this,
+                config = (function() {
+                    var data = edit ? $(edit).attr('data-config') : {};
+                    if ($.type(data) === 'string') {
+                        data = $.parseJSON(data);
+                    }
+                    return data;
+                })(),
+                data_config = edit ? $.extend(true, {
+                        nosContext : self.settings.theme_nos_context,
+                        enhancer: metadata.id,
+                        enhancerAction: 'update'
+                    }, config) : {
+                        nosContext : self.settings.theme_nos_context,
+                        enhancer: metadata.id,
+                        enhancerAction: 'insert'
+                    },
+                save = function(json) {
 
-            var save = function(json) {
+                    if (edit) {
+                        edit = edit[0];
+                    } else {
+                        // @todo inserts div or span depending on enhancer
+                        ed.execCommand('mceInsertContent', false, ed.dom.createHTML('div', {
+                            id : '__mce_tmp',
+                            'class' : 'mceNonEditable'
+                        }), {skip_undo : 1});
+                        edit = ed.dom.get('__mce_tmp');
+                    }
+                    $(edit).attr({
+                        'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
+                        'data-enhancer': metadata.id
+                    });
 
-				var pr = $(json.preview);
-				// We set a temporary ID so we can fetch the node later
-				pr.attr({
-					'id': '__mce_tmp',
-					'data-config': json.config,
-					'data-enhancer': metadata.id
-				}).addClass('mceNonEditable');
+                    edit.id = null;
+                    $(edit).html($(json.preview).html());
 
-                if (edit) {
-                    // @todo needs review!
-                    edit.empty().removeClass('mceNonEditable nosEnhancer').data('config', '').data('enhancer', '');
-					ed.selection.select(edit.get(0), true);
-					ed.focus(false);
-					ed.execCommand('mceSelectNode', false, edit.get(0), {skip_undo : 1});
-                    ed.execCommand('mceReplaceContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
-                } else {
-                    ed.execCommand('mceInsertContent', false, $('<div></div>').append(pr).html(), {skip_undo : 1});
-                }
+                    // Add special links (this is also called onInit())
+                    self.onEnhancerAdd(edit, metadata);
 
-				// Retrieve the preview node from the tinyMce document context, or we get this error:
-				// "Node cannot be used in a document other than the one in which it was created"
-				var preview = $(ed.dom.get('__mce_tmp'));
-				// We don't need the id anymore now
-				preview.attr('id', '');
-
-				// Add special links (this is also called onInit())
-				self.onEnhancerAdd(preview, metadata);
-
-				// @todo search why this doesn't work
-				// This is an uncessfull attempt to refocus the editor after the nonEditable block content has been added
-				// Right now, the undo/redo buttons are disabled after insertion, which is a bug
-				ed.selection.select(preview.get(0), true);
-				ed.selection.collapse(true);
-				ed.focus(false);
-				ed.execCommand('mceSelectNode', false, preview.get(0), {skip_undo : 1});
-				ed.execCommand('mceStartTyping');
-
-				// mceAddUndoLevel has been removed in 3.3, we don't need it anymore
-				// mceEndUndoLevel calls mceAddUndoLevel
-				ed.execCommand("mceEndUndoLevel");
-			};
+                    // @todo search why this doesn't work
+                    // This is an unsuccessful attempt to refocus the editor after the nonEditable block content has been added
+                    // Right now, the undo/redo buttons are disabled after insertion, which is a bug
+                    ed.selection.select(edit, true);
+                    ed.selection.collapse(true);
+                    //ed.focus(false);
+                };
 
             if (!$.isPlainObject(metadata.dialog) || !metadata.dialog.contentUrl) {
                 $.ajax({
                     url: metadata.previewUrl,
                     type: 'POST',
                     dataType: 'json',
+                    data: {
+                        enhancer: metadata.id
+                    },
                     success: save,
                     error: function() {
                         console.log('Error: unable to add the enhancer in the Wysiwyg (no popup)');
@@ -1970,7 +1964,7 @@
             if (metadata.dialog.ajax || !edit) {
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
                     title: metadata.title
-                }, edit ? $.extend({}, metadata.dialog, {ajax : true, ajaxData : edit.data('config')}) : metadata.dialog));
+                }, $.extend({}, metadata.dialog, {ajax : true, ajaxData : data_config})));
             } else {
                 // Open empty dialog
                 dialog = $nos(ed.getElement()).nosDialog($.extend({
@@ -2003,7 +1997,7 @@
                         }
                     };
 
-                $.each(edit.data('config') || {}, function(key, val) {
+                $.each(data_config || {}, function(key, val) {
                     addInput(key, val);
                 });
                 dialog.css('padding', '0px');
@@ -2111,16 +2105,20 @@
 			// Don't bind click handlers here, it will mess up when using undo/redo, which only tracks the HTML content
 			// Instead, use a global click handler and detect the action using data-action="..."
 			// Ctrf + F using an action name (removeEnhancer or addParagraphAfter) to find where this is :)
-			var deleteLink = $('<a href="#" data-action="removeEnhancer">Delete</a>')
+			var deleteLink = $('<a href="#" data-action="removeEnhancer"></a>')
+                    .text(ed.getLang('nos.enhancer_delete'))
                     .attr('title', ed.getLang('nos.enhancer_delete'))
                     .addClass('nos_enhancer_action nos_enhancer_action_delete'),
-			    editLink = $('<a href="#" data-action="editEnhancer">Options</a>')
+			    editLink = $('<a href="#" data-action="editEnhancer"></a>')
+                    .text(ed.getLang('nos.enhancer_options'))
                     .attr('title', ed.getLang('nos.enhancer_options'))
-                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),
-			    insertAfter = $('<a href="#" data-action="addParagraphAfter">New paragraph after</a>')
+                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),f
+			    insertAfter = $('<a href="#" data-action="addParagraphAfter"></a>')
+                    .text(ed.getLang('nos.enhancer_p_after'))
                     .attr('title', ed.getLang('nos.enhancer_p_after'))
                     .addClass('nos_enhancer_action nos_enhancer_action_after'),
-			    insertBefore = $('<a href="#" data-action="addParagraphBefore">New paragraph before</a>')
+			    insertBefore = $('<a href="#" data-action="addParagraphBefore"></a>')
+                    .text(ed.getLang('nos.enhancer_p_before'))
                     .attr('title', ed.getLang('nos.enhancer_p_before'))
                     .addClass('nos_enhancer_action nos_enhancer_action_before');
 

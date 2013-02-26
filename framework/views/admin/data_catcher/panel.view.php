@@ -7,6 +7,9 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+\Nos\I18n::current_dictionary('nos::common');
+
 $id = uniqid('temp_');
 
 $model_name = get_class($item);
@@ -14,32 +17,16 @@ $model_id   = $item->id;
 
 $data_catchers = $item->data_catchers();
 $default_nuggets = $item->get_default_nuggets();
-$contextableAndTwinnable = $model_name::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
-if ($contextableAndTwinnable) {
-    $default_nuggets['context'] = $item->{$contextableAndTwinnable['context_property']};
+$twinnable = $model_name::behaviours('Nos\Orm_Behaviour_Twinnable', false);
+if ($twinnable) {
+    $default_nuggets['context'] = $item->{$twinnable['context_property']};
 }
 ?>
 <div id="<?= $id ?>" class="nos-dark-theme line">
     <a href="#" class="nos-datacatchers-close"><img src="static/novius-os/admin/novius-os/img/icons/close.png" /></a>
-    <div class="unit col c4">
-        <div class="accordion catchers">
-            <h3><?= __('Applications') ?></h3>
-            <div>
-    <?php
-                echo \View::forge('nos::admin/data_catcher/applications', array(
-                    'data_catchers' => $data_catchers,
-                    'item' => $item,
-                    'model_id' => $model_id,
-                    'model_name' => $model_name,
-                    'nuggets' => $default_nuggets,
-                ), false);
-    ?>
-            </div>
-        </div>
-    </div>
-    <div class="unit col c8 lastUnit">
+    <div class="col c8">
         <div class="nos-datacatchers-default-nuggets accordion">
-            <h3><?= __('What is shared - Default settings') ?></h3>
+            <h3><?= __('What is shared - Default properties') ?></h3>
             <div>
                 <?php
                 echo \View::forge('nos::admin/data_catcher/form', array(
@@ -53,6 +40,22 @@ if ($contextableAndTwinnable) {
             </div>
         </div>
         <div class="nos-datacatchers-catecherform">
+        </div>
+    </div>
+    <div class="col c4">
+        <div class="accordion catchers">
+            <h3><?= __('Applications') ?></h3>
+            <div>
+                <?php
+                echo \View::forge('nos::admin/data_catcher/applications', array(
+                    'data_catchers' => $data_catchers,
+                    'item' => $item,
+                    'model_id' => $model_id,
+                    'model_name' => $model_name,
+                    'nuggets' => $default_nuggets,
+                ), false);
+                ?>
+            </div>
         </div>
     </div>
 </div>

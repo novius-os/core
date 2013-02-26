@@ -26,14 +26,13 @@ class Tools_Url
     {
         if (is_numeric($page_id)) {
             //Test if page_id is enhanced then no request
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-            $url_enhanced = \Config::get('data::url_enhanced', array());
+            $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
             $page_params = \Arr::get($url_enhanced, $page_id, false);
             if ($page_params) {
-                return Tools_Url::context($page_params['context']).$page_params['url'];
+                return Tools_Url::context($page_params['context']).(empty($page_params['url']) ? '' : substr($page_params['url'], 0, -1).'.html');
             }
 
-            $page = static::find($page_id);
+            $page = \Nos\Page\Model_Page::find($page_id);
             if (!empty($page)) {
                 return $page->url();
             }

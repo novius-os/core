@@ -12,6 +12,11 @@ namespace Nos;
 
 class Orm_Behaviour_Virtualname extends Orm_Behaviour
 {
+    public static function _init()
+    {
+        I18n::current_dictionary('nos::orm');
+    }
+
     protected $_properties = array();
 
     public function __construct($class)
@@ -21,7 +26,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
             $this->_properties['unique'] = 'context';
         }
         if ($this->_properties['unique'] === 'context') {
-            $this->_properties['unique'] = $class::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', true);
+            $this->_properties['unique'] = $class::behaviours('Nos\Orm_Behaviour_Twinnable', true);
         }
     }
 
@@ -29,15 +34,23 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     {
         $diff = $item->get_diff();
 
-        if (!empty($diff[0][$this->_properties['virtual_name_property']])) {
+        // If we have a new item or the virtual name has changed
+        if ($item->is_new() || !empty($diff[0][$this->_properties['virtual_name_property']])) {
+
+            // Enforce virtual name restrictions
             $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$this->_properties['virtual_name_property']});
+
+            // If the virtual name is empty, generate a default one from the title
             if (empty($item->{$this->_properties['virtual_name_property']})) {
                 $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$item->title_property()});
             }
+
+            // If it's still empty, we have an error
             if (empty($item->{$this->_properties['virtual_name_property']})) {
-                throw new \Exception(__('URL (SEO) was empty.'));
+                throw new \Exception(__('An URL is needed.'));
             }
 
+            // Check uniqueness if needed
             if ($this->_properties['unique']) {
                 $where = array(
                     array($this->_properties['virtual_name_property'], $item->{$this->_properties['virtual_name_property']})
@@ -52,7 +65,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
 
                 $duplicate = $item::find('all', (array('where' => $where)));
                 if (!empty($duplicate)) {
-                    throw new \Exception(__('A item with the same virtual name already exists.'));
+                    throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
                 }
             }
         }
@@ -66,7 +79,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     public static function friendly_slug($slug)
     {
         $slug = preg_replace("` `u", '-', $slug);
-        $slug = preg_replace("`[\?|:|\\|\/|\#|\[|\]|@]`u", '-', $slug);
+        $slug = preg_replace("`[\?|:|\\|\/|\#|\[|\]|@|&]`u", '-', $slug);
         $slug = preg_replace("`-{2,}`u", '-', $slug);
         $slug = preg_replace("`-$`u", '', $slug);
         $slug = preg_replace("`^-`u", '', $slug);

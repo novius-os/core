@@ -17,6 +17,11 @@ if [[ $files =~ $re ]]
 then
   ./hooks/minify-nos-js.sh
   git add static/admin/bundle/nos.min.js
+
+  SUB_DIR=( inspector media page views )
+  for D in ${SUB_DIR[@]}; do
+    git add static/admin/novius-os/js/$D/minified/*
+  done
 fi
 
 re="static/admin/vendor/tinymce/themes/nos/editor_template_src.js"

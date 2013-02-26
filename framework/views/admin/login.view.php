@@ -7,6 +7,8 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+Nos\I18n::current_dictionary('nos::common');
 ?>
 <script type="text/javascript">
 require(
@@ -25,29 +27,21 @@ if (!empty($error)) {
     <?php
 }
 ?>
-            var $email = $('#email');
-            $email.select();
+            $('#email').select();
         });
     });
 </script>
-<style type="text/css">
-.nos-login-error {
-    left: 50%;
-    margin-left: -150px;
-}
-</style>
 <div id="login">
-    <img src="static/novius-os/admin/novius-os/img/logo.png" />
+    <img src="static/novius-os/admin/novius-os/img/logo.png" alt="" />
     <form method="POST" action="">
-        <p><input type="email" name="email" id="email" value="<?= \Input::post('email', ''); ?>" placeholder="Email" /></p>
-        <p><input type="password" name="password" placeholder="Password" /></p>
+        <p><input type="email" name="email" id="email" value="<?= e(\Input::post('email', '')); ?>" placeholder="<?= __('Email address') ?>" /></p>
+        <p><input type="password" name="password" placeholder="<?= __('Password') ?>" /></p>
         <p>
-            <label style="font-size: 13px;" for="remember_me">
+            <input type="checkbox" id="remember_me" name="remember_me" value="1" />
+            <label for="remember_me">
                 <?= __('Remember me') ?>
             </label>
-
-            <input type="checkbox" id="remember_me" name="remember_me" value="1" />
         </p>
-        <p><input type="submit" value="Dive in"></p>
+        <p><input type="submit" value="<?= __('Let’s get started') ?>"></p>
     </form>
 </div>

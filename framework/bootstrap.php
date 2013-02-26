@@ -8,22 +8,27 @@
  * @link http://www.novius-os.org
  */
 
+// For previous versions of PHP 5.3.6
+if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+    define('DEBUG_BACKTRACE_IGNORE_ARGS', false);
+}
+
 // Get the start time and memory for use later
 defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
 defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 // Setup dir constants
 if (isset($_SERVER['NOS_ROOT'])) {
-    define('NOS_ROOT', $_SERVER['NOS_ROOT'].DIRECTORY_SEPARATOR);
+    define('NOSROOT', $_SERVER['NOS_ROOT'].DIRECTORY_SEPARATOR);
 } else {
-    define('NOS_ROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
+    define('NOSROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 }
-define('DOCROOT', NOS_ROOT.'public'.DIRECTORY_SEPARATOR);
+define('DOCROOT', NOSROOT.'public'.DIRECTORY_SEPARATOR);
 
-define('APPPATH', NOS_ROOT.'local'.DIRECTORY_SEPARATOR);
-define('PKGPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
-define('COREPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
-define('NOSPATH', NOS_ROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
+define('APPPATH', NOSROOT.'local'.DIRECTORY_SEPARATOR);
+define('PKGPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
+define('COREPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
+define('NOSPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
@@ -47,7 +52,9 @@ if (!MBSTRING) {
         'Config_File' => FUEL_EXTEND_PATH.'config_file.php',
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
-        'Event' => FUEL_EXTEND_PATH.'event.php',
+        'Event_Instance' => FUEL_EXTEND_PATH.'event/instance.php',
+        'Email' => FUEL_EXTEND_PATH.'email.php',
+        'Email_Driver' => FUEL_EXTEND_PATH.'email'.DIRECTORY_SEPARATOR.'driver.php',
         'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
         'Finder' => FUEL_EXTEND_PATH.'finder.php',
         'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
@@ -61,6 +68,7 @@ if (!MBSTRING) {
         'Response' => FUEL_EXTEND_PATH.'response.php',
         'Session' => FUEL_EXTEND_PATH.'session.php',
         'Str' => FUEL_EXTEND_PATH.'str.php',
+        'Validation_Error'  => FUEL_EXTEND_PATH.'validation_error.php',
         'View' => FUEL_EXTEND_PATH.'view.php',
         'Nos\Oil\Console' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'console.php',
         'Nos\Orm\Model' => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'model.php',
@@ -69,9 +77,20 @@ if (!MBSTRING) {
     )
 );
 
-function __($_message, $default = null)
+function __($message, $default = null)
 {
-    return \Nos\I18n::get($_message, $default);
+    $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    $i = -1;
+    do {
+        $function = $dbg[++$i]['function'];
+    } while ($function == '{closure}');
+
+    return \Nos\I18n::translate_from_file($dbg[$i]['file'], $message, $default);
+}
+
+function ___($group, $message, $default = null)
+{
+    return \Nos\I18n::gget($group, $message, $default);
 }
 
 // Register the autoloader
@@ -85,15 +104,7 @@ Autoloader::register();
  * Fuel::STAGE
  * Fuel::PRODUCTION
  */
-Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOPMENT);
-
-/**
- * Set error reporting and display errors settings.
- */
-if (Fuel::$env != FUEL::PRODUCTION) {
-    error_reporting(-1);
-    ini_set('display_errors', 1);
-}
+Fuel::$env = (isset($_SERVER['NOS_ENV']) ? $_SERVER['NOS_ENV'] : (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOPMENT));
 
 //* Register application autoloader
 spl_autoload_register(
@@ -123,6 +134,7 @@ spl_autoload_register(
         }
 
         // Try to load the application
+        // Not use \Nos\Config_Data, not yet defined
         \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
         $namespaces = \Config::get('data::app_namespaces');
         $application = array_search($namespace, $namespaces);
@@ -138,29 +150,20 @@ spl_autoload_register(
 //*/
 
 // Initialize the framework with the config file.
-$config_novius = include(NOSPATH.'config/config.php');
+$config_nos = include(NOSPATH.'config/config.php');
 
-$routes_novius = @include(NOSPATH.'config/routes.config.php');
-if ($routes_novius === false) {
-    $routes_novius = include(NOSPATH.'config/routes.php');
+$config_app = @include(APPPATH.'config/config.php');
+if ($config_app === false) {
+    $config_app = array();
 }
-
-$config_app = include(APPPATH.'config/config.php');
 if (!empty($config_app['base_url'])) {
     define('NOS_RELATIVE_DIR', ltrim(parse_url($config_app['base_url'], PHP_URL_PATH), '/'));
 }
 
-Fuel::init(Arr::merge($config_novius, array('routes' => $routes_novius), $config_app));
+Fuel::init(Arr::merge($config_nos, $config_app));
 
 Module::load('nos', NOSPATH);
-
-define('URL_ADMIN', Uri::base(false).'admin/');
-define('PHP_BEGIN', '<?php ');
-define('PHP_END', ' ?>');
 Module::load('local', APPPATH);
-
-//Autoloader::add_namespace('Nos', NOSPATH.'classes'.DS);
-//Autoloader::add_namespace('Local', APPPATH.'classes'.DS);
 
 Config::load('namespaces', true);
 
@@ -170,5 +173,9 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 
 chdir(DOCROOT);
 
-define('CACHE_DURATION_PAGE', 5);
-define('CACHE_DURATION_FUNCTION', 10);
+// Remove leading /
+$_SERVER['NOS_URL'] = mb_substr($_SERVER['REQUEST_URI'], 1);
+if (defined('NOS_RELATIVE_DIR')) {
+    $_SERVER['NOS_URL'] = mb_substr($_SERVER['NOS_URL'], mb_strlen(NOS_RELATIVE_DIR));
+}
+list($_SERVER['NOS_URL']) = explode('?', $_SERVER['NOS_URL']);

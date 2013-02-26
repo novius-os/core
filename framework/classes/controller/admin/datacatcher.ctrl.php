@@ -14,6 +14,12 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 {
     public $bypass   = true;
 
+    public function before()
+    {
+        parent::before();
+        \Nos\I18n::current_dictionary('nos::common');
+    }
+
     public function action_form()
     {
         $id = \Input::get('model_id');
@@ -34,13 +40,13 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 
             $data_catchers = $item->data_catchers();
             $default_nuggets = $item->get_default_nuggets();
-            $contextableAndTwinnable = $model_name::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
-            if ($contextableAndTwinnable) {
-                $default_nuggets['context'] = $item->{$contextableAndTwinnable['context_property']};
+            $twinnable = $model_name::behaviours('Nos\Orm_Behaviour_Twinnable', false);
+            if ($twinnable) {
+                $default_nuggets['context'] = $item->{$twinnable['context_property']};
             }
 
             \Response::json(array(
-                'notify' => __('Shared data successfully saved.'),
+                'notify' => __('OK, all changes are saved.'),
                 'applications' => (string) \View::forge('nos::admin/data_catcher/applications', array(
                     'data_catchers' => $data_catchers,
                     'item' => $item,
@@ -64,28 +70,28 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
 
         if (empty($params['model']) or empty($params['id']) or empty($params['view']) or empty($params['catcher_name'])) {
             \Response::json(array(
-                'error' => 'Insufficient parameters.',
+                'error' => __('We know it sounds stupid, but this isn’t supposed to happen. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.'),
             ));
         }
 
         try {
             $item = $params['model']::find($params['id']);
             if (empty($item)) {
-                throw new \Exception(Str::tr(__("Can't find item {item}"), array(
-                    '{item}' => $params['model'].'('.$params['id'].')',
+                throw new \Exception(Str::tr(__("We cannot find ‘{{item}}’. It must have been deleted while you tried to share it. Bad luck."), array(
+                    '{{item}}' => $params['model'].'('.$params['id'].')',
                 )));
             }
             $data_catchers = $item->data_catchers();
             $data_nugget   = $data_catchers[$params['catcher_name']];
             if (empty($item)) {
-                throw new \Exception(Str::tr(__("Can't find catcher {catcher} on {item}"), array(
-                    '{catcher}' => $params['catcher_name'],
-                    '{item}'    => $params['model'],
+                throw new \Exception(Str::tr(__("Surprisingly it appears ‘{{item}}’ cannot be shared with ‘{{catcher}}’. Contact your developer for further details."), array(
+                    '{{catcher}}' => $params['catcher_name'],
+                    '{{item}}'    => $params['model'],
                 )));
             }
         } catch (\Exception $e) {
             \Response::json(array(
-                'error' => 'Wrong parameters.',
+                'error' => __('Something went wrong. Please ask your developer or Novius OS to have a look into this. You could call your mother too but we doubt she would be much help. Unless your mum is a software engineer, which would be awesome. We forgot to say: We apologise for the inconvenience caused.'),
             ));
         }
 

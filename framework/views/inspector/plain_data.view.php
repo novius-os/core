@@ -12,49 +12,12 @@
 <table id="<?= $id ?>"></table>
 <script type="text/javascript">
 require(
-    ['jquery-nos-listgrid'],
+    ['jquery-nos-inspector-plain-data'],
     function( $ ) {
         $(function() {
-            var inspector = $('#<?= $id ?>').removeAttr('id'),
-                parent = inspector.parent()
-                    .bind({
-                        widgetResize: function() {
-                            inspector.noslistgrid('setSize', parent.width(), parent.height());
-                        }
-                    }),
-                inspectorData = parent.data('inspector'),
-                rendered = false;
+            $('#<?= $id ?>').nosInspectorPlainData(<?= $data ?>);
 
-            inspector.css({
-                    height : '100%',
-                    width : '100%'
-                })
-                .noslistgrid({
-                    showFilter: false,
-                    allowSorting: false,
-                    scrollMode : 'auto',
-                    allowPaging : false,
-                    allowColSizing : false,
-                    allowColMoving : false,
-                    columns : inspectorData.grid.columns,
-                    data: <?= $data ?>,
-                    currentCellChanged: function (e) {
-                        var row = $(e.target).noslistgrid("currentCell").row(),
-                            data = row ? row.data : false;
 
-                        if (data && rendered) {
-                            inspectorData.selectionChanged(data.id, data.title);
-                        }
-                        inspector.noslistgrid("currentCell", -1, -1);
-                    },
-                    rendering : function() {
-                        rendered = false;
-                    },
-                    rendered : function() {
-                        rendered = true;
-                        inspector.css('height', 'auto');
-                    }
-                });
         });
     });
 </script>

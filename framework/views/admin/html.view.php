@@ -8,13 +8,14 @@
  * @link http://www.novius-os.org
  */
 
-$assets_minified = \Config::get('assets_minified', true);
+$assets_minified = \Config::get('novius-os.assets_minified', true);
 $config = array(
     'baseUrl' => $base,
     'paths' => array(
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce',
         'link' => 'static/novius-os/admin/vendor/requirejs/link',
         'log' => 'static/novius-os/admin/bundle/vendor.min',
+        'stacktrace' => 'static/novius-os/admin/vendor/stacktrace',
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
         'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.8.2.min',
@@ -22,10 +23,13 @@ $config = array(
         'jquery.bgiframe' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize' => 'static/novius-os/admin/bundle/vendor.min',
+        'jquery.globalize.cultures' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.mousewheel' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-form' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.datetimepicker' => 'static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon',
+        'jquery-ui.datetimepicker.i18n' => 'static/novius-os/admin/vendor/jquery/ui-datetimepicker/i18n/jquery-ui-i18n',
         'jquery.passwordstrength' => 'static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength',
+        'jquery.validate' => 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate.min',
 
         'jquery-ui.core' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.widget' => 'static/novius-os/admin/bundle/vendor.min',
@@ -43,6 +47,7 @@ $config = array(
         'jquery-ui.slider' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.slider.min',
         'jquery-ui.tabs' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.tabs.min',
         'jquery-ui.datepicker' => 'static/novius-os/admin/bundle/vendor.min',
+        'jquery-ui.datepicker.i18n' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.progressbar' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.progressbar.min',
         'jquery-ui.effects.core' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.effects.blind' => 'static/novius-os/admin/bundle/vendor.min',
@@ -121,14 +126,35 @@ $config = array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
+
+        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.contextable-invariant-fields',
+        'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.appstab',
+        'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.publishable',
+        'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.layout-standard',
+        'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.toolbar-crud',
+        'jquery-nos-update-tab-crud' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.update-tab-crud',
+        'jquery-nos-virtualname' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.virtualname',
+        'jquery-nos-media-folder-form' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.media-folder-form',
+        'jquery-nos-media-add-form' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.media-add-form',
+        'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.media-edit-form',
+        'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/minified/jquery.novius-os.image-wysiwyg',
+        'jquery-nos-link-wysiwyg' => 'static/novius-os/admin/novius-os/js/page/minified/jquery.novius-os.link-wysiwyg',
+        'jquery-nos-inspector-date' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-date',
+        'jquery-nos-inspector-model' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-model',
+        'jquery-nos-inspector-tree-model' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model',
+        'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model-checkbox',
+        'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model-radio',
+        'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-plain-data',
     ),
     'shim' => array(
         'jquery.bgiframe' => array('jquery'),
         'jquery.cookie' => array('jquery'),
         'jquery.globalize' => array('jquery'),
+        'jquery.globalize.cultures' => array('jquery', 'jquery.globalize'),
         'jquery.mousewheel' => array('jquery'),
         'jquery-form' => array('jquery'),
         'jquery-ui.datetimepicker' => array('jquery', 'jquery-ui.slider', 'link!static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon.css'),
+        'jquery-ui.datetimepicker.i18n' => array('jquery-ui.datetimepicker'),
         'jquery.passwordstrength' => array('jquery', 'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'),
 
         'jquery-ui.core' => array('jquery'),
@@ -147,6 +173,7 @@ $config = array(
         'jquery-ui.slider' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.mouse'),
         'jquery-ui.tabs' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'jquery-ui.datepicker' => array('jquery', 'jquery-ui.core'),
+        'jquery-ui.datepicker.i18n' => array('jquery-ui.datepicker'),
         'jquery-ui.progressbar' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'jquery-ui.effects.core' => array('jquery'),
         'jquery-ui.effects.blind' => array('jquery', 'jquery-ui.effects.core'),
@@ -166,42 +193,42 @@ $config = array(
         'wijmo.wijtextselection' => array('jquery'),
         'wijmo.raphael' => array('jquery', 'raphael'),
         'wijmo.wijaccordion' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil'),
-        'wijmo.wijbarchart' => array('jquery', 'jquery-ui.widget', 'wijmo.raphael', 'jquery.globalize', 'wijmo.wijchartcore'),
-        'wijmo.wijbubblechart' => array('jquery', 'jquery-ui.widget', 'wijmo.raphael', 'jquery.globalize', 'wijmo.wijchartcore'),
-        'wijmo.wijcalendar' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil', 'wijmo.wijpopup', 'jquery.globalize', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'jquery-ui.effects.slide', 'jquery-ui.effects.scale'),
+        'wijmo.wijbarchart' => array('jquery', 'jquery-ui.widget', 'wijmo.raphael', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.wijchartcore'),
+        'wijmo.wijbubblechart' => array('jquery', 'jquery-ui.widget', 'wijmo.raphael', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.wijchartcore'),
+        'wijmo.wijcalendar' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil', 'wijmo.wijpopup', 'jquery.globalize', 'jquery.globalize.cultures', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'jquery-ui.effects.slide', 'jquery-ui.effects.scale'),
         'wijmo.wijcarousel' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position'),
         'wijmo.wijchartcore' => array('jquery', 'wijmo.raphael'),
         'wijmo.wijcheckbox' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'wijmo.wijcombobox' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijlist'),
-        'wijmo.wijcompositechart' => array('jquery', 'jquery-ui.widget', 'wijmo.raphael', 'jquery.globalize', 'wijmo.wijchartcore'),
+        'wijmo.wijcompositechart' => array('jquery', 'jquery-ui.widget', 'wijmo.raphael', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.wijchartcore'),
         'wijmo.wijdatasource' => array('jquery'),
-        'wijmo.wijdatepager' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'wijmo.wijutil', 'wijmo.wijpopup'),
+        'wijmo.wijdatepager' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.wijutil', 'wijmo.wijpopup'),
         'wijmo.wijdialog' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.dialog', 'wijmo.wijutil', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'jquery-ui.effects.slide', 'jquery-ui.effects.scale', 'jquery-ui.effects.transfer', 'jquery-ui.effects.fade'),
         'wijmo.wijdropdown' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.resizable', 'jquery-ui.draggable', 'jquery-ui.effects.core', 'jquery.mousewheel', 'jquery.bgiframe', 'wijmo.wijsuperpanel'),
         'wijmo.wijeditor' => array('jquery', 'jquery-ui.core', 'jquery-ui.mouse', 'jquery-ui.widget', 'jquery-ui.tabs', 'jquery-ui.position', 'jquery-ui.draggable', 'wijmo.wijutil', 'wijmo.wijspliter', 'wijmo.wijdialog', 'wijmo.wijmenu', 'wijmo.wijtabs'),
-        'wijmo.wijevcal' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'jquery.mousewheel', 'wijmo.wijtextselection', 'wijmo.wijutil', 'wijmo.wijinputcore', 'wijmo.wijinputdate', 'wijmo.wijinputnumber', 'wijmo.wijcalendar', 'wijmo.wijdialog', 'wijmo.wijcombobox', 'wijmo.wijdatepager'),
+        'wijmo.wijevcal' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'jquery.mousewheel', 'wijmo.wijtextselection', 'wijmo.wijutil', 'wijmo.wijinputcore', 'wijmo.wijinputdate', 'wijmo.wijinputnumber', 'wijmo.wijcalendar', 'wijmo.wijdialog', 'wijmo.wijcombobox', 'wijmo.wijdatepager'),
         'wijmo.wijexpander' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil'),
         'wijmo.wijgallery' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijutil'),
         'wijmo.wijgauge' => array('jquery', 'wijmo.raphael'),
-        'wijmo.wijgrid' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.draggable', 'jquery-ui.droppable', 'wijmo.wijinputdate', 'wijmo.wijinputmask', 'wijmo.wijinputnumber', 'wijmo.wijutil', 'wijmo.wijdatasource', 'jquery.globalize'),
+        'wijmo.wijgrid' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.draggable', 'jquery-ui.droppable', 'wijmo.wijinputdate', 'wijmo.wijinputmask', 'wijmo.wijinputnumber', 'wijmo.wijutil', 'wijmo.wijdatasource', 'jquery.globalize', 'jquery.globalize.cultures'),
         'wijmo.wijinputcore' => array('jquery'),
-        'wijmo.wijinputdate' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijtextselection', 'jquery.globalize', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'wijmo.wijpopup', 'wijmo.wijinputcore', 'wijmo.wijcalendar', 'jquery.mousewheel'),
-        'wijmo.wijinputmask' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijtextselection', 'jquery.globalize', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'wijmo.wijpopup', 'wijmo.wijinputcore'),
-        'wijmo.wijinputnumber' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijtextselection', 'jquery.globalize', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'wijmo.wijpopup', 'wijmo.wijinputcore'),
+        'wijmo.wijinputdate' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijtextselection', 'jquery.globalize', 'jquery.globalize.cultures', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'wijmo.wijpopup', 'wijmo.wijinputcore', 'wijmo.wijcalendar', 'jquery.mousewheel'),
+        'wijmo.wijinputmask' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijtextselection', 'jquery.globalize', 'jquery.globalize.cultures', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'wijmo.wijpopup', 'wijmo.wijinputcore'),
+        'wijmo.wijinputnumber' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijtextselection', 'jquery.globalize', 'jquery.globalize.cultures', 'jquery-ui.effects.core', 'jquery-ui.effects.blind', 'wijmo.wijpopup', 'wijmo.wijinputcore'),
         'wijmo.wijlightbox' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'jquery-ui.effects.core', 'jquery.cookie', 'wijmo.wijutil'),
-        'wijmo.wijlineargauge' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'wijmo.raphael', 'wijmo.wijgauge'),
-        'wijmo.wijlinechart' => array('jquery', 'jquery-ui.widget', 'jquery.globalize', 'wijmo.raphael', 'wijmo.wijchartcore'),
+        'wijmo.wijlineargauge' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.raphael', 'wijmo.wijgauge'),
+        'wijmo.wijlinechart' => array('jquery', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.raphael', 'wijmo.wijchartcore'),
         'wijmo.wijlist' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil', 'wijmo.wijsuperpanel'),
         'wijmo.wijmenu' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil', 'jquery-ui.position', 'jquery-ui.effects.core', 'jquery.mousewheel', 'jquery.bgiframe', 'wijmo.wijsuperpanel'),
         'wijmo.wijpager' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
-        'wijmo.wijpiechart' => array('jquery', 'jquery-ui.widget', 'jquery.globalize', 'wijmo.raphael', 'wijmo.wijchartcore'),
+        'wijmo.wijpiechart' => array('jquery', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.raphael', 'wijmo.wijchartcore'),
         'wijmo.wijpopup' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.position', 'wijmo.wijutil'),
         'wijmo.wijprogressbar' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
-        'wijmo.wijradialgauge' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'wijmo.raphael', 'wijmo.wijgauge'),
+        'wijmo.wijradialgauge' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.raphael', 'wijmo.wijgauge'),
         'wijmo.wijradio' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'wijmo.wijrating' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget'),
         'wijmo.wijribbon' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijtabs'),
-        'wijmo.wijscatterchart' => array('jquery', 'jquery-ui.widget', 'jquery.globalize', 'wijmo.raphael', 'wijmo.wijchartcore'),
+        'wijmo.wijscatterchart' => array('jquery', 'jquery-ui.widget', 'jquery.globalize', 'jquery.globalize.cultures', 'wijmo.raphael', 'wijmo.wijchartcore'),
         'wijmo.wijslider' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.slider', 'jquery-ui.effects.core', 'wijmo.wijutil'),
         'wijmo.wijsplitter' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.resizable', 'jquery-ui.mouse', 'wijmo.wijutil'),
         'wijmo.wijsuperpanel' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'jquery-ui.resizable', 'jquery-ui.draggable', 'jquery-ui.effects.core', 'jquery.mousewheel'),
@@ -231,9 +258,11 @@ if (!$assets_minified) {
 
         'jquery.bgiframe' => 'static/novius-os/admin/vendor/jquery/bgiframe/jquery.bgiframe-2.1.3-pre',
         'jquery.cookie' => 'static/novius-os/admin/vendor/jquery/cookie/jquery.cookie',
-        'jquery.globalize' => 'static/novius-os/admin/vendor/jquery/globalize/globalize.min',
+        'jquery.globalize' => 'static/novius-os/admin/vendor/jquery/globalize/globalize',
+        'jquery.globalize.cultures' => 'static/novius-os/admin/vendor/jquery/globalize/cultures/globalize.cultures',
         'jquery.mousewheel' => 'static/novius-os/admin/vendor/jquery/mousewheel/jquery.mousewheel.min',
         'jquery-form' => 'static/novius-os/admin/vendor/jquery/jquery-form/jquery.form',
+        'jquery.validate' => 'static/novius-os/admin/vendor/jquery/jquery-validation/jquery.validate',
 
         'jquery-ui.core' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.core',
         'jquery-ui.widget' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.widget',
@@ -251,6 +280,7 @@ if (!$assets_minified) {
         'jquery-ui.slider' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.slider',
         'jquery-ui.tabs' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.tabs',
         'jquery-ui.datepicker' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.datepicker',
+        'jquery-ui.datepicker.i18n' => 'static/novius-os/admin/vendor/jquery-ui/i18n/jquery-ui-i18n',
         'jquery-ui.progressbar' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.progressbar',
         'jquery-ui.effects.core' => 'static/novius-os/admin/vendor/jquery-ui/jquery.effects.core',
         'jquery-ui.effects.blind' => 'static/novius-os/admin/vendor/jquery-ui/jquery.effects.blind',
@@ -329,6 +359,25 @@ if (!$assets_minified) {
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.thumbnailsgrid',
         'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
+
+        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.contextable-invariant-fields',
+        'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.appstab',
+        'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
+        'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.layout-standard',
+        'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.toolbar-crud',
+        'jquery-nos-update-tab-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.update-tab-crud',
+        'jquery-nos-virtualname' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.virtualname',
+        'jquery-nos-media-folder-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-folder-form',
+        'jquery-nos-media-add-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-add-form',
+        'jquery-nos-media-edit-form' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.media-edit-form',
+        'jquery-nos-image-wysiwyg' => 'static/novius-os/admin/novius-os/js/media/jquery.novius-os.image-wysiwyg',
+        'jquery-nos-link-wysiwyg' => 'static/novius-os/admin/novius-os/js/page/jquery.novius-os.link-wysiwyg',
+        'jquery-nos-inspector-date' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-date',
+        'jquery-nos-inspector-model' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-model',
+        'jquery-nos-inspector-tree-model' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model',
+        'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-checkbox',
+        'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-radio',
+        'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-plain-data',
     ));
 }
 ?>
@@ -379,6 +428,19 @@ if ($assets_minified) {
 <script src="<?= $require ?>" type="text/javascript"></script>
 <script type="text/javascript">
     require.config(<?= \Format::forge($config)->to_json() ?>);
+</script>
+<script type="text/javascript">
+    require(['jquery-nos'], function($) {
+        $.nosLang = '<?php
+            $user = \Session::user();
+            echo !empty($user) ? $user->user_lang : \Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
+            ?>';
+        $.nosTexts = $.extend($.nosTexts, {
+            chooseMediaFile : <?= \Format::forge(__('Select a media file'))->to_json() ?>,
+            chooseMediaImage : <?= \Format::forge(__('Pick an image'))->to_json() ?>,
+            errorImageNotfind : <?= \Format::forge(__('We’re afraid we cannot find this image.'))->to_json() ?>
+        });
+    });
 </script>
 <?= $js ?>
 </head>

@@ -12,6 +12,11 @@ namespace Nos;
 
 class Orm_Behaviour_Tree extends Orm_Behaviour
 {
+    public static function _init()
+    {
+        I18n::current_dictionary('nos::orm');
+    }
+
     protected $_parent_relation = null;
     protected $_children_relation = null;
 
@@ -65,26 +70,19 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     }
 
     /**
-     * Deletes the children recursively
-     */
-    public function before_delete(\Nos\Orm\Model $item)
-    {
-        $this->delete_children($item);
-    }
-
-    /**
-     * Delete all the children of the item.
+     * Deletes all the children of the item (recursively)
      * (will only affect the current context, by design)
      *
-     * @param type $item
+     * @param \Nos\Orm\Model $item
      */
-    public function delete_children($item)
+    public function before_delete(\Nos\Orm\Model $item)
     {
         foreach ($this->find_children($item) as $child) {
             $child->delete();
         }
+        // Reset the relation, since we deleted the children manually
+        unset($item->{$this->_properties['children_relation']});
     }
-
     /**
      * Returns all the direct children of the object
      *
@@ -138,7 +136,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                 $children_ids = $this->get_ids_children($item, true);
                 if (in_array($parent->id, $children_ids)) {
                     // Dev details : Cannot move an element inside of its own children
-                    throw new \Exception(__('Wrong location ('.implode(',', $children_ids).')'));
+                    throw new \Exception(__('No, it cannot be moved here. Why? Because you cannot put something into itself.'));
                 }
             }
         }

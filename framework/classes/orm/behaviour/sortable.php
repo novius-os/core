@@ -17,6 +17,8 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      */
     protected $_properties = array();
 
+    protected $_sort_change = false;
+
     public function before_query(&$options)
     {
         if (array_key_exists('order_by', $options)) {
@@ -50,11 +52,11 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         $this->_move($item, 10000);
     }
 
-    public function get_sort(\Nos\Orm\Model $obj)
+    public function get_sort(\Nos\Orm\Model $item)
     {
         $sort_property = $this->_properties['sort_property'];
 
-        return $obj->get($sort_property);
+        return $item->get($sort_property);
     }
 
     public function set_sort(\Nos\Orm\Model $item, $sort)
@@ -65,17 +67,23 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
     protected function _move($item, $sort)
     {
-        $sort_property = $this->_properties['sort_property'];
-        $item->set($sort_property, $sort);
-        $item->observe('before_sort');
+        $this->set_sort($item, $sort);
         $item->save();
-        $item->observe('after_sort');
     }
 
     public function before_insert(\Nos\Orm\Model $item)
     {
         $sort_property = $this->_properties['sort_property'];
         if (empty($item->{$sort_property})) {
+            $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
+            if (!empty($twinnable)) {
+                if (!empty($item->{$twinnable['common_id_property']})) {
+                    $obj_main = $item->find_main_context();
+                    $item->{$sort_property} = $obj_main->{$sort_property};
+                    return;
+                }
+            }
+
             $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
             $conditions = array();
             if (!empty($tree)) {
@@ -93,29 +101,85 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         }
     }
 
-    public function after_sort(\Nos\Orm\Model $item)
-    {
-        $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
-        $sort_property = $this->_properties['sort_property'];
-        $conditions = array();
-        if (!empty($tree)) {
-            $conditions[] = array('parent', $item->get_parent());
-        }
-        $i = 1;
-        $unsorted = $item::find('all', array(
-            'where' => $conditions,
-            'order_by' => array('default_sort' => 'ASC')
-        ));
 
-        $round_value = +0.25;
-        foreach ($unsorted as $u) {
-            $sort = $u->get($sort_property);
-            if (round($sort + 0.25) != round($sort - 0.25)) {
-                $round_value += 1;
+    public function before_save(\Nos\Orm\Model $item)
+    {
+        if ($item->is_new()) {
+            return;
+        }
+
+        $sort_property = $this->_properties['sort_property'];
+        if ($item->is_changed($sort_property)) {
+            $this->_sort_change = true;
+        }
+    }
+
+    public function after_save(\Nos\Orm\Model $item)
+    {
+        if ($this->_sort_change) {
+            $this->_sort_change = false;
+            $sort_property = $this->_properties['sort_property'];
+            $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
+            $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
+            if (!empty($twinnable) && !$item->is_main_context()) {
+                $obj_main = $item->find_main_context();
+                $obj_main->set($sort_property, $item->get($sort_property));
+                $obj_main->save();
+                return;
             }
-            $u->set($sort_property, round($sort + $round_value));
-            $u->save();
-            $updated[$u->get_sort()] = $u->id;
+
+            $item->observe('before_sort');
+
+            $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
+            $params = array(
+                'order_by' => array($sort_property => 'ASC'),
+            );
+            if (!empty($tree)) {
+                $parent = $item->get_parent();
+                if (!empty($twinnable)) {
+                    if (!empty($parent)) {
+                        $parents = $item::find('all', array(
+                            'where' => array(
+                                array($twinnable['common_id_property'], $parent->{$twinnable['common_id_property']}),
+                            ),
+                        ));
+                        $parents_id = array_keys($parents);
+                        $params['where'] =  array(
+                            array($item->parent_relation()->key_from[0], 'IN', $parents_id),
+                            array($twinnable['is_main_property'], true),
+                        );
+                    } else {
+                        $params['where'] = array(
+                            array('parent', $parent),
+                            array($twinnable['is_main_property'], true),
+                        );
+                    }
+                } else {
+                    $params['where'] = array(array('parent', $parent));
+                    if (!empty($contextable)) {
+                        $params['where'][] = array($contextable['context_property'], $item->{$contextable['context_property']});
+                    }
+                }
+            } else {
+                if (!empty($twinnable)) {
+                    $params['where'] = array(array($twinnable['is_main_property'], true));
+                } elseif (!empty($contextable)) {
+                    $params['where'] = array(array($contextable['context_property'], $item->{$contextable['context_property']}));
+                }
+            }
+            $unsorted = $item::find('all', $params);
+            $i = 1;
+            $pk = \Arr::get($item->primary_key(), 0);
+            foreach ($unsorted as $u) {
+                if (!empty($twinnable)) {
+                    $item::query()->set($sort_property, $i)->where($twinnable['common_id_property'], $u->{$twinnable['common_id_property']})->update();
+                } else {
+                    $item::query()->set($sort_property, $i)->where($pk, $u->{$pk})->update();
+                }
+                $i++;
+            }
+
+            $item->observe('after_sort');
         }
     }
 }

@@ -33,14 +33,21 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      *
      * If there's no result, the function will return empty array()
      *
-     * @param  \Nos\Model        $item
+     * @param  \Nos\Orm\Model    $item
      * @param  array             $params
      * @return array
      */
     public function urls($item, $params = array())
     {
         $urls = array();
-        foreach ($this->_properties['enhancers'] as $enhancer_name) {
+        $enhancers = $this->_properties['enhancers'];
+        if (!empty($params['enhancer'])) {
+            if (in_array($params['enhancer'], $enhancers)) {
+                $enhancers = array($params['enhancer']);
+            }
+            unset($params['enhancer']);
+        }
+        foreach ($enhancers as $enhancer_name) {
             foreach (\Nos\Tools_Enhancer::url_item($enhancer_name, $item, $params) as $key => $url) {
                 $urls[$key] = $url;
             }
@@ -68,7 +75,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     /**
      * Returns a valid URL for the item.
      *
-     * @param  \Nos\Model        $item
+     * @param  \Nos\Orm\Model    $item
      * @param  array             $params
      * @return null|string       Full URL (relative to base). null if the item is not displayed.
      */
@@ -96,8 +103,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         }
 
         if (!empty($page_id)) {
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'page_enhanced.php', 'data::page_enhanced');
-            $page_enhanced = \Config::get('data::page_enhanced', array());
+            $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
 
             // The page should contain a valid enhancer for the current item
             foreach ($this->_properties['enhancers'] as $enhancer_name) {
@@ -107,9 +113,10 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
                 }
             }
             if ($page_contains_enhancer) {
-                $urlPath = Tools_Url::page($page_id);
-                if ($urlPath !== null) {
-                    $params['urlPath'] = $urlPath;
+                $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
+                $page_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($page_params) {
+                    $params['urlPath'] = Tools_Url::context($page_params['context']).$page_params['url'];
                 } else {
                     // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
                 }

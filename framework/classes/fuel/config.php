@@ -15,9 +15,7 @@ class Config extends \Fuel\Core\Config
 {
     public static function load($file, $group = null, $reload = false, $overwrite = false)
     {
-        $originFileName = $file;
-        $file = static::convertFileName($file, 'load');
-        if ($originFileName == 'db') {
+        if ($file == 'db') {
             $group = 'db';
         }
         if (!$reload and is_array($file) and is_string($group)) {
@@ -25,36 +23,6 @@ class Config extends \Fuel\Core\Config
         }
 
         return parent::load($file, $group, $reload, $overwrite);
-    }
-
-    public static function get($item, $default = null)
-    {
-        $item = static::convertFileName($item, 'get');
-        return parent::get($item, $default);
-    }
-
-    public static function load_and_get($item, $default = null)
-    {
-        $config_file = substr($item, 0, strpos($item, '.'));
-        static::load($config_file, true);
-        return static::get($item, $default);
-    }
-
-    public static function save($file, $config)
-    {
-        $file = static::convertFileName($file, 'save');
-
-        return parent::save($file, $config);
-    }
-
-    public static function convertFileName($file, $from = 'load')
-    {
-        if (is_string($file) && mb_strpos($file, '::') !== false && mb_substr($file, 0, 4) == 'nos_') {
-            list($application, $configuration_path) = explode('::', $file);
-            $file = 'nos::admin/'.$application.'/'.$configuration_path;
-        }
-
-        return $file;
     }
 
     public static function mergeWithUser($item, $config)
@@ -74,8 +42,7 @@ class Config extends \Fuel\Core\Config
         $file = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
         if ($application !== 'nos') {
-            \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces');
-            $namespaces = Config::get('data::app_namespaces', null);
+            $namespaces = \Nos\Config_Data::get('app_namespaces', null);
             if ($app = array_search($namespace, $namespaces)) {
                 $application = $app;
             }
@@ -86,15 +53,12 @@ class Config extends \Fuel\Core\Config
 
     public static function loadConfiguration($app_name, $file_name)
     {
-        \Config::load($app_name.'::'.$file_name, true);
-        $config = \Config::get($app_name.'::'.$file_name);
-        \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
-        $dependencies = \Config::get('data::app_dependencies', array());
+        $config = \Config::load($app_name.'::'.$file_name, true);
+        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$app_name])) {
             foreach ($dependencies[$app_name] as $dependency) {
-                \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
+                $config = \Arr::merge($config, \Config::load($dependency.'::'.$file_name, true));
             }
         }
         $config = \Arr::recursive_filter(
@@ -117,10 +81,8 @@ class Config extends \Fuel\Core\Config
 
     public static function extendable_load($module_name, $file_name)
     {
-        \Config::load($module_name.'::'.$file_name, true);
-        $config = \Config::get($module_name.'::'.$file_name);
-        \Config::load(APPPATH.'metadata'.DS.'app_dependencies.php', 'data::app_dependencies');
-        $dependencies = \Config::get('data::app_dependencies', array());
+        $config = \Config::load($module_name.'::'.$file_name, true);
+        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$module_name])) {
             foreach ($dependencies[$module_name] as $dependency) {
@@ -140,8 +102,24 @@ class Config extends \Fuel\Core\Config
 
     public static function metadata($application_name)
     {
-        \Config::load($application_name.'::metadata', true);
-        return \Config::get($application_name.'::metadata');
+        $metadata = \Config::load($application_name.'::metadata', true);
+
+        // More treatment for launchers
+        // Small fix relative to permissions
+        // We MUST have the key "application" in order to know if a launcher has or has not to be displayed...
+        foreach (array('launchers', 'enhancers', 'templates') as $section) {
+            if (!isset($metadata[$section])) {
+                continue;
+            }
+            foreach ($metadata[$section] as &$item) {
+                $item['i18n_application'] = $application_name;
+                if (!isset($item['application'])) {
+                    $item['application'] = $application_name;
+                }
+            }
+        }
+
+        return $metadata;
     }
 
     public static function application($application_name)
@@ -149,78 +127,113 @@ class Config extends \Fuel\Core\Config
         return static::extendable_load($application_name, 'config');
     }
 
-    public static function actions($context = array())
+    public static function actions($params = array())
     {
-        if (!isset($context['models'])) {
+        if (!isset($params['models'])) {
             return array();
         }
 
         $selected_actions = array();
-        foreach ($context['models'] as $model) {
-            $actions = $model::admin_config();
-            $actions = $actions['actions'];
+        foreach ($params['models'] as $model) {
+            $common_config = \Nos\Config_Common::load($model, array());
+            $actions = $common_config['actions']['list'];
+            $actions_order = $common_config['actions']['order'];
+
+            $params['model'] = $model;
+
+            foreach ($actions_order as $key) {
+                if (!isset($actions[$key])) {
+                    throw new \Exception('You are trying to order an action which key would be "'.$key.'" but such an action doesn\'t seem to exist.');
+                }
+                $action = $actions[$key];
+                if (static::can_add_action($action, $params)) {
+                    $selected_actions[$key] = $action;
+                }
+                unset($actions[$key]);
+            }
 
             foreach ($actions as $key => $action) {
-                $action['name'] = $key;
-
-                if (isset($context['type']) && isset($action['context']) && isset($action['context'][$context['type']]) && $action['context'][$context['type']]) {
+                if (static::can_add_action($action, $params)) {
                     $selected_actions[$key] = $action;
                 }
             }
 
-            if (isset($context['item'])) {
-                $selected_actions = static::placeholder_replace($selected_actions, $context['item']);
+            foreach ($selected_actions as $key => $action) {
+                if (!empty($params['item']) && isset($action['disabled'])) {
+                    $selected_actions[$key]['disabled'] = $action['disabled']($params['item']);
+                }
             }
         }
 
         return $selected_actions;
     }
 
-
-
-    public static function placeholder_replace($obj, $data)
+    protected static function can_add_action($action, $params)
     {
-        $retrieveFromData = function($arg, $data) {
-            if (isset($data[$arg])) {
-                return $data[$arg];
-            }
-            if (isset($data->{$arg})) {
-                return $data->{$arg};
-            }
-            try {
-                return $data->{$arg}();
-            } catch (\Exception $e) {
-                return '';
-            }
-        };
+        if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
+            return false;
+        }
 
-        if (is_string($obj)) {
-            $obj = preg_replace_callback('/\[\:([\w]+)\]/', function($matches) use($data, $retrieveFromData) {
-                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
-            }, $obj);
-            $obj = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
-                return isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '';
-            }, $obj);
-            $obj = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($data, $retrieveFromData) {
-                return urlencode(isset($matches[1]) ? $retrieveFromData($matches[1], $data) : '');
-            }, $obj);
-        } else if (is_array($obj)) {
-            foreach ($obj as $key => $value) {
-                $new_key = static::placeholder_replace($key, $data);
-                $obj[$new_key] = static::placeholder_replace($value, $data);
+        return !isset($action['visible']) || $action['visible']($params);
+    }
+
+    /**
+     * Replace placeholders recursively in an array
+     *
+     * @param  array  $array  Array to look placeholders inside
+     * @param  mixed  $data   Array or object used to fetch placeholders
+     * @param  bool   $remove_unset  Should placeholders not found in data be removed?
+     * @return array  A new array with replacement done
+     */
+    public static function placeholderReplace($array, $data, $remove_unset = true)
+    {
+        if (is_string($array)) {
+            $retrieveFromData = function($placeholder, $fallback) use ($data) {
+                if (is_array($data) && isset($data[$placeholder])) {
+                    return $data[$placeholder];
+                }
+                if (is_object($data)) {
+                    if (isset($data->{$placeholder})) {
+                        return $data->{$placeholder};
+                    }
+                    try {
+                        return $data->{$placeholder}();
+                    } catch (\Exception $e) {
+                    }
+                }
+                return $fallback;
+            };
+
+            $array = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
+            }, $array);
+            $array = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                return urlencode($retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]));
+            }, $array);
+        } else if (is_array($array)) {
+            foreach ($array as $key => $value) {
+                $new_key = static::placeholderReplace($key, $data, $remove_unset);
+                $array[$new_key] = static::placeholderReplace($value, $data, $remove_unset);
                 if ($new_key !== $key) {
-                    unset($obj[$key]);
+                    unset($array[$key]);
                 }
             }
         }
-        return $obj;
+        return $array;
     }
 
-    public static function icon($application_name, $icon_key)
+    public static function icon($application_or_model_name, $icon_key)
     {
-        \Config::load($application_name.'::metadata', true);
-        $metadata = \Config::get($application_name.'::metadata');
-        return $metadata['icons'][$icon_key];
+        if (strpos($application_or_model_name, '\\') === false) {
+            $metadata = \Nos\Config_Data::get('app_installed.'.$application_or_model_name);
+        } else {
+            $metadata = \Nos\Config_Common::load($application_or_model_name);
+        }
+
+        if (!empty($metadata['icons'][$icon_key])) {
+            return $metadata['icons'][$icon_key];
+        }
+        return '';
     }
 
 }

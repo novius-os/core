@@ -1,0 +1,56 @@
+<?php
+
+return array(
+    'extensions' => array(
+        'image' => 'gif,png,jpg,jpeg,bmp',
+        'document' => 'doc,xls,ppt,docx,xlsx,pptx,odt,odf,odp,pdf',
+        'music' => 'mp3,ogg,wav',
+        'video' => 'avi,mkv,mpg,mpeg,mov',
+        'archive' => 'zip,rar,tar,gz,7z',
+        'text' => 'txt,xml,htm,html',
+    ),
+    'icons' => array(
+        16 => array(
+            'music.png' => 'mp3,ogg,wav',
+            'video.png' => 'avi,mkv,mpg,mpeg,mov',
+            'archive.png'  => 'zip,rar,tar,gz,7z',
+            'text.png'  => 'txt,xml,htm,html',
+
+            'csv.png' => 'csv',
+            'doc.png' => 'doc,docx',
+            'gif.png' => 'gif',
+            'jpg.png' => 'jpg,jpeg',
+            'odp.png'  => 'odp',
+            'ods.png'  => 'ods',
+            'odt.png'  => 'odt',
+            'pdf.png'  => 'pdf',
+            'png.png'  => 'png',
+            'ppt.png'  => 'ppt,pptx',
+            'swf.png'  => 'swf',
+            'xls.png'  => 'xls,xlsx',
+        ),
+        64 => array(
+            'music.png' => '',
+            'video.png' => 'mkv,mpg,mpeg',
+            'archive.png'  => 'tar,gz,7z',
+            'misc.png' => 'txt,xml,htm,html',
+
+            'avi.png' => 'avi',
+            'csv.png' => 'csv',
+            'doc.png' => 'doc,docx',
+            'flv.png' => 'flv',
+            'mov.png' => 'mov',
+            'mp3.png' => 'mp3',
+            'odp.png' => 'odp',
+            'ods.png' => 'ods',
+            'odt.png' => 'odt',
+            'pdf.png' => 'pdf',
+            'ppt.png' => 'ppt,pptx',
+            'rar.png' => 'rar',
+            'swf.png' => 'swf',
+            'wav.png' => 'wav',
+            'xls.png' => 'xls,xlsx',
+            'zip.png' => 'zip',
+        ),
+    ),
+);

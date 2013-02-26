@@ -5,13 +5,13 @@
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
-* 
+*
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
 * http://www.wijmo.com/license
 *
 * * Wijmo Dropdown widget.
-* 
+*
 * Depends:
 *	jquery.js
 *	jquery.ui.js
@@ -45,12 +45,12 @@
 		_create: function () {
 			var self = this,
 				ele = self.element;
-			
+
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
 			}
-			
+
 			if (ele.get(0).tagName.toLowerCase() !== "select") {
 				return;
 			}
@@ -64,7 +64,7 @@
 			else {
 				self.needInit = true;
 			}
-			
+
 			//update for visibility change
 			if (self.element.is(":hidden") &&
 						self.element.wijAddVisibilityObserver) {
@@ -172,7 +172,7 @@
 				}
 			});
 
-			//update for fixing height setting is incorrect when 
+			//update for fixing height setting is incorrect when
 			//execute refresh at 2011/11/30
 			listContainer.height("");
 			//end for height setting
@@ -504,24 +504,22 @@
 		},
 
 		_setValueToEle: function () {
+            // @todo : Fixed Novius OS. Little refactoring in this function
 			var self = this, ele = self.element,
-				oldSelectedItem = ele.find("option[selected]"),
-				//oldSelectedIndex = oldSelectedItem.index(),
-				oldSelectedIndex = $('option', ele).index(oldSelectedItem),
+                $options = ele.find("option"),
+				oldSelectedItem = $options.filter("[selected]"),
+                //oldSelectedItem = ele.find("option[selected]"),
+				oldSelectedIndex = $options.index(oldSelectedItem),
+                //oldSelectedIndex = $('option', ele).index(oldSelectedItem),
 				selectedIndex = self._selectedIndex;
 
-			//self.oldVal = ele.val();
-			//ele.val(self._value);
 			if (oldSelectedIndex !== selectedIndex) {
-                // @todo : Fixed Novius OS. Reversal of these two lines
-				ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
-                oldSelectedItem.removeAttr('selected');
+                $options.eq(selectedIndex)[0].selected = true;
+                //ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
+                //oldSelectedItem.removeAttr('selected');
 
                 ele.trigger("change");
 			}
-			//if (self.oldVal !== self._value) {
-			//	ele.trigger("change");
-			//}
 		},
 
 		_initActiveItem: function () {
@@ -685,7 +683,7 @@
 			//update for fixed tooltip can't take effect
 			this.element.attr("title", this._container.attr("title"));
 
-			/// Remove the functionality completely. 
+			/// Remove the functionality completely.
 			/// This will return the element back to its pre-init state.
 			this.element.closest(".wijmo-wijdropdown")
 			.find(">div.wijmo-dropdown-trigger,>div.wijmo-dropdown," +

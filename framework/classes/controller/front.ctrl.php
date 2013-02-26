@@ -47,19 +47,19 @@ class Controller_Front extends Controller
     protected $_page;
     protected $_page_id;
 
+    protected $_wysiwyg_name = null;
+
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
         $this->_context_url = \URI::base(false);
 
-        // Strip out leading / and trailing .html
-        $this->_url = mb_substr(\Input::server('REDIRECT_URL'), defined('NOS_RELATIVE_DIR') ? 1 + mb_strlen(NOS_RELATIVE_DIR) : 1);
+        $this->_url = \Input::server('NOS_URL');
         $url = str_replace('.html', '', $this->_url);
 
         $this->_is_preview = \Input::get('_preview', false);
 
         $cache_path = (empty($url) ? 'index/' : $url);
-        $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
@@ -70,13 +70,19 @@ class Controller_Front extends Controller
         }
 
         \Event::trigger('front.start');
-        \Event::trigger_function('front.start', array(&$url));
+        \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
+
+        $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
+            // Cache exist, retrieve his content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
+            // Cache not exist, try to found page for this URL
+
+            // Build array of possibles contexts for this absolute URL
             $contexts_possibles = array();
             foreach (Tools_Context::contexts() as $context => $domains) {
                 foreach ($domains as $domain) {
@@ -89,61 +95,72 @@ class Controller_Front extends Controller
 
             $cache->start();
 
-            \Config::load(APPPATH.'data'.DS.'config'.DS.'url_enhanced.php', 'data::url_enhanced');
-            $url_enhanced = \Config::get('data::url_enhanced', array());
-            $url_enhanced = array_filter($url_enhanced, function ($v) use ($contexts_possibles) {
-                return in_array($v['context'], array_keys($contexts_possibles));
+            // Filter URLs enhanced : remove if not in possibles contexts, remove if url not match
+            $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
+            $base_href = $this->_base_href;
+            $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts_possibles, $base_href, $url) {
+                if (!in_array($page_params['context'], array_keys($contexts_possibles))) {
+                    return false;
+                }
+                $url_absolute = $contexts_possibles[$page_params['context']].$page_params['url'];
+                return mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
             });
 
+            // Add current url to URLs enhanced
             $url_enhanced['current'] = array(
                 'url' => $url.'/',
             );
 
             $_404 = true;
+            // Loop URLs enhanced for one that not send a NotFoundException
             foreach ($url_enhanced as $page_id => $page_params) {
                 $temp_url = $page_params['url'];
-                if (mb_substr($url.'/', 0, mb_strlen($temp_url)) === $temp_url) {
-                    if ($page_id != 'current') {
-                        $this->_contexts_possibles = array($page_params['context']);
-                        $this->_page_id = $page_id;
 
-                        $temp_url = mb_substr(\Uri::base(false).$temp_url, mb_strlen($contexts_possibles[$page_params['context']]));
-                        if (!in_array($temp_url, array('', '/'))) {
-                            $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
-                            $this->_enhanced_url_path = $temp_url;
-                        } else {
-                            $this->_page_url = '';
-                            $this->_enhanced_url_path = '';
-                        }
-                        $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($contexts_possibles[$page_params['context']].$temp_url));
+                if ($page_id != 'current') {
+                    $this->_contexts_possibles = array($page_params['context']);
+                    $this->_page_id = $page_id;
+
+                    if (!in_array($temp_url, array('', '/'))) {
+                        $this->_page_url = mb_substr($temp_url, 0, -1).'.html';
+                        $this->_enhanced_url_path = $temp_url;
                     } else {
-                        $this->_contexts_possibles = $contexts_possibles;
-                        $this->_page_id = null;
-                        $this->_page_url = $temp_url;
+                        $this->_page_url = '';
+                        $this->_enhanced_url_path = '';
                     }
-
-                    $_404 = false;
-                    try {
-                        $this->_generate_cache();
-                        $this->_context_url = $contexts_possibles[$this->_context];
-                    } catch (NotFoundException $e) {
-                        $_404 = true;
-                        $this->_page = null;
-                        $this->_enhanced_url_path = false;
-                        $this->_enhancer_url = false;
-                        continue;
-                    } catch (\Exception $e) {
-                        // Cannot generate cache: fatal error...
-                        //@todo : error page case
-                        exit($e->getMessage());
-                    }
-
-                    echo $this->_view->render();
-                    $cache->save($no_cache ? -1 : CACHE_DURATION_PAGE, $this);
-                    $content = $cache->execute();
-
-                    break;
+                    $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($contexts_possibles[$page_params['context']].$temp_url));
+                } else {
+                    $this->_contexts_possibles = $contexts_possibles;
+                    $this->_page_id = null;
+                    $this->_page_url = $temp_url;
                 }
+
+                $_404 = false;
+                try {
+                    $this->_generate_cache();
+                    $this->_context_url = $contexts_possibles[$this->_context];
+                } catch (NotFoundException $e) {
+                    $_404 = true;
+                    $this->_page = null;
+                    $this->_enhanced_url_path = false;
+                    $this->_enhancer_url = false;
+                    continue;
+                } catch (\Exception $e) {
+                    // Cannot generate cache: fatal error...
+                    //@todo : error page case
+                    exit($e->getMessage());
+                }
+
+                $content = $this->_view->render();
+
+                $this->_handle_head($content);
+                \Event::trigger_function('front.display', array(&$content));
+
+                echo $content;
+
+                $cache->save($no_cache ? -1 : \Config::get('novius-os.cache_duration_page', 5), $this);
+                $content = $cache->execute();
+
+                break;
             }
 
             if ($_404) {
@@ -152,7 +169,7 @@ class Controller_Front extends Controller
                 if (empty($event_404)) {
                     // If no redirection then we display 404
                     if (!empty($url)) {
-                        $_SERVER['REDIRECT_URL'] = '/';
+                        $_SERVER['NOS_URL'] = '/';
 
                         return $this->router('index', $params, 404);
                     } else {
@@ -161,12 +178,6 @@ class Controller_Front extends Controller
                     }
                 }
             }
-        }
-
-        $this->_handle_head($content);
-
-        foreach (\Event::trigger('front.display', null, 'array') as $c) {
-            is_callable($c) && call_user_func_array($c, array(&$content));
         }
 
         return \Response::forge($content, $status);
@@ -186,6 +197,14 @@ class Controller_Front extends Controller
     public function getPage()
     {
         return $this->_page;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWysiwygName()
+    {
+        return $this->_wysiwyg_name;
     }
 
     /**
@@ -412,7 +431,7 @@ class Controller_Front extends Controller
         foreach ($this->_metas as $metas) {
             $head[] = $metas;
         }
-        $this->_css = array_unique($this->_css);
+        $this->_css = array_unique($this->_css, SORT_REGULAR);
         foreach ($this->_css as $css) {
             if (is_array($css) && isset($css['inline']) && $css['inline'] && isset($css['css'])) {
                 $head[] = '<style type="text/css">'.$css['css'].'</style>';
@@ -420,7 +439,7 @@ class Controller_Front extends Controller
                 $head[] = '<link href="'.(is_string($css) ? $css : $css['css']).'" rel="stylesheet" type="text/css">';
             }
         }
-        $this->_js_header = array_unique($this->_js_header);
+        $this->_js_header = array_unique($this->_js_header, SORT_REGULAR);
         foreach ($this->_js_header as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $head[] = '<script type="text/javascript">'.$js['js'].'</script>';
@@ -433,13 +452,16 @@ class Controller_Front extends Controller
         }
 
         $footer = array();
-        $this->_js_footer = array_unique($this->_js_footer);
-        $this->_js_footer = array_diff($this->_js_footer, $this->_js_header);
+        $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
-                $footer[] = '<script src="'.(is_string($js) ? $js : $js['js']).'" type="text/javascript"></script>';
+                $js = is_string($js) ? $js : $js['js'];
+                if (in_array($js, $this->_js_header)) {
+                    continue;
+                }
+                $footer[] = '<script src="'.$js.'" type="text/javascript"></script>';
             }
         }
         if (count($footer)) {
@@ -463,11 +485,15 @@ class Controller_Front extends Controller
 
         // Scan all wysiwyg
         foreach ($this->_template['layout'] as $wysiwyg_name => $layout) {
-            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->_page->wysiwygs->{$wysiwyg_name}, $this);
+            $this->_wysiwyg_name = $wysiwyg_name;
+            $wysiwyg[$wysiwyg_name] = Nos::parse_wysiwyg($this->_page->wysiwygs->{$wysiwyg_name});
         }
+        $this->_wysiwyg_name = null;
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
         $this->_view->set('title', $this->_title, false);
+        $this->_view->set('page', $this->_page, false);
+        $this->_view->set('main_controller', $this, false);
     }
 
     /**
@@ -481,7 +507,7 @@ class Controller_Front extends Controller
                 $where[] = array('page_published', 1);
             }
 
-            $page = Model_Page::find('first', array(
+            $page = Page\Model_Page::find('first', array(
                     'where' => $where,
                 ));
 
@@ -508,9 +534,9 @@ class Controller_Front extends Controller
                     $where[] = array('page_virtual_url', $url);
                 }
 
-                $page = Model_Page::find('first', array(
+                $page = \Nos\Page\Model_Page::find('first', array(
                         'where' => $where,
-                    ));
+                ));
 
                 if (!empty($page)) {
                     $this->_page = $page;
@@ -529,15 +555,19 @@ class Controller_Front extends Controller
             throw new NotFoundException('The requested page was not found.');
         }
 
+        if ($this->_page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
+            \Response::redirect($this->_page->page_external_link, 'location', 301);
+            exit();
+        }
+
         $this->_context = $this->_page->get_context();
-        \Nos\I18n::setLocale($this->_page->get_context());
+        \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
     }
 
     protected function _find_template()
     {
         // Find the template
-        Config::load(APPPATH.'metadata'.DS.'templates.php', 'data::templates');
-        $templates = Config::get('data::templates', array());
+        $templates = \Nos\Config_Data::get('templates', array());
 
         if (!isset($templates[$this->_page->page_template])) {
             throw new \Exception('The template '.$this->_page->page_template.' is not configured.');
@@ -549,7 +579,6 @@ class Controller_Front extends Controller
         }
 
         try {
-            // @todo : always load from the template directory?
             // Try normal loading
             $this->_view = View::forge($this->_template['file']);
         } catch (\FuelException $e) {
@@ -576,12 +605,12 @@ class Controller_Front extends Controller
 
     public function rebuild_cache($cache)
     {
-        $this->_page = new Model_Page();
+        $page = array();
         foreach ($cache['page'] as $field => $value) {
-            $this->_page->{'page_'.$field} = $value;
+            $page['page_'.$field] = $value;
         }
+        $this->_page = new \Nos\Page\Model_Page($page, false);
         $this->_page->freeze();
         unset($cache['page']);
-        //return parent::rebuild_cache($cache); @todo: to be reviewed
     }
 }

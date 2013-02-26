@@ -19,13 +19,13 @@ foreach ($fieldset->field() as $field) {
     }
 }
 ?>
-<div class="accordion fieldset">
+<div class="accordion fieldset <?= !empty($classes) ? $classes : '' ?>">
 <?php
 foreach ((array) $accordions as $options) {
     if (!is_array($options)) {
         $options = array($options);
     }
-    if (!isset($options['fields'])) {
+    if (!isset($options['fields']) && !isset($options['view'])) {
         $options = array('fields' => $options);
     }
     if (!isset($options['field_template'])) {
@@ -34,10 +34,25 @@ foreach ((array) $accordions as $options) {
     if (!isset($options['title'])) {
         $options['title'] = '';
     }
+    if (empty($options['view'])) {
+        $exclude = true;
+        foreach ((array) $options['fields'] as $field) {
+            if ($field instanceof \View || !$fieldset->field($field)->is_expert()) {
+                $exclude = false;
+                continue;
+            }
+        }
+        if ($exclude) {
+            continue;
+        }
+    }
     ?>
         <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $options['title'] ?></a></h3>
         <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
     <?php
+    if (!empty($options['view'])) {
+        echo View::forge($options['view'], $view_params + (isset($options['params']) ? $options['params'] : array()), false);
+    }
     foreach ((array) $options['fields'] as $field) {
         try {
             if ($field instanceof \View) {
@@ -55,4 +70,3 @@ foreach ((array) $accordions as $options) {
 }
 ?>
  </div>
-</div>

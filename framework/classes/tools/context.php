@@ -31,13 +31,14 @@ class Tools_Context
         if (!is_array(static::$_contexts)) {
             $all_domains = array();
 
+            \Config::load('contexts', true);
             $sites = static::sites();
             $locales = static::locales();
-            $contexts = \Config::get('contexts', array());
+            $contexts = \Config::get('contexts.contexts', array());
             static::$_contexts = array();
             foreach ($contexts as $context_code => $domains) {
-                $site = static::site_code($context_code);
-                $locale = static::locale_code($context_code);
+                $site = static::siteCode($context_code);
+                $locale = static::localeCode($context_code);
                 if (isset($sites[$site]) && isset($locales[$locale])) {
                     if (empty($domains)) {
                         if (!in_array(\Uri::base(false), $all_domains)) {
@@ -77,7 +78,8 @@ class Tools_Context
     {
         if (!is_array(static::$_sites)) {
             static::$_sites = array();
-            $sites = \Config::get('sites', array());
+            \Config::load('contexts', true);
+            $sites = \Config::get('contexts.sites', array());
             foreach ($sites as $site_code => $site_params) {
                 if (!is_array($site_params)) {
                     $site_params = array('title' => $site_params);
@@ -104,7 +106,8 @@ class Tools_Context
     {
         if (!is_array(static::$_locales)) {
             static::$_locales = array();
-            $locales = \Config::get('locales', array());
+            \Config::load('contexts', true);
+            $locales = \Config::get('contexts.locales', array());
             foreach ($locales as $locale_code => $locale_params) {
                 if (!is_array($locale_params)) {
                     $locale_params = array('title' => $locale_params);
@@ -114,7 +117,7 @@ class Tools_Context
                 }
                 if (empty($locale_params['flag'])) {
                     // Convert lang_LOCALE to locale
-                    $lang = static::lang_locale_to_lang($locale_code);
+                    $lang = static::langLocaleToLang($locale_code);
                     switch ($lang) {
                         case 'en':
                             $lang = 'gb';
@@ -135,7 +138,7 @@ class Tools_Context
      * @param $lang_locale
      * @return string
      */
-    public static function lang_locale_to_lang($lang_locale)
+    public static function langLocaleToLang($lang_locale)
     {
         // Convert lang_LOCALE to locale
         list($lang, $locale) = explode('_', $lang_locale.'_');
@@ -153,7 +156,17 @@ class Tools_Context
     public static function flag($context)
     {
         $locale = self::locale($context);
-        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" /> ';
+        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" />';
+    }
+
+    /**
+     * @param $context
+     * @return string
+     */
+    public static function flagUrl($context)
+    {
+        $locale = self::locale($context);
+        return 'static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png';
     }
 
     /**
@@ -161,25 +174,22 @@ class Tools_Context
      * @param array $options
      * @return string
      */
-    public static function context_label($context, array $options = array())
+    public static function contextLabel($context, array $options = array())
     {
         $options = array_merge(array(
-                'alias' => false,
+                'short' => false,
                 'template' => '{site} {locale}',
-                'flag' => true,
-                'force_flag' => false,
             ), $options);
 
         $site = self::site($context);
         $locale = self::locale($context);
-        $site_label = $options['alias'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : '';
-        $site_label = empty($site_label) ? $site['title'] : $site_label;
+        $site_label = $options['short'] ? '<span title="'.htmlspecialchars($site['title']).'">'.$site['alias'].'</span>' : $site['title'];
         if (count(static::sites()) === 1) {
-            $label = $options['force_flag'] ? static::flag($context) : $locale['title'];
+            $label = $options['short'] ? static::flag($context) : $locale['title'].' '.static::flag($context);
         } elseif (count(static::locales()) === 1) {
             $label = $site_label;
         } else {
-            $label = strtr($options['template'], array('{locale}' => $options['flag'] ? static::flag($context) : $locale['title'], '{site}' => $site_label));
+            $label = strtr($options['template'], array('{locale}' => static::flag($context), '{site}' => $site_label));
         }
 
         return $label;
@@ -188,18 +198,18 @@ class Tools_Context
     /**
      * @return string
      */
-    public static function default_context()
+    public static function defaultContext()
     {
         $contexts = static::contexts();
 
-        return current($contexts);
+        return key($contexts);
     }
 
     /**
      * @param $context
      * @return mixed
      */
-    public static function locale_code($context)
+    public static function localeCode($context)
     {
         list(, $locale) = explode('::', $context, 2);
         if (empty($locale)) {
@@ -216,11 +226,11 @@ class Tools_Context
     public static function locale($context)
     {
         $locales = static::locales();
-        $locale_code = self::locale_code($context);
+        $locale_code = self::localeCode($context);
         if (empty($locales[$locale_code])) {
             return array(
                 'title' => $locale_code,
-                'flag' => static::lang_locale_to_lang($locale_code),
+                'flag' => static::langLocaleToLang($locale_code),
             );
         } else {
             return $locales[$locale_code];
@@ -231,7 +241,7 @@ class Tools_Context
      * @param $context
      * @return mixed
      */
-    public static function site_code($context)
+    public static function siteCode($context)
     {
         list($site) = explode('::', $context, 2);
 
@@ -245,14 +255,15 @@ class Tools_Context
     public static function site($context)
     {
         $sites = static::sites();
-        $site_code = self::site_code($context);
+        $site_code = self::siteCode($context);
         if (empty($sites[$site_code])) {
             return array(
+                'code' => $site_code,
                 'title' => $site_code,
                 'alias' => $site_code,
             );
         } else {
-            return $sites[$site_code];
+            return array_merge(array('code' => $site_code), $sites[$site_code]);
         }
     }
 }

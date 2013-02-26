@@ -19,10 +19,9 @@ class Controller_Inspector extends Controller_Admin_Application
 
     public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
     {
-        if (isset($config['model'])) {
+        if (!empty($config['model'])) {
             $inspector_path = static::get_path();
-
-            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
+            $model = $config['model'];
 
             if (!isset($config['appdesk']['inputName'])) {
                 $config['appdesk']['inputName'] = $config['input']['key'].'[]';
@@ -33,7 +32,7 @@ class Controller_Inspector extends Controller_Admin_Application
             }
 
             if (!isset($config['appdesk']['contextChange'])) {
-                $config['appdesk']['contextChange'] = isset($behaviours['Nos\Orm_Behaviour_ContextableAndTwinnable']);
+                $config['appdesk']['contextChange'] = !!$model::behaviours('Nos\Orm_Behaviour_Twinnable', false);
             }
 
             if (!isset($config['appdesk']['url'])) {
@@ -63,7 +62,7 @@ class Controller_Inspector extends Controller_Admin_Application
                                 'headerText' => __('Status'),
                                 'dataKey' => 'publication_status'
                             );
-                        } else {
+                        } else if (!empty($value['headerText'])) {
                             $config['appdesk'][$gridKey]['columns'][$key]['headerText'] = $value['headerText'];
                             $config['appdesk'][$gridKey]['columns'][$key]['dataKey'] = $key;
                         }

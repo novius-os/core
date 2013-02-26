@@ -10,16 +10,17 @@ html {
     height : 100%;
 }
 body {
-  background: url("../img/wallpapers/circles.jpg");
+  background: url("../img/wallpapers/default.jpg");
   background-size: cover;
 }
 #login {
   background: rgba(255, 255, 255, 0.5);
   border: 1px outset rgba(0, 0, 0, 0.5);
   border-radius: 10px;
-  height: 360px;
+  font-size: 20px;
+  height: 400px;
   left: 50%;
-  margin: -195px 0 0 -235px;
+  margin: -215px 0 0 -235px;
   padding: 15px;
   position: absolute;
   text-align: center;
@@ -29,11 +30,13 @@ body {
 #login p {
     margin: 1em 0;
 }
-#login label {
+#login .wijmo-checkbox label  {
 	display: inline-block;
 	text-align: right;
-	width: 100px;
+    padding-left: 1em;
 }
-#login input {
-	font-size: 20px;
+
+.nos-login-error {
+    left: 50%;
+    margin-left: -150px;
 }

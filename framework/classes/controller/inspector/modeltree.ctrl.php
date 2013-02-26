@@ -48,26 +48,35 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
 
     public static function process_config($application, $config, $item_actions = array(), $gridKey = 'treeGrid')
     {
-        if (isset($config['model'])) {
-            $admin_config = $config['model']::admin_config();
+        if (!empty($config['model'])) {
+            if (!isset($config['data_mapping'])) {
+                $config['data_mapping'] = null;
+            }
+
+            $common_config = \Nos\Config_Common::load($config['model'], $config['data_mapping']);
+            $data_mapping = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array();
 
             if (!isset($config['dataset'])) {
-                $config['dataset']  = $admin_config['dataset'];
+                $config['dataset']  = $data_mapping;
             }
             $config['dataset']['id']       = array(
                 'column' => 'id',
                 'visible' => false
             );
 
-            $item_actions = \Config::actions(array('models' => array($config['model']), 'type' => 'list'));
+            $item_actions = \Config::actions(array('models' => array($config['model']), 'target' => 'grid', 'inspector' => 'modeltree', 'class' => get_called_class()));
 
             if (!isset($config['dataset']['actions'])) {
                 $config['dataset']['actions'] = array();
                 foreach ($item_actions as $action_key => $action_value) {
-                    if (isset($action_value['enabled'])) {
-                        $config['dataset']['actions'][$action_key] = $action_value['enabled'];
+                    if (isset($action_value['disabled'])) {
+                        $config['dataset']['actions'][$action_key] = $action_value['disabled'];
                     }
                 }
+            }
+
+            if (!isset($config['order_by']) && !!$config['model']::behaviours('Nos\Orm_Behaviour_Sortable', false)) {
+                $config['order_by'] = $config['model']::prefix().'sort';
             }
 
             if (!isset($config['models'])) {
@@ -78,8 +87,8 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 $config['models'][0]['model'] = $config['model'];
             }
 
-            if (!isset($config['models'][0]['order_by'])) {
-                $config['models'][0]['order_by'] = $config['model']::prefix().'sort';
+            if (!isset($config['models'][0]['order_by']) && isset($config['order_by'])) {
+                $config['models'][0]['order_by'] = $config['order_by'];
             }
 
             if (!isset($config['models'][0]['childs'])) {
@@ -102,8 +111,8 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 $config['roots'][0]['where'] = array(array($config['model']::prefix().'parent_id', 'IS', \DB::expr('NULL')));
             }
 
-            if (!isset($config['roots'][0]['order_by'])) {
-                $config['roots'][0]['order_by'] = $config['model']::prefix().'sort';
+            if (!isset($config['roots'][0]['order_by']) && isset($config['order_by'])) {
+                $config['roots'][0]['order_by'] = $config['order_by'];
             }
 
             if (!isset($config['input']['query'])) {
