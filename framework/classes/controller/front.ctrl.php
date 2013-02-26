@@ -54,8 +54,7 @@ class Controller_Front extends Controller
         $this->_base_href = \URI::base(false);
         $this->_context_url = \URI::base(false);
 
-        // Strip out leading / and trailing .html
-        $this->_url = mb_substr(\Input::server('REDIRECT_URL'), defined('NOS_RELATIVE_DIR') ? 1 + mb_strlen(NOS_RELATIVE_DIR) : 1);
+        $this->_url = \Input::server('NOS_URL');
         $url = str_replace('.html', '', $this->_url);
 
         $this->_is_preview = \Input::get('_preview', false);
@@ -170,7 +169,7 @@ class Controller_Front extends Controller
                 if (empty($event_404)) {
                     // If no redirection then we display 404
                     if (!empty($url)) {
-                        $_SERVER['REDIRECT_URL'] = '/';
+                        $_SERVER['NOS_URL'] = '/';
 
                         return $this->router('index', $params, 404);
                     } else {

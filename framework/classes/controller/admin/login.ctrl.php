@@ -29,7 +29,7 @@ class Controller_Admin_Login extends Controller
 
     protected function redirect()
     {
-        \Response::redirect(ltrim(urldecode(\Input::get('redirect', 'admin/')), '/'));
+        \Response::redirect(urldecode(\Input::get('redirect', 'admin/')));
         exit();
     }
 
