@@ -12,7 +12,7 @@
 
 namespace Nos;
 
-class Orm_ContextableAndTwinnable_BelongsTo extends \Orm\BelongsTo
+class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 {
     protected $column_context_from = 'context';
 
@@ -26,13 +26,13 @@ class Orm_ContextableAndTwinnable_BelongsTo extends \Orm\BelongsTo
         if (!class_exists($to)) {
             throw new \FuelException('Related model not found by Belongs_To relation "'.$name.'": '.$to);
         }
-        $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
+        $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$to_behaviour) {
-            throw new \FuelException('Related model not have ContextableAndTwinnable behaviour "'.$name.'"');
+            throw new \FuelException('Related model not have Twinnable behaviour "'.$name.'"');
         }
-        $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_ContextableAndTwinnable', false);
+        $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('Model not have ContextableAndTwinnable behaviour');
+            throw new \FuelException('Model not have Twinnable behaviour');
         }
 
         parent::__construct($from, $name, $config);
