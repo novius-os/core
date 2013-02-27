@@ -479,7 +479,14 @@ class Controller_Front extends Controller
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
-        $this->setTitle($this->_page->page_title);
+        if ($this->_page->page_meta_noindex) {
+            $this->setTitle($this->_page->page_title);
+            $this->setMetaRobots('noindex');
+        } else {
+            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
+            $this->setMetaDescription($this->_page->page_meta_description);
+            $this->setMetaKeywords($this->_page->page_meta_keywords);
+        }
 
         $wysiwyg = array();
 
