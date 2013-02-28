@@ -2,7 +2,7 @@
 /*jslint white: false */
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -167,7 +167,7 @@
 		// handle option changes:
 		_setOption: function (key, value) {
 			switch (key) {
-				case "contentUrl": 
+				case "contentUrl":
 					if (value) {
 						this.element.find("> .ui-widget-content").wijContent(value);
 					} else {
@@ -229,7 +229,9 @@
 			content.attr("role", "tabpanel");
 
 			if (header.find("> a").length === 0) {
-				header.wrapInner('<a href="#"></a>');
+				// fix for 32089:
+				header.wrapInner('<a href="javascript:void(null)"></a>');
+				//header.wrapInner('<a href="#"></a>');
 			}
 			if (header.find("> .ui-icon").length === 0) {
 				$('<span class="ui-icon"></span>').insertBefore($("> a", header)[0]);
@@ -524,9 +526,10 @@
 		},
 
 		/** Private methods */
-		_onHeaderClick: function () {
-			this.option('expanded', !this.options.expanded);
-			return false;
+		_onHeaderClick: function (e) {
+			this.option("expanded", !this.options.expanded);
+			// commented in order to fix issue 32089:
+			//return false;	// fix for 32089
 		}
 
 	});

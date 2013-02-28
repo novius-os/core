@@ -4,7 +4,7 @@ clearTimeout,amplify*/
 /*jslint nomen: false*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -39,7 +39,7 @@ clearTimeout,amplify*/
 			///	Default: {
 			///	dayViewTooltipFormat: "{0:dddd, MMMM d, yyyy}",
 			///	weekViewTooltipFormat: "{0:MMMM d} - {1:d, yyyy}",
-			///	weekViewTooltip2MothesFormat: "{0:MMMM d} - {1:MMMM d, yyyy}",			
+			///	weekViewTooltip2MonthesFormat: "{0:MMMM d} - {1:MMMM d, yyyy}",			
 			///	monthViewTooltipFormat: "{0:MMMM yyyy}",			
 			///	dayViewLabelFormat": "{0:d }",
 			///	weekViewLabelFormat: "{0:MMM dd}-{1:dd}",
@@ -49,7 +49,7 @@ clearTimeout,amplify*/
 			/// Code example: $("#datepager").wijdatepager(
 			///					{ 
 			///						localization: {
-			///							weekViewTooltip2MothesFormat: "{0:MMMM d} - {1:MMMM d}",
+			///							weekViewTooltip2MonthesFormat: "{0:MMMM d} - {1:MMMM d}",
 			///							dayViewTooltipFormat: "{0:dddd, MMMM d}"
 			///						}
 			///					});
@@ -73,7 +73,7 @@ clearTimeout,amplify*/
 			/// Code example: $("#datepager").wijdatepager(
 			///						{ selectedDate: new Date(2015, 11, 21) });
 			/// </summary>
-			selectedDate: new Date(),
+			selectedDate: null,
 
 			/// <summary>
 			/// The active view type. Possible values are: day, week, month.
@@ -263,9 +263,9 @@ clearTimeout,amplify*/
 				newIndex = this.element
 							.find(".wijmo-wijdatepager-pagelabel").index(selectedPage)
 				this._index = newIndex;
-/*
+				/*
 				if (this._index !== newIndex) {
-					this._index = newIndex;
+				this._index = newIndex;
 				}*/
 			}
 
@@ -598,7 +598,7 @@ clearTimeout,amplify*/
 				case "week":
 					if (dateDef.d.getMonth() !==
 							dateDef.d2.getMonth()) {
-						s = this._formatString(this.localizeString("weekViewTooltip2MothesFormat", "{0:MMMM d} - {1:MMMM d, yyyy}"), dateDef.d, dateDef.d2);
+						s = this._formatString(this.localizeString("weekViewTooltip2MonthesFormat", "{0:MMMM d} - {1:MMMM d, yyyy}"), dateDef.d, dateDef.d2);
 					} else {
 						s = this._formatString(this.localizeString("weekViewTooltipFormat", "{0:MMMM d} - {1:d, yyyy}"), dateDef.d, dateDef.d2);
 					}
@@ -657,8 +657,24 @@ clearTimeout,amplify*/
 		},
 
 
+		_detectLeftButton: function (event) {
+			if (event.originalEvent) {
+				event = event.originalEvent;
+			}
+			if ("buttons" in event) {
+				return event.buttons === 1;
+			} else if ("which" in event) {
+				return event.which === 1;
+			} else {
+				return event.button === 1;
+			}
+		},
 
 		_pageindicatorMouseMove: function (e) {
+			if (!this._detectLeftButton(e)) {
+				this._pageindicatorMouseUp();
+				return;
+			}
 			e.preventDefault();
 			if (this._isInAnimate) {
 				return;
@@ -688,7 +704,7 @@ clearTimeout,amplify*/
 			}
 			//this.element.find(".wijmo-wijdatepager-pagelabel").css(left;
 		},
-		_pageindicatorMouseUp: function (e) {
+		_pageindicatorMouseUp: function () {
 			this._dragActivated = false;
 			$(document).unbind("." + this._dtpagernamespacekey);
 			this._hideTooltip();

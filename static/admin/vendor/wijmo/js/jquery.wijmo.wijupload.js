@@ -2,7 +2,7 @@
 
 /*
 * 
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 * 
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -153,6 +153,7 @@
 				_doAjax = function (file) {
 					var name = _getFileName(file.name),
 					xhr = createXHR(name, action);
+					self.handleRequest(xhr, file);
 					self.currentFile = file;
 					xhr.send(file);
 				};
@@ -177,6 +178,7 @@
 				self.updateAction = function (act) {
 					action = act;
 				};
+				self.handleRequest = null;
 				self.onCancel = null;
 				self.onComplete = null;
 				self.onProgress = null;
@@ -472,7 +474,7 @@
 			/// Code Example: 
 			///		$(".selector").wijupload("multiple", true)
 			/// </summary>
-			multiple: false,
+			multiple: true,
 			/// <summary>
 			/// Specifies the accept attribute of upload. 
 			/// Default: "".
@@ -481,8 +483,334 @@
 			///		$(".selector").wijupload("accept", "image/*")
 			/// </summary>
 			accept: "",
+			/// <summary>
+			/// upload with SWFupload.swf,
+			/// this option is used for multiple-select in IE.
+			/// </summary>
+			enableSWFUploadOnIE: false,
+			/// <summary>
+			/// Options of SWFupload.
+			/// </summary>
+			swfUploadOptions: {},
+			/// <summary>
+			/// Set localization string of buttons.
+			/// </summary>
+			localization: {},
+			/// <summary>
+			/// handle the request header of xhr.
+			/// </summary>
+			handleRequest: null
+		},
 
-			localization: {}
+		_swfAppendAddtionalData: function (swfupload) {
+			swfupload.queueData = {
+				files: {}, // The files in the queue
+				filesSelected: 0, // The number of files selected in the last select operation
+				filesQueued: 0, // The number of files added to the queue in the last select operation
+				filesReplaced: 0, // The number of files replaced in the last select operation
+				filesCancelled: 0, // The number of files that were cancelled instead of replaced
+				filesErrored: 0, // The number of files that caused error in the last select operation
+				uploadsSuccessful: 0, // The number of files that were successfully uploaded
+				uploadsErrored: 0, // The number of files that returned errors during upload
+				averageSpeed: 0, // The average speed of the uploads in KB
+				queueLength: 0, // The number of files in the queue
+				queueSize: 0, // The size in bytes of the entire queue
+				uploadSize: 0, // The size in bytes of the upload queue
+				queueBytesUploaded: 0, // The size in bytes that have been uploaded for the current upload queue
+				uploadQueue: [], // The files currently to be uploaded
+				errorMsg: '' //Some files were not added to the queue:
+			};
+			swfupload.widget = this;
+		},
+
+		_swfGetHandlers: function () {
+			var widget = this, el = widget.element;
+			return {
+				onSelect: function (file) {
+					var swfupload = this;
+					var queuedFile = {};
+					widget._createFileRow(file);
+					this.queueData.queueSize += file.size;
+					this.queueData.files[file.id] = file;
+				},
+				onDialogOpen: function () {
+					//prepare
+					this.queueData.filesReplaced = 0;
+					this.queueData.filesCancelled = 0;
+				},
+				onDialogClose: function (filesSelected, filesQueued, queueLength) {
+					// start upload
+					var settings = this.settings;
+
+					// Update the queue information
+					this.queueData.filesErrored = filesSelected - filesQueued;
+					this.queueData.filesSelected = filesSelected;
+					this.queueData.filesQueued = filesQueued - this.queueData.filesCancelled;
+					this.queueData.queueLength = queueLength;
+
+
+					widget.isStartUpload = false;
+					// Call the user-defined event handler
+					if (widget.options.autoSubmit) {
+						widget.uploadAll = true;
+						widget._swfUploadFile();
+					}
+					if (settings.onDialogClose) settings.onDialogClose.call(this, this.queueData);
+
+				},
+				onUploadStart: function (file) {
+					this.bytesLoaded = 0;
+					if (this.queueData.uploadQueue.length == 0) {
+						this.queueData.uploadSize = file.size;
+					}
+
+					if (!widget.isStartUpload && widget.uploadAll) {
+						if (widget._trigger("totalUpload", null, null) === false) {
+							this.cancelUpload();
+							return false;
+						}
+						widget.isStartUpload = true;
+					}
+
+					if (widget._trigger("upload", null, file) === false) {
+						this.cancelUpload(file.id);
+						return false;
+					}
+				},
+				onUploadProgress: function (file, fileBytesLoaded, fileTotalBytes) {
+
+					var fileRow = $("#" + file.id, el), loaded, total,
+					percentage = Math.round(fileBytesLoaded / fileTotalBytes * 100),
+					progressSpan = $("." + uploadProgressClass, fileRow),
+                    data = {
+                    	sender: file.name,
+                    	loaded: fileBytesLoaded,
+                    	total: fileTotalBytes
+                    }, queue = this.queueData;
+					progressSpan.html(percentage + "%");
+					widget._trigger("progress", null, data);
+
+					loaded = queue.queueBytesUploaded + fileBytesLoaded;
+					total = queue.queueSize;
+
+					widget._updateSwfProgress(loaded, total);
+					widget._trigger("totalProgress", null, {
+						loaded: loaded,
+						total: total
+					});
+
+				},
+				onUploadError: function (file, errorCode, errorMsg) {
+					// Load the swfupload settings
+					var settings = this.settings,
+					fileRow = $("#" + file.id, el),
+					progressSpan = $("." + uploadProgressClass, fileRow);
+
+					// Set the error string
+					var errorString = 'Error';
+					switch (errorCode) {
+						case SWFUpload.UPLOAD_ERROR.HTTP_ERROR:
+							errorString = 'HTTP Error (' + errorMsg + ')';
+							break;
+						case SWFUpload.UPLOAD_ERROR.MISSING_UPLOAD_URL:
+							errorString = 'Missing Upload URL';
+							break;
+						case SWFUpload.UPLOAD_ERROR.IO_ERROR:
+							errorString = 'IO Error';
+							break;
+						case SWFUpload.UPLOAD_ERROR.SECURITY_ERROR:
+							errorString = 'Security Error';
+							break;
+						case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
+							alert('The upload limit has been reached (' + errorMsg + ').');
+							errorString = 'Exceeds Upload Limit';
+							break;
+						case SWFUpload.UPLOAD_ERROR.UPLOAD_FAILED:
+							errorString = 'Failed';
+							break;
+						case SWFUpload.UPLOAD_ERROR.SPECIFIED_FILE_ID_NOT_FOUND:
+							break;
+						case SWFUpload.UPLOAD_ERROR.FILE_VALIDATION_FAILED:
+							errorString = 'Validation Error';
+							break;
+						case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
+							errorString = 'Cancelled';
+							this.queueData.queueSize -= file.size;
+							this.queueData.queueLength -= 1;
+							if (file.status == SWFUpload.FILE_STATUS.IN_PROGRESS || $.inArray(file.id, this.queueData.uploadQueue) >= 0) {
+								this.queueData.uploadSize -= file.size;
+							}
+							// Trigger the onCancel event
+							if (settings.onCancel) settings.onCancel.call(this, file);
+							delete this.queueData.files[file.id];
+							break;
+						case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
+							errorString = 'Stopped';
+							break;
+					}
+
+					progressSpan.text(errorString);
+					var stats = this.getStats();
+					this.queueData.uploadsErrored = stats.upload_errors;
+				},
+				onUploadSuccess: function (file, data, response) {
+
+					var stats = this.getStats();
+					this.queueData.uploadsSuccessful = stats.successful_uploads;
+					this.queueData.queueBytesUploaded += file.size;
+					this.queueData.response = response;
+
+					var fileRow = $("#" + file.id, el), self = this;
+					self.queueData.queueLength -= 1;
+
+					fileRow.fadeOut(1500, function () {
+						fileRow.remove();
+						if (widget.options.showUploadedFiles) {
+							widget._createUploadedFiles(file.name);
+						}
+						if (!self.queueData.queueLength) {
+							widget.commandRow.hide();
+						}
+					});
+
+					widget._trigger("complete", null, { response: response });
+
+				},
+				onUploadComplete: function (file, data, response) {
+					var self = this;
+
+					if (!self.queueData.queueLength && widget.uploadAll) {
+						widget._cleanSwfProgress();
+						widget._trigger("totalComplete", null, self.queueData);
+					}
+					if (widget.uploadAll) {
+						widget._swfUploadFile();
+					}
+				}
+			};
+		},
+
+		_cleanSwfProgress: function () { },
+		_updateSwfProgress: function () { },
+
+		_initSwfUploadOptions: function (w, h) {
+			var self = this, el = self.element, settings,
+			handlers = self._swfGetHandlers(), o = self.options,
+			swfOptions = self.options.swfUploadOptions,
+			id = el.attr("id"), inputId = id + "_SWFUpload";
+
+			$("<input type='file' id='" + inputId + "'>").appendTo(el);
+
+			//uploadify
+			settings = $.extend({
+				id: inputId,
+				swf: 'SWFUpload.swf',
+				// Options
+				auto: false,
+				buttonClass: '',
+				buttonCursor: 'hand',
+				buttonImage: null,               // (String or null) The path to an image to use for the Flash browse button if not using CSS to style the button
+				checkExisting: false,              // The path to a server-side script that checks for existing files on the server
+				debug: false,              // Turn on swfUpload debugging mode
+				fileObjName: 'Filedata',         // The name of the file object to use in your server-side script
+				fileSizeLimit: 0,                  // The maximum size of an uploadable file in KB (Accepts units B KB MB GB if string, 0 for no limit)
+				fileTypeDesc: 'All Files',        // The description for file types in the browse dialog
+				fileTypeExts: o.accept ? o.accept : '*.*',              // Allowed extensions in the browse dialog (server-side validation should also be used)
+				height: h,                 // The height of the browse button
+				itemTemplate: false,              // The template for the file item in the queue
+				method: 'post',             // The method to use when sending files to the server-side upload script
+				multi: o.multiple,               // Allow multiple file selection in the browse dialog
+				formData: {},                 // An object with additional data to send to the server-side upload script with every file upload
+				preventCaching: true,               // Adds a random value to the Flash URL to prevent caching of it (conflicts with existing parameters)
+				progressData: 'percentage',       // ('percentage' or 'speed') Data to show in the queue item during a file upload
+				queueID: false,              // The ID of the DOM object to use as a file queue (without the #)
+				queueSizeLimit: 999,                // The maximum number of files that can be in the queue at one time
+				removeCompleted: true,               // Remove queue items from the queue when they are done uploading
+				removeTimeout: 3,                  // The delay in seconds before removing a queue item if removeCompleted is set to true
+				requeueErrors: false,              // Keep errored files in the queue and keep trying to upload them
+				successTimeout: 30,                 // The number of seconds to wait for Flash to detect the server's response after the file has finished uploading
+				uploadLimit: 0,                  // The maximum number of files you can upload
+				width: w,                // The width of the browse button
+				uploader: o.action,
+
+				// Events
+				overrideEvents: []             // (Array) A list of default event handlers to skip
+			}, swfOptions);
+
+			return {
+				assume_success_timeout: settings.successTimeout,
+				button_placeholder_id: settings.id,
+				button_width: settings.width,
+				button_height: settings.height,
+				button_text: null,
+				button_text_style: null,
+				button_text_top_padding: 0,
+				button_text_left_padding: 0,
+				button_action: (o.multiple ? SWFUpload.BUTTON_ACTION.SELECT_FILES : SWFUpload.BUTTON_ACTION.SELECT_FILE),
+				button_disabled: false,
+				button_cursor: (settings.buttonCursor == 'arrow' ? SWFUpload.CURSOR.ARROW : SWFUpload.CURSOR.HAND),
+				button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
+				debug: settings.debug,
+				requeue_on_error: settings.requeueErrors,
+				file_post_name: settings.fileObjName,
+				file_size_limit: settings.fileSizeLimit,
+				file_types: settings.fileTypeExts,
+				file_types_description: settings.fileTypeDesc,
+				file_queue_limit: settings.queueSizeLimit,
+				file_upload_limit: settings.uploadLimit,
+				flash_url: settings.swf,
+				prevent_swf_caching: settings.preventCaching,
+				post_params: settings.formData,
+				upload_url: settings.uploader,
+				use_query_string: (settings.method == 'get'),
+
+				// Event Handlers 
+				file_dialog_complete_handler: handlers.onDialogClose,
+				file_dialog_start_handler: handlers.onDialogOpen,
+				file_queued_handler: handlers.onSelect,
+				file_queue_error_handler: handlers.onSelectError,
+				swfupload_loaded_handler: settings.onSWFReady,
+				upload_complete_handler: handlers.onUploadComplete,
+				upload_error_handler: handlers.onUploadError,
+				upload_progress_handler: handlers.onUploadProgress,
+				upload_start_handler: handlers.onUploadStart,
+				upload_success_handler: handlers.onUploadSuccess
+			}
+
+		},
+
+		_createSWFUpload: function () {
+			var self = this, el = self.element,
+				btn = self.addBtn,
+				swfOptions,
+				settings = self.options.swfUploadOptions,
+				swfupload, w = btn.width(), h = btn.height();
+
+			var playerVersion = swfobject.getFlashPlayerVersion();
+			var flashInstalled = (playerVersion.major >= 9);
+
+			if (flashInstalled) {
+				swfOptions = self._initSwfUploadOptions(w, h);
+				swfupload = new SWFUpload(swfOptions);
+
+				// Add the SWFUpload object to the elements data object
+				self.swfupload = swfupload;
+
+				$('#' + swfupload.movieName).css({
+					'position': 'absolute',
+					'z-index': 100,
+					'top': 0,
+					'left': 0
+					//					'width': w,
+					//					'height': h
+				});
+
+				self._swfAppendAddtionalData(swfupload);
+			}
+			else {
+				alert("Please install flash player.");
+				if (settings && settings.onFallback) settings.onFallback.call($this);
+			}
 		},
 
 		_create: function () {
@@ -490,7 +818,7 @@
 				o = self.options,
 				id = new Date().getTime(),
 				useXhr = self.supportXhr();
-			
+
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
@@ -503,7 +831,12 @@
 
 			self._createContainers();
 			self._createUploadButton();
-			self._createFileInput();
+			if (o.enableSWFUploadOnIE && $.browser.msie) {
+				self._createSWFUpload();
+			} else {
+				self._createFileInput();
+			}
+
 			self._bindEvents();
 
 			//Add for support disabled option at 2011/7/8
@@ -638,6 +971,7 @@
 				.parent();
 			}
 			else if (self.element.is("div")) {
+				self.maxDisplay = self.options.multiple ? 0 : 1;
 				self.upload = el;
 			}
 			else {
@@ -687,6 +1021,7 @@
 				addBtn = $("<a>").attr("href", "#").button({
 					label: self._getLocalization("uploadFiles", "Upload files")
 				});
+
 			addBtn.mousemove(function (e) {
 				var disabled = addBtn.data("button").options.disabled;
 				if (self.input) {
@@ -768,7 +1103,9 @@
 			});
 			self.uploadAll = false;
 		},
+		_createUploadedFiles: function () {
 
+		},
 		_setAddBtnState: function () {
 			var self = this,
 				maxFiles = self.options.maximumFiles || self.maxDisplay,
@@ -806,8 +1143,9 @@
 
 		_createFileRow: function (uploadFile) {
 			var self = this,
+				o = self.options,
 				fileRow = $("<li>"),
-			//fileName = uploadFile.val(),
+				fileName = '',
 				file,
 				progress,
 				fileRows,
@@ -835,9 +1173,17 @@
 			fileRow.addClass(uploadFileRowClass)
 				.addClass(uiContentClass)
 				.addClass(uiCornerClass);
-			fileRow.append(uploadFile);
-			uploadFile.hide();
-			file = $("<span>" + _getFileNameByInput(uploadFile[0]) + "</span>")
+
+			if (o.enableSWFUploadOnIE && $.browser.msie) {
+				fileName = uploadFile.name;
+				fileRow.attr("id", uploadFile.id).data("file", uploadFile);
+			} else {
+				fileRow.append(uploadFile);
+				uploadFile.hide();
+				fileName = _getFileNameByInput(uploadFile[0]);
+			}
+
+			file = $("<span>" + fileName + "</span>")
 				.addClass(uploadFileClass)
 				.addClass(uiHighlight)
 				.addClass(uiCornerClass);
@@ -851,7 +1197,9 @@
 			fileRows = $(isUploadFileRow, self.upload);
 			if (fileRows.length) {
 				self.commandRow.show();
-				self._createUploader(fileRow);
+				if (!o.enableSWFUploadOnIE || !$.browser.msie) {
+					self._createUploader(fileRow);
+				}
 				self._resetProgressAll();
 			}
 			return fileRow;
@@ -861,9 +1209,15 @@
 			var self = this,
 				inputFile = $("input", fileRow),
 				action = self.options.action,
+				hr = self.options.handleRequest,
 				uploader;
 			if (self.useXhr) {
 				uploader = wijuploadXhr(self.id, fileRow, action);
+				uploader.handleRequest = function (xhr, file) {
+					if ($.isFunction(hr)) {
+						hr.call(self, xhr, file);
+					}
+				}
 			} else {
 				uploader = wijuploadFrm(self.id, fileRow, action);
 			}
@@ -978,84 +1332,136 @@
 
 		_upload: function (fileRow) { },
 
+		_swfUploadFile: function (fileName) {
+			this.swfupload.startUpload(fileName);
+		},
+
 		_bindEvents: function () {
-			var self = this,
+			var self = this, o = self.options,
 				progressAll = self.progressAll;
 			self.upload.delegate(isUploadCancel, "click." + self.widgetName,
 				function (e) {
 					var cancelBtn = $(this),
 						fileRow = cancelBtn.parents(isUploadFileRow),
-						fileInput = $("input", fileRow[0]),
+						fileInput, uploader;
+
+					if (o.enableSWFUploadOnIE && $.browser.msie) {
+						var file = fileRow.data("file");
+						//self.swfupload.queueData.queueSize -= file.size;
+						//self.swfupload.queueData.queueLength -= 1;
+
+						self.swfupload.cancelUpload(file.id);
+						fileRow.fadeOut(1500, function () {
+							fileRow.remove();
+
+							if (self.swfupload.queueData.queueLength == 0) {
+								self.commandRow.hide();
+							}
+						});
+					}
+					else {
+
+						fileInput = $("input", fileRow[0]);
 						uploader = self.uploaders[fileInput.attr("id")];
-
-					/*
-					if (!self._wijUpload()) {
-					self._wijcancel(fileInput);
-					if (uploader) {
-					uploader.cancel();
-					}
-					}
-					*/
-					self._wijcancel(fileInput);
-					if (self._wijUpload() && uploader) {
-						uploader.cancel();
-					}
-
-					if (progressAll) {
-						progressAll.totalSize -= _getFileSize(fileInput[0]);
-						if (progressAll.loadedSize[fileInput.val()]) {
-							delete progressAll.loadedSize[fileInput.val()];
+						self._wijcancel(fileInput);
+						if (self._wijUpload() && uploader) {
+							uploader.cancel();
 						}
+
+						if (progressAll) {
+							progressAll.totalSize -= _getFileSize(fileInput[0]);
+							if (progressAll.loadedSize[fileInput.val()]) {
+								delete progressAll.loadedSize[fileInput.val()];
+							}
+						}
+						self._removeFileRow(fileRow, uploader, false);
 					}
-					self._removeFileRow(fileRow, uploader, false);
 				});
 			self.upload.delegate(isUploadUpload, "click." + self.widgetName,
 				function (e) {
 					var uploadBtn = $(this),
 						fileRow = uploadBtn.parents(isUploadFileRow),
-						fileInput = $("input", fileRow[0]),
-						uploader = self.uploaders[fileInput.attr("id")];
-					if (self._trigger("upload", e, fileInput) === false) {
-						return false;
-					}
-					if (self.options.autoSubmit) {
-						//when autoSubmit set to "true", will trigger "totalUpload" immediately.
-						//self.uploadAll = true; //fixed bug 23877
-						uploader.autoSubmit = true;
-						if (self._trigger("totalUpload", e, null) === false) {
-							return false;
+						fileInput, uploader;
+
+					if (o.enableSWFUploadOnIE && $.browser.msie) {
+						var file = fileRow.data("file");
+						self.uploadAll = false;
+
+						if (self._wijUpload()) {
+							self._swfUploadFile(file.id);
+						}
+						else {
+							self._upload(file.id, true);
 						}
 					}
-					self.totalUploadFiles++;
-					self._upload(fileRow);
-					if (uploader && self._wijUpload()) {
-						uploader.upload();
+					else {
+						fileInput = $("input", fileRow[0]);
+						uploader = self.uploaders[fileInput.attr("id")];
+						if (self._trigger("upload", e, fileInput) === false) {
+							return false;
+						}
+						if (self.options.autoSubmit) {
+							//when autoSubmit set to "true", will trigger "totalUpload" immediately.
+							//self.uploadAll = true; //fixed bug 23877
+							uploader.autoSubmit = true;
+							if (self._trigger("totalUpload", e, null) === false) {
+								return false;
+							}
+						}
+						self.totalUploadFiles++;
+						self._upload(fileRow);
+						if (uploader && self._wijUpload()) {
+							uploader.upload();
+						}
 					}
+					e.preventDefault();
 				});
 			self.upload.delegate("." + uploadUploadAllClass, "click." + self.widgetName,
 				function (e) {
-					self.uploadAll = true;
-					if (!self.progressAll) {
-						self._resetProgressAll();
+					if (o.enableSWFUploadOnIE && $.browser.msie) {
+						self.uploadAll = true;
+						if (self._wijUpload()) {
+							self._swfUploadFile();
+						}
+						else {
+							self._upload(true, true);
+						}
 					}
-					if (self._trigger("totalUpload", e, null) === false) {
-						return false;
-					}
-					self.progressAll.totalSize = self._getTotalSize();
-					self._wijuploadAll($(isUploadUpload, self.filesList[0]));
-					if (self._wijUpload()) {
-						$(isUploadUpload, self.filesList[0])
+					else {
+						self.uploadAll = true;
+						if (!self.progressAll) {
+							self._resetProgressAll();
+						}
+						if (self._trigger("totalUpload", e, null) === false) {
+							return false;
+						}
+						self.progressAll.totalSize = self._getTotalSize();
+						self._wijuploadAll($(isUploadUpload, self.filesList[0]));
+						if (self._wijUpload()) {
+							$(isUploadUpload, self.filesList[0])
 						.each(function (idx, uploadBtn) {
 							$(uploadBtn).click();
 						});
+						}
 					}
 				});
 			self.upload.delegate("." + uploadCancelAllClass, "click." + self.widgetName,
 				function (e) {
-					self._resetProgressAll();
-					$(isUploadCancel, self.filesList[0]).each(function (idx, cancelBtn) {
-						$(cancelBtn).click();
-					});
+					if (o.enableSWFUploadOnIE && $.browser.msie) {
+						$.each(self.swfupload.queueData.files, function (key, v) {
+							self.swfupload.cancelUpload(key);
+						});
+						$(isUploadFileRow, self.element).fadeOut(1500, function () {
+							$(this).remove();
+							self.commandRow.hide();
+						});
+					}
+					else {
+						self._resetProgressAll();
+						$(isUploadCancel, self.filesList[0]).each(function (idx, cancelBtn) {
+							$(cancelBtn).click();
+						});
+					}
 				});
 		},
 

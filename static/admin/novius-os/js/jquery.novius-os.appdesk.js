@@ -939,13 +939,18 @@ define('jquery-nos-appdesk',
                 self.gridRendered = false;
                 self.uiGridTitle.html(o.texts.gridTitle);
 
-                self.uiThumbnail.thumbnailsgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiGrid.noslistgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiTreeGrid.nostreegrid('destroy')
+                // Use try/catch, widget can not be initialize
+                try {
+                    self.uiThumbnail.thumbnailsgrid('destroy');
+                } catch (e) {}
+                try {
+                    self.uiGrid.noslistgrid('destroy');
+                } catch (e) {}
+                try {
+                    self.uiTreeGrid.nostreegrid('destroy');
+                } catch (e) {}
+
+                self.uiThumbnail.add(self.uiGrid).add(self.uiTreeGrid)
                     .empty()
                     .hide();
                 if (o.defaultView === 'thumbnails') {

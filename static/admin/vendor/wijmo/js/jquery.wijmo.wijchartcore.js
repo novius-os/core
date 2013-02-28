@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize, wijmoASPNetParseOptions*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -294,54 +294,54 @@
 						y: 0
 					};
 				switch (compass.toLowerCase()) {
-				case "east":
-					point.x = box.x + box.width;
-					point.y = box.y + box.height / 2;
-					break;
-				case "eastnorth":
-					point.x = box.x + box.width;
-					point.y = box.y;
-					break;
-				case "eastsouth":
-					point.x = box.x + box.width;
-					point.y = box.y + box.height;
-					break;
-				case "west":
-					point.x = box.x;
-					point.y = box.y + box.height / 2;
-					break;
-				case "westnorth":
-					point.x = box.x;
-					point.y = box.y;
-					break;
-				case "westsouth":
-					point.x = box.x;
-					point.y = box.y + box.height;
-					break;
-				case "north":
-					point.x = box.x + box.width / 2;
-					point.y = box.y;
-					break;
-				case "northeast":
-					point.x = box.x + box.width;
-					point.y = box.y;
-					break;
-				case "northwest":
-					point.x = box.x;
-					point.y = box.y;
-					break;
-				case "south":
-					point.x = box.x + box.width / 2;
-					point.y = box.y + box.height;
-					break;
-				case "southeast":
-					point.x = box.x + box.width;
-					point.y = box.y + box.height;
-					break;
-				case "southwest":
-					point.x = box.x;
-					point.y = box.y + box.height;
-					break;
+					case "east":
+						point.x = box.x + box.width;
+						point.y = box.y + box.height / 2;
+						break;
+					case "eastnorth":
+						point.x = box.x + box.width;
+						point.y = box.y;
+						break;
+					case "eastsouth":
+						point.x = box.x + box.width;
+						point.y = box.y + box.height;
+						break;
+					case "west":
+						point.x = box.x;
+						point.y = box.y + box.height / 2;
+						break;
+					case "westnorth":
+						point.x = box.x;
+						point.y = box.y;
+						break;
+					case "westsouth":
+						point.x = box.x;
+						point.y = box.y + box.height;
+						break;
+					case "north":
+						point.x = box.x + box.width / 2;
+						point.y = box.y;
+						break;
+					case "northeast":
+						point.x = box.x + box.width;
+						point.y = box.y;
+						break;
+					case "northwest":
+						point.x = box.x;
+						point.y = box.y;
+						break;
+					case "south":
+						point.x = box.x + box.width / 2;
+						point.y = box.y + box.height;
+						break;
+					case "southeast":
+						point.x = box.x + box.width;
+						point.y = box.y + box.height;
+						break;
+					case "southwest":
+						point.x = box.x;
+						point.y = box.y + box.height;
+						break;
 				}
 				return point;
 			},
@@ -433,66 +433,66 @@
 			_convertCompassToPosition = function (compass) {
 				var position = "";
 				switch (compass.toLowerCase()) {
-				case "east":
-					position = "right-middle";
-					oX = 2;
-					oY = 0;
-					break;
-				case "eastnorth":
-					position = "right-top";
-					oX = 2;
-					oY = -2;
-					break;
-				case "eastsouth":
-					position = "right-bottom";
-					oX = 2;
-					oY = 2;
-					break;
-				case "west":
-					position = "left-middle";
-					oX = -2;
-					oY = 0;
-					break;
-				case "westnorth":
-					position = "left-top";
-					oX = -2;
-					oY = -2;
-					break;
-				case "westsouth":
-					position = "left-bottom";
-					oX = -2;
-					oY = 2;
-					break;
-				case "north":
-					position = "top-middle";
-					oX = 0;
-					oY = -2;
-					break;
-				case "northeast":
-					position = "top-right";
-					oX = 2;
-					oY = -2;
-					break;
-				case "northwest":
-					position = "top-left";
-					oX = -2;
-					oY = -2;
-					break;
-				case "south":
-					position = "bottom-middle";
-					oX = 0;
-					oY = 2;
-					break;
-				case "southeast":
-					position = "bottom-right";
-					oX = 2;
-					oY = 2;
-					break;
-				case "southwest":
-					position = "bottom-left";
-					oX = -2;
-					oY = 2;
-					break;
+					case "east":
+						position = "right-middle";
+						oX = 2;
+						oY = 0;
+						break;
+					case "eastnorth":
+						position = "right-top";
+						oX = 2;
+						oY = -2;
+						break;
+					case "eastsouth":
+						position = "right-bottom";
+						oX = 2;
+						oY = 2;
+						break;
+					case "west":
+						position = "left-middle";
+						oX = -2;
+						oY = 0;
+						break;
+					case "westnorth":
+						position = "left-top";
+						oX = -2;
+						oY = -2;
+						break;
+					case "westsouth":
+						position = "left-bottom";
+						oX = -2;
+						oY = 2;
+						break;
+					case "north":
+						position = "top-middle";
+						oX = 0;
+						oY = -2;
+						break;
+					case "northeast":
+						position = "top-right";
+						oX = 2;
+						oY = -2;
+						break;
+					case "northwest":
+						position = "top-left";
+						oX = -2;
+						oY = -2;
+						break;
+					case "south":
+						position = "bottom-middle";
+						oX = 0;
+						oY = 2;
+						break;
+					case "southeast":
+						position = "bottom-right";
+						oX = 2;
+						oY = 2;
+						break;
+					case "southwest":
+						position = "bottom-left";
+						oX = -2;
+						oY = 2;
+						break;
 				}
 				return position;
 			},
@@ -504,30 +504,30 @@
 					compass = o.calloutSide;
 				}
 				switch (compass.toLowerCase()) {
-				case "east":
-				case "eastsouth":
-				case "eastnorth":
-					arr = ["M", p.x + offset, p.y + offset, "l",
+					case "east":
+					case "eastsouth":
+					case "eastnorth":
+						arr = ["M", p.x + offset, p.y + offset, "l",
 					-offset, -offset, "l", offset, -offset, "Z"];
-					break;
-				case "west":
-				case "westsouth":
-				case "westnorth":
-					arr = ["M", p.x - offset, p.y - offset, "l",
+						break;
+					case "west":
+					case "westsouth":
+					case "westnorth":
+						arr = ["M", p.x - offset, p.y - offset, "l",
 					offset, offset, "l", -offset, offset, "Z"];
-					break;
-				case "north":
-				case "northeast":
-				case "northwest":
-					arr = ["M", p.x - offset, p.y - offset, "l",
+						break;
+					case "north":
+					case "northeast":
+					case "northwest":
+						arr = ["M", p.x - offset, p.y - offset, "l",
 					offset, offset, "l", offset, -offset, "Z"];
-					break;
-				case "south":
-				case "southeast":
-				case "southwest":
-					arr = ["M", p.x - offset, p.y + offset, "l",
+						break;
+					case "south":
+					case "southeast":
+					case "southwest":
+						arr = ["M", p.x - offset, p.y + offset, "l",
 					offset, -offset, "l", offset, offset, "Z"];
-					break;
+						break;
 				}
 				return arr;
 			},
@@ -569,28 +569,28 @@
 				if (o.calloutSide) {
 					var offset = gapLength || offsetLength;
 					switch (o.calloutSide) {
-					case "south":
-					case "north":
-						if (duration) {
-							callout.animate({
-								"translation": (-width / 2 + offset + calloutOffset) +
+						case "south":
+						case "north":
+							if (duration) {
+								callout.animate({
+									"translation": (-width / 2 + offset + calloutOffset) +
 								",0"
-							}, duration);
-						} else {
-							callout.translate(-width / 2 + offset + calloutOffset, 0);
-						}
-						break;
-					case "east":
-					case "west":
-						if (duration) {
-							callout.animate({
-								"translation": "0," + (-height / 2 +
+								}, duration);
+							} else {
+								callout.translate(-width / 2 + offset + calloutOffset, 0);
+							}
+							break;
+						case "east":
+						case "west":
+							if (duration) {
+								callout.animate({
+									"translation": "0," + (-height / 2 +
 							offset + calloutOffset)
-							}, duration);
-						} else {
-							callout.translate(0, -height / 2 + offset + calloutOffset);
-						}
-						break;
+								}, duration);
+							} else {
+								callout.translate(0, -height / 2 + offset + calloutOffset);
+							}
+							break;
 					}
 				}
 			},
@@ -734,22 +734,22 @@
 				}][pos[1] === "middle" ? 1 : (pos[1] === "left" || pos[1] === "top") * 2];
 				out = self.path(fill(shapes[pos[0]], mask));
 				switch (pos[0]) {
-				case "top":
-					dx = point.x - (x + r + mask.left + gap + offsetLength);
-					dy = point.y - (y + r + h + r + gap + offsetLength);
-					break;
-				case "bottom":
-					dx = point.x - (x + r + mask.left + gap + offsetLength);
-					dy = point.y - (y - gap - offsetLength);
-					break;
-				case "left":
-					dx = point.x - (x + r + w + r + gap + offsetLength);
-					dy = point.y - (y + r + mask.top + gap + offsetLength);
-					break;
-				case "right":
-					dx = point.x - (x - gap - off);
-					dy = point.y - (y + r + mask.top + gap + off);
-					break;
+					case "top":
+						dx = point.x - (x + r + mask.left + gap + offsetLength);
+						dy = point.y - (y + r + h + r + gap + offsetLength);
+						break;
+					case "bottom":
+						dx = point.x - (x + r + mask.left + gap + offsetLength);
+						dy = point.y - (y - gap - offsetLength);
+						break;
+					case "left":
+						dx = point.x - (x + r + w + r + gap + offsetLength);
+						dy = point.y - (y + r + mask.top + gap + offsetLength);
+						break;
+					case "right":
+						dx = point.x - (x - gap - off);
+						dy = point.y - (y + r + mask.top + gap + off);
+						break;
 				}
 				out.translate(dx, dy);
 				set.translate(dx, dy);
@@ -895,7 +895,8 @@
 						x: point.x,
 						y: point.y
 					},
-					anim = null;
+					anim = null,
+					trans = null;
 
 				$.wijraphael.clearRaphaelCache();
 				position = _convertCompassToPosition(compass);
@@ -1066,33 +1067,52 @@
 					elements.push(container);
 					ox = newPoint.x - lastPoint.x;
 					oy = newPoint.y - lastPoint.y;
-					anim = Raphael.animation({ transform: Raphael
-					.format("...T{0},{1}", ox, oy)
-					}, duration);
+					trans = Raphael.format("...T{0},{1}", ox, oy);
+					anim = Raphael.animation({ transform: trans }, duration);
 					if (container) {
 						// container.animate({ "translation": ox + "," + oy },
 						// duration);
-						container.animate(anim);
+						if (o.showAnimated || o.animated) {
+							container.animate(anim);
+						} else {
+							container.attr("transform", trans);
+						}
 					}
 					if (title) {
 						// title.animate({ "translation": ox + "," + oy },
 						// duration);
-						title.animate(anim);
+						if (o.showAnimated || o.animated) {
+							title.animate(anim);
+						} else {
+							title.attr("transform", trans);
+						}
 					}
 					if (content) {
 						// content.animate({ "translation": ox + "," + oy },
 						// duration);
-						content.animate(anim);
+						if (o.showAnimated || o.animated) {
+							content.animate(anim);
+						} else {
+							content.attr("transform", trans);
+						}
 					}
 					if (closeBtn) {
 						// closeBtn.animate({ "translation": ox + "," + oy },
 						// duration);
-						closeBtn.animate(anim);
+						if (o.showAnimated || o.animated) {
+							closeBtn.animate(anim);
+						} else {
+							closeBtn.attr("transform", trans);
+						}
 					}
 					if (callout) {
 						// callout.animate({ "translation": ox + "," + oy },
 						// duration);
-						callout.animate(anim);
+						if (o.showAnimated || o.animated) {
+							callout.animate(anim);
+						} else {
+							callout.attr("transform", trans);
+						}
 					}
 				} else {
 					if (o.showCallout && (o.calloutSide || o.calloutFilled)) {
@@ -1209,7 +1229,9 @@
 						}
 					}
 					fmt = $.proxy(obj.fmt, obj);
-					fmt();
+					if (fmt() === false) {
+						return;
+					};
 				}
 				tit = o.title;
 				cont = o.content;
@@ -1246,51 +1268,51 @@
 					raphaelObj = null,
 					t = e.target;
 				switch (relativeTo) {
-				case "mouse":
-					point.x = e.pageX - offsetX;
-					point.y = e.pageY - offsetY;
-					break;
-				case "element":
-					if (!t.raphael || !t.raphaelid) {
-						t = t.parentNode;
-					}
-					if (t.raphael && t.raphaelid) {
-						raphaelObj = self.getById(t.raphaelid);
-						point = _getShowPoint(raphaelObj, o.compass);
-					}
-					// raphaelObj = $(e.target).data("raphaelObj");
-					// if (!raphaelObj) {
-					// raphaelObj = $(e.target.parentNode).data("raphaelObj");
-					// }
-					// point = _getShowPoint(raphaelObj, o.compass);
-					break;
+					case "mouse":
+						point.x = e.pageX - offsetX;
+						point.y = e.pageY - offsetY;
+						break;
+					case "element":
+						if (!t.raphael || !t.raphaelid) {
+							t = t.parentNode;
+						}
+						if (t.raphael && t.raphaelid) {
+							raphaelObj = self.getById(t.raphaelid);
+							point = _getShowPoint(raphaelObj, o.compass);
+						}
+						// raphaelObj = $(e.target).data("raphaelObj");
+						// if (!raphaelObj) {
+						// raphaelObj = $(e.target.parentNode).data("raphaelObj");
+						// }
+						// point = _getShowPoint(raphaelObj, o.compass);
+						break;
 				}
 				_showAt(point, e);
 			},
 
 			_bindEvent = function (tar) {
 				switch (o.triggers) {
-				case "hover":
-					$(tar.node).bind("mouseover.Rtooltip", function (e) {
-						_show(e);
-					}).bind("mouseout.Rtooltip", function (e) {
-						if (o.closeBehavior === "auto") {
-							_hide(e);
+					case "hover":
+						$(tar.node).bind("mouseover.Rtooltip", function (e) {
+							_show(e);
+						}).bind("mouseout.Rtooltip", function (e) {
+							if (o.closeBehavior === "auto") {
+								_hide(e);
+							}
+						});
+						if (o.mouseTrailing && o.relativeTo === "mouse") {
+							$(tar.node).bind("mousemove.Rtooltip", function (e) {
+								_show(e);
+							});
 						}
-					});
-					if (o.mouseTrailing && o.relativeTo === "mouse") {
-						$(tar.node).bind("mousemove.Rtooltip", function (e) {
+						break;
+					case "click":
+						$(tar.node).bind("click.Rtooltip", function (e) {
 							_show(e);
 						});
-					}
-					break;
-				case "click":
-					$(tar.node).bind("click.Rtooltip", function (e) {
-						_show(e);
-					});
-					break;
-				case "custom":
-					break;
+						break;
+					case "custom":
+						break;
 					/*
 					* case "rightClick": $(tar.node).bind("contextmenu.Rtooltip",
 					* function (e) { _show(e); }); break;
@@ -1315,27 +1337,27 @@
 			_bindLiveEventBySelector = function () {
 				if (selector) {
 					switch (o.triggers) {
-					case "hover":
-						selector.live("mouseover.Rtooltip", function (e) {
-							_show(e);
-						}).live("mouseout.Rtooltip", function (e) {
-							if (o.closeBehavior === "auto") {
-								_hide(e);
+						case "hover":
+							selector.live("mouseover.Rtooltip", function (e) {
+								_show(e);
+							}).live("mouseout.Rtooltip", function (e) {
+								if (o.closeBehavior === "auto") {
+									_hide(e);
+								}
+							});
+							if (o.mouseTrailing && o.relativeTo === "mouse") {
+								selector.live("mousemove.Rtooltip", function (e) {
+									_show(e);
+								});
 							}
-						});
-						if (o.mouseTrailing && o.relativeTo === "mouse") {
-							selector.live("mousemove.Rtooltip", function (e) {
+							break;
+						case "click":
+							selector.live("click.Rtooltip", function (e) {
 								_show(e);
 							});
-						}
-						break;
-					case "click":
-						selector.live("click.Rtooltip", function (e) {
-							_show(e);
-						});
-						break;
-					case "custom":
-						break;
+							break;
+						case "custom":
+							break;
 						/*
 						* case "rightClick":
 						* $(tar.node).bind("contextmenu.Rtooltip", function (e) {
@@ -1431,6 +1453,12 @@
 			_bindLiveEventBySelector(selector);
 		}
 
+		//// enable touch support:
+		//if (window.wijmoApplyWijTouchUtilEvents) {
+		//    $ = window.wijmoApplyWijTouchUtilEvents($);
+		//    this.element = $(this.element);
+		//}
+
 		return new Tooltip();
 	};
 
@@ -1451,7 +1479,7 @@
 	"use strict";
 
 	$.widget("wijmo.wijchartcore", {
-		options: {
+	    options: {
 			// / <summary>
 			// / A value that indicates the width of wijchart.
 			// / Default: null.
@@ -2915,6 +2943,13 @@
 					fill: "#000"
 				}
 			},
+
+			indicator: {
+				visible: false,
+				style:{
+					stroke: "#000000"
+				}
+			},
 			// / <summary>
 			// / A value that indicates whether to show default chart labels.
 			// / Default: true.
@@ -3079,9 +3114,15 @@
 					o.seriesList = $.arrayClone(self.seriesList);
 				}
 				self._init();
-			} 
-
-			if (key === "seriesList") {
+			} else if (key === "data") {
+				self.seriesTransition = true;
+				o.data = value;
+				//restore the binded data
+				if (self.seriesList) {
+					o.seriesList = $.arrayClone(self.seriesList);
+				}
+				self._init();
+			} else if (key === "seriesList") {
 				if (!value) {
 					value = [];
 				}
@@ -3133,6 +3174,12 @@
 					else{
 						$.extend(true, o[key], value);
 					}
+
+					if (key === "indicator") {
+					    this._unbindCanvasEvents();
+					    this._bindCanvasEvents();
+					}
+
 					if (key === "axis") {
 						newYAxis = o.axis.y;
 						if (o.axis.x.tickMajor.factor < 0) {
@@ -3231,6 +3278,12 @@
 				}
 			}
 
+			// fixed an issue that if set height and width option, 
+			// the chart element's height is not reset.
+			if (key === "height" || key === "width") {
+				self.chartElement[key](value);
+			}
+
 			self.redraw();
 		},
 
@@ -3278,11 +3331,12 @@
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
-			}
+			}		    
 
 			self.updating = 0;
 			self.innerState = {};
-			
+			self.axisCompass = {};
+
 			if (self.element.is(":hidden") && self.element.wijAddVisibilityObserver) {
 				self.element.wijAddVisibilityObserver(function () {
 					self.redraw();
@@ -3351,7 +3405,26 @@
 
 				self.chartElement.addClass("ui-widget");
 				
-				canvas = new Raphael(self.chartElement[0], width, height);
+				// if fail to create canvas, move element to body and recreate it
+				// the issue that creating canvas in ie9 when element is invisible.
+				try {
+					canvas = new Raphael(self.chartElement[0], width, height);
+				} catch (e) {
+					var displayCss = self.chartElement.css("display");
+					newEle = $("<div></div>").insertBefore(self.chartElement)
+						.append(self.chartElement);
+					self.chartElement.addClass("ui-helper-hidden-accessible")
+						.appendTo($('body'));
+					if (displayCss === "none") {
+						self.chartElement.css("display", "block");
+					}
+					canvas = new Raphael(self.chartElement[0], width, height);
+					self.chartElement.appendTo(newEle).unwrap()
+						.removeClass("ui-helper-hidden-accessible");
+					if (displayCss === "none") {
+						self.chartElement.css("display", "none");
+					}
+				}
 				self.canvas = canvas;
 				
 				//add comments to fix tfs issue 27816, if element's height is not set,
@@ -3388,6 +3461,25 @@
 			}
 
 			
+		},
+
+		_hotFixForJQ1_9: function(){
+			// fixed the seriesStyles issue in jQuery UI 1.9 by dail 2012.11.1
+			if($.ui.version && $.ui.version >= "1.9"){
+				this._extendArrayFromBase("seriesStyles");
+				this._extendArrayFromBase("seriesHoverStyles");
+			}
+		},
+
+		_extendArrayFromBase:function(optionName){
+			var result = $.extend(true,{}, 
+				$.wijmo.wijchartcore.prototype.options[optionName], this.options[optionName]),
+				newArr = [];
+
+				$.each(result, function(i, n){
+					newArr.push(n);
+				});
+			this.options[optionName] = newArr;
 		},
 		
 		_getDefFill: function () {
@@ -3436,9 +3528,9 @@
 				ele = outerEle || self.element,
 				eleOffset = ele.offset(),
 				disabledWidth = o.width || ele.outerWidth(),
-				disabledHeight = o.height || ele.outerHeight();
+				disabledHeight = o.height || ele.outerHeight(), disabledDiv;
 
-			return $("<div></div>")
+			disabledDiv = $("<div></div>")
 					.addClass("ui-disabled")
 					.css({
 					"z-index": "99999",
@@ -3448,6 +3540,13 @@
 					left: eleOffset.left,
 					top: eleOffset.top
 				});
+
+			if (Raphael.vml) {
+				disabledDiv.addClass("ui-state-disabled")
+					.css("background-color", "#fff");
+			}
+
+			return disabledDiv;
 		},
 
 		_bindData: function () {
@@ -3831,6 +3930,9 @@
 				self.tooltip = null;
 			}
 
+			self.dataPoints = null;
+			self.pointXs = null;
+
 			if (fields && fields.trackers) {
 				self._destroyRaphaelArray(fields.trackers);
 				fields.trackers = null;
@@ -3921,7 +4023,16 @@
 			self._paintLegend();
 			self._paintChartArea();
 			//self._paintChartLabels();
+			if(o.indicator && o.indicator.visible){
+				if (this.pointXs) {
+					this.pointXs = this.pointXs.sort(function(a, b){ 
+						return a - b;
+					});
+				}
+				
+			} 
 			self._paintTooltip();
+			
 			self._trigger("painted");
 
 			self.rendered = true;
@@ -3938,6 +4049,11 @@
 				element.css("position", oldPosition);
 				element.hide();
 			}
+		},
+
+		// indicator tooltip
+		_paintIndicater: function(){
+			
 		},
 
 		_calculatePosition: function (compass, width, height) {
@@ -4502,6 +4618,122 @@
 			return false;
 		},
 
+		_setTooltipContent: function (obj) {
+			var self = this,
+				tooltipObjs,
+				title, content,
+				tooltip = self.tooltip,
+				hintOptions,
+				newOptions = {},
+				hint = self.options.hint,
+				isFunction = $.isFunction;
+			if (tooltip) {
+				// if the chart is line chart or compositechart, the data.x value is the marker position.
+				// change the value to the x value.
+				tooltipObjs = [];
+				$.each(obj, function (i, tooltipObj) {
+					var valX = tooltipObj.valX,
+						valY = tooltipObj.valY;
+					if (valX && valY) {
+						tooltipObjs.push($.extend({}, tooltipObj, {
+						    x: valX,
+						    y: valY
+						}))
+					}
+					else {
+						tooltipObjs.push(tooltipObj);
+					}
+				})
+				hintOptions = tooltip.getOptions();
+				title = hint.title;
+				content = hint.content;
+
+				if (isFunction(title)) {
+					newOptions.title = function () {
+						return title.call(tooltipObjs);
+					};
+				}
+
+				if (isFunction(content)) {
+					newOptions.content = function () {
+						return content.call(tooltipObjs);
+					};
+				}
+
+				tooltip.setOptions(newOptions);
+			}
+		},
+
+		// when mouse down in plot area , set the indicator tooltip
+		_setTooltip: function () {
+			var self = this,
+				o = self.options,
+				tooltip = self.tooltip,
+				obj;
+
+			if (tooltip) {
+				obj = {
+					closeBehavior: "none",
+					style:{
+						stroke: o.indicator.style.stroke
+					},
+					animated: false,
+					showDelay: 0,
+					hideDelay: 0,
+				    windowCollisionDetection: "fit",
+					beforeShowing: function(e, d){
+						if(this.target && self.indicatorLine){
+							return false;
+							
+						}
+					}
+				}
+				if (o.horizontal) {
+					obj.compass = "east";
+				}
+				tooltip.setOptions(obj);
+			}
+		},
+
+		// when mouse up in plot area, reset the tooltip options.
+		_resetTooltip: function(){
+			var self = this,
+				o = self.options,
+				hint = o.hint,
+				title = hint.title,
+				content = hint.content,
+				tooltip = self.tooltip,
+				isFunction = $.isFunction, 
+				obj = {};
+
+				if (tooltip) {
+					obj.animated = hint.animated;
+					obj.showDelay = hint.showDelay;
+					obj.hideDelay = hint.hideDelay;
+					obj.title = hint.title;
+					obj.content = hint.content;
+					obj.closeBehavior = hint.closeBehavior || "auto";
+					obj.windowCollisionDetection = "fit";
+
+					if (isFunction(title)) {
+						obj.title = function () {
+							return self._getTooltipText(title, this.target);
+						};
+					}
+
+					if (isFunction(content)) {
+						obj.content = function () {
+							return self._getTooltipText(content, this.target);
+						};
+					}
+
+					obj.beforeShowing = function () {
+						self._onBeforeTooltipShowing(this);
+					};
+					tooltip.setOptions(obj);
+				}
+		},
+
 		_paintTooltip: function () {
 			var self = this,
 				o = self.options,
@@ -4519,6 +4751,31 @@
 				});
 				title = hint.title;
 				content = hint.content;
+
+				// set default hint.
+				if (!content) {
+					content = hint.content = function () {
+						var label;
+						if ($.isArray(this)) {
+							var str = "";
+							$.each(this, function(i, data){
+								label = data.label;
+								if (data.lineSeries && data.lineSeries.label) {
+									label = data.lineSeries.label;
+								}
+								str += label + ":" + data.y + "\n";
+							})
+							return str;
+						}
+						else {							
+							label = this.label;
+							if (this.lineSeries && this.lineSeries.label) {
+								label = this.lineSeries.label;
+							}
+							return label + ":" + this.y;
+						}
+					};
+				}
 
 				if (isFunction(title)) {
 					hintEx.title = function () {
@@ -4684,6 +4941,7 @@
 						},
 						y: {}
 					};
+					self.axisCompass[axisOption.x.compass] = true;
 
 					if (isMultiYAxis) {
 						$.each(axisOption.y, function (i, axisY) {
@@ -4708,6 +4966,10 @@
 								annoMethod: axisY.annoMethod,
 								valueLabels: axisY.valueLabels || []
 							};
+							
+							if (!self.axisCompass[axisY.compass]) {
+								self.axisCompass[axisY.compass] = true;
+							}
 						});				
 					} else
 					{
@@ -4732,6 +4994,10 @@
 							annoMethod: axisOption.y.annoMethod,
 							valueLabels: axisOption.y.valueLabels || []
 						};
+						
+						if (!self.axisCompass[axisOption.y.compass]) {
+							self.axisCompass[axisOption.y.compass] = true;
+						}
 					}
 
 					self._getSeriesGroup(isMultiYAxis);
@@ -5733,7 +5999,7 @@
 				textStyle = $.extend(true, {}, o.textStyle,
 						axisOptions.textStyle, labels.style, axisInfo.textStyle);
 
-				retInfo = self._paintMajorMinor(max, min, val, tickMajor, 
+				retInfo = self._paintMajorMinor(axisOptions.origin, max, min, val, tickMajor, 
 						unitMajor, tickRectMajor, compass, startPoint,
 						endPoint, axisSize, axisTextOffset, tickMajorStyle,
 						text, gridMajor, axisOptions.textVisible, textStyle,
@@ -5780,7 +6046,7 @@
 				var retInfo;
 
 				if (val > min && val < max) {
-					retInfo = self._paintMajorMinor(max, min, val, tickMinor, 
+					retInfo = self._paintMajorMinor(axisOptions.origin, max, min, val, tickMinor, 
 						unitMinor, tickRectMinor, compass, startPoint, 
 						endPoint, axisSize, axisTextOffset, tickMinorStyle, 
 						null, gridMinor, axisOptions.textVisible, textStyle, 
@@ -5920,7 +6186,7 @@
 			return minorTickValues;
 		},
 
-		_paintMajorMinor: function (max, min, val, tick, unit, tickRect, compass,
+		_paintMajorMinor: function (origin, max, min, val, tick, unit, tickRect, compass,
 						startPoint, endPoint, axisSize, axisTextOffset, tickStyle,
 						text, grid, textVisible, textStyle, textAlign, labelWidth,
 						vlGridLine, vlGridLineStyle) {
@@ -5940,7 +6206,8 @@
 				txt = { text: null, len: 0 },
 				textBounds = null,
 				retInfo = {},
-				majorMinorElements = [];
+				majorMinorElements = [],
+				axisCompass = self.axisCompass;
 				
 			switch (compass) {
 			case "south":
@@ -6004,8 +6271,10 @@
 				y += (val - min) / (max - min) * (endPoint.y - startPoint.y);
 				arrPath = ["M", bs.startX, y, "H", bs.endX];
 				if (grid.visible) {
-					if ((y !== bs.startY && compass === "east") ||
-							(y !== bs.endY && compass === "west")) {
+					//if ((y !== bs.startY && compass === "east") ||
+					//		(y !== bs.endY && compass === "west")) {
+					if ((y !== bs.startY || !axisCompass["north"]) &&
+							(y !== bs.endY || !axisCompass["south"]) || val !== origin) {
 						p = self.canvas.path(arrPath.concat(" "));
 						$.wijraphael.addClass($(p.node), "wijchart-axis-gridline");
 						p.attr(grid.style);
@@ -6013,8 +6282,10 @@
 					}
 				}
 				if (vlGridLine) {
-					if ((y !== bs.startY && compass === "east") || 
-							(y !== bs.endY && compass === "west")) {
+					//if ((y !== bs.startY && compass === "east") || 
+					//		(y !== bs.endY && compass === "west")) {
+					if ((y !== bs.startY || !axisCompass["north"]) &&
+							(y !== bs.endY || !axisCompass["south"]) || val !== origin) {
 						p = self.canvas.path(arrPath.concat(" "));
 						$.wijraphael.addClass($(p.node), "wijchart-axis-gridline");
 						p.attr($.extend(true, grid.style, vlGridLineStyle));
@@ -6032,8 +6303,10 @@
 				x += (val - min) / (max - min) * (endPoint.x - startPoint.x);
 				arrPath = ["M", x, bs.startY, "V", bs.endY];
 				if (grid.visible) {
-					if ((x !== bs.startX && compass === "south") ||
-							(x !== bs.endX && compass === "north")) {
+					//if ((x !== bs.startX && compass === "south") ||
+					//		(x !== bs.endX && compass === "north")) {
+					if ((x !== bs.startX || !axisCompass["west"]) &&
+							(x !== bs.endX || !axisCompass["east"]) || val !== origin) {
 						p = self.canvas.path(arrPath.concat(" "));
 						$.wijraphael.addClass($(p.node), "wijchart-axis-gridline");
 						p.attr(grid.style);
@@ -6041,8 +6314,10 @@
 					}
 				}
 				if (vlGridLine) {
-					if ((y !== bs.startY && compass === "south") || 
-							(y !== bs.endY && compass === "north")) {
+					//if ((y !== bs.startY && compass === "south") || 
+					//		(y !== bs.endY && compass === "north")) {
+					if ((x !== bs.startX || !axisCompass["west"]) &&
+							(x !== bs.endX || !axisCompass["east"]) || val !== origin) {
 						p = self.canvas.path(arrPath.concat(" "));
 						$.wijraphael.addClass($(p.node), "wijchart-axis-gridline");
 						p.attr($.extend(true, {}, grid.style, vlGridLineStyle));
@@ -6269,9 +6544,204 @@
 		},
 		
 		_mouseMoveInsidePlotArea: function (e, mousePos) {
+			var self = this,
+				o = self.options,
+				indicator = o.indicator,
+				canvas = self.canvas, point, bounds, path, offset = 0,
+				tooltipObj = [],
+				horizontal = o.horizontal;
+
+			if (indicator && indicator.visible && this.isPlotAreaMouseDown) {
+				if (horizontal) {
+					point = this._calculatePositionByX(mousePos.top);
+				}
+				else {
+					point = this._calculatePositionByX(mousePos.left);
+				}
+				if (point && this.indicatorLine) {
+					if(point.x !== this.lastIndicatorPosition){
+						$.each(point.data, function (i, obj) {
+							if(obj.visible){
+								
+								tooltipObj.push(obj);
+							}
+						});
+						if (tooltipObj.length > 0) {
+							bounds = self.canvasBounds;
+							if (horizontal) {
+								this.indicatorLine.transform("T0 " + point.x );
+							}
+							else {
+								this.indicatorLine.transform("T"+ point.x + " 0");
+							}
+
+//							if (this.tooltip) {
+//								this.tooltip.destroy();
+//								this.tooltip = null;
+//							}
+							//this.tooltip.hide();
+							//this._paintIndicatorTooltip(tooltipObj);
+							this._setTooltipContent(tooltipObj);
+							
+							if (horizontal) {
+								this.tooltip.showAt({x: bounds.endX, y: point.x});
+							}
+							else {
+								this.tooltip.showAt({x: point.x, y: bounds.startY});
+							}
+							this.lastIndicatorPosition = point.x;
+							self._indicatorLineShowing(tooltipObj);
+							this.lastIndicatorObjects = tooltipObj;
+						}
+					}
+				}
+			}
+		},
+
+		// return a chart element point which is near the mouse.
+		_calculatePositionByX: function(x){
+			var self = this,
+				xArr = self.pointXs, position, 
+				points = self.dataPoints;
+			if (xArr && xArr.length > 0) {
+				position = this._calculatePositionByXInternal(x, xArr);
+			}
+			if (points) {
+				return { x: position, data: points[position.toString()] }; 
+			}
+			return null;
+		},
+
+		_calculatePositionByXInternal: function(x, arr){
+			var len = arr.length, half, subArr;
+			if(len ===1 ) {
+				return arr[0];
+			}
+			else if (len === 2) {
+				if(Math.abs(x - arr[0]) > Math.abs(x - arr[1])){
+					return arr[1];
+				}
+				else {
+					return arr[0]
+				}
+			}
+			else{
+				half = parseInt(len / 2);
+				if (x > arr[half]) {
+					subArr = arr.slice(half);
+				}
+				else {
+					subArr = arr.slice(0, half + 1)
+				}
+				return this._calculatePositionByXInternal(x, subArr);
+			}
 		},
 		
 		_mouseMoveOutsidePlotArea: function (e, mousePos) {
+			if (this.indicatorLine) {
+				this.indicatorLine.wijRemove();
+				this.indicatorLine = null;
+				if (this.tooltip) {
+					this.tooltip.hide();
+				}
+				this._resetTooltip();
+			}
+		},
+
+		_mouseDownInsidePlotArea: function (e, mousePos) {
+			this.isPlotAreaMouseDown = true;
+			var self = this,
+				o = self.options,
+				indicator = o.indicator,
+				canvas = self.canvas, point, bounds, path,				
+				tooltipObj = [],
+				horizontal = o.horizontal;
+
+			if (indicator && indicator.visible && this.isPlotAreaMouseDown) {
+				self._setTooltip();
+				if (horizontal) {
+					point = this._calculatePositionByX(mousePos.top);
+				}
+				else {
+					point = this._calculatePositionByX(mousePos.left);
+				}
+				if (point) {
+					// for each the points, if the element is not visible, 
+					// don't show the indicator.
+					$.each(point.data, function (i, obj) {
+						if(obj.visible){
+							tooltipObj.push(obj);												
+						}
+					});
+					if (tooltipObj.length > 0) {
+						bounds = self.canvasBounds;
+						if (horizontal) {
+							path = ["M", bounds.startX, 0, "H", bounds.endX];
+						}
+						else{
+							path = ["M", 0 , bounds.startY, "V", bounds.endY];
+						}
+						if (this.indicatorLine) {
+						    this.indicatorLine.wijRemove();
+						}
+						this.indicatorLine = canvas.path(path);
+						this.indicatorLine.attr(indicator.style);
+						if (horizontal) {
+							this.indicatorLine.transform("T0 " + point.x );
+						}
+						else {
+							this.indicatorLine.transform("T" + point.x + " 0");
+						}
+//						if (this.tooltip) {
+//							this.tooltip.destroy();
+//							this.tooltip = null;
+//						}
+						
+						// show tooltip		
+						//this.tooltip.hide();			
+						this._setTooltipContent(tooltipObj);
+						//this._paintIndicatorTooltip(tooltipObj);
+						
+						if (horizontal) {
+							this.tooltip.showAt({x: bounds.endX, y: point.x});
+						}
+						else {
+							this.tooltip.showAt({x: point.x, y: bounds.startY});
+						}
+						this.lastIndicatorPosition = point.x;
+						self._indicatorLineShowing(tooltipObj);
+						this.lastIndicatorObjects = tooltipObj;
+						
+					}
+				}
+				e.preventDefault();
+			}
+		},
+
+
+		_indicatorLineShowing: function(obj){
+			if (this.lastIndicatorObjects) {
+				this._removeIndicatorStyles(this.lastIndicatorObjects);
+			}
+		},
+
+		_removeIndicatorStyles: function(lastIndicatorObjects){
+			
+		},
+		_mouseUpInsidePlotArea: function (e, mousePos) {
+			this.isPlotAreaMouseDown = false;
+			if (this.indicatorLine) {
+				this.indicatorLine.wijRemove();
+				this.indicatorLine = null;
+				if (this.tooltip) {
+					this.tooltip.hide();
+				}
+				this._resetTooltip();
+			}
+			if (this.lastIndicatorObjects) {
+				this._removeIndicatorStyles(this.lastIndicatorObjects);
+				this.lastIndicatorObjects = null;
+			}
 		},
 
 		_bindLiveEvents: function () {
@@ -6281,10 +6751,20 @@
 		
 		_bindCanvasEvents: function () {
 			var self = this,
-				element = self.chartElement;
-			
+				element = self.chartElement,
+			    touchEventPre = "",
+				namespace = "." + this.widgetName;
+			if (window.navigator.msPointerEnabled) {
+			    element.css("-ms-touch-action", "none");
+			}
+
+		    // if support touch.
+			if ($.support.isTouchEnabled) {
+			    touchEventPre = "wij";
+			}
+
 			element
-				.bind("mousemove", function (e) {
+				.bind(touchEventPre + "mousemove" + namespace, function (e) {
 					var elePos = element.offset(),
 						cBounds = self.canvasBounds,
 						mousePos = {
@@ -6305,23 +6785,77 @@
 						self._mouseMoveOutsidePlotArea(e, mousePos);
 					}
 				});
+
+				if(self.options.indicator && self.options.indicator.visible){
+				    element.bind(touchEventPre + "mousedown" + namespace, function (e) {
+						var elePos = element.offset(),
+							cBounds = self.canvasBounds,
+							mousePos = {
+								left: e.pageX - elePos.left,
+								top: e.pageY - elePos.top
+							},
+							disabled = self.options.disabled;
+						if (disabled) {
+							return;
+						}
+						if (mousePos.left >= cBounds.startX && 
+								mousePos.left <= cBounds.endX && 
+								mousePos.top >= cBounds.startY && 
+								mousePos.top <= cBounds.endY) {
+							self._mouseDownInsidePlotArea(e, mousePos);
+						}
+				    }).bind(touchEventPre + "mouseup" + namespace, function (e) {
+						var elePos = element.offset(),
+							cBounds = self.canvasBounds,
+							mousePos = {
+								left: e.pageX - elePos.left,
+								top: e.pageY - elePos.top
+							},
+							disabled = self.options.disabled;
+						if (disabled) {
+							return;
+						}
+						if (mousePos.left >= cBounds.startX && 
+								mousePos.left <= cBounds.endX && 
+								mousePos.top >= cBounds.startY && 
+								mousePos.top <= cBounds.endY) {
+							self._mouseUpInsidePlotArea(e, mousePos);
+						}
+					});
+				}
+		},
+
+		_unbindCanvasEvents: function () {
+		    if (window.navigator.msPointerEnabled) {
+		        this.element.css("-ms-touch-action", "");
+		    }
+		    this.element.unbind("." + this.widgetName);
 		},
 		
 		_bindLegendEvents: function () {
 			var self = this,
-				element = self.chartElement,
-				widgetName = self.widgetName;
-			$(".wijchart-legend", element[0])
-				.live("click." + widgetName, function (e) {
-					if (self.options.disabled) {
-						return;
-					}
-					var tar = $(e.target);
-					if (tar[0].tagName && tar[0].tagName === "tspan") {
-						tar = tar.parent();
-					}
-					self._legendClick(tar);
-				});
+				element = self.chartElement;
+			element.delegate(".wijchart-legend", "click.wijchartcore", function (e) {
+			    if (self.options.disabled) {
+			        return;
+			    }
+			    var tar = $(e.target);
+			    if (tar[0].tagName && tar[0].tagName === "tspan") {
+			        tar = tar.parent();
+			    }
+			    self._legendClick(tar);
+			});
+			//$(".wijchart-legend", element[0])
+			//	.live("click." + widgetName, function (e) {
+			//		if (self.options.disabled) {
+			//			return;
+			//		}
+			//		var tar = $(e.target);
+			//		if (tar[0].tagName && tar[0].tagName === "tspan") {
+			//			tar = tar.parent();
+			//		}
+			//		self._legendClick(tar);
+			//	});
 		},
 		
 		_legendClick: function (obj) {
@@ -6406,10 +6940,9 @@
 			var self = this,
 				element = this.chartElement,
 				widgetName = self.widgetName;
-			$(".wijchart-legend", element[0]).die(widgetName)
-			// for jQuery 1.7.1
-			.die("." + widgetName);
-			element.unbind("mousemove");
+		    element.undelegate(".wijchart-legend", ".wijchartcore")
+				.undelegate(".wijchart-legend", "wijchartcore");
+			this._unbindCanvasEvents();
 		},
 
 		_isBarChart: function () {
@@ -6953,6 +7486,10 @@
 			return Math.floor(val);
 		},
 
+		_supportStacked: function(){
+			return false;
+		},
+
 		_getDataExtreme: function (isMultiYAxis) {
 			var val = {
 				txx: 0,
@@ -6982,7 +7519,7 @@
 			var self = this,
 				o = self.options,
 				seriesList = o.seriesList,
-				stacked = o.stacked,
+				stacked = o.stacked && self._supportStacked(),
 				is100Percent = o.is100Percent,
 				axis = o.axis,
 				axisInfo = self.axisInfo,

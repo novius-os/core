@@ -126,8 +126,8 @@ define('jquery-nos-preview',
             },
 
             _loadImg : function(item, thumbnail) {
-                var self = this,
-                    o = self.options;
+                var self = this;
+                var o = self.options;
 
                 $('<img />')
                     .error(function() {

@@ -1,6 +1,6 @@
 /*globals jQuery, alert, document, window, setTimeout, $, Components, netscape */
 /*
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -342,7 +342,7 @@
 		selector_dlg_cancel = "." + css_dlg_buttons + " input:last",
 		
 		selector_input_ok = "." + css_dlg_buttons + " input[value='OK']",
-		selector_input_cancel = "." + css_dlg_buttons + " input[value='Cancel']",
+		selector_input_cancel = "." + css_dlg_buttons + " input[engValue='Cancel']",
 
 		imageTypeButton = ["Bold", "Italic", "UnderLine",
 							"StrikeThrough", "SubScript", "SuperScript",
@@ -515,7 +515,7 @@
 		Inspect: { name: "inspect", tip: 'Tag Inspect',
 			css: css_ribbon_inspect, text: 'Inspect'
 		},
-		Save: { name: "save", tip: 'Form', css: css_ribbon_save, text: 'Save' },
+		Save: { name: "save", tip: 'Save', css: css_ribbon_save, text: 'Save' },
 		Spelling: { name: "spelling", tip: 'Form', css: '' },
 		InsertImage: { name: "imagebrowser", tip: 'Image Browser',
 			css: css_ribbon_imagebrowser
@@ -873,6 +873,10 @@
 					}
 				}, "wijeditor");
 			}
+		},
+		
+		_contextMenuWidgetName: function () {
+			return "wijmenu";
 		},
 
 		_createBigButton: function (tip, css, name, text) {
@@ -1636,6 +1640,8 @@
 			
 			self._oriStyle = element.attr("style");
 			self._oriContent = element.html();
+			self._oriEleWidth = width;
+			self._oriEleHeight = height;
 
 			if (element.is("textarea")) {
 				if (mode === "ribbon") {
@@ -1663,6 +1669,7 @@
 				self.sourceView = element;
 				self.editor = element.wrap("<div></div>").parent();
 				self.editor.width(width).height(height);
+				
 			} else {
 				self.editor = element;
 				self.$ribbon = element.children(":eq(0)");
@@ -1684,7 +1691,7 @@
 					self.sourceView = $("<textarea></textarea>").val(text);
 				}
 			}
-
+			
 			container = $("<div class='" + css_editor_container + "'></div>");
 			self.dialog = $("<div class ='" + css_editor + "'></div>");
 			self.subDialog = $("<div class ='" + css_editor + "'></div>");
@@ -1692,13 +1699,12 @@
 			.append(container)
 			.append(self.dialog)
 			.append(self.subDialog);
-
 			//fixed bug for customContextMenu
 			self._createMenuMarkUp(self, o);
 
 			//head
 			//ribbon
-			self.$ribbon.wrap("<a href='#'></a>").parent()
+			self.$ribbon.wrap("<a href='javascript:void(null)'></a>").parent()
 			.appendTo("<div class='" + css_editor_header +
 					" ui-widget-header ui-helper-clearfix ui-corner-top'></div>")
 			.parent().appendTo(container);
@@ -1759,7 +1765,9 @@
 				if (!self.disabledDiv) {
 					self.disabledDiv = self._createDisabledDiv(ele);
 				}
-				self.disabledDiv.appendTo("body");
+				//self.disabledDiv.appendTo("body");
+				$("body").focus();
+				self.disabledDiv.appendTo(self.editor);
 			}
 			else {
 				if (self.disabledDiv) {
@@ -1773,7 +1781,7 @@
 			var self = this,
 			//Change your outerelement here
 				ele = outerEle ? outerEle : self.element,
-				eleOffset = ele.offset(),
+				//eleOffset = ele.offset(),
 				disabledWidth = ele.outerWidth(),
 				disabledHeight = ele.outerHeight();
 
@@ -1781,12 +1789,15 @@
 						.addClass("ui-state-disabled")
 						.css({
 				"z-index": "99999",
-				position: "absolute",
+				//position: "absolute",
+				position: "relative",
 				"background-color": "lightgray",
 				width: disabledWidth,
 				height: disabledHeight,
-				left: eleOffset.left,
-				top: eleOffset.top
+				//left: eleOffset.left,
+				//top: eleOffset.top
+				left: 0,
+				top: -disabledHeight
 			});
 		},
 
@@ -1811,7 +1822,8 @@
 					collapsed: true
 				}
 			});
-
+			self.sourceView.css("width","").
+			css("height","");
 			self._addHandlerToDesignView();
 			//for adding default font style to editor by wh at 2012/1/18 
 			self._addDefaultFontStyleToDesignView();
@@ -1824,6 +1836,7 @@
 				self._getPathSelector().hide();
 			}
 			self._ribbonCommand(o.editorMode);
+			
 
 			//update for supporting fullscreenmode by wuhao at 2011/8/2
 			if (o.fullScreenMode) {
@@ -1835,8 +1848,24 @@
 			buttonStates[cmd_redo] = true;
 			buttonStates[cmd_undo] = true;
 			self.$ribbon.wijribbon(setButtonsDisabled, buttonStates);
+			self._handleWinDocumentKeyDown();//update for 32998 at 2013-2-19
+
 		},
 
+		_handleWinDocumentKeyDown: function() {
+			var self = this;
+			$(document).keydown(function(e) {
+		        if (self.options.disabled) {
+		            return;
+		        }
+		        switch (e.keyCode) {
+		            case 27:
+		            	self._escActionAssociated();
+		                break;
+		        }
+			});
+		},
+		
 		_setOption: function (key, value) {
 			var self = this,
 			o = self.options,
@@ -1894,7 +1923,7 @@
 					self._createWijMenu();
 				}
 				else {
-					self.contextMenu.wijmenu("destroy")
+					self.contextMenu[self._contextMenuWidgetName()]("destroy")
 					.remove();
 					self.contextMenu = undefined;
 				}
@@ -2015,6 +2044,10 @@
 			" type=\"text/css\" >table,td,tr{border: 1px #acacac dashed;}" +
 			"</style></head><body>" + text + "</body></html>");
 			doc.close();
+			//update for 24254 issue
+			if (!tblBorderShowing) {
+				$('#__wijStyle', doc).attr("disabled", !tblBorderShowing);
+			}
 			undoBuffers = [];
 			undoBuffers.push(text);
 			undoSteps = 0;
@@ -2031,6 +2064,10 @@
 				setTimeout(self._setDesignModeForFF, 1000, self);
 			} else {
 				self._setContentEditable(doc, true);
+			}
+			
+			if ($.browser.msie) {
+				self._setContentSpellCheck(doc, false);
 			}
 
 			self.sourceView.bind('blur.' + self.widgetName, function (e) {
@@ -2203,10 +2240,15 @@
 		_fontSizeCommand: function (cmd) {
 			var self = this,
 				doc = self._getDesignViewDocument(),
+				docSelection,
+				//docSelection = self._getDesignViewWindow().getSelection(),
 				arg = 4,
 				fontSize = "font-size",
 				$spans = [];
 
+			if (self._getDesignViewWindow().getSelection) {
+				docSelection = self._getDesignViewWindow().getSelection();
+			}
 			switch (cmd) {
 			case cmd_verysmall:
 				arg = 1;
@@ -2236,7 +2278,13 @@
 			//support px/pt etc other than only small/x-small/x-large/large...
 			//doc.execCommand("FontSize", false, arg);
 			if (!self._isFontSizeCustomized()) {
-				doc.execCommand("FontSize", false, arg);
+				if ($.browser.msie && wijParseInt($.browser.version) >= 9) {
+					if (docSelection && docSelection.rangeCount > 0) {
+						doc.execCommand("FontSize", false, arg);
+					}   
+				} else {
+					doc.execCommand("FontSize", false, arg);
+				}				
 			} else if ($.browser.msie) {
 				self._formatFontSpan(doc, fontSize, cmd);
 			} else {
@@ -2263,9 +2311,14 @@
 		_fontNameCommand: function (cmd) {
 			var self = this,
 				doc = self._getDesignViewDocument(),
+				docSelection,
+				//docSelection = self._getDesignViewWindow().getSelection(),
 				fontNames = self.$ribbon.wijribbon("getDropdownList", cmd_fontname),
 				fontName;
 
+			if (self._getDesignViewWindow().getSelection) {
+				docSelection = self._getDesignViewWindow().getSelection();
+			}
 			$.each(fontNames, function (key, value) {
 				if (cmd === key) {
 					fontName = value;
@@ -2277,7 +2330,13 @@
 			//For implementing the font-size 
 			//support px/pt etc other than only small/smaller/larger/large...
 			//doc.execCommand("FontName", false, fontName);
-			doc.execCommand("FontName", false, fontName);
+			if ($.browser.msie && wijParseInt($.browser.version) >= 9) {
+				if (docSelection && docSelection.rangeCount > 0) {
+					doc.execCommand("FontName", false, fontName);
+				}   
+			} else {
+				doc.execCommand("FontName", false, fontName);
+			}
 
 			if (self._isFontSizeCustomized() && $.browser.msie) {
 				self._formatFontSpan(doc, "font-family", fontName);
@@ -2300,7 +2359,6 @@
 				tempValue = "c1-temp";
 				styleAttrName = "fontSize";
 			}
-
 			doc.execCommand("FontName", false, tempValue);
 
 			$.each($("font[face='" + tempValue + "']", doc), function (i, fn) {
@@ -2611,10 +2669,11 @@
 				.addClass(css_editor_fullscreen);
 				//end by wuhao
 				
+				/*
 				self.sourceView.css({
 					width: width,
 					height: height
-				});
+				});*/
 				
 				self.$ribbon.wijribbon("updateRibbonSize");
 			} else {
@@ -2623,6 +2682,7 @@
 				//}
 				self._replacedDiv.after(self.editor)
 				.remove();
+				
 				self.editor.css({
 					width: oriWidth,
 					height: oriHeight,
@@ -2630,10 +2690,11 @@
 				})
 				.removeClass(css_editor_fullscreen);
 
+				/*
 				self.sourceView.css({
 					width: oriWidth,
 					height: oriHeight
-				});
+				});*/
 				
 				if (!self.options.fullScreenContainerSelector) {
 					$(document.documentElement).css({
@@ -2662,12 +2723,15 @@
 			//update for fixing bug 20695 
 			if ($.browser.msie) {
 				window.setTimeout(function () {
-						self._setDesignViewText(oriHtml);
-						//for case 20731 fixing at 2012/4/23
-						if (wijParseInt($.browser.version) >= 9) {
-							self.sourceView.val(oriHtml);
-						}
-					},
+					if (self.options.mode === "bbcode") {
+						oriHtml = self._convertHtmlToBBCode($.trim(oriHtml));
+					}
+					self._setDesignViewText(oriHtml);
+					//for case 20731 fixing at 2012/4/23
+					if (wijParseInt($.browser.version) >= 9) {
+						self.sourceView.val(oriHtml);
+					}
+				},
 					40);
 			}
 		},
@@ -2676,7 +2740,7 @@
 		_createWijMenu: function () {
 			var self = this, doc = self._getDesignViewDocument();
 			if (self.contextMenu) {
-				self.contextMenu.wijmenu({
+				self.contextMenu[self._contextMenuWidgetName()]({
 					orientation: 'vertical',
 					trigger: self.designView,
 					triggerEvent: 'rtclick',
@@ -2694,10 +2758,11 @@
 							.scrollTop(),
 						menuOffsetLeft = offset.left + 2 - contentWindowScrollLeft,
 						menuOffsetTop = offset.top - contentWindowScrollTop;
-						sublist.options.position = { my: 'left top',
+						sublist.options.position = { 
+							my: 'left+' + menuOffsetLeft + ' ' + 'top+' + menuOffsetTop,
 							at: 'right top',
 							of: e,
-							offset: (menuOffsetLeft) + " " + (menuOffsetTop),
+							//offset: (menuOffsetLeft) + " " + (menuOffsetTop),
 							collision: 'none none'
 						};
 						//sublist.element.hide();
@@ -2709,7 +2774,7 @@
 						//end for 20488 issue.
 						self._contextMenuItemClick(e, item);
 						//fixed a bug: the hover state remain after select
-						self.contextMenu.wijmenu("deactivate");         
+						self.contextMenu[self._contextMenuWidgetName()]("deactivate");         
 					}
 				});
 			}
@@ -2946,9 +3011,10 @@
 				self.insertDateAndTime();
 				break;
 			case cmd_designview:
-				self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, true)
-			.wijribbon(setButtonChecked, cmd_designview, true);
-
+				if (self.$modes.data("wijribbon")) {
+					self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, true)
+					.wijribbon(setButtonChecked, cmd_designview, true);
+				}
 				self.$ribbon.wijribbon("option", "disabled", false);
 
 				//TODO:maybe need to add the code block
@@ -2963,8 +3029,10 @@
 				});
 				break;
 			case cmd_splitview:
-				self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, true)
-			.wijribbon(setButtonChecked, cmd_splitview, true);
+				if (self.$modes.data("wijribbon")) {
+					self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, true)
+					.wijribbon(setButtonChecked, cmd_splitview, true);
+				}
 
 				self.$ribbon.wijribbon("option", "disabled", false);
 
@@ -2974,8 +3042,10 @@
 				});
 				break;
 			case cmd_sourceview:
-				self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, false)
-			.wijribbon(setButtonChecked, cmd_sourceview, true);
+				if (self.$modes.data("wijribbon")) {
+					self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, false)
+					.wijribbon(setButtonChecked, cmd_sourceview, true);
+				}
 
 				self.$ribbon.wijribbon("option", "disabled", true);
 
@@ -2989,6 +3059,9 @@
 				content.wijsplitter("option", "panel1", {
 					collapsed: true
 				});
+				if ($.browser.msie) {
+					self.sourceView.focus();
+				}
 				break;
 			case cmd_wordwrap:
 				if (content.wijsplitter("option", "panel1").collapsed) {
@@ -3464,7 +3537,7 @@
 		_hideAllDropdownsMenus: function () {
 			var self = this;
 			if (self.contextMenu) {
-				self.contextMenu.wijmenu("hideAllMenus");
+				self.contextMenu[self._contextMenuWidgetName()]("hideAllMenus");
 			}
 
 			self.$ribbon.wijribbon("hideDropdown", cmd_fontname)
@@ -3609,6 +3682,9 @@
 
 		//bbcode implement		
 		_convertBBCodeToHtml: function (data) {
+			if (!data) {
+				return "";
+			}
 			// Convert < and > to their HTML entities.
 			data = data.replace(/</g, '&lt;');
 			data = data.replace(/>/g, '&gt;');
@@ -4786,6 +4862,11 @@
 
 			if (color) {
 				sColor = color.toString();
+				
+				//update for case 27846 issue
+				if ($.browser.mozilla && sColor === "transparent") {
+					sColor = "#ffffff";
+				}
 
 				if ($.browser.msie) {
 					iColor = wijParseInt(sColor);
@@ -5497,10 +5578,13 @@
 			if ($.browser.msie) {
 				if (self.tRange) {
 					if (self.txtFoundInIE && needReplace) {
-						self.tRange.pasteHTML(rText);
-						self.tRange = null;
-						strReplaced = true;
-						self.txtFoundInIE = false;
+						strFound = self.tRange.findText(fText);
+						if (strFound) {
+							self.tRange.pasteHTML(rText);
+							self.tRange.collapse(false);
+							strReplaced = true;
+							self.txtFoundInIE = false;
+						}
 					} else {
 						self.tRange.collapse(false);
 						strFound = self.tRange.findText(fText);
@@ -5516,7 +5600,6 @@
 						self.tRange.select();
 						if (needReplace) {
 							self.tRange.pasteHTML(rText);
-							self.tRange = null;
 							strReplaced = true;
 						}
 					}
@@ -5544,7 +5627,8 @@
 			}
 
 			if (!strFound && !strReplaced) {
-				wijAlert('"' + fText + '" String Not Found');
+				wijAlert('"' + fText + '"' + this.localizeString("errorMessageFindTextError", 
+				" String Not Found!"));
 				self.tRange = null;
 				self.txtFoundInNoneIE = false;
 				self.txtFoundInIE = false;
@@ -5554,12 +5638,15 @@
 		},
 
 		_replaceSelectionForNoneIE: function (html) {
-			var doc = this._getDesignViewDocument(),
-		randomStr = 'insert_html_' + Math.round(Math.random() * 100000000),
-		regex = new RegExp('<[^<]*' + randomStr + '[^>]*>');
+			var doc = this._getDesignViewDocument();
+		//randomStr = 'insert_html_' + Math.round(Math.random() * 100000000);
+		//regex = new RegExp('<[^<]*' + randomStr + '[^>]*>');
 
+			/** update for case 30008
 			doc.execCommand('insertimage', false, randomStr);
 			doc.body.innerHTML = doc.body.innerHTML.replace(regex, html);
+			*/
+			doc.execCommand('inserthtml', false, html);
 		},
 		//end of find/replace dialog.
 
@@ -6291,6 +6378,7 @@
 			buttons.add(self._createElement("input", {
 				type: "button",
 				"class": css_dlg_button,
+				engValue: "Cancel",
 				value: this.localizeString("dialogCancel", "Cancel")
 			}));
 
@@ -7200,7 +7288,7 @@
 						doc[designMode] = 'off';
 					} else if (isEditable && doc[designMode] !== 'on') {
 						//update for ie9 can't select the content after scroll
-						 if (!($.browser.msie && wijParseInt($.browser.version) >= 9)) {
+						if (!($.browser.msie && wijParseInt($.browser.version) >= 9)) {
 							doc[designMode] = 'on';
 						}
 					    
@@ -7212,6 +7300,16 @@
 				}
 			} catch (e) { }
 		},
+		
+		
+		_setContentSpellCheck: function (doc, isSpellCheck) {
+                var spellcheck = "spellcheck";
+			    try {
+				    if (doc.body[spellcheck] !== undefined) {
+					    doc.body[spellcheck] = isSpellCheck;
+				    }
+			    } catch (e) { }
+		    },
 
 		_formatString: function (str, len) {
 			var strLen = str.length, i;
@@ -7278,8 +7376,8 @@
 			element = self.element,
 			header = self._getHeader(),
 			footer = self._getFooter(),
-			width = element.width(),
-			height = element.height(),
+			width = self._oriEleWidth,
+			height = self._oriEleHeight,
 			content = self._getContent(),
 			contentHeight;		
 			
@@ -7377,6 +7475,7 @@
 		fb.square = 100;
 		fb.width = 194;
 
+		/**update for fixing issue 34193
 		// Fix background PNGs in IE6
 		if ($.browser.msie && $.browser.version < 7) {
 			$('*', e).each(function () {
@@ -7392,7 +7491,7 @@
 					});
 				}
 			});
-		}
+		}*/
 
 		/**
 		* Link to the given element(s) or callback.

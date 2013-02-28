@@ -1,7 +1,7 @@
 /*globals jQuery, Globalize*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -573,6 +573,8 @@
 			/// </param>
 			click: null
 		},
+		
+		widgetEventPrefix: "wijcompositechart",
 
 		_create: function () {
 			var self = this,
@@ -604,6 +606,13 @@
 				o.is100Percent = false;
 			}
 
+			//handle the multiple y axis for extender and controls
+			if (o.yAxes && $.isArray(o.yAxes) && o.yAxes.length > 0) {
+				o.axis.y = o.yAxes;
+			}
+
+
+			self._hotFixForJQ1_9();
 			// default some fills
 			$.each(o.seriesStyles, function (idx, style) {
 				if (!style.fill) {
@@ -620,6 +629,10 @@
 			if (key !== "is100Percent") {
 				$.wijmo.wijchartcore.prototype._setOption.apply(this, arguments);
 			}
+		},
+
+		_supportStacked: function () {
+			return true;
 		},
 
 		destroy: function () {
@@ -904,6 +917,13 @@
 							if (eles.path.tracker) {
 								eles.path.tracker.show();
 							}
+							if ($(eles.path.node).data("wijchartDataObj") &&
+							$(eles.path.node).data("wijchartDataObj").virtualMarkers) {
+								$.each($(eles.path.node).data("wijchartDataObj").virtualMarkers,
+								function (i, markerObj) {
+									markerObj.visible = true;
+								});
+							}
 						}
 					}
 					break;
@@ -918,6 +938,9 @@
 							if (bar.bar.tracker) {
 								bar.bar.tracker.show();
 							}
+							if ($(bar.bar.node).data("wijchartDataObj")) {
+								$(bar.bar.node).data("wijchartDataObj").visible = true;
+							}
 						}
 						if (bar.dcl) {
 							bar.dcl.show();
@@ -930,6 +953,28 @@
 				case "scatter":
 					$.each(eles, function (i, dot) {
 						dot.show();
+						if (dot.label) {
+							dot.label.show();
+						}
+						if ($(dot.element).data("wijchartDataObj")) {
+							$(dot.element).data("wijchartDataObj").visible = true;
+						}
+					});
+					break;
+				case "bubble":
+					$.each(eles, function (i, bubbleInfo) {
+						if (bubbleInfo.bubble) {
+							bubbleInfo.bubble.show();
+							if (bubbleInfo.bubble.tracker) {
+								bubbleInfo.bubble.tracker.show();
+							}
+						}
+						if (bubbleInfo.dcl) {
+							bubbleInfo.dcl.show();
+						}
+						if (bubbleInfo.symbol) {
+							bubbleInfo.symbol.show();
+						}
 					});
 					break;
 			}
@@ -981,6 +1026,13 @@
 						if (eles.path.tracker) {
 							eles.path.tracker.hide();
 						}
+						if ($(eles.path.node).data("wijchartDataObj") &&
+							$(eles.path.node).data("wijchartDataObj").virtualMarkers) {
+							$.each($(eles.path.node).data("wijchartDataObj").virtualMarkers,
+								function (i, markerObj) {
+									markerObj.visible = false;
+								});
+						}
 					}
 					break;
 				case "bar":
@@ -994,6 +1046,9 @@
 							if (bar.bar.tracker) {
 								bar.bar.tracker.hide();
 							}
+							if ($(bar.bar.node).data("wijchartDataObj")) {
+								$(bar.bar.node).data("wijchartDataObj").visible = false;
+							}
 						}
 						if (bar.dcl) {
 							bar.dcl.hide();
@@ -1006,10 +1061,67 @@
 				case "scatter":
 					$.each(eles, function (i, dot) {
 						dot.hide();
+						if (dot.label) {
+							dot.label.hide();
+						}
+						if ($(dot.element).data("wijchartDataObj")) {
+							$(dot.element).data("wijchartDataObj").visible = false;
+						}
+					});
+					break;
+				case "bubble":
+					$.each(eles, function (i, bubbleInfo) {
+						if (bubbleInfo.bubble) {
+							bubbleInfo.bubble.hide();
+							if (bubbleInfo.bubble.tracker) {
+								bubbleInfo.bubble.tracker.hide();
+							}
+						}
+						if (bubbleInfo.dcl) {
+							bubbleInfo.dcl.hide();
+						}
+						if (bubbleInfo.symbol) {
+							bubbleInfo.symbol.hide();
+						}
 					});
 					break;
 			}
 		},
+
+		_indicatorLineShowing: function (objs) {
+			var type;
+			$.wijmo.wijchartcore.prototype._indicatorLineShowing.apply(this, arguments);
+			$.each(objs, function (i, obj) {
+				type = obj.type;
+				if (type === "column" || type === "bar") {
+					obj.bar.attr(obj.hoverStyle);
+				} else if (type === "marker") {
+					obj.marker.attr(obj.markerHoverStyle);
+				}
+				else if (type === "scatter") {
+					obj.dot.attr(obj.hoverStyle);
+					obj.dot.scale(1.5, 1.5);
+				}
+			})
+		},
+
+		_removeIndicatorStyles: function (objs) {
+			var type;
+			$.each(objs, function (i, obj) {
+				type = obj.type;
+				if (type === "column" || type === "bar") {
+					obj.bar.attr(obj.style);
+				} else if (type === "marker") {
+					obj.marker.attr(obj.markerStyle);
+					obj.marker.transform("s1");
+				}
+				else if (type === "scatter") {
+					obj.dot.attr(obj.style);
+					obj.dot.scale(1, 1);
+				}
+			});
+		},
+
 
 		_paintTooltip: function () {
 			var self = this,
@@ -1058,6 +1170,7 @@
 					animation: o.animation,
 					disabled: o.disabled,
 					culture: self._getCulture(),
+					widget: this,
 					mouseDown: function (e, args) {
 						self._trigger("mouseDown", e, args);
 					},
@@ -1183,6 +1296,10 @@
 					chart[seriesHoverStyles] = [];
 				}
 
+				if (type === "scatter") {
+					chart.showChartLabels = !!series.showChartLabels;
+				}
+
 				chart[seriesList].push(series);
 				chart[seriesStyles].push(style);
 				chart[seriesHoverStyles].push(hoverStyle);
@@ -1190,7 +1307,7 @@
 			});
 
 			$.each(charts, function (type, chart) {
-				var yAxisIndex = chart.yAxis;
+				var yAxisIndex = chart.yAxis, chartLabel = o.chartLabel;
 				switch (type) {
 					case "pie":
 						$.each(chart, function (idx, pie) {
@@ -1254,11 +1371,14 @@
 								axis: o.axis,
 								isXTime: self.axisInfo.x.isTime,
 								isYTime: self.axisInfo.y[0].isTime,
-								aniPathsAttr: self.aniPathsAttr,
-								chartLabelEles: self.chartLabelEles,
+								//aniPathsAttr: self.aniPathsAttr,
+								//chartLabelEles: self.chartLabelEles,
 								type: type === "area" ? "area" : "line",
 								hole: o.hole
 							}, subchart);
+							tmpOptions.aniPathsAttr = self.aniPathsAttr;
+							tmpOptions.chartLabelEles = self.chartLabelEles;
+
 							tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
 							self.chartElement.wijline(tmpOptions);
 
@@ -1272,13 +1392,42 @@
 								axis: o.axis,
 								isXTime: self.axisInfo.x.isTime,
 								isYTime: self.axisInfo.y[0].isTime,
-								zoomOnHover: o.zoomOnHover
+								zoomOnHover: o.zoomOnHover,
+								showChartLabels: chart.showChartLabels
 							}, subchart);
 							tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
 							self.chartElement.wijscatter(tmpOptions);
 
 							self._savechartData(type);
 						});
+						break;
+					case "bubble":
+						chartgroup = self._getyAxisGroup(chart);
+
+						if (!chartLabel) {
+							chartLabel = { visible: o.showChartLabels, style: o.chartLabelStyle };
+						}
+
+						$.each(chartgroup, function (ykey, subchart) {
+							tmpOptions = $.extend(true, {}, options, {
+								axis: o.axis,
+								isXTime: self.axisInfo.x.isTime,
+								isYTime: self.axisInfo.y[0].isTime,
+								xAxisInfo: self.axisInfo.x,
+								yAxisInfo: self.axisInfo.y,
+								chartLabel: chartLabel,
+								minimumSize: o.minimumSize || 5,
+								maximumSize: o.maximumSize || 20,
+								sizingMethod: o.sizingMethod || "diameter"
+							}, subchart);
+
+							tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
+							tmpOptions.yAxisInfo = self.axisInfo.y[ykey] || self.axisInfo.y[0]
+							self.chartElement.wijbubble(tmpOptions);
+
+							self._savechartData(type);
+						});
+						break;
 						break;
 				}
 			});
@@ -1297,7 +1446,7 @@
 				self.seriesEles.push({ eles: ele, type: type });
 			});
 			if (notrackers) {
-				fields.ctracers = [];
+				//fields.ctracers = [];
 			}
 			else {
 				ctracers = fields.ctracers || [];
@@ -1351,7 +1500,7 @@
 			var self = this,
 			namespace = self.widgetName,
 			fields = self.chartElement.data("fields");
-			if (fields) {
+			if (fields && fields.ctracers) {
 				$.each(fields.ctracers, function (index, ctracer) {
 					if (ctracer.trackers) {
 						ctracer.trackers.toFront();
@@ -1360,13 +1509,13 @@
 			}
 
 			self.chartElement
-			.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart",
+			.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker",
 			"mouseover." + namespace, $.proxy(self._tooltipMouseOver, self));
 			self.chartElement
-			.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart",
+			.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker",
 			 "mouseout." + namespace, $.proxy(self._tooltipMouseOut, self));
 			self.chartElement
-			.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart",
+			.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker",
 			 "mousemove." + namespace, $.proxy(self._tooltipMouseMove, self));
 		},
 
@@ -1381,9 +1530,13 @@
 				hintStyle = hint.style,
 				isTitleFunc = $.isFunction(title),
 				isContentFunc = $.isFunction(content),
-				data, bbox, position;
+				data, bbox, position, raphaelObj;
 
 			position = $(self.canvas.canvas.parentNode).offset();
+
+			if (self.indicatorLine) {
+				return;
+			}
 
 			if ($(target).data("owner")) {
 				target = $(target).data("owner");
@@ -1427,14 +1580,28 @@
 						self.hoverVirtualPoint = null;
 					}
 				}
-				else if (data.type === "scatter") {
+				else if (data.type === "scatter" || hint.relativeTo === "element") {
 					self._clearHoverState();
-					bbox = data.dot.getBBox();
+
+					if (data.type === "scatter") {
+						bbox = data.dot.getBBox();
+					}
+					// fixed an issue that when the hint's relativeTo is "element", 
+					// the tooltip will shows with the mouse. 
+					else if (target[0] && target[0].raphael && target[0].raphaelid) {
+						raphaelObj = self.canvas.getById(target[0].raphaelid);
+						if (raphaelObj) {
+							bbox = raphaelObj.getBBox();
+						}
+					}
+
 					op.style.stroke = hintStyle.stroke || target.attr("stroke");
-					self.tooltip.showAt({
-						x: bbox.x + bbox.width / 2,
-						y: bbox.y
-					}, e);
+					if (bbox) {
+						self.tooltip.showAt({
+							x: bbox.x + bbox.width / 2,
+							y: bbox.y
+						}, e);
+					}
 				}
 				else {
 					self._clearHoverState();
@@ -1450,6 +1617,7 @@
 		_tooltipMouseMove: function (e) {
 			var self = this,
 				target = e.target, data,
+				hint = self.options.hint,
 				position = $(self.canvas.canvas.parentNode).offset();
 
 			if ($(target).data("owner")) {
@@ -1458,9 +1626,9 @@
 			target = $(target);
 			data = target.data("wijchartDataObj");
 
-			if (self.tooltip) {
-				if (data.type !== "line" && data.type !== "marker" 
-						&& data.type !== "scatter") {
+			if (self.tooltip && !this.indicatorLine) {
+				if (data.type !== "line" && data.type !== "marker"
+						&& data.type !== "scatter" && hint.relativeTo !== "element") {
 					self.tooltip.showAt({
 						x: e.pageX - position.left,
 						y: e.pageY - position.top
@@ -1478,7 +1646,7 @@
 			}
 			target = $(target);
 			data = target.data("wijchartDataObj");
-			if (data.type !== "line" && data.type !== "marker") {
+			if (data.type !== "line" && data.type !== "marker" && !self.indicatorLine) {
 				if (self.tooltip) {
 					self.tooltip.hide();
 				}
@@ -1507,7 +1675,7 @@
 				op = tooltip.getOptions();
 			}
 
-			if (self.hoverLine) {
+			if (self.hoverLine && !self.indicatorLine) {
 				hoverLine = self.hoverLine;
 				if (self.isNewLine) {
 					if (hint.enable && tooltip) {
@@ -1640,6 +1808,11 @@
 			._mouseMoveInsidePlotArea.apply(self, arguments);
 		},
 
+		_mouseDownInsidePlotArea: function (e, mousePos) {
+			$.wijmo.wijchartcore.prototype._mouseDownInsidePlotArea.apply(this, arguments);
+			this._clearHoverState(true);
+		},
+
 		_mouseMoveOutsidePlotArea: function (e, mousePos) {
 			var self = this;
 			self._clearHoverState();
@@ -1647,16 +1820,16 @@
 			._mouseMoveOutsidePlotArea.apply(self, arguments);
 		},
 
-		_clearHoverState: function () {
+		_clearHoverState: function (keepTooltip) {
 			var self = this,
 			tooltip = self.tooltip,
 			hint = self.options.hint;
 
-			if (hint.enable && tooltip) {
-				tooltip.hide();
-			}
-
 			if (self.hoverLine) {
+
+				if (hint.enable && tooltip && !keepTooltip) {
+					tooltip.hide();
+				}
 				if (!self.hoverLine.path.removed) {
 					self.hoverLine.path.wijAttr(self.hoverLine.lineStyle);
 					if (self.hoverPoint && !self.hoverPoint.isSymbol) {
