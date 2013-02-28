@@ -169,7 +169,7 @@ class Controller_Front extends Controller
                 if (empty($event_404)) {
                     // If no redirection then we display 404
                     if (!empty($url)) {
-                        $_SERVER['NOS_URL'] = '/';
+                        $_SERVER['NOS_URL'] = '';
 
                         return $this->router('index', $params, 404);
                     } else {
