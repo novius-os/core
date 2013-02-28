@@ -174,7 +174,7 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 chdir(DOCROOT);
 
 // Remove leading /
-$_SERVER['NOS_URL'] = mb_substr($_SERVER['REQUEST_URI'], 1);
+$_SERVER['NOS_URL'] = mb_substr(urldecode($_SERVER['REQUEST_URI']), 1);
 if (defined('NOS_RELATIVE_DIR')) {
     $_SERVER['NOS_URL'] = mb_substr($_SERVER['NOS_URL'], mb_strlen(NOS_RELATIVE_DIR));
 }
