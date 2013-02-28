@@ -15,6 +15,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<base href="<?= $base_url ?>">
 <title>Novius OS welcomes you</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">

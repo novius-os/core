@@ -173,7 +173,9 @@ class Controller_Front extends Controller
 
                         return $this->router('index', $params, 404);
                     } else {
-                        echo \View::forge('nos::errors/blank_slate_front');
+                        echo \View::forge('nos::errors/blank_slate_front', array(
+                            'base_url' => $this->_base_href,
+                        ), false);
                         exit();
                     }
                 }
@@ -542,7 +544,7 @@ class Controller_Front extends Controller
                 }
 
                 $page = \Nos\Page\Model_Page::find('first', array(
-                        'where' => $where,
+                    'where' => $where,
                 ));
 
                 if (!empty($page)) {
@@ -558,7 +560,8 @@ class Controller_Front extends Controller
         }
 
         if (empty($this->_page)) {
-            //var_dump($this->_url);
+            // Blank slate also needs the base_href to display a 404 from a sub-folder
+            $this->setBaseHref($domain);
             throw new NotFoundException('The requested page was not found.');
         }
 
