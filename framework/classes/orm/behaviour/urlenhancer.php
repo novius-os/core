@@ -13,9 +13,7 @@ namespace Nos;
 class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 {
     /**
-     * publication_bool_property
-     * publication_start_property
-     * publication_end_property
+     * enhancers
      */
     protected $_properties = array();
 

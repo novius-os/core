@@ -76,7 +76,9 @@ class Model_Page extends \Nos\Orm\Model
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(
-            'publication_bool_property' => 'page_published',
+            'publication_state_property' => 'page_published',
+            'publication_start_property' => 'page_publication_start',
+            'publication_end_property' => 'page_publication_end',
         ),
     );
 
