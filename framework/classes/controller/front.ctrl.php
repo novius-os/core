@@ -214,7 +214,7 @@ class Controller_Front extends Controller
      */
     public function getUrl()
     {
-        return $this->_url;
+        return $this->getContextUrl().$this->_url;
     }
 
     /**
