@@ -1,7 +1,7 @@
 /*globals window, document, jQuery, _comma_separated_list_of_variables_*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -220,10 +220,10 @@
 			
 			if (self.element.is(":hidden") && self.element.wijAddVisibilityObserver) {
 				self.element.wijAddVisibilityObserver(function () {
-					self._pageLize(true);
 					if (self.element.wijRemoveVisibilityObserver) {
 						self.element.wijRemoveVisibilityObserver();
 					}
+					self._pageLize(true);
 				}, "wijchart");
 				return;
 			}
@@ -464,7 +464,10 @@
 			//this.list = this.element.find('ol,ul').eq(0);
 			this.list = this.element.children('ol,ul').eq(0);
 			if (this.list && this.list.length === 0) {
-				this.list = null;
+				this.list = this.element.find(".wijmo-wijwizard-steps").eq(0);
+				if (this.list && this.list.length === 0) {
+					this.list = null;
+				}
 			}
 			if (this.list) {
 				this.lis = $('li', this.list);

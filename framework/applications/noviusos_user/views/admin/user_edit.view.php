@@ -21,7 +21,7 @@ echo View::forge('nos::crud/toolbar', $view_params, false);
 <style type="text/css">
 /* ? */
 /* @todo check this */
-.ui-accordion-content-active {
+.wijmo-wijaccordion-content-active {
     overflow: visible !important;
 }
 </style>

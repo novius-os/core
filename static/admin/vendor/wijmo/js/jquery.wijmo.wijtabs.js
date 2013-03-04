@@ -1,7 +1,7 @@
 /*globals $, jQuery, document, window, location, wijmoASPNetParseOptions*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -321,13 +321,34 @@
 		},
 
 		_create: function () {
-			var self = this;
+			var self = this,
+				o = self.options;
 			
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
 			}
+			
+			if (self.element.is(":hidden") && self.element.wijAddVisibilityObserver) {
+				self.element.wijAddVisibilityObserver(function () {
+					if (self.element.wijRemoveVisibilityObserver) {
+						self.element.wijRemoveVisibilityObserver();
+					}
+					var dataObj = self.element.data("wijtabs");
+					var wijmoDataObj = self.element.data("wijmoWijtabs");
+					self.destroy();
+					self.element.data("wijtabs", dataObj);
+					self.element.data("wijmoWijtabs", wijmoDataObj);
+					self._tabify(true);
+				}, "wijtabs");
+			}
+			
 			self._tabify(true);
+
+			if (o.disabledstate || o.disabled) {
+				self.disable();
+			}
+			$.Widget.prototype._create.apply(self, arguments);
 		},
 
 		_setOption: function (key, value) {
@@ -342,7 +363,7 @@
 				break;
 
 			case 'alignment':
-				this.destroy();
+				this._innerDestroy();
 				this._tabify(true);
 				break;
 
@@ -397,15 +418,43 @@
 
 		_tabId: function (a) {
 			var $a = $(a),
-				tabId;
+				tabId,
+				hrefParams;
 			if ($a.data && $a.data("tabid")) {
 				return $a.data("tabid");
 			}
+			if (a.href && a.href.length) {
+				hrefParams = this._getURLParameters(a.href);
+				if (hrefParams.tabId) {
+					tabId = hrefParams.tabId;
+					$a.data("tabid", tabId);
+					return tabId;
+				}
+			}
+			
 			tabId = a.title && a.title.replace(/\s/g, '_')
 				.replace(/[^A-Za-z0-9\-_:\.]/g, '') ||
 				this.options.idPrefix + getNextTabId();
+			
 			$a.data("tabid", tabId);
 			return tabId;
+		},
+		
+		_getURLParameters: function (url) {
+			var params = {},
+				parametersString,
+				parameters;
+			if (url.indexOf('?') > -1) {
+				parametersString = url.split('?')[1];
+				parameters = parametersString.split('&');
+				$.each(parameters, function (i, param) {
+					var p = param.split('=');
+					if (p.length > 1) {
+						params[p[0]] = p[1];
+					}
+				});
+			}
+			return params;
 		},
 
 		_sanitizeSelector: function (hash) {
@@ -430,7 +479,7 @@
 
 		_cleanup: function () {
 			// restore all former loading tabs labels
-			this.lis.filter('.ui-state-processing').removeClass('ui-state-processing')
+			this.lis.filter('.ui-tabs-loading').removeClass('ui-tabs-loading')
 				.find('span:data(label.tabs)')
 				.each(function () {
 					var el = $(this);
@@ -549,7 +598,7 @@
 				complete: function () {
 					if (mode === 'hide') {
 						self.lis
-							.removeClass('ui-tabs-selected ui-state-active')
+							.removeClass('ui-tabs-active ui-state-active')
 							.attr('aria-selected', false);
 						panel.addClass('ui-tabs-hide').attr('aria-hidden', true); // Hide
 					} else {
@@ -699,7 +748,7 @@
 					break;
 				}
 
-				if (o.sortable) {
+				if (o.sortable && this.list.sortable) {
 					this.list.sortable({ axis: (tabsAlign === 'top' || 
 						tabsAlign === 'bottom') ? "x" : "y" });
 				}
@@ -722,8 +771,8 @@
 						o.selected = parseInt(self._cookie(), 10);
 					}
 					if (typeof o.selected !== 'number' && 
-							this.lis.filter('.ui-tabs-selected').length) {
-						o.selected = this.lis.index(this.lis.filter('.ui-tabs-selected'));
+							this.lis.filter('.ui-tabs-active').length) {
+						o.selected = this.lis.index(this.lis.filter('.ui-tabs-active'));
 					}
 					o.selected = o.selected || (this.lis.length ? 0 : -1);
 				}
@@ -751,13 +800,13 @@
 
 				// highlight selected tab
 				this.panels.addClass('ui-tabs-hide').attr('aria-hidden', true);
-				this.lis.removeClass('ui-tabs-selected ui-state-active')
+				this.lis.removeClass('ui-tabs-active ui-state-active')
 					.attr('aria-selected', false);
 				// check for length avoids error when initializing empty list
 				if (o.selected >= 0 && this.anchors.length) {
 					this.panels.eq(o.selected).removeClass('ui-tabs-hide')
 						.attr('aria-hidden', false);
-					this.lis.eq(o.selected).addClass('ui-tabs-selected ui-state-active')
+					this.lis.eq(o.selected).addClass('ui-tabs-active ui-state-active')
 						.attr('aria-selected', true);
 
 					// seems to be expected behavior that the show callback is fired
@@ -780,7 +829,7 @@
 					self.lis = self.anchors = self.panels = null;
 				});
 			} else { // update selected after add/remove
-				o.selected = this.lis.index(this.lis.filter('.ui-tabs-selected'));
+				o.selected = this.lis.index(this.lis.filter('.ui-tabs-active'));
 			}
 
 			// update collapsible
@@ -795,7 +844,7 @@
 			// disable tabs
 			for (i = 0; (li = this.lis[i]); i++) {
 				$(li)[$.inArray(i, o.disabledIndexes) !== -1 &&
-				!$(li).hasClass('ui-tabs-selected') ? 'addClass' : 
+				!$(li).hasClass('ui-tabs-active') ? 'addClass' : 
 					'removeClass']('ui-state-disabled');
 				if ($(li).hasClass('ui-state-disabled')) {
 					$(li).attr('aria-disabled', true);
@@ -811,7 +860,7 @@
 			// after add or option change
 			this.lis.add(this.anchors).unbind('.tabs');
 
-			if (!o.disabledState && o.event !== 'mouseover') {
+			if (!o.disabledState && !o.disabled && o.event !== 'mouseover') {
 				addState = function (state, el) {
 					if (el.is(':not(.ui-state-disabled)')) {
 						el.addClass('ui-state-' + state);
@@ -848,7 +897,7 @@
 			showTab = ((o.showOption.blind || o.showOption.fade) && 
 				o.showOption.duration > 0) ?
 			function (clicked, $show) {
-				$(clicked).closest('li').addClass('ui-tabs-selected ui-state-active')
+				$(clicked).closest('li').addClass('ui-tabs-active ui-state-active')
 					.attr('aria-selected', true);
 				self._showContent();
 				$show.removeClass('ui-tabs-hide').attr('aria-hidden', false);
@@ -876,7 +925,7 @@
 				}
 			} :
 			function (clicked, $show) {
-				$(clicked).closest('li').addClass('ui-tabs-selected ui-state-active')
+				$(clicked).closest('li').addClass('ui-tabs-active ui-state-active')
 					.attr('aria-selected', true);
 				self._showContent();
 				$show.removeClass('ui-tabs-hide').attr('aria-hidden', false);
@@ -899,7 +948,7 @@
 						props.opacity = 'toggle'; 
 					}
 					$hide.animate(props, o.hideOption.duration || 'normal', function () {
-						self.lis.removeClass('ui-tabs-selected ui-state-active')
+						self.lis.removeClass('ui-tabs-active ui-state-active')
 							.attr('aria-selected', false);
 						$hide.addClass('ui-tabs-hide').attr('aria-hidden', true);
 						self._resetStyle($hide);
@@ -911,7 +960,7 @@
 				}
 			} :
 			function (clicked, $hide, $show) {
-				self.lis.removeClass('ui-tabs-selected ui-state-active')
+				self.lis.removeClass('ui-tabs-active ui-state-active')
 					.attr('aria-selected', false);
 				self._hideContent();
 				$hide.addClass('ui-tabs-hide').attr('aria-hidden', true);
@@ -919,7 +968,7 @@
 			};
 
 			// attach tab event handler, unbind to avoid duplicates from former tabifying
-			if (!o.disabledState) {
+			if (!o.disabledState && !o.disabled) {
 				this.anchors.bind(o.event + '.tabs', function () {
 					var el = this,
 				$li = $(this).closest('li'),
@@ -930,9 +979,9 @@
 					// or is already loading or click callback returns false stop here.
 					// Check if click handler returns false last so that it is not
 					// executed for a disabled or loading tab!
-					if (($li.hasClass('ui-tabs-selected') && !o.collapsible) ||
+					if (($li.hasClass('ui-tabs-active') && !o.collapsible) ||
 					$li.hasClass('ui-state-disabled') ||
-					$li.hasClass('ui-state-processing') ||
+					$li.hasClass('ui-tabs-loading') ||
 					self._trigger('select', null, self._ui(this, $show[0])) === false) {
 						this.blur();
 						return false;
@@ -944,7 +993,7 @@
 
 					// if tab may be closed
 					if (o.collapsible) {
-						if ($li.hasClass('ui-tabs-selected')) {
+						if ($li.hasClass('ui-tabs-active')) {
 							o.selected = -1;
 
 							if (o.cookie) {
@@ -1016,8 +1065,13 @@
 			});
 
 		},
-
+		
 		destroy: function () {
+			this._innerDestroy();
+			$.Widget.prototype.destroy.apply(this, arguments);
+		},
+
+		_innerDestroy: function () {
 			var o = this.options,
 				content = $('.wijmo-wijtabs-content');
 			this.abort();
@@ -1065,7 +1119,7 @@
 						'ui-corner-bottom',
 						'ui-corner-left',
 						'ui-corner-right',
-						'ui-tabs-selected',
+						'ui-tabs-active',
 						'ui-state-active',
 						'ui-state-hover',
 						'ui-state-focus',
@@ -1163,7 +1217,7 @@
 
 			if (this.anchors.length === 1) { // after tabify
 				o.selected = 0;
-				$li.addClass('ui-tabs-selected ui-state-active')
+				$li.addClass('ui-tabs-active ui-state-active')
 					.attr('aria-selected', true);
 				$panel.removeClass('ui-tabs-hide').attr('aria-hidden', false);
 				this.element.queue("tabs", function () {
@@ -1195,7 +1249,7 @@
 
 			// If selected tab was removed focus tab to the right or
 			// in case the last tab was removed the tab to the left.
-			if ($li.hasClass('ui-tabs-selected') && this.anchors.length > 1) {
+			if ($li.hasClass('ui-tabs-active') && this.anchors.length > 1) {
 				this.select(index + (index + 1 < this.anchors.length ? 1 : -1));
 			}
 
@@ -1314,7 +1368,7 @@
 			}
 
 			// load remote from here on
-			this.lis.eq(index).addClass('ui-state-processing');
+			this.lis.eq(index).addClass('ui-tabs-loading');
 
 			if (o.spinner || self._defaults.spinner) {
 				span.data('label.tabs', span.html())

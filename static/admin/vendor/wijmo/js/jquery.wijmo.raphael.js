@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -11,7 +11,7 @@
 * http://wijmo.com/license
 */
 
-(function () {
+(function ($) {
 	"use strict";
 	/*
 	Raphael.el.wijGetBBox = function () {
@@ -913,4 +913,4 @@
 			height: mmax[apply](0, h) - y
 		};
 	};
-} ());
+} (jQuery));

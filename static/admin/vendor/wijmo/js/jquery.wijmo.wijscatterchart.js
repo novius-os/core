@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, navigator*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -69,6 +69,18 @@
 				/// </summary>
 				easing: ">"
 			},
+
+			// / <summary>
+			// / A value that indicates whether to show default chart labels.
+			// / Default: false.
+			// / Type: Boolean.
+			// / Code example:
+			// / $("#scatterchart").wijscatterchart({
+			// / showChartLabels:false
+			// / });
+			// / </summary>
+			showChartLabels: false,
+
 			/// <summary>
 			/// A value that indicates whether to show animation 
 			///	and the duration and easing for the animation when reloading data.
@@ -275,8 +287,11 @@
 			click: null
 		},
 
+		widgetEventPrefix: "wijscatterchart",
+
 		_create: function () {
 			var self = this;
+			self._hotFixForJQ1_9();
 			$.wijmo.wijchartcore.prototype._create.apply(self, arguments);
 			self.chartElement.addClass("wijmo-wijscatterchart");
 		},
@@ -378,7 +393,7 @@
 							chartsSeriesStyle[chartsSeries.length - 1 - i] :
 							chartsSeriesStyle[i],
 						style = $.extend(true, {}, seriesStyle),
-						leg = o.legend.textWidth ? 
+						leg = o.legend.textWidth ?
 							self.legends[idx][0] : self.legends[idx],
 						dot;
 					if (style.stroke && !style.fill) {
@@ -424,12 +439,43 @@
 		_showSerieEles: function (seriesEle) {
 			$.each(seriesEle, function (i, dot) {
 				dot.show();
+				if (dot.label) {
+					dot.label.show();
+				}
+				if ($(dot.element).data("wijchartDataObj")) {
+					$(dot.element).data("wijchartDataObj").visible = true;
+				}
 			});
 		},
 
 		_hideSerieEles: function (seriesEle) {
 			$.each(seriesEle, function (i, dot) {
 				dot.hide();
+				if (dot.label) {
+					dot.label.hide();
+				}
+				if ($(dot.element).data("wijchartDataObj")) {
+					$(dot.element).data("wijchartDataObj").visible = false;
+				}
+			});
+		},
+
+		_indicatorLineShowing: function (objs) {
+			$.wijmo.wijchartcore.prototype._indicatorLineShowing.apply(this, arguments);
+			$.each(objs, function (i, obj) {
+				if (obj.dot) {
+					obj.dot.attr(obj.hoverStyle);
+					obj.dot.scale(1.5, 1.5);
+				}
+			})
+		},
+
+		_removeIndicatorStyles: function (objs) {
+			$.each(objs, function (i, obj) {
+				if (obj.dot) {
+					obj.dot.attr(obj.style);
+					obj.dot.scale(1, 1);
+				}
 			});
 		},
 
@@ -465,7 +511,7 @@
 			var self = this,
 				o = tooltip.options,
 				hintStyle = self.options.hint.style,
-				target = tooltip.target, obj, 
+				target = tooltip.target, obj,
 				dotStyle;
 
 			if (target) {
@@ -476,7 +522,7 @@
 					dotStyle.stroke ||
 					dotStyle.fill || "#ffffff";
 				} else {
-					o.style.stroke = hintStyle.stroke || 
+					o.style.stroke = hintStyle.stroke ||
 					target.getAttribute("stroke") ||
 					target.getAttribute("fill") || "#ffffff";
 				}
@@ -563,9 +609,12 @@
 				});
 				fields.chartElements = {};
 				$(fields.clipRect.element).stop().remove();
-				fields.render.destroy();				
+				fields.render.destroy();
 				fields.clipRect.destroy();
 			}
+
+			self.dataPoints = null;
+			self.pointXs = null;
 
 			self.canvas.clear();
 			self.innerState = {};
@@ -587,6 +636,7 @@
 				seriesStyles: o.seriesStyles,
 				seriesHoverStyles: o.seriesHoverStyles,
 				hint: o.hint,
+				disabled: o.disabled,
 				//plotInfo: plotInfo,
 				isXTime: self.axisInfo.x.isTime,
 				isYTime: self.axisInfo.y[0].isTime,
@@ -596,7 +646,12 @@
 				mouseOver: $.proxy(self._mouseOver, self),
 				mouseOut: $.proxy(self._mouseOut, self),
 				mouseMove: $.proxy(self._mouseMove, self),
-				click: $.proxy(self._click, self)
+				click: $.proxy(self._click, self),
+				showChartLabels: o.showChartLabels,
+				chartLabelStyle: o.chartLabelStyle,
+				chartLabelFormatString: o.chartLabelFormatString,
+				culture: self._getCulture(),
+				widget: this
 			});
 		}
 
@@ -651,6 +706,7 @@
 				click = options.click,
 				animationSet = canvas.set(),
 				scatters = [],
+				chartLabels = [],
 				tooltipTars = [],
 				chartEles,
 				fields = element.data("fields") || {},
@@ -664,7 +720,11 @@
 				bgColor = element.css("background-color"),
 				seriesEles = [],
 				toOADate = $.toOADate,
-				Render, clipRect, g;
+				showChartLabels = options.showChartLabels,
+				labelStyle = options.chartLabelStyle,
+				Render, clipRect, g,
+				disabled = options.disabled,
+				widget = options.widget;
 				
 			if (element.find("svg").length > 0) {
 				Render = new $.chartRender(element.find("svg").get(0), 
@@ -688,6 +748,9 @@
 
 				$(".wijscatterchart", element[0])
 					.live("mousedown." + widgetName, function (e) {
+						if (disabled) {
+							return;
+						}
 						if (isFunction(mouseDown)) {
 							var dataObj = $(e.target).data("wijchartDataObj");
 							if (!dataObj) {
@@ -697,6 +760,9 @@
 						}
 					})
 					.live("mouseup." + widgetName, function (e) {
+						if (disabled) {
+							return;
+						}
 						if (isFunction(mouseUp)) {
 							var dataObj = $(e.target).data("wijchartDataObj");
 							if (!dataObj) {
@@ -706,6 +772,9 @@
 						}
 					})
 					.live("mouseover." + widgetName, function (e) {
+						if (disabled) {
+							return;
+						}
 						var dataObj = $(e.target).data("wijchartDataObj"),
 							seriesIndex,
 							style,
@@ -734,6 +803,9 @@
 						}
 					})
 					.live("mouseout." + widgetName, function (e) {
+						if (disabled) {
+							return;
+						}
 						var dataObj = $(e.target).data("wijchartDataObj"),
 							seriesIndex,
 							dot;
@@ -755,6 +827,9 @@
 						}
 					})
 					.live("mousemove." + widgetName, function (e) {
+						if (disabled) {
+							return;
+						}
 						if (isFunction(mouseMove)) {
 							var dataObj = $(e.target).data("wijchartDataObj");
 							if (!dataObj) {
@@ -764,6 +839,9 @@
 						}
 					})
 					.live("click." + widgetName, function (e) {
+						if (disabled) {
+							return;
+						}
 						if (isFunction(click)) {
 							var dataObj = $(e.target).data("wijchartDataObj");
 							if (!dataObj) {
@@ -779,15 +857,30 @@
 				// for jQuery 1.7.1
 				.die("." + widgetName);
 			}
+
+			function paintDefaultChartLabel(x, y, val) {
+				var textStyle =  $.extend(true, {},
+						options.textStyle, options.chartLabelStyle),
+					text = $.round(val, 2),
+					chartLabelFormatString = options.chartLabelFormatString,
+					dcl;
+				if (chartLabelFormatString && chartLabelFormatString.length) {
+					text = Globalize.format(text, chartLabelFormatString, options.culture);
+				}
+				dcl = Render.text(x, y, text);
+				return dcl;
+			}
+
 			$.each(seriesList, function (i, series) {
 				var data = series.data,
 					type,
 					markerWidth = series.markerWidth || 5,
 					style = seriesStyles[i],
+					hoverStyle = seriesHoverStyles[i],
 					valuesX = data.x,
 					valuesY = data.y,
 					scatter = [],
-					seriesEle = [];
+					seriesEle = [], pointX;
 				series = $.extend(true, {
 					visible: true,
 					markerType: "circle"
@@ -810,6 +903,7 @@
 						Y = 0,
 						val,
 						dot,
+						chartLabel,
 						dotData = {};
 					if (isXTime) {
 						valX = toOADate(valX);
@@ -860,8 +954,38 @@
 						index: j,
 						markerType: type,
 						type: "scatter",
-						style: style
+						style: style,
+						hoverStyle: hoverStyle,
+						visible: true
 					}, series);
+
+					// paint label
+					if (showChartLabels) {
+						chartLabel = paintDefaultChartLabel(X, Y - 6, valuesY[j]);
+						chartLabel.add(g);
+						labelStyle = $.extend({
+							"font-size": "10px",
+							fill: "#888",
+							"font-family": "Arial"
+						}, labelStyle);
+						chartLabel.attr(labelStyle);
+						dot.label = chartLabel;
+						chartLabels.push(chartLabel);
+					}
+
+					// cache the bar position to show indicator line.
+					widget.dataPoints = widget.dataPoints || {};
+					widget.pointXs = widget.pointXs || [];
+
+					pointX = $.round(X, 2);
+
+					if (!widget.dataPoints[pointX.toString()]) {
+						widget.dataPoints[pointX.toString()] = [];
+						widget.pointXs.push(pointX);
+					}
+
+					widget.dataPoints[pointX.toString()].push(dotData);
+
 
 					$(dot.element).data("wijchartDataObj", dotData);
 					scatter.push(dot);
@@ -915,7 +1039,8 @@
 			chartEles = {
 				animationSet: animationSet,
 				tooltipTars: tooltipTars,
-				scatters: scatters
+				scatters: scatters,
+				labels: chartLabels
 			};
 			if (!fields.chartElements) {
 				fields.chartElements = {};
@@ -1442,6 +1567,20 @@
 			return defined(name) ? elem.attr({ 'class': PREFIX + name }) : elem;
 		},
 
+		text: function (x, y, text) {
+			if ($.isPlainObject(x)) {
+				y = x.y;
+				text = x.text;
+				x = x.x;
+			}
+			var wrapper = this.createElement('text').attr({
+				x: x,
+				y: y,
+				"text-anchor": "middle"
+			});
+			wrapper.element.textContent = text;
+			return wrapper;
+		},
 
 		symbol: function (symbol, x, y, radius, options) {
 
@@ -2178,6 +2317,28 @@
 
 				return wrapper;
 			},		
+
+			text: function (x, y, text) {
+				var wrapper = this.createElement("span"),
+					ele = wrapper.element, width, height;
+				ele.innerHTML = text;				
+				$(ele).appendTo("body");
+				width = $(ele).width();
+				height = $(ele).height();
+				x -= width / 2;
+				y -= height / 2;
+				wrapper.x = x;
+				wrapper.y = y;
+				$(ele).css({
+					position: "absolute",
+					"white-space": "nowrap",
+					"font-family": "Arial",
+					"font-size": "10",
+					left: x + "px",
+					top: y + "px"
+				});
+				return wrapper;
+			},
 
 			symbols: {
 				arc: function (x, y, radius, options) {

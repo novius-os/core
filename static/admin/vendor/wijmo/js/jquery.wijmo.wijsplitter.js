@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -316,11 +316,22 @@
 		_create: function () {
 			var self = this,
 				element = self.element,
-				o = self.options;
+				o = self.options, minSize;
 
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
+			}
+
+			//if default value, update the value of splitterDistance
+			if (o.splitterDistance == 100) {
+				minSize = this.element.width() - o.panel2.minSize;
+				if (o.panel1.minSize > o.splitterDistance) {
+					o.splitterDistance = o.panel1.minSize;
+				}
+				else if (minSize < o.splitterDistance) {
+					o.splitterDistance = minSize;
+				}
 			}
 
 			self._fields = {
@@ -381,18 +392,24 @@
 				ele = outerEle ? outerEle : self.element,
 				eleOffset = ele.offset(),
 				disabledWidth = ele.outerWidth(),
-				disabledHeight = ele.outerHeight();
-
-			return $("<div></div>")
-				.addClass("ui-disabled")
-				.css({
+				disabledHeight = ele.outerHeight(),
+				css = {
 					"z-index": "99999",
 					position: "absolute",
 					width: disabledWidth,
 					height: disabledHeight,
 					left: eleOffset.left,
 					top: eleOffset.top
+				};
+			if ($.browser.msie) {
+				$.extend(css, {
+					"background-color": "#fff",
+					opacity: 0.1
 				});
+			}
+			return $("<div></div>")
+				.addClass("ui-disabled")
+				.css(css);
 		},
 
 		destroy: function () {
@@ -711,6 +728,8 @@
 					distance = width - barW;
 				}
 
+				//fixed bug 29981
+				//To prevent panel2 be a new line by the css "float:left"
 				wrapper.width(width * 2);
 
 				if (o.panel1.collapsed) {
