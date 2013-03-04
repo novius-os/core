@@ -133,7 +133,7 @@ class Model_Media extends \Nos\Orm\Model
         if (!$this->is_image()) {
             return false;
         }
-        if (!empty($max_width) || !empty($params['max_height'])) {
+        if (!empty($max_width) || !empty($max_height)) {
             list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $max_width, $max_height);
             $src = $this->get_public_path_resized($max_width, $max_height);
         } else {

@@ -169,11 +169,13 @@ class Controller_Front extends Controller
                 if (empty($event_404)) {
                     // If no redirection then we display 404
                     if (!empty($url)) {
-                        $_SERVER['NOS_URL'] = '/';
+                        $_SERVER['NOS_URL'] = '';
 
                         return $this->router('index', $params, 404);
                     } else {
-                        echo \View::forge('nos::errors/blank_slate_front');
+                        echo \View::forge('nos::errors/blank_slate_front', array(
+                            'base_url' => $this->_base_href,
+                        ), false);
                         exit();
                     }
                 }
@@ -479,7 +481,14 @@ class Controller_Front extends Controller
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
-        $this->setTitle($this->_page->page_title);
+        if ($this->_page->page_meta_noindex) {
+            $this->setTitle($this->_page->page_title);
+            $this->setMetaRobots('noindex');
+        } else {
+            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
+            $this->setMetaDescription($this->_page->page_meta_description);
+            $this->setMetaKeywords($this->_page->page_meta_keywords);
+        }
 
         $wysiwyg = array();
 
@@ -535,7 +544,7 @@ class Controller_Front extends Controller
                 }
 
                 $page = \Nos\Page\Model_Page::find('first', array(
-                        'where' => $where,
+                    'where' => $where,
                 ));
 
                 if (!empty($page)) {
@@ -551,7 +560,8 @@ class Controller_Front extends Controller
         }
 
         if (empty($this->_page)) {
-            //var_dump($this->_url);
+            // Blank slate also needs the base_href to display a 404 from a sub-folder
+            $this->setBaseHref($domain);
             throw new NotFoundException('The requested page was not found.');
         }
 

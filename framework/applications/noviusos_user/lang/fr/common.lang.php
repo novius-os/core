@@ -94,7 +94,7 @@ return array(
 
     #. Crud
     #: config/common/user.config.php:32
-    'New user added. We look forward to see her/him soon.' => 'Nouvelle utilisatrice ajoutée (ou est-ce un utilisateur&nbsp;?). En espérantfaire sa connaissance bientôt.',
+    'New user added. We look forward to see her/him soon.' => 'Nouvelle utilisatrice ajoutée (ou est-ce un utilisateur&nbsp;?). En espérant faire sa connaissance bientôt.',
 
     #: config/common/user.config.php:33
     'The user has been deleted.' => 'L’utilisateur a été supprimé.',
