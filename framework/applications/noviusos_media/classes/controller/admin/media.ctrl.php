@@ -90,19 +90,17 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             if (is_file($dest)) {
                 throw new \Exception(__('A file with the same name already exists.'));
             }
+        }
 
-            if ($this->is_new || !$is_uploaded) {
-                // Create the directory if needed
-                $dest_dir = dirname($dest);
-                $base_dir = APPPATH.\Nos\Media\Model_Media::$private_path;
-                $remaining_dir = str_replace($base_dir, '', $dest_dir);
-                // chmod  is 0777 here because it should be restricted with by the umask
-                is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
+        // Create the directory if needed
+        $dest_dir = dirname($dest);
+        $base_dir = APPPATH.Model_Media::$private_path;
+        $remaining_dir = str_replace($base_dir, '', $dest_dir);
+        // chmod  is 0777 here because it should be restricted with by the umask
+        is_dir($dest_dir) or \File::create_dir($base_dir, $remaining_dir, 0777);
 
-                if (!is_writeable($dest_dir)) {
-                    throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
-                }
-            }
+        if (!is_writeable($dest_dir)) {
+            throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
         }
 
         // Delete old files
