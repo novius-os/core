@@ -31,7 +31,20 @@ if ($is_media) {
     if ($is_resized) {
         list(, $path, $max_width, $max_height, $verification, $extension) = $m;
         $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
-        $media_url = str_replace("/$max_width-$max_height", '', $media_url);
+
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$/'.$media_url.'$'.$max_width.'$'.$max_height);
+
+        // Thumbnails view or slideshow app just replace '64-64' by '128-128' in the URL...
+        if (empty($verification) || substr($hash, 0, 6) !== $verification) {
+            // Still allow generated for back-office authenticated users
+            if (!\Nos\Auth::check()) {
+                header('HTTP/1.0 403 Forbidden');
+                header('HTTP/1.1 403 Forbidden');
+                exit();
+            }
+        }
+
     } else {
         $media_url = str_replace('media/', '', $nos_url);
     }

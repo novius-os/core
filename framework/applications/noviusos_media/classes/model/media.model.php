@@ -160,7 +160,15 @@ class Model_Media extends \Nos\Orm\Model
             return $this->get_public_path();
         }
 
-        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$'.$this->virtual_path().'$'.$max_width.'$'.$max_height);
+
+        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s.%s',
+            (int) $max_width,
+            (int) $max_height,
+            substr($hash, 0, 6),
+            $this->media_ext
+        );
     }
 
     public function _event_before_save()
