@@ -15,7 +15,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
     public function action_popup()
     {
         try {
-            $attachment = $this->attachment(str_replace('files/', '', \Input::param('attachment', null)));
+            $attachment = $this->attachment(str_replace('data/files/', '', \Input::param('attachment', null)));
             $item = Model_Media::forge();
             $fieldset = \Fieldset::build_from_config($this->config['fields'], $item, array(
                     'before_save'=> function() use ($item, $attachment) {
