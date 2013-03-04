@@ -45,7 +45,7 @@ if ($is_media) {
         $media = \Nos\Media\Model_Media::forge(reset($res));
     }
 
-    if (false === $media) {
+    if (false === $media || !is_file(APPPATH.$media->get_private_path())) {
         $send_file = false;
     } else {
         if ($is_resized) {
@@ -138,7 +138,7 @@ if ($is_attachment) {
             $target_relative = $attachment->url();
         }
 
-        if ($send_file && $check === false) {
+        if ($send_file && $check === false && is_file($send_file)) {
             $source = $send_file;
             $target = DOCROOT.$target_relative;
             $dir = dirname($target);
