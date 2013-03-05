@@ -164,20 +164,18 @@ class Controller_Front extends Controller
             }
 
             if ($_404) {
-                $event_404 = \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
-                $event_404 = array_filter($event_404);
-                if (empty($event_404)) {
-                    // If no redirection then we display 404
-                    if (!empty($url)) {
-                        $_SERVER['NOS_URL'] = '';
+                \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
 
-                        return $this->router('index', $params, 404);
-                    } else {
-                        echo \View::forge('nos::errors/blank_slate_front', array(
-                            'base_url' => $this->_base_href,
-                        ), false);
-                        exit();
-                    }
+                // If no redirection then we display 404
+                if (!empty($url)) {
+                    $_SERVER['NOS_URL'] = '';
+
+                    return $this->router('index', $params, 404);
+                } else {
+                    echo \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                    ), false);
+                    exit();
                 }
             }
         }
