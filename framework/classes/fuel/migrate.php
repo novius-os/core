@@ -40,7 +40,8 @@ class Migrate extends \Fuel\Core\Migrate
         return $files;
     }
 
-    public static function set_table($table) {
+    public static function set_table($table)
+    {
         static::$table = $table;
     }
 
