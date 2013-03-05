@@ -182,8 +182,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
 
-            if (isset($config['tree'])) {
-
+            if (isset($config['tree']) && $config['tree'] !== false) {
 
                 if (!isset($config['tree']['models'])) {
                     $config['tree']['models'] = array();
@@ -244,6 +243,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             foreach ($config['inspectors'] as $key => $value) {
                 $inspector_key = is_array($value) ? $key : $value;
                 $inspector_name = $inspectors_class_prefix.ucfirst($inspector_key);
+                if (strpos($inspector_key, '\\') !== false) {
+                    $inspector_name = $inspector_key;
+                }
                 if (!class_exists($inspector_name) && is_array($value)) {
                     $inspectors[$inspector_key] = $value;
                     continue;
@@ -419,7 +421,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
             }
 
-            if (isset($config['tree'])) {
+            if (isset($config['tree']) && $config['tree'] !== false) {
                 if (!isset($config['appdesk']['appdesk']['treeGrid'])) {
                     $config['appdesk']['appdesk']['treeGrid'] = array();
                 }

@@ -12,9 +12,15 @@ namespace Nos\User;
 
 class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 {
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary('noviusos_user::common');
+    }
+
     public function before()
     {
-        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->method_params[0] == $user->user_id) {
+        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->route->method_params[0] == $user->user_id) {
             $this->bypass = true;
         }
         parent::before();
@@ -30,7 +36,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             $fields['user_last_connection']['dont_save'] = true;
         } else {
             unset($fields['user_password']);
-            $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
+            $this->config['i18n']['notification item saved'] = __('Done, your password has been changed.');
         }
 
         return $fields;

@@ -8,6 +8,11 @@
  * @link http://www.novius-os.org
  */
 
+// For previous versions of PHP 5.3.6
+if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+    define('DEBUG_BACKTRACE_IGNORE_ARGS', false);
+}
+
 // Get the start time and memory for use later
 defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
 defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
@@ -167,3 +172,10 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 }
 
 chdir(DOCROOT);
+
+// Remove leading /
+$_SERVER['NOS_URL'] = mb_substr(urldecode($_SERVER['REQUEST_URI']), 1);
+if (defined('NOS_RELATIVE_DIR')) {
+    $_SERVER['NOS_URL'] = mb_substr($_SERVER['NOS_URL'], mb_strlen(NOS_RELATIVE_DIR));
+}
+list($_SERVER['NOS_URL']) = explode('?', $_SERVER['NOS_URL']);

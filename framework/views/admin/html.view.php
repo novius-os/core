@@ -15,6 +15,7 @@ $config = array(
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce',
         'link' => 'static/novius-os/admin/vendor/requirejs/link',
         'log' => 'static/novius-os/admin/bundle/vendor.min',
+        'stacktrace' => 'static/novius-os/admin/vendor/stacktrace',
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
         'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.8.2.min',

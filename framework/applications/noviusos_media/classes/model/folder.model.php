@@ -75,8 +75,6 @@ class Model_Folder extends \Nos\Orm\Model
 
     /**
      * Delete all the public/cache entries (image thumbnails) for this folder
-     *
-     * @return void
      */
     public function delete_public_cache()
     {
@@ -94,6 +92,7 @@ class Model_Folder extends \Nos\Orm\Model
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
                 throw $e;
             }
+            return false;
         }
     }
 

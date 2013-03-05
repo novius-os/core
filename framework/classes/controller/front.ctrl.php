@@ -54,8 +54,7 @@ class Controller_Front extends Controller
         $this->_base_href = \URI::base(false);
         $this->_context_url = \URI::base(false);
 
-        // Strip out leading / and trailing .html
-        $this->_url = mb_substr(\Input::server('REDIRECT_URL'), defined('NOS_RELATIVE_DIR') ? 1 + mb_strlen(NOS_RELATIVE_DIR) : 1);
+        $this->_url = \Input::server('NOS_URL');
         $url = str_replace('.html', '', $this->_url);
 
         $this->_is_preview = \Input::get('_preview', false);
@@ -170,11 +169,13 @@ class Controller_Front extends Controller
                 if (empty($event_404)) {
                     // If no redirection then we display 404
                     if (!empty($url)) {
-                        $_SERVER['REDIRECT_URL'] = '/';
+                        $_SERVER['NOS_URL'] = '';
 
                         return $this->router('index', $params, 404);
                     } else {
-                        echo \View::forge('nos::errors/blank_slate_front');
+                        echo \View::forge('nos::errors/blank_slate_front', array(
+                            'base_url' => $this->_base_href,
+                        ), false);
                         exit();
                     }
                 }
@@ -454,12 +455,15 @@ class Controller_Front extends Controller
 
         $footer = array();
         $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
-        $this->_js_footer = array_diff($this->_js_footer, $this->_js_header);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
-                $footer[] = '<script src="'.(is_string($js) ? $js : $js['js']).'" type="text/javascript"></script>';
+                $js = is_string($js) ? $js : $js['js'];
+                if (in_array($js, $this->_js_header)) {
+                    continue;
+                }
+                $footer[] = '<script src="'.$js.'" type="text/javascript"></script>';
             }
         }
         if (count($footer)) {
@@ -477,7 +481,14 @@ class Controller_Front extends Controller
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
-        $this->setTitle($this->_page->page_title);
+        if ($this->_page->page_meta_noindex) {
+            $this->setTitle($this->_page->page_title);
+            $this->setMetaRobots('noindex');
+        } else {
+            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
+            $this->setMetaDescription($this->_page->page_meta_description);
+            $this->setMetaKeywords($this->_page->page_meta_keywords);
+        }
 
         $wysiwyg = array();
 
@@ -533,7 +544,7 @@ class Controller_Front extends Controller
                 }
 
                 $page = \Nos\Page\Model_Page::find('first', array(
-                        'where' => $where,
+                    'where' => $where,
                 ));
 
                 if (!empty($page)) {
@@ -549,7 +560,8 @@ class Controller_Front extends Controller
         }
 
         if (empty($this->_page)) {
-            //var_dump($this->_url);
+            // Blank slate also needs the base_href to display a 404 from a sub-folder
+            $this->setBaseHref($domain);
             throw new NotFoundException('The requested page was not found.');
         }
 
@@ -603,12 +615,12 @@ class Controller_Front extends Controller
 
     public function rebuild_cache($cache)
     {
-        $this->_page = new \Nos\Page\Model_Page();
+        $page = array();
         foreach ($cache['page'] as $field => $value) {
-            $this->_page->{'page_'.$field} = $value;
+            $page['page_'.$field] = $value;
         }
+        $this->_page = new \Nos\Page\Model_Page($page, false);
         $this->_page->freeze();
         unset($cache['page']);
-        //return parent::rebuild_cache($cache); @todo: to be reviewed
     }
 }

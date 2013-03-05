@@ -1,11 +1,14 @@
 <?php
 
-// Generated on 30/01/2013 14:07:42
+// Generated on 20/02/2013 17:43:50
 
 // 21 out of 21 messages are translated (100%).
 // 95 out of 95 words are translated (100%).
 
 return array(
+    #: classes/controller/admin/appdesk.ctrl.php:156
+    'Default view' => 'Affichage par défaut',
+
     #. Note to translator: This is a submit button
     #: classes/controller/admin/crud.ctrl.php:316
     'Add' => 'Ajouter',
@@ -24,17 +27,15 @@ return array(
     #: classes/controller/admin/crud.ctrl.php:612
     'Edit {{context}}' => 'Modifier {{context}}',
 
-    #: classes/controller/admin/crud.ctrl.php:628
+    #. Note to translator: action (button)
+    #: classes/controller/admin/crud.ctrl.php:629
     'Translate' => 'Traduire',
 
-    #: classes/controller/admin/crud.ctrl.php:630
+    #: classes/controller/admin/crud.ctrl.php:631
     'Add to another site' => 'Ajouter à un autre site',
 
-    #: classes/controller/admin/crud.ctrl.php:632
+    #: classes/controller/admin/crud.ctrl.php:633
     'Translate / Add to another site' => 'Traduire / Ajouter à un autre site',
-
-    #: classes/controller/admin/appdesk.ctrl.php:156
-    'Default view' => 'Affichage par défaut',
 
     #. Note to translator: this is an action (button)
     #: views/crud/blank_slate.view.php:61

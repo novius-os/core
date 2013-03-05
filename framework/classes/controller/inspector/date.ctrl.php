@@ -179,7 +179,11 @@ class Controller_Inspector_Date extends Controller_Inspector
             ),
         );
 
-        $config = \Arr::merge($default_config, $config);
+        $config = array_merge($default_config, $config);
+        $config['appdesk'] = array_merge($default_config['appdesk'], $config['appdesk']);
+        $config['since'] = array_merge($default_config['since'], $config['since']);
+        $config['month'] = array_merge($default_config['month'], $config['month']);
+        $config['year'] = array_merge($default_config['year'], $config['year']);
 
         if (!isset($config['input']['query'])) {
             $column = $config['input']['key'];

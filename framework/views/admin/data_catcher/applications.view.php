@@ -56,11 +56,11 @@ foreach ($data_catchers as $catcher_name => $data_catcher) {
 
     if (isset($data_catcher['onDemand']) && $data_catcher['onDemand'] && !$onDemande) {
         $onDemande = true;
-        echo '<div>', strtr(__('‘{{item}}’ can be shared with the following applications.'), array('{item}' => htmlspecialchars($item->title_item()))) ,'</div>';
+        echo '<div>', strtr(__('‘{{item}}’ can be shared with the following applications.'), array('{{item}}' => htmlspecialchars($item->title_item()))) ,'</div>';
         echo '<h4>', __('Click to share:') ,'</h4>';
         echo '<small>', __('(Don’t worry, you’ll get a preview first)') ,'</small>';
     } elseif ((!isset($data_catcher['onDemand']) || !$data_catcher['onDemand']) && !$auto) {
-        echo '<div>', strtr(__('‘{{item}}’ is automatically shared with the following applications.'), array('{item}' => htmlspecialchars($item->title_item()))) ,'</div>';
+        echo '<div>', strtr(__('‘{{item}}’ is automatically shared with the following applications.'), array('{{item}}' => htmlspecialchars($item->title_item()))) ,'</div>';
         echo '<h4>', __('No action required, click to customise:') ,'</h4>';
         $auto = true;
     }

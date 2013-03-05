@@ -48,7 +48,7 @@ class View extends \Fuel\Core\View
         if (!isset(static::$redirects[$from])) {
             static::$redirects[$from] = array();
         }
-        static::$redirects[$from][] = array('view' => $to, 'callback' => $callback);
+        array_unshift(static::$redirects[$from], array('view' => $to, 'callback' => $callback));
     }
 
 }

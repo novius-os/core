@@ -1614,6 +1614,9 @@ define('jquery-nos-appdesk',
                                                                 }
                                                                 $.each(cellFormatters, function(i, formatter) {
                                                                     formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
+                                                                    if (formatter.replace) {
+                                                                        args.$container.empty();
+                                                                    }
                                                                     switch (formatter.type) {
                                                                         case 'bold':
                                                                             args.$container.css('font-weight', 'bold');
@@ -1627,11 +1630,15 @@ define('jquery-nos-appdesk',
 
                                                                         case 'icon':
                                                                             if ($.isPlainObject(args.row.data)) {
-                                                                                if (formatter.column && !args.row.data[formatter.column]) {
+                                                                                var src = '';
+                                                                                formatter.column && args.row.data[formatter.column] && (src = args.row.data[formatter.column]);
+                                                                                formatter.src && (src = formatter.src);
+                                                                                $.type(formatter.mapping) === 'object' && formatter.mapping[args.formattedValue] && (src = formatter.mapping[args.formattedValue]);
+                                                                                if (!src) {
                                                                                     break;
                                                                                 }
                                                                                 var size = (formatter.size ? ' width="' + formatter.size + '" height="' + formatter.size + '"' : '');
-                                                                                args.$container.prepend(' <img src="' + (formatter.column ? args.row.data[formatter.column] : formatter.src) + '" ' + size + ' style="vertical-align: middle;" /> ');
+                                                                                args.$container.prepend(' <img src="' + src + '" ' + size + ' style="vertical-align: middle;" /> ');
                                                                             }
                                                                             break;
 
@@ -2125,12 +2132,13 @@ define('jquery-nos-appdesk',
                             .appendTo($div)
                             .noslistgrid({
                                 scrollMode : 'auto',
+                                pageSize: 1,
                                 showFilter: true,
                                 allowPaging : true,
-                                data: [ ['test'] ]
+                                data: [ ['test'], ['test2'] ]
                             });
                         this.heights = {
-                            row : table.height(),
+                            row : table.find('tr:first').height(),
                             footer : $div.find('.wijmo-wijgrid-footer').outerHeight(),
                             header : $div.find('.wijmo-wijgrid-headerrow').outerHeight(),
                             filter : $div.find('.wijmo-wijgrid-filterrow').outerHeight()

@@ -113,9 +113,10 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
                 }
             }
             if ($page_contains_enhancer) {
-                $urlPath = Tools_Url::page($page_id);
-                if ($urlPath !== null) {
-                    $params['urlPath'] = $urlPath;
+                $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
+                $page_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($page_params) {
+                    $params['urlPath'] = Tools_Url::context($page_params['context']).$page_params['url'];
                 } else {
                     // This page does not contain an enhancer anymore... Can't use it to generate the canonical URL...
                 }

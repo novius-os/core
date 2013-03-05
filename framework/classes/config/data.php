@@ -72,8 +72,12 @@ class Config_Data
      * @param    bool     $reload       true to force a reload even if the file is already loaded
      * @return   array                  the (loaded) config data array
      */
-    public static function load($name, $event = true, $reload = false)
+    public static function load($name, $event = null, $reload = false)
     {
+        if ($event === null) {
+            $event = Nos::$entry_point === Nos::ENTRY_POINT_ADMIN;
+        }
+
         list($file, $callback) = static::getFile($name);
         if ($event && !empty($callback)) {
             \Event::register_function('config|'.$file, function(&$config) use($callback, $name, $file) {

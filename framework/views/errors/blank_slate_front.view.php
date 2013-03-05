@@ -15,6 +15,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<base href="<?= $base_url ?>">
 <title>Novius OS welcomes you</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
@@ -34,15 +35,26 @@ body {
   border-radius: 10px;
   padding: 20px 40px;
   position: absolute;
-  top: 50px;
-  left: 50px;
-  right: 50px;
-  bottom: 50px;
+  top: 45px;
+  left: 45px;
+  right: 45px;
+  bottom: 45px;
   overflow: auto;
 }
 #blank_slate h1, #blank_slate img {
     vertical-align: middle;
     padding: 0 2em 0 1em;
+}
+#blank_slate img {
+    float: left;
+}
+#blank_slate h1:after
+{
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
 }
 a {
     color: #555;
