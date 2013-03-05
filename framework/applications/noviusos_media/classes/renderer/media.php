@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Media;
 
 class Renderer_Media extends \Fieldset_Field
 {
