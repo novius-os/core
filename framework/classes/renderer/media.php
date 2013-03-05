@@ -16,7 +16,8 @@ namespace Nos;
  */
 class Renderer_Media extends \Nos\Media\Renderer_Media
 {
+    public static function _init() {
+        parent::_init();
+        logger(\Fuel::L_WARNING, 'This class is deprecated.  Please use \Nos\Media\Renderer_Media instead.');
+    }
 }
-
-logger(\Fuel::L_WARNING, 'This class is deprecated.  Please use \Nos\Media\Renderer_Media instead.');
-
