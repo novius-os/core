@@ -248,6 +248,8 @@
 				}
 				else {
 					self._labelWrap.focus();
+                    // Novius OS : add preventDefault, when click on rightTrigger in a dropdown which is in a popup, list open and close
+                    e.preventDefault();
 				}
 			}).bind("mouseover" + namespace, function () {
 				if (self.options.disabled) {
