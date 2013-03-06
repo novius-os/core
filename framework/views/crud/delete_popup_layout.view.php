@@ -26,7 +26,7 @@ $id = $uniqid = uniqid('form_');
 </p>
 </form>
 <script type="text/javascript">
-    require(['jquery-nos'],
+    require(['jquery-nos', 'wijmo.wijgrid'],
         function ($) {
             $(function () {
                 var $form = $('#<?= $id ?>'),

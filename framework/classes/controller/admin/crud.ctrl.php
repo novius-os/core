@@ -501,7 +501,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+            return $this->send_error(new \Exception($this->config['i18n']['notification item deleted']));
         }
 
         $this->is_new = $this->item->is_new();
@@ -768,14 +768,5 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function delete()
     {
-        return array(
-            'dispatchEvent' => array(
-                array(
-                    'name' => 'Nos\User\Model_User',
-                    'action' => 'delete',
-                    'id' => array((int) 1),
-                ),
-            ),
-        );
     }
 }
