@@ -261,6 +261,8 @@ class Application
         $this->save_config($config);
         static::$rawAppInstalled = $config['app_installed'];
 
+        \Migrate::latest($this->folder, 'module');
+
         return true;
     }
 
