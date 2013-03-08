@@ -12,9 +12,10 @@ namespace Nos;
 
 class Migration
 {
-    static $sql_file = null;
+    public static $sql_file = null;
 
-    public function up() {
+    public function up()
+    {
         if (static::$sql_file === null) {
             $backtrace = debug_backtrace();
             static::$sql_file = $backtrace[2]['args'][0][1]['path'];
@@ -23,14 +24,16 @@ class Migration
         if (file_exists($sql_file)) {
             $queries = explode(';', file_get_contents($sql_file)); // @todo: might not work everywhere (; in values)
             foreach ($queries as $query) {
-                if (trim($query) != '') { // @todo: might not work for comments
+                if (trim($query) != '') {
+                    // @todo: might not work for comments
                     \DB::query($query)->execute();
                 }
             }
         }
     }
 
-    public function down() {
+    public function down()
+    {
 
     }
 }
