@@ -1,0 +1,1 @@
+ALTER TABLE `nos_user` CHANGE `user_md5` `user_md5` VARCHAR( 32 ) NOT NULL;
