@@ -1,5 +1,5 @@
 <?php
-namespace Fuel\Migrations;
+namespace Nos\Migrations;
 
 class Move_migration_table
 {

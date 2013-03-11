@@ -1,5 +1,5 @@
 <?php
-namespace Fuel\Migrations;
+namespace Nos\Migrations;
 
 class Version_0_2 extends \Nos\Migration
 {
