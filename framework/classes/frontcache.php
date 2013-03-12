@@ -51,6 +51,23 @@ class FrontCache
         return static::$_php_end;
     }
 
+    public function call_hmvc_uncached($uri, $args = array())
+    {
+        echo static::_php_begin();
+        // Serialize allow to persist objects in the cache file
+        // API is Nos\Nos::hmvc('location', array('args' => $args))
+        echo '\Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize(array('args' => $args)), true).'));';
+        echo static::_php_end();
+    }
+
+    public function view_forge_uncached($file = null, $data = null, $auto_filter = null)
+    {
+        echo static::_php_begin();
+        // Serialize allow to persist objects in the cache file
+        echo 'echo View::forge('.var_export($file, true).', unserialize('.var_export(serialize($data), true).'), '.var_export($auto_filter, true).');';
+        echo static::_php_end();
+    }
+
     public static function forge($path)
     {
         return new static($path);
