@@ -136,14 +136,22 @@ class Nos
 
     public static function parse_enhancers($content, $closure)
     {
-        preg_match_all('`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
-        foreach ($matches[2] as $match_id => $enhancer) {
-            $closure($enhancer, $matches[3][$match_id], $matches[0][$match_id]);
-        }
+        preg_match_all('`<(\w+)\s[^>]*data-enhancer=[^>]*>.*?</\\1>`u', $content, $matches);
+        foreach ($matches[0] as $enhancer_content) {
+            if (preg_match_all('`data-enhancer="([^"]+)"`u', $enhancer_content, $matches2)) {
+                $enhancer = $matches2[1][0];
+            } elseif (preg_match_all('`data-enhancer=\'([^\']+)\'`u', $enhancer_content, $matches2)) {
+                $enhancer = $matches2[1][0];
+            }
+            if (preg_match_all('`data-config="([^"]+)"`u', $enhancer_content, $matches2)) {
+                $config = $matches2[1][0];
+            } elseif (preg_match_all('`data-config=\'([^\']+)\'`u', $enhancer_content, $matches2)) {
+                $config = $matches2[1][0];
+            }
 
-        preg_match_all('`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
-        foreach ($matches[3] as $match_id => $enhancer) {
-            $closure($enhancer, $matches[2][$match_id], $matches[0][$match_id]);
+            if (!empty($enhancer) && !empty($config)) {
+                $closure($enhancer, $config, $enhancer_content);
+            }
         }
     }
 
