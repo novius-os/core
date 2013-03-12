@@ -111,29 +111,44 @@ class FrontCache
 
     public function save($duration = -1, $controller = null)
     {
+        $prepend = '';
+        $this->_content = '';
         if ($duration == -1) {
             //flock($this->_lock_fp, LOCK_UN);
             $expires = 0;
             $this->_path = \Config::get('tmp_dir', '/tmp/'.uniqid('page/').'.php');
-            $this->_content = '';
         } else {
             $expires = time() + $duration;
-            $this->_content = '<?php
+            $prepend .= '<?php
             '.__CLASS__.'::check_expires('.$expires.');'."\n";
 
             if (!empty($controller)) {
-                $this->_content .= '
+                $prepend .= '
                 if (!empty($controller)) {
                     $controller->rebuild_cache('.var_export($controller->save_cache(), true).');
                 }'."\n";
             }
-            $this->_content .= '?>';
+            $prepend .= '?>';
             \Fuel::$profiling && \Profiler::console('FrontCache:'.\Fuel::clean_path($this->_path).' saved for '.$duration.' s.');
         }
 
         while (ob_get_level() >= $this->_level) {
             $this->_content .= ob_get_clean();
         }
+
+        // Prevent PHP injection using a <script language=php> tag
+        $this->_content = preg_replace('`<script\s+language=(.?)php\1\s*>(.*?)</script>`i', '&lt;script language=$1php$1>$2&lt;/script>', $this->_content);
+        $this->_content = strtr(
+            $this->_content,
+            array(
+                // Prevent PHP injection using tags
+                '<?' => '&lt;?',
+                '?>' => '?&gt;',
+            )
+        );
+
+        $this->_content = $prepend.$this->_content;
+
         if (!$this->store()) {
             trigger_error('Cache could not be written! (path = '.$this->_path.')', E_USER_WARNING);
         }
