@@ -51,7 +51,7 @@ class FrontCache
         return static::$_php_end;
     }
 
-    public function call_hmvc_uncached($uri, $args = array())
+    public static function call_hmvc_uncached($uri, $args = array())
     {
         echo static::_php_begin();
         // Serialize allow to persist objects in the cache file
@@ -60,7 +60,7 @@ class FrontCache
         echo static::_php_end();
     }
 
-    public function view_forge_uncached($file = null, $data = null, $auto_filter = null)
+    public static function view_forge_uncached($file = null, $data = null, $auto_filter = null)
     {
         echo static::_php_begin();
         // Serialize allow to persist objects in the cache file
