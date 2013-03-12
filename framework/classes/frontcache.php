@@ -20,12 +20,52 @@ class CacheExpiredException extends \Exception
 
 class FrontCache
 {
+    protected static $_php_begin = null;
+    protected static $_php_end = null;
+
     /**
      * Loads any default caching settings when available
      */
     public static function _init()
     {
         \Config::load('cache', true);
+    }
+
+    protected static function _php_begin()
+    {
+        if (static::$_php_begin !== null) {
+            return static::$_php_begin;
+        }
+        \Config::load('crypt', true);
+        static::$_php_begin = md5(\Config::get('crypt.hmac').'begin');
+        return static::$_php_begin;
+    }
+
+    protected static function _php_end()
+    {
+        if (static::$_php_end !== null) {
+            return static::$_php_end;
+        }
+        \Config::load('crypt', true);
+        static::$_php_end = md5(\Config::get('crypt.hmac').'end');
+        return static::$_php_end;
+    }
+
+    public function call_hmvc_uncached($uri, $args = array())
+    {
+        echo static::_php_begin();
+        // Serialize allow to persist objects in the cache file
+        // API is Nos\Nos::hmvc('location', array('args' => $args))
+        echo '\Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize(array('args' => $args)), true).'));';
+        echo static::_php_end();
+    }
+
+    public function view_forge_uncached($file = null, $data = null, $auto_filter = null)
+    {
+        echo static::_php_begin();
+        // Serialize allow to persist objects in the cache file
+        echo 'echo View::forge('.var_export($file, true).', unserialize('.var_export(serialize($data), true).'), '.var_export($auto_filter, true).');';
+        echo static::_php_end();
     }
 
     public static function forge($path)
@@ -111,29 +151,54 @@ class FrontCache
 
     public function save($duration = -1, $controller = null)
     {
+        $prepend = '';
+        $this->_content = '';
         if ($duration == -1) {
             //flock($this->_lock_fp, LOCK_UN);
             $expires = 0;
             $this->_path = \Config::get('tmp_dir', '/tmp/'.uniqid('page/').'.php');
-            $this->_content = '';
         } else {
             $expires = time() + $duration;
-            $this->_content = '<?php
+            $prepend .= '<?php
             '.__CLASS__.'::check_expires('.$expires.');'."\n";
 
             if (!empty($controller)) {
-                $this->_content .= '
+                $prepend .= '
                 if (!empty($controller)) {
                     $controller->rebuild_cache('.var_export($controller->save_cache(), true).');
                 }'."\n";
             }
-            $this->_content .= '?>';
+            $prepend .= '?>';
             \Fuel::$profiling && \Profiler::console('FrontCache:'.\Fuel::clean_path($this->_path).' saved for '.$duration.' s.');
         }
 
         while (ob_get_level() >= $this->_level) {
             $this->_content .= ob_get_clean();
         }
+
+        // Prevent PHP injection using a <script language=php> tag
+        $this->_content = preg_replace('`<script\s+language=(.?)php\1\s*>(.*?)</script>`i', '&lt;script language=$1php$1>$2&lt;/script>', $this->_content);
+        $this->_content = strtr(
+            $this->_content,
+            array(
+                // Prevent PHP injection using tags
+                '<?' => '&lt;?',
+                '?>' => '?&gt;',
+            )
+        );
+
+        if (null !== static::$_php_begin && null !== static::$_php_end) {
+            $this->_content = strtr(
+                $this->_content,
+                array(
+                    // Replace legitimate PHP tags
+                    static::$_php_begin => "<?php\n",
+                    static::$_php_end => "\n?".">",
+                )
+            );
+        }
+        $this->_content = $prepend.$this->_content;
+
         if (!$this->store()) {
             trigger_error('Cache could not be written! (path = '.$this->_path.')', E_USER_WARNING);
         }
