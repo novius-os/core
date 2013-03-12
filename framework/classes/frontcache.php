@@ -20,12 +20,35 @@ class CacheExpiredException extends \Exception
 
 class FrontCache
 {
+    protected static $_php_begin = null;
+    protected static $_php_end = null;
+
     /**
      * Loads any default caching settings when available
      */
     public static function _init()
     {
         \Config::load('cache', true);
+    }
+
+    protected static function _php_begin()
+    {
+        if (static::$_php_begin !== null) {
+            return static::$_php_begin;
+        }
+        \Config::load('crypt', true);
+        static::$_php_begin = md5(\Config::get('crypt.hmac').'begin');
+        return static::$_php_begin;
+    }
+
+    protected static function _php_end()
+    {
+        if (static::$_php_end !== null) {
+            return static::$_php_end;
+        }
+        \Config::load('crypt', true);
+        static::$_php_end = md5(\Config::get('crypt.hmac').'end');
+        return static::$_php_end;
     }
 
     public static function forge($path)
@@ -147,6 +170,16 @@ class FrontCache
             )
         );
 
+        if (null !== static::$_php_begin && null !== static::$_php_end) {
+            $this->_content = strtr(
+                $this->_content,
+                array(
+                    // Replace legitimate PHP tags
+                    static::$_php_begin => "<?php\n",
+                    static::$_php_end => "\n?".">",
+                )
+            );
+        }
         $this->_content = $prepend.$this->_content;
 
         if (!$this->store()) {
