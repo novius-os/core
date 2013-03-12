@@ -741,6 +741,8 @@ define('jquery-nos-ostabs',
                                 e.preventDefault();
                                 e.stopPropagation();
 
+                                self.element.find('ul.nos-ostabs-menuactions').remove();
+
                                 links = $( '<ul></ul>' )
                                     .addClass( 'nos-ostabs-menuactions' )
                                     .prependTo(self.element);
