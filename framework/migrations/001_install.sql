@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `nos_wysiwyg` (
   PRIMARY KEY (`wysiwyg_id`)
 )  DEFAULT CHARSET=utf8;
 
+# User table is necessary to install applications
 CREATE TABLE IF NOT EXISTS `nos_user` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_md5` varchar(32) DEFAULT NULL,
