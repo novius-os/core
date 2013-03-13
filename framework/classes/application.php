@@ -41,7 +41,6 @@ class Application
 
     public static function installNativeApplications($ignore_core_migrations = false)
     {
-
         foreach (static::$repositories as $where => $repository) {
             if ($repository['native']) {
 
