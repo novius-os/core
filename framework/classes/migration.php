@@ -12,23 +12,29 @@ namespace Nos;
 
 class Migration
 {
+    public $path = null;
     public $sql_file = null;
 
     public function __construct($path)
     {
+        $this->path     = $path;
         $this->sql_file = substr($path, 0, strlen($path) - 4).'.sql';
     }
 
     public function up()
     {
-        \Log::error($this->sql_file);
         if (file_exists($this->sql_file)) {
-            $queries = explode(';', file_get_contents($this->sql_file));//@todo: might not work everywhere (; in values)
-            foreach ($queries as $query) {
-                if (trim($query) != '') {
-                    // @todo: might not work for comments
-                    \DB::query($query)->execute();
-                }
+            static::execute_sql_file($this->sql_file);
+        }
+    }
+
+    public static function execute_sql_file($sql_file)
+    {
+        $queries = explode(';', file_get_contents($sql_file));//@todo: might not work everywhere (; in values)
+        foreach ($queries as $query) {
+            if (trim($query) != '') {
+                // @todo: might not work for comments
+                \DB::query($query)->execute();
             }
         }
     }
