@@ -88,6 +88,9 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
         }
         \Response::json(array(
             'notify' => __('OK, permissions saved.'),
+            'dispatchEvent' => array(
+                'name' => 'Nos\Application',
+            ),
         ));
 
     }
