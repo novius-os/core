@@ -45,10 +45,16 @@ class Migrate extends \Fuel\Core\Migrate
         static::$table = $table;
     }
 
+    // change migration prefix and cache find_migrations results in order to prevent duplicate classes errors
+    public static $_migrations = array();
     protected static function find_migrations($name, $type, $start = null, $end = null, $direction = 'up')
     {
-        static::generate_prefix($name, $type);
-        return parent::find_migrations($name, $type, $start, $end, $direction);
+        $cache_key = $type.'.'.$name;
+        if (!isset(static::$_migrations[$cache_key])) {
+            static::generate_prefix($name, $type);
+            static::$_migrations[$cache_key] = parent::find_migrations($name, $type, $start, $end, $direction);
+        }
+        return static::$_migrations[$cache_key];
     }
 
     // Overloaded function in order to support \Nos\Migration
@@ -64,7 +70,7 @@ class Migrate extends \Fuel\Core\Migrate
         foreach ($migrations as $ver => $migration) {
             logger(Fuel::L_INFO, 'Migrating to version: '.$ver);
 
-            // <<<<<<<<<<<<<<<<<<< CHANGE ARE HERE
+            // <<<<<<<<<<<<<<<<<<< CHANGES ARE HERE
             $migration_inst = new $migration['class']($migration['path']);
             $result = $migration_inst->$method();
             // >>>>>>>>>>>>>>>>>>>
@@ -95,6 +101,17 @@ class Migrate extends \Fuel\Core\Migrate
         } else {
             static::$prefix = 'Fuel\\Migrations\\';
         }
+    }
+
+    public static function is_last_version($name, $type)
+    {
+        $current = \Config::get('migrations.version.'.$type.'.'.$name);
+        if (is_array($current)) {
+            $current = count($current) == 0? null : $current[count($current) - 1];
+        }
+
+        $migrations = static::find_migrations($name, $type, $current, null);
+        return count($migrations) == 0;
     }
 
 }

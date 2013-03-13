@@ -39,7 +39,7 @@ class Application
         return false;
     }
 
-    public static function installNativeApplications()
+    public static function installNativeApplications($ignore_core_migrations = false)
     {
 
         foreach (static::$repositories as $where => $repository) {
@@ -54,6 +54,10 @@ class Application
                     $application->install(false);
                 }
             }
+        }
+
+        if (!$ignore_core_migrations) {
+            \Migrate::latest('nos', 'package');
         }
     }
 
@@ -72,7 +76,7 @@ class Application
             }
         }
 
-        return false;
+        return !\Migrate::is_last_version('nos', 'package');
     }
 
     public static function cleanApplications()
@@ -198,12 +202,17 @@ class Application
      */
     public function is_dirty()
     {
-        return ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install()) || !$this->check_metadata();
+        return ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install())
+            || !$this->check_metadata()
+            || ($this->folder == 'local' && !\Migrate::is_last_version('default', 'app'));
     }
 
     protected function check_install()
     {
-        return static::get_application_path($this->folder) !== false && $this->is_link('static') && $this->is_link('htdocs');
+        return static::get_application_path($this->folder) !== false
+            && $this->is_link('static')
+            && $this->is_link('htdocs')
+            && \Migrate::is_last_version($this->folder, 'module');
     }
 
     /**
@@ -261,7 +270,12 @@ class Application
         $this->save_config($config);
         static::$rawAppInstalled = $config['app_installed'];
 
-        \Migrate::latest($this->folder, 'module');
+        if ($this->folder == 'local') {
+            \Migrate::latest('default', 'app');
+        } else {
+            \Migrate::latest($this->folder, 'module');
+        }
+
 
         return true;
     }

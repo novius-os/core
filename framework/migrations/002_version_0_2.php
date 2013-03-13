@@ -38,7 +38,7 @@ class Version_0_2 extends \Nos\Migration
         \Config::set('data::launchers', $launchers);
 
         // Update native apps into 0.2
-        \Nos\Application::installNativeApplications();
+        \Nos\Application::installNativeApplications(true);
 
         parent::up();
 
