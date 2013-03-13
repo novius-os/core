@@ -10,6 +10,8 @@
 
 \Nos\I18n::current_dictionary('noviusos_user::common');
 
+$role = reset($user->roles);
+
 ?>
 
 <div class="permissions fill-parent" id="<?= $uniqid = uniqid('id_') ?>" style="overflow:auto;">
@@ -21,44 +23,35 @@
     <div class="applications">
         <div class="application all">
             <div class="maincheck">
-                <input type="checkbox" name="access_to_everything" value="1" class="access_to_everything" />
+                <input type="checkbox" name="perm[nos::access][_full]" value="1" class="access_to_everything" <?= ($role->check_permission('nos::access', '_full') ? 'checked' : '') ?> />
             </div>
             <div class="infos">
                 <?= __('Full access to everything') ?>
             </div>
         </div>
 
-<?php
-foreach ($apps as $app => $perms) {
+        <?php
+        $permissions = \Config::load('noviusos_user::permissions', true);
 
-    \Config::load("$app::permissions", true);
-    ?>
+        $category_sections = array();
+        foreach ($permissions['categories'] as $section => $callback) {
+            $category_sections[$section] = $callback();
+        }
 
-    <input type="hidden" name="applications[]" value="<?= $app ?>" />
-    <div class="application item">
-        <div class="maincheck">
-            <input type="checkbox" name="access[<?= $app ?>]" value="1" <?= $role->check_permission($app, 'access') ? 'checked' : '' ?> />
-        </div>
-        <div class="icon">
-    <?php
-    if (!empty($apps[$app]['icons'][64])) {
-        echo '<img src="'.$apps[$app]['icons'][64].'" />';
-    }
-    ?>
-        </div>
-        <div class="infos" title="<?= strtr(__('Application provided by {{provider_name}}'), array(
-                '{{provider_name}}' => $apps[$app]['provider']['name'],
-            )) ?>">
-            <?= !empty($apps[$app]['name']) ? $apps[$app]['name'] : $app ?>
-        </div>
-    </div>
-
-    <div style="margin-left: 30px;">
-
-    </div>
-    <?php
-}
-?>
+        foreach ($permissions['permissions']['categories'] as $section => $list) {
+            $category_section = $category_sections[$section];
+            foreach ($list as $permission_name => $perm) {
+                echo '<h2>'.htmlspecialchars($perm['title']).'</h2>';
+                echo '<ul>';
+                foreach ($category_section as $category_key => $categories) {
+                    echo '<li>
+                        <label><input type="checkbox" name="perm['.$permission_name.']['.$category_key.']" value="1" '.($role->check_permission($permission_name, $category_key) ? 'checked' : '').' /> <img src="'.$categories['icon'].'" /> '.$categories['title'].'</label>
+                    </li>';
+                }
+                echo '<ul>';
+            }
+        }
+        ?>
     </div>
 
 </form>

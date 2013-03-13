@@ -18,52 +18,17 @@ class Model_Role extends \Nos\Orm\Model
     protected static $permissions;
     protected $access;
 
-    public function check_permission($application, $key)
+    public function check_permission($permission_name, $category_key)
     {
-        if ($key == 'access') {
-            $this->load_access($application);
-            return $this->access->check($this, $key);
+        // Load permissions
+        if (!isset(static::$permissions[$this->role_id])) {
+            $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
+            foreach ($query->as_object()->execute() as $permission) {
+                static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
+            }
         }
 
-        $args = func_get_args();
-        $args = array_slice($args, 2);
-        array_unshift($args, $this->role_id);
-        $driver = $this->get_permission_driver($application, $key);
-        return call_user_func_array(array($driver, 'check'), $args);
-    }
-
-    public static function get_permission_driver($application, $key)
-    {
-        static::load_permission_driver($application, $key);
-        return static::$permissions[$application][$key];
-    }
-
-    public function load_access($application)
-    {
-        $this->access = \Nos\Permission::forge($application, 'access', array(
-            'driver' => 'select',
-            'title'=> 'Grant access to the application',
-            'label' => 'Grant access to the application',
-            'driver_config' => array(
-                'choices' => array(
-                    'access' => array(
-                        'title' => 'Access the application',
-                    ),
-                ),
-            ),
-        ));
-    }
-
-    public static function load_permission_driver($application, $key)
-    {
-        if (isset(static::$permissions[$application][$key])) {
-            return;
-        }
-
-        $permissions = \Config::load("$application::permissions", true);
-
-        static::$permissions[$application][$key] = Permission::forge($application, $key, $permissions[$key]);
-
-        return static::$permissions[$application][$key];
+        // Check authorisation
+        return isset(static::$permissions[$this->role_id][$permission_name]) && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
     }
 }

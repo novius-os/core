@@ -56,26 +56,34 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
     {
         $role = Model_Role::find(\Input::post('role_id'));
 
-        $applications = \Input::post('applications');
-        foreach ($applications as $application) {
-            $access = Model_Permission::find('first', array('where' => array(
-                array('perm_role_id',       $role->role_id),
-                array('perm_key',           'access'),
-                array('perm_application',   $application),
-            )));
+        $permissions = \Input::post('perm');
+        foreach ($permissions as $perm_name => $allowed) {
+            $allowed = array_keys($allowed);
 
-            // Grant of remove access to the application
-            if (empty($_POST['access'][$application]) && !empty($access)) {
-                $access->delete();
+            $olds = Model_Permission::find('all', array('where' => array(
+                array('perm_role_id', $role->role_id),
+                array('perm_name',    $perm_name),
+            )));
+            $existing = array();
+
+            // Delete old authorisations
+            foreach ($olds as $old) {
+                if (!in_array($old->perm_category_key, $allowed)) {
+                    $old->delete();
+                } else {
+                    $existing[] = $old->perm_category_key;
+                }
             }
 
-            if (!empty($_POST['access'][$application]) && empty($access)) {
-                $access = new Model_Permission();
-                $access->perm_role_id     = $role->role_id;
-                $access->perm_key           = 'access';
-                $access->perm_identifier    = '';
-                $access->perm_application   = $application;
-                $access->save();
+            // Add new authorisations
+            foreach ($allowed as $category_key) {
+                if (!in_array($category_key, $existing)) {
+                    $new = new Model_Permission();
+                    $new->perm_role_id      = $role->role_id;
+                    $new->perm_name         = $perm_name;
+                    $new->perm_category_key = $category_key;
+                    $new->save();
+                }
             }
         }
         \Response::json(array(

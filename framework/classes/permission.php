@@ -12,31 +12,15 @@ namespace Nos;
 
 class Permission
 {
-    public static function forge($app_name, $key, $driver_config)
-    {
-        $driver = $driver_config['driver'];
-        // @todo Inflector::words_to_upper ?
-        $class = '\Nos\Permission_'.ucfirst($driver);
-
-        if (empty($driver_config['label'])) {
-            \Debug::dump($driver_config);
-        }
-
-        if (class_exists($class)) {
-            return new $class($app_name, $key, $driver_config['label'], $driver_config['driver_config']);
-        }
-        throw new \Exception('The permission driver '.$driver.' has not be found for application '.$app_name.' ('.$key.').');
-    }
-
-    public static function check($app, $key)
+    public static function check($permission_name, $category_key)
     {
         $user = \Session::user();
         $role = reset($user->roles);
 
-        return $role->check_permission($app, $key);
+        return $role->check_permission($permission_name, $category_key);
     }
 
-    public static function add($app, $key)
+    public static function add($app_name, $perm_name)
     {
         $user = \Session::user();
         if (empty($user)) {
@@ -45,10 +29,9 @@ class Permission
         $role = reset($user->roles);
         try {
             $access = new User\Model_Permission();
-            $access->perm_role_id       = $role->role_id;
-            $access->perm_key           = $key;
-            $access->perm_identifier    = '';
-            $access->perm_application   = $app;
+            $access->perm_role_id      = $role->role_id;
+            $access->perm_name         = $perm_name;
+            $access->perm_category_key = $app_name;
             $access->save();
         } catch (\Exception $e) {
 

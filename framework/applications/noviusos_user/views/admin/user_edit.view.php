@@ -36,22 +36,9 @@ echo View::forge('nos::crud/toolbar', $view_params, false);
     </div>
     <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
 <?php
-$role = reset($item->roles);
-
-\Config::load('nos::admin/permissions', 'permissions');
-$applications = array_merge(\Nos\Config_Data::get('app_installed', array()), \Config::get('permissions', array()));
-foreach ($applications as $app => $params) {
-    if (isset($params['permission'])) {
-        $apps[$app] = array_merge($params, $params['permission']);
-    }
-}
-unset($apps['local']);
-unset($apps['nos']);
 
 echo \View::forge('noviusos_user::admin/permission', array(
     'user' => $item,
-    'role' => $role,
-    'apps' => $apps,
 ), false);
 ?>
     </div>
