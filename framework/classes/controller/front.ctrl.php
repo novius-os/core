@@ -144,6 +144,21 @@ class Controller_Front extends Controller
                     $this->_enhanced_url_path = false;
                     $this->_enhancer_url = false;
                     continue;
+                } catch (\Database_Exception $e) {
+                    // No database configuration file is found
+                    if (!is_file(APPPATH.'config'.DS.'db.config.php')) {
+                        // if install.php is there, redirects!
+                        if (is_file(DOCROOT.'install.php')) {
+                            \Response::redirect($this->_base_href.'install.php');
+                        }
+                    }
+
+                    echo \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                        'error' => 'Database configuration error.',
+                        'exception' => $e,
+                    ), false);
+                    exit();
                 } catch (\Exception $e) {
                     // Cannot generate cache: fatal error...
                     //@todo : error page case
@@ -172,6 +187,7 @@ class Controller_Front extends Controller
 
                     return $this->router('index', $params, 404);
                 } else {
+                    // The DB config is there, there's probably no homepage.
                     echo \View::forge('nos::errors/blank_slate_front', array(
                         'base_url' => $this->_base_href,
                     ), false);
