@@ -6,7 +6,6 @@ DELETE FROM `nos_migration` WHERE `nos_migration`.`type` = 'app' AND `nos_migrat
 
 # insert new equivalent migrations
 INSERT INTO `nos_migration` (`type`, `name`, `migration`) VALUES
-('package', 'nos', '001_install'),
 ('module', 'noviusos_media', '001_install'),
 ('module', 'noviusos_media', '002_migrate_0_1_1'),
 ('module', 'noviusos_page', '001_install'),
