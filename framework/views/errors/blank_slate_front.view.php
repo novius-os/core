@@ -72,15 +72,15 @@ a:hover {
 <body>
     <div id="blank_slate">
         <?php
-        if (!empty($error)) {
+if (!empty($error)) {
             ?>
             <img src="static/novius-os/admin/novius-os/img/logo.png" />
             <h1 class="error"><?= htmlspecialchars($error) ?></h1>
             <?php
-            if (!empty($exception)) {
-                echo '<p>Original message: '.$exception->getMessage().'</p>';
-            }
-        } else {
+    if (!empty($exception)) {
+        echo '<p>Original message: '.$exception->getMessage().'</p>';
+    }
+} else {
             ?>
             <h1><img src="static/novius-os/admin/novius-os/img/logo.png" />Novius OS is up and running. Now what?</h1>
 
@@ -95,7 +95,7 @@ a:hover {
             <h2>I don't know</h2>
             <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
             <?php
-        }
+}
         ?>
     </div>
 </body>

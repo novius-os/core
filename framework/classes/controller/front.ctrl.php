@@ -66,7 +66,7 @@ class Controller_Front extends Controller
         if (\Input::method() == 'POST' || $this->_is_preview) {
             $no_cache = true;
         } else {
-            $no_cache = \Fuel::$env === \Fuel::DEVELOPMENT && \Input::get('_cache', 0) != 1;
+            $no_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
         \Event::trigger('front.start');
@@ -77,6 +77,10 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
+            if ($no_cache) {
+                throw new CacheNotFoundException();
+            }
+
             // Cache exist, retrieve his content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
