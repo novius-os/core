@@ -176,8 +176,8 @@ if (!empty($menus)) {
     ?>
                 <div class="col <?= $large ? 'c4' : 'c3' ?>" style="position:relative;">
     <?php
-    $menu = current($menus);
-    if (empty($menu['view'])) {
+
+    if (!isset($menus['view'])) {
         $accordions = array();
         foreach ($menus as $key => $menu) {
             if (isset($menu['fields'])) {
@@ -194,11 +194,14 @@ if (!empty($menus)) {
                 'params' => array('accordions' => $accordions),
             ),
         );
-    }
-    foreach ($menus as $view) {
-        if (!empty($view['view'])) {
-            echo View::forge($view['view'], $view_params + (isset($view['params']) ? $view['params'] : array()) + array('view_params' => $view_params), false);
+
+        foreach ($menus as $view) {
+            if (!empty($view['view'])) {
+                echo View::forge($view['view'], $view_params + (isset($view['params']) ? $view['params'] : array()) + array('view_params' => $view_params), false);
+            }
         }
+    } else {
+        echo View::forge($menus['view'], $view_params + (isset($menus['params']) ? $menus['params'] : array()) + array('view_params' => $view_params), false);
     }
     ?>
                  </div>
