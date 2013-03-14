@@ -41,6 +41,10 @@ class Application
 
     public static function installNativeApplications($ignore_core_migrations = false)
     {
+        if (!$ignore_core_migrations) {
+            \Migrate::latest('nos', 'package');
+        }
+
         foreach (static::$repositories as $where => $repository) {
             if ($repository['native']) {
 
@@ -53,10 +57,6 @@ class Application
                     $application->install(false);
                 }
             }
-        }
-
-        if (!$ignore_core_migrations) {
-            \Migrate::latest('nos', 'package');
         }
     }
 
