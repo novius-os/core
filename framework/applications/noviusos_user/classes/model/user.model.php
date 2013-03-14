@@ -70,7 +70,7 @@ class Model_User extends \Nos\Orm\Model
         }
         if (empty($this->user_md5) || $this->is_changed('user_password') || $this->is_new()) {
             $this->generate_md5();
-            if ($this->user_id == \Session::user()->user_id) {
+            if (\Session::user() !== null && $this->user_id == \Session::user()->user_id) {
                 \Nos\Auth::set_user_md5($this->user_md5);
             }
         }
