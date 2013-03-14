@@ -9,7 +9,7 @@ class Move_migration_table
         $existing_migration = \DB::query('SELECT * FROM nos_migration WHERE
         type = "package" AND name="nos" AND migration="003_move_migration_table";')->execute();
         if (count($existing_migration) > 0) {
-            return false;
+            return true;
         }
 
         \Config::load('migrations', true);

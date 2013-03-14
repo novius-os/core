@@ -9,7 +9,7 @@ class Version_0_2 extends \Nos\Migration
         $existing_migration = \DB::query('SELECT * FROM nos_migration WHERE
         type = "package" AND name="nos" AND migration="002_version_0_2";')->execute();
         if (count($existing_migration) > 0) {
-            return false;
+            return true;
         }
 
         // Add new namespaces before everything else, or run into 'Fatal error: class Nos\Page\Model_Page not found!'

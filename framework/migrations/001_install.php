@@ -11,7 +11,7 @@ class Install extends \Nos\Migration
         if (count($old_migration) > 0) {
             $sql_file_legacy = substr($this->path, 0, strlen($this->path) - 4).'_legacy.sql';
             static::execute_sql_file($sql_file_legacy);
-            \Config::set('migrations.app.default', array());
+            \Config::set('migrations.version.app.default', array());
             \Config::set('migrations.version.package', array(
                 'nos' =>
                 array(
