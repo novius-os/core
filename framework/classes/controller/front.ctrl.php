@@ -77,6 +77,10 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
+            if (\Input::method() == 'POST' || $this->_is_preview) {
+                throw new CacheNotFoundException();
+            }
+
             // Cache exist, retrieve his content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
