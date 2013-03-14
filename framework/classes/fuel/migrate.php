@@ -188,7 +188,7 @@ class Migrate extends \Fuel\Core\Migrate
         if ($type == 'module') {
             $namespace = \Nos\Config_Data::get('app_namespaces.'.$name, null);
             if ($namespace === null) {
-                return false; // Namespace doesn't exist, so probably not on last version.
+                return false; // Namespace isn't registered, so probably not on last version.
             }
         }
         $current = \Config::get('migrations.version.'.$type.'.'.$name);
