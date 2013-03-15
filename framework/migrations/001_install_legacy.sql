@@ -15,7 +15,6 @@ INSERT INTO `nos_migration` (`type`, `name`, `migration`) VALUES
 ('module', 'noviusos_user', '002_migrate_0_1_1'),
 ('module', 'noviusos_user', '003_version_0_2'),
 ('package', 'nos', '002_version_0_2'),
-('package', 'nos', '003_move_migration_table'),
 ('module', 'noviusos_templates_basic', '001_version_0_2'),
 ('module', 'noviusos_blog', '001_install'),
 ('module', 'noviusos_blog', '002_migrate_0_1_1'),

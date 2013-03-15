@@ -5,6 +5,14 @@ class Install extends \Nos\Migration
 {
     public function up()
     {
+        \Config::load('migrations', true);
+        $table = \Config::get('migrations.table');
+        if ($table == 'migration') {
+            \DB::query('RENAME TABLE `migration` TO  `nos_migration`;')->execute();
+            \Migrate::set_table('nos_migration');
+            \Config::set('migrations.table', 'nos_migration');
+        }
+
         // test if there exists old migrations migrations
         $old_migration = \DB::query('SELECT * FROM nos_migration WHERE
         type = "app" AND name="default" AND migration="001_installation_0_1";')->execute();
