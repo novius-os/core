@@ -176,8 +176,8 @@ class Migrate extends \Fuel\Core\Migrate
         if ($name == 'nos' && $type == 'package') {
             static::$prefix = 'Nos\\Migrations\\';
         } else if ($type == 'module') {
-            $namespaces = \Nos\Config_Data::get('app_namespaces', null);
-            static::$prefix = $namespaces[$name].'\\Migrations\\';
+            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
+            static::$prefix = $namespace.'\\Migrations\\';
         } else {
             static::$prefix = 'Fuel\\Migrations\\';
         }
