@@ -13,6 +13,8 @@ define('NOS_ENTRY_POINT', 'admin');
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
+Fuel::$profiling = false;
+
 // Generate the request, execute it and send the output.
 try {
     $response = Request::forge(Input::server('NOS_URL'))->execute()->response();

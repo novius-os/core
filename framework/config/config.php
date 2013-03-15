@@ -30,7 +30,7 @@ return array(
     */
     'index_file'    => false,
 
-    'profiling'        => false,
+    'profiling'        => Fuel::$env === Fuel::DEVELOPMENT,
 
     'caching'            => false,
     'cache_dir'            => APPPATH.'cache/',

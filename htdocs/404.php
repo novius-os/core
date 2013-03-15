@@ -13,6 +13,8 @@ define('NOS_ENTRY_POINT', '404');
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
+Fuel::$profiling = false;
+ 
 $nos_url = Input::server('NOS_URL');
 
 \Event::trigger_function('404.start', array(array('url' => &$nos_url)));
