@@ -49,6 +49,8 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
+    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url');
+
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
@@ -622,23 +624,20 @@ class Controller_Front extends Controller
 
     public function save_cache()
     {
-        $page_fields = array('id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
-        $this->cache['page'] = array();
-        foreach ($page_fields as $field) {
-            $this->cache['page'][$field] = $this->_page->{'page_'.$field};
+        foreach (static::$_properties_cached as $property) {
+            $this->cache[$property] = $this->{$property};
         }
-        //return parent::save_cache();
-        return $this->cache; //@todo: to be reviewed
+
+        return $this->cache;
     }
 
     public function rebuild_cache($cache)
     {
-        $page = array();
-        foreach ($cache['page'] as $field => $value) {
-            $page['page_'.$field] = $value;
+        foreach (static::$_properties_cached as $property) {
+            if (isset($cache[$property])) {
+                $this->{$property} = $cache[$property];
+                unset($cache[$property]);
+            }
         }
-        $this->_page = new \Nos\Page\Model_Page($page, false);
-        $this->_page->freeze();
-        unset($cache['page']);
     }
 }
