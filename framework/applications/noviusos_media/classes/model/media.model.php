@@ -22,7 +22,10 @@ class Model_Media extends \Nos\Orm\Model
         'media_file',
         'media_ext',
         'media_title',
-        'media_protected',
+        'media_protected' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
         'media_width',
         'media_height',
         'media_created_at',

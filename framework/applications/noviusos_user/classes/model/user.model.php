@@ -24,7 +24,10 @@ class Model_User extends \Nos\Orm\Model
         'user_firstname',
         'user_email',
         'user_password',
-        'user_lang',
+        'user_lang' => array(
+            'data_type' => 'varchar',
+            'default' => 'en_GB',
+        ),
         'user_last_connection',
         'user_configuration',
         'user_created_at',
