@@ -17,7 +17,7 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      */
     protected $_properties = array();
 
-    protected $_sort_change = false;
+    protected $_sort_change = array();
 
     public function before_query(&$options)
     {
@@ -110,14 +110,14 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
         $sort_property = $this->_properties['sort_property'];
         if ($item->is_changed($sort_property)) {
-            $this->_sort_change = true;
+            $this->_sort_change[$item::implode_pk($item)] = true;
         }
     }
 
     public function after_save(\Nos\Orm\Model $item)
     {
-        if ($this->_sort_change) {
-            $this->_sort_change = false;
+        if (isset($this->_sort_change[$item::implode_pk($item)])) {
+            unset($this->_sort_change[$item::implode_pk($item)]);
             $sort_property = $this->_properties['sort_property'];
             $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
             $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
