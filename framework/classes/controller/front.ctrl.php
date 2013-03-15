@@ -475,7 +475,7 @@ class Controller_Front extends Controller
         $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
-                $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
+                $footer[] = \Str::sub($js['js'], 0, 8) === '<script ' ? $js['js'] : '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
                 $js = is_string($js) ? $js : $js['js'];
                 if (in_array($js, $this->_js_header)) {
