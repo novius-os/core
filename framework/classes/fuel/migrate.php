@@ -186,11 +186,12 @@ class Migrate extends \Fuel\Core\Migrate
     public static function isLastVersion($name, $type)
     {
         if ($type == 'module') {
-            $namespace = \Nos\Config_Data::get('app_namespaces.'.$name, null);
+            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
             if ($namespace === null) {
-                return false; // Namespace isn't registered, so probably not on last version.
+                return true; // Application doesn't have any namespace, so probably no migration files.
             }
         }
+
         $current = \Config::get('migrations.version.'.$type.'.'.$name);
         if (is_array($current)) {
             $current = count($current) == 0? null : $current[count($current) - 1];
