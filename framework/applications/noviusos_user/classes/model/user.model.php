@@ -32,7 +32,10 @@ class Model_User extends \Nos\Orm\Model
         'user_configuration',
         'user_created_at',
         'user_updated_at',
-        'user_expert',
+        'user_expert' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
     );
 
     protected static $_delete;
