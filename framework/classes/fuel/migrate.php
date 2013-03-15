@@ -49,7 +49,7 @@ class Migrate extends \Fuel\Core\Migrate
     protected static function find_migrations($name, $type, $start = null, $end = null, $direction = 'up')
     {
         // <<<<<<<<<<<<<<<<<<< CHANGES ARE HERE
-        static::generate_prefix($name, $type);
+        static::generatePrefix($name, $type);
         // >>>>>>>>>>>>>>>>>>>
 
         // Load all *_*.php files in the migrations path
@@ -140,7 +140,7 @@ class Migrate extends \Fuel\Core\Migrate
     // Overloaded function in order to support \Nos\Migration
     protected static function run($migrations, $name, $type, $method = 'up')
     {
-        static::generate_prefix($name, $type);
+        static::generatePrefix($name, $type);
         // storage for installed migrations
         $done = array();
 
@@ -171,7 +171,7 @@ class Migrate extends \Fuel\Core\Migrate
         return $done;
     }
 
-    protected static function generate_prefix($name, $type)
+    protected static function generatePrefix($name, $type)
     {
         if ($name == 'nos' && $type == 'package') {
             static::$prefix = 'Nos\\Migrations\\';
@@ -183,7 +183,7 @@ class Migrate extends \Fuel\Core\Migrate
         }
     }
 
-    public static function is_last_version($name, $type)
+    public static function isLastVersion($name, $type)
     {
         if ($type == 'module') {
             $namespace = \Nos\Config_Data::get('app_namespaces.'.$name, null);

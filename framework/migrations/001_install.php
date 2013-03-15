@@ -10,7 +10,7 @@ class Install extends \Nos\Migration
         type = "app" AND name="default" AND migration="001_installation_0_1";')->execute();
         if (count($old_migration) > 0) {
             $sql_file_legacy = substr($this->path, 0, strlen($this->path) - 4).'_legacy.sql';
-            static::execute_sql_file($sql_file_legacy);
+            static::executeSqlFile($sql_file_legacy);
             \Config::set('migrations.version.app.default', array());
             \Config::set('migrations.version.package', array(
                 'nos' =>

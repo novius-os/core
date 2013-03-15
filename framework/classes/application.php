@@ -75,7 +75,7 @@ class Application
             }
         }
 
-        return !\Migrate::is_last_version('nos', 'package');
+        return !\Migrate::isLastVersion('nos', 'package');
     }
 
     public static function cleanApplications()
@@ -203,7 +203,7 @@ class Application
     {
         return ($this->folder != 'local' && $this->folder != 'nos' && !$this->check_install())
             || !$this->check_metadata()
-            || ($this->folder == 'local' && !\Migrate::is_last_version('default', 'app'));
+            || ($this->folder == 'local' && !\Migrate::isLastVersion('default', 'app'));
     }
 
     protected function check_install()
@@ -211,7 +211,7 @@ class Application
         return static::get_application_path($this->folder) !== false
             && $this->is_link('static')
             && $this->is_link('htdocs')
-            && \Migrate::is_last_version($this->folder, 'module');
+            && \Migrate::isLastVersion($this->folder, 'module');
     }
 
     /**

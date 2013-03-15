@@ -24,11 +24,11 @@ class Migration
     public function up()
     {
         if (file_exists($this->sql_file)) {
-            static::execute_sql_file($this->sql_file);
+            static::executeSqlFile($this->sql_file);
         }
     }
 
-    public static function execute_sql_file($sql_file)
+    public static function executeSqlFile($sql_file)
     {
         $queries = explode(';', file_get_contents($sql_file));//@todo: might not work everywhere (; in values)
         foreach ($queries as $query) {
