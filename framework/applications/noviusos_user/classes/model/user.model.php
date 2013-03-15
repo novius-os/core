@@ -17,6 +17,21 @@ class Model_User extends \Nos\Orm\Model
     protected static $_table_name = 'nos_user';
     protected static $_primary_key = array('user_id');
 
+    protected static $_properties = array(
+        'user_id',
+        'user_md5',
+        'user_name',
+        'user_firstname',
+        'user_email',
+        'user_password',
+        'user_lang',
+        'user_last_connection',
+        'user_configuration',
+        'user_created_at',
+        'user_updated_at',
+        'user_expert',
+    );
+
     protected static $_delete;
 
     protected static $_many_many = array(

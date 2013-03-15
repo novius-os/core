@@ -15,6 +15,14 @@ class Model_Link extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media_link';
     protected static $_primary_key = array('medil_id');
 
+    protected static $_properties = array(
+        'medil_id',
+        'medil_from_table',
+        'medil_foreign_id',
+        'medil_key',
+        'medil_media_id',
+    );
+
     public static $_belongs_to = array(
         'media' => array(
             'key_from' => 'medil_media_id',

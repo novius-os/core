@@ -15,6 +15,12 @@ class Model_Role extends \Nos\Orm\Model
     protected static $_table_name = 'nos_role';
     protected static $_primary_key = array('role_id');
 
+    protected static $_properties = array(
+        'role_id',
+        'role_name',
+        'role_user_id',
+    );
+
     protected static $permissions;
     protected $access;
 
