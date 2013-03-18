@@ -173,6 +173,13 @@ class FrontCache
         return true;
     }
 
+    public function delete()
+    {
+        if (is_file($this->_path)) {
+            @unlink($this->_path);
+        }
+    }
+
     public function get_path()
     {
         return $this->_path;

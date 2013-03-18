@@ -29,6 +29,10 @@ body {
 	bottom : 0px;
 	border : 0px;
 
+    > .wijmo-wijmenu {
+        position: absolute;
+    }
+
 	.nos-ostabs-header {
 		background-position : 50% 75%;
 		border : 0;
@@ -84,7 +88,21 @@ body {
 				font-weight : normal;
 				font-size : 0.8em;
 			}
+
+            span.nos-ostabs-closetab {
+                float: right;
+                margin-top: 4px;
+                cursor: pointer;
+                display: none;
+            }
+
 		}
+
+        li.ui-state-active {
+            span.nos-ostabs-closetab {
+                display: block;
+            }
+        }
 
 		li.nos-ostabs-appstab {
 		    margin : 0px 30px 0 30px;
@@ -123,7 +141,7 @@ body {
 
 		li.ui-sortable-helper {
 			background : #000;
-			top : 47px;
+			top : 21px;
 			cursor : move;
 
 			a {
@@ -237,7 +255,7 @@ body {
 		position : absolute;
 		@include box-sizing(border-box);
 		left : 0px;
-		top : 69px;
+		top : 54px;
 		bottom : 0px;
 		right : 0px;
 
@@ -262,7 +280,7 @@ body {
 
 		.nos-ostabs-actions {
 			position : absolute;
-			top : -59px;
+			top : -56px;
 			width : 100%;
 			left : 0;
 			height : 54px;
@@ -312,6 +330,16 @@ body {
 		display: none !important;
 	}
 }
+.nos-ostabs-touch {
+    .nos-ostabs-panel {
+        top : 59px;
+
+        .nos-ostabs-actions {
+            top : -59px;
+        }
+    }
+}
+
 
 /* Specifique */
 .nos-ostabs {
@@ -363,15 +391,6 @@ body {
     #noviusospanel {
         background-image : url(../img/wallpapers/default.jpg);
         background-size : cover;
-        top : 64px;
-
-		.nos-ostabs-actions {
-			top : -54px;
-		}
-
-        div.nos-ostabs-panel-content {
-            top : 20px;
-        }
 
         ul.apps {
             margin : 40px 30px 15px 60px;
