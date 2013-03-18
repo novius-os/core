@@ -335,6 +335,25 @@ img.publication_status {
         }
     }
 }
+
+table.publication_status {
+
+    a {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    td {
+        white-space: nowrap;
+
+        &:first-child {
+            padding-right: 0.5em;
+            text-align: right;
+        }
+    }
+
+}
+
 .nos-notification {
 	top : 69px;
 }

@@ -11,42 +11,43 @@ define('jquery-nos-publishable',
     function($) {
         "use strict";
 
-        var init_range_input = function($input, $p) {
+        var update_date_label = function($input, $p, params) {
 
-            var $p_empty  = $p.find('.date_empty');
-            var $p_filled = $p.find('.date_filled');
-
-
-            var $clear = $p_filled.find('.date_clear');
-            $clear.on('click', function(e) {
-                e.preventDefault();
-                $input.val('').trigger('change');
-            });
-
-            $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
-            $input.datetimepicker({
-                timeFormat: 'hh:mm:ss',
-                dateFormat: 'yy-mm-dd'
-            });
-
-            var $pick = $p.find('.date_pick').on('click', function(e) {
-                e.preventDefault();
-                $input.datetimepicker('show');
-            });
-
-            $input.on('change', function() {
-                var value = $input.val();
-                require(['jquery.globalize', 'jquery.globalize.cultures'], function() {
+            var value = $input.val();
+            require(['jquery.globalize', 'jquery.globalize.cultures'], function() {
+                if (value == '') {
+                    var $date = $p.find('a.date_new');
+                    if ($date.length > 0) {
+                        // Date pick layout is here, nothing to do!
+                    } else {
+                        $p.empty().append($('<a class="date_new"></a>').text(params.texts.pick).on('click', function showDatePickerEmpty(e) {
+                            e.preventDefault();
+                            $input.datetimepicker('show');
+                        }));
+                    }
+                } else {
                     Globalize.culture( $.nosLang.substr(0, 2) );
                     var date = $input.datetimepicker('getDate');
                     var formatted = Globalize.format(date, 'd') + ' ' + Globalize.format(date, 't');
 
-                    $p_filled.find('.date_pick').text(formatted);
-                });
+                    var $date = $p.find('a.date_pick');
+                    if ($date.length > 0) {
+                        // Date layout is here, just update the text!
+                        $date.text(formatted);
 
-                $p_empty[value == '' ? 'show' : 'hide']();
-                $p_filled[value == '' ? 'hide' : 'show']();
-            }).trigger('change');
+                    } else {
+                        $p.empty().append($(params.texts['clear']));
+                        $p.find('a.date_pick').text(formatted).on('click', function showDatePickerValue(e) {
+                            e.preventDefault();
+                            $input.datetimepicker('show');
+                        });
+                        $p.find('a.date_clear').on('click', function clearDatePicker(e) {
+                            e.preventDefault();
+                            $input.val('').trigger('change');
+                        });
+                    }
+                }
+            });
         }
 
         $.fn.extend({
@@ -75,6 +76,7 @@ define('jquery-nos-publishable',
                         $buttonset = $container.find('td:first'),
                         $label = $buttonset.next(),
                         $planned = $label.next(),
+                        dateRangeStatus = 'initial', // 'initial' or 'modified'
                         changeAlt = function() {
                             $buttonset.find(':radio').each(function() {
                                 var $radio = $(this),
@@ -87,14 +89,54 @@ define('jquery-nos-publishable',
                             });
                         };
 
-
                     if (params.date_range) {
                         var $publishable = $('#' + params.date_range.container);
                         var $input_start = $publishable.find('#' + params.date_range.inputStart);
                         var $input_end = $publishable.find('#' + params.date_range.inputEnd);
 
-                        init_range_input($input_start, $publishable.find('p.date_start'));
-                        init_range_input($input_end, $publishable.find('p.date_end'));
+                        var now = params.date_range.now;
+                        // new Date(year, month, day, hour, min, sec)
+                        // month range is 0-11
+                        now = new Date(now[0], now[1] - 1, now[2], now[3], now[4], now[5]);
+
+                        // This event is triggered first
+                        $input_start.add($input_end).on('change', function(e) {
+                            var date_start = $input_start.datetimepicker('getDate');
+                            var date_end = $input_end.datetimepicker('getDate');
+                            var planification = '';
+
+                            if (date_start == null || date_start < now) {
+                                planification = 'published';
+                            } else if (date_end != null && date_end < now) {
+                                planification = 'backdated';
+                            } else {
+                                planification = 'scheduled';
+                            }
+
+                            // We need to refresh the layout when this changes = when the 'dateRangeStatus' changes or the 'planification' changes
+                            var css = 'planification_status_' + dateRangeStatus + '_' + planification;
+                            var $table = $planned.find('table.' + css);
+
+                            if ($table.length > 0) {
+                                // Layout has not changed, just update the values
+                            } else {
+                                $table = $('<table class="publication_status ' + css + '"></table>').append(params.date_range.texts[dateRangeStatus][planification]);
+                                $planned.empty().append($table);
+                                dateRangeStatus = 'modified';
+                            }
+
+                            // Update texts
+                            update_date_label($input_start, $planned.find('span.date_start'), params.date_range);
+                            update_date_label($input_end, $planned.find('span.date_end'), params.date_range);
+                        });
+
+                        $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
+                        $input_start.add($input_end).datetimepicker({
+                            timeFormat: 'hh:mm:ss',
+                            dateFormat: 'yy-mm-dd'
+                        });
+
+                        $input_start.trigger('change');
                     }
 
                     changeAlt();
@@ -117,7 +159,13 @@ define('jquery-nos-publishable',
                                 return;
                             }
                             params.initialStatus = json.publication_initial_status;
-                            $buttonset.find(':checked').triggerHandler('change');
+                            if (params.date_range && params.initialStatus == 2) {
+                                dateRangeStatus = 'initial';
+                                $('#' + params.date_range.inputStart).trigger('change');
+
+                            } else {
+                                $buttonset.find(':checked').triggerHandler('change');
+                            }
                         });
                 });
             }

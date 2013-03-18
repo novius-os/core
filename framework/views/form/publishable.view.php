@@ -29,78 +29,53 @@ $published = !empty($item) ? $item->published() : false;
     <table style="margin:0 2em 0 1em;" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
             <td class="publishable" style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
-                <?php
-                if ($yes_no_mode) {
-                    ?>
-                    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
-                    <?php
-                }
-                if ($planification_mode) {
-                    ?>
-                    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-clock.png" /></label>
-                    <?php
-                }
-                if ($yes_no_mode) {
-                    ?>
-                    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
-                    <?php
-                }
+<?php
+if ($yes_no_mode) {
+    ?>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
+    <?php
+}
+if ($planification_mode) {
+    ?>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-clock.png" /></label>
+    <?php
+}
+if ($yes_no_mode) {
+    ?>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
+    <?php
+}
 
-                if ($planification_mode) {
-                    echo html_tag('input', array(
-                        'id' => ($uniqid_start = uniqid('start_')),
-                        'type' => 'hidden',
-                        'name' => $publishable['publication_start_property'],
-                        'value' => $item->publication_start(),
-                    ));
-                    // Fixing strange bug of datepicker
-                    echo '<span></span>';
+if ($planification_mode) {
+    echo html_tag('input', array(
+        'id' => ($uniqid_start = uniqid('start_')),
+        'type' => 'hidden',
+        'name' => $publishable['publication_start_property'],
+        'value' => $item->publication_start(),
+    ));
+    // Fixing strange bug of datepicker
+    echo '<span></span>';
 
-                    echo html_tag('input', array(
-                        'id' => ($uniqid_end = uniqid('end_')),
-                        'type' => 'hidden',
-                        'name' => $publishable['publication_end_property'],
-                        'value' => $item->publication_end(),
-                    ));
-                    // Fixing strange bug of datepicker
-                    echo '<span></span>';
-                }
-                ?>
+    echo html_tag('input', array(
+        'id' => ($uniqid_end = uniqid('end_')),
+        'type' => 'hidden',
+        'name' => $publishable['publication_end_property'],
+        'value' => $item->publication_end(),
+    ));
+    // Fixing strange bug of datepicker
+    echo '<span></span>';
+}
+?>
             </td>
             <td style="padding-left:10px;"></td>
             <?php
-            if ($planification_mode) {
-                ?>
-                <td style="padding-left:10px;display:none;">
-                    <p class="date_start">
-                        <span class="date_empty">
-                            <?= strtr(__('From: <a>Pick a date</a>'), array(
-                            '<a>' => '<a class="date_pick" href="#">',
-                        )) ?>
-                        </span>
-                        <span class="date_filled">
-                            <?= strtr(__('From: <a1>{{date}}</a> &nbsp; <a2>Clear</a>'), array(
-                                '<a1>' => '<a class="date_pick" href="#">',
-                                '<a2>' => '<a class="date_clear" href="#">',
-                            )) ?>
-                        </span>
-                    </p>
-                    <p class="date_end">
-                        <span class="date_empty">
-                            <?= strtr(__('To: <a>Pick a date</a>'), array(
-                                '<a>' => '<a class="date_pick" href="#">',
-                            )) ?>
-                        </span>
-                        <span class="date_filled">
-                            <?= strtr(__('To: <a1>{{date}}</a> &nbsp; <a2>Clear</a>'), array(
-                                '<a1>' => '<a class="date_pick" href="#">',
-                                '<a2>' => '<a class="date_clear" href="#">',
-                            )) ?>
-                        </span>
-                    </p>
-                </td>
-                <?php
-            }
+if ($planification_mode) {
+    ?>
+    <td class="date_schedule" style="padding-left:10px;display:none;">
+
+    </td>
+    <?php
+}
             ?>
         </tr>
     </table>
@@ -108,12 +83,41 @@ $published = !empty($item) ? $item->published() : false;
 
 <?php
 
+$replacePlaceholders = function($txt) {
+    $txt = __($txt);
+    return strtr($txt, array(
+        '<row>' => '<tr>',
+        '</row>' => '</tr>',
+        '<cell>' => '<td>',
+        '</cell>' => '</td>',
+        '<a>' => '<a class="date_clear">',
+        '{{start}}' => '<span class="date_start"></span>',
+        '{{end}}' => '<span class="date_end"></span>',
+        '{{date}}' => '<a class="date_pick"></a>',
+    ));
+};
+
 $nosPublishable = array(
     'initialStatus' => empty($item) || $item->is_new() ? 'undefined' : $item->planification_status(),
     'date_range' => !$planification_mode ? false : array(
         'container' => $publishable_id,
         'inputStart' => $uniqid_start,
         'inputEnd' => $uniqid_end,
+        'now' => explode(' ', date('Y m d H i s')),
+        'texts' => array(
+            'initial' => array(
+                'scheduled' => $replacePlaceholders('<row><cell>Scheduled from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
+                'published' => $replacePlaceholders('<row><cell>Published since:</cell><cell>{{start}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell></row>'),
+                'backdated' => $replacePlaceholders('<row><cell>Was published from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
+            ),
+            'modified' => array(
+                'scheduled' => $replacePlaceholders('<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
+                'published' => $replacePlaceholders('<row><cell>Will be published since:</cell><cell>{{start}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell></row>'),
+                'backdated' => $replacePlaceholders('<row><cell>Will be backdated from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
+            ),
+            'pick' => __('Pick a date'),
+            'clear' => $replacePlaceholders('{{date}} &nbsp; <a>Clear</a>')
+        ),
     ),
     'texts' => array(
         'undefined' => array(
