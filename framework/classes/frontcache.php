@@ -178,14 +178,8 @@ class FrontCache
 
         // Prevent PHP injection using a <script language=php> tag
         $this->_content = preg_replace('`<script\s+language=(.?)php\1\s*>(.*?)</script>`i', '&lt;script language=$1php$1>$2&lt;/script>', $this->_content);
-        $this->_content = strtr(
-            $this->_content,
-            array(
-                // Prevent PHP injection using tags
-                '<?' => '&lt;?',
-                '?>' => '?&gt;',
-            )
-        );
+        $this->_content = preg_replace('`<\?(?!xml)`i', '&lt;?', $this->_content);
+        $this->_content = str_replace('<?xml', "<?= '<?' ?>xml", $this->_content);
 
         if (null !== static::$_php_begin && null !== static::$_php_end) {
             $this->_content = strtr(

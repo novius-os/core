@@ -18,9 +18,14 @@ class NotFoundException extends \Exception
 {
 }
 
+class FrontReplaceTemplateException extends \Exception
+{
+}
+
 class Controller_Front extends Controller
 {
     protected $_url = '';
+    protected $_extension = '';
     protected $_page_url = '';
     protected $_enhancer_url = false;
     protected $_enhanced_url_path = false;
@@ -29,6 +34,7 @@ class Controller_Front extends Controller
 
     protected $_template;
     protected $_view;
+    protected $_content;
 
     protected $_is_preview = false;
 
@@ -49,42 +55,58 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
-    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url');
+    protected $_save_cache = true;
+    protected $_cache_duration = 60;
+    protected $_custom_data = array();
+    protected $_status = 200;
+    protected $_headers = array();
+
+    protected $_custom_data_cached = array();
+    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url', '_extension', '_status', '_headers');
+
+    public function before()
+    {
+        parent::before();
+        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
+    }
 
     public function router($action, array $params, $status = 200)
     {
+        $this->_status = $status;
+
         $this->_base_href = \URI::base(false);
         $this->_context_url = \URI::base(false);
 
         $this->_url = \Input::server('NOS_URL');
-        $url = str_replace('.html', '', $this->_url);
+        $this->_extension = pathinfo($this->_url, PATHINFO_EXTENSION);
+        $url = \Str::sub($this->_url, 0, - strlen($this->_extension) - 1);
 
         $this->_is_preview = \Input::get('_preview', false);
 
-        $cache_path = (empty($url) ? 'index/' : $url);
+        $cache_path = (empty($this->_url) ? 'index/' : $this->_url);
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
         if (\Input::method() == 'POST' || $this->_is_preview) {
-            $no_cache = true;
+            $this->_save_cache = true;
         } else {
-            $no_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
+            $this->_save_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
         \Event::trigger('front.start');
-        \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
+        \Event::trigger_function('front.start', array(array('url' => &$url, 'extension' => &$this->_extension, 'cache_path' => &$cache_path)));
 
         $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
-            if ($no_cache) {
+            if ($this->_save_cache) {
                 throw new CacheNotFoundException();
             }
 
             // Cache exist, retrieve his content
-            $content = $cache->execute($this);
+            $this->_content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
             // Cache not exist, try to found page for this URL
 
@@ -144,6 +166,26 @@ class Controller_Front extends Controller
                 try {
                     $this->_generate_cache();
                     $this->_context_url = $contexts_possibles[$this->_context];
+                    $this->_content = $this->_view->render();
+
+                    $this->_handle_head();
+                    \Event::trigger_function('front.display', array(&$this->_content));
+
+                    echo $this->_content;
+
+                    $cache->save($this->_save_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $cache->execute();
+
+                    break;
+                } catch (FrontReplaceTemplateException $e) {
+                    $this->_context_url = $contexts_possibles[$this->_context];
+
+                    echo $this->_content;
+
+                    $cache->save($this->_save_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $cache->execute();
+
+                    break;
                 } catch (NotFoundException $e) {
                     $_404 = true;
                     $this->_page = null;
@@ -170,18 +212,6 @@ class Controller_Front extends Controller
                     //@todo : error page case
                     exit($e->getMessage());
                 }
-
-                $content = $this->_view->render();
-
-                $this->_handle_head($content);
-                \Event::trigger_function('front.display', array(&$content));
-
-                echo $content;
-
-                $cache->save($no_cache ? -1 : \Config::get('novius-os.cache_duration_page', 5), $this);
-                $content = $cache->execute();
-
-                break;
             }
 
             if ($_404) {
@@ -202,7 +232,7 @@ class Controller_Front extends Controller
             }
         }
 
-        return \Response::forge($content, $status);
+        return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
 
     /**
@@ -227,6 +257,14 @@ class Controller_Front extends Controller
     public function getWysiwygName()
     {
         return $this->_wysiwyg_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->_extension;
     }
 
     /**
@@ -274,6 +312,7 @@ class Controller_Front extends Controller
 
     /**
      * @param $title
+     * @param $template
      * @return Controller_Front
      */
     public function setTitle($title, $template = null)
@@ -388,7 +427,7 @@ class Controller_Front extends Controller
         return $this->_is_preview;
     }
 
-    protected function _handle_head(&$content)
+    protected function _handle_head()
     {
         $replaces  = array(
             '_base_href'         => array(
@@ -413,6 +452,7 @@ class Controller_Front extends Controller
             ),
         );
 
+        $content = $this->_content;
         $replace_fct = function($pattern, $replace) use (&$content) {
             $content_old = $content;
             $content = preg_replace(
@@ -489,6 +529,7 @@ class Controller_Front extends Controller
         if (count($footer)) {
             $replace_fct('</body>', implode("\n", $footer)."\n</body>");
         }
+        $this->_content = $content;
     }
 
     /**
@@ -609,35 +650,127 @@ class Controller_Front extends Controller
         }
 
         try {
-            // Try normal loading
             $this->_view = View::forge($this->_template['file']);
         } catch (\FuelException $e) {
-
-            $template_file = \Finder::search('views', $this->_template['file']);
-
-            if (!is_file($template_file)) {
-                throw new \Exception('The template '.$this->_template['file'].' cannot be found.');
-            }
-            $this->_view = View::forge($template_file);
+            throw new \Exception('The template '.$this->_template['file'].' cannot be found.');
         }
     }
 
     public function save_cache()
     {
+        $cache = array();
         foreach (static::$_properties_cached as $property) {
-            $this->cache[$property] = $this->{$property};
+            $cache[$property] = $this->{$property};
         }
 
-        return $this->cache;
+        $cache['_custom_data'] = array();
+        foreach ($this->_custom_data_cached as $property) {
+            \Arr::set($cache['_custom_data'], $property, \Arr::get($this->_custom_data, $property, null));
+        }
+
+        return $cache;
     }
 
     public function rebuild_cache($cache)
     {
-        foreach (static::$_properties_cached as $property) {
+        $_properties_cached = static::$_properties_cached + array('_custom_data');
+        foreach ($_properties_cached as $property) {
             if (isset($cache[$property])) {
                 $this->{$property} = $cache[$property];
                 unset($cache[$property]);
             }
         }
+    }
+
+    /**
+     * @param $save_cache
+     * @return Controller_Front
+     */
+    public function setSaveCache($save_cache)
+    {
+        $this->_save_cache = $save_cache;
+
+        return $this;
+    }
+
+    /**
+     * @param $cache_duration
+     * @return Controller_Front
+     */
+    public function setCacheDuration($cache_duration)
+    {
+        $this->_cache_duration = $cache_duration;
+
+        return $this;
+    }
+
+    /**
+     * @param $status
+     * @return Controller_Front
+     */
+    public function setStatus($status)
+    {
+        $this->_status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name The header name
+     * @param string $value The header value
+     * @param bool|string $replace Whether to replace existing value for the header, will never overwrite/be overwritten when false
+     *
+     * @return Controller_Front
+     */
+    public function setHeader($name, $value, $replace = true)
+    {
+        if ($replace) {
+            $this->_headers[$name] = $value;
+        } else {
+            $this->_headers[] = array($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns a (dot notated) custom data
+     *
+     * @param   string   $item      name of the custom data, can be dot notated
+     * @param   mixed    $default   the return value if the custom data isn't found
+     * @return  mixed               the custom data or default if not found
+     */
+    public function getCustomData($item, $default = null)
+    {
+        return \Arr::get($this->_custom_data, $item, $default);
+    }
+
+    /**
+     * Sets a (dot notated) custom data
+     *
+     * @param    string    $item a (dot notated) custom data key
+     * @param    mixed     $value the custom data value
+     * @param    boolean   $cached if custom data have to be cached
+     * @return   void      the \Arr::set result
+     */
+    public function setCustomData($item, $value, $cached = false)
+    {
+        \Arr::set($this->_custom_data, $item, $value);
+        if ($cached) {
+            $this->_custom_data_cached[] = $item;
+        }
+    }
+
+    /**
+     * Replace the template by a specific content and stop treatments
+     *
+     * @param mixed $content The new content, can be a string or a View
+     * @throws FrontReplaceTemplateException Internal exception for stopping treatments
+     */
+    public function replaceTemplate($content)
+    {
+        $this->_content = $content;
+
+        throw new FrontReplaceTemplateException();
     }
 }
