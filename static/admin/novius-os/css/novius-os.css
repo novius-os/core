@@ -534,67 +534,74 @@ span.optional {
 }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003323}}
-.crud_subtitle {
+.line .line.crud_subtitle {
   overflow: visible;
   margin-bottom: 1em;
+  margin-left: 2px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003327}}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003330}}
 .crud_subtitle td {
   vertical-align: top;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003332}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003335}}
 img.publication_status {
   vertical-align: middle;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003336}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003339}}
 .publishable {
   line-height: 1.4em;
+  margin: 0 2em 0 0em;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003340}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003344}}
 .publishable_radio {
   white-space: nowrap;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003343}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003347}}
 .publishable_radio .ui-button-text {
   padding: 0;
   width: 20px;
   height: 20px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003348}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003352}}
 .publishable_radio .ui-button-text img {
   vertical-align: middle;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003353}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003357}}
 .publishable_label {
   padding-left: 10px;
   height: 2.8em;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003358}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003362}}
 .publishable_schedule {
   padding-left: 10px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003364}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003368}}
 table.publication_status a {
   text-decoration: underline;
   cursor: pointer;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003369}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003373}}
 table.publication_status td {
   white-space: nowrap;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003372}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003376}}
 table.publication_status td:first-child {
   padding-right: 0.5em;
   text-align: right;
 }
-
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003380}}
+table.publication_status td:last-child {
+  padding-left: 0.5em;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003387}}
 .nos-notification {
   top: 69px;
 }
@@ -602,7 +609,7 @@ table.publication_status td:first-child {
 /*+-++-++-++-+
  *|H||O||M||E|
  *+-++-++-++-+*/
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003388}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003395}}
 #search {
   display: none;
   /*display: inline-block;*/
@@ -611,7 +618,7 @@ table.publication_status td:first-child {
   position: relative;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003395}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003402}}
 #search input {
   font-size: 1.4em;
   padding: 6px;
@@ -628,7 +635,7 @@ table.publication_status td:first-child {
   background-image: linear-gradient(top, #d0d0d0 0%, #ffffff 100%);
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003412}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003419}}
 #magnifier {
   background: url(../img/icons/magnifier.png) no-repeat left center;
   height: 20px;
@@ -638,16 +645,16 @@ table.publication_status td:first-child {
   left: 16px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003421}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003428}}
 .ui-state-highlight a {
   text-shadow: none;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003425}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003432}}
 #apps {
   padding: 0 15px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003428}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003435}}
 #apps .icon {
   width: 90px;
   height: 90px;
@@ -660,14 +667,14 @@ table.publication_status td:first-child {
   margin-bottom: 4px;
   position: relative;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003441}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003448}}
 #apps .icon img {
   position: absolute;
   top: 13px;
   left: 13px;
   z-index: 1;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003447}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003454}}
 #apps .icon img.gloss {
   z-index: 2;
   border-radius: 45px 45px 0 0;
@@ -676,11 +683,11 @@ table.publication_status td:first-child {
   /* Need to keep 0 for the radius/hidden to operate properly */
   left: 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003454}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003461}}
 #apps a {
   vertical-align: top;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003457}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003464}}
 #apps .text {
   display: inline-block;
   background: rgba(255, 255, 255, 0.6);
@@ -689,7 +696,7 @@ table.publication_status td:first-child {
   padding: 4px 5px;
   border-radius: 4px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003465}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003472}}
 #apps .app {
   display: inline-block;
   text-align: center;
@@ -701,65 +708,65 @@ table.publication_status td:first-child {
 /*+-++-++-++-+
  * |F||O||R||M|
  * +-++-++-++-+*/
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003477}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003484}}
 .fieldset.wijmo-wijexpander {
   /*margin-top: 2em;*/
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003480}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003487}}
 .fieldset .ui-widget-content {
   padding: inherit 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003483}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003490}}
 .fieldset table, table.fieldset {
   width: 100%;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003487}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003494}}
 .fieldset th, .fieldset td {
   padding-right: 2em;
   /* = .c7 .col */
   padding-top: 0.5em;
   padding-bottom: 0.5em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003492}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003499}}
 .fieldset th {
   text-align: right;
   vertical-align: top;
   width: 30.4% !important;
   /* = .c7 .c2 + .c7 .col */
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003497}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003504}}
 .fieldset input, .fieldset textarea {
   width: 100%;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003502}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003509}}
 .fieldset textarea {
   resize: vertical;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003505}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003512}}
 .fieldset input[size], .fieldset textarea[cols] {
   width: auto;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003512}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003519}}
 table.title-fields {
   width: 100%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003515}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003522}}
 table.title-fields td {
   padding-right: 1em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003519}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003526}}
 table.title-fields td:last-child {
   padding-right: 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003523}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003530}}
 table.title-fields input {
   display: inline-block;
   width: 100%;
@@ -767,27 +774,27 @@ table.title-fields input {
   -moz-box-sizing: border-box;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003531}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003538}}
 .table-field {
   display: table;
   width: 100%;
   border-collapse: separate;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003539}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003546}}
 .table-field > input, .table-field > textarea, .row-field > input, .row-field > textarea {
   display: table-cell;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003546}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003553}}
 .table-field > input[size], .table-field > textarea[cols], .row-field > input[size], .row-field > textarea[cols] {
   width: auto;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003552}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003559}}
 .table-field > span, .table-field > div:not(.row-field), .table-field > label, .row-field > span, .row-field > div:not(.row-field), .row-field > label {
   display: table-cell;
 }
@@ -795,17 +802,17 @@ table.title-fields input {
 /*+-++-++-++-++-++-++-++-++-++-++-+
 * |P||E||R||M||I||S||S||I||O||N||S|
 * +-++-++-++-++-++-++-++-++-++-++-+*/
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003560}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003567}}
 #permissions {
   padding: 0px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003566}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003573}}
 .permissions .applications {
   overflow: hidden;
   padding-left: 3em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003569}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003576}}
 .permissions .applications .application {
   border: 1px solid #a8a8a8;
   border-radius: 5px 0 0 5px;
@@ -815,34 +822,34 @@ table.title-fields input {
   margin-top: 10px;
   margin-bottom: 20px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003579}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003586}}
 .permissions .applications .application.all {
   height: 40px;
   border: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003583}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003590}}
 .permissions .applications .application.all:hover, .permissions .applications .application.all.selected {
   background: none !important;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003587}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003594}}
 .permissions .applications .application.all .infos {
   line-height: 40px;
   background: none;
   left: 60px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003593}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003600}}
 .permissions .applications .application.all .maincheck {
   background: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003596}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003603}}
 .permissions .applications .application.all .maincheck .wijmo-checkbox {
   margin-top: 11px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003606}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003613}}
 .permissions .applications .application:hover, .permissions .applications .application.selected {
   background-color: #F5F5F5;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003610}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003617}}
 .permissions .applications .application .maincheck {
   position: absolute;
   top: 0px;
@@ -852,12 +859,12 @@ table.title-fields input {
   border-radius: 5px 0 0 5px;
   background-color: #E8E8E8;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003619}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003626}}
 .permissions .applications .application .maincheck .wijmo-checkbox {
   margin-left: 8px;
   margin-top: 28px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003625}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003632}}
 .permissions .applications .application .icon {
   position: absolute;
   top: 0px;
@@ -865,7 +872,7 @@ table.title-fields input {
   left: 35px;
   width: 100px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003632}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003639}}
 .permissions .applications .application .icon img {
   position: absolute;
   top: 50%;
@@ -873,7 +880,7 @@ table.title-fields input {
   margin-top: -32px;
   margin-left: -32px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003641}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003648}}
 .permissions .applications .application .infos {
   position: absolute;
   top: 0px;
@@ -884,42 +891,42 @@ table.title-fields input {
   font-size: 24px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003657}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003664}}
 .ui-tabs-left .wijmo-wijtabs-content {
   width: 84%;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003661}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003668}}
 .ui-pnotify-title {
   font-size: 1.2em;
   line-height: 1;
   font-weight: bold;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003668}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003675}}
 .login_popup {
   margin: 0 auto;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003672}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003679}}
 .login_popup p {
   margin: 1em auto;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003676}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003683}}
 label.tooltip {
   cursor: pointer;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003679}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003686}}
 label.tooltip div.content {
   display: none;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003683}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003690}}
 div.wijmo-wijtooltip.tooltip {
   line-height: 1.3em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003687}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/novius-os\.scss}line{font-family:\00003694}}
 div.wijmo-wijtooltip.tooltip p {
   margin-bottom: 0.5em;
 }

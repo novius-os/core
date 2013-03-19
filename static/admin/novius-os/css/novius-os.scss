@@ -320,10 +320,13 @@ span.optional {
     opacity    : 0.7;
 }
 
-.crud_subtitle {
-    overflow:visible;
-    margin-bottom:1em;
+.line .line.crud_subtitle {
+    overflow: visible;
+    margin-bottom: 1em;
+    margin-left: 2px;
+}
 
+.crud_subtitle {
     td {
         vertical-align: top;
     }
@@ -335,6 +338,7 @@ img.publication_status {
 
 .publishable {
     line-height: 1.4em;
+    margin:0 2em 0 0em;
 }
 
 .publishable_radio {
@@ -372,6 +376,9 @@ table.publication_status {
         &:first-child {
             padding-right: 0.5em;
             text-align: right;
+        }
+        &:last-child {
+            padding-left: 0.5em;
         }
     }
 

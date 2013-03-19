@@ -26,7 +26,7 @@ $planification_status = $item->planification_status();
 $published = !empty($item) ? $item->published() : false;
 ?>
 <td class="c3">
-    <table class="publishable" style="margin:0 2em 0 1em;" id="<?= $publishable_id = uniqid('publishable_') ?>">
+    <table class="publishable" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
             <td class="publishable_radio" style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
 <?php
@@ -84,16 +84,14 @@ if ($planification_mode) {
 <?php
 
 $replacePlaceholders = function($txt) {
-    $txt = __($txt);
     return strtr($txt, array(
         '<row>' => '<tr>',
         '</row>' => '</tr>',
         '<cell>' => '<td>',
         '</cell>' => '</td>',
-        '<a>' => '<a class="date_clear">',
-        '{{start}}' => '<span class="date_start"></span>',
-        '{{end}}' => '<span class="date_end"></span>',
-        '{{date}}' => '<a class="date_pick"></a>',
+        '{{start}}' => '<a class="date_start"></a><a class="date_pick"></a>',
+        '{{end}}' => '<a class="date_end"></a><a class="date_pick"></a>',
+        '{{clear}}' => '<a class="date_clear"></a>',
     ));
 };
 
@@ -106,17 +104,17 @@ $nosPublishable = array(
         'now' => explode(' ', date('Y m d H i s')),
         'texts' => array(
             'initial' => array(
-                'scheduled' => $replacePlaceholders('<row><cell>Scheduled from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
-                'published' => $replacePlaceholders('<row><cell>Published since:</cell><cell>{{start}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell></row>'),
-                'backdated' => $replacePlaceholders('<row><cell>Was published from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
+                'scheduled' => $replacePlaceholders(__('<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
+                'published' => $replacePlaceholders(__('<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
+                'backdated' => $replacePlaceholders(__('<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
             ),
             'modified' => array(
-                'scheduled' => $replacePlaceholders('<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
-                'published' => $replacePlaceholders('<row><cell>Will be published since:</cell><cell>{{start}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell></row>'),
-                'backdated' => $replacePlaceholders('<row><cell>Will be backdated from:</cell><cell>{{start}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell></row>'),
+                'scheduled' => $replacePlaceholders(__('<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
+                'published' => $replacePlaceholders(__('<row><cell>Will be published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
+                'backdated' => $replacePlaceholders(__('<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
             ),
             'pick' => __('Pick a date'),
-            'clear' => $replacePlaceholders('{{date}} &nbsp; <a>Clear</a>')
+            'clear' => __('Clear'),
         ),
     ),
     'texts' => array(

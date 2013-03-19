@@ -13,35 +13,44 @@ define('jquery-nos-publishable',
 
         var update_date_label = function($input, $p, params) {
 
+            var $container = $p.closest('tr');
+            var $pick = $container.find('a.date_pick');
+            var $clear = $container.find('a.date_clear');
+
             var value = $input.val();
+
             require(['jquery.globalize', 'jquery.globalize.cultures'], function() {
                 if (value == '') {
-                    var $date = $p.find('a.date_new');
-                    if ($date.length > 0) {
+                    if ($pick.is(':visible')) {
                         // Date pick layout is here, nothing to do!
                     } else {
-                        $p.empty().append($('<a class="date_new"></a>').text(params.texts.pick).on('click', function showDatePickerEmpty(e) {
+                        $p.hide();
+                        $clear.hide();
+                        $pick.show();
+                        $pick.text(params.texts.pick).off('click').on('click', function showDatePickerEmpty(e) {
                             e.preventDefault();
                             $input.datetimepicker('show');
-                        }));
+                        });
                     }
                 } else {
                     Globalize.culture( $.nosLang.substr(0, 2) );
                     var date = $input.datetimepicker('getDate');
                     var formatted = Globalize.format(date, 'd') + ' ' + Globalize.format(date, 't');
 
-                    var $date = $p.find('a.date_pick');
-                    if ($date.length > 0) {
+                    if ($clear.is(':visible')) {
                         // Date layout is here, just update the text!
-                        $date.text(formatted);
+                        $p.text(formatted);
 
                     } else {
-                        $p.empty().append($(params.texts['clear']));
-                        $p.find('a.date_pick').text(formatted).on('click', function showDatePickerValue(e) {
+                        $p.show();
+                        $clear.show();
+                        $pick.hide();
+                        $clear.text(params.texts['clear']);
+                        $p.text(formatted).off('click').on('click', function showDatePickerValue(e) {
                             e.preventDefault();
                             $input.datetimepicker('show');
                         });
-                        $p.find('a.date_clear').on('click', function clearDatePicker(e) {
+                        $clear.off('click').on('click', function clearDatePicker(e) {
                             e.preventDefault();
                             $input.val('').trigger('change');
                         });
@@ -126,14 +135,40 @@ define('jquery-nos-publishable',
                             }
 
                             // Update texts
-                            update_date_label($input_start, $planned.find('span.date_start'), params.date_range);
-                            update_date_label($input_end, $planned.find('span.date_end'), params.date_range);
+                            update_date_label($input_start, $planned.find('a.date_start'), params.date_range);
+                            update_date_label($input_end, $planned.find('a.date_end'), params.date_range);
                         });
 
                         $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
-                        $input_start.add($input_end).datetimepicker({
+                        $input_start.datetimepicker({
                             timeFormat: 'hh:mm:ss',
-                            dateFormat: 'yy-mm-dd'
+                            dateFormat: 'yy-mm-dd',
+                            maxDate: $input_end.val(),
+                            onClose: function(selectedDate ) {
+                                $input_end.datepicker('option', 'minDate', selectedDate);
+                            }
+                        });
+                        $input_end.datetimepicker({
+                            timeFormat: 'hh:mm:ss',
+                            dateFormat: 'yy-mm-dd',
+                            minDate: $input_start.val(),
+                            onClose: function(selectedDate) {
+                                $input_start.datepicker('option', 'maxDate', selectedDate);
+                            }
+                        });
+
+                        // When clearing the start date, remove the minDate restriction on the end date
+                        $input_start.on('change', function() {
+                            if ($(this).val() == '') {
+                                $input_end.datepicker('option', 'minDate', '');
+                            }
+                        });
+
+                        // When clearing the end date, remove the maxDate restriction on the start date
+                        $input_end.on('change', function() {
+                            if ($(this).val() == '') {
+                                $input_start.datepicker('option', 'maxDate', '');
+                            }
                         });
 
                         $input_start.trigger('change');
