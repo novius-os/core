@@ -164,6 +164,7 @@ define('jquery-nos-publishable',
                                 $('#' + params.date_range.inputStart).trigger('change');
 
                             } else {
+                                $buttonset.find(':radio[value=' + params.initialStatus + ']')[0].checked = true;
                                 $buttonset.find(':checked').triggerHandler('change');
                             }
                         });

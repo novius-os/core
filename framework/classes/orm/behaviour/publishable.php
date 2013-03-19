@@ -50,7 +50,8 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         }
     }
 
-    public function planification_status($item) {
+    public function planification_status($item)
+    {
         $property = $this->_properties['publication_state_property'];
         return $item->get($property);
     }
@@ -100,7 +101,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                     reset($w);
                     // array('published' => 1);
                     if (count($w) == 1 && key($w) == 'published') {
-                        $published_key = k;
+                        $published_key = $k;
                         $published_value = (bool) current($w);
                     }
 
@@ -139,8 +140,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     {
         $publishable = $this->_properties['publication_state_property'];
         // $data[$publishable] can possibly be filled with the data (see multi-line comment below)
-        $item->set($publishable, (string) (int) \Input::post($publishable));
-        $response_json['publication_initial_status'] = $item->get($publishable);
+        $status = (string) (int) \Input::post($publishable);
 
         if (!empty($this->_properties['publication_start_property']) && !empty($this->_properties['publication_end_property'])) {
             $publication_start_property = $this->_properties['publication_start_property'];
@@ -148,8 +148,16 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             $publication_start = \Input::post($publication_start_property, null);
             $publication_end   = \Input::post($publication_end_property, null);
             $item->set($publication_start_property, empty($publication_start) ? null : $publication_start);
-            $item->set($publication_end_property,   empty($publication_end)   ? null : $publication_end);
+            $item->set($publication_end_property, empty($publication_end) ? null : $publication_end);
+
+            // Scheduled but no dates were provided
+            if ($status == 2 && empty($publication_start) && empty($publication_end)) {
+                // Unpublish
+                $status = 0;
+            }
         }
+        $item->set($publishable, $status);
+        $response_json['publication_initial_status'] = $status;
     }
 
     /*

@@ -26,9 +26,9 @@ $planification_status = $item->planification_status();
 $published = !empty($item) ? $item->published() : false;
 ?>
 <td class="c3">
-    <table style="margin:0 2em 0 1em;" id="<?= $publishable_id = uniqid('publishable_') ?>">
+    <table class="publishable" style="margin:0 2em 0 1em;" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
-            <td class="publishable" style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
+            <td class="publishable_radio" style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
 <?php
 if ($yes_no_mode) {
     ?>
@@ -67,11 +67,11 @@ if ($planification_mode) {
 }
 ?>
             </td>
-            <td style="padding-left:10px;"></td>
+            <td class="publishable_label"></td>
             <?php
 if ($planification_mode) {
     ?>
-    <td class="date_schedule" style="padding-left:10px;display:none;">
+    <td class="publishable_schedule" style="display:none;">
 
     </td>
     <?php
