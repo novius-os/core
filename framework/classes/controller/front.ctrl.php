@@ -164,8 +164,13 @@ class Controller_Front extends Controller
 
                 $_404 = false;
                 try {
-                    $this->_generate_cache();
+                    $this->_find_page();
                     $this->_context_url = $contexts_possibles[$this->_context];
+
+                    \Event::trigger('front.findPage');
+
+                    $this->_generate_cache();
+
                     $this->_content = $this->_view->render();
 
                     $this->_handle_head();
@@ -231,6 +236,8 @@ class Controller_Front extends Controller
                 }
             }
         }
+
+        \Event::trigger_function('front.response', array(array('content' => &$this->_content)));
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
@@ -537,19 +544,7 @@ class Controller_Front extends Controller
      */
     protected function _generate_cache()
     {
-        $this->_find_page();
         $this->_find_template();
-
-        \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
-
-        if ($this->_page->page_meta_noindex) {
-            $this->setTitle($this->_page->page_title);
-            $this->setMetaRobots('noindex');
-        } else {
-            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
-            $this->setMetaDescription($this->_page->page_meta_description);
-            $this->setMetaKeywords($this->_page->page_meta_keywords);
-        }
 
         $wysiwyg = array();
 
@@ -633,6 +628,17 @@ class Controller_Front extends Controller
 
         $this->_context = $this->_page->get_context();
         \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
+
+        \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
+
+        if ($this->_page->page_meta_noindex) {
+            $this->setTitle($this->_page->page_title);
+            $this->setMetaRobots('noindex');
+        } else {
+            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
+            $this->setMetaDescription($this->_page->page_meta_description);
+            $this->setMetaKeywords($this->_page->page_meta_keywords);
+        }
     }
 
     protected function _find_template()
@@ -680,6 +686,8 @@ class Controller_Front extends Controller
                 unset($cache[$property]);
             }
         }
+
+        \Event::trigger('front.findPage');
     }
 
     /**
