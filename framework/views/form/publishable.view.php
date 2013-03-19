@@ -29,24 +29,7 @@ $published = !empty($item) ? $item->published() : false;
     <table class="publishable" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
             <td class="publishable_radio">
-                <div style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
 <?php
-if ($yes_no_mode) {
-    ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
-    <?php
-}
-if ($planification_mode) {
-    ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><span class="ui-icon ui-icon-clock" /></label>
-    <?php
-}
-if ($yes_no_mode) {
-    ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
-    <?php
-}
-
 if ($planification_mode) {
     echo html_tag('input', array(
         'id' => ($uniqid_start = uniqid('start_')),
@@ -67,15 +50,31 @@ if ($planification_mode) {
     echo '<span></span>';
 }
 ?>
+                <div style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
+<?php
+if ($yes_no_mode) {
+    ?>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
+    <?php
+}
+if ($planification_mode) {
+    ?>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><span class="ui-icon ui-icon-clock" /></label>
+    <?php
+}
+if ($yes_no_mode) {
+    ?>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
+    <?php
+}
+?>
                 </div>
             </td>
             <td class="publishable_label"></td>
             <?php
 if ($planification_mode) {
     ?>
-    <td class="publishable_schedule" style="display:none;">
-
-    </td>
+    <td class="publishable_schedule" style="display:none;"></td>
     <?php
 }
             ?>
@@ -91,9 +90,9 @@ $replacePlaceholders = function($txt) {
         '</row>' => '</tr>',
         '<cell>' => '<td>',
         '</cell>' => '</td>',
-        '{{start}}' => '<a class="date_start"></a><a class="date_pick"></a>',
-        '{{end}}' => '<a class="date_end"></a><a class="date_pick"></a>',
-        '{{clear}}' => '<a class="date_clear"></a>',
+        '{{start}}' => '<a class="date_start" style="display:none;"></a><a class="date_pick" style="display:none;"></a>',
+        '{{end}}' => '<a class="date_end" style="display:none;"></a><a class="date_pick" style="display:none;"></a>',
+        '{{clear}}' => '<a class="date_clear" style="display:none;"></a>',
     ));
 };
 

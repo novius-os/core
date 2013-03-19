@@ -81,9 +81,9 @@ define('jquery-nos-publishable',
 
                 return this.each(function() {
                     var $container = $(this),
-                        $buttonset = $container.find('td:first'),
-                        $label = $buttonset.next(),
-                        $planned = $label.next(),
+                        $buttonset = $container.find('.publishable_radio'),
+                        $label = $container.find('.publishable_label'),
+                        $planned = $container.find('.publishable_schedule'),
                         dateRangeStatus = 'initial', // 'initial' or 'modified'
                         changeAlt = function() {
                             $buttonset.find(':radio').each(function() {
@@ -98,82 +98,84 @@ define('jquery-nos-publishable',
                         };
 
                     if (params.date_range) {
-                        var $publishable = $('#' + params.date_range.container),
-                            $input_start = $publishable.find('#' + params.date_range.inputStart),
-                            $input_end = $publishable.find('#' + params.date_range.inputEnd),
-                            now = params.date_range.now;
+                        $planned.nosOnShow('one', function() {
+                            var $publishable = $('#' + params.date_range.container),
+                                $input_start = $publishable.find('#' + params.date_range.inputStart),
+                                $input_end = $publishable.find('#' + params.date_range.inputEnd),
+                                now = params.date_range.now;
 
-                        // new Date(year, month, day, hour, min, sec)
-                        // month range is 0-11
-                        now = new Date(now[0], now[1] - 1, now[2], now[3], now[4], now[5]);
+                            // new Date(year, month, day, hour, min, sec)
+                            // month range is 0-11
+                            now = new Date(now[0], now[1] - 1, now[2], now[3], now[4], now[5]);
 
-                        // This event is triggered first
-                        $input_start.add($input_end).on('change', function(e) {
-                            var date_start = $input_start.datetimepicker('getDate'),
-                                date_end = $input_end.datetimepicker('getDate'),
-                                planification = '',
-                                css, $table;
+                            // This event is triggered first
+                            $input_start.add($input_end).on('change', function(e) {
+                                var date_start = $input_start.datetimepicker('getDate'),
+                                    date_end = $input_end.datetimepicker('getDate'),
+                                    planification = '',
+                                    css, $table;
 
-                            if (date_start == null && date_end == null) {
-                                planification = 'scheduled';
-                            } else if (date_start == null || date_start < now) {
-                                planification = 'published';
-                            } else if (date_end != null && date_end < now) {
-                                planification = 'backdated';
-                            } else {
-                                planification = 'scheduled';
-                            }
+                                if (date_start == null && date_end == null) {
+                                    planification = 'scheduled';
+                                } else if (date_start == null || date_start < now) {
+                                    planification = 'published';
+                                } else if (date_end != null && date_end < now) {
+                                    planification = 'backdated';
+                                } else {
+                                    planification = 'scheduled';
+                                }
 
-                            // We need to refresh the layout when this changes = when the 'dateRangeStatus' changes or the 'planification' changes
-                            css = 'planification_status_' + dateRangeStatus + '_' + planification;
-                            $table = $planned.find('table.' + css);
+                                // We need to refresh the layout when this changes = when the 'dateRangeStatus' changes or the 'planification' changes
+                                css = 'planification_status_' + dateRangeStatus + '_' + planification;
+                                $table = $planned.find('table.' + css);
 
-                            if ($table.length > 0) {
-                                // Layout has not changed, just update the values
-                            } else {
-                                $table = $('<table class="publication_status ' + css + '"></table>').append(params.date_range.texts[dateRangeStatus][planification]);
-                                $planned.empty().append($table);
-                                dateRangeStatus = 'modified';
-                            }
+                                if ($table.length > 0) {
+                                    // Layout has not changed, just update the values
+                                } else {
+                                    $table = $('<table class="publication_status ' + css + '"></table>').append(params.date_range.texts[dateRangeStatus][planification]);
+                                    $planned.empty().append($table);
+                                    dateRangeStatus = 'modified';
+                                }
 
-                            // Update texts
-                            update_date_label($input_start, $planned.find('a.date_start'), params.date_range);
-                            update_date_label($input_end, $planned.find('a.date_end'), params.date_range);
+                                // Update texts
+                                update_date_label($input_start, $planned.find('a.date_start'), params.date_range);
+                                update_date_label($input_end, $planned.find('a.date_end'), params.date_range);
+                            });
+
+                            $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
+                            $input_start.datetimepicker({
+                                timeFormat: 'hh:mm:ss',
+                                dateFormat: 'yy-mm-dd',
+                                maxDate: $input_end.val(),
+                                onClose: function(selectedDate ) {
+                                    $input_end.datepicker('option', 'minDate', selectedDate);
+                                }
+                            });
+                            $input_end.datetimepicker({
+                                timeFormat: 'hh:mm:ss',
+                                dateFormat: 'yy-mm-dd',
+                                minDate: $input_start.val(),
+                                onClose: function(selectedDate) {
+                                    $input_start.datepicker('option', 'maxDate', selectedDate);
+                                }
+                            });
+
+                            // When clearing the start date, remove the minDate restriction on the end date
+                            $input_start.on('change', function() {
+                                if ($(this).val() == '') {
+                                    $input_end.datepicker('option', 'minDate', '');
+                                }
+                            });
+
+                            // When clearing the end date, remove the maxDate restriction on the start date
+                            $input_end.on('change', function() {
+                                if ($(this).val() == '') {
+                                    $input_start.datepicker('option', 'maxDate', '');
+                                }
+                            });
+
+                            $input_start.trigger('change');
                         });
-
-                        $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
-                        $input_start.datetimepicker({
-                            timeFormat: 'hh:mm:ss',
-                            dateFormat: 'yy-mm-dd',
-                            maxDate: $input_end.val(),
-                            onClose: function(selectedDate ) {
-                                $input_end.datepicker('option', 'minDate', selectedDate);
-                            }
-                        });
-                        $input_end.datetimepicker({
-                            timeFormat: 'hh:mm:ss',
-                            dateFormat: 'yy-mm-dd',
-                            minDate: $input_start.val(),
-                            onClose: function(selectedDate) {
-                                $input_start.datepicker('option', 'maxDate', selectedDate);
-                            }
-                        });
-
-                        // When clearing the start date, remove the minDate restriction on the end date
-                        $input_start.on('change', function() {
-                            if ($(this).val() == '') {
-                                $input_end.datepicker('option', 'minDate', '');
-                            }
-                        });
-
-                        // When clearing the end date, remove the maxDate restriction on the start date
-                        $input_end.on('change', function() {
-                            if ($(this).val() == '') {
-                                $input_start.datepicker('option', 'maxDate', '');
-                            }
-                        });
-
-                        $input_start.trigger('change');
                     }
 
                     changeAlt();
@@ -183,8 +185,13 @@ define('jquery-nos-publishable',
                             var value = $(this).val();
                             $label.text(params.texts[params.initialStatus][value]);
                             changeAlt();
-                            $label[value == 2 ? 'hide' : 'show']();
-                            $planned[value == 2 ? 'show' : 'hide']();
+                            if (value == 2) {
+                                $label.hide();
+                                $planned.show().nosOnShow();
+                            } else {
+                                $label.show();
+                                $planned.hide();
+                            }
                         });
                     $buttonset.find(':checked')
                         .triggerHandler('change');
