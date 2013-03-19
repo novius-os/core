@@ -62,10 +62,14 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             return '<span class="publication_status ui-icon ui-icon-clock" /> '.__('Scheduled from {{date}}');
         }
         if (!empty($end) && strtotime($end) < $now) {
-            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Was published until {{date}}');
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.strtr(__('Was published until {{date}}'), array(
+                '{{date}}' => \Date::forge(strtotime($end))->format(__('date_format.normal')),
+            ));
         }
         if (!empty($end)) {
-            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published until {{date}}');
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.strtr(__('Published until {{date}}'), array(
+                '{{date}}' => \Date::forge(strtotime($end))->format(__('date_format.normal')),
+            ));
         }
 
         return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published');
