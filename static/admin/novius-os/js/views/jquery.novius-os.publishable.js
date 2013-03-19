@@ -13,11 +13,10 @@ define('jquery-nos-publishable',
 
         var update_date_label = function($input, $p, params) {
 
-            var $container = $p.closest('tr');
-            var $pick = $container.find('a.date_pick');
-            var $clear = $container.find('a.date_clear');
-
-            var value = $input.val();
+            var $container = $p.closest('tr'),
+                $pick = $container.find('a.date_pick'),
+                $clear = $container.find('a.date_clear'),
+                value = $input.val();
 
             require(['jquery.globalize', 'jquery.globalize.cultures'], function() {
                 if (value == '') {
@@ -34,8 +33,8 @@ define('jquery-nos-publishable',
                     }
                 } else {
                     Globalize.culture( $.nosLang.substr(0, 2) );
-                    var date = $input.datetimepicker('getDate');
-                    var formatted = Globalize.format(date, 'd') + ' ' + Globalize.format(date, 't');
+                    var date = $input.datetimepicker('getDate'),
+                        formatted = Globalize.format(date, 'd') + ' ' + Globalize.format(date, 't');
 
                     if ($clear.is(':visible')) {
                         // Date layout is here, just update the text!
@@ -99,20 +98,21 @@ define('jquery-nos-publishable',
                         };
 
                     if (params.date_range) {
-                        var $publishable = $('#' + params.date_range.container);
-                        var $input_start = $publishable.find('#' + params.date_range.inputStart);
-                        var $input_end = $publishable.find('#' + params.date_range.inputEnd);
+                        var $publishable = $('#' + params.date_range.container),
+                            $input_start = $publishable.find('#' + params.date_range.inputStart),
+                            $input_end = $publishable.find('#' + params.date_range.inputEnd),
+                            now = params.date_range.now;
 
-                        var now = params.date_range.now;
                         // new Date(year, month, day, hour, min, sec)
                         // month range is 0-11
                         now = new Date(now[0], now[1] - 1, now[2], now[3], now[4], now[5]);
 
                         // This event is triggered first
                         $input_start.add($input_end).on('change', function(e) {
-                            var date_start = $input_start.datetimepicker('getDate');
-                            var date_end = $input_end.datetimepicker('getDate');
-                            var planification = '';
+                            var date_start = $input_start.datetimepicker('getDate'),
+                                date_end = $input_end.datetimepicker('getDate'),
+                                planification = '',
+                                css, $table;
 
                             if (date_start == null || date_start < now) {
                                 planification = 'published';
@@ -123,8 +123,8 @@ define('jquery-nos-publishable',
                             }
 
                             // We need to refresh the layout when this changes = when the 'dateRangeStatus' changes or the 'planification' changes
-                            var css = 'planification_status_' + dateRangeStatus + '_' + planification;
-                            var $table = $planned.find('table.' + css);
+                            css = 'planification_status_' + dateRangeStatus + '_' + planification;
+                            $table = $planned.find('table.' + css);
 
                             if ($table.length > 0) {
                                 // Layout has not changed, just update the values
