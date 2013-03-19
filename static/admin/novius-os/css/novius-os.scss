@@ -332,7 +332,8 @@ span.optional {
     }
 }
 
-img.publication_status {
+img.publication_status, span.publication_status {
+    display: inline-block;
     vertical-align: middle;
 }
 

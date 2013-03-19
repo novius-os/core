@@ -34,20 +34,41 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         }
     }
 
-    public static function dataset(&$dataset)
+    public function dataset(&$dataset)
     {
-        $dataset['publication_status'] = array(__CLASS__, 'publication_status');
+        $dataset['publication_status'] = array($this, 'publication_status');
     }
 
-    public static function publication_status($item)
+    public function publication_status($item)
     {
-        $published = $item->published();
-        if ($published === true) {
+
+        $property = $this->_properties['publication_state_property'];
+        $status = $item->get($property);
+        if ($status == 0) {
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
+        } else if ($status == 1) {
             return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published');
         }
-        if ($published === false) {
-            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
+
+        $start = $this->publication_start($item);
+        $end = $this->publication_end($item);
+        if (empty($start) && empty($end)) {
+            return '';
         }
+
+        $now = strtotime('now');
+
+        if (!empty($start) && strtotime($start) > $now) {
+            return '<span class="publication_status ui-icon ui-icon-clock" /> '.__('Scheduled from {{date}}');
+        }
+        if (!empty($end) && strtotime($end) < $now) {
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Was published until {{date}}');
+        }
+        if (!empty($end)) {
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published until {{date}}');
+        }
+
+        return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.__('Published');
     }
 
     public function planification_status($item)
@@ -69,19 +90,29 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     }
 
     /**
-     * Returns whether the item is published or not
+     * Returns whether the item is currently published or not
      *
      * @return string
      */
     public function published($item)
     {
-        $bool = $this->_properties['publication_state_property'];
-        if (!empty($bool)) {
-            return (bool) $item->get($bool);
+        $property = $this->_properties['publication_state_property'];
+        $status = $item->get($property);
+        if ($status == 0 || $status == 1) {
+            return (bool) $status;
         }
 
-        return false;
-        // @todo publication start / end
+        $start = $this->publication_start($item);
+        $end = $this->publication_end($item);
+        if (empty($start) && empty($end)) {
+            return false;
+        }
+        if (empty($end)) {
+            return strtotime($start) < strtotime('now');
+        }
+        if (empty($start)) {
+            return strtotime($end) > strtotime('now');
+        }
     }
 
     public function before_query(&$options)
