@@ -19,6 +19,8 @@ class Renderer_Media extends \Nos\Media\Renderer_Media
     public static function _init()
     {
         parent::_init();
-        logger(\Fuel::L_WARNING, 'This class is deprecated.  Please use \Nos\Media\Renderer_Media instead.');
+        // @todo : deprecated
+        logger(\Fuel::L_WARNING, 'Class \\Nos\\Renderer_Media is deprecated. '.
+            'Please use \\Nos\\Media\\Renderer_Media instead.');
     }
 }

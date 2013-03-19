@@ -1082,6 +1082,7 @@ define('jquery-nos-appdesk',
                                 $.each(self.uiGrid.noslistgrid('data') || [], function(dataRowIndex, data) {
                                     if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                         sel.addRows(dataRowIndex);
+                                        self.element.trigger('selectionChanged.appdesk', data);
                                     }
                                 });
                             }
@@ -1178,6 +1179,7 @@ define('jquery-nos-appdesk',
                                 $.each(self.uiTreeGrid.nostreegrid('data') || [], function(dataRowIndex, data) {
                                     if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                         sel.addRows(dataRowIndex);
+                                        self.element.trigger('selectionChanged.appdesk', data);
                                     }
                                 });
                             }
