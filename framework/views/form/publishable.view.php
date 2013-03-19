@@ -28,7 +28,8 @@ $published = !empty($item) ? $item->published() : false;
 <td class="c3">
     <table class="publishable" id="<?= $publishable_id = uniqid('publishable_') ?>">
         <tr>
-            <td class="publishable_radio" style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
+            <td class="publishable_radio">
+                <div style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
 <?php
 if ($yes_no_mode) {
     ?>
@@ -37,7 +38,7 @@ if ($yes_no_mode) {
 }
 if ($planification_mode) {
     ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-clock.png" /></label>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><span class="ui-icon ui-icon-clock" /></label>
     <?php
 }
 if ($yes_no_mode) {
@@ -66,6 +67,7 @@ if ($planification_mode) {
     echo '<span></span>';
 }
 ?>
+                </div>
             </td>
             <td class="publishable_label"></td>
             <?php

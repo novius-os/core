@@ -349,7 +349,8 @@ img.publication_status {
         width : 20px;
         height : 20px;
 
-        img {
+        img, span {
+            display: inline-block;
             vertical-align : middle;
         }
     }
