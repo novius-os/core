@@ -560,15 +560,16 @@ class Model extends \Orm\Model
         parent::set($property, $value);
 
         if ($properties_reload && isset($this->_custom_data[$property])) {
-            unset($this->_custom_data[$property]);
             try {
                 static::$_properties_cached[$class] = \DB::list_columns(static::table(), null, static::connection());
+                unset($this->_custom_data[$property]);
+                parent::set($property, $value);
+                if (array_key_exists($property, static::properties())) {
+                    logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
+                        'You have to set the additional model property "'.$property.'" in model config.');
+                }
             } catch (\Exception $e) {
-            }
-            parent::set($property, $value);
-            if (array_key_exists($property, static::properties())) {
-                logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
-                    'You have to set the additional model property "'.$property.'" in model config.');
+                // Do nothing : set() may be really called for set a custom_data
             }
         }
 
@@ -684,20 +685,22 @@ class Model extends \Orm\Model
 
         try {
             return parent::get($property);
-        } catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $oobe) {
             $class = get_called_class();
             if (property_exists($class, '_properties')) {
                 try {
                     static::$_properties_cached[$class] = \DB::list_columns(static::table(), null, static::connection());
                 } catch (\Exception $e) {
+                    // Do nothing : if $property exist, we already have a logger above
+                    // else method throw an exception
                 }
                 if (array_key_exists($property, static::properties())) {
                     logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
                         'You have to set the additional model property "'.$property.'" in model config.');
+                    return parent::get($property);
                 }
-
-                return parent::get($property);
             }
+            throw $oobe;
         }
     }
 
