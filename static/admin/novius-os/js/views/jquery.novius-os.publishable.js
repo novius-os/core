@@ -114,7 +114,9 @@ define('jquery-nos-publishable',
                                 planification = '',
                                 css, $table;
 
-                            if (date_start == null || date_start < now) {
+                            if (date_start == null && date_end == null) {
+                                planification = 'scheduled';
+                            } else if (date_start == null || date_start < now) {
                                 planification = 'published';
                             } else if (date_end != null && date_end < now) {
                                 planification = 'backdated';
