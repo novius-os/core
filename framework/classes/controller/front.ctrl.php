@@ -123,7 +123,7 @@ class Controller_Front extends Controller
                 $temp_url = $page_params['url'];
 
                 if ($page_id != 'current') {
-                    $this->_contexts_possibles = array($page_params['context']);
+                    $this->_contexts_possibles = array($page_params['context'] => $contexts_possibles[$page_params['context']]);
                     $this->_page_id = $page_id;
 
                     if (!in_array($temp_url, array('', '/'))) {
@@ -143,7 +143,6 @@ class Controller_Front extends Controller
                 $_404 = false;
                 try {
                     $this->_generate_cache();
-                    $this->_context_url = $contexts_possibles[$this->_context];
                 } catch (NotFoundException $e) {
                     $_404 = true;
                     $this->_page = null;
@@ -591,6 +590,7 @@ class Controller_Front extends Controller
         }
 
         $this->_context = $this->_page->get_context();
+        $this->_context_url = $this->_contexts_possibles[$this->_context];
         \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
     }
 
