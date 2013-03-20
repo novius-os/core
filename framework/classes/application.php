@@ -282,14 +282,13 @@ class Application
 
     public static function applicationRequiredFromMetadata($metadata)
     {
-        $required = array();
-        if (isset($metadata['requires'])) {
-            $required = $metadata['requires'];
-            if (is_string($required)) {
-                $required = array($required);
-            }
+        $requires = isset($metadata['requires']) ? $metadata['requires'] :
+            (isset($metadata['extend']) ? $metadata['extend'] : array());
+
+        if ($requires && is_string($requires)) {
+            $requires = array($requires);
         }
-        return $required;
+        return $requires;
     }
 
     public function applicationsRequiredAndNotInstalled()
