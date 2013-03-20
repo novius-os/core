@@ -64,9 +64,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             ));
         }
         if (!empty($end) && strtotime($end) < $now) {
-            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.strtr(__('Was published until {{date}}'), array(
-                '{{date}}' => \Date::forge(strtotime($end))->format(__('date_format.normal')),
-            ));
+            return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
         }
         if (!empty($end)) {
             return '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-green.png"> '.strtr(__('Published until {{date}}'), array(
