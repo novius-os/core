@@ -283,7 +283,7 @@ class Application
     public static function applicationRequiredFromMetadata($metadata)
     {
         $requires = isset($metadata['requires']) ? $metadata['requires'] :
-            (isset($metadata['extend']) ? $metadata['extend'] : array());
+            (isset($metadata['extends']) ? $metadata['extends'] : array());
 
         if ($requires && is_string($requires)) {
             $requires = array($requires);
