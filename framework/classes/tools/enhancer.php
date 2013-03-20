@@ -23,7 +23,11 @@ class Tools_Enhancer
         // Check if this enhancer exists
         $enhancer = \Nos\Config_Data::get('enhancers.'.$enhancer_name, array());
         if (empty($enhancer)) {
+            logger(\Fuel::L_WARNING, 'The urlEnhancer "'.$enhancer_name.'" don\'t exist anymore.', __METHOD__);
             return array();
+        }
+        if (empty($enhancer['urlEnhancer'])) {
+            throw new \RuntimeException('This enhancer "'.$enhancer_name.'" is not an urlEnhancer.');
         }
 
         $urlEnhancer = $enhancer['urlEnhancer'];

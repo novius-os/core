@@ -21,7 +21,7 @@ define('jquery-nos-validate',
             if ( label.length ) {
                 // refresh error/success class
                 label.removeClass( this.settings.validClass ).addClass( this.settings.errorClass );
-                label.closest('.ui-accordion-content').prev().addClass( this.settings.errorClass );
+                label.closest('.wijmo-wijaccordion-content').prev().addClass( this.settings.errorClass );
             } else {
                 // create label
                 label = $("<" + this.settings.errorElement + "/>")
@@ -91,7 +91,7 @@ define('jquery-nos-validate',
                     }
                 });
 
-                var accordion_header = $(element).closest('.ui-accordion-content').prev().addClass( this.settings.errorClass ).removeClass( this.settings.validClass );
+                var accordion_header = $(element).closest('.wijmo-wijaccordion-content').prev().addClass( this.settings.errorClass ).removeClass( this.settings.validClass );
 
                 if ($element.hasClass('media')) {
                     label.insertAfter($element.closest('.ui-inputfilethumb'));
@@ -102,8 +102,8 @@ define('jquery-nos-validate',
                     });
                 }
 
-                accordion_header.closest('.ui-accordion').unbind('wijaccordionselectedindexchanged').bind('wijaccordionselectedindexchanged', function(e, args) {
-                    var contents = $(this).find('.ui-accordion-content');
+                accordion_header.closest('.wijmo-wijaccordion').unbind('wijaccordionselectedindexchanged').bind('wijaccordionselectedindexchanged', function(e, args) {
+                    var contents = $(this).find('.wijmo-wijaccordion-content');
                     var label = contents.eq(args.newIndex).find('label[generated=true]');
 
                     if (label.data('wijtooltip-manuallyclosed')) {
@@ -113,8 +113,8 @@ define('jquery-nos-validate',
                     }
                 });
 
-                accordion_header.closest('.ui-accordion').bind('wijaccordionbeforeselectedindexchanged', function(e, args) {
-                    var contents = $(this).find('.ui-accordion-content');
+                accordion_header.closest('.wijmo-wijaccordion').bind('wijaccordionbeforeselectedindexchanged', function(e, args) {
+                    var contents = $(this).find('.wijmo-wijaccordion-content');
                     contents.eq(args.prevIndex).find('label[generated=true]').wijtooltip('hide');
                 });
 
@@ -128,7 +128,7 @@ define('jquery-nos-validate',
             if ( !message && this.settings.success ) {
                 label.wijtooltip('hide');
                 label.wijtooltip('destroy');
-                label.closest('.ui-accordion-content').prev().addClass( this.settings.validClass ).removeClass( this.settings.errorClass );
+                label.closest('.wijmo-wijaccordion-content').prev().addClass( this.settings.validClass ).removeClass( this.settings.errorClass );
 
                 if ($element.hasClass('media')) {
                     $element.closest('.ui-inputfilethumb').find('.ui-inputfilethumb-thumb').addClass( this.settings.validClass ).removeClass( this.settings.errorClass );

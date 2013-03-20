@@ -1362,7 +1362,7 @@
 			a = s.theme_nos_toolbar_align.toLowerCase();
 			a = 'mce' + t._ufirst(a);
 
-			n = DOM.add(DOM.add(c, 'tr', {role: 'toolbar'}), 'td', {'class' : 'mceToolbar ' + a, "role":"presentation"});
+			n = DOM.add(DOM.add(c, 'tr', {role: 'presentation'}), 'td', {'class' : 'mceToolbar ' + a, "role":"presentation"});
 
 			// Create toolbar and add the controls
 			for (i=1; (v = s['theme_nos_buttons' + i]); i++) {
@@ -1926,22 +1926,16 @@
                         edit = ed.dom.get('__mce_tmp');
                     }
                     $(edit).attr({
-                        'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
-                        'data-enhancer': metadata.id
-                    });
-
-                    edit.id = null;
-                    $(edit).html($(json.preview).html());
+                            'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
+                            'data-enhancer': metadata.id
+                        })
+                        .removeAttr('id')
+                        .html($(json.preview).html());
 
                     // Add special links (this is also called onInit())
                     self.onEnhancerAdd(edit, metadata);
 
-                    // @todo search why this doesn't work
-                    // This is an unsuccessful attempt to refocus the editor after the nonEditable block content has been added
-                    // Right now, the undo/redo buttons are disabled after insertion, which is a bug
-                    ed.selection.select(edit, true);
-                    ed.selection.collapse(true);
-                    //ed.focus(false);
+                    ed.focus(true);
                 };
 
             if (!$.isPlainObject(metadata.dialog) || !metadata.dialog.contentUrl) {

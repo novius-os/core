@@ -18,7 +18,7 @@
 }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/data\/www-local\/feature\/novius-os\/static\/admin\/novius-os\/css\/jquery\.novius-os\.appdesk\.scss}line{font-family:\0000319}}
-.wijmo-wijpager .ui-list .ui-page {
+.wijmo-wijpager .ui-list .wijmo-wijpager-button {
   line-height: 0.8em;
   font-size: 0.8em;
 }

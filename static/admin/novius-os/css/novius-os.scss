@@ -209,6 +209,16 @@ ul {
     width: 5%;
 }
 
+.wijmo-wijgrid-frozener-v, .wijmo-wijgrid-frozener-h {
+    overflow: hidden;
+}
+.wijmo-wijgrid-frozener-v {
+    width: 0;
+}
+.wijmo-wijgrid-frozener-h {
+    height: 0;
+}
+
 .ui-tabs-left div.nos-tabs-context-content {
     left: 6%;
     width: 94%;
@@ -239,7 +249,7 @@ input.ui-state-disabled {
 }
 
 // Right menu on form pages
-.wijmo-wijaccordion .ui-accordion-content, .fieldset.standalone {
+.wijmo-wijaccordion .wijmo-wijaccordion-content, .fieldset.standalone {
     > p, > div {
         margin: 0.5em 0;
     }

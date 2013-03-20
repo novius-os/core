@@ -46,6 +46,7 @@
                 widget,
                 vAccessor,
                 updatingFromEvents = false,
+                updatingEventSource = null,
                 updatingFromOtherObservables = false;
 
             binding.init = function (element, valueAccessor, allBindingAccessor, viewModel) {
@@ -81,12 +82,16 @@
                             ko.utils.registerEventHandler(element, widgetName + ev.toLowerCase(), function () {
                                 // add vAccessor and update it in update event, because sometimes the reference of
                                 // value accessor  will be updated by customer.
+                                vAccessor = $(element).data("vAccessor");
                                 var v = vAccessor[key],
                                     newVal;
                                 if (updatingFromOtherObservables) {
                                     return;
                                 }
+
                                 updatingFromEvents = true;
+                                updatingEventSource = element;
+
                                 if ($.isFunction(observableOption.onChange)) {
                                     if (v) {
                                         observableOption.onChange.call(observableOption, widget, v, arguments);
@@ -103,6 +108,7 @@
                                     }
                                 }
 
+                                updatingEventSource = null;
                                 updatingFromEvents = false;
                             });
                         });
@@ -123,7 +129,8 @@
                 //	(e.g., inside a with: person binding, viewModel will be set to person).
 
                 var valueUnwrapped = ko.utils.unwrapObservable(valueAccessor());
-                vAccessor = valueUnwrapped;
+                //vAccessor = valueUnwrapped;
+                $(element).data("vAccessor", valueUnwrapped);
                 $.each(valueUnwrapped, function (key, value) {
                     //The observable can be used like following: style: { width: percentMax() * 100 + '%' },
                     //the style.width is not an observable value and cannot be observed in ko.computed.
@@ -137,7 +144,7 @@
                                ? hash[key]
                                : $(element)[widgetName]("option", key);
 
-                        if (updatingFromEvents) {
+                        if (updatingFromEvents && (element === updatingEventSource)) {
                             return true;
                         }
                         if (optType && optType === 'numeric') {
@@ -595,6 +602,7 @@
             autoOpen: {},
             draggable: {},
             modal: {},
+			contentUrl:{},
             resizable: {}
         }
     });
@@ -739,6 +747,9 @@
             listItems: {
                 type: 'array'
             },
+            dataSource: {
+                type: 'array'
+            },
             selectionMode: {},
             autoSize: {},
             maxItemsCount: {
@@ -756,6 +767,9 @@
             data: {
                 type: 'array'
             },
+            dataSource: {
+                type: 'array'
+            },
             labelText: {},
             showTrigger: {},
             triggerPosition: {},
@@ -769,6 +783,9 @@
                 attachEvents: ['changed']
             },
             selectedValue: {
+                attachEvents: ['changed']
+            },
+            text: {
                 attachEvents: ['changed']
             },
             inputTextInDropDownList: {

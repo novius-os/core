@@ -49,6 +49,8 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
+    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url');
+
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
@@ -66,7 +68,7 @@ class Controller_Front extends Controller
         if (\Input::method() == 'POST' || $this->_is_preview) {
             $no_cache = true;
         } else {
-            $no_cache = \Fuel::$env === \Fuel::DEVELOPMENT && \Input::get('_cache', 0) != 1;
+            $no_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
         \Event::trigger('front.start');
@@ -77,6 +79,10 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
+            if ($no_cache) {
+                throw new CacheNotFoundException();
+            }
+
             // Cache exist, retrieve his content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
@@ -144,6 +150,21 @@ class Controller_Front extends Controller
                     $this->_enhanced_url_path = false;
                     $this->_enhancer_url = false;
                     continue;
+                } catch (\Database_Exception $e) {
+                    // No database configuration file is found
+                    if (!is_file(APPPATH.'config'.DS.'db.config.php')) {
+                        // if install.php is there, redirects!
+                        if (is_file(DOCROOT.'install.php')) {
+                            \Response::redirect($this->_base_href.'install.php');
+                        }
+                    }
+
+                    echo \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                        'error' => 'Database configuration error.',
+                        'exception' => $e,
+                    ), false);
+                    exit();
                 } catch (\Exception $e) {
                     // Cannot generate cache: fatal error...
                     //@todo : error page case
@@ -164,18 +185,19 @@ class Controller_Front extends Controller
             }
 
             if ($_404) {
-                $event_404 = \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
-                $event_404 = array_filter($event_404);
-                if (empty($event_404)) {
-                    // If no redirection then we display 404
-                    if (!empty($url)) {
-                        $_SERVER['NOS_URL'] = '/';
+                \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
 
-                        return $this->router('index', $params, 404);
-                    } else {
-                        echo \View::forge('nos::errors/blank_slate_front');
-                        exit();
-                    }
+                // If no redirection then we display 404
+                if (!empty($url)) {
+                    $_SERVER['NOS_URL'] = '';
+
+                    return $this->router('index', $params, 404);
+                } else {
+                    // The DB config is there, there's probably no homepage.
+                    echo \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                    ), false);
+                    exit();
                 }
             }
         }
@@ -212,7 +234,7 @@ class Controller_Front extends Controller
      */
     public function getUrl()
     {
-        return $this->_url;
+        return $this->getContextUrl().$this->_url;
     }
 
     /**
@@ -455,7 +477,7 @@ class Controller_Front extends Controller
         $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
-                $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
+                $footer[] = \Str::sub($js['js'], 0, 8) === '<script ' ? $js['js'] : '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
                 $js = is_string($js) ? $js : $js['js'];
                 if (in_array($js, $this->_js_header)) {
@@ -479,7 +501,14 @@ class Controller_Front extends Controller
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
-        $this->setTitle($this->_page->page_title);
+        if ($this->_page->page_meta_noindex) {
+            $this->setTitle($this->_page->page_title);
+            $this->setMetaRobots('noindex');
+        } else {
+            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
+            $this->setMetaDescription($this->_page->page_meta_description);
+            $this->setMetaKeywords($this->_page->page_meta_keywords);
+        }
 
         $wysiwyg = array();
 
@@ -491,7 +520,7 @@ class Controller_Front extends Controller
         $this->_wysiwyg_name = null;
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
-        $this->_view->set('title', $this->_title, false);
+        $this->_view->set('title', $this->_page->page_title, false);
         $this->_view->set('page', $this->_page, false);
         $this->_view->set('main_controller', $this, false);
     }
@@ -535,7 +564,7 @@ class Controller_Front extends Controller
                 }
 
                 $page = \Nos\Page\Model_Page::find('first', array(
-                        'where' => $where,
+                    'where' => $where,
                 ));
 
                 if (!empty($page)) {
@@ -551,7 +580,8 @@ class Controller_Front extends Controller
         }
 
         if (empty($this->_page)) {
-            //var_dump($this->_url);
+            // Blank slate also needs the base_href to display a 404 from a sub-folder
+            $this->setBaseHref($domain);
             throw new NotFoundException('The requested page was not found.');
         }
 
@@ -594,23 +624,20 @@ class Controller_Front extends Controller
 
     public function save_cache()
     {
-        $page_fields = array('id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
-        $this->cache['page'] = array();
-        foreach ($page_fields as $field) {
-            $this->cache['page'][$field] = $this->_page->{'page_'.$field};
+        foreach (static::$_properties_cached as $property) {
+            $this->cache[$property] = $this->{$property};
         }
-        //return parent::save_cache();
-        return $this->cache; //@todo: to be reviewed
+
+        return $this->cache;
     }
 
     public function rebuild_cache($cache)
     {
-        $page = array();
-        foreach ($cache['page'] as $field => $value) {
-            $page['page_'.$field] = $value;
+        foreach (static::$_properties_cached as $property) {
+            if (isset($cache[$property])) {
+                $this->{$property} = $cache[$property];
+                unset($cache[$property]);
+            }
         }
-        $this->_page = new \Nos\Page\Model_Page($page, false);
-        $this->_page->freeze();
-        unset($cache['page']);
     }
 }

@@ -22,5 +22,5 @@ return array(
         ),
     ),
     'folder' => 'migrations/',
-    'table' => 'migration',
+    'table' => 'nos_migration',
 );

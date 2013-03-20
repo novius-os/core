@@ -10,7 +10,7 @@ amplify*/
 
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -427,7 +427,8 @@ block comments:
 	/////////////// <end of data layer	
 
 	$.widget("wijmo.wijevcal", {
-		// widget options
+
+		widgetEventPrefix: "wijevcal",
 		options: {
 
 			///	<summary>
@@ -440,6 +441,7 @@ block comments:
 			///	Use the localization option in order to localize
 			///	text which not depends on culture option.
 			/// Default: {
+			///	messageEndOccursBeforeStart: "The end date you entered occurs before the start date.",
 			/// activityLoading: "Loading...",
 			///	activityDeletingCalendar: "Deleting calendar...",
 			/// activityCreatingCalendar: "Creating calendar...",
@@ -494,6 +496,8 @@ block comments:
 			///	monthViewHeaderFormat: "{0:MMMM yyyy}",
 			///	agendaHeaderFullDateFormat": "{0:MMMM d, yyyy}",
 			///	logCouldntOpenLocalStorage: "Couldn't open built-in local data storage. Please, add amplify.store references."
+			///	buttonClearAll: "Clear All",
+			///	buttonClose: "Close"
 			/// }
 			/// Type: Object.
 			/// Code example: $("#eventscalendar").wijevcal(
@@ -511,6 +515,17 @@ block comments:
 			///	bottom date pager.
 			///	</summary>
 			datePagerLocalization: null,
+
+			/// <summary>
+			/// Set this option to true if you want to prevent users to edit events data.
+			/// Default: false
+			/// Type: Boolean.
+			/// Code example: 
+			/// $("#report").wijevcal({ 
+			///		readOnly: true
+			///	});
+			/// </summary>
+			readOnly: false,
 
 			/// <summary>
 			/// The URL to the web service which will be used 
@@ -574,6 +589,18 @@ block comments:
 			},
 
 			/// <summary>
+			/// A dataview object to bind to events data
+			/// Default: null
+			/// Type: Object
+			/// Code example:
+			/// var dv = $.wijmo.wijdataview({....});
+			/// $("#eventscalendar").wijevcal({
+			///   dataSource: dv
+			/// })
+			/// </summary>
+			dataSource: null,
+
+			/// <summary>
 			/// The event objects array.
 			/// Default: []
 			/// Type: Array.
@@ -635,7 +662,8 @@ block comments:
 			/// <summary>
 			/// Format of the title text for the event.
 			/// Format arguments:
-			///  {0} = Start, {1} = End, {2} = Subject, {3} = Location, {4} = Icons.
+			///  {0} = Start, {1} = End, {2} = Subject, {3} = Location, {4} = Icons,
+			///	 {5} = Description.
 			/// Default: "{2}"
 			/// Type: String.
 			/// Code example: 
@@ -1182,6 +1210,10 @@ block comments:
 		_setOption: function (key, value) {
 			var o = this.options;
 			switch (key) {
+				case "dataSource":
+					o.dataSource = value;
+					this._bindDataView();
+					break;
 				case "eventsData":
 					o.eventsData = value;
 					o.appointments = value; //remove deprecated appointments option?
@@ -1283,29 +1315,46 @@ block comments:
 			var o = this.options;
 			if (o.disabled) {
 				this.element.addClass("ui-state-disabled");
-				this.element.find(".ui-button").button("option",
+				try {
+					this.element.find(".wijmo-wijcalendar").wijcalendar("option",
 																"disabled", true);
-				this.element.find(".ui-buttonset").buttonset("option",
+					this.element.find(".wijmo-wijsuperpanel").wijsuperpanel("option",
 																"disabled", true);
-				this.element.find(".wijmo-wijcalendar").wijcalendar("option",
+					this.element.find(".wijmo-wijdatepager").wijdatepager("option",
 																"disabled", true);
-				this.element.find(".wijmo-wijsuperpanel").wijsuperpanel("option",
+
+
+
+					this.element.find(".ui-buttonset").buttonset("option",
 																"disabled", true);
-				this.element.find(".wijmo-wijdatepager").wijdatepager("option",
-																"disabled", true);
+					this.element.find(".wijmo-wijev-today.ui-button").button("option", "disabled", true);
+					//this.element.find(".ui-button.ui-widget").button("option", "disabled", true);
+
+				} catch (ex) {
+					this.log(ex, "error");
+					//fix for:
+					//Error: cannot call methods on button prior to initialization; attempted to call method 'option' 
+				}
 				this._unbindEvents();
 			} else {
 				this.element.removeClass("ui-state-disabled");
-				this.element.find(".ui-button").button("option",
+
+				try {
+					this.element.find(".wijmo-wijcalendar").wijcalendar("option",
 																"disabled", false);
-				this.element.find(".ui-buttonset").buttonset("option",
+					this.element.find(".wijmo-wijsuperpanel").wijsuperpanel("option",
 																"disabled", false);
-				this.element.find(".wijmo-wijcalendar").wijcalendar("option",
+					this.element.find(".wijmo-wijdatepager").wijdatepager("option",
 																"disabled", false);
-				this.element.find(".wijmo-wijsuperpanel").wijsuperpanel("option",
+					this.element.find(".ui-buttonset").buttonset("option",
 																"disabled", false);
-				this.element.find(".wijmo-wijdatepager").wijdatepager("option",
-																"disabled", false);
+					this.element.find(".wijmo-wijev-today.ui-button").button("option", "disabled", false);
+					//this.element.find(".ui-button").button("option", "disabled", false);
+				} catch (ex) {
+					this.log(ex, "error");
+					//fix for:
+					//Error: cannot call methods on button prior to initialization; attempted to call method 'option' 
+				}
 				this._bindEvents();
 				this._updateTitleText();
 			}
@@ -1543,6 +1592,7 @@ this.localizeString("activityLoading", "Loading...") +
 
 		/* initialization code > */
 		_init: function () {
+
 			var o = this.options;
 			if (o.selectedDates && o.selectedDates.length > 0) {
 				o.selectedDate = o.selectedDates[0] = _toDayDate(o.selectedDates[0]);
@@ -1561,26 +1611,94 @@ this.localizeString("activityLoading", "Loading...") +
 			if (o.disabled) {
 				this.element.addClass("ui-state-disabled");
 			}
+
 			this._initHeaderbar();
+
 			this._initNavigationbar();
+
 			this._initStatusbar();
+
 			this._initRightPane();
+
 			if (o.fullScreen) {
 				//qq:todo fullscreenmode
 				this._onFullScreenModeChanged(o.fullScreen);
 
 			}
 			this._initLogPanel();
+
 			this._initLocalDataStorage(); // _loadData called here
 			this.element.ajaxError(jQuery.proxy(this._onAjaxError, this));
-			$(window).resize($.proxy(this._onWindowResize, this));
+			
+			$(window).bind("resize." + this.wijevcalnamespacekey,
+								$.proxy(this._onWindowResize, this));
 
-			this._renderActiveView(); // invalidate called here
-
+			this._renderActiveView(); // invalidate called here			
 			//this._bindEvents();this._updateTitleText(); called here:
-			this._ensureDisabled();
+
+			this._bindDataView();
 
 		},
+
+		// wijdataview implementation
+		_isDataViewLoaded: function (dv) {
+			return dv && (dv.isLoaded() || (dv.count() > 0));
+		},
+
+		_isDataview: function (dv) {
+			if (dv && typeof (dv) === "object" && !$.isArray(dv)) {
+				return true;
+			}
+		},
+
+		_getDataViewInst: function () {
+			return this.element.data("wijdataview");
+		},
+
+		_bindDataView: function () {
+			var o = this.options,
+				dataSource = o.dataSource,
+				dataSource,
+				self = this;
+
+			if (!dataSource && this._getDataViewInst()) {
+				dataSource = this._getDataViewInst();
+				dataSource = o.dataSource = dataSource;
+			}
+
+			if (dataSource && this._isDataview(dataSource)) {
+				if (this._isDataViewLoaded(dataSource)) {
+					this._dataView = dataSource;
+					this._setOption("eventsData", dataSource.toArray());
+
+				}
+				else {
+
+					dataSource.element.bind("dataloaded", function () {
+						self._dataView = dataSource;
+						self._setOption("eventsData", dataSource.toArray());
+					});
+					/*
+					//qq:?
+					.bind("datachange", function (e, args) {
+					if (args && args.length && args[0].changeType !== "reset") {
+					self.dataList = dataSource.dataView.toArray();
+					self._bindData();
+					self.redraw();
+					}
+					});*/
+				}
+			} else {
+				this._dataView = null;
+			}
+			/*
+			qq:?
+			if (!self._needloaded) {
+			self._bindData();
+			}*/
+		},
+
+
 		_initLocalDataStorage: function () {
 			/* local data storage initialization >> */
 			try {
@@ -1778,11 +1896,16 @@ this.localizeString("logCouldntOpenLocalStorage", "Couldn't open built-in local 
 				},
 				errorCallback);
 			}
-
-
-
-			o.eventsData = [];
-			eventsDataById = this._eventsDataById = {};
+			if (this._dataView) {
+				o.eventsData = this._dataView.toArray();
+			} else {
+				o.eventsData = [];
+			}
+			if (!this._eventsDataById) {
+				eventsDataById = this._eventsDataById = {};
+			} else {
+				eventsDataById = this._eventsDataById;
+			}
 			loadEventsCallback = function (events) {
 				if (!events) {
 					return;
@@ -1808,8 +1931,7 @@ this.localizeString("logCouldntOpenLocalStorage", "Couldn't open built-in local 
 					self._storeEventWithSort(appt);
 				}
 				self._onEventsDataChanged();
-				self._trigger("initialized");
-				self.hideLoadingLabel();
+				self._onInitialized();
 			};
 			if (o.dataStorage.loadEvents) {
 				o.dataStorage.loadEvents(o.visibleCalendars,
@@ -1830,7 +1952,10 @@ this.localizeString("logCouldntOpenLocalStorage", "Couldn't open built-in local 
 				});
 
 			} else {
-
+				if (this._dataView) {
+					this._onInitialized();
+					return;
+				}
 				query = "SELECT * FROM events where ";
 				for (i = 0; i < o.visibleCalendars.length; i += 1) {
 					if (i > 0) {
@@ -1846,14 +1971,18 @@ this.localizeString("logCouldntOpenLocalStorage", "Couldn't open built-in local 
 						self._storeEventWithSort(appt);
 					}
 					self._onEventsDataChanged();
-					self._trigger("initialized");
-					self.hideLoadingLabel();
+					self._onInitialized();
 				},
 				errorCallback);
 			}
 
 		},
+		_onInitialized: function () {
+			this._ensureDisabled();
+			this.hideLoadingLabel();
+			this._trigger("initialized");
 
+		},
 		_readEventData: function (data) {
 			var appt = this._cloneObj(data);
 			appt.start = new Date(appt.start);
@@ -2318,13 +2447,14 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 							this._editEventDialog.find(".wijmo-wijev-calendar").wijdropdown("refresh");
 							this._editEventDialog.find(".wijmo-wijev-repeat").wijdropdown("refresh");
 						}
+						this._onEditEventDialogShown(this._editEventDialog,
+														this._editEventDialog.appt);
 						this._editEventDialog.find(".wijmo-wijev-subject").focus();
 						this._updateEditEventPopupCallout();
 					}, this)
 				});
 			}
 		},
-
 		_updateEditEventPopupCallout: function () {
 
 			if (this._editEventDialog && this._editEventDialog._arrowTarget) {
@@ -2410,7 +2540,8 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 
 			if (startDate.getTime() === endDate.getTime()
 						&& startTime.getTime() > endTime.getTime()) {
-				throw "The end date you entered occurs before the start date.";
+				throw this.localizeString("messageEndOccursBeforeStart",
+								"The end date you entered occurs before the start date.");
 			}
 			appt.subject = dlg.find(".wijmo-wijev-subject").val();
 			appt.location = dlg.find(".wijmo-wijev-location").val();
@@ -2487,11 +2618,6 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 															appt.calendar);
 
 			this._loadRepeatValue(appt, dlg.find(".wijmo-wijev-repeat"));
-			if (appt.recurrenceState === "exception") {
-				dlg.find(".wijmo-wijev-repeat").wijdropdown("option", "disabled", true);
-			} else {
-				dlg.find(".wijmo-wijev-repeat").wijdropdown("option", "disabled", false);
-			}
 
 			dlg.find(".wijmo-wijev-description")
 							.val(appt.description || "");
@@ -2510,6 +2636,15 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 			}
 			this._addColorClass(dlg.find(".wijmo-wijev-color"), color);
 			this._eventDialogEnsureTimePartState();
+		},
+		_onEditEventDialogShown: function (dlg, appt) {
+			// fix for jquery-ui-1.9pre problem 
+			// (cannot call methods on wijdropdown prior to initialization)
+			if (appt.recurrenceState === "exception") {
+				dlg.find(".wijmo-wijev-repeat").wijdropdown("option", "disabled", true);
+			} else {
+				dlg.find(".wijmo-wijev-repeat").wijdropdown("option", "disabled", false);
+			}
 		},
 		_eventDialogEnsureTimePartState: function () {
 			var dlg = this._editEventDialog;
@@ -2693,6 +2828,7 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 
 		destroy: function () {
 			this.element.removeClass("wijmo-wijev wijmo-wijevcal ui-widget ui-helper-reset");
+			$(window).unbind("resize." + this.wijevcalnamespacekey);
 			this._unbindEvents();
 			$.Widget.prototype.destroy.apply(this, arguments);
 		},
@@ -2717,11 +2853,11 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 		///	</param>
 		deleteCalendar: function (o, successCallback, errorCallback) {
 			var i, calendars = this.options.calendars,
-				name = o.name || o, found = false,
+				id = o.id || o, found = false,
 				deleteCalendarCallback, deleteCalendarErrorCallback, k,
 				self = this;
 			for (i = 0; i < calendars.length; i += 1) {
-				if (calendars[i].name === name) {
+				if (calendars[i].id === id) {
 					found = true;
 					o = calendars[i];
 					if (!this._trigger("beforeDeleteCalendar", null,
@@ -2734,7 +2870,24 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 				}
 			}
 			if (!found) {
-				this.status("Calendar with name '" + name + "' not found.");
+				
+				// try search by name
+				for (i = 0; i < calendars.length; i += 1) {
+					if (calendars[i].name === id) {
+						found = true;
+						o = calendars[i];
+						if (!this._trigger("beforeDeleteCalendar", null,
+							{ data: o })) {
+							return false;
+						}
+						delete this._calendarsById[o.id];
+						calendars.splice(i, 1);
+						break;
+					}
+				}
+			}
+			if (!found) {
+				this.status("Calendar with id/name '" + id + "' not found.");
 				return false;
 			}
 			this.showLoadingLabel(this.localizeString("activityDeletingCalendar",
@@ -2781,7 +2934,7 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 					error: deleteCalendarErrorCallback
 				});
 			} else {
-				executeSql("DELETE FROM calendars " + "WHERE name='" + name + "'",
+				executeSql("DELETE FROM calendars " + "WHERE id='" + o.id + "'",
 					[],
 					deleteCalendarCallback,
 					deleteCalendarErrorCallback);
@@ -3488,8 +3641,13 @@ this.localizeString("labelDescription", "Description") + "</label>" +
 				exceptionsArr = [],
 				removedArr = [],
 				occurrenceHash = {};
+			if (!this._eventsDataById) {
+				this._eventsDataById = {};
+
+			}
 			for (i = 0, icnt = appts.length; i < icnt; i += 1) {
 				appt = appts[i];
+
 				this._eventsDataById[appt.id] = appt;
 				if (appt.recurrenceState === "master") {
 					pattern = appt.recurrencePattern;
@@ -4706,11 +4864,6 @@ this.localizeString("labelAllDay", "all-day") +
 			this._updateAgendaList(this.element
 					.find(".wijmo-wijev-day-details  .wijmo-wijev-agenda-container"),
 					selectedDate, selectedDate, false);
-
-			// invalidate agenda height when text is changed(fix for 21282):
-
-			agendaContainer.outerHeight(leftPane.innerHeight() -
-												agendaContainer[0].offsetTop);
 		},
 
 		_listViewAgendaScrolled: function () {
@@ -4728,8 +4881,15 @@ this.localizeString("labelAllDay", "all-day") +
 						.show()
 						.html(this.localizeString("agendaLoadingMoreEvents",
 														"Loading more events..."));
-					setTimeout($.proxy(function () {
+					if (this._renderAgendaEventsTimeoutId) {
+						clearTimeout(this._renderAgendaEventsTimeoutId);
+						this._renderAgendaEventsTimeoutId = null;
+					}
+					this._renderAgendaEventsTimeoutId = setTimeout($.proxy(function () {
+						this._renderAgendaEventsTimeoutId = null;
 						this._renderAgendaEvents($agendaList, null, null, true);
+						// fix for 29488:
+						$agendaList.find(".wijmo-wijev-agenda-more-events").remove();
 					}, this), 100);
 				}
 			}
@@ -4750,13 +4910,22 @@ this.localizeString("labelAllDay", "all-day") +
 					null, null, true);
 		},
 
-		_updateAgendaList: function ($agendaList, startDt, endDt, listViewMode) {
+		_updateAgendaList: function (agendaContainer, startDt, endDt, listViewMode) {
+			var leftPane = this.element.find(".wijmo-wijev-leftpane"),
+				$agendaList = agendaContainer;
+
+			///////////
+			// invalidate agenda height when text is changed(fix for 21282):
+			agendaContainer.outerHeight(leftPane.innerHeight() -
+												agendaContainer[0].offsetTop);
+
 			if ($agendaList.find(".wijmo-wijsuperpanel-templateouterwrapper")
 																	.length > 0) {
 				$agendaList = $agendaList
 									.find(".wijmo-wijsuperpanel-templateouterwrapper");
 			}
-			///////////
+
+
 			if (listViewMode && $agendaList.data("wijevcal_agenda_initialized")) {
 				/*fix for 24623 */
 				$agendaList.parents(".wijmo-wijsuperpanel").wijsuperpanel("refresh");
@@ -5030,8 +5199,13 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 						dayColumns[j]._cached = true;
 						conflictColumns.push(dayColumns[j]);
 					} //<if(!dayColumns[j]._cached
+					else {
+						// fix for 30112 case 1:
+						conflictColumns.push(dayColumns[j]);
+					}
 				} //<for (j = 0 
 			}
+
 			this._dayColumnsToResolve = conflictColumns;
 			this._dayColumnResolveIdx = 0;
 			if (!this._resolveDayApptConflictsTimeout) {
@@ -5079,7 +5253,7 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 									this._formatString(this.options.eventTitleFormat,
 											appt.start, appt.end,
 											appt.subject, appt.location,
-											""
+											"", appt.description
 			/*"<strong>ICONS</strong>"*/) +
 
 								"</div></div>" +
@@ -5155,10 +5329,16 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 
 		// day view time interval
 		_onDayViewTimeIntervalClick: function (e) {
+			if (this.options.readOnly) {
+				return;
+			}
 			this.showEditEventDialog(null, e.target, e);
 		},
 
 		_onDayViewAllDayCellClick: function (e) {
+			if (this.options.readOnly) {
+				return;
+			}
 			var targetAppt = $(e.target);
 			if (targetAppt.hasClass("wijmo-wijev-appointment") ||
 				targetAppt.parents(".wijmo-wijev-appointment").length > 0) {
@@ -5196,6 +5376,9 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 		_onMonthViewCellClick: function (e) {
 			var monthcellcontainer = $(e.target)
 										.parent(".wijmo-wijev-monthcellcontainer");
+			if (this.options.readOnly) {
+				return;
+			}
 			if (monthcellcontainer.length < 1) {
 				return;
 			}
@@ -5204,6 +5387,9 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 		},
 		_onAppointmentClick: function (e) {
 			var target = $(e.target), appt;
+			if (this.options.readOnly) {
+				return;
+			}
 			if (this._apptDragResizeFlag) {
 				return;
 			}
@@ -5234,6 +5420,9 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 
 		// month view appointment drag/drop
 		_onMonthViewAppointmentMouseDown: function (e) {
+			if (this.options.readOnly) {
+				return;
+			}
 			var target = $(e.target),
 				appt = target.hasClass("wijmo-wijev-appointment") ?
 							target : target.parents(".wijmo-wijev-appointment");
@@ -5247,6 +5436,9 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 		},
 		// day view appointment drag/drop/resize/inline edit
 		_onDayViewAppointmentMouseDown: function (e) {
+			if (this.options.readOnly) {
+				return;
+			}
 			var target = $(e.target),
 				appt = target.hasClass("wijmo-wijev-appointment") ?
 							target : target.parents(".wijmo-wijev-appointment"),
@@ -5339,9 +5531,6 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 			$(this.element).find(".wijmo-wijev-dayview .wijmo-wijev-allday-cell")
 												.unbind(".tmp_wijevcal");
 
-
-			this._resolveDayViewAppointmentConflicts(
-								this.__targetAppt.parents(".wijmo-wijev-daycolumn"));
 			if (this._apptDragResizeFlag || this._apptMovedFlag) {
 				var o = this.findEventById(this.__targetAppt[0].className);
 				this._onApptVisualDargOrResize(this.__targetAppt, o);
@@ -5352,7 +5541,11 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 					if (this.__targetAppt &&
 							!this.__targetAppt.hasClass("wijmo-wijev-dragging")) {
 						this._apptDragResizeFlag = false;
+						// fix for 30112 case 2
+						this._resolveDayViewAppointmentConflicts(
+								this.__targetAppt.parents(".wijmo-wijev-daycolumn"));
 					}
+
 
 				}, this), 1);
 
@@ -5370,7 +5563,7 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 				visual.find(".wijmo-wijev-title").html(this._formatString(o.eventTitleFormat,
 											appt.start, appt.end,
 											appt.subject, appt.location,
-											""
+											"", appt.description
 				/*"<strong>ICONS</strong>"*/));
 				curDayStart = _toDayDate(appt.start);
 				visualStartMin = (((appt.start - curDayStart) / 1000) / 60);
@@ -5453,7 +5646,7 @@ this.localizeString("agendaHeaderFullDateFormat", "{0:MMMM d, yyyy}"), curDaySta
 				visual.find(".wijmo-wijev-title").html(this._formatString(o.eventTitleFormat,
 											appt.start, appt.end,
 											appt.subject, appt.location,
-											""
+											"", appt.description
 				/*"<strong>ICONS</strong>"*/));
 				if (!this._isApptResize && realEndDt.getTime() !== visualEndDt.getTime()) {
 					// fix for 25120
@@ -5856,6 +6049,13 @@ appt.subject +
 				this.logDialog = $('<div title="Log">' +
 					'<div class="wijmo-wijev-log"></div></div>');
 				this.logDialog.appendTo(this.element);
+				var btnsHash = {};
+				btnsHash[this.localizeString("buttonClearAll", "Clear All")] = function () {
+					$(this).find(".wijmo-wijev-log").html("");
+				};
+				btnsHash[this.localizeString("buttonClose", "Close")] = function () {
+					$(this).wijdialog("close");
+				};
 				this.logPanel = this.logDialog.wijdialog({
 					captionButtons: {
 						/*pin: { visible: false },
@@ -5863,14 +6063,7 @@ appt.subject +
 						toggle: { visible: false },
 						minimize: { visible: false }*/
 					},
-					buttons: {
-						"Clear All": function () {
-							$(this).find(".wijmo-wijev-log").html("");
-						},
-						"Close": function () {
-							$(this).wijdialog("close");
-						}
-					},
+					buttons: btnsHash,
 					width: 600, height: 420,
 					position: ["right", "top"]
 				}).find(".wijmo-wijev-log");
@@ -5932,7 +6125,9 @@ appt.subject +
 
 
 			viewHeight = elemInnerH - headerH - navigationbarH - footerH;
-			viewWidth = elemInnerW - rightPaneW - leftPaneW;
+			// -1 is fix for [29300] [JPN issue] 
+			//	[Sample][EventCalendar]List view of EventCalendar gets control desorted
+			viewWidth = elemInnerW - rightPaneW - leftPaneW - 1;
 			//alert("leftPaneW=" + leftPaneW + ",viewWidth=" + viewWidth);
 
 

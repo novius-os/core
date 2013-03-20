@@ -939,13 +939,18 @@ define('jquery-nos-appdesk',
                 self.gridRendered = false;
                 self.uiGridTitle.html(o.texts.gridTitle);
 
-                self.uiThumbnail.thumbnailsgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiGrid.noslistgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiTreeGrid.nostreegrid('destroy')
+                // Use try/catch, widget can not be initialize
+                try {
+                    self.uiThumbnail.thumbnailsgrid('destroy');
+                } catch (e) {}
+                try {
+                    self.uiGrid.noslistgrid('destroy');
+                } catch (e) {}
+                try {
+                    self.uiTreeGrid.nostreegrid('destroy');
+                } catch (e) {}
+
+                self.uiThumbnail.add(self.uiGrid).add(self.uiTreeGrid)
                     .empty()
                     .hide();
                 if (o.defaultView === 'thumbnails') {
@@ -1077,6 +1082,7 @@ define('jquery-nos-appdesk',
                                 $.each(self.uiGrid.noslistgrid('data') || [], function(dataRowIndex, data) {
                                     if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                         sel.addRows(dataRowIndex);
+                                        self.element.trigger('selectionChanged.appdesk', data);
                                     }
                                 });
                             }
@@ -1173,6 +1179,7 @@ define('jquery-nos-appdesk',
                                 $.each(self.uiTreeGrid.nostreegrid('data') || [], function(dataRowIndex, data) {
                                     if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                         sel.addRows(dataRowIndex);
+                                        self.element.trigger('selectionChanged.appdesk', data);
                                     }
                                 });
                             }

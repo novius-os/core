@@ -1,7 +1,7 @@
 /*globals jQuery,window,S,document */
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -92,6 +92,13 @@
 			/// Code example: $("#element").wijgallery( { showCaption: true } );
 			/// </summary>
 			showCaption: true,
+			/// <summary>
+			/// Determines whether the caption of thumbnails should be shown.
+			/// Default: true.
+			/// Type: Boolean.
+			/// Code example: $("#element").wijgallery( { showThumbnailCaptions: true } );
+			/// </summary>
+			showThumbnailCaptions: false,
 			/// <summary>
 			/// An object collection that contains the data of the gallery.
 			/// Default: [].
@@ -446,7 +453,7 @@
 					case "showControlsOnHover":
 					case "mode":
 					case "data":
-						self._destroy();
+						self._wijdestroy();
 						self._create();
 						break;
 					default:
@@ -579,7 +586,7 @@
 			self.currentIdx = -1;
 			self.disabledEles = self.element;
 			self.disabledDiv = $();
-			
+
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
@@ -756,6 +763,12 @@
 				var nav = $(navHtml.replace(/\{0\}/, n))
 				.appendTo(self.frame),
 				link = nav.children("a");
+
+				if ($.browser.msie && parseInt($.browser.version) <= 9) {
+					nav.css({
+						"background-color": "#fff"
+					});
+				}
 
 				if (o.showControlsOnHover) {
 					nav.bind("mouseenter." + self.widgetName, function () {
@@ -956,7 +969,7 @@
 					display: o.thumbsDisplay,
 					step: o.thumbsDisplay - 1,
 					itemPadding: "0 10px",
-					showCaption: false,
+					showCaption: o.showThumbnailCaptions,
 					orientation: o.thumbnailOrientation,
 					loop: false,
 					itemClick: function (event, ui) {
@@ -1254,7 +1267,10 @@
 						}
 						self._setCurrentStates(index);
 						if (index !== undefined) {
-							//self._loadCaption(image);
+							if (o.showCaption) {
+								self._loadCaption(self.images[index]);
+								self._showCaption(self.images[index]);
+							}
 							pic.show();
 							lastContent.fadeOut(function () {
 								lastContent.empty();
@@ -1279,12 +1295,10 @@
 			if (w > size.w || h > size.h) {
 				if (w / h > size.w / size.h) {
 					pic.css({ width: "100%" });
-				}
-				else {
+				} else {
 					pic.css({ height: "100%" });
 				}
-			}
-			else if (w < size.w && h < size.h) {
+			} else if (w < size.w && h < size.h) {
 				pic.addClass("ui-state-default wijmo-wijgallery-small-image");
 			}
 
@@ -1347,23 +1361,20 @@
 						self.last.hide();
 						self._setCurrentStates(index);
 					});
-				}
-				else if (effect === "explode" || effect === "scale" ||
+				} else if (effect === "explode" || effect === "scale" ||
 				effect === "blind" || effect === "fold") {
 					self.current.css({ position: "absolute" });
 					self.current.stop(true, true).show(effect, duration, function () {
 						self.last.hide();
 						self._setCurrentStates(index);
 					});
-				}
-				else if (effect === "size") {
+				} else if (effect === "size") {
 					self.last.hide();
 					self.current.stop(true, true).show(effect, duration, function () {
 						self.last.hide();
 						self._setCurrentStates(index);
 					});
-				}
-				else {
+				} else {
 					half = duration / 2;
 					self.last.hide(effect, half, function () {
 						self.last.hide();
@@ -1372,8 +1383,7 @@
 						});
 					});
 				}
-			}
-			else {
+			} else {
 				self.last.hide();
 				self.current.show();
 				self._setCurrentStates(index);
@@ -1388,8 +1398,7 @@
 				if (o.scrollWithSelection) {
 					scrollIdx = index - Math.ceil(o.thumbsDisplay / 2) + 1;
 					self.thumbs[self.thumbWidgetName]("scrollTo", scrollIdx);
-				}
-				else {
+				} else {
 					if (index > (o.thumbsDisplay + self.currentThumbIdx - 1)) {
 						self.thumbs[self.thumbWidgetName]("scrollTo",
 						index - o.thumbsDisplay + 1);
@@ -1491,7 +1500,7 @@
 			return this.count;
 		},
 
-		_destroy: function () {
+		_wijdestroy: function () {
 			var self = this;
 			self.frame.unwrap().remove();
 			if (self.options.thumbnails) {
@@ -1524,7 +1533,7 @@
 		},
 
 		destroy: function () {
-			this._destroy();
+			this._wijdestroy();
 			$.Widget.prototype.destroy.apply(this);
 		},
 
@@ -1566,7 +1575,7 @@
 			/// Start displaying the images in order automatically.
 			/// </summary>
 			var self = this, o = self.options;
-			if (self.isPlaying) {
+			if (self.isPlaying || o.disabled) {
 				return;
 			}
 
@@ -1635,25 +1644,20 @@
 			if (typeof ui === "string") {
 				item = $(ui);
 				data = self._initLi(item);
-			}
-			else if (ui.jquery) {
+			} else if (ui.jquery) {
 				item = ui;
 				data = self._initLi(item);
-			}
-			else if ($.isPlainObject(ui)) {
+			} else if ($.isPlainObject(ui)) {
 				data = ui;
-			}
-			else {
+			} else {
 				return;
 			}
 			//image
 			if (!index || index > self.count) {
 				idx = self.count;
-			}
-			else if (index < 0) {
+			} else if (index < 0) {
 				idx = 0;
-			}
-			else {
+			} else {
 				idx = index;
 			}
 
@@ -1671,21 +1675,32 @@
 			/// If  no index specified the last item will be removed.
 			/// </summary>
 			var self = this, idx;
-			if (!index || index > self.count) {
+			if (isNaN(index) || index > self.count) {
 				idx = self.count;
-			}
-			else if (index < 0) {
+			} else if (index < 0) {
 				idx = 0;
-			}
-			else {
+			} else {
 				idx = index;
 			}
 
 			self.images.splice(idx, 1);
+
 			self.count--;
 			if (self.thumbs && self.thumbs[self.thumbWidgetName]) {
 				self.thumbs[self.thumbWidgetName]("remove", index);
 			}
+			if (self.currentIdx == index) {
+				self.current.children("img").remove();
+				self.last.children("img").remove();
+				self.picture = null;
+				self.currentIdx = -1;
+				self.show(index);
+			} else if (self.currentIdx > index) {
+				var ci = self.currentIdx;
+				self.currentIdx = -1;
+				self.show(ci);
+			}
+
 		},
 
 		_getExt: function (url) {

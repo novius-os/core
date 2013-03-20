@@ -1,7 +1,7 @@
 /*globals jQuery*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -37,12 +37,20 @@
 			/// Type: Function.
 			/// Code example:
 			/// Supply a function as an option.
-			///  $("#tags").wijcheckbox({changed: function(e, data) { } });
+			///  $("#tags").wijcheckbox({changed: function(e, data) { 
+			///     alert("checkbox is changed to " + (data.checked ? "" : "un") + "checked");
+			///  } });
 			/// Bind to the event by type: wijcheckboxchanged
-			/// $("#tags").bind("wijcheckboxchanged", function(e, data) {} );
+			/// $("#tags").bind("wijcheckboxchanged", function(e, data) {
+			///     alert("checkbox is changed to " + (data.checked ? "" : "un") + "checked");
+			/// } );
 			/// </summary>
 			/// <param name="e" type="EventObj">
 			/// The jquery event object.
+			/// </param>
+			/// <param name="data" type="Object">
+			/// The wijcheckbox event data, include property "checked"
+			/// </param>
 			changed: null
 			},
 		_init: function () {

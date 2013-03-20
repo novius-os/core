@@ -820,7 +820,7 @@ define('jquery-nos',
                 $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",
                     selectedIndexChanged : function(e, args) {
-                        $(e.target).find('.ui-accordion-content').eq(args.newIndex).nosOnShow();
+                        $(e.target).find('.wijmo-wijaccordion-content').eq(args.newIndex).nosOnShow();
                     }
                 });
                 // @todo Check usefulness of this

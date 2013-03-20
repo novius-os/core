@@ -33,7 +33,6 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         $user = \Session::user();
         $config_user = \Config::load('noviusos_user::controller/admin/user', true);
         $fields = $config_user['fields'];
-        $fields['password_confirmation']['validation']['match_field'] = array('password_reset');
         unset($fields['user_password']);
         // Form target is Controller_Admin_User_User, we only display the fieldset here
         $fieldset_infos = \Fieldset::build_from_config(
@@ -96,7 +95,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         $fields = array(
             'background' => array(
                 'label' => __('Wallpaper'),
-                'renderer' => 'Nos\Renderer_Media',
+                'renderer' => 'Nos\Media\Renderer_Media',
                 'form' => array(
                     'value' => \Arr::get($configuration, 'misc.display.background', ''),
                 ),

@@ -1,7 +1,7 @@
 /*globals jQuery,window,document,ActiveXObject,Image,S,now*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -88,7 +88,7 @@
 			/// Default: []
 			/// Type: Array
 			///	</summary>
-			groupItems: [],
+			groupItems: null,
 			///	<summary>
 			///	Determines the root url for each item.
 			/// Default: ''
@@ -599,12 +599,14 @@
 
 		_create: function () {
 			var o = this.options, self = this;
-			
+
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
 			}
-
+			if (!o.groupItems) {
+				o.groupItems = [];
+			}
 			this._defaults = {
 				transAnimation: {
 					animated: 'fade',
@@ -780,9 +782,13 @@
 						});
 						if (e.pageX >= rect.left &&
 						e.pageX < (rect.left + rect.width / 2)) {
-							self.back();
+							if (!self.backBtn.hasClass('ui-state-disabled')) {
+								self.back();
+							}
 						} else {
-							self.next();
+							if (!self.nextBtn.hasClass('ui-state-disabled')) {
+								self.next();
+							}
 						}
 					});
 				}
@@ -1930,6 +1936,14 @@
 			/// <summary>Shows the content in specified index.</summary>
 			this._show(index);
 			return this;
+		},
+
+		adjustPosition: function () {
+			///<summary>
+			/// Adjust the position of lightbox according to the "position" option.
+			/// It is usually called after window resized.
+			///</summary >
+			this._position();
 		},
 
 		_resize: function (complete) {

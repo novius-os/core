@@ -13,7 +13,11 @@ define('NOS_ENTRY_POINT', '404');
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
+Fuel::$profiling = false;
+
 $nos_url = Input::server('NOS_URL');
+
+\Event::trigger_function('404.start', array(array('url' => &$nos_url)));
 
 if (in_array($nos_url, array(
     'favicon.ico',
@@ -31,7 +35,20 @@ if ($is_media) {
     if ($is_resized) {
         list(, $path, $max_width, $max_height, $verification, $extension) = $m;
         $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
-        $media_url = str_replace("/$max_width-$max_height", '', $media_url);
+
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$/'.$media_url.'$'.$max_width.'$'.$max_height);
+
+        // Thumbnails view or slideshow app just replace '64-64' by '128-128' in the URL...
+        if (empty($verification) || substr($hash, 0, 6) !== $verification) {
+            // Still allow generated for back-office authenticated users
+            if (!\Nos\Auth::check()) {
+                header('HTTP/1.0 403 Forbidden');
+                header('HTTP/1.1 403 Forbidden');
+                exit();
+            }
+        }
+
     } else {
         $media_url = str_replace('media/', '', $nos_url);
     }
@@ -45,7 +62,7 @@ if ($is_media) {
         $media = \Nos\Media\Model_Media::forge(reset($res));
     }
 
-    if (false === $media) {
+    if (false === $media || !is_file(APPPATH.$media->get_private_path())) {
         $send_file = false;
     } else {
         if ($is_resized) {
@@ -87,6 +104,8 @@ if ($is_media) {
         header('HTTP/1.1 200 Ok');
 
         Nos\Tools_File::send($send_file);
+    } else {
+        \Event::trigger('404.mediaNotFound', array('url' => $nos_url));
     }
 }
 
@@ -138,7 +157,7 @@ if ($is_attachment) {
             $target_relative = $attachment->url();
         }
 
-        if ($send_file && $check === false) {
+        if ($send_file && $check === false && is_file($send_file)) {
             $source = $send_file;
             $target = DOCROOT.$target_relative;
             $dir = dirname($target);
@@ -163,8 +182,12 @@ if ($is_attachment) {
         header('HTTP/1.1 200 Ok');
 
         Nos\Tools_File::send($send_file);
+    } else {
+        \Event::trigger('404.attachmentNotFound', array('url' => $nos_url));
     }
 }
+
+\Event::trigger('404.end', array('url' => $nos_url));
 
 // real 404
 if (!$is_attachment && !$is_media && pathinfo($nos_url, PATHINFO_EXTENSION) == 'html') {
