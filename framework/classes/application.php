@@ -264,18 +264,12 @@ class Application
 
     public function canInstall()
     {
-        $missing = $this->applicationsRequiredAndNotInstalled();
-        foreach ($missing as $missing_item) {
-            if (!\Module::exists($missing_item)) {
-                return false;
-            }
-        }
-        return true;
+        return count($this->applicationsRequiredAndUnavailable()) === 0;
     }
 
     public function canUninstall()
     {
-        return count($this->installedDependentApplication()) === 0;
+        return count($this->installedDependentApplications()) === 0;
     }
 
     public function applicationsRequired()
@@ -300,16 +294,30 @@ class Application
 
     public function applicationsRequiredAndNotInstalled()
     {
-        $missing = array();
+        $not_installed = array();
         $required = $this->applicationsRequired();
 
         foreach ($required as $require) {
             if (!static::forge($require)->is_installed()) {
-                $missing[] = $require;
+                $not_installed[] = $require;
             }
         }
 
-        return $missing;
+        return $not_installed;
+    }
+
+    public function applicationsRequiredAndUnavailable()
+    {
+        $unavailable = array();
+        $required = $this->applicationsRequiredAndNotInstalled();
+
+        foreach ($required as $required_item) {
+            if (!\Module::exists($required_item)) {
+                $unavailable[] = $required_item;
+            }
+        }
+
+        return $unavailable;
     }
 
     public function installRequiredApplications($add_permission = true)
@@ -320,7 +328,7 @@ class Application
         }
     }
 
-    public function installedDependentApplication()
+    public function installedDependentApplications()
     {
         return static::$requirements[$this->folder]['required_by'];
     }
@@ -339,7 +347,7 @@ class Application
         if (!$this->canInstall()) {
             throw new \Exception('Application '.$this->folder.
                 ' can\'t be installed because it needs the following applications: '.implode(', ',
-                $this->applicationsRequiredAndNotInstalled()).'.');
+                $this->applicationsRequiredAndUnavailable()).'.');
         }
         $this->installRequiredApplications($add_permission);
         if ($add_permission) {
@@ -384,7 +392,7 @@ class Application
     public function uninstall()
     {
         if (!$this->canUninstall()) {
-            $dependents = $this->installedDependentApplication();
+            $dependents = $this->installedDependentApplications();
             throw new \Exception('Application '.$this->folder.
                 ' can\'t be uninstalled because it needs the following applications: '.implode(', ', $dependents).'.');
         }
