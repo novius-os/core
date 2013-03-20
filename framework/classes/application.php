@@ -10,6 +10,8 @@
 
 namespace Nos;
 
+use Oil\Exception;
+
 class Application
 {
     protected static $repositories;
@@ -237,6 +239,40 @@ class Application
         return $diff_metadata;
     }
 
+    public function canInstall()
+    {
+        return count($this->applicationsRequiredAndMissing()) == 0;
+    }
+
+    public function applicationsRequired()
+    {
+        $required = array();
+        $new_metadata = $this->getRealMetadata();
+
+        if (isset($new_metadata['requires'])) {
+            $required = $new_metadata['requires'];
+            if (is_string($required)) {
+                $required = array($required);
+            }
+        }
+
+        return $required;
+    }
+
+    public function applicationsRequiredAndMissing()
+    {
+        $missing = array();
+        $required = $this->applicationsRequired();
+
+        foreach ($required as $require) {
+            if (!static::forge($require)->is_installed()) {
+                $missing[] = $require;
+            }
+        }
+
+        return $missing;
+    }
+
     /**
      * Install an application:
      * - Authorise the user who added the application to access it
@@ -248,6 +284,11 @@ class Application
      */
     public function install($add_permission = true)
     {
+        if (!$this->canInstall()) {
+            throw new \Exception('Application '.$this->folder.
+                ' can\'t be installed because it needs the following applications: '.implode(', ',
+                $this->applicationsRequiredAndMissing()).'.');
+        }
         if ($add_permission) {
             $this->addPermission();
         }
