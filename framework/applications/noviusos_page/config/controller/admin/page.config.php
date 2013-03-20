@@ -91,7 +91,6 @@ return array(
             'label' => __('Title'),
             'form' => array(
                 'type' => 'text',
-                'id' => 'my_page_title',
             ),
             'validation' => array(
                 'required',
