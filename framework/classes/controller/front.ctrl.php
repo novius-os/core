@@ -166,7 +166,7 @@ class Controller_Front extends Controller
                 try {
                     $this->_find_page();
 
-                    \Event::trigger('front.findPage');
+                    \Event::trigger('front.pageFound');
 
                     $this->_generate_cache();
 
@@ -693,7 +693,7 @@ class Controller_Front extends Controller
             }
         }
 
-        \Event::trigger('front.findPage');
+        \Event::trigger('front.pageFound');
     }
 
     /**
