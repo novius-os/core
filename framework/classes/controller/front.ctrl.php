@@ -145,7 +145,7 @@ class Controller_Front extends Controller
                 $temp_url = $page_params['url'];
 
                 if ($page_id != 'current') {
-                    $this->_contexts_possibles = array($page_params['context']);
+                    $this->_contexts_possibles = array($page_params['context'] => $contexts_possibles[$page_params['context']]);
                     $this->_page_id = $page_id;
 
                     if (!in_array($temp_url, array('', '/'))) {
@@ -165,7 +165,6 @@ class Controller_Front extends Controller
                 $_404 = false;
                 try {
                     $this->_find_page();
-                    $this->_context_url = $contexts_possibles[$this->_context];
 
                     \Event::trigger('front.findPage');
 
@@ -183,8 +182,6 @@ class Controller_Front extends Controller
 
                     break;
                 } catch (FrontReplaceTemplateException $e) {
-                    $this->_context_url = $contexts_possibles[$this->_context];
-
                     echo $this->_content;
 
                     $cache->save($this->_save_cache ? -1 : $this->_cache_duration, $this);
@@ -240,6 +237,14 @@ class Controller_Front extends Controller
         \Event::trigger_function('front.response', array(array('content' => &$this->_content)));
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
+    }
+
+    /**
+     * @return string
+     */
+    public function getContext()
+    {
+        return $this->_context;
     }
 
     /**
@@ -627,6 +632,7 @@ class Controller_Front extends Controller
         }
 
         $this->_context = $this->_page->get_context();
+        $this->_context_url = $this->_contexts_possibles[$this->_context];
         \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
