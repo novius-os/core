@@ -22,36 +22,98 @@ $role = reset($user->roles);
 
     <div class="applications">
         <div class="application all">
+            <label>
             <div class="maincheck">
                 <input type="checkbox" name="perm[nos::access][_full]" value="1" class="access_to_everything" <?= ($role->check_permission('nos::access', '_full') ? 'checked' : '') ?> />
             </div>
             <div class="infos">
-                <?= __('Full access to everything') ?>
+                <?= __('Access to all applications') ?>
             </div>
+            </label>
         </div>
 
-        <?php
-        $permissions = \Config::load('noviusos_user::permissions', true);
+        <div class="line">
+            <div class="col c7">
+            <?php
+            $permissions = \Config::load('nos::permissions', true);
 
-        $category_sections = array();
-        foreach ($permissions['categories'] as $section => $callback) {
-            $category_sections[$section] = $callback();
-        }
-
-        foreach ($permissions['permissions']['categories'] as $section => $list) {
-            $category_section = $category_sections[$section];
-            foreach ($list as $permission_name => $perm) {
-                echo '<h2>'.htmlspecialchars($perm['title']).'</h2>';
-                echo '<ul>';
-                foreach ($category_section as $category_key => $categories) {
-                    echo '<li>
-                        <label><input type="checkbox" name="perm['.$permission_name.']['.$category_key.']" value="1" '.($role->check_permission($permission_name, $category_key) ? 'checked' : '').' /> <img src="'.$categories['icon'].'" /> '.$categories['title'].'</label>
-                    </li>';
-                }
-                echo '<ul>';
+            $category_sections = array();
+            foreach ($permissions['categories'] as $section => $callback) {
+                $category_sections[$section] = is_callable($callback) ? call_user_func($callback) : array();
             }
-        }
-        ?>
+
+            foreach ($permissions['permissions']['categories'] as $section => $list) {
+                $category_section = $category_sections[$section];
+                foreach ($list as $permission_name => $perm) {
+                    echo '<div class="permission '.$permission_name.'" style="margin-top: 1em;">';
+                    echo '<h2>'.htmlspecialchars($perm['title']).'</h2>';
+                    echo \View::forge($perm['view'], array(
+                        'permission_name' => $permission_name,
+                        'checkbox_name' => 'perm['.$permission_name.'][]',
+                        'categories' => $category_section,
+                        'check_permission' => function($perm_name, $cat_key) use ($role) {
+                            return $role->check_permission($perm_name, $cat_key);
+                        }
+                    ));
+                    echo '</div>';
+                }
+            }
+            ?>
+
+            </div>
+            <div class="col c5">
+                <?php
+                foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
+                    $permissions = \Config::load($app_name.'::permissions', true);
+                    echo '<div class="accordion '.$app_name.'" style="display:none;">';
+
+                    if (!empty($permissions['permissions']['standalone'])) {
+                        ?>
+                        <h3><img src="<?= Config::icon($app_name, 16) ?>" /> <?= $app['name'] ?></h3>
+                        <div>
+                            <?php
+                            foreach ($permissions['permissions']['standalone'] as $permission_name => $permission) {
+                                ?>
+                                <label>
+                                    <input type="checkbox" name="perm[<?= $permission_name ?>][]" value="1" <?= $role->check_permission($permission_name) ? 'checked' : '' ?> />
+                                    &nbsp; <?= $permission['title'] ?>
+                                </label>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                        <?php
+                    }
+
+                    if (!empty($permissions['permissions']['categories'])) {
+                        $category_sections = array();
+                        foreach ($permissions['categories'] as $section => $callback) {
+                            $category_sections[$section] = is_callable($callback) ? call_user_func($callback) : array();
+                        }
+                        foreach ($permissions['permissions']['categories'] as $section => $list) {
+                            $category_section = $category_sections[$section];
+                            foreach ($list as $permission_name => $perm) {
+                                echo '<h3>'.htmlspecialchars($perm['title']).'</h3>';
+                                echo '<div>';
+                                echo \View::forge($perm['view'], array(
+                                    'permission_name' => $permission_name,
+                                    'checkbox_name' => 'perm['.$permission_name.'][]',
+                                    'categories' => $category_section,
+                                    'check_permission' => function($perm_name, $cat_key) use ($role) {
+                                        return $role->check_permission($perm_name, $cat_key);
+                                    }
+                                ));
+                                echo '</div>';
+                            }
+                        }
+                    }
+                    ?>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
     </div>
 
 </form>
@@ -59,7 +121,7 @@ $role = reset($user->roles);
 
 <script type="text/javascript">
 require(
-    ["jquery-nos"],
+    ['jquery-nos'],
     function($) {
         $(function() {
             var $form = $('#<?= $uniqid ?>').nosFormUI(),
@@ -68,44 +130,37 @@ require(
                 $checkboxes = $items.find(":checkbox"),
                 $access_to_everything = $applications.find(":checkbox.access_to_everything");
 
-            $form.prev().nosFormUI();
+            var $ul = $form.find('div[class~="nos::access"]')
+            $ul.find('.wijmo-checkbox').css('display', 'block');
+            $ul.find('li').on('click', function(e) {
+                if (!$(this).hasClass('ui-state-active') && $(this).find(':checkbox').is(':checked')) {
+                    log(e.target);
 
-            $items.click(function() {
-                var $checkbox = $(this).find('div.maincheck :checkbox');
-                $checkbox.attr('checked', !$checkbox.is(':checked'));
-                $checkbox.change();
-                $checkbox.wijcheckbox('refresh');
-            });
-
-            $checkboxes.change(function() {
-                var all_checked = true;
-                $checkboxes.each(function() {
-                    if (!$(this).is(':checked')) {
-                        all_checked = false;
-                    }
-                });
-                $access_to_everything.attr('checked', all_checked);
-                $access_to_everything.wijcheckbox('refresh');
-            });
-            $checkboxes.eq(0).change();
-
-            $access_to_everything.change(function() {
-                var all_checked = true;
-                $checkboxes.each(function() {
-                    if (!$(this).is(':checked')) {
-                        all_checked = false;
-                    }
-                });
-
-                if (all_checked) {
-                    $checkboxes.attr('checked', false);
-                } else {
-                    $checkboxes.attr('checked', true);
+                    e.stopPropagation();
+                    e.preventDefault();
+                    $(this).find(':checkbox').trigger('change');
                 }
-                $checkboxes.wijcheckbox('refresh');
+            });
+            $ul.find(':checkbox').on('change', function() {
+                var $this = $(this);
+                var $li = $this.closest('li');
+                var $accordion = $form.find('div.' + $this.val());
+
+                if ($this.is(':checked')) {
+                    $li.addClass('ui-state-active').siblings().removeClass('ui-state-active');
+                    $accordion.show().nosOnShow()
+                        .siblings().hide()
+                        .end().css('marginTop', $li.offset().top - $this.closest('.line').offset().top);
+                } else {
+                    $li.removeClass('ui-state-active');
+                    $accordion.hide();
+                }
             });
 
-            $form.find('form').nosFormAjax();
+            $form.nosFormAjax();
+
+
         });
     });
+
 </script>

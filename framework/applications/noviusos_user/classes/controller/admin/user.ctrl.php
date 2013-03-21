@@ -56,23 +56,30 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
     {
         $role = Model_Role::find(\Input::post('role_id'));
 
+        $db = Model_Permission::find('all', array('where' => array(
+            array('perm_role_id', $role->role_id),
+        )));
+
+        $olds = array();
+        foreach ($db as $old) {
+            $olds[$old->perm_name][$old->perm_category_key] = $old;
+        }
+
         $permissions = \Input::post('perm');
         foreach ($permissions as $perm_name => $allowed) {
-            $allowed = array_keys($allowed);
-
-            $olds = Model_Permission::find('all', array('where' => array(
-                array('perm_role_id', $role->role_id),
-                array('perm_name',    $perm_name),
-            )));
+            //$allowed = array_keys($allowed);
             $existing = array();
 
             // Delete old authorisations
-            foreach ($olds as $old) {
-                if (!in_array($old->perm_category_key, $allowed)) {
-                    $old->delete();
-                } else {
-                    $existing[] = $old->perm_category_key;
+            if (!empty($olds[$perm_name])) {
+                foreach ($olds[$perm_name] as $old) {
+                    if (!in_array($old->perm_category_key, $allowed)) {
+                        $old->delete();
+                    } else {
+                        $existing[] = $old->perm_category_key;
+                    }
                 }
+                unset($olds[$perm_name]);
             }
 
             // Add new authorisations
@@ -86,6 +93,14 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
                 }
             }
         }
+
+        // None checked for perm_name
+        foreach ($olds as $perm_name => $old) {
+            foreach ($old as $delete) {
+                $delete->delete();
+            }
+        }
+
         \Response::json(array(
             'notify' => __('OK, permissions saved.'),
             'dispatchEvent' => array(

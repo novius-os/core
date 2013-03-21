@@ -18,7 +18,7 @@ class Model_Role extends \Nos\Orm\Model
     protected static $permissions;
     protected $access;
 
-    public function check_permission($permission_name, $category_key)
+    public function check_permission($permission_name, $category_key = null)
     {
         // Load permissions
         if (!isset(static::$permissions[$this->role_id])) {
@@ -28,7 +28,12 @@ class Model_Role extends \Nos\Orm\Model
             }
         }
 
+        $isset = isset(static::$permissions[$this->role_id][$permission_name]);
+        if ($category_key == null) {
+            return $isset;
+        }
+
         // Check authorisation
-        return isset(static::$permissions[$this->role_id][$permission_name]) && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
+        return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
     }
 }

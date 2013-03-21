@@ -13,24 +13,23 @@
 
 return array(
     'categories' => array(
-        'applications' => function() {
-            $apps = array();
-            foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
-                $apps[$app_name] = array(
-                    'title' => $app['name'],
-                    'icon' => \Config::icon($app_name, 16),
-                );
-            }
-            return $apps;
-        },
+        'applications' => array(),
+        //'contexts' => array('Nos\Tools_Context', 'contexts'),
     ),
     'permissions' => array(
         'categories' => array(
             'applications' => array(
                 'nos::access' => array(
                     'title' => __('Can access the following applications:'),
+                    'view' => 'nos::admin/permissions/list_app',
                 ),
             ),
+            /*'contexts' => array(
+                'nos::context' => array(
+                    'title' => __('Can access the following contexts:'),
+                    'view' => 'nos::admin/permissions/list_contexts',
+                ),
+            ),*/
         ),
     ),
 );
