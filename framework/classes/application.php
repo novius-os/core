@@ -515,14 +515,16 @@ class Application
             }
         }
 
-        $old_dependency = \Arr::get($old_metadata, 'extends', null);
+        $old_dependency = static::extendsToDependency(\Arr::get($old_metadata, 'extends', null));
         $new_dependency = static::extendsToDependency(\Arr::get($new_metadata, 'extends', null));
 
         if ($old_dependency !== $new_dependency) {
             // Remove old dependency
             unset($config['app_dependencies'][$old_dependency['application']][$this->folder]);
-            // Set new dependency if not null
-            if ($new_dependency !== null) {
+            // Set new dependency
+            if ($new_dependency === null) {
+                unset($config['app_dependencies'][$new_dependency['application']][$this->folder]);
+            } else {
                 $config['app_dependencies'][$new_dependency['application']][$this->folder] = $new_dependency;
             }
         }
