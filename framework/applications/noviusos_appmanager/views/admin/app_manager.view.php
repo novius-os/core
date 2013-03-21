@@ -27,6 +27,9 @@ Nos\I18n::current_dictionary('noviusos_appmanager::common');
         .app_manager .app_list_available {
             width : 600px;
         }
+        .app_manager label.tooltip {
+            font-weight: bold;
+        }
     </style>
 
     <div class="col c1"></div>
@@ -81,13 +84,10 @@ foreach ($installed as $app) {
         if (count($dependents) == 1) {
             echo strtr(__('Cannot be uninstalled. Uninstall ‘{{application}}’ first.'), array('{{application}}' => $dependents[0]));
         } else {
-            echo  __('Cannot be uninstalled. Uninstall <a>these applications</a> first.').
-                \View::forge('nos::admin/tooltip', array(
-                    'title' => '',
-                    'content' => '<ul><li>' . implode('</li><li>', $dependents) . '</li></ul>',
-                    'options' => array(
-                    ),
-                ), false);
+            echo  preg_replace('`<a>(.*)</a>`',
+                render('noviusos_appmanager::admin/applications_tooltip', array('applications' => $dependents)),
+                __('Cannot be uninstalled. Uninstall <a>these applications</a> first.')
+            );
         }
     }
         ?>
@@ -135,13 +135,10 @@ foreach ($others as $app) {
         if (count($unavailable_applications) == 1) {
             echo strtr(__('Cannot be installed. Install ‘{{application}}’ first.'), array('{{application}}' => $unavailable_applications[0]));
         } else {
-            echo __('Cannot be installed. Install <a>these applications</a> first.').
-                \View::forge('nos::admin/tooltip', array(
-                    'title' => '',
-                    'content' => '<ul><li>' . implode('</li><li>', $unavailable_applications) . '</li></ul>',
-                    'options' => array(
-                    ),
-                ), false);
+            echo  preg_replace('`<a>(.*)</a>`',
+                render('noviusos_appmanager::admin/applications_tooltip', array('applications' => $unavailable_applications)),
+                __('Cannot be installed. Install <a>these applications</a> first.')
+            );
         }
 
 
