@@ -77,6 +77,7 @@ foreach ($installed as $app) {
         foreach ($dependents as &$dependent) {
             $dependent = \Nos\Application::forge($dependent)->get_name();
         }
+        unset($dependent);
         if (count($dependents) == 1) {
             echo strtr(__('Required by the "{{application}}" application.'), array('{{application}}' => $dependents[0]));
         } else {
