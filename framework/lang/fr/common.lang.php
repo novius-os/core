@@ -425,7 +425,7 @@ return array(
     'GNU AGPL v3' => 'GNU AGPL v3',
 
     #: views/admin/login_popup.view.php:21
-    'You’ve been inactive for too long. We need to make sure this is really you.' => 'Vous êtes inactif(ve) un bon moment. Nous devons nous assurer que c’est bien vous.',
+    'You’ve been inactive for too long. We need to make sure this is really you.' => 'Vous êtes inactif(ve) depuis un bon moment. Nous devons nous assurer que c’est bien vous.',
 
     #: views/admin/login_popup.view.php:38
     'Resume my work' => 'Reprendre mon travail',

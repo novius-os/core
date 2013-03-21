@@ -15,6 +15,8 @@ require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DI
 
 $nos_url = Input::server('NOS_URL');
 
+\Event::trigger_function('404.start', array(array('url' => &$nos_url)));
+
 if (in_array($nos_url, array(
     'favicon.ico',
     'robots.txt',
@@ -87,6 +89,8 @@ if ($is_media) {
         header('HTTP/1.1 200 Ok');
 
         Nos\Tools_File::send($send_file);
+    } else {
+        \Event::trigger('404.mediaNotFound', array('url' => $nos_url));
     }
 }
 
@@ -163,8 +167,12 @@ if ($is_attachment) {
         header('HTTP/1.1 200 Ok');
 
         Nos\Tools_File::send($send_file);
+    } else {
+        \Event::trigger('404.attachmentNotFound', array('url' => $nos_url));
     }
 }
+
+\Event::trigger('404.end', array('url' => $nos_url));
 
 // real 404
 if (!$is_attachment && !$is_media && pathinfo($nos_url, PATHINFO_EXTENSION) == 'html') {

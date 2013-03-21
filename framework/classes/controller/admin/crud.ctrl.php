@@ -501,7 +501,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+            return $this->send_error(new \Exception($this->config['i18n']['notification item deleted']));
         }
 
         $this->is_new = $this->item->is_new();
@@ -579,13 +579,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions_context()
     {
-        if (!$this->behaviours['twinnable'] || $this->is_new) {
+        $contexts = array_keys(Tools_Context::contexts());
+
+        if (!$this->behaviours['twinnable'] || $this->is_new || count($contexts) == 1) {
             return array();
         }
 
         $actions = array();
 
-        $contexts = array_keys(Tools_Context::contexts());
         $sites = Tools_Context::sites();
         $locales = Tools_Context::locales();
 
@@ -768,14 +769,5 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function delete()
     {
-        return array(
-            'dispatchEvent' => array(
-                array(
-                    'name' => 'Nos\User\Model_User',
-                    'action' => 'delete',
-                    'id' => array((int) 1),
-                ),
-            ),
-        );
     }
 }

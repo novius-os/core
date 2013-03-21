@@ -20,7 +20,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 
     public function before()
     {
-        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && \Request::active()->route->method_params[0] == $user->user_id) {
+        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && isset(\Request::active()->route->method_params[0]) && \Request::active()->route->method_params[0] == $user->user_id) {
             $this->bypass = true;
         }
         parent::before();
@@ -31,6 +31,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
         $fields = parent::fields($fields);
         if ($this->is_new) {
             $fields['user_password']['validation'][] = 'required';
+            $fields['password_confirmation']['validation']['match_field'] = array('user_password');
             $fields['password_confirmation']['validation'][] = 'required';
             $fields['user_last_connection']['dont_populate'] = true;
             $fields['user_last_connection']['dont_save'] = true;
