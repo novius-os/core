@@ -78,16 +78,12 @@ foreach ($installed as $app) {
             $dependent = \Nos\Application::forge($dependent)->get_name();
         }
         if (count($dependents) == 1) {
-            echo strtr(__('Required by the "{{application}}" application.'), array('{{application}}' => $dependents[0]));
+            echo strtr(__('Cannot be uninstalled. Uninstall ‘{{application}}’ first.'), array('{{application}}' => $dependents[0]));
         } else {
-            echo  __('Required by other installed applications.').
+            echo  __('Cannot be uninstalled. Uninstall <a>these applications</a> first.').
                 \View::forge('nos::admin/tooltip', array(
                     'title' => '',
-                    'content' => strtr(__('Required by the following applications: {{applications}}'),
-                        array(
-                            '{{applications}}' => '<br/><br/>- '.implode('<br/>- ', $dependents)
-                        )
-                    ),
+                    'content' => '<ul><li>' . implode('</li><li>', $dependents) . '</li></ul>',
                     'options' => array(
                     ),
                 ), false);
@@ -136,16 +132,12 @@ foreach ($others as $app) {
         // @note: we can't get application names here since they don't exist therefore there aren't any metadata
         $unavailable_applications = $app->applicationsRequiredAndUnavailable();
         if (count($unavailable_applications) == 1) {
-            echo strtr(__('Application "{{application}}" required.'), array('{{application}}' => $unavailable_applications[0]));
+            echo strtr(__('Cannot be installed. Install ‘{{application}}’ first.'), array('{{application}}' => $unavailable_applications[0]));
         } else {
-            echo __('Unavailable applications required.').
+            echo __('Cannot be installed. Install <a>these applications</a> first.').
                 \View::forge('nos::admin/tooltip', array(
                     'title' => '',
-                    'content' => strtr(__('The following applications are required but unavailable: {{applications}}'),
-                        array(
-                            '{{applications}}' => '<br/><br/>- '.implode('<br/>- ', $unavailable_applications)
-                        )
-                    ),
+                    'content' => '<ul><li>' . implode('</li><li>', $unavailable_applications) . '</li></ul>',
                     'options' => array(
                     ),
                 ), false);

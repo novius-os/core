@@ -42,7 +42,7 @@ return array(
     'Up-to-date' => 'À jour',
 
     #: views/admin/app_manager.view.php:70
-    'Uninstall' => 'Désintaller',
+    'Uninstall' => 'Désinstaller',
 
     #: views/admin/app_manager.view.php:82
     #: views/admin/app_manager.view.php:120
