@@ -65,7 +65,13 @@ class Tools_Enhancer
         $preview = \Arr::get($params, 'preview', false);
         if ($urlPath === false) {
             foreach ($page_enhanced as $page_id => $params) {
-                if ((!$twinnable || $params['context'] == $item_context) && ($preview || $params['published'])) {
+                $now = \Date::forge()->format('mysql');
+                if (is_array($params['published'])) {
+                    $published = (empty($params['published']['start']) || $params['published']['start'] < $now) && (empty($params['published']['end']) || $now < $params['published']['end']);
+                } else {
+                    $published = $params['published'] == true;
+                }
+                if ((!$twinnable || $params['context'] == $item_context) && ($preview || $published)) {
                     $page_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($page_params) {
                         $urls[$page_id.'::'.$urlItem] = \Nos\Tools_Url::context($page_params['context']).$page_params['url'].$urlItem;
