@@ -282,8 +282,13 @@ class Application
 
     public static function applicationRequiredFromMetadata($metadata)
     {
-        $requires = isset($metadata['requires']) ? $metadata['requires'] :
-            (isset($metadata['extends']) ? $metadata['extends'] : array());
+        $requires = array();
+        if (isset($metadata['requires'])) {
+            $requires = $metadata['requires'];
+        } else if (isset($metadata['extends'])) {
+            $requires = static::extendsToDependency($metadata['extends']);
+            $requires = $requires['application'];
+        }
 
         if ($requires && is_string($requires)) {
             $requires = array($requires);
@@ -510,14 +515,16 @@ class Application
             }
         }
 
-        $old_dependency = static::extendsToDependency(\Arr::get($old_metadata, 'extends', null));
+        $old_dependency = \Arr::get($old_metadata, 'extends', null);
         $new_dependency = static::extendsToDependency(\Arr::get($new_metadata, 'extends', null));
 
         if ($old_dependency !== $new_dependency) {
             // Remove old dependency
             unset($config['app_dependencies'][$old_dependency['application']][$this->folder]);
-            // Set new dependency
-            $config['app_dependencies'][$new_dependency['application']][$this->folder] = $new_dependency;
+            // Set new dependency if not null
+            if ($new_dependency !== null) {
+                $config['app_dependencies'][$new_dependency['application']][$this->folder] = $new_dependency;
+            }
         }
 
         return $config;
