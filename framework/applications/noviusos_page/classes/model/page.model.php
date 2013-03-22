@@ -47,6 +47,8 @@ class Model_Page extends \Nos\Orm\Model
             'data_type' => 'int',
             'default' => 0,
         ),
+        'page_publication_start',
+        'page_publication_end',
         'page_meta_noindex' => array(
             'data_type' => 'int',
             'default' => 0,
@@ -133,7 +135,9 @@ class Model_Page extends \Nos\Orm\Model
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(
-            'publication_bool_property' => 'page_published',
+            'publication_state_property' => 'page_published',
+            'publication_start_property' => 'page_publication_start',
+            'publication_end_property' => 'page_publication_end',
         ),
     );
 
@@ -234,7 +238,10 @@ class Model_Page extends \Nos\Orm\Model
                     $page_enhanced[$name][$this->page_id] = array(
                         'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
                         'context' => $this->page_context,
-                        'published' => $this->published(),
+                        'published' => $this->planificationStatus() == 2 ? array(
+                            'start' => $this->publicationStart(),
+                            'end' => $this->publicationEnd(),
+                        ) : $this->published(),
                     );
 
                     \Nos\Config_Data::save('page_enhanced', $page_enhanced);

@@ -330,21 +330,72 @@ span.optional {
     opacity    : 0.7;
 }
 
-img.publication_status {
+.line .line.crud_subtitle {
+    overflow: visible;
+    margin-bottom: 1em;
+    margin-left: 2px;
+}
+
+.crud_subtitle {
+    td {
+        vertical-align: top;
+    }
+}
+
+img.publication_status, span.publication_status {
+    display: inline-block;
     vertical-align: middle;
 }
 
 .publishable {
+    line-height: 1.4em;
+    margin:0 2em 0 0em;
+}
+
+.publishable_radio {
+    white-space: nowrap;
+
     .ui-button-text {
         padding : 0;
         width : 20px;
         height : 20px;
 
-        img {
+        img, span {
+            display: inline-block;
             vertical-align : middle;
         }
     }
 }
+.publishable_label {
+    padding-left: 10px;
+    height: 2.8em;
+}
+
+.publishable_schedule {
+    padding-left:10px;
+}
+
+table.publication_status {
+
+    a {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    td {
+        white-space: nowrap;
+
+        &:first-child {
+            padding-right: 0.5em;
+            text-align: right;
+        }
+        &:last-child {
+            padding-left: 0.5em;
+        }
+    }
+
+}
+
 .nos-notification {
 	top : 69px;
 }
