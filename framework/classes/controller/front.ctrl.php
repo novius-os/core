@@ -532,7 +532,7 @@ class Controller_Front extends Controller
         if (!empty($this->_page_id)) {
             $where = array(array('page_id', $this->_page_id));
             if (!$this->_is_preview) {
-                $where[] = array('page_published', 1);
+                $where[] = array('published', 1);
             }
 
             $page = Page\Model_Page::find('first', array(
@@ -554,7 +554,7 @@ class Controller_Front extends Controller
 
                 $where = array(array('page_context', $context));
                 if (!$this->_is_preview) {
-                    $where[] = array('page_published', 1);
+                    $where[] = array('published', 1);
                 }
                 if (empty($url)) {
                     $where[] = array('page_entrance', 1);

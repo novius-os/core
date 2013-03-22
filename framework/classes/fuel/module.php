@@ -40,8 +40,8 @@ class Module extends Fuel\Core\Module
             // Load dependent applications
             $dependencies = \Nos\Config_Data::get('app_dependencies', array());
             if (!empty($dependencies[$module])) {
-                foreach ($dependencies[$module] as $dependence) {
-                    static::load($dependence);
+                foreach ($dependencies[$module] as $application => $dependence) {
+                    static::load($application);
                 }
             }
         }
