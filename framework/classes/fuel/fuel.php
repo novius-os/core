@@ -17,13 +17,6 @@ class Fuel extends Fuel\Core\Fuel
     // We have a different base url because we changed the index.php
     protected static function generate_base_url()
     {
-
-        if (\Input::server('server_alias')) {
-            $base_url = \Input::protocol().'://'.\Input::server('server_alias').'/';
-        }
-        if (\Input::server('server_name')) {
-            $base_url = \Input::protocol().'://'.\Input::server('server_name').'/';
-        }
-        return $base_url;
+        return \Input::protocol().'://'.\Input::server('http_host').'/';
     }
 }
