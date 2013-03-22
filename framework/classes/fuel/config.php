@@ -57,8 +57,10 @@ class Config extends \Fuel\Core\Config
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$app_name])) {
-            foreach ($dependencies[$app_name] as $dependency) {
-                $config = \Arr::merge($config, \Config::load($dependency.'::'.$file_name, true));
+            foreach ($dependencies[$app_name] as $application => $dependency) {
+                if ($dependency['extend_configuration']) {
+                    $config = \Arr::merge($config, \Config::load($application.'::'.$file_name, true));
+                }
             }
         }
         $config = \Arr::recursive_filter(
@@ -81,23 +83,8 @@ class Config extends \Fuel\Core\Config
 
     public static function extendable_load($module_name, $file_name)
     {
-        $config = \Config::load($module_name.'::'.$file_name, true);
-        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-        if (!empty($dependencies[$module_name])) {
-            foreach ($dependencies[$module_name] as $dependency) {
-                \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name, array()));
-            }
-        }
-        $config = \Arr::recursive_filter(
-            $config,
-            function($var) {
-                return $var !== null;
-            }
-        );
-
-        return $config;
+        logger(\Fuel::L_WARNING, '\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
+        return static::loadConfiguration($module_name, $file_name);
     }
 
     public static function metadata($application_name)
@@ -124,7 +111,7 @@ class Config extends \Fuel\Core\Config
 
     public static function application($application_name)
     {
-        return static::extendable_load($application_name, 'config');
+        return static::loadConfiguration($application_name, 'config');
     }
 
     public static function actions($params = array())
