@@ -29,18 +29,19 @@ class Module extends Fuel\Core\Module
                 ), true);
                 // Allow autoloading from bootstrap to alias classes from this namespace
                 Fuel::$namespace_aliases[Inflector::words_to_upper($module)] = $namespace;
-            }
 
-            // Load the bootstrap if it exists
-            if ($module !== 'nos' && is_file($path.'bootstrap.php')) {
-                Fuel::load($path.'bootstrap.php');
+                // Load the bootstrap if it exists
+                // Inside namespace condition because we need the application to be installed
+                if ($module !== 'nos' && is_file($path.'bootstrap.php')) {
+                    Fuel::load($path.'bootstrap.php');
+                }
             }
 
             // Load dependent applications
             $dependencies = \Nos\Config_Data::get('app_dependencies', array());
             if (!empty($dependencies[$module])) {
-                foreach ($dependencies[$module] as $dependence) {
-                    static::load($dependence);
+                foreach ($dependencies[$module] as $application => $dependence) {
+                    static::load($application);
                 }
             }
         }

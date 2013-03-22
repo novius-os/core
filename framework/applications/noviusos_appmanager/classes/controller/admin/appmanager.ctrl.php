@@ -108,4 +108,33 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
             )
         );
     }
+
+    public function action_refresh_metadata()
+    {
+        $files = array(
+            'app_dependencies',
+            'data_catchers',
+            'enhancers',
+            'launchers',
+            'templates',
+        );
+        foreach ($files as $metadata) {
+            \Nos\Config_Data::set($metadata, array());
+            \Nos\Config_Data::save($metadata, array());
+        }
+
+        foreach (array_keys(\Nos\Config_Data::get('app_installed')) as $app) {
+            \Nos\Application::forge($app)->install(false);
+        }
+
+        $this->response(
+            array(
+                // The tab will be refreshed by the javaScript within the view
+                'notify' => __('Metadata was refreshed.'),
+                'dispatchEvent' => array(
+                    'name' => 'Nos\Application',
+                ),
+            )
+        );
+    }
 }
