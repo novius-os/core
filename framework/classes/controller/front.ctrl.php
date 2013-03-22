@@ -55,7 +55,7 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
-    protected $_save_cache = true;
+    protected $_use_cache = true;
     protected $_cache_duration = 60;
     protected $_custom_data = array();
     protected $_status = 200;
@@ -88,9 +88,9 @@ class Controller_Front extends Controller
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
         if (\Input::method() == 'POST' || $this->_is_preview) {
-            $this->_save_cache = true;
+            $this->_use_cache = false;
         } else {
-            $this->_save_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
+            $this->_use_cache = \Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
         \Event::trigger('front.start');
@@ -101,7 +101,7 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
-            if ($this->_save_cache) {
+            if (!$this->_use_cache) {
                 throw new CacheNotFoundException();
             }
 
@@ -164,27 +164,27 @@ class Controller_Front extends Controller
 
                 $_404 = false;
                 try {
-                    $this->_find_page();
+                    $this->_findPage();
 
                     \Event::trigger('front.pageFound');
 
-                    $this->_generate_cache();
+                    $this->_generateCache();
 
                     $this->_content = $this->_view->render();
 
-                    $this->_handle_head();
+                    $this->_handleHead();
                     \Event::trigger_function('front.display', array(&$this->_content));
 
                     echo $this->_content;
 
-                    $cache->save($this->_save_cache ? -1 : $this->_cache_duration, $this);
+                    $cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
                     $this->_content = $cache->execute();
 
                     break;
                 } catch (FrontReplaceTemplateException $e) {
                     echo $this->_content;
 
-                    $cache->save($this->_save_cache ? -1 : $this->_cache_duration, $this);
+                    $cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
                     $this->_content = $cache->execute();
 
                     break;
@@ -439,7 +439,7 @@ class Controller_Front extends Controller
         return $this->_is_preview;
     }
 
-    protected function _handle_head()
+    protected function _handleHead()
     {
         $replaces  = array(
             '_base_href'         => array(
@@ -547,9 +547,9 @@ class Controller_Front extends Controller
     /**
      * Generate the cache. Renders all wysiwyg and assign them to the view.
      */
-    protected function _generate_cache()
+    protected function _generateCache()
     {
-        $this->_find_template();
+        $this->_findTemplate();
 
         $wysiwyg = array();
 
@@ -569,7 +569,7 @@ class Controller_Front extends Controller
     /**
      * Find the page in the database and fill in the page variable.
      */
-    protected function _find_page()
+    protected function _findPage()
     {
         if (!empty($this->_page_id)) {
             $where = array(array('page_id', $this->_page_id));
@@ -647,7 +647,7 @@ class Controller_Front extends Controller
         }
     }
 
-    protected function _find_template()
+    protected function _findTemplate()
     {
         // Find the template
         $templates = \Nos\Config_Data::get('templates', array());
@@ -668,7 +668,7 @@ class Controller_Front extends Controller
         }
     }
 
-    public function save_cache()
+    public function getCache()
     {
         $cache = array();
         foreach (static::$_properties_cached as $property) {
@@ -683,7 +683,7 @@ class Controller_Front extends Controller
         return $cache;
     }
 
-    public function rebuild_cache($cache)
+    public function rebuildCache($cache)
     {
         $_properties_cached = static::$_properties_cached + array('_custom_data');
         foreach ($_properties_cached as $property) {
@@ -697,12 +697,11 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $save_cache
      * @return Controller_Front
      */
-    public function setSaveCache($save_cache)
+    public function disableCaching()
     {
-        $this->_save_cache = $save_cache;
+        $this->_use_cache = false;
 
         return $this;
     }
@@ -781,7 +780,7 @@ class Controller_Front extends Controller
      * @param mixed $content The new content, can be a string or a View
      * @throws FrontReplaceTemplateException Internal exception for stopping treatments
      */
-    public function replaceTemplate($content)
+    public function sendContent($content)
     {
         $this->_content = $content;
 
