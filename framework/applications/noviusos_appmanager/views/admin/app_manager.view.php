@@ -85,7 +85,7 @@ foreach ($installed as $app) {
             echo strtr(__('Cannot be uninstalled. Uninstall ‘{{application}}’ first.'), array('{{application}}' => $dependents[0]));
         } else {
             echo  preg_replace('`<a>(.*)</a>`',
-                render('noviusos_appmanager::admin/applications_tooltip', array('applications' => $dependents)),
+                render('noviusos_appmanager::admin/applications_tooltip', array('app_folder' => $app->folder, 'applications' => $dependents), true),
                 __('Cannot be uninstalled. Uninstall <a>these applications</a> first.')
             );
         }
@@ -136,7 +136,7 @@ foreach ($others as $app) {
             echo strtr(__('Cannot be installed. Install ‘{{application}}’ first.'), array('{{application}}' => $unavailable_applications[0]));
         } else {
             echo  preg_replace('`<a>(.*)</a>`',
-                render('noviusos_appmanager::admin/applications_tooltip', array('applications' => $unavailable_applications)),
+                render('noviusos_appmanager::admin/applications_tooltip', array('app_folder' => $app->folder, 'applications' => $unavailable_applications), true),
                 __('Cannot be installed. Install <a>these applications</a> first.')
             );
         }
