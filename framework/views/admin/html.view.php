@@ -156,8 +156,8 @@ $config = array(
         'jquery.globalize.cultures' => array('jquery', 'jquery.globalize'),
         'jquery.mousewheel' => array('jquery'),
         'jquery-form' => array('jquery'),
-        'jquery-ui.datetimepicker' => array('jquery', 'jquery-ui.slider', 'link!static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon.css'),
-        'jquery-ui.datetimepicker.i18n' => array('jquery-ui.datetimepicker'),
+        'jquery-ui.datetimepicker' => array('jquery', 'jquery-ui.datepicker', 'jquery-ui.slider', 'link!static/novius-os/admin/vendor/jquery/ui-datetimepicker/jquery-ui-timepicker-addon.css'),
+        'jquery-ui.datetimepicker.i18n' => array('jquery-ui.datetimepicker', 'jquery-ui.datepicker.i18n'),
         'jquery.passwordstrength' => array('jquery', 'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'),
         'jquery-ui.tag-it' => array('jquery', 'jquery-ui.autocomplete', 'link!static/novius-os/admin/vendor/jquery/ui-tag-it/css/jquery.tagit.css'),
 
