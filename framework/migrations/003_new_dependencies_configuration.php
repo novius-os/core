@@ -15,7 +15,7 @@ class New_Dependencies_Configuration extends \Nos\Migration
                     $extending_application = $dependencies[$key];
                     unset($dependencies[$key]);
                     $dependencies[$extending_application] = array(
-                        'extend_configuration' => true
+                        'extend_configuration' => true,
                     );
                 }
             }

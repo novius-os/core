@@ -537,7 +537,7 @@ class Application
         }
         if (!is_array($extends)) {
             $extends = array(
-                'application' => $extends
+                'application' => $extends,
             );
         }
 
