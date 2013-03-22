@@ -46,19 +46,19 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         ), false);
     }
 
-    public function planification_status($item)
+    public function planificationStatus($item)
     {
         $property = $this->_properties['publication_state_property'];
         return $item->get($property);
     }
 
-    public function publication_start($item)
+    public function publicationStart($item)
     {
         $property = $this->_properties['publication_start_property'];
         return $item->get($property);
     }
 
-    public function publication_end($item)
+    public function publicationEnd($item)
     {
         $property = $this->_properties['publication_end_property'];
         return $item->get($property);
@@ -77,8 +77,8 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             return (bool) $status;
         }
 
-        $start = $this->publication_start($item);
-        $end = $this->publication_end($item);
+        $start = $this->publicationStart($item);
+        $end = $this->publicationEnd($item);
         if (empty($start) && empty($end)) {
             return false;
         }
@@ -105,13 +105,13 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             foreach ($where as $k => $w) {
                 if (is_int($k)) {
                     reset($w);
-                    // array('published' => 1);
+                    // This handles the case where the column is a key: array('published' => 1);
                     if (count($w) == 1 && key($w) == 'published') {
                         $published_key = $k;
                         $published_value = (bool) current($w);
                     }
 
-                    // array('published', $value);
+                    // This handles the case the column is a value: array('published', $value);
                     if (count($w) > 1 && current($w) == 'published') {
                         $published_key = $k;
                         end($w);

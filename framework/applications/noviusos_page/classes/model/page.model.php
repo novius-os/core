@@ -238,9 +238,9 @@ class Model_Page extends \Nos\Orm\Model
                     $page_enhanced[$name][$this->page_id] = array(
                         'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
                         'context' => $this->page_context,
-                        'published' => $this->planification_status() == 2 ? array(
-                            'start' => $this->publication_start(),
-                            'end' => $this->publication_end(),
+                        'published' => $this->planificationStatus() == 2 ? array(
+                            'start' => $this->publicationStart(),
+                            'end' => $this->publicationEnd(),
                         ) : $this->published(),
                     );
 

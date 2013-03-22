@@ -22,7 +22,7 @@ $state_property     = !empty($publishable['publication_state_property']) ? $publ
 $yes_no_mode        = ($state_property !== '');
 $planification_mode = !empty($publishable['publication_start_property']) && !empty($publishable['publication_end_property']);
 
-$planification_status = $item->planification_status();
+$planification_status = $item->planificationStatus();
 $published = !empty($item) ? $item->published() : false;
 ?>
 <td class="c3">
@@ -35,7 +35,7 @@ if ($planification_mode) {
         'id' => ($uniqid_start = uniqid('start_')),
         'type' => 'hidden',
         'name' => $publishable['publication_start_property'],
-        'value' => $item->publication_start(),
+        'value' => $item->publicationStart(),
     ));
     // Fixing strange bug of datepicker
     echo '<span></span>';
@@ -44,7 +44,7 @@ if ($planification_mode) {
         'id' => ($uniqid_end = uniqid('end_')),
         'type' => 'hidden',
         'name' => $publishable['publication_end_property'],
-        'value' => $item->publication_end(),
+        'value' => $item->publicationEnd(),
     ));
     // Fixing strange bug of datepicker
     echo '<span></span>';
@@ -97,7 +97,7 @@ $replacePlaceholders = function($txt) {
 };
 
 $nosPublishable = array(
-    'initialStatus' => empty($item) || $item->is_new() ? 'undefined' : $item->planification_status(),
+    'initialStatus' => empty($item) || $item->is_new() ? 'undefined' : $item->planificationStatus(),
     'date_range' => !$planification_mode ? false : array(
         'container' => $publishable_id,
         'inputStart' => $uniqid_start,
