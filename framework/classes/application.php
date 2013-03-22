@@ -14,6 +14,7 @@ class Application
 {
     protected static $repositories;
     protected static $rawAppInstalled;
+    protected static $requirements;
 
     public static function _init()
     {
@@ -26,6 +27,28 @@ class Application
             \Config::get('nos::applications_repositories', array()),
             \Config::get('local::applications_repositories', array())
         );
+        static::refreshRequirements();
+    }
+
+    public static function refreshRequirements()
+    {
+        static::$requirements = array();
+        // Initialize requirements informations
+        foreach (static::$rawAppInstalled as $key => $application) {
+            static::$requirements[$key] = array(
+                'requires'      => array(),
+                'required_by'   => array(),
+            );
+        }
+
+        foreach (static::$rawAppInstalled as $key => $application) {
+            $requires = static::applicationRequiredFromMetadata($application);
+
+            static::$requirements[$key]['requires'] = $requires;
+            foreach ($requires as $application_required) {
+                static::$requirements[$application_required]['required_by'][] = $key;
+            }
+        }
     }
 
     public static function get_application_path($application)
@@ -237,6 +260,76 @@ class Application
         return $diff_metadata;
     }
 
+    public function canInstall()
+    {
+        return count($this->applicationsRequiredAndUnavailable()) === 0;
+    }
+
+    public function canUninstall()
+    {
+        return count($this->installedDependentApplications()) === 0;
+    }
+
+    public function applicationsRequired()
+    {
+        $new_metadata = $this->getRealMetadata();
+        $required = static::applicationRequiredFromMetadata($new_metadata);
+
+        return $required;
+    }
+
+    public static function applicationRequiredFromMetadata($metadata)
+    {
+        $requires = isset($metadata['requires']) ? $metadata['requires'] :
+            (isset($metadata['extends']) ? $metadata['extends'] : array());
+
+        if ($requires && is_string($requires)) {
+            $requires = array($requires);
+        }
+        return $requires;
+    }
+
+    public function applicationsRequiredAndNotInstalled()
+    {
+        $not_installed = array();
+        $required = $this->applicationsRequired();
+
+        foreach ($required as $require) {
+            if (!static::forge($require)->is_installed()) {
+                $not_installed[] = $require;
+            }
+        }
+
+        return $not_installed;
+    }
+
+    public function applicationsRequiredAndUnavailable()
+    {
+        $unavailable = array();
+        $required = $this->applicationsRequiredAndNotInstalled();
+
+        foreach ($required as $required_item) {
+            if (!\Module::exists($required_item)) {
+                $unavailable[] = $required_item;
+            }
+        }
+
+        return $unavailable;
+    }
+
+    public function installRequiredApplications($add_permission = true)
+    {
+        $to_be_installed = $this->applicationsRequiredAndNotInstalled();
+        foreach ($to_be_installed as $application) {
+            \Nos\Application::forge($application)->install($add_permission);
+        }
+    }
+
+    public function installedDependentApplications()
+    {
+        return static::$requirements[$this->folder]['required_by'];
+    }
+
     /**
      * Install an application:
      * - Authorise the user who added the application to access it
@@ -248,6 +341,12 @@ class Application
      */
     public function install($add_permission = true)
     {
+        if (!$this->canInstall()) {
+            throw new \Exception('Application '.$this->folder.
+                ' can\'t be installed because it requires the following applications: '.implode(', ',
+                $this->applicationsRequiredAndUnavailable()).'.');
+        }
+        $this->installRequiredApplications($add_permission);
         if ($add_permission) {
             $this->addPermission();
         }
@@ -274,7 +373,7 @@ class Application
         } else {
             \Migrate::latest($this->folder, 'module');
         }
-
+        static::refreshRequirements();
 
         return true;
     }
@@ -289,6 +388,11 @@ class Application
      */
     public function uninstall()
     {
+        if (!$this->canUninstall()) {
+            $dependents = $this->installedDependentApplications();
+            throw new \Exception('Application '.$this->folder.
+                ' can\'t be uninstalled because it is required by the following applications: '.implode(', ', $dependents).'.');
+        }
         $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder);
         $new_metadata = array();
 
@@ -302,6 +406,7 @@ class Application
             $this->save_config($config);
             static::$rawAppInstalled = $config['app_installed'];
         }
+        static::refreshRequirements();
 
         return true;
     }
