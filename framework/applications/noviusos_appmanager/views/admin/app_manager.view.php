@@ -27,6 +27,9 @@ Nos\I18n::current_dictionary('noviusos_appmanager::common');
         .app_manager .app_list_available {
             width : 600px;
         }
+        .app_manager label.tooltip {
+            font-weight: bold;
+        }
     </style>
 
     <div class="col c1"></div>
@@ -77,20 +80,14 @@ foreach ($installed as $app) {
         foreach ($dependents as &$dependent) {
             $dependent = \Nos\Application::forge($dependent)->get_name();
         }
+        unset($dependent);
         if (count($dependents) == 1) {
-            echo strtr(__('Required by the "{{application}}" application.'), array('{{application}}' => $dependents[0]));
+            echo strtr(__('Cannot be uninstalled. Uninstall ‘{{application}}’ first.'), array('{{application}}' => $dependents[0]));
         } else {
-            echo  __('Required by other installed applications.').
-                \View::forge('nos::admin/tooltip', array(
-                    'title' => '',
-                    'content' => strtr(__('Required by the following applications: {{applications}}'),
-                        array(
-                            '{{applications}}' => '<br/><br/>- '.implode('<br/>- ', $dependents)
-                        )
-                    ),
-                    'options' => array(
-                    ),
-                ), false);
+            echo  preg_replace('`<a>(.*)</a>`',
+                render('noviusos_appmanager::admin/applications_tooltip', array('applications' => $dependents)),
+                __('Cannot be uninstalled. Uninstall <a>these applications</a> first.')
+            );
         }
     }
         ?>
@@ -136,19 +133,12 @@ foreach ($others as $app) {
         // @note: we can't get application names here since they don't exist therefore there aren't any metadata
         $unavailable_applications = $app->applicationsRequiredAndUnavailable();
         if (count($unavailable_applications) == 1) {
-            echo strtr(__('Application "{{application}}" required.'), array('{{application}}' => $unavailable_applications[0]));
+            echo strtr(__('Cannot be installed. Install ‘{{application}}’ first.'), array('{{application}}' => $unavailable_applications[0]));
         } else {
-            echo __('Unavailable applications required.').
-                \View::forge('nos::admin/tooltip', array(
-                    'title' => '',
-                    'content' => strtr(__('The following applications are required but unavailable: {{applications}}'),
-                        array(
-                            '{{applications}}' => '<br/><br/>- '.implode('<br/>- ', $unavailable_applications)
-                        )
-                    ),
-                    'options' => array(
-                    ),
-                ), false);
+            echo  preg_replace('`<a>(.*)</a>`',
+                render('noviusos_appmanager::admin/applications_tooltip', array('applications' => $unavailable_applications)),
+                __('Cannot be installed. Install <a>these applications</a> first.')
+            );
         }
 
 

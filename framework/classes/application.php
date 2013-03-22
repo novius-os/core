@@ -10,8 +10,6 @@
 
 namespace Nos;
 
-use Oil\Exception;
-
 class Application
 {
     protected static $repositories;
@@ -350,7 +348,7 @@ class Application
     {
         if (!$this->canInstall()) {
             throw new \Exception('Application '.$this->folder.
-                ' can\'t be installed because it needs the following applications: '.implode(', ',
+                ' can\'t be installed because it requires the following applications: '.implode(', ',
                 $this->applicationsRequiredAndUnavailable()).'.');
         }
         $this->installRequiredApplications($add_permission);
@@ -398,7 +396,7 @@ class Application
         if (!$this->canUninstall()) {
             $dependents = $this->installedDependentApplications();
             throw new \Exception('Application '.$this->folder.
-                ' can\'t be uninstalled because it needs the following applications: '.implode(', ', $dependents).'.');
+                ' can\'t be uninstalled because it is required by the following applications: '.implode(', ', $dependents).'.');
         }
         $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder);
         $new_metadata = array();
