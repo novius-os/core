@@ -17,6 +17,63 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_table_name = 'nos_page';
     protected static $_primary_key = array('page_id');
 
+    protected static $_properties = array(
+        'page_id',
+        'page_parent_id',
+        'page_template',
+        'page_level' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_title',
+        'page_context',
+        'page_context_common_id',
+        'page_context_is_main' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_menu_title',
+        'page_meta_title',
+        'page_sort',
+        'page_menu' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_type' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_published' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_meta_noindex' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_lock' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_entrance' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_home' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_cache_duration',
+        'page_virtual_name',
+        'page_virtual_url',
+        'page_external_link',
+        'page_external_link_type',
+        'page_created_at',
+        'page_updated_at',
+        'page_meta_description',
+        'page_meta_keywords',
+    );
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'page_id',

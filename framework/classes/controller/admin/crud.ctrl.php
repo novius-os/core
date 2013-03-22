@@ -579,13 +579,14 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions_context()
     {
-        if (!$this->behaviours['twinnable'] || $this->is_new) {
+        $contexts = array_keys(Tools_Context::contexts());
+
+        if (!$this->behaviours['twinnable'] || $this->is_new || count($contexts) == 1) {
             return array();
         }
 
         $actions = array();
 
-        $contexts = array_keys(Tools_Context::contexts());
         $sites = Tools_Context::sites();
         $locales = Tools_Context::locales();
 

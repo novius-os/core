@@ -49,6 +49,8 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
+    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url');
+
     public function router($action, array $params, $status = 200)
     {
         $this->_base_href = \URI::base(false);
@@ -66,7 +68,7 @@ class Controller_Front extends Controller
         if (\Input::method() == 'POST' || $this->_is_preview) {
             $no_cache = true;
         } else {
-            $no_cache = \Fuel::$env === \Fuel::DEVELOPMENT && \Input::get('_cache', 0) != 1;
+            $no_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
         \Event::trigger('front.start');
@@ -77,6 +79,10 @@ class Controller_Front extends Controller
         $cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
+            if ($no_cache) {
+                throw new CacheNotFoundException();
+            }
+
             // Cache exist, retrieve his content
             $content = $cache->execute($this);
         } catch (CacheNotFoundException $e) {
@@ -117,7 +123,7 @@ class Controller_Front extends Controller
                 $temp_url = $page_params['url'];
 
                 if ($page_id != 'current') {
-                    $this->_contexts_possibles = array($page_params['context']);
+                    $this->_contexts_possibles = array($page_params['context'] => $contexts_possibles[$page_params['context']]);
                     $this->_page_id = $page_id;
 
                     if (!in_array($temp_url, array('', '/'))) {
@@ -137,7 +143,6 @@ class Controller_Front extends Controller
                 $_404 = false;
                 try {
                     $this->_generate_cache();
-                    $this->_context_url = $contexts_possibles[$this->_context];
                 } catch (NotFoundException $e) {
                     $_404 = true;
                     $this->_page = null;
@@ -471,7 +476,7 @@ class Controller_Front extends Controller
         $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
-                $footer[] = '<script type="text/javascript">'.$js['js'].'</script>';
+                $footer[] = \Str::sub($js['js'], 0, 8) === '<script ' ? $js['js'] : '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
                 $js = is_string($js) ? $js : $js['js'];
                 if (in_array($js, $this->_js_header)) {
@@ -585,6 +590,7 @@ class Controller_Front extends Controller
         }
 
         $this->_context = $this->_page->get_context();
+        $this->_context_url = $this->_contexts_possibles[$this->_context];
         \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
     }
 
@@ -618,23 +624,20 @@ class Controller_Front extends Controller
 
     public function save_cache()
     {
-        $page_fields = array('id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
-        $this->cache['page'] = array();
-        foreach ($page_fields as $field) {
-            $this->cache['page'][$field] = $this->_page->{'page_'.$field};
+        foreach (static::$_properties_cached as $property) {
+            $this->cache[$property] = $this->{$property};
         }
-        //return parent::save_cache();
-        return $this->cache; //@todo: to be reviewed
+
+        return $this->cache;
     }
 
     public function rebuild_cache($cache)
     {
-        $page = array();
-        foreach ($cache['page'] as $field => $value) {
-            $page['page_'.$field] = $value;
+        foreach (static::$_properties_cached as $property) {
+            if (isset($cache[$property])) {
+                $this->{$property} = $cache[$property];
+                unset($cache[$property]);
+            }
         }
-        $this->_page = new \Nos\Page\Model_Page($page, false);
-        $this->_page->freeze();
-        unset($cache['page']);
     }
 }

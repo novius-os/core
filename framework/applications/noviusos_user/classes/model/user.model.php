@@ -17,6 +17,27 @@ class Model_User extends \Nos\Orm\Model
     protected static $_table_name = 'nos_user';
     protected static $_primary_key = array('user_id');
 
+    protected static $_properties = array(
+        'user_id',
+        'user_md5',
+        'user_name',
+        'user_firstname',
+        'user_email',
+        'user_password',
+        'user_lang' => array(
+            'data_type' => 'varchar',
+            'default' => 'en_GB',
+        ),
+        'user_last_connection',
+        'user_configuration',
+        'user_created_at',
+        'user_updated_at',
+        'user_expert' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+    );
+
     protected static $_delete;
 
     protected static $_many_many = array(
@@ -70,7 +91,7 @@ class Model_User extends \Nos\Orm\Model
         }
         if (empty($this->user_md5) || $this->is_changed('user_password') || $this->is_new()) {
             $this->generate_md5();
-            if ($this->user_id == \Session::user()->user_id) {
+            if (\Session::user() !== null && $this->user_id == \Session::user()->user_id) {
                 \Nos\Auth::set_user_md5($this->user_md5);
             }
         }

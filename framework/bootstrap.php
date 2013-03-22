@@ -96,6 +96,10 @@ function ___($group, $message, $default = null)
 // Register the autoloader
 Autoloader::register();
 
+if (!defined('NOS_ENTRY_POINT')) {
+    define('NOS_ENTRY_POINT', 'front');
+}
+
 /**
  * Your environment.  Can be set to any of the following:
  *

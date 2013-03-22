@@ -165,7 +165,7 @@ class FrontCache
             if (!empty($controller)) {
                 $prepend .= '
                 if (!empty($controller)) {
-                    $controller->rebuild_cache('.var_export($controller->save_cache(), true).');
+                    $controller->rebuild_cache(unserialize('.var_export(serialize($controller->save_cache()), true).'));
                 }'."\n";
             }
             $prepend .= '?>';
@@ -236,6 +236,13 @@ class FrontCache
         file_put_contents($this->_path, $this->_content);
 
         return true;
+    }
+
+    public function delete()
+    {
+        if (is_file($this->_path)) {
+            @unlink($this->_path);
+        }
     }
 
     public function get_path()
