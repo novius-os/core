@@ -20,6 +20,7 @@ class New_Dependencies_Configuration extends \Nos\Migration
                 }
             }
         }
+        unset($dependencies);
         if ($has_changed) {
             \Nos\Config_Data::save('app_dependencies', $config);
         }
