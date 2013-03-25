@@ -67,13 +67,17 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 
         $permissions = \Input::post('perm');
         foreach ($permissions as $perm_name => $allowed) {
-            //$allowed = array_keys($allowed);
             $existing = array();
+            list($app_name, ) = explode('::', $perm_name.'::', 2);
+            $app_removed = $app_name != 'nos' && !in_array($app_name, $permissions['nos::access']);
 
             // Delete old authorisations
             if (!empty($olds[$perm_name])) {
                 foreach ($olds[$perm_name] as $old) {
-                    if (!in_array($old->perm_category_key, $allowed)) {
+                    // If the role has no longer access to the application, remove old authorisations related to this application
+                    if ($app_removed) {
+                        $old->delete();
+                    } else if (!in_array($old->perm_category_key, $allowed)) {
                         $old->delete();
                     } else {
                         $existing[] = $old->perm_category_key;
@@ -84,7 +88,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 
             // Add new authorisations
             foreach ($allowed as $category_key) {
-                if (!in_array($category_key, $existing)) {
+                if (!$app_removed && !in_array($category_key, $existing)) {
                     $new = new Model_Permission();
                     $new->perm_role_id      = $role->role_id;
                     $new->perm_name         = $perm_name;
@@ -107,6 +111,5 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
                 'name' => 'Nos\Application',
             ),
         ));
-
     }
 }

@@ -22,11 +22,22 @@ class Model_Role extends \Nos\Orm\Model
     );
 
     protected static $permissions;
-    protected $access;
 
+    /**
+     * @param   string  $permission_name  Name of the permission to check against
+     * @param   null    $category_key     (optional) If the permission has categories, the category key to check against
+     * @return  bool    Has the role the required authorisation?
+     */
     public function check_permission($permission_name, $category_key = null)
     {
-        // Load permissions
+        // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
+        list($application, ) = explode($permission_name.'::', 2);
+        // If this application is loaded, check the user has access to it
+        if (\Fuel\Core\Module::loaded($application) && !$this->check_permission('nos::access', $application)) {
+            return false;
+        }
+
+        // Load permissions from the database
         if (!isset(static::$permissions[$this->role_id])) {
             $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
             foreach ($query->as_object()->execute() as $permission) {
@@ -34,12 +45,13 @@ class Model_Role extends \Nos\Orm\Model
             }
         }
 
+        // For permissions without category, just check the existence of the permission
         $isset = isset(static::$permissions[$this->role_id][$permission_name]);
         if ($category_key == null) {
             return $isset;
         }
 
-        // Check authorisation
+        // For permission with categories, also check the existence of the category
         return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
     }
 }
