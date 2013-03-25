@@ -91,6 +91,9 @@ class FrontCache
     }
 
     protected $_path = null;
+    protected $_router = array();
+    protected $_path_router = null;
+    protected $_path_router_dir = null;
     protected $_level = null;
     protected $_content = '';
     protected $_lock_fp = null;
@@ -100,7 +103,69 @@ class FrontCache
         if ($path == false) {
             $this->_path = false;
         } else {
-            $this->_path = \Config::get('cache_dir').$path.'.php';
+            $path = \Config::get('cache_dir').$path;
+            $this->_path = $path.'.php';
+            $this->_path_router = $path.'.cache.router.php';
+            $this->_path_router_dir = $path.'.cache.router/';
+            $this->_router();
+        }
+    }
+
+    public function addRouter(array $router)
+    {
+        $this->_router[] = $router;
+
+        $dir = dirname($this->_path_router);
+        // check if specified subdir exists
+        if (!@is_dir($dir)) {
+            // create non existing dir
+            if (!@mkdir($dir, 0755, true)) {
+                return false;
+            }
+        }
+        file_put_contents($this->_path_router, "<?php\n".'return '.var_export(array_unique($this->_router), true).";\n");
+
+        $this->_router();
+    }
+
+    protected function _router()
+    {
+        if (!empty($this->_path_router) && is_file($this->_path_router)) {
+            $this->_router = include($this->_path_router);
+            if (!is_array($this->_router)) {
+                $this->_router = array();
+            }
+            $suffix_router = array();
+            foreach ($this->_router as $router) {
+                $type = isset($router['type']) ? $router['type'] : null;
+
+                switch ($type) {
+                    case '$_GET':
+                        if (!empty($router['keys'])) {
+                            $keys = (array) $router['keys'];
+                            foreach ($keys as $key) {
+                                if (!empty($_GET[$key])) {
+                                    $suffix_router[] = '$_GET['.urlencode($key).']='.urlencode($_GET[$key]);
+                                }
+                            }
+                        }
+                        break;
+
+                    case 'callable':
+                        if (!empty($router['callable']) && is_callable($router['callable'])) {
+                            $args = is_array($router['args']) ? $router['args'] : array();
+                            $suffix = call_user_func_array($router['callable'], $args);
+                            if (!empty($suffix)) {
+                                $suffix_router[] = $suffix;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            if (!empty($suffix_router)) {
+                $this->_path = $this->_path_router_dir.implode('&', $suffix_router).'.php';
+            }
         }
     }
 

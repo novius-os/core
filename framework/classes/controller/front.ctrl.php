@@ -55,6 +55,7 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
+    protected $_cache;
     protected $_use_cache = true;
     protected $_cache_duration = 60;
     protected $_custom_data = array();
@@ -98,7 +99,7 @@ class Controller_Front extends Controller
 
         $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
-        $cache = FrontCache::forge('pages'.DS.$cache_path);
+        $this->_cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
             if (!$this->_use_cache) {
@@ -106,7 +107,7 @@ class Controller_Front extends Controller
             }
 
             // Cache exist, retrieve his content
-            $this->_content = $cache->execute($this);
+            $this->_content = $this->_cache->execute($this);
         } catch (CacheNotFoundException $e) {
             // Cache not exist, try to found page for this URL
 
@@ -121,7 +122,7 @@ class Controller_Front extends Controller
                 }
             }
 
-            $cache->start();
+            $this->_cache->start();
 
             // Filter URLs enhanced : remove if not in possibles contexts, remove if url not match
             $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
@@ -177,15 +178,15 @@ class Controller_Front extends Controller
 
                     echo $this->_content;
 
-                    $cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
-                    $this->_content = $cache->execute();
+                    $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $this->_cache->execute();
 
                     break;
                 } catch (FrontReplaceTemplateException $e) {
                     echo $this->_content;
 
-                    $cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
-                    $this->_content = $cache->execute();
+                    $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $this->_cache->execute();
 
                     break;
                 } catch (NotFoundException $e) {
@@ -785,5 +786,15 @@ class Controller_Front extends Controller
         $this->_content = $content;
 
         throw new FrontReplaceTemplateException();
+    }
+
+    /**
+     * Add a cache router for the current page
+     *
+     * @param array $router The cache router
+     */
+    public function addCacheRouter(array $router)
+    {
+        $this->_cache->addRouter($router);
     }
 }
