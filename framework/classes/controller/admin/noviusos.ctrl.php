@@ -149,6 +149,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
             // Compatibility with 0.1
             if (!empty($app['url']) && empty($app['action'])) {
+                logger(\Fuel::L_WARNING, 'On launchers, the url key is deprecated ('.$key.'). Please use the action key.');
+
                 $app['action'] = array(
                     'action' => 'nosTabs',
                     'tab' => array(
