@@ -313,21 +313,7 @@ class Model extends \Orm\Model
                 $application = array_search($namespace, $namespaces);
             }
 
-            $config = \Config::load($application.'::'.$file_name, true);
-            $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-            if (!empty($dependencies[$application])) {
-                foreach ($dependencies[$application] as $dependency) {
-                    \Config::load($dependency.'::'.$file_name, true);
-                    $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
-                }
-            }
-            static::$_configs[$class] = \Arr::recursive_filter(
-                $config,
-                function ($var) {
-                    return $var !== null;
-                }
-            );
+            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
         }
 
         return static::$_configs[$class];
@@ -548,7 +534,7 @@ class Model extends \Orm\Model
 
     public function set($property, $value = null)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+        if (!is_array($property) && isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
             $property = static::prefix().$property;
         }
 
