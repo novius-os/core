@@ -548,7 +548,7 @@ class Model extends \Orm\Model
 
     public function set($name, $value = null)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
+        if (!is_array($name) && isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
             $name = static::prefix().$name;
         }
 
