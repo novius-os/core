@@ -12,24 +12,21 @@
 \Nos\I18n::current_dictionary('noviusos_user::common');
 
 return array(
-    'categories' => array(
-        'applications' => array(),
-        //'contexts' => array('Nos\Tools_Context', 'contexts'),
-    ),
-    'permissions' => array(
-        'categories' => array(
-            'applications' => array(
-                'nos::access' => array(
+    'all' => array(
+        'view' => 'nos::admin/permissions/core',
+        'params' => array(
+            'list' => array(
+                /*'contexts' => array(
+                    'permission_name' => 'nos::context',
+                    'title' => __('Can access the following contexts:'),
+                    'view' => 'nos::admin/permissions/list_contexts',
+                ),*/
+                'apps' => array(
+                    'permission_name' => 'nos::access',
                     'title' => __('Can access the following applications:'),
                     'view' => 'nos::admin/permissions/list_app',
                 ),
             ),
-            /*'contexts' => array(
-                'nos::context' => array(
-                    'title' => __('Can access the following contexts:'),
-                    'view' => 'nos::admin/permissions/list_contexts',
-                ),
-            ),*/
         ),
     ),
 );

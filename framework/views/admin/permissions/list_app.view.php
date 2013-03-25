@@ -1,13 +1,16 @@
-<ul class="nobullet" style="list-style-type: none;">
+<p class="check_all">
+    <label><input type="checkbox" class="check_all" /> <?= __('Check all') ?></label>
+</p>
+<ul class="applications">
 <?php
 foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
-    $icon = Config::icon($app_name, 16);
+    $icon = Config::icon($app_name, 32);
     ?>
-    <li class="ui-corner-all" style="border:1px solid transparent;">
-        <label style="display:block;">
+    <li class="application ui-corner-all ui-widget-content">
+        <div class="checkbox_hit_area ui-corner-tl ui-corner-bl">
             <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $app_name ?>" <?= $check_permission($permission_name, $app_name) ? 'checked' : '' ?> />
-            &nbsp; <?= empty($icon) ? '' : '<img src="'.$icon.'" />' ?> <?= $app['name'] ?>
-        </label>
+        </div>
+        <?= empty($icon) ? '' : '<img class="app_icon" src="'.$icon.'"  />' ?> &nbsp; <?= $app['name'] ?>
     </li>
     <?php
 }
