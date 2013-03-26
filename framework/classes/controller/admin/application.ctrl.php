@@ -24,7 +24,7 @@ class Controller_Admin_Application extends Controller_Admin_Auth
 
         if (!$this->bypass) {
             list($application) = \Config::configFile(get_called_class());
-            if (!Permission::check('nos::access', $application)) {
+            if (!User\Permission::check('nos::access', $application)) {
                 throw new Access_Exception('You don\'t have access to application '.$application.'!');
             }
         }

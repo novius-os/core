@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\User;
 
 class Permission
 {
@@ -20,7 +20,7 @@ class Permission
         return $role->check_permission($permission_name, $category_key);
     }
 
-    public static function add($app_name, $perm_name)
+    public static function add($permission_name, $category_key)
     {
         $user = \Session::user();
         if (empty($user)) {
@@ -30,8 +30,8 @@ class Permission
         try {
             $access = new User\Model_Permission();
             $access->perm_role_id      = $role->role_id;
-            $access->perm_name         = $perm_name;
-            $access->perm_category_key = $app_name;
+            $access->perm_name         = $permission_name;
+            $access->perm_category_key = $category_key;
             $access->save();
         } catch (\Exception $e) {
 
