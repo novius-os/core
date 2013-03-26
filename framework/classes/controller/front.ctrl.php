@@ -171,6 +171,10 @@ class Controller_Front extends Controller
 
                     $this->_generateCache();
 
+                    if (!empty($this->_extension) && $this->_extension !== 'html') {
+                        throw new NotFoundException();
+                    }
+
                     $this->_content = $this->_view->render();
 
                     $this->_handleHead();
@@ -222,9 +226,16 @@ class Controller_Front extends Controller
 
                 // If no redirection then we display 404
                 if (!empty($url)) {
-                    $_SERVER['NOS_URL'] = '';
+                    if (!empty($this->_extension) && $this->_extension !== 'html') {
+                        $this->_content = \View::forge('nos::errors/404', array(
+                            'base_url' => $this->_base_href,
+                        ), false);
+                        $this->_status = 404;
+                    } else {
+                        $_SERVER['NOS_URL'] = '';
 
-                    return $this->router('index', $params, 404);
+                        return $this->router('index', $params, 404);
+                    }
                 } else {
                     // The DB config is there, there's probably no homepage.
                     echo \View::forge('nos::errors/blank_slate_front', array(
@@ -235,7 +246,7 @@ class Controller_Front extends Controller
             }
         }
 
-        \Event::trigger_function('front.response', array(array('content' => &$this->_content)));
+        \Event::trigger_function('front.response', array(array('content' => &$this->_content, 'status' => &$this->_status, 'headers' => &$this->_headers)));
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
@@ -622,8 +633,6 @@ class Controller_Front extends Controller
         }
 
         if (empty($this->_page)) {
-            // Blank slate also needs the base_href to display a 404 from a sub-folder
-            $this->setBaseHref($domain);
             throw new NotFoundException('The requested page was not found.');
         }
 
