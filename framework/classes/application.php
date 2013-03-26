@@ -623,7 +623,7 @@ class Application
 
     public function addPermission()
     {
-        Permission::add($this->folder, 'access');
+        Permission::add($this->folder, 'nos::access');
     }
 
     public function __get($property)
