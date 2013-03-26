@@ -18,7 +18,7 @@ class NotFoundException extends \Exception
 {
 }
 
-class FrontReplaceTemplateException extends \Exception
+class FrontIgnoreTemplateException extends \Exception
 {
 }
 
@@ -186,7 +186,7 @@ class Controller_Front extends Controller
                     $this->_content = $this->_cache->execute();
 
                     break;
-                } catch (FrontReplaceTemplateException $e) {
+                } catch (FrontIgnoreTemplateException $e) {
                     echo $this->_content;
 
                     $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
@@ -788,22 +788,23 @@ class Controller_Front extends Controller
      * Replace the template by a specific content and stop treatments
      *
      * @param mixed $content The new content, can be a string or a View
-     * @throws FrontReplaceTemplateException Internal exception for stopping treatments
+     * @throws FrontIgnoreTemplateException Internal exception for stopping treatments
      */
     public function sendContent($content)
     {
         $this->_content = $content;
 
-        throw new FrontReplaceTemplateException();
+        throw new FrontIgnoreTemplateException();
     }
 
     /**
-     * Add a cache router for the current page
+     * Add a cache suffix handler for the current page
      *
-     * @param array $router The cache router
+     * @param array $handler The cache suffix handler
+     * @return null|\Nos\FrontCache The cache instance if the cache path have changed, null otherwise
      */
-    public function addCacheRouter(array $router)
+    public function addCacheSuffixHandler(array $handler)
     {
-        $this->_cache->addRouter($router);
+        return $this->_cache->addSuffixHandler($handler);
     }
 }

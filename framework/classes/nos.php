@@ -67,7 +67,7 @@ class Nos
             $response = $request->execute($args['args']);
 
             echo $response;
-        } catch (\Nos\FrontReplaceTemplateException $e) {
+        } catch (\Nos\FrontIgnoreTemplateException $e) {
             throw $e;
         } catch (\Nos\NotFoundException $e) {
             throw $e;

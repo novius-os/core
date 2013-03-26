@@ -90,10 +90,10 @@ class FrontCache
         }
     }
 
+    protected $_init_path = null;
     protected $_path = null;
-    protected $_router = array();
-    protected $_path_router = null;
-    protected $_path_router_dir = null;
+    protected $_path_suffix = null;
+    protected $_suffix_handlers = array();
     protected $_level = null;
     protected $_content = '';
     protected $_lock_fp = null;
@@ -104,68 +104,58 @@ class FrontCache
             $this->_path = false;
         } else {
             $path = \Config::get('cache_dir').$path;
-            $this->_path = $path.'.php';
-            $this->_path_router = $path.'.cache.router.php';
-            $this->_path_router_dir = $path.'.cache.router/';
-            $this->_router();
+            $this->_init_path = $path.'.php';
+            $this->_path = $this->_init_path;
+            $this->_path_suffix = $path.'.cache.suffixes/';
         }
     }
 
-    public function addRouter(array $router)
+    public function addSuffixHandler(array $handler)
     {
-        $this->_router[] = $router;
-
-        $dir = dirname($this->_path_router);
-        // check if specified subdir exists
-        if (!@is_dir($dir)) {
-            // create non existing dir
-            if (!@mkdir($dir, 0755, true)) {
-                return false;
-            }
+        if (isset($handler['type'])) {
+            $this->_suffix_handlers[] = $handler;
+        } else {
+            $this->_suffix_handlers = $this->_suffix_handlers + $handler;
         }
-        file_put_contents($this->_path_router, "<?php\n".'return '.var_export(array_unique($this->_router), true).";\n");
+        $this->_suffix_handlers = array_unique($this->_suffix_handlers);
 
-        $this->_router();
+        $this->_suffix_handlers();
+
+        return $this->_path !== $this->_init_path ? $this : null;
     }
 
-    protected function _router()
+    protected function _suffix_handlers()
     {
-        if (!empty($this->_path_router) && is_file($this->_path_router)) {
-            $this->_router = include($this->_path_router);
-            if (!is_array($this->_router)) {
-                $this->_router = array();
-            }
-            $suffix_router = array();
-            foreach ($this->_router as $router) {
-                $type = isset($router['type']) ? $router['type'] : null;
+        $suffixes = array();
+        foreach ($this->_suffix_handlers as $handler) {
+            $type = isset($handler['type']) ? $handler['type'] : null;
 
-                switch ($type) {
-                    case '$_GET':
-                        if (!empty($router['keys'])) {
-                            $keys = (array) $router['keys'];
-                            foreach ($keys as $key) {
-                                if (!empty($_GET[$key])) {
-                                    $suffix_router[] = '$_GET['.urlencode($key).']='.urlencode($_GET[$key]);
-                                }
+            switch ($type) {
+                case '$_GET':
+                    if (!empty($handler['keys'])) {
+                        $keys = (array) $handler['keys'];
+                        foreach ($keys as $key) {
+                            if (!empty($_GET[$key])) {
+                                $suffixes[] = '$_GET['.urlencode($key).']='.urlencode($_GET[$key]);
                             }
                         }
-                        break;
+                    }
+                    break;
 
-                    case 'callable':
-                        if (!empty($router['callable']) && is_callable($router['callable'])) {
-                            $args = is_array($router['args']) ? $router['args'] : array();
-                            $suffix = call_user_func_array($router['callable'], $args);
-                            if (!empty($suffix)) {
-                                $suffix_router[] = $suffix;
-                            }
+                case 'callable':
+                    if (!empty($handler['callable']) && is_callable($handler['callable'])) {
+                        $args = is_array($handler['args']) ? $handler['args'] : array();
+                        $suffix = call_user_func_array($handler['callable'], $args);
+                        if (!empty($suffix)) {
+                            $suffixes[] = $suffix;
                         }
-                        break;
-                }
+                    }
+                    break;
             }
+        }
 
-            if (!empty($suffix_router)) {
-                $this->_path = $this->_path_router_dir.implode('&', $suffix_router).'.php';
-            }
+        if (!empty($suffixes)) {
+            $this->_path = $this->_path_suffix.implode('&', $suffixes).'.php';
         }
     }
 
@@ -217,6 +207,17 @@ class FrontCache
             '.__CLASS__.'::checkExpires('.$expires.');'."\n";
 
             if (!empty($controller)) {
+                if ($this->_path === $this->_init_path && !empty($this->_suffix_handlers)) {
+                    $prepend .= '
+                    if (!empty($controller)) {
+                        $cache = $controller->addCacheSuffixHandler(unserialize('.var_export(serialize($this->_suffix_handlers), true).'));
+                        if (!empty($cache)) {
+                            echo $cache->execute($controller);
+                            return;
+                        }
+                    }'."\n";
+                }
+
                 $prepend .= '
                 if (!empty($controller)) {
                     $controller->rebuildCache(unserialize('.var_export(serialize($controller->getCache()), true).'));
@@ -250,6 +251,36 @@ class FrontCache
             trigger_error('Cache could not be written! (path = '.$this->_path.')', E_USER_WARNING);
         }
         //flock($this->_lock_fp, LOCK_UN);
+
+        if ($this->_path !== $this->_init_path && !empty($this->_suffix_handlers) && !is_file($this->_init_path)) {
+            $dir = dirname($this->_init_path);
+            // check if specified subdir exists
+            if (!@is_dir($dir)) {
+                // create non existing dir
+                if (!@mkdir($dir, 0755, true)) {
+                    return false;
+                }
+            }
+
+            $prepend = "<?php\n";
+
+            if (!empty($controller)) {
+                $prepend .= '
+                if (!empty($controller)) {
+                    $cache = $controller->addCacheSuffixHandler(unserialize('.var_export(serialize($this->_suffix_handlers), true).'));
+                    if (!empty($cache)) {
+                        echo $cache->execute($controller);
+                        return;
+                    }
+                }'."\n";
+            }
+            $prepend .= '
+                throw new \Nos\CacheNotFoundException();
+                '."\n";
+            $prepend .= '?>';
+
+            file_put_contents($this->_init_path, $prepend);
+        }
     }
 
     public function saveAndExecute($duration = -1, $controller = null)
