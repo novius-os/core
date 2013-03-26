@@ -4,6 +4,9 @@
 <ul class="applications">
 <?php
 foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
+    if (!isset($app['permission'])) {
+        continue;
+    }
     $icon = Config::icon($app_name, 32);
     ?>
     <li class="application ui-corner-all ui-widget-content">
