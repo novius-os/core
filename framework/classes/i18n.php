@@ -99,7 +99,8 @@ class I18n
                     }
                 }
             }
-            static::$_loaded_files[static::$_locale] = true;
+            \Event::register_function('i18n|'.$file, array(&static::$_messages));
+            static::$_loaded_files[static::$_locale][$file] = true;
         }
     }
 
