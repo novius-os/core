@@ -655,6 +655,10 @@ class Controller_Front extends Controller
             $this->setMetaDescription($this->_page->page_meta_description);
             $this->setMetaKeywords($this->_page->page_meta_keywords);
         }
+
+        if (!empty($this->_page->page_cache_duration)) {
+            $this->_cache_duration = $this->_page->page_cache_duration;
+        }
     }
 
     protected function _findTemplate()

@@ -252,7 +252,7 @@ class FrontCache
         }
         //flock($this->_lock_fp, LOCK_UN);
 
-        if ($this->_path !== $this->_init_path && !empty($this->_suffix_handlers) && !is_file($this->_init_path)) {
+        if ($duration != -1 && $this->_path !== $this->_init_path && !empty($this->_suffix_handlers) && !is_file($this->_init_path)) {
             $dir = dirname($this->_init_path);
             // check if specified subdir exists
             if (!@is_dir($dir)) {
