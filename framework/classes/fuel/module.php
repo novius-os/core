@@ -29,12 +29,12 @@ class Module extends Fuel\Core\Module
                 ), true);
                 // Allow autoloading from bootstrap to alias classes from this namespace
                 Fuel::$namespace_aliases[Inflector::words_to_upper($module)] = $namespace;
+            }
 
-                // Load the bootstrap if it exists
-                // Inside namespace condition because we need the application to be installed
-                if ($module !== 'nos' && is_file($path.'bootstrap.php')) {
-                    Fuel::load($path.'bootstrap.php');
-                }
+            // Load the bootstrap if it exists
+            // If module isn't local, we need the application to be installed
+            if ((!empty($namespace) || $module == 'local') && is_file($path.'bootstrap.php')) {
+                Fuel::load($path.'bootstrap.php');
             }
 
             // Load dependent applications
