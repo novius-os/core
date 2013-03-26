@@ -6,7 +6,7 @@
 /* English/UK initialisation for the jQuery UI date picker plugin. */
 /* Written by Stuart. */
 jQuery(function($){
-    $.datepicker.regional['en-GB'] = {
+    $.datepicker.regional['en'] = {
         closeText: 'Done',
         prevText: 'Prev',
         nextText: 'Next',
@@ -24,7 +24,6 @@ jQuery(function($){
         isRTL: false,
         showMonthAfterYear: false,
         yearSuffix: ''};
-    $.datepicker.setDefaults($.datepicker.regional['en-GB']);
 });
 
 /* French initialisation for the jQuery UI date picker plugin. */
@@ -50,7 +49,6 @@ jQuery(function($){
         isRTL: false,
         showMonthAfterYear: false,
         yearSuffix: ''};
-    $.datepicker.setDefaults($.datepicker.regional['fr']);
 });
 
 /* Japanese initialisation for the jQuery UI date picker plugin. */
@@ -74,5 +72,4 @@ jQuery(function($){
         isRTL: false,
         showMonthAfterYear: true,
         yearSuffix: '年'};
-    $.datepicker.setDefaults($.datepicker.regional['ja']);
 });
