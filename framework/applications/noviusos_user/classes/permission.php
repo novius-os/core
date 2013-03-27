@@ -12,7 +12,7 @@ namespace Nos\User;
 
 class Permission
 {
-    public static function check($permission_name, $category_key)
+    public static function check($permission_name, $category_key = null)
     {
         $user = \Session::user();
         $role = reset($user->roles);
