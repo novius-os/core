@@ -107,8 +107,14 @@ class Nos
         static::_parse_internals($content);
 
         $content = preg_replace(
-            '`href="#([^"])`iUu',
+            '`href="#([^#"])`iUu',
             'href="'.static::main_controller()->getUrl().(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
+            $content
+        );
+
+        $content = str_replace(
+            'href="##',
+            'href="#',
             $content
         );
 
