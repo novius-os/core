@@ -92,11 +92,21 @@ define('jquery-nos-toolbar-crud',
                     $container.nosToolbar('add', params.saveField)
                         .filter('button:first')
                         .click(function() {
+                            var $form;
                             if ($container.is('form')) {
-                                $container.submit();
+                                $form = $container;
                             } else {
-                                $container.find('form:visible').submit();
+                                $form = $container.find('form:visible')
                             }
+                            $form.nosAjax({
+                                dataType: 'json',
+                                type: 'POST',
+                                url: $form.attr('action'),
+                                data: $form.serialize(),
+                                success: function(data) {
+                                    params.dataset = data.dataset;
+                                }
+                            });
                         });
 
                     if (!params.isNew) {

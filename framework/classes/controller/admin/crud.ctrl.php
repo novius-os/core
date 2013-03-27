@@ -384,6 +384,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     'label' => (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
                 ),
             );
+            $return['dataset'] = \Nos\Controller::dataset_item($this->item);
         }
 
         return $return;
