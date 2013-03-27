@@ -165,6 +165,7 @@ class Controller_Front extends Controller
 
                 $_404 = false;
                 try {
+                    $this->_cache->reset();
                     $this->_findPage();
 
                     \Event::trigger('front.pageFound');

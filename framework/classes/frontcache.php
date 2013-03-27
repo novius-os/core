@@ -105,9 +105,15 @@ class FrontCache
         } else {
             $path = \Config::get('cache_dir').$path;
             $this->_init_path = $path.'.php';
-            $this->_path = $this->_init_path;
             $this->_path_suffix = $path.'.cache.suffixes/';
+            $this->reset();
         }
+    }
+
+    public function reset()
+    {
+        $this->_path = $this->_init_path;
+        $this->_suffix_handlers = array();
     }
 
     public function addSuffixHandler(array $handler)
