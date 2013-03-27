@@ -89,6 +89,13 @@ define('jquery-nos-toolbar-crud',
                             });
                         };
 
+
+                    $container.add($container.find('form')).filter('form').bind('ajax_success', function(e, data) {
+                        if (data.dataset && data.dataset._model == params.dataset._model && data.dataset._id == params.dataset._id) {
+                            params.dataset = data.dataset;
+                        }
+                    });
+
                     $container.nosToolbar('add', params.saveField)
                         .filter('button:first')
                         .click(function() {
@@ -96,17 +103,9 @@ define('jquery-nos-toolbar-crud',
                             if ($container.is('form')) {
                                 $form = $container;
                             } else {
-                                $form = $container.find('form:visible')
+                                $form = $container.find('form:visible');
                             }
-                            $form.nosAjax({
-                                dataType: 'json',
-                                type: 'POST',
-                                url: $form.attr('action'),
-                                data: $form.serialize(),
-                                success: function(data) {
-                                    params.dataset = data.dataset;
-                                }
-                            });
+                            $form.submit();
                         });
 
                     if (!params.isNew) {
