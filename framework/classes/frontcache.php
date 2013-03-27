@@ -137,19 +137,24 @@ class FrontCache
             $type = isset($handler['type']) ? $handler['type'] : null;
 
             switch ($type) {
-                case '$_GET':
+                case 'GET':
                     if (!empty($handler['keys'])) {
                         $keys = (array) $handler['keys'];
                         foreach ($keys as $key) {
                             if (!empty($_GET[$key])) {
-                                $suffixes[] = '$_GET['.urlencode($key).']='.urlencode($_GET[$key]);
+                                $suffixes[] = 'GET['.urlencode($key).']='.urlencode($_GET[$key]);
                             }
                         }
                     }
                     break;
 
                 case 'callable':
-                    if (!empty($handler['callable']) && is_callable($handler['callable'])) {
+                    if (!empty($handler['callable']) && is_callable($handler['callable'], false, $callable_name)) {
+                        if (empty($callable_name)) {
+                            \Log::warning('Suffix handlers can\'t be a closure');
+                            break;
+                        }
+
                         $args = is_array($handler['args']) ? $handler['args'] : array();
                         $suffix = call_user_func_array($handler['callable'], $args);
                         if (!empty($suffix)) {
@@ -214,14 +219,7 @@ class FrontCache
 
             if (!empty($controller)) {
                 if ($this->_path === $this->_init_path && !empty($this->_suffix_handlers)) {
-                    $prepend .= '
-                    if (!empty($controller)) {
-                        $cache = $controller->addCacheSuffixHandler(unserialize('.var_export(serialize($this->_suffix_handlers), true).'));
-                        if (!empty($cache)) {
-                            echo $cache->execute($controller);
-                            return;
-                        }
-                    }'."\n";
+                    $prepend .= $this->cacheSuffixHandlers();
                 }
 
                 $prepend .= '
@@ -253,39 +251,25 @@ class FrontCache
         }
         $this->_content = $prepend.$this->_content;
 
-        if (!$this->store()) {
+        if (!static::store($this->_path, $this->_content)) {
             trigger_error('Cache could not be written! (path = '.$this->_path.')', E_USER_WARNING);
         }
         //flock($this->_lock_fp, LOCK_UN);
 
         if ($duration != -1 && $this->_path !== $this->_init_path && !empty($this->_suffix_handlers) && !is_file($this->_init_path)) {
-            $dir = dirname($this->_init_path);
-            // check if specified subdir exists
-            if (!@is_dir($dir)) {
-                // create non existing dir
-                if (!@mkdir($dir, 0755, true)) {
-                    return false;
-                }
-            }
-
-            $prepend = "<?php\n";
+            $content = "<?php\n";
 
             if (!empty($controller)) {
-                $prepend .= '
-                if (!empty($controller)) {
-                    $cache = $controller->addCacheSuffixHandler(unserialize('.var_export(serialize($this->_suffix_handlers), true).'));
-                    if (!empty($cache)) {
-                        echo $cache->execute($controller);
-                        return;
-                    }
-                }'."\n";
+                $content .= $this->cacheSuffixHandlers();
             }
-            $prepend .= '
+            $content .= '
                 throw new \Nos\CacheNotFoundException();
                 '."\n";
-            $prepend .= '?>';
+            $content .= '?>';
 
-            file_put_contents($this->_init_path, $prepend);
+            if (!static::store($this->_init_path, $content)) {
+                trigger_error('Cache could not be written! (path = '.$this->_init_path.')', E_USER_WARNING);
+            }
         }
     }
 
@@ -307,9 +291,21 @@ class FrontCache
         }
     }
 
-    protected function store()
+    protected function cacheSuffixHandlers()
     {
-        $dir = dirname($this->_path);
+        return '
+                if (!empty($controller)) {
+                    $cache = $controller->addCacheSuffixHandler(unserialize('.var_export(serialize($this->_suffix_handlers), true).'));
+                    if (!empty($cache)) {
+                        echo $cache->execute($controller);
+                        return;
+                    }
+                }'."\n";
+    }
+
+    protected static function store($path, $content)
+    {
+        $dir = dirname($path);
         // check if specified subdir exists
         if (!@is_dir($dir)) {
             // create non existing dir
@@ -317,7 +313,7 @@ class FrontCache
                 return false;
             }
         }
-        file_put_contents($this->_path, $this->_content);
+        file_put_contents($path, $content);
 
         return true;
     }
