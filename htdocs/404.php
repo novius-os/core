@@ -195,11 +195,6 @@ if (!$is_attachment && !$is_media && pathinfo($nos_url, PATHINFO_EXTENSION) == '
     $response->send(true);
 }
 
-header('HTTP/1.0 404 Ok');
-header('HTTP/1.1 404 Ok');
-
-// Fire off the shutdown event
-Event::shutdown();
-
-// Make sure everything is flushed to the browser
-ob_end_flush();
+\Response::forge(\View::forge('nos::errors/404', array(
+    'base_url' => \Uri::base(false),
+), false), 404)->send();

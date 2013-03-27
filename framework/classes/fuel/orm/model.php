@@ -839,6 +839,16 @@ class Model extends \Orm\Model
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
+
+    public function __sleep()
+    {
+        return array('_data', '_is_new');
+    }
+
+    public function __wakeup()
+    {
+        $this->initProviders();
+    }
 }
 
 
