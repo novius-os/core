@@ -594,9 +594,21 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $json_response;
     }
 
-    public function is_expert($field_name)
+    protected function is_expert($field_name)
     {
         return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+    }
+
+    public function is_restricted($field_name)
+    {
+        if ($this->is_expert($field_name)) {
+            return true;
+        }
+        $show_when = \Arr::get($this->config_used[$field_name], 'show_when', false);
+        if ($show_when === false || !is_callable($show_when)) {
+            return false;
+        }
+        return !call_user_func($show_when);
     }
 
     public function getInstance()

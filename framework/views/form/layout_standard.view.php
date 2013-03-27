@@ -24,9 +24,21 @@ require(
 </script>
 
 <?php
+
+$has_restricted_fields = false;
 foreach ($fieldset->field() as $field) {
-    $field->is_expert() && $field->set_type('hidden')->set_template('{field}');
+    if ($field->is_restricted()) {
+        if (!$has_restricted_fields) {
+            echo '<div style="display:none;">';
+            $has_restricted_fields = true;
+        }
+        echo $field->set_template('{field}')->build();
+    }
 }
+if ($has_restricted_fields) {
+    echo '</div>';
+}
+
 echo $fieldset->build_hidden_fields();
 
 $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
@@ -119,7 +131,7 @@ if (!empty($subtitle) || !empty($publishable)) {
         $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
-            if ($field->is_expert()) {
+            if ($field->type == 'hidden' || $field->is_restricted()) {
                 continue;
             }
             $field_template = $field->template;

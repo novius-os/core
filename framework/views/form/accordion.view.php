@@ -37,14 +37,14 @@ foreach ((array) $accordions as $options) {
         $options['title'] = '';
     }
     if (empty($options['view'])) {
-        $exclude = true;
+        $ignore = true;
         foreach ((array) $options['fields'] as $field) {
-            if ($field instanceof \View || !$fieldset->field($field)->is_expert()) {
-                $exclude = false;
+            if ($field instanceof \View || !$fieldset->field($field)->is_restricted()) {
+                $ignore = false;
                 continue;
             }
         }
-        if ($exclude) {
+        if ($ignore) {
             continue;
         }
     }
@@ -63,8 +63,11 @@ foreach ((array) $accordions as $options) {
         try {
             if ($field instanceof \View) {
                 echo $field;
-            } else {
-                echo strtr($options['field_template'], array('{field}' => $fieldset->field($field)->build()));
+                continue;
+            }
+            $field = $fieldset->field($field);
+            if (!$field->is_restricted()) {
+                echo strtr($options['field_template'], array('{field}' => $field->build()));
             }
         } catch (\Exception $e) {
             throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
