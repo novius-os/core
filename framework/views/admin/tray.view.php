@@ -15,8 +15,10 @@
                             var $a = $(this),
                                 action = $a.data('action');
                             $a.click(function(e) {
-                                e.preventDefault();
-                                $a.nosAction(action);
+                                if (action) {
+                                    e.preventDefault();
+                                    $a.nosAction(action);
+                                }
                             });
                         })
                         .end()
