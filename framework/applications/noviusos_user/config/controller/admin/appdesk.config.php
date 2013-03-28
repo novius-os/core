@@ -20,6 +20,7 @@ return array(
         'user_name',
         'user_email',
     ),
+    'inspectors' => \Config::get('novius-os.users.enable_roles', false) ? array('role') : array(),
     'hideContexts' => true,
     'i18n' => array(
         'item' => __('user'),

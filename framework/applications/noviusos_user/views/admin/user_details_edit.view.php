@@ -33,6 +33,14 @@
                 'fields' => array('user_email', 'user_last_connection', 'user_lang', 'user_expert'),
             ), false)
         ), false),
+        !empty($no_role) || \Config::get('novius-os.users.enable_roles', false) == false ? '' : \View::forge('form/expander', array(
+            'title' => __('Roles'),
+            'nomargin' => false,
+            'content' => \View::forge('noviusos_user::admin/user_roles_edit', array(
+                'fieldset' => $fieldset,
+                'user' => $user,
+            ), false)
+        ), false),
         \View::forge('form/expander', array(
             'title'   => __('Set a new password'),
             'nomargin' => false,

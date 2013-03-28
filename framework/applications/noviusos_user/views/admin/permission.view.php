@@ -10,59 +10,52 @@
 
 \Nos\I18n::current_dictionary('noviusos_user::common');
 
-$role = reset($user->roles);
-
+// Role is filled when accessing from the user. The generic 'item
+empty($role) && $role = $item;
 ?>
 
-<div class="permissions fill-parent" id="<?= $uniqid = uniqid('id_') ?>" style="overflow:auto;">
+<!--<input type="hidden" name="role_id" value="<?= $role->role_id ?>" />-->
 
-<form action="admin/noviusos_user/user/save_permissions" method="POST">
+<div class="line" id="<?= $uniqid = uniqid('id_') ?>">
+    <div class="col c6 native_permissions">
+<?php
 
-    <input type="hidden" name="role_id" value="<?= $role->role_id ?>" />
+$my_view_params = array(
+    'role' => $role,
+    'check_permission' => function($perm_name, $cat_key = null) use ($role) {
+        return $role->check_permission($perm_name, $cat_key);
+    }
+);
+$my_view_params['view_params'] =& $my_view_params;
+$permissions = \Config::load('nos::permissions', true);
 
-    <div class="line">
-        <div class="col c6 native_permissions">
-        <?php
+foreach ($permissions as $view) {
+    echo \View::forge(
+        $view['view'],
+        (!empty($view['params']) ? $view['params'] : array()) + $my_view_params,
+        false
+    );
+}
+?>
 
-        $view_params = array(
-            'role' => $role,
-            'check_permission' => function($perm_name, $cat_key = null) use ($role) {
-                return $role->check_permission($perm_name, $cat_key);
-            }
-        );
-        $view_params['view_params'] =& $view_params;
-        $permissions = \Config::load('nos::permissions', true);
-
-        foreach ($permissions as $view) {
-            echo \View::forge(
-                $view['view'],
-                (!empty($view['params']) ? $view['params'] : array()) + $view_params,
-                false
-            );
-        }
-        ?>
-
-        </div>
-        <div class="col c6">
-            <?php
-            foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
-                $permissions = \Config::load($app_name.'::permissions', true);
-                echo '<div class="'.$app_name.'" style="display:none;">';
-
-                foreach ($permissions as $view) {
-                    echo \View::forge(
-                        $view['view'],
-                        (!empty($view['params']) ? $view['params'] : array()) + $view_params,
-                        false
-                    );
-                }
-                echo '</div>';
-            }
-            ?>
-        </div>
     </div>
+    <div class="col c6">
+<?php
+foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
+    $permissions = \Config::load($app_name.'::permissions', true);
+    echo '<div class="'.$app_name.'" style="display:none;">';
 
-</form>
+    foreach ($permissions as $view) {
+        echo \View::forge(
+            $view['view'],
+            (!empty($view['params']) ? $view['params'] : array()) + $my_view_params,
+            false
+        );
+    }
+    echo '</div>';
+}
+?>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -70,7 +63,7 @@ require(
     ['jquery-nos'],
     function($) {
         $(function() {
-            var $form = $('#<?= $uniqid ?>').nosFormUI().nosFormAjax();
+            var $form = $('#<?= $uniqid ?>');//.nosFormUI().nosFormAjax();
             var $ul = $form.find('div[class~="nos::access"]');
             var preventCheckAction = false;
 

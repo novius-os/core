@@ -15,17 +15,22 @@ class Permission
     public static function check($permission_name, $category_key = null)
     {
         $user = \Session::user();
-        $role = reset($user->roles);
-
-        return $role->check_permission($permission_name, $category_key);
+        return $user->check_permission($permission_name, $category_key);
     }
 
     public static function add($permission_name, $category_key)
     {
+        // Can't tell on which role to add the permission, skip
+        if (\Config::get('novius-os.users.enable_roles', false)) {
+            return true;
+        }
+
         $user = \Session::user();
+        // If no user is connected, can't do
         if (empty($user)) {
             return false;
         }
+
         $role = reset($user->roles);
         try {
             $access = new Model_Permission();
@@ -34,7 +39,6 @@ class Permission
             $access->perm_category_key = $category_key;
             $access->save();
         } catch (\Exception $e) {
-
         }
 
         return true;

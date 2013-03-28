@@ -23,6 +23,19 @@ class Model_Role extends \Nos\Orm\Model
 
     protected static $permissions;
 
+    protected static $_many_many = array(
+        'users' => array(
+            'key_from' => 'role_id',
+            'key_through_from' => 'role_id',
+            'table_through' => 'nos_user_role',
+            'key_through_to' => 'user_id',
+            'model_to' => 'Nos\User\Model_User',
+            'key_to' => 'user_id',
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        ),
+    );
+
     /**
      * @param   string  $permission_name  Name of the permission to check against
      * @param   null    $category_key     (optional) If the permission has categories, the category key to check against

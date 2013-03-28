@@ -42,7 +42,11 @@ $uniqid = uniqid('id_');
             <li><a href="#display"><?= __('Theme') ?></a></li>
         </ul>
         <div id="infos">
-            <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
+            <?= render('noviusos_user::admin/user_details_edit', array(
+                'fieldset' => $fieldset_infos,
+                'user' => $logged_user,
+                'no_role' => true,
+            ), false) ?>
         </div>
         <div id="display">
             <?= $fieldset_display ?>
