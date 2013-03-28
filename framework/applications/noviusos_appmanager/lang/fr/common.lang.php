@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 29/01/2013 19:08:29
+// Generated on 20/02/2013 17:43:50
 
 // 18 out of 18 messages are translated (100%).
 // 58 out of 58 words are translated (100%).
@@ -13,7 +13,8 @@ return array(
     #: classes/controller/admin/appmanager.ctrl.php:64
     'Great, a new app! Installed and ready to use.' => 'Une nouvelle appli ! Installée et prête à l’emploi.',
 
-    #: classes/controller/admin/appmanager.ctrl.php:105
+    #. The tab will be refreshed by the javaScript within the view
+    #: classes/controller/admin/appmanager.ctrl.php:104
     'The application has been uninstalled.' => 'L’application a été désinstallée.',
 
     #: views/admin/app_manager.view.php:35
@@ -41,7 +42,7 @@ return array(
     'Up-to-date' => 'À jour',
 
     #: views/admin/app_manager.view.php:70
-    'Uninstall' => 'Désintaller',
+    'Uninstall' => 'Désinstaller',
 
     #: views/admin/app_manager.view.php:82
     #: views/admin/app_manager.view.php:120

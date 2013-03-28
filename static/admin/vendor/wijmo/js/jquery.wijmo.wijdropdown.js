@@ -1,7 +1,7 @@
 /*globals jQuery,document,window*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -69,11 +69,13 @@
 			if (self.element.is(":hidden") &&
 						self.element.wijAddVisibilityObserver) {
 				self.element.wijAddVisibilityObserver(function () {
-			           self.refresh();
-			           if(self.element.wijRemoveVisibilityObserver) {
-			        	   self.element.wijRemoveVisibilityObserver();
-			           }}, "wijdropdown");
-			 }
+			            self.refresh();
+			            if (self.element.wijRemoveVisibilityObserver) {
+                            self.element.wijRemoveVisibilityObserver();
+			            }
+                    },
+                        "wijdropdown");
+			}
 		},
 
 		_createSelect: function () {
@@ -111,10 +113,11 @@
 
 			if (ele.get(0).disabled !== false) {
 				self.options.disabled = true;
-				labelWrap.addClass("ui-state-disabled");
-				label.addClass("ui-state-disabled");
 			}
-
+            if (self.options.disabled) {
+                labelWrap.addClass("ui-state-disabled");
+                label.addClass("ui-state-disabled");
+            }
 			labelWrap.append(label);
 			container.append(selectWrap)
 				.append(labelWrap)
@@ -186,7 +189,14 @@
 			});
 
 			//update for fixing can't show all dropdown items by wuhao at 2012/2/24
-			list.setOutWidth(list.parent().parent().innerWidth() - 18);
+            //fixed the bug 30486
+			//list.setOutWidth(list.parent().parent().innerWidth() - 18);
+			if ($.browser.msie && /^[8]\.[0-9]+/.test($.browser.version)) {
+			    list.setOutWidth(list.parent().parent().innerWidth() - 19);
+			}
+			else {
+			    list.setOutWidth(list.parent().parent().innerWidth() - 18);
+			}
 			//end for issue
 
 			if (listContainer.data("wijsuperpanel")) {
@@ -203,7 +213,13 @@
 			//update for fixing can't show all dropdown items by wuhao at 2012/2/24
 			//list.setOutWidth(list.parent().parent().innerWidth());
 			if (!self.superpanel.vNeedScrollBar) {
-				list.setOutWidth(list.parent().parent().innerWidth());
+                //fixed the bug 30486
+			    if ($.browser.msie && /^[8]\.[0-9]+/.test($.browser.version)) {
+			        list.setOutWidth(list.parent().parent().innerWidth() - 1);
+			    }
+			    else {
+			        list.setOutWidth(list.parent().parent().innerWidth());
+			    }
 				self.superpanel.refresh();
 			}
 			//end for issue
@@ -232,6 +248,8 @@
 				}
 				else {
 					self._labelWrap.focus();
+                    // Novius OS : add preventDefault, when click on rightTrigger in a dropdown which is in a popup, list open and close
+                    e.preventDefault();
 				}
 			}).bind("mouseover" + namespace, function () {
 				if (self.options.disabled) {
@@ -272,11 +290,12 @@
 				labelWrap = self._labelWrap,
 				listContainer = self._listContainer,
 				ele = self.element,
+				ischrome = false,
 				offset;
 			self._handelEvents(self._label);
 			self._handelEvents(self._rightTrigger);
 
-			$(document.body).bind("click" + namespace, function (e) {
+			$(document).bind("click" + namespace, function (e) {
 				if (listContainer.is(":hidden")) {
 					return;
 				}
@@ -392,6 +411,17 @@
 				}
 				ele.trigger('keyup');
 			});
+
+			ischrome = /chrome/.test(navigator.userAgent.toLowerCase());
+			if (ischrome || $.browser.safari) {
+				rightTrigger.bind("mouseout" + namespace, function () {
+					if (self.options.disabled) {
+						return;
+					}
+					label.removeClass(self.focusClass);
+					rightTrigger.removeClass(self.focusClass);
+				});
+			}
 		},
 
 		_init: function () {
@@ -504,22 +534,26 @@
 		},
 
 		_setValueToEle: function () {
-            // @todo : Fixed Novius OS. Little refactoring in this function
 			var self = this, ele = self.element,
-                $options = ele.find("option"),
-				oldSelectedItem = $options.filter("[selected]"),
-                //oldSelectedItem = ele.find("option[selected]"),
-				oldSelectedIndex = $options.index(oldSelectedItem),
-                //oldSelectedIndex = $('option', ele).index(oldSelectedItem),
+				oldSelectedItem = ele.find(":selected"),
+			//oldSelectedIndex = oldSelectedItem.index(),
+				oldSelectedIndex = $('option', ele).index(oldSelectedItem),
 				selectedIndex = self._selectedIndex;
 
+			//self.oldVal = ele.val();
+			//ele.val(self._value);
 			if (oldSelectedIndex !== selectedIndex) {
-                $options.eq(selectedIndex)[0].selected = true;
-                //ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
-                //oldSelectedItem.removeAttr('selected');
+				if ($.browser.mozilla) {
+					ele.val(self._value);
+				}
+				oldSelectedItem.removeAttr('selected');
+				ele.find("option:eq(" + selectedIndex + ")").attr("selected", true);
 
-                ele.trigger("change");
+				ele.trigger("change");
 			}
+			//if (self.oldVal !== self._value) {
+			//	ele.trigger("change");
+			//}
 		},
 
 		_initActiveItem: function () {

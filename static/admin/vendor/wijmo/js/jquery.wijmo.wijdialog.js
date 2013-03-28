@@ -1,7 +1,7 @@
 /*globals window,document,jQuery,setTimeout*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -282,7 +282,7 @@
 			var self = this, isIn = true;
 			self._createCaptionButtons();
 			self._checkUrl();
-			self.uiDialogButtonPane = $(".ui-dialog-buttonpane", self.uiDialog);
+			//self.uiDialogButtonPane = $(".ui-dialog-buttonpane", self.uiDialog);
 
 			self.uiDialog.bind("mousedown", function (event) {
 				var el = event.target;
@@ -347,6 +347,8 @@
 				else {
 					self._checkUrl();
 				}
+			} else if (key = "captionButtons") {
+				self._createCaptionButtons();
 			}
 		},
 
@@ -555,6 +557,9 @@
 
 		_enableDisableResizer: function (disabled) {
 			var dlg = this.uiDialog;
+			if (!this.options.resizable) {
+				return;
+			}
 			dlg.resizable({ disabled: disabled });
 			if (disabled) {
 				dlg.removeClass("ui-state-disabled");
@@ -563,6 +568,9 @@
 
 		_enableDisableDragger: function (disabled) {
 			var dlg = this.uiDialog;
+			if (!this.options.draggable) {
+				return;
+			}
 			dlg.draggable({ disabled: disabled });
 			if (disabled) {
 				dlg.removeClass("ui-state-disabled");
@@ -753,8 +761,7 @@
 				if (!self.collapsed) {
 					self._enableDisableDragger(true);
 				}
-				self.uiDialog.resizable({ disabled: true });
-				self.uiDialog.removeClass("ui-state-disabled");
+				self._enableDisableResizer(true);
 
 				position = self.uiDialog.position();
 				size.width = self.uiDialog.width();
@@ -865,7 +872,7 @@
 			// restore form minimized state.
 			if (self.minimized) {
 				self.minimized = false;
-				self._enableDisableDragger(false);
+				//self._enableDisableDragger(false);
 				if (self.innerFrame) {
 					content = "copy";
 					if (!self[content]) {
@@ -1030,6 +1037,7 @@
 				}
 				else {
 					self.uiDialog.show();
+					self._isOpen = true;
 				}
 				self.uiDialog.wijTriggerVisibility();
 			}
@@ -1040,6 +1048,7 @@
 				}
 				else {
 					self.uiDialogTitlebar.show();
+					self._isOpen = true;
 				}
 			}
 			if (self.collapsed) {

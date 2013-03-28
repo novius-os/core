@@ -13,6 +13,28 @@ namespace Nos;
 class Nos
 {
     /**
+     * @var  string  constant used for when entry point is back-office
+     */
+    const ENTRY_POINT_ADMIN = 'admin';
+    /**
+     * @var  string  constant used for when entry point is front-office
+     */
+    const ENTRY_POINT_FRONT = 'front';
+    /**
+     * @var  string  constant used for when entry point is 404
+     */
+    const ENTRY_POINT_404 = '404';
+    /**
+     * @var  string  constant used for when entry point is install
+     */
+    const ENTRY_POINT_INSTALL = 'install';
+
+    /**
+     * @var  string  The Novius OS entry point
+     */
+    public static $entry_point = NOS_ENTRY_POINT;
+
+    /**
      * Returns the controller instance from the main request
      *
      * @return \Nos\Controller
@@ -45,6 +67,8 @@ class Nos
             $response = $request->execute($args['args']);
 
             echo $response;
+        } catch (\Nos\FrontIgnoreTemplateException $e) {
+            throw $e;
         } catch (\Nos\NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -85,8 +109,14 @@ class Nos
         static::_parse_internals($content);
 
         $content = preg_replace(
-            '`href="#([^"])`iUu',
+            '`href="#([^#"])`iUu',
             'href="'.static::main_controller()->getUrl().(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
+            $content
+        );
+
+        $content = str_replace(
+            'href="##',
+            'href="#',
             $content
         );
 
@@ -114,14 +144,22 @@ class Nos
 
     public static function parse_enhancers($content, $closure)
     {
-        preg_match_all('`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
-        foreach ($matches[2] as $match_id => $enhancer) {
-            $closure($enhancer, $matches[3][$match_id], $matches[0][$match_id]);
-        }
+        preg_match_all('`<(\w+)\s[^>]*data-enhancer=[^>]*>.*?</\\1>`u', $content, $matches);
+        foreach ($matches[0] as $enhancer_content) {
+            if (preg_match_all('`data-enhancer="([^"]+)"`u', $enhancer_content, $matches2)) {
+                $enhancer = $matches2[1][0];
+            } elseif (preg_match_all('`data-enhancer=\'([^\']+)\'`u', $enhancer_content, $matches2)) {
+                $enhancer = $matches2[1][0];
+            }
+            if (preg_match_all('`data-config="([^"]+)"`u', $enhancer_content, $matches2)) {
+                $config = $matches2[1][0];
+            } elseif (preg_match_all('`data-config=\'([^\']+)\'`u', $enhancer_content, $matches2)) {
+                $config = $matches2[1][0];
+            }
 
-        preg_match_all('`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
-        foreach ($matches[3] as $match_id => $enhancer) {
-            $closure($enhancer, $matches[2][$match_id], $matches[0][$match_id]);
+            if (!empty($enhancer) && !empty($config)) {
+                $closure($enhancer, $config, $enhancer_content);
+            }
         }
     }
 

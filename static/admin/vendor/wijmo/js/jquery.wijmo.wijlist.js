@@ -1,7 +1,7 @@
 /*globals jQuery*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -295,12 +295,9 @@
 				self.items.push(item);
 			}
 			else {
-				//update for fixing bug 17873 by wuhao at 2011/10/20
-				//self.items.splice(index, 0, item);
 				if (self.items) {
 					self.items.splice(index, 0, item);
 				}
-				//end for 17873
 			}
 			self._refresh();
 		},
@@ -344,6 +341,33 @@
 			}
 			return index;
 		},
+		
+		findIndexByLabel: function (label) {
+			/// <summary> 
+			/// Allows the user to find the index of first matched list item by item's label.
+			/// Return the index of first matched list item.
+			/// If there is no matched list item, it will return -1. 
+			/// Code Example:$("#element").wijlist("findIndexByLabel","label");
+			/// </summary>
+			/// <param name="label" type="String">
+			/// Indicates the specified item's label that used to search.
+			/// </param>
+			
+			var self = this, index = -1, i = 0, oItem;
+			if (label === null ||
+					label === undefined) {
+				return index;
+			}
+			self._checkData();
+			for (i = 0; i < self.items.length; i++) {
+				oItem = self.items[i];
+				if (oItem.label === label) {
+					index = i;
+					break;
+				}
+			}
+			return index;
+		},
 
 		removeItemAt: function (index) {
 			///	<summary>
@@ -379,7 +403,6 @@
 
 			$.Widget.prototype._setOption.apply(self, arguments);
 
-			//Add for support disabled option at 2011/7/8
 			if (key === "disabled") {
 				self._handleDisabledOption(value, self.element);
 			} else if (key === "selectionMode") {
@@ -417,7 +440,6 @@
 			} else if (key === "autoSize" || key === "maxItemsCount") {
 				self.refreshSuperPanel();
 			}
-			//end for disabled option
 		},
 
 		_create: function () {
@@ -467,11 +489,9 @@
 				}, "wijlist");
 			}
 
-			//Add for support disabled option at 2011/7/8
 			if (o.disabled) {
 				self.disable();
 			}
-			//end for disabled option
 		},
 		
 		_isBind: function () {
@@ -550,7 +570,6 @@
 
 		_createDisabledDiv: function (outerEle) {
 			var self = this,
-			//Change your outerelement here
 				ele = outerEle || self.element,
 				eleOffset = ele.offset(),
 				disabledWidth = ele.outerWidth(),
@@ -600,7 +619,8 @@
 				//update for 24130 issue at 2012/7/20
 				//first load the items by keydown, the 
 				//items.length will not be equal self._templates.length				
-				if (self._templates && items && items.length !== self._templates.length) {
+				if (self._templates && items && 
+						items.length !== self._templates.length) {
 					return;
 				}
 				self.items = items;
@@ -615,7 +635,7 @@
 						self.items.push({ 
 							templateHtml: self._templates[idx].templateHtml,
 							label: items[idx].label,
-							value: items[idx].value	
+							value: items[idx].value
 						});
 					}
 				});
@@ -639,34 +659,107 @@
 				self.selectedItems = selectedItems;
 			}
 		},
-
-		filterTemplateItems: function (searchTerm) {
+		
+		filterItems: function (searchTerm, autoFilter, needHighlightMatching, hightWord) {
 			var self = this,
 			term1 = self._escapeRegex(searchTerm), matcher,
+			label,
+			liText = '',
+			css = null,
+			itemsChanged = false,
 			topHit = null;
 			/// TODO : start with or contains and case sensitive.
 			if (!this.items) {
 				return null;
 			}
+			
+			if ($("li[wijhidden].wijmo-wijlist-item", self.element) && 
+					$("li[wijhidden].wijmo-wijlist-item", self.element).length > 0) {
+				itemsChanged = true;
+			}
+			
+			if ($("span.ui-priority-primary", self.element) && 
+					$("span.ui-priority-primary", self.element).length > 0) {
+				itemsChanged = true;
+			}
+			
+			if (!itemsChanged && 
+					(!searchTerm || searchTerm.length === 0)) {
+				$.each(this.items, function (index, item) {
+					if (item.selected) {
+						self.activate(null, item, false);
+						if (item.element) {
+							item.element.addClass(selectedActive);
+						}
+						self.selectedItem = item;
+					} else {
+						if (item.element && 
+								item.element.hasClass(selectedActive)) {
+							item.element.removeClass(selectedActive);
+						}
+					}
+				});
+				return;
+			}
+			
 			matcher = new RegExp(term1, "i");
 			$.each(this.items, function (index, item) {
+				label = item.label;
+				// if text is set, text will override label value.
+				if (item.templateHtml) {
+					label = item.templateHtml;
+				} else if (item.text !== undefined) {
+					label = item.text;
+				}
+				/* remove the code the close the dropdown list
+				 * when close the dropdown list, all items need to 
+				 * restore original style, see resetItemsStyle*/
+				if ($("span.ui-priority-primary", item.element).length > 0) {
+					item.element.empty().append(label);
+				}
+				//filter still use the item.label;
 				var matchResult = matcher.exec(item.label);
-				if (matchResult === null) {
-					item.element.hide();
+				if (matchResult === null && autoFilter) {
+					if (item.element) {
+						item.element.hide();
+						item.element.attr("wijhidden","wijhidden");
+					}
 				}
 				else {
 					// update for: when using the key to active the item 
 					// the active item is incorrect at 2012/8/13
 					if (item.selected) {
 						self.activate(null, item, false);
+						if (item.element) {
+							item.element.addClass(selectedActive);
+						}
+						self.selectedItem = item;
+					} else {
+						if (item.element && item.element.hasClass(selectedActive)) {
+							item.element.removeClass(selectedActive);
+						}
 					}
-					if (!item.element.is("visible")) {
+					
+					if (needHighlightMatching) {
+						liText = label.replace(
+								new RegExp("(?![^&;]+;)(?!<[^<>]*)(" +
+										term1 +
+								")(?![^<>]*>)(?![^&;]+;)", "gi"),
+								"<span class='ui-priority-primary'>$1</span>");
+						if (item.element) {
+							item.element.html(liText);
+						}
+					}
+
+					if (item.element && !item.element.is(":visible")) {
 						item.element.show();
+						item.element.removeAttr("wijhidden");
 					}
 
 					//update for 25224 issue at 2012/8/13
 					if (term1 !== undefined && term1.length !== 0 &&
-							topHit === null && matchResult.index === 0) {
+							topHit === null && matchResult &&
+							matchResult.index === 0) {
 						//self.activate(null, item, true);
 						topHit = item;
 					}
@@ -674,7 +767,7 @@
 			});
 			return topHit;
 		},
-		
+
 		popItem: function () {
 			///	<summary>
 			///	Remove the last item in the wijlist. 
@@ -724,12 +817,10 @@
 			.removeAttr("aria-activedescendant").unbind("." + self.widgetName);
 			self.ul.remove();
 
-			//Add for support disabled option at 2011/7/8
 			if (self.disabledDiv) {
 				self.disabledDiv.remove();
 				self.disabledDiv = null;
 			}
-			//end for disabled option
 
 			if (self._isInnerData) {
 				self._oriChildren.show();
@@ -775,7 +866,9 @@
 			if (scrollTo && self.superPanel !== undefined) {
 				self.superPanel.scrollChildIntoView(activeElement);
 			}
-			self._trigger("focus", event, item);
+			if (self.element.is(":visible")) {
+				self._trigger("focus", event, item);
+			}
 		},
 
 		deactivate: function () {
@@ -791,7 +884,6 @@
 			}
 			ele = a.element;
 			self._trigger("blur", null, a);
-			//for fix bug 15423
 			if (ele) {
 				ele.removeClass(stateHover).removeAttr("id");
 			}
@@ -865,16 +957,18 @@
 
 			var self = this, item, next;
 			if (!self.active) {
-				item = self.ul.children(edge).data(itemKey);
+				item = self.ul.children(":visible" + edge).data(itemKey);
 				self.activate(event, item, true);
 				return;
 			}
+			next = self.active.element[direction + "All"](":visible." + listItemCSS).eq(0);
+			/*
 			if (!self._templates) {
 				next = self.active.element[direction + "All"]("." + listItemCSS).eq(0);
 			} else {
 				//add for only visible item will be moved
 				next = self.active.element[direction + "All"](":visible." + listItemCSS).eq(0);
-			}
+			}*/
 			
 			if (next.length) {
 				self.activate(event, next.data(itemKey), true);
@@ -899,11 +993,10 @@
 			} 
 			
 			ele = self.active.element;
-			if (ele === undefined) {
+			if (ele === undefined || ele.attr("wijhidden")) {
 				return;
 			}
 			item = ele.data(itemKey);
-			//update for 24106 issue at 2012/7/20
 			if (!item) {
 				return;
 			}
@@ -938,11 +1031,17 @@
 				else {
 					ele.removeClass(selectedActive).removeAttr("aria-selected", "true");
 				}
-				self.selectedItems = $.grep(self.items, function (a) {
-					return a.selected;
+				selectedIndex = [];
+				self.selectedItems = $.grep(self.items, function (a, index) {
+					if (a.selected) {
+						selectedIndex.push(index);
+					}
+				    return a.selected;
 				});
-
+				
+				
 				self._trigger("selected", event, {
+					selectedIndex: selectedIndex,
 					item: item,
 					selectedItems: self.selectedItems
 				});
@@ -977,51 +1076,60 @@
 			return found;
 		},
 
-		getItems: function (indices) {
+		getItems: function (indices, byIndex) {
 			/// <summary>
 			/// Allows the user to find list items by indices or values.
 			/// Code Example:$("#element").wijlist("getItems",5);
 			/// </summary>
-			/// <param name="indices" type="Array/Number">
+			/// <param name="indices" type="Array/Number/String">
 			/// This parameter could be a string, number, array of string,
 			/// array of number.
-			/// If parameter is a number or an array of number,
-			/// it's used as the index/indices of the item(s) to get.
-			/// If parameter is a string or an array of string,
-			/// it's used as the value/values of the item(s) to get.
+			/// </param>
+			/// <param name="byIndex" type="Boolean">
+			/// Indicates the indices parameter is indices or values of items.
+			/// If true, it's used as the index/indices of the item(s) to get.
+			/// If false, it's used as the value/values of the item(s) to get.
 			/// </param>
 
 			var self = this, isNumber, byArray, searchTerms, foundItems;
 
 			byArray = $.isArray(indices);
-			isNumber = (!byArray) && !isNaN(indices) || (byArray && !isNaN(indices[0]));
+			isNumber = (!byArray) && typeof(indices) === "number" || 
+				(byArray && typeof(indices[0]) === "number");
 			searchTerms = byArray ? indices : [indices];
-			foundItems = isNumber ?
-			self._findItemsByIndices(searchTerms) : self._findItemsByValues(searchTerms);
+			if (!byIndex) {
+				foundItems = self._findItemsByValues(searchTerms);
+			} else {
+				if (!isNumber) {
+					return null;
+				}
+				foundItems = self._findItemsByIndices(searchTerms);
+			}
 			return foundItems;
 		},
 
-		selectItems: function (indices, triggerSelected) {
+		selectItems: function (indices, triggerSelected, byIndex) {
 			/// <summary>
 			/// Selects item(s) in the list by item index/indices or value(s).
-			/// Code Example:$("#element").wijlist("selectItems",5, false);
+			/// Code Example:$("#element").wijlist("selectItems",5, false, true);
 			/// </summary>
-			/// <param name="indices" type="Array/Number">
+			/// <param name="indices" type="Array/Number/String">
 			/// This parameter could be a string, number, array of string,
 			/// array of number.
-			/// If parameter is a number or an array of number,
-			/// it's used as the index/indices of the item(s) to get.
-			/// If parameter is a string or an array of string,
-			/// it's used as the value/values of the item(s) to get.
 			/// </param>
 			/// <param name="triggerSelected" type="Boolean">
 			/// Whether to trigger selected event of list.
+			/// </param>
+			/// <param name="byIndex" type="Boolean">
+			/// Indicates the indices parameter is indices or values of items.
+			/// If true, it's used as the index/indices of the item(s) to get.
+			/// If false, it's used as the value/values of the item(s) to get.
 			/// </param>
 
 			var self = this, singleMode = this.options.selectionMode === "single",
 			item, previous, foundItems;
 
-			foundItems = self.getItems(indices);
+			foundItems = self.getItems(indices, byIndex);
 			if (singleMode) {
 				if (foundItems.length > 0) {
 					item = foundItems[0];
@@ -1077,7 +1185,10 @@
 				}
 			}
 			else {
-				foundItems = self.getItems(indices);
+				foundItems = self.getItems(indices, true);
+				if (!foundItems || foundItems.length === 0) {
+					return;
+				}
 				$.each(foundItems, function (index, i) {
 					i.selected = false;
 					i.element.removeClass(selectedActive);
@@ -1094,7 +1205,7 @@
 			/// Code Example:$("#element").wijlist("renderList");
 			/// </summary>
 			var self = this, ul = this.ul, o = this.options, items,
-			count, singleMode, i, item;
+			count, singleMode, i, item, licollection;
 			ul.empty();
 			// returns if no items to render.
 			items = self.items;
@@ -1106,10 +1217,15 @@
 				return;
 			}
 			singleMode = o.selectionMode === "single";
+			//for performance change
+			licollection = [];
 			for (i = 0; i < count; i++) {
 				item = items[i];
-				self._renderItem(ul, item, i, singleMode);
+				//self._renderItem(ul, item, i, singleMode);
+				licollection.push(self._renderItem(ul, item, i, singleMode));
 			}
+			//for performance change
+			$(licollection).appendTo(ul);
 			if (count > 0) {
 				if (items[0].element) {
 					items[0].element.addClass(listItemCSSFirst);
@@ -1125,14 +1241,17 @@
 
 		_renderItem: function (ul, item, index, singleMode) {
 			var self = this,
-			li = $("<li role='option' class='wijmo-wijlist-item " +
-			"ui-corner-all'></li>"), label, url;
+			li = $("<li role='option' class='wijmo-wijlist-item ui-corner-all'></li>"), 
+			label, url;
 			item.element = li;
 			item.list = self;
 			if (self._trigger("itemRendering", null, item) === false) {
 				return;
 			}
 			label = item.label;
+			if (item.title) {
+				li.attr("title", item.title);
+			}
 			// if text is set, text will override label value.
 			if (item.templateHtml) {
 				label = item.templateHtml;
@@ -1146,7 +1265,7 @@
 				if (!self.options.keepHightlightOnMouseLeave) {
 					self.deactivate();
 				}
-			}).data(itemKey, item).append(label).appendTo(ul);
+			}).data(itemKey, item).append(label);//.appendTo(ul);
 			// render image
 			if (!self._isInnerData) {
 				// render image
@@ -1164,6 +1283,7 @@
 				li.addClass(listItemCSSAlternate);
 			}
 			self._trigger("itemRendered", null, item);
+			return li;
 		},
 		
 		_escapeRegex: function (value) {
@@ -1194,22 +1314,25 @@
 			var self = this, ele = this.element, o = this.options, ul = this.ul,
 			singleItem = ul.children(".wijmo-wijlist-item:first"),
 			headerHeight,
+			ulOuterHeight,
+			eleInnerWidth,
 			adjustHeight = null, h, percent, small, vScroller, large, spOptions, pt;
 			if (!ele.is(":visible")) {
 				return false;
 			}
-			
+			ulOuterHeight = ul.outerHeight();
+			eleInnerWidth = ele.innerWidth();
 			if (o.autoSize) {
 				adjustHeight = singleItem.outerHeight(true) * o.maxItemsCount;
 			}
 
 			if (adjustHeight !== null) {
-				ele.height(Math.min(adjustHeight, ul.outerHeight()));
+				ele.height(Math.min(adjustHeight, ulOuterHeight));
 			}
 			h = ele.innerHeight();
-			percent = h / (ul.outerHeight() - h);
+			percent = h / (ulOuterHeight - h);
 			large = (101 * percent) / (1 + percent);
-			small = (singleItem.outerHeight() / (ul.outerHeight() - h)) * (101 - large);
+			small = (singleItem.outerHeight() / (ulOuterHeight - h)) * (101 - large);
 			if (self.superPanel === undefined) {
 				spOptions = {
 					allowResize: false,
@@ -1228,7 +1351,7 @@
 				self.superPanel = ele.wijsuperpanel(spOptions).data("wijsuperpanel");
 				//update for fixing can't show all dropdown items by wuhao 
 				if (self.superPanel.vNeedScrollBar) {
-					ul.setOutWidth(ele.innerWidth() - 18);
+					ul.setOutWidth(eleInnerWidth - 18);
 					self.superPanel.refresh();
 				}
 				//end for issue
@@ -1240,7 +1363,7 @@
 				//update for fixing can't show all dropdown items by wuhao
 				self.superPanel.paintPanel();
 				if (self.superPanel.vNeedScrollBar) {
-					ul.setOutWidth(ele.innerWidth() - 18);
+					ul.setOutWidth(eleInnerWidth - 18);
 					self.superPanel.refresh();
 				} else {
 					ul.setOutWidth(ele.outerWidth());
@@ -1248,7 +1371,10 @@
 					.children(".wijmo-wijsuperpanel-header").outerHeight();
 					//update for case 24248 at 2012/7/27
 					//Note: not good method for doing this
-					ele.height(ul.outerHeight() + headerHeight);
+					if (headerHeight !== null &&
+							headerHeight !== undefined) {
+						ele.height(ulOuterHeight + headerHeight);
+					}
 					//end 
 					self.superPanel.refresh();
 				}

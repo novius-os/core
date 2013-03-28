@@ -1,7 +1,7 @@
 /*globals jQuery, window*/
 /*
  * 
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  * 
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -658,7 +658,10 @@
 								animations[animated](o, allStars, function () {
 									self._trigger("rated", e, args);
 								});
-							} else if ($.effects && $.effects[animated]) {
+							} else if ($.effects && ($.effects[animated] 
+									|| ($.effects.effect && $.effects.effect[animated]))) {
+								//individual effects in jqueryui 1.9 are now defined on $.effects.effect 
+								//rather than directly on $.effects.
 								self._playJqueryAnimation(animation, allStars, 
 									function () {
 										//remove filter style to fix jquery animation 

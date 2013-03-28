@@ -17,6 +17,65 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_table_name = 'nos_page';
     protected static $_primary_key = array('page_id');
 
+    protected static $_properties = array(
+        'page_id',
+        'page_parent_id',
+        'page_template',
+        'page_level' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_title',
+        'page_context',
+        'page_context_common_id',
+        'page_context_is_main' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_menu_title',
+        'page_meta_title',
+        'page_sort',
+        'page_menu' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_type' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_published' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_publication_start',
+        'page_publication_end',
+        'page_meta_noindex' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_lock' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_entrance' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_home' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'page_cache_duration',
+        'page_virtual_name',
+        'page_virtual_url',
+        'page_external_link',
+        'page_external_link_type',
+        'page_created_at',
+        'page_updated_at',
+        'page_meta_description',
+        'page_meta_keywords',
+    );
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'page_id',
@@ -76,7 +135,9 @@ class Model_Page extends \Nos\Orm\Model
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(
-            'publication_bool_property' => 'page_published',
+            'publication_state_property' => 'page_published',
+            'publication_start_property' => 'page_publication_start',
+            'publication_end_property' => 'page_publication_end',
         ),
     );
 
@@ -177,7 +238,10 @@ class Model_Page extends \Nos\Orm\Model
                     $page_enhanced[$name][$this->page_id] = array(
                         'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
                         'context' => $this->page_context,
-                        'published' => $this->published(),
+                        'published' => $this->planificationStatus() == 2 ? array(
+                            'start' => $this->publicationStart(),
+                            'end' => $this->publicationEnd(),
+                        ) : $this->published(),
                     );
 
                     \Nos\Config_Data::save('page_enhanced', $page_enhanced);

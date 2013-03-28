@@ -87,7 +87,8 @@ class Model extends \Orm\Model
 
             if (empty($_title_property)) {
                 foreach ($properties as $column => $props) {
-                    if ($props['data_type'] === 'varchar') {
+                    // if data_type is not set then it is considered as varchar
+                    if (isset($props['data_type']) && $props['data_type'] === 'varchar') {
                         $_title_property = $column;
                         break;
                     }
@@ -319,21 +320,7 @@ class Model extends \Orm\Model
                 $application = array_search($namespace, $namespaces);
             }
 
-            $config = \Config::load($application.'::'.$file_name, true);
-            $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-            if (!empty($dependencies[$application])) {
-                foreach ($dependencies[$application] as $dependency) {
-                    \Config::load($dependency.'::'.$file_name, true);
-                    $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
-                }
-            }
-            static::$_configs[$class] = \Arr::recursive_filter(
-                $config,
-                function ($var) {
-                    return $var !== null;
-                }
-            );
+            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
         }
 
         return static::$_configs[$class];
@@ -552,13 +539,34 @@ class Model extends \Orm\Model
         return null;
     }
 
-    public function set($name, $value = null)
+    public function set($property, $value = null)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
-            $name = static::prefix().$name;
+        if (!is_array($property) && isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+            $property = static::prefix().$property;
         }
 
-        return parent::set($name, $value);
+        $class = get_called_class();
+        $properties_reload = !is_array($property) &&
+            property_exists($class, '_properties') &&
+            !isset($this->_custom_data[$property]);
+
+        parent::set($property, $value);
+
+        if ($properties_reload && isset($this->_custom_data[$property])) {
+            try {
+                static::$_properties_cached[$class] = \DB::list_columns(static::table(), null, static::connection());
+                unset($this->_custom_data[$property]);
+                parent::set($property, $value);
+                if (array_key_exists($property, static::properties())) {
+                    logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
+                        'You have to set the additional model property "'.$property.'" in model config.');
+                }
+            } catch (\Exception $e) {
+                // Do nothing : set() may be really called for set a custom_data
+            }
+        }
+
+        return $this;
     }
 
     public function __set($name, $value)
@@ -662,14 +670,14 @@ class Model extends \Orm\Model
         return $obj;
     }
 
-    public function & get($name)
+    public function & get($property)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
-            $name = static::prefix().$name;
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+            $property = static::prefix().$property;
         }
 
         try {
-            return parent::get($name);
+            return parent::get($property);
         } catch (\OutOfBoundsException $e) {
             $class = get_called_class();
             \Cache::delete('model_properties.'.str_replace('\\', '_', $class));
@@ -677,7 +685,7 @@ class Model extends \Orm\Model
             static::properties();
         }
 
-        return parent::get($name);
+        return parent::get($property);
     }
 
     public function & __get($name)
@@ -828,6 +836,16 @@ class Model extends \Orm\Model
     {
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
+    }
+
+    public function __sleep()
+    {
+        return array('_data', '_is_new');
+    }
+
+    public function __wakeup()
+    {
+        $this->initProviders();
     }
 }
 

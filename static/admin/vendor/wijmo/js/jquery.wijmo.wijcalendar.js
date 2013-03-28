@@ -2,7 +2,7 @@
 	document, wijMonthView, wijMyGrid, htmlTextWriter, jQuery*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -74,7 +74,8 @@
 	$.widget("wijmo.wijcalendar", {
 		options: {
 			///	<summary>
-			///	Gets or sets culture ID.
+			///	Assigns the string value of the culture ID that appears on the calendar 
+			/// for the weekday and title names.
 			/// Default: ''
 			/// Type: String
 			/// Code example:
@@ -122,7 +123,8 @@
 			///	</summary>
 			displayDate: undefined,
 			///	<summary>
-			///	Gets or sets the number of day rows. 
+			///	Gets or sets the number of day rows that appear in the calendar. 
+			/// This is useful if you want to view more or less calendar days on the calendar month.
 			/// Default: 6
 			/// Type: Number
 			/// Code example:
@@ -130,7 +132,8 @@
 			///	</summary>
 			dayRows: 6,
 			///	<summary>
-			///	Gets or sets the number of day columns. 
+			///	Gets or sets the number of day columns that appear in the calendar. 
+			/// This is useful if you want to view more or less calendar days on the calendar month.
 			/// Default: 7
 			/// Type: Number
 			/// Code example:
@@ -155,7 +158,10 @@
 			///	</summary>
 			showWeekDays: true,
 			///	<summary>
-			///	Determines whether to display week numbers. 
+			///	Determines whether to display week numbers. When enabled, 
+			/// the week numbers appear vertically on the left side of the calendar. 
+			/// The week numbers represent a week number for each week in the calendar month. 
+			/// In the calendar year there are a total of 52 weeks so the weeknumbers will range from 1 to 52.
 			/// Default: false
 			/// Type: Boolean
 			/// Code example:
@@ -218,7 +224,9 @@
 			///	</summary>
 			selectionMode: { day: true, days: true },
 			///	<summary>
-			///	Determines whether the preview buttons are displayed.
+			///	When set to true, a popup calendar appears that displays the previous and 
+			/// next calendar months. This is useful when you want to view the current calendar month 
+			/// while navigating through the previous or next calendar months.
 			/// Default: false
 			/// Type: Boolean
 			/// Code example:
@@ -568,10 +576,17 @@
 				break;
 
 			case "monthCols":
+				if (this._myGrid) {
+					this._myGrid = undefined;
+				}
 				this._resetWidth();
 				this.refresh();
 				break;
-
+			case "monthRows":
+				if (this._myGrid) {
+					this._myGrid = undefined;
+				}
+				break;
 			case "autoHide":
 				this.element.wijpopup({ autoHide: this.options.autoHide });
 				break;
@@ -735,7 +750,9 @@
 			this._myGrid = undefined;
 			this.refresh();
 			this.element.data('dragging.wijcalendar', false);
-			this.element.wijpopup('show', position);
+			if (this.element.data("wijpopup")) {
+				this.element.wijpopup('show', position);
+			}
 		},
 
 		popupAt: function (x, y) {
@@ -747,7 +764,9 @@
 			this._myGrid = undefined;
 			this.refresh();
 			this.element.data('dragging.wijcalendar', false);
-			this.element.wijpopup('showAt', x, y);
+			if (this.element.data("wijpopup")) {
+				this.element.wijpopup('showAt', x, y);
+			}
 		},
 
 		close: function () {
@@ -1063,9 +1082,10 @@
 				if (monthTable.id !== monthID) {
 					throw Error.create('not a column');
 				}
+				/** update for issue 29995
 				if (!this._isSingleMonth()) {
 					i++;
-				}
+				}*/
 				if (this.options.showWeekDays) {
 					i++;
 				}
@@ -1666,6 +1686,7 @@
 			},
 			this.options.duration || 500,
 			function () {
+				nextTable.css("width", "");
 			}
 		);
 
@@ -1721,7 +1742,7 @@
 
 		_bindEvents: function () {
 			if (!this.element.data('preview.wijcalendar') &&
-					!this.options.disabledState) {
+					!this.options.disabledState && !this.options.disabled) {
 				this.element.find('div .wijmo-wijcalendar-navbutton')
 						.unbind().bind('mouseout.wijcalendar', function () {
 							var el = $(this);
@@ -1824,7 +1845,7 @@
 				allowSelDay = (!!o.selectionMode.day || !!o.selectionMode.days);
 
 			previewMode = previewMode || false;
-			if (!previewMode && !o.disabledState && allowSelDay &&
+			if (!previewMode && !o.disabledState && !o.disabled && allowSelDay &&
 					this._isSelectable(dayType)) {
 				cssCell += " wijmo-wijcalendar-day-selectable";
 			}
@@ -2516,7 +2537,10 @@
 				return;
 			}
 			var o = this.calendar.options,
-				offset = (Math.floor(Math.abs(date - this._startDate) /
+	            dUTC = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+	            startUTC = Date.UTC(this._startDate.getFullYear(),
+	             this._startDate.getMonth(), this._startDate.getDate()),
+				offset = (Math.floor(Math.abs(dUTC - startUTC) /
 					(24 * 60 * 60 * 1000))),
 				row = Math.floor(offset / this.calendar.options.dayCols),
 				col = Math.floor(offset % this.calendar.options.dayCols),
@@ -2640,7 +2664,8 @@
 					hw.writeAttribute('role', 'columnheader');
 					hw.writeTagRightChar();
 
-					if (!!o.selectionMode.month && !previewMode && !o.disabledState) {
+					if (!!o.selectionMode.month && !previewMode 
+							&& !o.disabledState && !o.disabled) {
 						hw.writeBeginTag('a');
 						hw.writeAttribute('class', 'ui-icon ui-icon-triangle-1-se');
 						hw.writeSelfClosingTagEnd();
@@ -3042,7 +3067,7 @@
 						cls = cls + ' ui-datepicker-other-month ' +
 							'ui-priority-secondary ui-datepicker-unselectable';
 					} else {
-						if (!o.disabledState) {
+						if (!o.disabledState && !o.disabled) {
 							cls += " wijmo-wijcalendar-day-selectable";
 						}
 					}

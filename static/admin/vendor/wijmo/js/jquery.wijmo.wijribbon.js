@@ -1,7 +1,7 @@
 /*globals window,document,jQuery*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -124,7 +124,9 @@
 				offsetParent = "body",
 				disabledModal = self.disabledModal;
 
-			element.wijtabs("option", "disabled", value);
+			if (element.data("wijtabs")) {
+				element.wijtabs("option", "disabled", value);
+			}
 			
 			if (element.closest(".wijmo-wijeditor").length !== 0) {
 				offsetTop = 0;
@@ -139,7 +141,7 @@
 						.css({
 							top: offsetTop,
 							left: offsetLeft,
-							"z-index": "10000",
+							"z-index": "990",
 							//for ie can't disabled, so add background-color attribute
 							"background-color": "lightgray",
 							"position": "absolute"
@@ -578,6 +580,10 @@
 					$tabPage.addClass(css_tabs_hide);
 				}
 			});
+			if (self.options.disabled) {
+				self._setDisabled(true);
+			}
+			
 		},
 
 		_createRibbonGroups: function () {

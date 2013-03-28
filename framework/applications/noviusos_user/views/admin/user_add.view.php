@@ -16,7 +16,7 @@ $uniqid = uniqid('id_');
 <style type="text/css">
 /* ? */
 /* @todo check this */
-.ui-accordion-content-active {
+.wijmo-wijaccordion-content-active {
     overflow: visible !important;
 }
 </style>

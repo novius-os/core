@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window, Globalize*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -353,11 +353,14 @@
 			///	</param>
 			click: null
 		},
+		
+		widgetEventPrefix: "wijlinechart",
 
 		// widget creation:    
 		_create: function () {
 			var self = this,
 				o = self.options;
+			this._hotFixForJQ1_9();
 			$.wijmo.wijchartcore.prototype._create.apply(self, arguments);
 			self.chartElement.addClass("wijmo-wijlinechart");
 			if (o.type === "area") {
@@ -481,6 +484,14 @@
 						seriesEle.path.tracker.show();
 					}
 				}
+				// mark the mark is not visible
+				if ($(seriesEle.path.node).data("wijchartDataObj") &&
+					$(seriesEle.path.node).data("wijchartDataObj").virtualMarkers) {
+					$.each($(seriesEle.path.node).data("wijchartDataObj").virtualMarkers,
+						function (i, markerObj) {
+							markerObj.visible = true;
+						});
+				}
 			}
 		},
 
@@ -508,7 +519,43 @@
 				if (seriesEle.path.tracker) {
 					seriesEle.path.tracker.hide();
 				}
+
+				if ($(seriesEle.path.node).data("wijchartDataObj") &&
+					$(seriesEle.path.node).data("wijchartDataObj").virtualMarkers) {
+					$.each($(seriesEle.path.node).data("wijchartDataObj").virtualMarkers,
+						function (i, markerObj) {
+							markerObj.visible = false;
+						});
+				}
 			}
+		},
+
+		_supportStacked: function () {
+			return true;
+		},
+
+		// when showing the indicator line, hover the line marker.
+		_indicatorLineShowing: function (objs) {
+			$.wijmo.wijchartcore.prototype._indicatorLineShowing.apply(this, arguments);
+			$.each(objs, function (i, obj) {
+				if (obj.marker) {
+					obj.marker.attr(obj.markerHoverStyle);
+				}
+			})
+		},
+
+		_removeIndicatorStyles: function (objs) {
+			$.each(objs, function (i, obj) {
+				if (obj.marker) {
+					obj.marker.attr(obj.markerStyle);
+					obj.marker.transform("s1");
+				}
+			});
+		},
+
+		_mouseDownInsidePlotArea: function (e, mousePos) {
+			$.wijmo.wijchartcore.prototype._mouseDownInsidePlotArea.apply(this, arguments);
+			this._clearHoverState(true);
 		},
 
 		_paintLegend: function () {
@@ -541,12 +588,33 @@
 			if (o.legend.visible) {
 				//set fill attr to legendIcons
 				if (self.legends.length && self.legendIcons.length) {
+					/*
 					for (i = 0, ii = self.legendIcons.length; i < ii; i++) {
-						legendIcon = self.legendIcons[i];
-						legendIcon.attr({
-							fill: legendIcon.attr("stroke")
-						});						
+					legendIcon = self.legendIcons[i];
+					legendIcon.attr({
+					fill: legendIcon.attr("stroke")
+					});						
 					}
+					*/
+					$.each(self.legendIcons, function (i, icon) {
+						var b = icon.getBBox(),
+							canvas = self.canvas,
+							newIcon;
+						newIcon = canvas.path(Raphael.format("M{0},{1}L{2},{3}",
+							b.x, b.y + b.height / 2, b.x + b.width,
+							b.y + b.height / 2)).attr($.extend(true, {}, icon.attr(), {
+								stroke: icon.attr("stroke"),
+								"stroke-width": o.legend.size.height
+							}));
+
+						$(newIcon.node).data("legendIndex", $(icon.node).data("legendIndex"))
+							.data("index", $(icon.node).data("index"));
+						$.wijraphael.addClass($(newIcon.node),
+							"wijchart-legend-icon wijchart-legend");
+						icon.remove();
+						icon = null;
+						self.legendIcons[i] = newIcon;
+					});
 				}
 				//add marker to legendIcons
 				if (!o.legend.reversed) {
@@ -557,6 +625,13 @@
 								chartSeries.display !== "exclude") {
 							if (chartSeries.markers && chartSeries.markers.visible) {
 								legendIcon = self.legendIcons[idx];
+								if (chartSeriesStyle["stroke-dasharray"]) {
+									legendIcon.attr({
+										//if stroke-width is bigger than 1, it doesn't look good.
+										"stroke-width": 1,
+										"stroke-dasharray": chartSeriesStyle["stroke-dasharray"]
+									});
+								}
 								box = legendIcon.wijGetBBox();
 								x = box.x + box.width / 2;
 								y = box.y + box.height / 2;
@@ -571,7 +646,7 @@
 									type = "circle";
 								}
 								dot = self.canvas.paintMarker(type, x, y, 3);
-								$.wijraphael.addClass($(dot.node), 
+								$.wijraphael.addClass($(dot.node),
 									"chart-legend-dot wijchart-legend");
 								dot.attr(markerStyle);
 								$(dot.node).data("index", i)
@@ -589,6 +664,13 @@
 								chartSeries.display !== "exclude") {
 							if (chartSeries.markers && chartSeries.markers.visible) {
 								legendIcon = self.legendIcons[idx];
+								if (chartSeriesStyle["stroke-dasharray"]) {
+									legendIcon.attr({
+										//if stroke-width is bigger than 1, it doesn't look good.
+										"stroke-width": 1,
+										"stroke-dasharray": chartSeriesStyle["stroke-dasharray"]
+									});
+								}
 								box = legendIcon.wijGetBBox();
 								x = box.x + box.width / 2;
 								y = box.y + box.height / 2;
@@ -604,7 +686,7 @@
 								}
 								dot = self.canvas.paintMarker(type, x, y, 3);
 								$.wijraphael.addClass($(dot.node),
-									"chart-legend-dot wijchart-canvas-object" + 
+									"chart-legend-dot wijchart-canvas-object" +
 									" wijchart-legend");
 								dot.attr(markerStyle);
 								$(dot.node).data("index", i)
@@ -633,8 +715,16 @@
 				return;
 			}
 
+			//			if (self.options.indicator && self.options.indicator.visible) {
+			//				return;
+			//			}
+
+			if (self.indicatorLine) {
+				return;
+			}
+
 			$.wijmo.wijchartcore.prototype._mouseOver.apply(this, arguments);
-			
+
 			if (lineSeries.type === "marker") {
 				lineSeries = lineSeries.lineSeries;
 			}
@@ -646,6 +736,13 @@
 				self.isNewLine = true;
 				if (self.hoverLine) {
 					if (!self.hoverLine.path.removed) {
+						// fixed the issue jQuery 1.9.
+						// the options will set on the prototype, so the seriesStyles will effect
+						// by other chart. if the chart type is not area, remove the style's fill.
+
+						if (self.options.type === "line" && self.hoverLine.lineStyle.fill) {
+							delete self.hoverLine.lineStyle.fill;
+						}
 						self.hoverLine.path.wijAttr(self.hoverLine.lineStyle);
 						if (self.hoverPoint && !self.hoverPoint.isSymbol) {
 							self.hoverPoint.marker.wijAttr(self.hoverPoint.markerStyle);
@@ -691,12 +788,13 @@
 				content = hint.content,
 				isTitleFunc = $.isFunction(title),
 				isContentFunc = $.isFunction(content),
-				distance = 0;
+				distance = 0,
+				indicator = self.options.indicator;
 
 			if (tooltip) {
 				op = tooltip.getOptions();
 			}
-			if (self.hoverLine) {
+			if (self.hoverLine && !self.indicatorLine) {
 				if (self.isNewLine) {
 					if (hint.enable && tooltip) {
 						tooltip.hide();
@@ -835,17 +933,26 @@
 				._mouseMoveOutsidePlotArea.apply(self, arguments);
 		},
 
-		_clearHoverState: function () {
+		_clearHoverState: function (keepTooltip) {
 			var self = this,
 			tooltip = self.tooltip,
 			hint = self.options.hint;
 
-			if (hint.enable && tooltip) {
+			if (hint.enable && tooltip && !keepTooltip) {
 				tooltip.hide();
 			}
 
 			if (self.hoverLine) {
 				if (!self.hoverLine.path.removed) {
+
+					// fixed the issue jQuery 1.9.
+					// the options will set on the prototype, so the seriesStyles will effect
+					// by other chart. if the chart type is not area, remove the style's fill.
+
+					if (self.options.type === "line" && self.hoverLine.lineStyle.fill) {
+						delete self.hoverLine.lineStyle.fill;
+					}
+
 					self.hoverLine.path.wijAttr(self.hoverLine.lineStyle);
 					if (self.hoverPoint && !self.hoverPoint.isSymbol) {
 						self.hoverPoint.marker.wijAttr(self.hoverPoint.markerStyle);
@@ -899,7 +1006,8 @@
 				mouseOver: $.proxy(self._mouseOver, self),
 				mouseOut: $.proxy(self._mouseOut, self),
 				mouseMove: $.proxy(self._mouseMove, self),
-				click: $.proxy(self._click, self)
+				click: $.proxy(self._click, self),
+				widget: this
 			};
 
 			self.chartElement.wijline(opt);
@@ -942,8 +1050,10 @@
 			chartEles,
 			fields = element.data("fields") || {},
 			seriesEles = [],
-			culture = options.culture;
+			culture = options.culture, 
+			widget = options.widget;
 			
+		self.widget = widget;
 		self.render(options, aniPathsAttr, fieldsAniPathAttr, paths, 
 			shadowPaths, markersSet, animationSet, symbols, linesStyle, seriesEles, culture);
 			
@@ -995,7 +1105,7 @@
 				if (typeof path === "undefined" || path === null) {
 					return true;
 				}
-				if (fieldsAniPathAttr && fieldsAniPathAttr.length && 
+				if (fieldsAniPathAttr && fieldsAniPathAttr.length > idx && 
 						seTrans.enabled) {
 					duration = seTrans.duration;
 					easing = seTrans.easing;
@@ -1022,8 +1132,10 @@
 			path.tracker.hide();
 		}
 		aniPathAttr = fieldsAniPathAttr[idx];
-		diffAttr = $.wijchart.getDiffAttrs(aniPathAttr.path, 
-			path.attr());
+		if (aniPathAttr && aniPathAttr.path) {
+			diffAttr = $.wijchart.getDiffAttrs(aniPathAttr.path, 
+					path.attr());
+		}
 		if (!$.isEmptyObject(diffAttr)) {
 			path.attr(aniPathAttr.path);
 			path.wijAnimate(diffAttr, duration, easing, function () {
@@ -1262,8 +1374,9 @@
 				paintSymbol = true;
 			}
 			defaultChartLabels = canvas.set();
-			
-			if (!fieldsAniPathAttr || fieldsAniPathAttr.length === 0 || 
+
+			//if (!fieldsAniPathAttr || fieldsAniPathAttr.length === 0 || 
+			if (!fieldsAniPathAttr || fieldsAniPathAttr.length <= k || 
 					(ani.enabled && !seTrans.enabled)) {
 				needAnimated = true;
 			}
@@ -1325,6 +1438,12 @@
 		$.each(paths, function (idx, path) {
 			if (path.tracker) {
 				path.tracker.toFront();
+			}
+		});
+		//markers should always be in front of trackers.
+		$.each(paths, function (idx, path) {
+			if (path.markers) {
+				path.markers.toFront();
 			}
 		});
 	};
@@ -1390,6 +1509,9 @@
 			}
 			
 			opacity = 0.5;
+			if (lineStyle["fill-opacity"] && lineStyle["fill-opacity"] !== "none") {
+				opacity = lineStyle["fill-opacity"];
+			}
 			/*
 			if (lineStyle.opacity) {
 				opacity = lineStyle.opacity;
@@ -1409,7 +1531,7 @@
 				if (pathIdx > 0) {
 					prevPathArr = Raphael.parsePathString(
 						paths[pathIdx - 1].attr("path"));
-					if (prevPathArr.length > 0) {
+					if (prevPathArr && prevPathArr.length > 0) {
 						for (idx = prevPathArr.length - 1; idx >= 0; idx--) {
 							prevPath = prevPathArr[idx];
 							if (prevPath.length === 3) {
@@ -1430,7 +1552,7 @@
 				}
 			} else {
 				currentPathArr = Raphael.parsePathString(path.attr("path"));
-				if (currentPathArr.length > 0) {
+				if (currentPathArr && currentPathArr.length > 0) {
 					pathArr = [];
 					$.each(currentPathArr, function (i, currentPath) {
 						$.each(currentPath, function (j, val) {
@@ -1582,7 +1704,9 @@
 			initAniY,
 			markerData,
 			defaultChartLabel,
-			markerVisible = lineSeries.markers.visible;
+			markerVisible = lineSeries.markers.visible,
+			widget = self.widget,
+			pointX;
 		if (isNaN(valX) || typeof valX === "string") {
 			val = pointIdx;
 		} else {
@@ -1649,6 +1773,7 @@
 		markerData.y = Y;
 		markerData.markerStyle = lineMarkerStyle;
 		markerData.markerHoverStyle = lineMarkerHoverStyle;
+		markerData.visible = true;
 
 		if (markerVisible) {
 			markerData.marker = dot;
@@ -1659,7 +1784,19 @@
 			aniMarkersAttr.push($.extend(true, {}, dot.attr()));
 			animationSet.push(dot);
 		}
-		
+		// cache the bar position to show indicator line.
+		widget.dataPoints = widget.dataPoints || {};
+		widget.pointXs = widget.pointXs || [];
+
+		pointX = $.round(X, 2);
+
+		if (!widget.dataPoints[pointX.toString()]) {
+			widget.dataPoints[pointX.toString()] = [];
+			widget.pointXs.push(pointX);
+		}
+
+		widget.dataPoints[pointX.toString()].push(markerData);
+
 		virtualMarkers.push(markerData);
 		
 		return pathArr;

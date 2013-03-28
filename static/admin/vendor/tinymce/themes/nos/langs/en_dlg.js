@@ -27,6 +27,5 @@ tinyMCE.addI18n('en.nos_dlg',{
     "anchor_invalid":"Please specify a valid anchor name.",
 	"accessibility_help":"Accessibility Help",
 	"accessibility_usage_title":"General Usage",
-    "invalid_color_value":"Invalid color value",
-	"":""
+    "invalid_color_value":"Invalid color value"
 });

@@ -1,7 +1,7 @@
 /*globals jQuery window */
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -931,7 +931,14 @@
 		_applyCaptionStyle: function (overlay, text) {
 			var caption = overlay.add(text), height;
 			caption.width(this.itemWidth);
-			height = text.children("span").height();
+
+			if ($.browser.webkit) {
+				height = text.children("span").css("display", "inline-block").height();
+				text.children("span").css("display", "");
+			}
+			else {
+				height = text.children("span").height();
+			}
 			caption.height(height);
 		},
 
@@ -1247,7 +1254,7 @@
 					case "display":
 					case "preview":
 						if (value !== old) {
-							self._destroy();
+							self._wijdestroy();
 							self._create();
 						}
 						break;
@@ -1339,7 +1346,7 @@
 			}
 		},
 
-		_destroy: function () {
+		_wijdestroy: function () {
 			var self = this;
 			self.container
 			.removeClass("wijmo-wijcarousel ui-widget")
@@ -1347,6 +1354,7 @@
 			.removeClass("wijmo-wijcarousel-vertical");
 
 			if (self.timeout) {
+				self.list.stop(true);
 				window.clearTimeout(self.timeout);
 				self.timeout = null;
 			}
@@ -1369,7 +1377,7 @@
 			self.element.find(ctrlSelector +
 			",.wijmo-wijcarousel-timerbar").remove();
 			if (self.pager) {
-				self.pager.wijpager("destroy").remove();
+				self.pager.remove();
 			}
 			self.element.find("li>span").css("display", "");
 
@@ -1383,7 +1391,7 @@
 			/// <summary>
 			/// Destroys this widget.
 			/// </summary>
-			this._destroy();
+			this._wijdestroy();
 			$.Widget.prototype.destroy.apply(this);
 		},
 
@@ -1460,7 +1468,7 @@
 			/// Start displaying the images in order automatically.
 			/// </summary>
 			var self = this, o = self.options;
-			if (self.isPlaying) {
+			if (self.isPlaying || o.disabled) {
 				return;
 			}
 			if (o.interval === 0) {
@@ -1832,8 +1840,10 @@
 						item.data("itemIndex", item.data("itemIndex") + 1);
 					}
 				});
-			}
-			else {
+			} else {
+				if (index == 0) {
+					li.appendTo(self.list);
+				}
 				li.insertAfter(self._getItemByIndex(self.count - 1));
 			}
 			self._createItem(item, index !== undefined ? index : self.count);
@@ -1856,8 +1866,7 @@
 						li.data("itemIndex", li.data("itemIndex") - 1);
 					}
 				});
-			}
-			else {
+			} else {
 				item = self._getItemByIndex(self.count - 1);
 			}
 			if (item) {

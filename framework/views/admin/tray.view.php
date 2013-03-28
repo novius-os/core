@@ -1,5 +1,5 @@
 <div id="tray-username" class="menu">
-    <?= \Session::user()->user_firstname ?>
+    <?= \Session::user()->user_firstname ?> &nbsp;▾
 </div>
 <ul id="tray-username-menu" style="display: none;">
     <?= \View::forge('nos::admin/tray/inside') ?>
@@ -15,8 +15,10 @@
                             var $a = $(this),
                                 action = $a.data('action');
                             $a.click(function(e) {
-                                e.preventDefault();
-                                $a.nosAction(action);
+                                if (action) {
+                                    e.preventDefault();
+                                    $a.nosAction(action);
+                                }
                             });
                         })
                         .end()

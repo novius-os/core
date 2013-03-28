@@ -2,7 +2,7 @@
 /*jslint white: false */
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -23,6 +23,8 @@
 (function ($) {
 	"use strict";
 	$.widget("wijmo.wijpager", {
+		widgetEventPrefix: "wijpager",
+
 		options: {
 			/// <summary>
 			/// The class of the first-page button.
@@ -178,14 +180,9 @@
 		_init: function () {
 		},
 
-		destroy: function () {
-			/// <summary>
-			/// Destroys the wijpager widget and reset the DOM element.
-			/// Code example: $("#element").wijpager("destroy");
-			/// </summary>
+		_destroy: function () {
 			this.element.removeClass("ui-widget wijmo-wijpager ui-helper-clearfix");
 			this.$ul.remove();
-			$.Widget.prototype.destroy.apply(this, arguments);
 		},
 
 		_setOption: function (key, value) {
@@ -314,7 +311,7 @@
 			var btnContent,
 				 self = this,
 				 $li = $("<li />")
-					.addClass("ui-page ui-corner-all")
+					.addClass("wijmo-wijpager-button ui-corner-all")
 					.attr({ "role": "tab", "aria-label": title, "title": title });
 
 			if (active) {
