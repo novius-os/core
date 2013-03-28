@@ -54,6 +54,7 @@ define('jquery-nos-inspector-tree-model-radio',
                                 treeOptions.context = connector.data('nosContext') || '';
                             }
 
+                            container.find('input[name="' + params.input_name + '"]').remove();
                             table.nostreegrid({
                                 sortable : false,
                                 movable : false,
@@ -126,6 +127,15 @@ define('jquery-nos-inspector-tree-model-radio',
                             }
                         }
                     });
+
+                    // keep selected value when hidden
+                    if ($.isPlainObject(params.selected) && params.selected.id) {
+                        $('<input type="hidden" />').attr({
+                                name : params.input_name,
+                                value : params.selected.id
+                            })
+                            .appendTo(container);
+                    }
 
                     table.css({
                         height : '100%',

@@ -505,26 +505,23 @@ class Application
 
         $old_namespace = \Arr::get($old_metadata, 'namespace', '');
         $new_namespace = \Arr::get($new_metadata, 'namespace', '');
-
         if ($old_namespace != $new_namespace) {
             unset($config['app_namespaces'][$this->folder]);
-            if ($new_namespace != '') {
-                $config['app_namespaces'][$this->folder] = $new_namespace;
-            }
+        }
+        if ($new_namespace != '') {
+            $config['app_namespaces'][$this->folder] = $new_namespace;
         }
 
         $old_dependency = static::extendsToDependency(\Arr::get($old_metadata, 'extends', null));
         $new_dependency = static::extendsToDependency(\Arr::get($new_metadata, 'extends', null));
 
-        if ($old_dependency !== $new_dependency) {
-            // Remove old dependency
-            unset($config['app_dependencies'][$old_dependency['application']][$this->folder]);
-            // Set new dependency
-            if ($new_dependency === null) {
-                unset($config['app_dependencies'][$new_dependency['application']][$this->folder]);
-            } else {
-                $config['app_dependencies'][$new_dependency['application']][$this->folder] = $new_dependency;
-            }
+        // Remove old dependency
+        unset($config['app_dependencies'][$old_dependency['application']][$this->folder]);
+        // Set new dependency
+        if ($new_dependency === null) {
+            unset($config['app_dependencies'][$new_dependency['application']][$this->folder]);
+        } else {
+            $config['app_dependencies'][$new_dependency['application']][$this->folder] = $new_dependency;
         }
 
         return $config;

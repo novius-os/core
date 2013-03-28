@@ -193,6 +193,20 @@ if ($local->is_dirty()) {
                         labelDisplay: false
                     });
 
+                    var $a = $('<a href="#" data-icon="wrench"><?= htmlspecialchars(__('Refresh all metadata')); ?></a>')
+                        .on('click', function(e) {
+                            e.preventDefault();
+                            $container.nosAjax({
+                                url: 'admin/noviusos_appmanager/appmanager/refresh_metadata',
+                                complete: function() {
+                                    $container.load('admin/noviusos_appmanager/appmanager', function() {
+                                        $container.find(':first').unwrap();
+                                    });
+                                }
+                            })
+                        });
+                    $container.nosToolbar($a);
+
                     $(".app_list_available table, .app_list_installed table").wijgrid({
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
