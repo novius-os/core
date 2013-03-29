@@ -141,7 +141,7 @@ class FrontCache
                     if (!empty($handler['keys'])) {
                         $keys = (array) $handler['keys'];
                         foreach ($keys as $key) {
-                            if (!empty($_GET[$key])) {
+                           if (isset($_GET[$key])) {
                                 $suffixes[] = 'GET['.urlencode($key).']='.urlencode($_GET[$key]);
                             }
                         }
