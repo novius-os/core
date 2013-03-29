@@ -133,8 +133,6 @@ define('jquery-nos-inspector-tree-model-radio',
                         }
                     });
 
-                    log($hidden);
-
                     table.css({
                         height : '100%',
                         width : '100%'

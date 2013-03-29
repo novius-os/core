@@ -380,32 +380,30 @@ class Application
 
         $old_namespace = \Arr::get($old_metadata, 'namespace', '');
         $new_namespace = \Arr::get($new_metadata, 'namespace', '');
-
         if ($old_namespace != $new_namespace) {
             unset($config['app_namespaces'][$this->folder]);
-            if ($new_namespace != '') {
-                $config['app_namespaces'][$this->folder] = $new_namespace;
-            }
         }
+        if ($new_namespace != '') {
+            $config['app_namespaces'][$this->folder] = $new_namespace;
+        }
+
+
 
         $old_dependency = \Arr::get($old_metadata, 'extends', '');
         $new_dependency = \Arr::get($new_metadata, 'extends', '');
-
-        if ($old_dependency != $new_dependency) {
-            // Add new dependency
-            if ($new_dependency != '') {
-                if (empty($config['app_dependencies'][$new_dependency])) {
-                    $config['app_dependencies'][$new_dependency] = array();
-                }
-                $config['app_dependencies'][$new_dependency][] = $this->folder;
+        // Remove old dependency
+        if (!empty($config['app_dependencies'][$old_dependency])) {
+            foreach (array_keys($config['app_dependencies'][$old_dependency], $this->folder) as $key) {
+                unset($config['app_dependencies'][$old_dependency][$key]);
             }
+        }
 
-            // Remove old dependency
-            if (!empty($config['app_dependencies'][$old_dependency])) {
-                foreach (array_keys($config['app_dependencies'][$old_dependency], $this->folder) as $key) {
-                    unset($config['app_dependencies'][$old_dependency][$key]);
-                }
+        // Add new dependencies
+        if ($new_dependency != '') {
+            if (empty($config['app_dependencies'][$new_dependency])) {
+                $config['app_dependencies'][$new_dependency] = array();
             }
+            $config['app_dependencies'][$new_dependency][] = $this->folder;
         }
 
         return $config;
