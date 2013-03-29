@@ -215,6 +215,7 @@ class FrontCache
         } else {
             $expires = time() + $duration;
             $prepend .= '<?php
+
             '.__CLASS__.'::checkExpires('.$expires.');'."\n";
 
             if (!empty($controller)) {
@@ -323,15 +324,16 @@ class FrontCache
         if (is_file($this->_path)) {
             @unlink($this->_path);
         }
+        if (is_dir($this->_path_suffix)) {
+            try {
+                \File::delete_dir($this->_path_suffix, true, true);
+            } catch (\Exception $e) {
+            }
+        }
     }
 
     public function get_path()
     {
         return $this->_path;
-    }
-
-    public function __toString()
-    {
-        return $this->content;
     }
 }

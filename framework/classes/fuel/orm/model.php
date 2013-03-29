@@ -87,7 +87,8 @@ class Model extends \Orm\Model
 
             if (empty($_title_property)) {
                 foreach ($properties as $column => $props) {
-                    if ($props['data_type'] === 'varchar') {
+                    // if data_type is not set then it is considered as varchar
+                    if (isset($props['data_type']) && $props['data_type'] === 'varchar') {
                         $_title_property = $column;
                         break;
                     }
