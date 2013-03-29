@@ -128,20 +128,40 @@ class Model extends \Orm\Model
     /**
      * @see \Orm\Model::properties()
      */
-    public static function properties()
+    public static function properties($from_db = false)
     {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
 
-        if (!$init) {
+        if (!$init || $from_db) {
             try {
+                if ($from_db) {
+                    if ($init) {
+                        unset(static::$_properties_cached[$class]);
+                    }
+                    throw new \CacheNotFoundException();
+                }
+
                 static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
             } catch (\CacheNotFoundException $e) {
                 parent::properties();
 
                 $config = static::_config();
                 if (!empty($config) && !empty($config['properties'])) {
-                    static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+                    static::$_properties_cached[$class] = \Arr::merge(
+                        static::$_properties_cached[$class],
+                        $config['properties']
+                    );
+                }
+
+                if ($from_db && property_exists($class, '_properties')) {
+                    try {
+                        static::$_properties_cached[$class] = \Arr::merge(
+                            \DB::list_columns(static::table(), null, static::connection()),
+                            static::$_properties_cached[$class]
+                        );
+                    } catch (\Exception $e) {
+                    }
                 }
 
                 \Cache::set('model_properties.'.str_replace('\\', '_', $class), static::$_properties_cached[$class]);
@@ -550,9 +570,7 @@ class Model extends \Orm\Model
         $return = parent::set($property, $value);
 
         if ($properties_reload && isset($this->_custom_data[$property])) {
-            $class = get_called_class();
-            \Cache::delete('model_properties.'.str_replace('\\', '_', $class));
-            unset(static::$_properties_cached[$class]);
+            static::properties(true);
             unset($this->_custom_data[$property]);
             $return = parent::set($property, $value);
         }
@@ -670,9 +688,7 @@ class Model extends \Orm\Model
         try {
             return parent::get($property);
         } catch (\OutOfBoundsException $e) {
-            $class = get_called_class();
-            \Cache::delete('model_properties.'.str_replace('\\', '_', $class));
-            unset(static::$_properties_cached[$class]);
+            static::properties(true);
         }
 
         return parent::get($property);
