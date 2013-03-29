@@ -1,7 +1,7 @@
 <?php
 return array(
     'actions' => array(
-       'add' => array(
+        'add' => array(
             // Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
             'label' => __('Add {{model_label}}'),
             'action' => array(
@@ -15,7 +15,7 @@ return array(
                 'toolbar-grid' => true,
             ),
         ),
-       'edit' => array(
+        'edit' => array(
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
