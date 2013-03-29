@@ -147,12 +147,28 @@ class Config extends \Fuel\Core\Config
 
             foreach ($selected_actions as $key => $action) {
                 if (!empty($params['item']) && isset($action['disabled'])) {
-                    $selected_actions[$key]['disabled'] = $action['disabled']($params['item']);
+                    $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item']);
                 }
             }
         }
 
         return $selected_actions;
+    }
+
+    static public function getActionDisabledState($disabled, $item)
+    {
+        if (is_callable($disabled)) {
+            $disabled = $disabled($item);
+        }
+        if (is_array($disabled)) {
+            foreach ($disabled as $disabled_item) {
+                $disabled_state = static::getActionDisabledState($disabled_item, $item);
+                if ($disabled_state !== false) {
+                    return $disabled_state;
+                }
+            }
+        }
+        return $disabled;
     }
 
     protected static function can_add_action($action, $params)
