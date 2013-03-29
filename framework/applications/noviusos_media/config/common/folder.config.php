@@ -43,12 +43,18 @@ return array(
         ),
         'Nos\Media\Model_Folder.edit' => array(
             'disabled' => function($item) {
-                return empty($item->medif_parent_id);
+                if (empty($item->medif_parent_id)) {
+                    return __('You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)');
+                }
+                return false;
             },
         ),
         'Nos\Media\Model_Folder.delete' => array(
             'disabled' => function($item) {
-                return empty($item->medif_parent_id);
+                if (empty($item->medif_parent_id)) {
+                    return __('You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)');
+                }
+                return false;
             },
         ),
         'Nos\Media\Model_Folder.add_media' => array(
