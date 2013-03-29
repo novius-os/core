@@ -82,7 +82,7 @@ class FrontCache
 
         $cache = new static($path);
         try {
-            return $cache->execute_or_start($params['controller']);
+            return $cache->executeOrStart($params['controller']);
         } catch (CacheNotFoundException $e) {
             call_user_func_array($params['callback_func'], $params['callback_args']);
 
