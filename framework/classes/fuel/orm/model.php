@@ -545,28 +545,19 @@ class Model extends \Orm\Model
             $property = static::prefix().$property;
         }
 
-        $class = get_called_class();
-        $properties_reload = !is_array($property) &&
-            property_exists($class, '_properties') &&
-            !isset($this->_custom_data[$property]);
+        $properties_reload = !is_array($property) && !isset($this->_custom_data[$property]);
 
-        parent::set($property, $value);
+        $return = parent::set($property, $value);
 
         if ($properties_reload && isset($this->_custom_data[$property])) {
-            try {
-                static::$_properties_cached[$class] = \DB::list_columns(static::table(), null, static::connection());
-                unset($this->_custom_data[$property]);
-                parent::set($property, $value);
-                if (array_key_exists($property, static::properties())) {
-                    logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
-                        'You have to set the additional model property "'.$property.'" in model config.');
-                }
-            } catch (\Exception $e) {
-                // Do nothing : set() may be really called for set a custom_data
-            }
+            $class = get_called_class();
+            \Cache::delete('model_properties.'.str_replace('\\', '_', $class));
+            unset(static::$_properties_cached[$class]);
+            unset($this->_custom_data[$property]);
+            $return = parent::set($property, $value);
         }
 
-        return $this;
+        return $return;
     }
 
     public function __set($name, $value)
@@ -682,7 +673,6 @@ class Model extends \Orm\Model
             $class = get_called_class();
             \Cache::delete('model_properties.'.str_replace('\\', '_', $class));
             unset(static::$_properties_cached[$class]);
-            static::properties();
         }
 
         return parent::get($property);
