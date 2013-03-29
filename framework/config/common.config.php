@@ -88,9 +88,7 @@ return array(
                 'action' => 'confirmationDialog',
                 'dialog' => array(
                     'contentUrl' => '{{controller_base_url}}delete/{{_id}}',
-                    'title' => strtr($config['i18n']['deleting item title'], array(
-                        '{{title}}' => '{{_title}}',
-                    )),
+                    'title' => 'TO BE REPLACED',
                 ),
             ),
             'label' => __('Delete'),
@@ -106,5 +104,5 @@ return array(
                 return !isset($params['item']) || !$params['item']->is_new();
             },
         ),
-    )
+    ),
 );
