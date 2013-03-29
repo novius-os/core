@@ -773,9 +773,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             }
         }
         $item['actions'] = array();
-        foreach ($actions as $action => $callback) {
-            $value = $callback($object);
-            $item['actions'][$action] = $value === false ? true : $value;
+        foreach ($actions as $action => $value) {
+            $item['actions'][$action] = \Config::getActionDisabledState($value, $item);
         }
         $item['_id'] = $object->{$pk};
         $item['_model'] = $model;
