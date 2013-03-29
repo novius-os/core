@@ -120,6 +120,10 @@ class Config extends \Fuel\Core\Config
             return array();
         }
 
+        if (!isset($params['all_targets'])) {
+            $params['all_targets'] = false;
+        }
+
         $selected_actions = array();
         foreach ($params['models'] as $model) {
             $common_config = \Nos\Config_Common::load($model, array());
@@ -167,12 +171,17 @@ class Config extends \Fuel\Core\Config
                     return $disabled_state;
                 }
             }
+            return false;
         }
         return $disabled;
     }
 
     protected static function can_add_action($action, $params)
     {
+        if ($params['all_targets']) {
+            return true;
+        }
+
         if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
             return false;
         }

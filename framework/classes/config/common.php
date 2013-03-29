@@ -153,13 +153,18 @@ class Config_Common
     {
         $list_actions = array();
         foreach ($original_list_actions as $original_name => $action) {
-            $name = $original_name;
-            if (strpos($original_name, '\\') === false) {
-                $name = $model.'.'.$original_name;
-            }
+            $name = static::prefixActionName($original_name, $model);
             $list_actions[$name] = $original_list_actions[$original_name];
         }
         return $list_actions;
+    }
+
+    public static function prefixActionName($action_name, $model)
+    {
+        if (strpos($action_name, '\\') === false) {
+            return $model.'.'.$action_name;
+        }
+        return $action_name;
     }
 
     /**
