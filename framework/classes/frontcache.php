@@ -167,6 +167,10 @@ class FrontCache
 
         if (!empty($suffixes)) {
             $this->_path = $this->_path_suffix.implode('&', $suffixes).'.php';
+            $basename = basename($this->_path);
+            if (\Str::length($basename) > 100) {
+                $this->_path = dirname($this->_path).DS.\Str::sub($basename, 0, 100).md5($basename).'.php';
+            }
         }
     }
 
