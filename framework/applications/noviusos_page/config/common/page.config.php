@@ -141,7 +141,7 @@ return array(
             ),
             'disabled' =>
                 function($page) {
-                    return !!$page->page_home;
+                    return !!$page->page_home ? __('This page is already the home page.') : false;
                 },
         ),
         'Nos\Page\Model_Page.duplicate' => array(
