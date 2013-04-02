@@ -42,11 +42,12 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
             $olds[$old->perm_name][$old->perm_category_key] = $old;
         }
 
-        $permissions = \Input::post('perm');
+        $permissions = \Input::post('perm', array());
+        $nos_access = \Arr::get($permissions, 'nos::access', array());
         foreach ($permissions as $perm_name => $allowed) {
             $existing = array();
             list($app_name, ) = explode('::', $perm_name.'::', 2);
-            $app_removed = $app_name != 'nos' && !in_array($app_name, $permissions['nos::access']);
+            $app_removed = $app_name != 'nos' && !in_array($app_name, $nos_access);
 
             // Delete old authorisations
             if (!empty($olds[$perm_name])) {
