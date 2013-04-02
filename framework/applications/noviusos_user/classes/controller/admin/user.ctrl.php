@@ -12,6 +12,7 @@ namespace Nos\User;
 
 class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 {
+    protected $is_account = false;
     public function prepare_i18n()
     {
         parent::prepare_i18n();
@@ -20,7 +21,8 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 
     public function before()
     {
-        if (\Request::active()->action == 'insert_update' && ($user = \Session::user()) && isset(\Request::active()->route->method_params[0]) && \Request::active()->route->method_params[0] == $user->user_id) {
+        $this->is_account = \Request::active()->action == 'insert_update' && ($user = \Session::user()) && isset(\Request::active()->route->method_params[0]) && \Request::active()->route->method_params[0] == $user->user_id;
+        if ($this->is_account) {
             $this->bypass = true;
         }
         parent::before();
@@ -48,22 +50,27 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             if ($item->is_changed('user_password')) {
                 $this->config['messages']['successfully saved'] = __('Done, your password has been changed.');
             }
+        }
 
-            if (\Config::get('novius-os.users.enable_roles', false)) {
-                $roles = \Input::post('roles', array());
-                if (!empty($roles)) {
-                    $roles = Model_Role::find('all', array(
-                        'where' => array(
-                            array('role_id', 'IN', $roles),
-                        ),
-                    ));
-                }
-                // Load the roles...
-                $item->roles;
-                unset($item->roles);
-                foreach ($roles as $role) {
-                    $item->roles[$role->role_id] = $role;
-                }
+        if (\Config::get('novius-os.users.enable_roles', false)) {
+            $roles = \Input::post('roles', array());
+            if (!empty($roles)) {
+                $roles = Model_Role::find('all', array(
+                    'where' => array(
+                        array('role_id', 'IN', $roles),
+                    ),
+                ));
+            }
+            // Load the roles...
+            $item->roles;
+            unset($item->roles);
+            foreach ($roles as $role) {
+                $item->roles[$role->role_id] = $role;
+            }
+
+            // When editing, save() is called after. When creating, save() is called before (we know the ID). So re-save it.
+            if ($this->is_new) {
+                $item->save(array('roles'));
             }
         }
 
