@@ -38,7 +38,9 @@ class Model_User extends \Nos\Orm\Model
         ),
     );
 
-    protected static $_delete;
+    protected static $_delete = array(
+        'roles' => array(),
+    );
 
     protected static $_many_many = array(
         'roles' => array(
