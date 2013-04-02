@@ -36,6 +36,27 @@ class Model_Role extends \Nos\Orm\Model
         ),
     );
 
+    protected static $_has_many = array(
+        'permissions' => array(
+            'key_from' => 'role_id',
+            'model_to' => 'Nos\User\Model_Permission',
+            'key_to' => 'perm_role_id',
+            'cascade_save' => false,
+            'cascade_delete' => true, // Won't be used until ORM 1.6, @see _event_before_delete()
+        ),
+    );
+
+    public function _event_before_delete()
+    {
+        // @todo delete this method when upgrading the ORM to 1.6
+        // The FK on permission is part of the primary key so it doesn't work in 1.5
+        // https://github.com/fuel/orm/commit/a17324bf1912b36f9413306d017a39db1003b978
+        foreach ($this->permissions as $permission) {
+            $permission->delete();
+        }
+        unset($this->permissions);
+    }
+
     /**
      * @param   string  $permission_name  Name of the permission to check against
      * @param   null    $category_key     (optional) If the permission has categories, the category key to check against
