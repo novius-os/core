@@ -80,7 +80,10 @@ class Controller_Front extends Controller
 
         $this->_url = \Input::server('NOS_URL');
         $this->_extension = pathinfo($this->_url, PATHINFO_EXTENSION);
-        $url = \Str::sub($this->_url, 0, - strlen($this->_extension) - 1);
+        $url = $this->_url;
+        if (!empty($this->_extension)) {
+            $url = \Str::sub($url, 0, - strlen($this->_extension) - 1);
+        }
 
         $this->_is_preview = \Input::get('_preview', false);
 
