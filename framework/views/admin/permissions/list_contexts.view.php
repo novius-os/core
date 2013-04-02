@@ -2,46 +2,46 @@
     <thead>
         <tr>
             <th></th>
-        <?php
-        foreach (\Nos\Tools_Context::locales() as $locale => $locale_params) {
-            ?>
-                <th>
-                    <?= $locale_params['title'] ?>
-                    <br />
-                    <img src="static/novius-os/admin/novius-os/img/flags/<?= $locale_params['flag'] ?>.png" />
-                </th>
-            <?php
-        }
-        ?>
+<?php
+foreach (\Nos\Tools_Context::locales() as $locale => $locale_params) {
+    ?>
+        <th>
+            <?= $locale_params['title'] ?>
+            <br />
+            <img src="static/novius-os/admin/novius-os/img/flags/<?= $locale_params['flag'] ?>.png" />
+        </th>
+    <?php
+}
+?>
         </tr>
     </thead>
     <tbody>
+<?php
+foreach (\Nos\Tools_Context::sites() as $site => $site_params) {
+    $contexts = \Nos\Tools_Context::contexts();
+    ?>
+    <tr>
+        <th><?= $site_params['title'] ?></th>
     <?php
-    foreach (\Nos\Tools_Context::sites() as $site => $site_params) {
-        $contexts = \Nos\Tools_Context::contexts();
+    foreach (\Nos\Tools_Context::locales() as $locale => $locale_params) {
         ?>
-        <tr>
-            <th><?= $site_params['title'] ?></th>
-            <?php
-            foreach (\Nos\Tools_Context::locales() as $locale => $locale_params) {
-                ?>
-                <td>
-                    <?php
-                    $category_key = $site.'::'.$locale;
-                    if (isset($contexts[$category_key])) {
-                        ?>
-                        <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $category_key ?>" <?= $check_permission($permission_name, $category_key) ? 'checked' : '' ?> />
-                        <?php
-                    }
-                    ?>
-                </td>
-                <?php
-            }
+        <td>
+        <?php
+        $category_key = $site.'::'.$locale;
+        if (isset($contexts[$category_key])) {
             ?>
-        </tr>
+            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $category_key ?>" <?= $check_permission($permission_name, $category_key) ? 'checked' : '' ?> />
+            <?php
+        }
+        ?>
+        </td>
         <?php
     }
     ?>
+    </tr>
+    <?php
+}
+?>
     </tbody>
 </table>
 <script type="text/javascript">
