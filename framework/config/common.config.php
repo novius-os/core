@@ -40,11 +40,18 @@ return array(
                 'url' => '{{preview_url}}?_preview=1',
             ),
             'disabled' =>
-            function($item)
+            function($item, $params)
             {
                 if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                     $url = $item->url_canonical(array('preview' => true));
-                    return $item->is_new() || !!empty($url);
+                    if ($item->is_new()) {
+                        return $params['config']['i18n']['visualising new item'];
+                    }
+                    if (!!empty($url)) {
+                        return $params['config']['i18n']['visualising no url'];
+                    }
+
+                    return false;
                 }
                 return true;
             },

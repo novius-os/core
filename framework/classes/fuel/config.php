@@ -161,8 +161,9 @@ class Config extends \Fuel\Core\Config
 
     static public function getActionDisabledState($disabled, $item)
     {
+        $common_config = \Nos\Config_Common::load(get_class($item), array());
         if (is_callable($disabled)) {
-            $disabled = $disabled($item);
+            $disabled = $disabled($item, array('config' => $common_config));
         }
         if (is_array($disabled)) {
             foreach ($disabled as $disabled_item) {
