@@ -116,13 +116,29 @@ class Controller_Front extends Controller
 
             // Build array of possibles contexts for this absolute URL
             $contexts_possibles = array();
-            foreach (Tools_Context::contexts() as $context => $domains) {
-                foreach ($domains as $domain) {
-                    if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
-                        $contexts_possibles[$context] = $domain;
-                        break;
+            try {
+                foreach (Tools_Context::contexts() as $context => $domains) {
+                    foreach ($domains as $domain) {
+                        if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
+                            $contexts_possibles[$context] = $domain;
+                            break;
+                        }
                     }
                 }
+            } catch (\RuntimeException $e) {
+                if (!is_file(APPPATH.'config'.DS.'contexts.config.php')) {
+                    // if install.php is there, redirects!
+                    if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
+                        \Response::redirect($this->_base_href.'install.php');
+                    }
+                }
+
+                echo \View::forge('nos::errors/blank_slate_front', array(
+                    'base_url' => $this->_base_href,
+                    'error' => 'Context configuration error.',
+                    'exception' => $e,
+                ), false);
+                exit();
             }
 
             $this->_cache->start();
@@ -207,7 +223,7 @@ class Controller_Front extends Controller
                     // No database configuration file is found
                     if (!is_file(APPPATH.'config'.DS.'db.config.php')) {
                         // if install.php is there, redirects!
-                        if (is_file(DOCROOT.'install.php')) {
+                        if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
                             \Response::redirect($this->_base_href.'install.php');
                         }
                     }
