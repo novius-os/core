@@ -136,7 +136,13 @@ class Controller_Inspector_Model extends Controller_Inspector
                 };
             }
 
+            if (!isset($config['appdesk'])) {
+                $config['appdesk'] = array();
+            }
 
+            if (!isset($config['appdesk']['view'])) {
+                $config['appdesk']['view'] = View::forge('inspector/model')->render();
+            }
         }
 
 

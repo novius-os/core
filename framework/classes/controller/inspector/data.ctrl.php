@@ -21,10 +21,28 @@ class Controller_Inspector_Data extends Controller_Inspector
 
     public function action_list()
     {
+        return static::getView($this->config);
+    }
+
+    public static function getView($config)
+    {
         $view = View::forge('inspector/plain_data');
 
-        $view->set('data', \Format::forge()->to_json($this->config['data']), false);
+        $view->set('data', \Format::forge()->to_json($config['data']), false);
 
         return $view;
+    }
+
+    public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
+    {
+        if (!isset($config['appdesk'])) {
+            $config['appdesk'] = array();
+        }
+
+        if (!isset($config['appdesk']['view']) && !isset($config['appdesk']['url'])) {
+            $config['appdesk']['view'] = static::getView($config)->render();
+        }
+
+        return parent::process_config($application, $config, $item_actions, $gridKey);
     }
 }

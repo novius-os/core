@@ -35,10 +35,6 @@ class Controller_Inspector extends Controller_Admin_Application
                 $config['appdesk']['contextChange'] = !!$model::behaviours('Nos\Orm_Behaviour_Twinnable', false);
             }
 
-            if (!isset($config['appdesk']['url'])) {
-                $config['appdesk']['url'] = $inspector_path.'/list';
-            }
-
             if (!isset($config['appdesk']['reloadEvent'])) {
                 $config['appdesk']['reloadEvent'] = $config['model'];
             }

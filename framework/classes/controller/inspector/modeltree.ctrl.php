@@ -140,6 +140,13 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 };
             }
 
+            if (!isset($config['appdesk'])) {
+                $config['appdesk'] = array();
+            }
+
+            if (!isset($config['appdesk']['view'])) {
+                $config['appdesk']['view'] = View::forge('inspector/modeltree')->render();
+            }
         }
         return parent::process_config($application, $config, $item_actions, $gridKey);
     }
