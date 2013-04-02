@@ -33,6 +33,7 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                 }
                             }),
                         rendered = false,
+                        $hidden,
                         listenReloadEvent = function() {
                             if (params.reloadEvent) {
                                 container.nosUnlistenEvent('inspector' + id);
@@ -55,7 +56,6 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                 treeOptions.context = connector.data('nosContext') || '';
                             }
 
-                            container.find('input[name="' + params.input_name + '[]"]').remove();
                             table.nostreegrid({
                                 sortable : false,
                                 movable : false,
@@ -112,7 +112,6 @@ define('jquery-nos-inspector-tree-model-checkbox',
                             if ($.isPlainObject(args.row.data)) {
 
                                 $('<input type="checkbox" />').attr({
-                                        name : params.input_name + '[]',
                                         value : args.row.data._id
                                     })
                                     .click(function() {
@@ -124,9 +123,18 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                                 id : args.row.data._id,
                                                 model : args.row.data._model
                                             };
+                                            if (!$hidden.filter('[value="' + args.row.data._id + '"]').size()) {
+                                                $('<input type="hidden" />').attr({
+                                                        name : params.input_name + '[]',
+                                                        value : args.row.data._id
+                                                    })
+                                                    .appendTo(container);
+                                            }
                                         } else {
                                             params.selected[args.row.data._model + '|' + args.row.data._id] && delete params.selected[args.row.data._model + '|' + args.row.data._id];
+                                            $hidden.filter('[value="' + args.row.data._id + '"]').remove();
                                         }
+                                        $hidden = container.find('input[name="' + params.input_name + '[]"]');
                                         checkbox.trigger('selectionChanged', args.row.data);
                                     })
                                     .appendTo(args.$container);
@@ -156,6 +164,7 @@ define('jquery-nos-inspector-tree-model-checkbox',
                             }
                         });
                     }
+                    $hidden = container.find('input[name="' + params.input_name + '[]"]');
 
                     table.css({
                         height : '100%',
