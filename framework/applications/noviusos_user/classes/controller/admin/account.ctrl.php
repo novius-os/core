@@ -46,7 +46,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
         $fieldset_infos->set_config(
             'field_template',
             '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>'
-        ); // static::fieldset_edit($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
+        );
         $fieldset_display = static::fieldset_display($user)->set_config('field_template', '<tr><th>{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
         return View::forge(
