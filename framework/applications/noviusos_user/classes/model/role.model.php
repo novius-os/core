@@ -64,19 +64,8 @@ class Model_Role extends \Nos\Orm\Model
      */
     public function check_permission($permission_name, $category_key = null)
     {
-        // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
-        list($application, ) = explode($permission_name.'::', 2);
-        // If this application is loaded, check the user has access to it
-        if (\Fuel\Core\Module::loaded($application) && !$this->check_permission('nos::access', $application)) {
+        if (!$this->_authorised($permission_name)) {
             return false;
-        }
-
-        // Load permissions from the database
-        if (!isset(static::$permissions[$this->role_id])) {
-            $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
-            foreach ($query->as_object()->execute() as $permission) {
-                static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
-            }
         }
 
         // For permissions without category, just check the existence of the permission
@@ -87,5 +76,39 @@ class Model_Role extends \Nos\Orm\Model
 
         // For permission with categories, also check the existence of the category
         return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
+    }
+
+    /**
+     * List all the categories of a given permission name. Returns an array of string or false when the role has not
+     * access, or the permission name does not exists.
+     *
+     * @param   string  $permission_name  The name of the permission to retrieve categories from
+     * @return  array|false   An array containing the list of categories (values) for the request permission name
+     */
+    public function listPermissionCategories($permission_name)
+    {
+        if (!$this->_authorised($permission_name)) {
+            return false;
+        }
+        return isset(static::$permissions[$this->role_id][$permission_name]) ? static::$permissions[$this->role_id][$permission_name] : false;
+    }
+
+    protected function _authorised($permission_name)
+    {
+        // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
+        list($application, ) = explode($permission_name.'::', 2);
+        // If this application is loaded, check the user has access to it
+        if (\Module::loaded($application) && !$this->check_permission('nos::access', $application)) {
+            return false;
+        }
+
+        // Load permissions from the database
+        if (!isset(static::$permissions[$this->role_id])) {
+            $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
+            foreach ($query->as_object()->execute() as $permission) {
+                static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
+            }
+        }
+        return true;
     }
 }
