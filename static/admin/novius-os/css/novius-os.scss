@@ -581,6 +581,9 @@ table.title-fields {
 }
 
 .native_permissions {
+
+    padding-right: 2em;
+
     .permission {
         margin-bottom: 2em;
 
@@ -634,6 +637,19 @@ table.title-fields {
         img.app_icon {
             vertical-align: middle;
         }
+    }
+}
+
+.app_permissions {
+
+    > div {
+        position: relative;
+    }
+
+    .preview_arrow {
+        display: block;
+        position: absolute;
+        left: -35px;
     }
 }
 

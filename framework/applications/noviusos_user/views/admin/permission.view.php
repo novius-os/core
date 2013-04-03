@@ -36,11 +36,15 @@ foreach ($permissions as $view) {
 ?>
 
     </div>
-    <div class="col c6">
+    <div class="col c6 app_permissions">
 <?php
 foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
     $permissions = \Config::load($app_name.'::permissions', true);
+    if (empty($permissions)) {
+        continue;
+    }
     echo '<div class="'.$app_name.'" style="display:none;">';
+    echo '<img class="preview_arrow" src="static/apps/noviusos_user/img/arrow-edition.png">';
 
     foreach ($permissions as $view) {
         echo \View::forge(
@@ -113,9 +117,9 @@ require(
 
                 if ($this.is(':checked')) {
                     $li.addClass('ui-state-active').siblings().removeClass('ui-state-active');
+                    $form.find('.preview_arrow').parent().hide();
                     $accordion.show().nosOnShow()
-                        .siblings().hide()
-                        .end().css('marginTop', $li.offset().top - $this.closest('.line').offset().top);
+                        .css('marginTop', $li.offset().top - $this.closest('.line').offset().top);
                 } else {
                     $li.removeClass('ui-state-active');
                     $accordion.hide();
