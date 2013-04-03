@@ -140,7 +140,7 @@ return array(
                 ),
                 'disabled' => array(
                     function($page) {
-                        return !!$page->page_home ? __('This page is already the home page.') : false;
+                        return !!$page->page_home ? __('This page is the home page already.') : false;
                     }),
             ),
             'duplicate' => array(

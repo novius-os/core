@@ -16,7 +16,7 @@ return array(
     ),
     'i18n' => array(
         // Crud
-        'notification item added' => __('New role added successfully.'),
+        'notification item added' => __('All wrapped up! This new role is ready.'),
         'notification item deleted' => __('The role has been deleted.'),
 
         // General errors

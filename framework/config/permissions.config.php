@@ -9,7 +9,7 @@
  * @link http://www.novius-os.org
  */
 
-\Nos\I18n::current_dictionary('noviusos_user::common');
+\Nos\I18n::current_dictionary('nos::common');
 
 return array(
     'all' => array(
@@ -23,7 +23,7 @@ return array(
                 ),*/
                 'apps' => array(
                     'permission_name' => 'nos::access',
-                    'title' => __('Can access the following applications:'),
+                    'title' => __('Is granted access to the following applications:'),
                     'view' => 'nos::admin/permissions/list_app',
                 ),
             ),

@@ -52,7 +52,7 @@ return array(
     'deleting with N children' => __('This item has <strong>{{children_count}} sub-items</strong>.'),
 
     // Visualise action's labels
-    'visualising no url' => __('There aren’t any enhancer which have the ability to display this item.'),
+    'visualising no url' => __('This application hasn’t yet been added to a page. Visualising is therefore impossible.'),
 
     // Appdesk: allLanguages
     'allLanguages' =>__('All languages'),

@@ -80,7 +80,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     {
         parent::check_permission($action);
         if ($action === 'delete' && $this->item->page_lock == Model_Page::LOCK_DELETION) {
-            throw new \Exception(__('Permission denied'));
+            throw new \Exception(__('You can’t delete this page. It is locked.'));
         }
     }
 

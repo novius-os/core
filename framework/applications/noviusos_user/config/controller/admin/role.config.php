@@ -38,7 +38,7 @@ return array(
     ),
     'fields' => array(
         'role_name' => array(
-            'label' => __('Name'),
+            'label' => __('Title'),
             'validation' => array(
                 'required',
             ),
