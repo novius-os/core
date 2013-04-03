@@ -22,54 +22,36 @@ class Model_Role extends \Nos\Orm\Model
     );
 
     protected static $permissions;
-    protected $access;
 
-    public function check_permission($application, $key)
+    /**
+     * @param   string  $permission_name  Name of the permission to check against
+     * @param   null    $category_key     (optional) If the permission has categories, the category key to check against
+     * @return  bool    Has the role the required authorisation?
+     */
+    public function check_permission($permission_name, $category_key = null)
     {
-        if ($key == 'access') {
-            $this->load_access($application);
-            return $this->access->check($this, $key);
+        // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
+        list($application, ) = explode($permission_name.'::', 2);
+        // If this application is loaded, check the user has access to it
+        if (\Fuel\Core\Module::loaded($application) && !$this->check_permission('nos::access', $application)) {
+            return false;
         }
 
-        $args = func_get_args();
-        $args = array_slice($args, 2);
-        array_unshift($args, $this->role_id);
-        $driver = $this->get_permission_driver($application, $key);
-        return call_user_func_array(array($driver, 'check'), $args);
-    }
-
-    public static function get_permission_driver($application, $key)
-    {
-        static::load_permission_driver($application, $key);
-        return static::$permissions[$application][$key];
-    }
-
-    public function load_access($application)
-    {
-        $this->access = \Nos\Permission::forge($application, 'access', array(
-            'driver' => 'select',
-            'title'=> 'Grant access to the application',
-            'label' => 'Grant access to the application',
-            'driver_config' => array(
-                'choices' => array(
-                    'access' => array(
-                        'title' => 'Access the application',
-                    ),
-                ),
-            ),
-        ));
-    }
-
-    public static function load_permission_driver($application, $key)
-    {
-        if (isset(static::$permissions[$application][$key])) {
-            return;
+        // Load permissions from the database
+        if (!isset(static::$permissions[$this->role_id])) {
+            $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
+            foreach ($query->as_object()->execute() as $permission) {
+                static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
+            }
         }
 
-        $permissions = \Config::load("$application::permissions", true);
+        // For permissions without category, just check the existence of the permission
+        $isset = isset(static::$permissions[$this->role_id][$permission_name]);
+        if ($category_key == null) {
+            return $isset;
+        }
 
-        static::$permissions[$application][$key] = Permission::forge($application, $key, $permissions[$key]);
-
-        return static::$permissions[$application][$key];
+        // For permission with categories, also check the existence of the category
+        return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
     }
 }

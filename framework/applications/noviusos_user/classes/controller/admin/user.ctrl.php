@@ -56,31 +56,60 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
     {
         $role = Model_Role::find(\Input::post('role_id'));
 
-        $applications = \Input::post('applications');
-        foreach ($applications as $application) {
-            $access = Model_Permission::find('first', array('where' => array(
-                array('perm_role_id',       $role->role_id),
-                array('perm_key',           'access'),
-                array('perm_application',   $application),
-            )));
+        $db = Model_Permission::find('all', array('where' => array(
+            array('perm_role_id', $role->role_id),
+        )));
 
-            // Grant of remove access to the application
-            if (empty($_POST['access'][$application]) && !empty($access)) {
-                $access->delete();
+        $olds = array();
+        foreach ($db as $old) {
+            $olds[$old->perm_name][$old->perm_category_key] = $old;
+        }
+
+        $permissions = \Input::post('perm');
+        foreach ($permissions as $perm_name => $allowed) {
+            $existing = array();
+            list($app_name, ) = explode('::', $perm_name.'::', 2);
+            $app_removed = $app_name != 'nos' && !in_array($app_name, $permissions['nos::access']);
+
+            // Delete old authorisations
+            if (!empty($olds[$perm_name])) {
+                foreach ($olds[$perm_name] as $old) {
+                    // If the role has no longer access to the application, remove old authorisations related to this application
+                    if ($app_removed) {
+                        $old->delete();
+                    } else if (!in_array($old->perm_category_key, $allowed)) {
+                        $old->delete();
+                    } else {
+                        $existing[] = $old->perm_category_key;
+                    }
+                }
+                unset($olds[$perm_name]);
             }
 
-            if (!empty($_POST['access'][$application]) && empty($access)) {
-                $access = new Model_Permission();
-                $access->perm_role_id     = $role->role_id;
-                $access->perm_key           = 'access';
-                $access->perm_identifier    = '';
-                $access->perm_application   = $application;
-                $access->save();
+            // Add new authorisations
+            foreach ($allowed as $category_key) {
+                if (!$app_removed && !in_array($category_key, $existing)) {
+                    $new = new Model_Permission();
+                    $new->perm_role_id      = $role->role_id;
+                    $new->perm_name         = $perm_name;
+                    $new->perm_category_key = $category_key;
+                    $new->save();
+                }
             }
         }
+
+        // None checked for perm_name
+        foreach ($olds as $perm_name => $old) {
+            foreach ($old as $delete) {
+                $delete->delete();
+            }
+        }
+
         \Response::json(array(
             'notify' => __('OK, permissions saved.'),
+            'dispatchEvent' => array(
+                'name' => 'Nos\Application',
+            ),
         ));
-
     }
 }

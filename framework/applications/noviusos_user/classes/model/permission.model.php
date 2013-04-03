@@ -13,12 +13,12 @@ namespace Nos\User;
 class Model_Permission extends \Nos\Orm\Model
 {
     protected static $_table_name = 'nos_role_permission';
-    protected static $_primary_key = array('perm_role_id', 'perm_application', 'perm_key');
+
+    protected static $_primary_key = array('perm_role_id', 'perm_name', 'perm_category_key');
 
     protected static $_properties = array(
         'perm_role_id',
-        'perm_key',
-        'perm_identifier',
-        'perm_application',
+        'perm_name',
+        'perm_category_key',
     );
 }

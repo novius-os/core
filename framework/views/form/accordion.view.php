@@ -8,25 +8,27 @@
  * @link http://www.novius-os.org
  */
 
-$fieldset->form()->set_config('field_template', "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
+if (!empty($fieldset)) {
+    $fieldset->form()->set_config('field_template', "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
 
-foreach ($fieldset->field() as $field) {
-    if ($field->type == 'checkbox') {
-        $template = $field->template;
-        if (empty($template)) {
-            $field->set_template("\t\t<span class=\"{error_class}\">{field} {label}{required} {error_msg}</span>\n");
+    foreach ($fieldset->field() as $field) {
+        if ($field->type == 'checkbox') {
+            $template = $field->template;
+            if (empty($template)) {
+                $field->set_template("\t\t<span class=\"{error_class}\">{field} {label}{required} {error_msg}</span>\n");
+            }
         }
     }
 }
 ?>
-<div class="accordion fieldset <?= !empty($classes) ? $classes : '' ?>">
+<div class="accordion <?= !empty($fieldset) ? 'fieldset' : '' ?> <?= !empty($classes) ? $classes : '' ?>">
 <?php
 foreach ((array) $accordions as $options) {
     if (!is_array($options)) {
         $options = array($options);
     }
-    if (!isset($options['fields']) && !isset($options['view'])) {
-        $options = array('fields' => $options);
+    if (!isset($options['fields'])) {
+        $options['fields'] = !isset($options['view']) ? $options : array();
     }
     if (!isset($options['field_template'])) {
         $options['field_template'] = '<p>{field}</p>';
@@ -51,7 +53,11 @@ foreach ((array) $accordions as $options) {
         <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
     <?php
     if (!empty($options['view'])) {
-        echo View::forge($options['view'], $view_params + (isset($options['params']) ? $options['params'] : array()), false);
+        echo View::forge(
+            $options['view'],
+            (isset($view_params) ? $view_params : array()) + (isset($options['params']) ? $options['params'] : array()),
+            false
+        );
     }
     foreach ((array) $options['fields'] as $field) {
         try {
