@@ -190,7 +190,7 @@ class Config extends \Fuel\Core\Config
             foreach ($value as $value_item) {
                 $new_arg_list = $arg_list;
                 $new_arg_list[0] = $value_item;
-                $return = call_user_func_array(array(get_class(), 'processCallbackValue'), $new_arg_list);
+                $return = call_user_func_array('static::processCallbackValue', $new_arg_list);
                 if ($return !== $expected_value) {
                     return $return;
                 }

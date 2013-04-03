@@ -45,7 +45,7 @@ return array(
                 if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                     $url = $item->url_canonical(array('preview' => true));
                     if ($item->is_new()) {
-                        return $params['config']['i18n']['visualising new item'];
+                        return true;
                     }
                     if (!!empty($url)) {
                         return $params['config']['i18n']['visualising no url'];
@@ -95,7 +95,7 @@ return array(
                 'action' => 'confirmationDialog',
                 'dialog' => array(
                     'contentUrl' => '{{controller_base_url}}delete/{{_id}}',
-                    'title' => 'TO BE REPLACED',
+                    'title' => __('Deleting the item ‘{{title}}’'),
                 ),
             ),
             'label' => __('Delete'),
