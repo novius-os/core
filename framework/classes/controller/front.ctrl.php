@@ -63,7 +63,7 @@ class Controller_Front extends Controller
     protected $_headers = array();
 
     protected $_custom_data_cached = array();
-    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url', '_extension', '_status', '_headers');
+    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url', '_status', '_headers');
 
     public function before()
     {
@@ -98,7 +98,7 @@ class Controller_Front extends Controller
         }
 
         \Event::trigger('front.start');
-        \Event::trigger_function('front.start', array(array('url' => &$url, 'extension' => &$this->_extension, 'cache_path' => &$cache_path)));
+        \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
 
         $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
@@ -191,10 +191,6 @@ class Controller_Front extends Controller
 
                     $this->_generateCache();
 
-                    if (!empty($this->_extension) && $this->_extension !== 'html') {
-                        throw new NotFoundException();
-                    }
-
                     $this->_content = $this->_view->render();
 
                     $this->_handleHead();
@@ -246,16 +242,9 @@ class Controller_Front extends Controller
 
                 // If no redirection then we display 404
                 if (!empty($url)) {
-                    if (!empty($this->_extension) && $this->_extension !== 'html') {
-                        $this->_content = \View::forge('nos::errors/404', array(
-                            'base_url' => $this->_base_href,
-                        ), false);
-                        $this->_status = 404;
-                    } else {
-                        $_SERVER['NOS_URL'] = '';
+                    $_SERVER['NOS_URL'] = '';
 
-                        return $this->router('index', $params, 404);
-                    }
+                    return $this->router('index', $params, 404);
                 } else {
                     // The DB config is there, there's probably no homepage.
                     echo \View::forge('nos::errors/blank_slate_front', array(
@@ -301,14 +290,6 @@ class Controller_Front extends Controller
     public function getWysiwygName()
     {
         return $this->_wysiwyg_name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getExtension()
-    {
-        return $this->_extension;
     }
 
     /**
