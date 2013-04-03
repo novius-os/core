@@ -14,20 +14,17 @@ use Date, View;
 
 class Controller_Inspector_Date extends Controller_Inspector
 {
+    protected static $default_view = 'inspector/date';
+
     public function prepare_i18n()
     {
         parent::prepare_i18n();
         I18n::current_dictionary('nos::common');
     }
 
-    public function action_list()
+    public static function getView($config)
     {
-        return static::get_view($this->config);
-    }
-
-    public static function get_view($config)
-    {
-        $view = View::forge('inspector/date');
+        $view = View::forge(static::$default_view);
 
         $content = array();
         $since = array();
@@ -208,7 +205,7 @@ class Controller_Inspector_Date extends Controller_Inspector
             };
         }
 
-        $config['appdesk']['view'] = static::get_view($config)->render();
+        $config['appdesk']['view'] = static::getView($config)->render();
 
         return $config;
     }
