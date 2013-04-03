@@ -22,9 +22,6 @@ empty($role) && $role = $item;
 
 $my_view_params = array(
     'role' => $role,
-    'check_permission' => function($perm_name, $cat_key = null) use ($role) {
-        return $role->check_permission($perm_name, $cat_key);
-    }
 );
 $my_view_params['view_params'] =& $my_view_params;
 $permissions = \Config::load('nos::permissions', true);
@@ -63,7 +60,7 @@ require(
     ['jquery-nos'],
     function($) {
         $(function() {
-            var $form = $('#<?= $uniqid ?>');//.nosFormUI().nosFormAjax();
+            var $form = $('#<?= $uniqid ?>');
             var $ul = $form.find('div[class~="nos::access"]');
             var preventCheckAction = false;
 

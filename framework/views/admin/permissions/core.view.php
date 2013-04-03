@@ -7,7 +7,7 @@ foreach ($list as $permission) {
     echo \View::forge($permission['view'], (!empty($permission['params']) ? $permission['params'] : array()) + array(
         'permission_name' => $permission['permission_name'],
         'checkbox_name' => 'perm['.$permission['permission_name'].'][]',
-        'check_permission' => $check_permission,
+        'role' => $role,
     ), false);
     echo '</div>';
 }
