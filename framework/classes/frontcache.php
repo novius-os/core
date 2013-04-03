@@ -45,7 +45,7 @@ class FrontCache
         echo static::_phpBegin();
         // Serialize allow to persist objects in the cache file
         // API is Nos\Nos::hmvc('location', array('args' => $args))
-        echo '\Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize(array('args' => $args)), true).'));';
+        echo 'echo \Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize(array('args' => $args)), true).'));';
         echo '?>';
     }
 
@@ -82,7 +82,7 @@ class FrontCache
 
         $cache = new static($path);
         try {
-            return $cache->execute_or_start($params['controller']);
+            return $cache->executeOrStart($params['controller']);
         } catch (CacheNotFoundException $e) {
             call_user_func_array($params['callback_func'], $params['callback_args']);
 
@@ -141,8 +141,8 @@ class FrontCache
                     if (!empty($handler['keys'])) {
                         $keys = (array) $handler['keys'];
                         foreach ($keys as $key) {
-                            if (!empty($_GET[$key])) {
-                                $suffixes[] = 'GET['.urlencode($key).']='.urlencode($_GET[$key]);
+                            if (isset($_GET[$key])) {
+                                $suffixes[] = 'GET['.urlencode($key).']='.(is_array($_GET[$key]) ? http_build_query($_GET[$key]) : urlencode($_GET[$key]));
                             }
                         }
                     }
@@ -167,6 +167,10 @@ class FrontCache
 
         if (!empty($suffixes)) {
             $this->_path = $this->_path_suffix.implode('&', $suffixes).'.php';
+            $basename = basename($this->_path);
+            if (\Str::length($basename) > 100) {
+                $this->_path = dirname($this->_path).DS.\Str::sub($basename, 0, 100).md5($basename).'.php';
+            }
         }
     }
 
