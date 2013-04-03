@@ -58,9 +58,9 @@ class Model_Role extends \Nos\Orm\Model
     }
 
     /**
-     * @param   string  $permission_name  Name of the permission to check against
-     * @param   null    $category_key     (optional) If the permission has categories, the category key to check against
-     * @return  bool    Has the role the required authorisation?
+     * @param   string       $permission_name  Name of the permission to check against
+     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @return  bool  Has the role the required authorisation?
      */
     public function check_permission($permission_name, $category_key = null)
     {

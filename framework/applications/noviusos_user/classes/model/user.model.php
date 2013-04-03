@@ -138,6 +138,11 @@ class Model_User extends \Nos\Orm\Model
         return mb_substr($password, 0, 1).$password.mb_substr($password, -1);
     }
 
+    /**
+     * @param   string       $permission_name  Name of the permission to check against
+     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @return  bool  Has the user the required authorisation?
+     */
     public function check_permission($permission_name, $category_key = null)
     {
         $args = func_get_args();
