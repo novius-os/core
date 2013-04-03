@@ -117,12 +117,10 @@ return array(
                 'grid' => true,
                 'toolbar-edit' => true,
             ),
-            'visible' => function($params) {
+            'visible' => array(function($params) {
                 return !isset($params['item']) || !$params['item']->is_new();
-            },
-            'disabled' => function() {
-                return false;
-            },
+            }),
+            'disabled' => false,
         ),
     ),
 );

@@ -384,8 +384,11 @@ define('jquery-nos',
                         }
                         break;
                 }
-                if (element.disabled && element.disabled === true) {
+                if (element.disabled && element.disabled !== false) {
                     $element.attr('disabled', true);
+                    if ($.type(element.disabled) === 'string') {
+                        $element.attr('title', element.disabled);
+                    }
                 }
 
                 if ($element) {

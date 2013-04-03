@@ -82,129 +82,23 @@ class Config_Common
     {
         \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
 
-        $actions_template = array(
-            $model.'.add' => array(
-                // Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
-                'label' => __('Add {{model_label}}'),
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'method' => 'add',
-                    'tab' => array(
-                        'url' => '{{controller_base_url}}insert_update?context={{context}}',
-                    ),
-                ),
-                'targets' => array(
-                    'toolbar-grid' => true,
-                ),
-            ),
-            $model.'.edit' => array(
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'tab' => array(
-                        'url' => "{{controller_base_url}}insert_update/{{_id}}",
-                        'label' => '{{_title}}',
-                    ),
-                ),
-                // Standard, most frequent actions (Edit, Visualise, Share, etc.)
-                'label' => __('Edit'),
-                'primary' => true,
-                'icon' => 'pencil',
-                'targets' => array(
-                    'grid' => true,
-                ),
-            ),
-            $model.'.visualise' => array(
-                'label' => __('Visualise'),
-                'primary' => true,
-                'iconClasses' => 'nos-icon16 nos-icon16-eye',
-                'action' => array(
-                    'action' => 'window.open',
-                    'url' => '{{preview_url}}?_preview=1',
-                ),
-                'disabled' =>
-                    function($item)
-                    {
-                        if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                            $url = $item->url_canonical(array('preview' => true));
-                            return $item->is_new() || !!empty($url);
-                        }
-                        return true;
-                    },
-                'targets' => array(
-                    'grid' => true,
-                    'toolbar-edit' => true,
-                ),
-                'visible' =>
-                function($params) {
-                    if (isset($params['item']) && $params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        $url = $params['item']->url_canonical(array('preview' => true));
-                        return !$params['item']->is_new() && !empty($url);
-                    }
-                    if (isset($params['model']) && $params['model']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                        return true;
-                    }
-                    return false;
-                },
-            ),
-            $model.'.share' => array(
-                'label' => __('Share'),
-                'iconClasses' => 'nos-icon16 nos-icon16-share',
-                'action' => array(
-                    'action' => 'share',
-                    'data' => array(
-                        'model_id' => '{{_id}}',
-                        'model_name' => $model,
-                    ),
-                ),
-                'targets' => array(
-                    'toolbar-edit' => true,
-                ),
-                'visible' =>
-                function($params) {
-                    $model = get_class($params['item']);
-                    return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
-                },
-            ),
-            $model.'.delete' => array(
-                'action' => array(
-                    'action' => 'confirmationDialog',
-                    'dialog' => array(
-                        'contentUrl' => '{{controller_base_url}}delete/{{_id}}',
-                        'title' => strtr($config['i18n']['deleting item title'], array(
-                            '{{title}}' => '{{_title}}',
-                        )),
-                    ),
-                ),
-                'label' => __('Delete'),
-                'primary' => true,
-                'icon' => 'trash',
-                'red' => true,
-                'targets' => array(
-                    'grid' => true,
-                    'toolbar-edit' => true,
-                ),
-                'visible' =>
-                function($params) {
-                    return !isset($params['item']) || !$params['item']->is_new();
-                },
-            ),
+        $common_config = \Config::load('common', true);
+        $actions_template = $common_config['actions'];
+
+        \Arr::set(
+            $actions_template,
+            'delete.action.dialog.title',
+            strtr($config['i18n']['deleting item title'], array(
+                '{{title}}' => '{{_title}}',
+            ))
         );
-
-
 
         if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
             unset($actions_template['visualise']);
         }
 
-        $list_actions = array();
-        $original_list_actions = $config['actions']['list'];
-        foreach ($original_list_actions as $original_name => $action) {
-            $name = $original_name;
-            if (strpos($original_name, '\\') === false) {
-                $name = $model.'.'.$original_name;
-            }
-            $list_actions[$name] = $original_list_actions[$original_name];
-        }
+        $actions_template = static::prefixActions($actions_template, $model);
+        $list_actions = static::prefixActions($config['actions']['list'], $model);
 
         $orders = array();
         $original_orders = $config['actions']['order'];
@@ -253,6 +147,24 @@ class Config_Common
         $config['actions']['list'] = $actions;
 
         return $actions;
+    }
+
+    public static function prefixActions($original_list_actions, $model)
+    {
+        $list_actions = array();
+        foreach ($original_list_actions as $original_name => $action) {
+            $name = static::prefixActionName($original_name, $model);
+            $list_actions[$name] = $original_list_actions[$original_name];
+        }
+        return $list_actions;
+    }
+
+    public static function prefixActionName($action_name, $model)
+    {
+        if (strpos($action_name, '\\') === false) {
+            return $model.'.'.$action_name;
+        }
+        return $action_name;
     }
 
     /**

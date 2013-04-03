@@ -77,98 +77,105 @@ return array(
         'deleting with N children' => __('This page has <strong>{{children_count}} sub-pages</strong>.'),
     ),
     'actions' => array(
-        'Nos\Page\Model_Page.delete' => array(
-            'primary' => false,
-            'disabled' =>
-                function($page) {
-                    return $page->page_lock == $page::LOCK_DELETION;
-                },
-        ),
-        'Nos\Page\Model_Page.add' => array(
-            'label' => __('Add a page'),
-        ),
-        'Nos\Page\Model_Page.add_subpage' => array(
-            'label' => __('Add a sub-page to this page'),
-            'icon' => 'plus',
-            'action' => array(
-                'action' => 'nosTabs',
-                'tab' => array(
-                    'url' => '{{controller_base_url}}insert_update?environment_id={{_id}}&context={{_context}}',
-                    'label' => __('Add a page'),
-                    'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
+        'list' => array(
+            'delete' => array(
+                'primary' => false,
+                'disabled' => array(
+                    function($page) {
+                        return $page->page_lock == $page::LOCK_DELETION;
+                    }),
+            ),
+            'add' => array(
+                'label' => __('Add a page'),
+            ),
+            'visualise' => array(
+                'label' => __('Visualise'),
+                'primary' => true,
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                'action' => array(
+                    'action' => 'window.open',
+                    'url' => '{{previewUrl}}',
                 ),
-            ),
-            'targets' => array(
-                'grid' => true,
-            ),
-        ),
-        'Nos\Page\Model_Page.visualise' => array(
-            'label' => __('Visualise'),
-            'primary' => true,
-            'iconClasses' => 'nos-icon16 nos-icon16-eye',
-            'action' => array(
-                'action' => 'window.open',
-                'url' => '{{previewUrl}}',
-            ),
-            'disabled' => function() {
-                return false;
-            },
-            'targets' => array(
-                'grid' => true,
-                'toolbar-edit' => true,
-            ),
-            'visible' =>
+                'disabled' => false,
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true,
+                ),
+                'visible' => array(
                 function($params) {
                     return !isset($params['item']) || !$params['item']->is_new();
-                }
-        ),
-        'Nos\Page\Model_Page.set_homepage' => array(
-            'label' => __('Set as home page'),
-            'primary' => false,
-            'icon' => 'home',
-            'action' => array(
-                'action' => 'nosAjax',
-                'params' => array(
-                    'url' => '{{controller_base_url}}set_homepage',
-                    'method' => 'POST',
-                    'data' => array(
-                        'id' => '{{_id}}',
+                })
+            ),
+            'add_subpage' => array(
+                'label' => __('Add a sub-page to this page'),
+                'icon' => 'plus',
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'tab' => array(
+                        'url' => '{{controller_base_url}}insert_update?environment_id={{_id}}&context={{_context}}',
+                        'label' => __('Add a page'),
+                        'iconUrl' => 'static/apps/noviusos_page/img/16/page.png',
                     ),
                 ),
-            ),
-            'targets' => array(
-                'grid' => true,
-            ),
-            'disabled' =>
-                function($page) {
-                    return !!$page->page_home;
-                },
-        ),
-        'Nos\Page\Model_Page.duplicate' => array(
-            'action' => array(
-                'action' => 'nosAjax',
-                'params' => array(
-                    'url' => '{{controller_base_url}}duplicate/{{_id}}',
+                'targets' => array(
+                    'grid' => true,
                 ),
             ),
-            'label' => __('Duplicate'),
-            'primary' => false,
-            'icon' => 'circle-plus',
-            'targets' => array(
-                'grid' => true,
+            'set_homepage' => array(
+                'label' => __('Set as home page'),
+                'primary' => false,
+                'icon' => 'home',
+                'action' => array(
+                    'action' => 'nosAjax',
+                    'params' => array(
+                        'url' => '{{controller_base_url}}set_homepage',
+                        'method' => 'POST',
+                        'data' => array(
+                            'id' => '{{_id}}',
+                        ),
+                    ),
+                ),
+                'targets' => array(
+                    'grid' => true,
+                ),
+                'disabled' => array(
+                    function($page) {
+                        return !!$page->page_home ? __('This page is already the home page.') : false;
+                    }),
             ),
-        ),
-        'Nos\Page\Model_Page.renew_cache' => array(
-            'label' => __('Renew pages’ cache'),
-            'action' => array(
-                'action' => 'nosAjax',
-                'params' => array(
-                    'url' => 'admin/noviusos_page/appdesk/clear_cache',
+            'duplicate' => array(
+                'action' => array(
+                    'action' => 'nosAjax',
+                    'params' => array(
+                        'url' => '{{controller_base_url}}duplicate/{{_id}}',
+                    ),
+                ),
+                'label' => __('Duplicate'),
+                'primary' => false,
+                'icon' => 'circle-plus',
+                'targets' => array(
+                    'grid' => true,
                 ),
             ),
-            'targets' => array(
-                'toolbar-grid' => true,
+            'renew_cache' => array(
+                'label' => __('Renew pages’ cache'),
+                'action' => array(
+                    'action' => 'nosAjax',
+                    'params' => array(
+                        'url' => 'admin/noviusos_page/appdesk/clear_cache',
+                    ),
+                ),
+                'targets' => array(
+                    'toolbar-grid' => true,
+                ),
             ),
         ),
+        'order' => array(
+            'add',
+            'edit',
+            'visualise',
+            'share',
+            'delete',
+        )
     ),
 );
