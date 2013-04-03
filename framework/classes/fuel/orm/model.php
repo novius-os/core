@@ -128,18 +128,47 @@ class Model extends \Orm\Model
     /**
      * @see \Orm\Model::properties()
      */
-    public static function properties()
+    public static function properties($from_db = false)
     {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
 
-        if (!$init) {
+        if ($init && !$from_db) {
+            return static::$_properties_cached[$class];
+        }
+
+        try {
+            if ($from_db) {
+                if ($init) {
+                    unset(static::$_properties_cached[$class]);
+                }
+                throw new \CacheNotFoundException();
+            }
+
+            static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
+        } catch (\CacheNotFoundException $e) {
             parent::properties();
 
             $config = static::_config();
             if (!empty($config) && !empty($config['properties'])) {
-                static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+                static::$_properties_cached[$class] = \Arr::merge(
+                    static::$_properties_cached[$class],
+                    $config['properties']
+                );
             }
+
+            if ($from_db && property_exists($class, '_properties')) {
+                try {
+                    static::$_properties_cached[$class] = \Arr::merge(
+                        \DB::list_columns(static::table(), null, static::connection()),
+                        static::$_properties_cached[$class]
+                    );
+                } catch (\Exception $e) {
+                    // Do nothing, call from get() or set(), list_column not explicitly reclaimed
+                }
+            }
+
+            \Cache::set('model_properties.'.str_replace('\\', '_', $class), static::$_properties_cached[$class]);
         }
 
         return static::$_properties_cached[$class];
@@ -535,32 +564,25 @@ class Model extends \Orm\Model
 
     public function set($property, $value = null)
     {
-        if (!is_array($property) && isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+        if (is_array($property)) {
+            return parent::set($property, $value);
+        }
+
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
             $property = static::prefix().$property;
         }
 
-        $class = get_called_class();
-        $properties_reload = !is_array($property) &&
-            property_exists($class, '_properties') &&
-            !isset($this->_custom_data[$property]);
+        $properties_reload = !isset($this->_custom_data[$property]);
 
-        parent::set($property, $value);
+        $return = parent::set($property, $value);
 
         if ($properties_reload && isset($this->_custom_data[$property])) {
-            try {
-                static::$_properties_cached[$class] = \DB::list_columns(static::table(), null, static::connection());
-                unset($this->_custom_data[$property]);
-                parent::set($property, $value);
-                if (array_key_exists($property, static::properties())) {
-                    logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
-                        'You have to set the additional model property "'.$property.'" in model config.');
-                }
-            } catch (\Exception $e) {
-                // Do nothing : set() may be really called for set a custom_data
-            }
+            static::properties(true);
+            unset($this->_custom_data[$property]);
+            $return = parent::set($property, $value);
         }
 
-        return $this;
+        return $return;
     }
 
     public function __set($name, $value)
@@ -672,23 +694,11 @@ class Model extends \Orm\Model
 
         try {
             return parent::get($property);
-        } catch (\OutOfBoundsException $oobe) {
-            $class = get_called_class();
-            if (property_exists($class, '_properties')) {
-                try {
-                    static::$_properties_cached[$class] = \DB::list_columns(static::table(), null, static::connection());
-                } catch (\Exception $e) {
-                    // Do nothing : if $property exist, we already have a logger above
-                    // else method throw an exception
-                }
-                if (array_key_exists($property, static::properties())) {
-                    logger(\Fuel::L_WARNING, 'Listing columns is deprecated for class '.$class.'. '.
-                        'You have to set the additional model property "'.$property.'" in model config.');
-                    return parent::get($property);
-                }
-            }
-            throw $oobe;
+        } catch (\OutOfBoundsException $e) {
+            static::properties(true);
         }
+
+        return parent::get($property);
     }
 
     public function & __get($name)

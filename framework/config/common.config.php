@@ -39,20 +39,27 @@ return array(
                 'action' => 'window.open',
                 'url' => '{{preview_url}}?_preview=1',
             ),
-            'disabled' =>
-            function($item)
+            'disabled' => array(
+            function($item, $params)
             {
                 if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                     $url = $item->url_canonical(array('preview' => true));
-                    return $item->is_new() || !!empty($url);
+                    if ($item->is_new()) {
+                        return true;
+                    }
+                    if (!!empty($url)) {
+                        return $params['config']['i18n']['visualising no url'];
+                    }
+
+                    return false;
                 }
                 return true;
-            },
+            }),
             'targets' => array(
                 'grid' => true,
                 'toolbar-edit' => true,
             ),
-            'visible' =>
+            'visible' => array(
             function($params) {
                 if (isset($params['item']) && $params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                     $url = $params['item']->url_canonical(array('preview' => true));
@@ -62,7 +69,7 @@ return array(
                     return true;
                 }
                 return false;
-            },
+            }),
         ),
         'share' => array(
             'label' => __('Share'),
@@ -77,18 +84,18 @@ return array(
             'targets' => array(
                 'toolbar-edit' => true,
             ),
-            'visible' =>
+            'visible' => array(
             function($params) {
                 $model = get_class($params['item']);
                 return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
-            },
+            }),
         ),
         'delete' => array(
             'action' => array(
                 'action' => 'confirmationDialog',
                 'dialog' => array(
                     'contentUrl' => '{{controller_base_url}}delete/{{_id}}',
-                    'title' => 'TO BE REPLACED',
+                    'title' => __('Deleting the item ‘{{title}}’'),
                 ),
             ),
             'label' => __('Delete'),
@@ -99,10 +106,10 @@ return array(
                 'grid' => true,
                 'toolbar-edit' => true,
             ),
-            'visible' =>
+            'visible' => array(
             function($params) {
                 return !isset($params['item']) || !$params['item']->is_new();
-            },
+            }),
         ),
     ),
 );

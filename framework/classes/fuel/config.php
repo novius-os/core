@@ -161,19 +161,44 @@ class Config extends \Fuel\Core\Config
 
     static public function getActionDisabledState($disabled, $item)
     {
-        if (is_callable($disabled)) {
-            $disabled = $disabled($item);
+        $common_config = \Nos\Config_Common::load(get_class($item), array());
+        return static::processCallbackValue($disabled, false, $item, array('config' => $common_config));
+    }
+
+    /**
+     * General function to process callback value : can be simple values, callbacks, or array of callbacks
+     *
+     * @param  mixed  $value  Value to process
+     * @param  mixed  $positive_value   If the value is an array of callbacks, it defines which value is expected.
+     * If callback return the expected value, then we call next callback. Otherwise, we return the value.
+     *
+     * All appended parameters are sent to the callback functions (if there is any)
+     *
+     * @return mixed
+     */
+    static public function processCallbackValue()
+    {
+        $arg_list = func_get_args();
+        $value = $arg_list[0];
+        $expected_value = $arg_list[1];
+        $params = array_slice($arg_list, 2);
+        if (is_callable($value)) {
+            return call_user_func_array($value, $params);
         }
-        if (is_array($disabled)) {
-            foreach ($disabled as $disabled_item) {
-                $disabled_state = static::getActionDisabledState($disabled_item, $item);
-                if ($disabled_state !== false) {
-                    return $disabled_state;
+
+        if (is_array($value)) {
+            foreach ($value as $value_item) {
+                $new_arg_list = $arg_list;
+                $new_arg_list[0] = $value_item;
+                $return = call_user_func_array('static::processCallbackValue', $new_arg_list);
+                if ($return !== $expected_value) {
+                    return $return;
                 }
             }
-            return false;
+            return $expected_value;
         }
-        return $disabled;
+
+        return $value;
     }
 
     protected static function can_add_action($action, $params)
@@ -186,7 +211,11 @@ class Config extends \Fuel\Core\Config
             return false;
         }
 
-        return !isset($action['visible']) || $action['visible']($params);
+        if (isset($action['visible'])) {
+            return static::processCallbackValue($action['visible'], true, $params);
+        }
+
+        return true;
     }
 
     /**

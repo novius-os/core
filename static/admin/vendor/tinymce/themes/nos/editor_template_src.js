@@ -1905,11 +1905,11 @@
                     return data;
                 })(),
                 data_config = edit ? $.extend(true, {
-                        nosContext : self.settings.theme_nos_context,
+                        nosContext : $(ed.getElement()).closest('.nos-dispatcher').data('nosContext'),
                         enhancer: metadata.id,
                         enhancerAction: 'update'
                     }, config) : {
-                        nosContext : self.settings.theme_nos_context,
+                        nosContext : $(ed.getElement()).closest('.nos-dispatcher').data('nosContext'),
                         enhancer: metadata.id,
                         enhancerAction: 'insert'
                     },

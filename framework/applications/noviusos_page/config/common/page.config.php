@@ -80,10 +80,10 @@ return array(
         'list' => array(
             'delete' => array(
                 'primary' => false,
-                'disabled' =>
+                'disabled' => array(
                     function($page) {
                         return $page->page_lock == $page::LOCK_DELETION;
-                    },
+                    }),
             ),
             'add' => array(
                 'label' => __('Add a page'),
@@ -96,17 +96,15 @@ return array(
                     'action' => 'window.open',
                     'url' => '{{previewUrl}}',
                 ),
-                'disabled' => function() {
-                    return false;
-                },
+                'disabled' => false,
                 'targets' => array(
                     'grid' => true,
                     'toolbar-edit' => true,
                 ),
-                'visible' =>
+                'visible' => array(
                 function($params) {
                     return !isset($params['item']) || !$params['item']->is_new();
-                }
+                })
             ),
             'add_subpage' => array(
                 'label' => __('Add a sub-page to this page'),
@@ -140,10 +138,10 @@ return array(
                 'targets' => array(
                     'grid' => true,
                 ),
-                'disabled' =>
+                'disabled' => array(
                     function($page) {
                         return !!$page->page_home ? __('This page is already the home page.') : false;
-                    },
+                    }),
             ),
             'duplicate' => array(
                 'action' => array(

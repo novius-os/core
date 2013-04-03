@@ -32,6 +32,11 @@ define('jquery-nos-inspector-tree-model-radio',
                                 }
                             }),
                         rendered = false,
+                        $hidden = $('<input type="hidden" />').attr({
+                                name : params.input_name,
+                                value : $.isPlainObject(params.selected) && params.selected.id ? params.selected.id : ''
+                            })
+                            .appendTo(container),
                         listenReloadEvent = function() {
                             if (params.reloadEvent) {
                                 container.nosUnlistenEvent('inspector' + id);
@@ -54,7 +59,6 @@ define('jquery-nos-inspector-tree-model-radio',
                                 treeOptions.context = connector.data('nosContext') || '';
                             }
 
-                            container.find('input[name="' + params.input_name + '"]').remove();
                             table.nostreegrid({
                                 sortable : false,
                                 movable : false,
@@ -110,7 +114,7 @@ define('jquery-nos-inspector-tree-model-radio',
                             if ($.isPlainObject(args.row.data)) {
 
                                 $('<input type="radio" />').attr({
-                                    name : params.input_name,
+                                    name : params.input_name + 'fake',
                                     value : args.row.data._id
                                 })
                                     .click(function() {
@@ -119,6 +123,7 @@ define('jquery-nos-inspector-tree-model-radio',
                                             id : args.row.data._id,
                                             model : args.row.data._model
                                         };
+                                        $hidden.val(args.row.data._id);
                                         $(this).trigger('selectionChanged', args.row.data);
                                     })
                                     .appendTo(args.$container);
@@ -127,15 +132,6 @@ define('jquery-nos-inspector-tree-model-radio',
                             }
                         }
                     });
-
-                    // keep selected value when hidden
-                    if ($.isPlainObject(params.selected) && params.selected.id) {
-                        $('<input type="hidden" />').attr({
-                                name : params.input_name,
-                                value : params.selected.id
-                            })
-                            .appendTo(container);
-                    }
 
                     table.css({
                         height : '100%',
