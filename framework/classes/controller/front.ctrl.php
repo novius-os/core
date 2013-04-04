@@ -18,9 +18,14 @@ class NotFoundException extends \Exception
 {
 }
 
+class FrontIgnoreTemplateException extends \Exception
+{
+}
+
 class Controller_Front extends Controller
 {
     protected $_url = '';
+    protected $_extension = '';
     protected $_page_url = '';
     protected $_enhancer_url = false;
     protected $_enhanced_url_path = false;
@@ -29,6 +34,7 @@ class Controller_Front extends Controller
 
     protected $_template;
     protected $_view;
+    protected $_content;
 
     protected $_is_preview = false;
 
@@ -49,24 +55,46 @@ class Controller_Front extends Controller
 
     protected $_wysiwyg_name = null;
 
+    protected $_cache;
+    protected $_use_cache = true;
+    protected $_cache_duration = 60;
+    protected $_custom_data = array();
+    protected $_status = 200;
+    protected $_headers = array();
+
+    protected $_custom_data_cached = array();
+    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url', '_status', '_headers');
+
+    public function before()
+    {
+        parent::before();
+        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
+    }
+
     public function router($action, array $params, $status = 200)
     {
+        $this->_status = $status;
+
         $this->_base_href = \URI::base(false);
         $this->_context_url = \URI::base(false);
 
         $this->_url = \Input::server('NOS_URL');
-        $url = str_replace('.html', '', $this->_url);
+        $this->_extension = pathinfo($this->_url, PATHINFO_EXTENSION);
+        $url = $this->_url;
+        if (!empty($this->_extension)) {
+            $url = \Str::sub($url, 0, - strlen($this->_extension) - 1);
+        }
 
         $this->_is_preview = \Input::get('_preview', false);
 
-        $cache_path = (empty($url) ? 'index/' : $url);
+        $cache_path = (empty($this->_url) ? 'index/' : $this->_url);
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
         if (\Input::method() == 'POST' || $this->_is_preview) {
-            $no_cache = true;
+            $this->_use_cache = false;
         } else {
-            $no_cache = !\Input::get('_cache', \Config::get('novius-os.cache', true));
+            $this->_use_cache = \Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
         \Event::trigger('front.start');
@@ -74,30 +102,46 @@ class Controller_Front extends Controller
 
         $cache_path = str_replace(array('http://', 'https:://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
 
-        $cache = FrontCache::forge('pages'.DS.$cache_path);
+        $this->_cache = FrontCache::forge('pages'.DS.$cache_path);
 
         try {
-            if ($no_cache) {
+            if (!$this->_use_cache) {
                 throw new CacheNotFoundException();
             }
 
             // Cache exist, retrieve his content
-            $content = $cache->execute($this);
+            $this->_content = $this->_cache->execute($this);
         } catch (CacheNotFoundException $e) {
             // Cache not exist, try to found page for this URL
 
             // Build array of possibles contexts for this absolute URL
             $contexts_possibles = array();
-            foreach (Tools_Context::contexts() as $context => $domains) {
-                foreach ($domains as $domain) {
-                    if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
-                        $contexts_possibles[$context] = $domain;
-                        break;
+            try {
+                foreach (Tools_Context::contexts() as $context => $domains) {
+                    foreach ($domains as $domain) {
+                        if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
+                            $contexts_possibles[$context] = $domain;
+                            break;
+                        }
                     }
                 }
+            } catch (\RuntimeException $e) {
+                if (!is_file(APPPATH.'config'.DS.'contexts.config.php')) {
+                    // if install.php is there, redirects!
+                    if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
+                        \Response::redirect($this->_base_href.'install.php');
+                    }
+                }
+
+                echo \View::forge('nos::errors/blank_slate_front', array(
+                    'base_url' => $this->_base_href,
+                    'error' => 'Context configuration error.',
+                    'exception' => $e,
+                ), false);
+                exit();
             }
 
-            $cache->start();
+            $this->_cache->start();
 
             // Filter URLs enhanced : remove if not in possibles contexts, remove if url not match
             $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
@@ -140,52 +184,88 @@ class Controller_Front extends Controller
 
                 $_404 = false;
                 try {
-                    $this->_generate_cache();
+                    $this->_cache->reset();
+                    $this->_findPage();
+
+                    \Event::trigger('front.pageFound');
+
+                    $this->_generateCache();
+
+                    $this->_content = $this->_view->render();
+
+                    $this->_handleHead();
+                    \Event::trigger_function('front.display', array(&$this->_content));
+
+                    echo $this->_content;
+
+                    $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $this->_cache->execute();
+
+                    break;
+                } catch (FrontIgnoreTemplateException $e) {
+                    echo $this->_content;
+
+                    $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $this->_cache->execute();
+
+                    break;
                 } catch (NotFoundException $e) {
                     $_404 = true;
                     $this->_page = null;
                     $this->_enhanced_url_path = false;
                     $this->_enhancer_url = false;
                     continue;
+                } catch (\Database_Exception $e) {
+                    // No database configuration file is found
+                    if (!is_file(APPPATH.'config'.DS.'db.config.php')) {
+                        // if install.php is there, redirects!
+                        if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
+                            \Response::redirect($this->_base_href.'install.php');
+                        }
+                    }
+
+                    echo \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                        'error' => 'Database configuration error.',
+                        'exception' => $e,
+                    ), false);
+                    exit();
                 } catch (\Exception $e) {
                     // Cannot generate cache: fatal error...
                     //@todo : error page case
                     exit($e->getMessage());
                 }
-
-                $content = $this->_view->render();
-
-                $this->_handle_head($content);
-                \Event::trigger_function('front.display', array(&$content));
-
-                echo $content;
-
-                $cache->save($no_cache ? -1 : \Config::get('novius-os.cache_duration_page', 5), $this);
-                $content = $cache->execute();
-
-                break;
             }
 
             if ($_404) {
-                $event_404 = \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
-                $event_404 = array_filter($event_404);
-                if (empty($event_404)) {
-                    // If no redirection then we display 404
-                    if (!empty($url)) {
-                        $_SERVER['NOS_URL'] = '';
+                \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
 
-                        return $this->router('index', $params, 404);
-                    } else {
-                        echo \View::forge('nos::errors/blank_slate_front', array(
-                            'base_url' => $this->_base_href,
-                        ), false);
-                        exit();
-                    }
+                // If no redirection then we display 404
+                if (!empty($url)) {
+                    $_SERVER['NOS_URL'] = '';
+
+                    return $this->router('index', $params, 404);
+                } else {
+                    // The DB config is there, there's probably no homepage.
+                    echo \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                    ), false);
+                    exit();
                 }
             }
         }
 
-        return \Response::forge($content, $status);
+        \Event::trigger_function('front.response', array(array('content' => &$this->_content, 'status' => &$this->_status, 'headers' => &$this->_headers)));
+
+        return \Response::forge($this->_content, $this->_status, $this->_headers);
+    }
+
+    /**
+     * @return string
+     */
+    public function getContext()
+    {
+        return $this->_context;
     }
 
     /**
@@ -257,6 +337,7 @@ class Controller_Front extends Controller
 
     /**
      * @param $title
+     * @param $template
      * @return Controller_Front
      */
     public function setTitle($title, $template = null)
@@ -371,7 +452,7 @@ class Controller_Front extends Controller
         return $this->_is_preview;
     }
 
-    protected function _handle_head(&$content)
+    protected function _handleHead()
     {
         $replaces  = array(
             '_base_href'         => array(
@@ -396,6 +477,7 @@ class Controller_Front extends Controller
             ),
         );
 
+        $content = $this->_content;
         $replace_fct = function($pattern, $replace) use (&$content) {
             $content_old = $content;
             $content = preg_replace(
@@ -472,26 +554,15 @@ class Controller_Front extends Controller
         if (count($footer)) {
             $replace_fct('</body>', implode("\n", $footer)."\n</body>");
         }
+        $this->_content = $content;
     }
 
     /**
      * Generate the cache. Renders all wysiwyg and assign them to the view.
      */
-    protected function _generate_cache()
+    protected function _generateCache()
     {
-        $this->_find_page();
-        $this->_find_template();
-
-        \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
-
-        if ($this->_page->page_meta_noindex) {
-            $this->setTitle($this->_page->page_title);
-            $this->setMetaRobots('noindex');
-        } else {
-            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
-            $this->setMetaDescription($this->_page->page_meta_description);
-            $this->setMetaKeywords($this->_page->page_meta_keywords);
-        }
+        $this->_findTemplate();
 
         $wysiwyg = array();
 
@@ -511,12 +582,12 @@ class Controller_Front extends Controller
     /**
      * Find the page in the database and fill in the page variable.
      */
-    protected function _find_page()
+    protected function _findPage()
     {
         if (!empty($this->_page_id)) {
             $where = array(array('page_id', $this->_page_id));
             if (!$this->_is_preview) {
-                $where[] = array('page_published', 1);
+                $where[] = array('published', 1);
             }
 
             $page = Page\Model_Page::find('first', array(
@@ -538,7 +609,7 @@ class Controller_Front extends Controller
 
                 $where = array(array('page_context', $context));
                 if (!$this->_is_preview) {
-                    $where[] = array('page_published', 1);
+                    $where[] = array('published', 1);
                 }
                 if (empty($url)) {
                     $where[] = array('page_entrance', 1);
@@ -563,8 +634,6 @@ class Controller_Front extends Controller
         }
 
         if (empty($this->_page)) {
-            // Blank slate also needs the base_href to display a 404 from a sub-folder
-            $this->setBaseHref($domain);
             throw new NotFoundException('The requested page was not found.');
         }
 
@@ -576,9 +645,24 @@ class Controller_Front extends Controller
         $this->_context = $this->_page->get_context();
         $this->_context_url = $this->_contexts_possibles[$this->_context];
         \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_page->get_context()));
+
+        \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
+
+        if ($this->_page->page_meta_noindex) {
+            $this->setTitle($this->_page->page_title);
+            $this->setMetaRobots('noindex');
+        } else {
+            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
+            $this->setMetaDescription($this->_page->page_meta_description);
+            $this->setMetaKeywords($this->_page->page_meta_keywords);
+        }
+
+        if (!empty($this->_page->page_cache_duration)) {
+            $this->_cache_duration = $this->_page->page_cache_duration;
+        }
     }
 
-    protected function _find_template()
+    protected function _findTemplate()
     {
         // Find the template
         $templates = \Nos\Config_Data::get('templates', array());
@@ -593,38 +677,139 @@ class Controller_Front extends Controller
         }
 
         try {
-            // Try normal loading
             $this->_view = View::forge($this->_template['file']);
         } catch (\FuelException $e) {
+            throw new \Exception('The template '.$this->_template['file'].' cannot be found.');
+        }
+    }
 
-            $template_file = \Finder::search('views', $this->_template['file']);
+    public function getCache()
+    {
+        $cache = array();
+        foreach (static::$_properties_cached as $property) {
+            $cache[$property] = $this->{$property};
+        }
 
-            if (!is_file($template_file)) {
-                throw new \Exception('The template '.$this->_template['file'].' cannot be found.');
+        $cache['_custom_data'] = array();
+        foreach ($this->_custom_data_cached as $property) {
+            \Arr::set($cache['_custom_data'], $property, \Arr::get($this->_custom_data, $property, null));
+        }
+
+        return $cache;
+    }
+
+    public function rebuildCache($cache)
+    {
+        $_properties_cached = static::$_properties_cached + array('_custom_data');
+        foreach ($_properties_cached as $property) {
+            if (isset($cache[$property])) {
+                $this->{$property} = $cache[$property];
+                unset($cache[$property]);
             }
-            $this->_view = View::forge($template_file);
+        }
+
+        \Event::trigger('front.pageFound');
+    }
+
+    /**
+     * @return Controller_Front
+     */
+    public function disableCaching()
+    {
+        $this->_use_cache = false;
+
+        return $this;
+    }
+
+    /**
+     * @param $cache_duration
+     * @return Controller_Front
+     */
+    public function setCacheDuration($cache_duration)
+    {
+        $this->_cache_duration = $cache_duration;
+
+        return $this;
+    }
+
+    /**
+     * @param $status
+     * @return Controller_Front
+     */
+    public function setStatus($status)
+    {
+        $this->_status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name The header name
+     * @param string $value The header value
+     * @param bool|string $replace Whether to replace existing value for the header, will never overwrite/be overwritten when false
+     *
+     * @return Controller_Front
+     */
+    public function setHeader($name, $value, $replace = true)
+    {
+        if ($replace) {
+            $this->_headers[$name] = $value;
+        } else {
+            $this->_headers[] = array($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns a (dot notated) custom data
+     *
+     * @param   string   $item      name of the custom data, can be dot notated
+     * @param   mixed    $default   the return value if the custom data isn't found
+     * @return  mixed               the custom data or default if not found
+     */
+    public function getCustomData($item, $default = null)
+    {
+        return \Arr::get($this->_custom_data, $item, $default);
+    }
+
+    /**
+     * Sets a (dot notated) custom data
+     *
+     * @param    string    $item a (dot notated) custom data key
+     * @param    mixed     $value the custom data value
+     * @param    boolean   $cached if custom data have to be cached
+     * @return   void      the \Arr::set result
+     */
+    public function setCustomData($item, $value, $cached = false)
+    {
+        \Arr::set($this->_custom_data, $item, $value);
+        if ($cached) {
+            $this->_custom_data_cached[] = $item;
         }
     }
 
-    public function save_cache()
+    /**
+     * Replace the template by a specific content and stop treatments
+     *
+     * @param mixed $content The new content, can be a string or a View
+     * @throws FrontIgnoreTemplateException Internal exception for stopping treatments
+     */
+    public function sendContent($content)
     {
-        $page_fields = array('id', 'parent_id', 'level', 'title', 'menu_title', 'meta_title', 'type', 'meta_noindex', 'entrance', 'home', 'virtual_name', 'virtual_url', 'external_link', 'external_link_type', 'meta_description', 'meta_keywords');
-        $this->cache['page'] = array();
-        foreach ($page_fields as $field) {
-            $this->cache['page'][$field] = $this->_page->{'page_'.$field};
-        }
-        //return parent::save_cache();
-        return $this->cache; //@todo: to be reviewed
+        $this->_content = $content;
+
+        throw new FrontIgnoreTemplateException();
     }
 
-    public function rebuild_cache($cache)
+    /**
+     * Add a cache suffix handler for the current page
+     *
+     * @param array $handler The cache suffix handler
+     * @return null|\Nos\FrontCache The cache instance if the cache path have changed, null otherwise
+     */
+    public function addCacheSuffixHandler(array $handler)
     {
-        $page = array();
-        foreach ($cache['page'] as $field => $value) {
-            $page['page_'.$field] = $value;
-        }
-        $this->_page = new \Nos\Page\Model_Page($page, false);
-        $this->_page->freeze();
-        unset($cache['page']);
+        return $this->_cache->addSuffixHandler($handler);
     }
 }

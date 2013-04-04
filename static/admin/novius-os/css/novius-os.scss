@@ -209,6 +209,16 @@ ul {
     width: 5%;
 }
 
+.wijmo-wijgrid-frozener-v, .wijmo-wijgrid-frozener-h {
+    overflow: hidden;
+}
+.wijmo-wijgrid-frozener-v {
+    width: 0;
+}
+.wijmo-wijgrid-frozener-h {
+    height: 0;
+}
+
 .ui-tabs-left div.nos-tabs-context-content {
     left: 6%;
     width: 94%;
@@ -239,7 +249,7 @@ input.ui-state-disabled {
 }
 
 // Right menu on form pages
-.wijmo-wijaccordion .ui-accordion-content, .fieldset.standalone {
+.wijmo-wijaccordion .wijmo-wijaccordion-content, .fieldset.standalone {
     > p, > div {
         margin: 0.5em 0;
     }
@@ -320,21 +330,72 @@ span.optional {
     opacity    : 0.7;
 }
 
-img.publication_status {
+.line .line.crud_subtitle {
+    overflow: visible;
+    margin-bottom: 1em;
+    margin-left: 2px;
+}
+
+.crud_subtitle {
+    td {
+        vertical-align: top;
+    }
+}
+
+img.publication_status, span.publication_status {
+    display: inline-block;
     vertical-align: middle;
 }
 
 .publishable {
+    line-height: 1.4em;
+    margin:0 2em 0 0em;
+}
+
+.publishable_radio {
+    white-space: nowrap;
+
     .ui-button-text {
         padding : 0;
         width : 20px;
         height : 20px;
 
-        img {
+        img, span {
+            display: inline-block;
             vertical-align : middle;
         }
     }
 }
+.publishable_label {
+    padding-left: 10px;
+    height: 2.8em;
+}
+
+.publishable_schedule {
+    padding-left:10px;
+}
+
+table.publication_status {
+
+    a {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    td {
+        white-space: nowrap;
+
+        &:first-child {
+            padding-right: 0.5em;
+            text-align: right;
+        }
+        &:last-child {
+            padding-left: 0.5em;
+        }
+    }
+
+}
+
 .nos-notification {
 	top : 69px;
 }
@@ -519,98 +580,78 @@ table.title-fields {
 	padding: 0px;
 }
 
-.permissions {
+.native_permissions {
 
-	.applications {
-		overflow: hidden;
-        padding-left: 3em;
-		.application {
-			border: 1px solid #A8A8A8;
-			border-radius: 5px 0 0 5px;
-			border-right: 0px;
-			height: 80px;
-			position: relative;
-			margin-top: 10px;
-            margin-bottom: 20px;
+    padding-right: 2em;
+
+    .permission {
+        margin-bottom: 2em;
+
+        h2 {
+            font-size: 1.1em;
+            margin: 1em 0;
+        }
+    }
+
+    /* Width and Height of the checkbox hit area. This also is the height of a <li> item */
+    $checkbox_hit_area_size: 50px;
+
+    p.check_all {
+        margin-left: ($checkbox_hit_area_size - 16px) / 2 + 1; /* +1 because of the left-border */
+        margin-bottom: 1em;
+    }
+
+    ul.applications {
+        list-style-type: none;
+    }
+
+    li.application {
+        padding-left: $checkbox_hit_area_size + 20px;
+        line-height: $checkbox_hit_area_size;
+        font-size: 1.2em;
+        position: relative;
+        margin-bottom: 1em;
 
 
-			&.all {
-				height: 40px;
-	            border: none;
+        .checkbox_hit_area {
+            background-color: #E8E8E8;
+            position: absolute;
+            top: 0;
+            left:0;
+            width: $checkbox_hit_area_size;
+            height: $checkbox_hit_area_size;
+            cursor: pointer;
 
-	            &:hover, &.selected {
-	                background: none !important;
-	            }
+            .wijmo-checkbox {
+                line-height: $checkbox_hit_area_size;
+                text-align: center;
+                margin: 0;
+            }
+            .wijmo-checkbox-box {
+                position: absolute;
+                top: -10px;
+                left: ($checkbox_hit_area_size - 16px) / 2; /* 16 = wijmo-checkbox width */
+            }
+        }
 
-				.infos {
-					line-height: 40px;
-	                background: none;
-	                left: 60px;
-				}
-
-				.maincheck {
-				    background: none;
-
-					.wijmo-checkbox {
-						margin-top: 11px;
-					}
-				}
-			}
-
-			&.checked, &.unchecked {
-
-			}
-
-			&:hover, &.selected {
-				background-color: #F5F5F5;
-			}
-
-			.maincheck {
-				position: absolute;
-				top: 0px;
-				bottom: 0px;
-				left: 0px;
-				width: 35px;
-				border-radius: 5px 0 0 5px;
-				background-color: #E8E8E8;
-
-				.wijmo-checkbox {
-					margin-left: 8px;
-					margin-top: 28px;
-				}
-			}
-
-			.icon {
-				position: absolute;
-				top: 0px;
-				bottom: 0px;
-				left: 35px;
-				width: 100px;
-
-				img {
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					margin-top: -32px;
-					margin-left: -32px;
-				}
-			}
-
-			.infos {
-				position: absolute;
-				top: 0px;
-	            left: 155px;
-				bottom: 0px;
-				right: 0px;
-				line-height: 80px;
-				font-size: 24px;
-			}
-
-		}
-
-	}
+        img.app_icon {
+            vertical-align: middle;
+        }
+    }
 }
 
+.app_permissions {
+
+    > div {
+        position: relative;
+    }
+
+    .preview_arrow {
+        display: block;
+        position: absolute;
+        left: -35px;
+    }
+}
 
 .ui-tabs-left .wijmo-wijtabs-content {
     width: 84%;

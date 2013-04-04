@@ -1,7 +1,7 @@
 /*globals jQuery Raphael Globalize*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -456,6 +456,8 @@
 			click: null
 		},
 
+		widgetEventPrefix: "wijbubblechart",
+
 		_setOption: function (key, value) {
 			var self = this,
 				o = self.options;
@@ -468,12 +470,16 @@
 				}
 				o[key] = value;
 				self.redraw();
-			}
+			}			
 			else if (key === "chartLabel") {
 				$.extend(o.chartLabel, value);
 				self.redraw();
 			}
 			else {
+				if (key === "showChartLabels" || key === "chartLabelStyle") { 
+					o[key] = value;
+					self._setLabelOption();
+				}
 				$.wijmo.wijchartcore.prototype._setOption.apply(self, arguments);
 			}
 			if (key === "seriesList") {
@@ -487,7 +493,7 @@
 				o = self.options,
 				defFill = self._getDefFill();
 
-
+			this._hotFixForJQ1_9();
 			$.each(o.seriesStyles, function (idx, style) {
 				if (!style.fill) {
 					style.fill = defFill[idx];
@@ -636,7 +642,8 @@
 				mouseMove: $.proxy(self._mouseMove, self),
 				click: $.proxy(self._click, self),
 				disabled: o.disabled,
-				culture: self._getCulture()
+				culture: self._getCulture(),
+				widget: this
 			});
 
 			self.tooltipbubbles = [];
@@ -994,6 +1001,10 @@
 					if (bubbleInfo.bubble.tracker) {
 						bubbleInfo.bubble.tracker.show();
 					}
+
+					if ($(bubbleInfo.bubble.node).data("wijchartDataObj")) {
+						$(bubbleInfo.bubble.node).data("wijchartDataObj").visible = true;
+					}
 				}
 				if (bubbleInfo.dcl) {
 					bubbleInfo.dcl.show();
@@ -1011,12 +1022,32 @@
 					if (bubbleInfo.bubble.tracker) {
 						bubbleInfo.bubble.tracker.hide();
 					}
+					if ($(bubbleInfo.bubble.node).data("wijchartDataObj")) {
+						$(bubbleInfo.bubble.node).data("wijchartDataObj").visible = false;
+					}
 				}
 				if (bubbleInfo.dcl) {
 					bubbleInfo.dcl.hide();
 				}
 				if (bubbleInfo.symbol) {
 					bubbleInfo.symbol.hide();
+				}
+			});
+		},
+
+		_indicatorLineShowing: function (objs) {
+			$.wijmo.wijchartcore.prototype._indicatorLineShowing.apply(this, arguments);
+			$.each(objs, function (i, obj) {
+				if (obj.bubble) {
+					obj.bubble.attr(obj.hoverStyle);
+				}
+			})
+		},
+
+		_removeIndicatorStyles: function (objs) {
+			$.each(objs, function (i, obj) {
+				if (obj.bubble) {
+					obj.bubble.attr(obj.style);
 				}
 			});
 		},
@@ -1203,7 +1234,8 @@
 				bubbleInfos = [],
 				disabled = o.disabled,
 				trackers = canvas.set(),
-				culture = o.culture;
+				culture = o.culture,
+				widget = o.widget;
 
 			function initAnimationState(bubbleInfo, bounds) {
 				var bubble = bubbleInfo.bubble,
@@ -1323,7 +1355,7 @@
 			function getLabelVisible(visibles, index) {
 				var visible = true;
 				$.each(visibles, function (i, n) {
-					if (index === i) {
+					if (index === n) {
 						visible = false;
 						return false;
 					}
@@ -1398,7 +1430,7 @@
 					ky = height / (maxY - minY),
 					serieEles = [],
 					bubbleRadius = options.bubbleRadius,
-					dcl, imgWidth, imgHeight;
+					dcl, imgWidth, imgHeight, pointX;
 
 				if (data.y1 === undefined) {
 					return;
@@ -1464,7 +1496,8 @@
 						x: x,
 						y: y,
 						type: "bubble",
-						hoverStyle: seriesHoverStyle
+						hoverStyle: seriesHoverStyle,
+						visible: true
 					}, series);
 					if (symbol) {
 						wijchartDataObj.symbol = true;
@@ -1476,6 +1509,19 @@
 						$.wijraphael.addClass($(symbolEl.node), "wijbubblechart-symbol");
 					}
 					$(bubble.node).data("wijchartDataObj", wijchartDataObj);
+
+					// cache the bar position to show indicator line.
+					widget.dataPoints = widget.dataPoints || {};
+					widget.pointXs = widget.pointXs || [];
+
+					pointX = $.round(sX, 2);
+
+					if (!widget.dataPoints[pointX.toString()]) {
+						widget.dataPoints[pointX.toString()] = [];
+						widget.pointXs.push(pointX);
+					}
+
+					widget.dataPoints[pointX.toString()].push(wijchartDataObj);
 
 					tracker = bubble.clone();
 					//.attr({ opacity: 0.01, fill: "white", "fill-opacity": 0.01 });
@@ -1608,6 +1654,9 @@
 							}
 						}
 						else {
+							if (dataObj.hoverStyle["stroke-width"] && !dataObj.style["stroke-width"]) {
+								bubble.attr("stroke-width", "");
+							}
 							bubble.attr(dataObj.style);
 							if (dataObj.style.opacity) {
 								bubble.attr("opacity", dataObj.style.opacity);

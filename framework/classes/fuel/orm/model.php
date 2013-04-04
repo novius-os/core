@@ -87,7 +87,8 @@ class Model extends \Orm\Model
 
             if (empty($_title_property)) {
                 foreach ($properties as $column => $props) {
-                    if ($props['data_type'] === 'varchar') {
+                    // if data_type is not set then it is considered as varchar
+                    if (isset($props['data_type']) && $props['data_type'] === 'varchar') {
                         $_title_property = $column;
                         break;
                     }
@@ -127,18 +128,47 @@ class Model extends \Orm\Model
     /**
      * @see \Orm\Model::properties()
      */
-    public static function properties()
+    public static function properties($from_db = false)
     {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
 
-        if (!$init) {
+        if ($init && !$from_db) {
+            return static::$_properties_cached[$class];
+        }
+
+        try {
+            if ($from_db) {
+                if ($init) {
+                    unset(static::$_properties_cached[$class]);
+                }
+                throw new \CacheNotFoundException();
+            }
+
+            static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
+        } catch (\CacheNotFoundException $e) {
             parent::properties();
 
             $config = static::_config();
             if (!empty($config) && !empty($config['properties'])) {
-                static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+                static::$_properties_cached[$class] = \Arr::merge(
+                    static::$_properties_cached[$class],
+                    $config['properties']
+                );
             }
+
+            if ($from_db && property_exists($class, '_properties')) {
+                try {
+                    static::$_properties_cached[$class] = \Arr::merge(
+                        \DB::list_columns(static::table(), null, static::connection()),
+                        static::$_properties_cached[$class]
+                    );
+                } catch (\Exception $e) {
+                    // Do nothing, call from get() or set(), list_column not explicitly reclaimed
+                }
+            }
+
+            \Cache::set('model_properties.'.str_replace('\\', '_', $class), static::$_properties_cached[$class]);
         }
 
         return static::$_properties_cached[$class];
@@ -313,21 +343,7 @@ class Model extends \Orm\Model
                 $application = array_search($namespace, $namespaces);
             }
 
-            $config = \Config::load($application.'::'.$file_name, true);
-            $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-            if (!empty($dependencies[$application])) {
-                foreach ($dependencies[$application] as $dependency) {
-                    \Config::load($dependency.'::'.$file_name, true);
-                    $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
-                }
-            }
-            static::$_configs[$class] = \Arr::recursive_filter(
-                $config,
-                function ($var) {
-                    return $var !== null;
-                }
-            );
+            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
         }
 
         return static::$_configs[$class];
@@ -546,13 +562,27 @@ class Model extends \Orm\Model
         return null;
     }
 
-    public function set($name, $value = null)
+    public function set($property, $value = null)
     {
-        if (!is_array($name) && isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
-            $name = static::prefix().$name;
+        if (is_array($property)) {
+            return parent::set($property, $value);
         }
 
-        return parent::set($name, $value);
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+            $property = static::prefix().$property;
+        }
+
+        $properties_reload = !isset($this->_custom_data[$property]);
+
+        $return = parent::set($property, $value);
+
+        if ($properties_reload && isset($this->_custom_data[$property])) {
+            static::properties(true);
+            unset($this->_custom_data[$property]);
+            $return = parent::set($property, $value);
+        }
+
+        return $return;
     }
 
     public function __set($name, $value)
@@ -656,13 +686,19 @@ class Model extends \Orm\Model
         return $obj;
     }
 
-    public function & get($name)
+    public function & get($property)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
-            $name = static::prefix().$name;
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+            $property = static::prefix().$property;
         }
 
-        return parent::get($name);
+        try {
+            return parent::get($property);
+        } catch (\OutOfBoundsException $e) {
+            static::properties(true);
+        }
+
+        return parent::get($property);
     }
 
     public function & __get($name)
@@ -813,6 +849,16 @@ class Model extends \Orm\Model
     {
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
+    }
+
+    public function __sleep()
+    {
+        return array('_data', '_is_new');
+    }
+
+    public function __wakeup()
+    {
+        $this->initProviders();
     }
 }
 

@@ -17,14 +17,37 @@ class Model_User extends \Nos\Orm\Model
     protected static $_table_name = 'nos_user';
     protected static $_primary_key = array('user_id');
 
-    protected static $_delete;
+    protected static $_properties = array(
+        'user_id',
+        'user_md5',
+        'user_name',
+        'user_firstname',
+        'user_email',
+        'user_password',
+        'user_lang' => array(
+            'data_type' => 'varchar',
+            'default' => 'en_GB',
+        ),
+        'user_last_connection',
+        'user_configuration',
+        'user_created_at',
+        'user_updated_at',
+        'user_expert' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+    );
+
+    protected static $_delete = array(
+        'roles' => array(),
+    );
 
     protected static $_many_many = array(
         'roles' => array(
             'key_from' => 'user_id',
-            'key_through_from' => 'user_id', // column 1 from the table in between, should match a posts.id
-            'table_through' => 'nos_user_role', // both models plural without prefix in alphabetical order
-            'key_through_to' => 'role_id', // column 2 from the table in between, should match a users.id
+            'key_through_from' => 'user_id',
+            'table_through' => 'nos_user_role',
+            'key_through_to' => 'role_id',
             'model_to' => 'Nos\User\Model_Role',
             'key_to' => 'role_id',
             'cascade_save' => false,
@@ -85,21 +108,23 @@ class Model_User extends \Nos\Orm\Model
         }
         $already_saved[$this->user_id] = true;
 
-        if (empty($this->roles)) {
+        // If roles are not enabled, we create one internally to store its permissions
+        if (empty($this->roles) && \Config::get('novius-os.users.enable_roles', false) === false) {
             $role = new Model_Role();
+            $role->role_name = $this->fullname();
             $role->role_user_id = $this->user_id;
-        } else {
-            $role = reset($this->roles);
+            $this->roles[] = $role;
+            $this->save(array('roles'));
         }
-        $role->role_name = $this->fullname();
-        $this->roles[] = $role;
-        $this->save(array('roles'));
+        $already_saved[$this->user_id] = false;
     }
 
     public function _event_before_delete()
     {
-        // Load the roles to delete
-        static::$_delete['roles'] = $this->roles;
+        // If roles are not enabled, we need to delete the internal one (used to store the permissions)
+        if (\Config::get('novius-os.users.enable_roles', false) === false) {
+            static::$_delete['roles'] = $this->roles;
+        }
     }
     public function _event_after_delete()
     {
@@ -113,7 +138,12 @@ class Model_User extends \Nos\Orm\Model
         return mb_substr($password, 0, 1).$password.mb_substr($password, -1);
     }
 
-    public function check_permission($app, $key)
+    /**
+     * @param   string       $permission_name  Name of the permission to check against
+     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @return  bool  Has the user the required authorisation?
+     */
+    public function check_permission($permission_name, $category_key = null)
     {
         $args = func_get_args();
         foreach ($this->roles as $g) {

@@ -126,8 +126,8 @@ define('jquery-nos-preview',
             },
 
             _loadImg : function(item, thumbnail) {
-                var self = this,
-                    o = self.options;
+                var self = this;
+                var o = self.options;
 
                 $('<img />')
                     .error(function() {
@@ -222,8 +222,11 @@ define('jquery-nos-preview',
                 var self = this,
                     o = self.options;
 
-                self.element.wijsuperpanel('destroy')
-                    .empty();
+                // wijsuperpanel can not be initialized
+                try{
+                    self.element.wijsuperpanel('destroy');
+                } catch (e) {}
+                self.element.empty();
 
                 self._uiHeader(o.texts.headerDefault);
 

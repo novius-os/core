@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -244,6 +244,9 @@
 				}
 			}
 		},
+		
+		widgetEventPrefix: "wijradialgauge",
+		
 		_create: function () {
 			var self = this;
 			$.wijmo.wijgauge.prototype._create.apply(self, arguments);
@@ -335,19 +338,25 @@
 				startAngle = o.startAngle,
 				sweepAngle = o.sweepAngle;
 
-			return startAngle * (1 - alpha) + (startAngle + sweepAngle) * alpha;
+			if (o.isInverted) {
+				return startAngle * alpha + (startAngle + sweepAngle) * (1 - alpha);
+			}
+			else {
+				return startAngle * (1 - alpha) + (startAngle + sweepAngle) * alpha;
+			}
 		},
 
 		_angleToLogical: function (angle) {
 			var self = this,
 				o = self.options,
 				startAngle = o.startAngle,
+				isInverted = o.isInverted,
 				relativeAngle = $.wijgauge.math.mod360(angle - startAngle),
 				absSweepAngle = o.sweepAngle,
 				overflow, underflow;
 
 			if (absSweepAngle === 0 || relativeAngle === 0) {
-				return 0;
+				return isInverted ? 1 : 0;
 			}
 			if (absSweepAngle < 0) {
 				relativeAngle = 360 - relativeAngle;
@@ -358,13 +367,19 @@
 				underflow = 360 - relativeAngle;
 				return overflow < underflow ? 1 : 0;
 			}
-			return relativeAngle / absSweepAngle;
+			if (isInverted) {
+				return 1 - relativeAngle / absSweepAngle;
+			}
+			else {
+				return relativeAngle / absSweepAngle;
+			}
 		},
 
 		// to do screen coordinates
 
 		_generatePoints: function (fromAngle, toAngle, fromLength, toLength) {
 			var self = this,
+				isInverted = self.options.isInverted,
 						max = parseInt(interpMinPoints + interpMinPoints *
 						(Math.abs(parseInt((toAngle - fromAngle), 10)) /
 						(interpMinPoints * interJump)), 10),
@@ -536,15 +551,41 @@
 				},
 				marker = opt.marker || "circle",
 				baseLength = marker === "rect" ? 5 : 2,
-				width = 2, length;
+				width = 2, length,
+				strokeWidth = opt.style["stroke-width"] || 0;
+
+			
+			if (marker === "tri" || marker === "invertedTri") {
+				baseLength = 5;
+				width = 3;
+			}
+
+			if (marker === "cross") {
+				opt.style.fill = opt.style.stroke || opt.style.fill;
+			}
+
+
+			if (isNaN( startLocation.x)) {
+				startLocation.x = 0;
+			}
 
 			length = baseLength * opt.factor;
+
+			width += strokeWidth * 2;
+			length += strokeWidth * 2;
+
 			if ($.isFunction(marker)) {
 				return marker.call(self, self.canvas, startLocation, o);
 			}
 			else {
+				if (marker === "tri") {
+					return self.canvas.isoTri(startLocation.x, startLocation.y, length, width, "west");
+				}
+				else if (marker === "invertedTri"){
+					return self.canvas.isoTri(startLocation.x, startLocation.y, length, width, "east");
+				}
 				return $.wijgauge.paintMarker(self.canvas, marker, startLocation.x,
-					startLocation.y, length, width);
+					startLocation.y, length, width, true);
 			}
 		},
 

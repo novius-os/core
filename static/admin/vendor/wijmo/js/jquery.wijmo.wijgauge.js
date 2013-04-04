@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -41,6 +41,22 @@
 			y2 = y + height;
 			x3 = x + width / 2;
 			y3 = y + height;
+		}
+		else if (compass === "east") {
+			x1 = x - width / 2;
+			y1 = y - height / 2;
+			x2 = x - width / 2;
+			y2 = y + height / 2;
+			x3 = x + width / 2;
+			y3 = y;
+		}
+		else if (compass === "west") { 
+			x1 = x - width / 2;
+			y1 = y;
+			x2 = x + width /2;
+			y2 = y - height / 2;
+			x3 = x + width / 2;
+			y3 = y + height / 2
 		}
 		arrPath = ["M", x1, y1, "L", x2, y2, "L", x3, y3, "z"];
 		return this.path(arrPath.concat(" "));
@@ -106,10 +122,16 @@
 			}
 			else {
 				if (isHorizontal) {
-					ele = canvas.paintMarker(marker, x, y, width);
+					if (marker === "tri") {
+						ele = canvas.isoTri(x, y, length, width);
+					}
+					else {
+						ele = canvas.paintMarker(marker, x, y, width);
+					}
 				}
 				else {
 					ele = canvas.paintMarker(marker, x, y, length);
+
 				}
 				return ele;
 			}
@@ -123,7 +145,7 @@
 				if (reg.test(format)) {
 					match = format.match(reg);
 					formater = RegExp.$1;
-					return format.replace(/\{0(?::(?:(?:n|d|p|c)\d?))?\}/gi, 
+					return format.replace(/\{0(?::(?:(?:n|d|p|c)\d?))?\}/gi,
 						Globalize.format(str, formater));
 				}
 			}
@@ -480,6 +502,15 @@
 			/// </summary>
 			ranges: [],
 			/// <summary>
+			/// A value that indicator the gauge whether shows value from left/top to 
+			/// right/bottom or right/bottom to left/top.
+			/// Default: false
+			/// Type: Boolean
+			/// Code example:
+			/// $("gauge").wijgauge("option", "isInverted", true)
+			/// </summary>
+			isInverted: false,
+			/// <summary>
 			/// Fires before the value changs, this event can be called.
 			/// Default: null
 			/// Type: Function
@@ -541,7 +572,8 @@
 
 		_create: function () {
 			var self = this,
-				o = self.options;
+				o = self.options,
+				newEle;
 			
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
@@ -589,8 +621,28 @@
 
 			self.element.addClass("ui-widget")
 			.toggleClass("ui-state-disabled", o.disabled);
-
-			self.canvas = new Raphael(self.element[0], o.width, o.height);
+			
+			// if fail to create canvas, move element to body and recreate it
+			// the issue that creating canvas in ie9 when element is invisible.
+			try {
+				self.canvas = new Raphael(self.element[0], o.width, o.height);
+			} catch (e) {
+				var displayCss = self.element.css("display");
+				newEle = $("<div></div>").insertBefore(self.element)
+					.append(self.element);
+				self.element.addClass("ui-helper-hidden-accessible")
+					.appendTo($('body'));
+				if (displayCss === "none") {
+					self.element.css("display", "block");
+				}
+				self.canvas = new Raphael(self.element[0], o.width, o.height);
+				self.element.appendTo(newEle).unwrap()
+					.removeClass("ui-helper-hidden-accessible");
+				if (displayCss === "none") {
+					self.element.css("display", "none");
+				}
+			}
+			//self.canvas = new Raphael(self.element[0], o.width, o.height);
 			self._autoCalculate();			
 			self._draw();
 		},
@@ -631,11 +683,9 @@
 
 			if (key === "disabled") {
 				self._handleDisabledOption(value, self.element);
+				$.Widget.prototype._setOption.apply(self, arguments);
 			}
 			else if (key === "value") {
-				if (o.disabled) { 
-					return;
-				}
 				if (self._trigger("beforeValueChanged", null, 
 					{ newValue: value, oldValue: oldValue })) {
 					$.Widget.prototype._setOption.apply(self, arguments);
@@ -645,9 +695,6 @@
 					{ newValue: value, oldValue: oldValue });
 			}			
 			else {
-				if (o.disabled) { 
-					return;
-				}		
 				$.Widget.prototype._setOption.apply(self, arguments);
 				if ($.isPlainObject(value)) {
 					o[key] = $.extend({}, oldValue, value);
@@ -701,15 +748,42 @@
 			var self = this;
 			if (self.pointer) {
 				self.pointer.wijRemove();
+				self.pointer = null;
 			}
 			self._paintPointer();
 			self._setPointer();
+		},
+
+		_clearState: function () {
+			var self = this;
+			if (self.markBbox) { 
+				self.markBbox = null;
+			}
+			self.labels = [];
+			self.majorMarks = [];
+			self.minorMarks = [];
+			self.face = null;
+			self.pointer = null;
+		},
+
+		_set_face: function(){
+			var self = this;
+			if (self.face) {
+				self.face.wijRemove();
+				self.face = null;
+				self._paintFace();
+				self._resetElementPosition();
+			}
 		},
 
 		_set_islogarithmic: function () {
 			var self = this;
 			self._redrawMarksAndLabels();
 			self._setPointer();
+		},
+
+		_set_isIncerted: function () {
+			this.redraw();
 		},
 
 		_set_logarithmicBase: function () {
@@ -748,6 +822,41 @@
 			var self = this;
 			self._removeRanges();
 			self._paintRanges();
+			self._resetElementPosition();
+		},
+
+		//when redraw the range or face or pointer, reset the z-index of the elements.
+		_resetElementPosition: function (resetRangePosition) {
+			var self = this;
+			if (resetRangePosition && self.ranges) {
+				$.each(self.ranges, function (i, n) {
+					n.toFront();
+				});				
+			}
+
+			if (self.majorMarks) {
+				$.each(self.majorMarks, function(i, mark) {
+					mark.toFront();
+				});
+			}
+			if (self.minorMarks) {
+				$.each(self.minorMarks, function(i, mark) {
+					mark.toFront();
+				});
+			}
+
+			if (self.labels) {
+				$.each(self.labels, function(i, label) {
+					label.toFront();
+				});
+			}
+
+			if (self.pointer) {
+				self.pointer.toFront();
+			}
+			if (self.cap) {
+				self.cap.toFront();
+			}
 		},
 
 		_redrawMarksAndLabels: function () {
@@ -821,6 +930,7 @@
 			var self = this,
 				o = self.options;
 			self.element.empty();
+			this._clearState();
 			self.canvas = new Raphael(self.element[0], o.width, o.height);
 			self._draw();
 		},
@@ -1053,9 +1163,10 @@
 				ele = outerEle || self.element,
 				eleOffset = ele.offset(),
 				disabledWidth = o.width || ele.outerWidth(),
-				disabledHeight = o.height || ele.outerHeight();
+				disabledHeight = o.height || ele.outerHeight(),
+				disabledDiv;
 
-			return $("<div></div>")
+			disabledDiv = $("<div></div>")
 					.addClass("ui-disabled")
 					.css({
 					"z-index": "99999",
@@ -1065,6 +1176,11 @@
 					left: eleOffset.left,
 					top: eleOffset.top
 				});
+			if (Raphael.vml) {
+				disabledDiv.addClass("ui-state-disabled")
+					.css("background-color", "#fff")
+			}
+			return disabledDiv;
 		}
 
 	});

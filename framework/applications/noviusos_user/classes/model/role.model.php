@@ -15,55 +15,100 @@ class Model_Role extends \Nos\Orm\Model
     protected static $_table_name = 'nos_role';
     protected static $_primary_key = array('role_id');
 
+    protected static $_properties = array(
+        'role_id',
+        'role_name',
+        'role_user_id',
+    );
+
     protected static $permissions;
-    protected $access;
 
-    public function check_permission($application, $key)
+    protected static $_many_many = array(
+        'users' => array(
+            'key_from' => 'role_id',
+            'key_through_from' => 'role_id',
+            'table_through' => 'nos_user_role',
+            'key_through_to' => 'user_id',
+            'model_to' => 'Nos\User\Model_User',
+            'key_to' => 'user_id',
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        ),
+    );
+
+    protected static $_has_many = array(
+        'permissions' => array(
+            'key_from' => 'role_id',
+            'model_to' => 'Nos\User\Model_Permission',
+            'key_to' => 'perm_role_id',
+            'cascade_save' => false,
+            'cascade_delete' => true, // Won't be used until ORM 1.6, @see _event_before_delete()
+        ),
+    );
+
+    public function _event_before_delete()
     {
-        if ($key == 'access') {
-            $this->load_access($application);
-            return $this->access->check($this, $key);
+        // @todo delete this method when upgrading the ORM to 1.6
+        // The FK on permission is part of the primary key so it doesn't work in 1.5
+        // https://github.com/fuel/orm/commit/a17324bf1912b36f9413306d017a39db1003b978
+        foreach ($this->permissions as $permission) {
+            $permission->delete();
+        }
+        unset($this->permissions);
+    }
+
+    /**
+     * @param   string       $permission_name  Name of the permission to check against
+     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @return  bool  Has the role the required authorisation?
+     */
+    public function check_permission($permission_name, $category_key = null)
+    {
+        if (!$this->_authorised($permission_name)) {
+            return false;
         }
 
-        $args = func_get_args();
-        $args = array_slice($args, 2);
-        array_unshift($args, $this->role_id);
-        $driver = $this->get_permission_driver($application, $key);
-        return call_user_func_array(array($driver, 'check'), $args);
-    }
-
-    public static function get_permission_driver($application, $key)
-    {
-        static::load_permission_driver($application, $key);
-        return static::$permissions[$application][$key];
-    }
-
-    public function load_access($application)
-    {
-        $this->access = \Nos\Permission::forge($application, 'access', array(
-            'driver' => 'select',
-            'title'=> 'Grant access to the application',
-            'label' => 'Grant access to the application',
-            'driver_config' => array(
-                'choices' => array(
-                    'access' => array(
-                        'title' => 'Access the application',
-                    ),
-                ),
-            ),
-        ));
-    }
-
-    public static function load_permission_driver($application, $key)
-    {
-        if (isset(static::$permissions[$application][$key])) {
-            return;
+        // For permissions without category, just check the existence of the permission
+        $isset = isset(static::$permissions[$this->role_id][$permission_name]);
+        if ($category_key == null) {
+            return $isset;
         }
 
-        $permissions = \Config::load("$application::permissions", true);
+        // For permission with categories, also check the existence of the category
+        return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
+    }
 
-        static::$permissions[$application][$key] = Permission::forge($application, $key, $permissions[$key]);
+    /**
+     * List all the categories of a given permission name. Returns an array of string or false when the role has not
+     * access, or the permission name does not exists.
+     *
+     * @param   string  $permission_name  The name of the permission to retrieve categories from
+     * @return  array|false   An array containing the list of categories (values) for the request permission name
+     */
+    public function listPermissionCategories($permission_name)
+    {
+        if (!$this->_authorised($permission_name)) {
+            return false;
+        }
+        return isset(static::$permissions[$this->role_id][$permission_name]) ? static::$permissions[$this->role_id][$permission_name] : false;
+    }
 
-        return static::$permissions[$application][$key];
+    protected function _authorised($permission_name)
+    {
+        // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
+        list($application, ) = explode($permission_name.'::', 2);
+        // If this application is loaded, check the user has access to it
+        if (\Module::loaded($application) && !$this->check_permission('nos::access', $application)) {
+            return false;
+        }
+
+        // Load permissions from the database
+        if (!isset(static::$permissions[$this->role_id])) {
+            $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
+            foreach ($query->as_object()->execute() as $permission) {
+                static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
+            }
+        }
+        return true;
     }
 }

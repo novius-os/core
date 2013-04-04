@@ -13,6 +13,8 @@ define('NOS_ENTRY_POINT', '404');
 // Boot the app
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
+Fuel::$profiling = false;
+
 $nos_url = Input::server('NOS_URL');
 
 \Event::trigger_function('404.start', array(array('url' => &$nos_url)));
@@ -33,7 +35,20 @@ if ($is_media) {
     if ($is_resized) {
         list(, $path, $max_width, $max_height, $verification, $extension) = $m;
         $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
-        $media_url = str_replace("/$max_width-$max_height", '', $media_url);
+
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$/'.$media_url.'$'.$max_width.'$'.$max_height);
+
+        // Thumbnails view or slideshow app just replace '64-64' by '128-128' in the URL...
+        if (empty($verification) || substr($hash, 0, 6) !== $verification) {
+            // Still allow generated for back-office authenticated users
+            if (!\Nos\Auth::check()) {
+                header('HTTP/1.0 403 Forbidden');
+                header('HTTP/1.1 403 Forbidden');
+                exit();
+            }
+        }
+
     } else {
         $media_url = str_replace('media/', '', $nos_url);
     }
@@ -180,11 +195,6 @@ if (!$is_attachment && !$is_media && pathinfo($nos_url, PATHINFO_EXTENSION) == '
     $response->send(true);
 }
 
-header('HTTP/1.0 404 Ok');
-header('HTTP/1.1 404 Ok');
-
-// Fire off the shutdown event
-Event::shutdown();
-
-// Make sure everything is flushed to the browser
-ob_end_flush();
+\Response::forge(\View::forge('nos::errors/404', array(
+    'base_url' => \Uri::base(false),
+), false), 404)->send();

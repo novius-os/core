@@ -1,7 +1,7 @@
 /*globals jQuery,window*/
 /*
 *
-* Wijmo Library 2.2.2
+* Wijmo Library 2.3.7
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -178,7 +178,7 @@
 			/// $(".selector").wijtree("option","nodes",
 			/// [{ text:"node1", navigateUrl:"#" }]);
 			/// </summary>
-			nodes: [],
+			nodes: null,
 
 			/// <summary>
 			/// The nodeBlur event handler. A function called when a node is blurred.
@@ -478,12 +478,12 @@
 
 		/* init methods*/
 		_create: function () {
-			
+
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
 			}
-			
+
 			this._initState();
 			this._createTree();
 			this._attachEvent();
@@ -534,9 +534,12 @@
 		},
 
 		_initState: function () { //declare the properties of tree
-			var self = this;
+			var self = this, o = self.options;
 			self._selectedNodes = [];
 			self._checkedNodes = [];
+			if (!o.nodes) {
+				o.nodes = [];
+			}
 			self._enabled = true;
 			self._insertPosition = "unKnown"; //end,after,before
 			self.nodeWidgetName = "wijtreenode";
@@ -609,7 +612,7 @@
 		},
 
 		_generateMarkup: function (item) {
-			var li, a, u = item.navigateUrl;
+			var li, a, u = item.navigateUrl || "";
 			if (!$.isPlainObject(item)) {
 				return;
 			}
@@ -718,7 +721,20 @@
 							oldOwner.remove(d);
 						}
 						if (newPosition !== -1) {
-							parent.add(d, newPosition);
+							// re-calculate position (when old parent== new parent)
+							if (position === "before" || position === "after") {
+								if (idx != $.inArray(dropNode, brothers)) {
+									newPosition--;
+								}
+							}
+
+							// Handling when the drop tree has no child-nodes
+							if (self.$nodes.children("li").length) {
+								parent.add(d, newPosition);
+							}
+							else {
+								self.add(d, newPosition);
+							}
 						}
 					}
 
@@ -884,7 +900,9 @@
 			}
 			nodes = self._getField("nodes");
 			if (!position || position > nodes.length) {
-				position = nodes.length;
+				if (position !== 0) {
+					position = nodes.length;
+				}
 			}
 			cnodes = nodeWidget._getField("nodes");
 			nodeWidget._tree = self;
@@ -917,7 +935,7 @@
 			/// 2.the index of which node you determined to remove.
 			/// </param>
 			var idx = -1, nodeWidget, nodes;
-			if (node.jquery) {
+			if (node && node.jquery) {
 				idx = node.index();
 			}
 			else if (typeof node === "number") {
@@ -1146,7 +1164,7 @@
 			///	<summary>
 			///	Determines the child nodes of this nodes.
 			/// </summary>
-			nodes:[]
+			nodes:null
 		},
 
 		/*widget Method*/
@@ -1236,7 +1254,11 @@
 			if(o.checked) {
 				self._checkState = "checked";
 				if(self.$checkBox) {
-					self.$checkBox.wijtreecheck("option", "checkState", "check");
+					if(o.checkState === "indeterminate"){
+						self.$checkBox.wijtreecheck("option", "checkState", "triState");
+					} else {
+						self.$checkBox.wijtreecheck("option", "checkState", "check");
+					}
 				}
 			}						
 		},
@@ -1247,7 +1269,8 @@
 			this.$navigateUrl = $li.children("a");
 
 			if (self._tree === null) {
-				self._tree = self._getTree();
+				//self._tree = o.treeOwner? o.treeOwner: self._getTree();
+				self._tree = self._getTree();		
 			}
 
 			//apply opitons.nodes from parent.nodes[idx]
@@ -1376,6 +1399,7 @@
 					$li.data("owner", self);
 					opts.nIndex = i;
 					opts.treeClass = o.treeClass;
+					//opts.treeOwner = self._tree;
 					$li.wijtreenode(opts);
 					nodeWidget = self._getNodeWidget($li);
 					nodeWidget._index = i;
@@ -1392,32 +1416,40 @@
 					opts.cfli = true;
 					opts.nIndex = i;
 					opts.treeClass = o.treeClass;
+					//opts.treeOwner = self._tree;
 					opts.nodes = [];
 					$li.wijtreenode(opts);  //the arg must be jquerify
 					nodeWidget = self._getNodeWidget($li);
 					nodeWidget._index = i;
 					nodes.push(nodeWidget);
-					//o.nodes.push(nodeWidget.options);
 				});
 			}
 			return nodes;
 		},
 
 		_generateMarkup: function (item) {
-			var li, a, u = item.navigateUrl;
+			var li, a, u = item.navigateUrl || "";
 			if (!$.isPlainObject(item)) {
 				return;
 			}
-			li = $("<li></li>");
+//			li = $("<li></li>");
 
-			a = $("<a>").attr("src",
-			(typeof u === "string" && u) ? u : "#");
-			a.appendTo(li);
+//			a = $("<a>").attr("src",
+//			(typeof u === "string" && u) ? u : "#");
+//			a.appendTo(li);
+
+//			if (typeof item.text === "string" && item.text) {
+//				$("<span>").html(item.text).appendTo(a);//+((typeof u === "string" && u) ? u : "#")+
+//			}
+			li = "<li><a href='{0}'><span>{1}</span></a></li>";
 
 			if (typeof item.text === "string" && item.text) {
-				$("<span>").html(item.text).appendTo(a);
+				li = li.replace(/\{0\}/, u).replace(/\{1\}/,item.text);
 			}
-			return li;
+			else {
+				li = li.replace(/\{0\}/, u);
+			}
+			return $(li);
 		},
 
 		_initNode: function () {//init node(children,class, tree)
@@ -1500,10 +1532,8 @@
 
 		_initNodesUL: function () {
 			var self = this;
-			if (self._tree.options.showExpandCollapse) {
-				if (self._hasChildren) {
-					self.$nodes[self._expanded ? 'show' : 'hide']();
-				}
+			if (self._tree.options.showExpandCollapse && self._hasChildren) {
+				self.$nodes[self._expanded ? 'show' : 'hide']();
 			}
 		},
 
@@ -1512,8 +1542,9 @@
 			self.$navigateUrl.bind("blur." + self.widgetName, self, self._onBlur);
 
 			if (!this._isTemplate) {
-				self._navigateUrl = !!href ? href : "";
-				self._setNavigateUrlHref(href);
+				if(!href) {				
+					this.$navigateUrl.attr("href", "#");
+				}
 			}
 		},
 
@@ -1560,7 +1591,7 @@
 
 		_setNavigateUrlHref: function (href) {
 			if (this.$navigateUrl) {
-				if (href === "" || typeof href === "undefined") {
+				if (!href) {
 					href = "#";
 				}
 				this.$navigateUrl.attr("href", href);
@@ -1832,7 +1863,9 @@
 							self._insertPosition =
 							self._drowTemplate(p, temp, dropNode.element);
 						}
-						self._dropTarget = dropNode;
+						if(dropNode != self){
+							self._dropTarget = dropNode;
+						}
 					}
 				}
 				self._tree._trigger("nodeDragging", event, self);
@@ -1845,6 +1878,7 @@
 				temp.remove();
 				self._dropTarget = null;
 				self._insertPosition = "unKnown";
+				self._tree._isDragging = false;
 				if (draggable && $.isFunction(draggable.stop)) {
 					draggable.stop.call(self.element, event, ui);
 				}
@@ -2077,7 +2111,7 @@
 
 		_click: function (event) {
 			var self = this, o = self.options, tree = self._tree,
-			url = self._navigateUrl;
+			url = self.$navigateUrl.attr("href");
 			if (!tree.options.disabled && !self._isClosestDisabled()) {
 				if (!/^[#,\s]*$/.test(url)) {
 					if($.browser.msie && /^7\.[\d]*/.test($.browser.version)) {
@@ -2828,16 +2862,17 @@
 		},
 
 		_getChildren: function () {
-			return (this.element.find(">ul:first>li").length > 0 &&
-			this.element.children("ul:first")) ||
+			return this.element.has("li:eq(0)").length ||
 			!!(this.options.nodes && this.options.nodes.length);
+//			return (this.element.find(">ul:first>li").length > 0 &&
+//			this.element.children("ul:first")) ||
+//			!!(this.options.nodes && this.options.nodes.length);
 		},
 
 		_getNodeWidget: function (el) {
-			var node = this._getNodeByDom(el), widget;
+			var node = this._getNodeByDom(el);
 			if (node.length > 0) {
-				widget = node.data(node.data("widgetName"));
-				return widget;
+				return node.data(this.widgetName);
 			}
 			return null;
 		},

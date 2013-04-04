@@ -64,6 +64,9 @@ class Tools_Context
                     static::$_contexts[$context_code] = $domains;
                 }
             }
+            if (empty(static::$_contexts)) {
+                throw new \RuntimeException('No context has been defined.');
+            }
         }
 
         return static::$_contexts;

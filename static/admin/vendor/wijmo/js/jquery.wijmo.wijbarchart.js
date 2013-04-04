@@ -1,7 +1,7 @@
 /*globals jQuery, Globalize*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -331,6 +331,8 @@
 			click: null
 		},
 
+		widgetEventPrefix: "wijbarchart",
+		
 		_create: function () {
 			var self = this,
 				o = self.options,
@@ -357,6 +359,8 @@
 				compass: "east"
 			}, o.hint);
 
+			self._hotFixForJQ1_9();
+
 			// default some fills
 			$.each(o.seriesStyles, function (idx, style) {
 				if (!style.fill) {
@@ -373,10 +377,10 @@
 			if (key === "horizontal") {
 				$.extend(true, this.options.axis, {
 					x: {
-						compass: value? "west" : "south"
+						compass: value ? "west" : "south"
 					},
 					y: {
-						compass: value? "south" : "west"
+						compass: value ? "south" : "west"
 					}
 				});
 			}
@@ -525,7 +529,8 @@
 				mouseOver: $.proxy(self._mouseOver, self),
 				mouseOut: $.proxy(self._mouseOut, self),
 				mouseMove: $.proxy(self._mouseMove, self),
-				click: $.proxy(self._click, self)
+				click: $.proxy(self._click, self),
+				widget: this
 			});
 		},
 
@@ -538,6 +543,10 @@
 					}
 					if (bar.bar.tracker) {
 						bar.bar.tracker.show();
+					}
+
+					if ($(bar.bar.node).data("wijchartDataObj")) {
+						$(bar.bar.node).data("wijchartDataObj").visible = true;
 					}
 				}
 				if (bar && bar.dcl) {
@@ -560,6 +569,10 @@
 					if (bar.bar.tracker) {
 						bar.bar.tracker.hide();
 					}
+
+					if ($(bar.bar.node).data("wijchartDataObj")) {
+						$(bar.bar.node).data("wijchartDataObj").visible = false;
+					}
 				}
 				if (bar && bar.dcl) {
 					bar.dcl.hide();
@@ -569,6 +582,27 @@
 					bar.animatedBar.hide();
 				}
 			});
+		},
+
+		_indicatorLineShowing: function (objs) {
+			$.wijmo.wijchartcore.prototype._indicatorLineShowing.apply(this, arguments);
+			$.each(objs, function (i, obj) {
+				if (obj.bar) {
+					obj.bar.attr(obj.hoverStyle);
+				}
+			})
+		},
+
+		_removeIndicatorStyles: function (objs) {
+			$.each(objs, function (i, obj) {
+				if (obj.bar) {
+					obj.bar.attr(obj.style);
+				}
+			});
+		},		
+
+		_supportStacked: function () {
+			return true;
 		},
 
 		_calculateParameters: function (axisInfo, options) {
@@ -713,7 +747,8 @@
 				clusterInfos,
 				isYTime = options.isYTime,
 				isXTime = options.isXTime,
-				culture = options.culture;
+				culture = options.culture,
+				widget = options.widget;
 
 
 
@@ -983,11 +1018,12 @@
 
 				if (inPlotArea) {
 					if (rf.width === 0) {
-						rf.width = 0.5;
+						rf.width = 1;
 					}
 
 					if (rf.height === 0) {
-						rf.height = 0.5;
+						rf.height = 1;
+						rf.y -= 1;
 					}
 				}
 
@@ -1012,8 +1048,15 @@
 					strokeWidth = 0;
 				}
 
-				barWidth = rf.width - strokeWidth;
-				barHeight = rf.height - strokeWidth;
+				barWidth = rf.width;
+				barHeight = rf.height;
+
+				if (strokeWidth > 1) {
+					strokeWidth--;
+					barWidth = rf.width - strokeWidth;
+					barHeight = rf.height - strokeWidth / 2;
+					rf.x += strokeWidth / 2;
+				}
 
 				if (barWidth < 0) {
 					barWidth = 0;
@@ -1025,9 +1068,9 @@
 				if (animated) {
 					if (start === -1) {
 						if (inverted) {
-							start = startLocation.x;
+							start = startLocation.x + strokeWidth / 2;
 						} else {
-							start = startLocation.y + height - strokeWidth;
+							start = startLocation.y + height - strokeWidth / 2;
 						}
 					}
 
@@ -1066,7 +1109,7 @@
 										0, barHeight);
 						} else {
 							bar = canvas.rect(rf.x, start,
-										rf.width, 0);
+										barWidth, 0);
 						}
 						animatedBar = bar;
 					}
@@ -1136,6 +1179,7 @@
 					nSeries = seriesList.length,
 					bpl,
 					bw,
+					pointX,
 					chartLabels = [],
 					bars = [],
 					animatedBars = [],
@@ -1143,7 +1187,8 @@
 				//isYTime = yAxisInfo.isTime,
 					sList = [],
 					seriesEles = [],
-					trackers = canvas.set();
+					trackers = canvas.set(),
+					tooltipObj;
 
 				if (isYTime || isXTime) {
 					$.each(seriesList, function (i, s) {
@@ -1179,7 +1224,7 @@
 					bw /= (nSeries * (1 - clusterOverlap) + clusterOverlap);
 				}
 
-				$.each(bpl, function (pIdx, xs) {
+				$.each(bpl, function (bplIdx, xs) {
 					var ps = xs.paSpec,
 						ns = ps.length,
 						sx,
@@ -1196,7 +1241,22 @@
 					// calculate the first series rectangle					
 					rp = { x: xs.x - sx / 2, y: 0, width: bw, height: ps[0].y };
 
-					$.each(ps, function (sIdx, points) {
+					$.each(ps, function (psIndex, points) {
+						// if the array data.x's length is more than the data.y's, 
+						// the rp.height is undefined. it will cause wrong.
+						if (rp.height === undefined) {
+							return true;
+						}
+
+						var sIdx = points.sIdx,
+							pIdx = points.pIdx,
+							seriesStyle = seriesStyles[sIdx],
+							series = seriesList[sIdx],
+							tracker,
+							yAxisIndex = series.yAxis || 0,
+							axisY = yaxis[yAxisIndex] || yaxis,
+							axisInfoY = yAxisInfo[yAxisIndex] || yAxisInfo;
+
 						if (!rects[sIdx]) {
 							rects[sIdx] = [];
 						}
@@ -1204,20 +1264,6 @@
 						if (!seriesEles[sIdx]) {
 							seriesEles[sIdx] = [];
 						}
-
-						// if the array data.x's length is more than the data.y's, 
-						// the rp.height is undefined. it will cause wrong.
-						if (rp.height === undefined) {
-							return true;
-						}
-
-						var idx = points.sIdx,
-							seriesStyle = seriesStyles[idx],
-							series = seriesList[idx],
-							tracker,
-							yAxisIndex = series.yAxis || 0,
-							axisY = yaxis[yAxisIndex] || yaxis,
-							axisInfoY = yAxisInfo[yAxisIndex] || yAxisInfo;
 
 						yscale = getScaling(!inverted, axisY.max,
 										axisY.min, inverted ? width : height);
@@ -1229,7 +1275,7 @@
 
 						barInfo = paintBar(rp, points.y, height, xAxisInfo, axisInfoY,
 									seriesStyle, animated, shadowOffset, startLocation,
-									clusterOverlap, sIdx > 0 ? ps[sIdx - 1].y : null,
+									clusterOverlap, psIndex > 0 ? ps[psIndex - 1].y : null,
 									ps[ps.length - 1].y, isYTime,
 									series.textStyle, axisY);
 
@@ -1251,15 +1297,39 @@
 							}
 						}
 						addClass($(bar.node), "wijchart-canvas-object wijbarchart");
-						$(bar.node).data("wijchartDataObj", $.extend(false, {
+
+						tooltipObj = $.extend(false, {
 							index: pIdx,
 							bar: bar,
 							type: "bar",
 							style: seriesStyle,
-							hoverStyle: seriesHoverStyles[idx],
+							hoverStyle: seriesHoverStyles[sIdx],
 							x: series.data.x[pIdx],
-							y: series.data.y[pIdx]
-						}, series));
+							y: series.data.y[pIdx],
+							visible: true
+						}, series);
+
+						$(bar.node).data("wijchartDataObj", tooltipObj);
+
+						// cache the bar position to show indicator line.
+						//if()
+						widget.dataPoints = widget.dataPoints || {};
+						widget.pointXs = widget.pointXs || [];
+
+						if (options.horizontal) {
+							pointX = $.round(barInfo.rect.y + barInfo.rect.height / 2, 2);
+						}
+						else {
+							pointX = $.round(barInfo.rect.x + barInfo.rect.width / 2, 2);
+						}
+						if (!widget.dataPoints[pointX.toString()]) {
+							widget.dataPoints[pointX.toString()] = [];
+							widget.pointXs.push(pointX);
+						}
+
+						widget.dataPoints[pointX.toString()].push(tooltipObj);
+
+
 						$(tracker.node).data("owner", $(bar.node));
 						addClass($(tracker.node), "wijbarchart bartracker");
 						barInfo.bar.tracker = tracker;
@@ -1281,7 +1351,7 @@
 				});
 
 				//set default chart label to front.
-				$.each(chartLabels, function (idx, chartLabel) {
+				$.each(chartLabels, function (sIdx, chartLabel) {
 					chartLabel.toFront();
 				});
 

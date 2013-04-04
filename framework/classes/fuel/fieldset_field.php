@@ -67,9 +67,9 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field
         return $return;
     }
 
-    public function is_expert()
+    public function is_restricted()
     {
-        return $this->fieldset->is_expert($this->name);
+        return $this->fieldset->is_restricted($this->name);
     }
 
     public function before_save($item, $data)

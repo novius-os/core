@@ -45,7 +45,10 @@ body {
     vertical-align: middle;
     padding: 0 2em 0 1em;
 }
-#blank_slate img {
+#blank_slate h1.error {
+    color: red;
+}
+#blank_slate h1 img {
     float: left;
 }
 #blank_slate h1:after
@@ -68,18 +71,32 @@ a:hover {
 
 <body>
     <div id="blank_slate">
-        <h1><img src="static/novius-os/admin/novius-os/img/logo.png">Novius OS is up and running. Now what?</h1>
+        <?php
+if (!empty($error)) {
+            ?>
+            <img src="static/novius-os/admin/novius-os/img/logo.png" />
+            <h1 class="error"><?= htmlspecialchars($error) ?></h1>
+            <?php
+    if (!empty($exception)) {
+        echo '<p>Original message: '.$exception->getMessage().'</p>';
+    }
+} else {
+            ?>
+            <h1><img src="static/novius-os/admin/novius-os/img/logo.png" />Novius OS is up and running. Now what?</h1>
 
-        <h2>I want a <strong>website</strong></h2>
-        <p>Novius OS is a CMS: you can create pages and manage your content. Once set up, your website will show here.</p>
-        <p><a href="http://docs.novius-os.org/en/0.2/install/whats_next/first_page.html" target="_blank">Check out our guide</a> to get started.</p>
+            <h2>I want a <strong>website</strong></h2>
+            <p>Novius OS is a CMS: you can create pages and manage your content. Once set up, your website will show here.</p>
+            <p><a href="http://docs.novius-os.org/en/0.2/install/whats_next/first_page.html" target="_blank">Check out our guide</a> to get started.</p>
 
-        <h2>I want an <strong>application</strong></h2>
-        <p>Novius OS is a web OS and framework: you can create custom applications which fit your business logic.</p>
-        <p><a href="http://docs.novius-os.org/en/0.2/app_create/index.html" target="_blank">Have a look at the documentation</a>.</p>
+            <h2>I want an <strong>application</strong></h2>
+            <p>Novius OS is a web OS and framework: you can create custom applications which fit your business logic.</p>
+            <p><a href="http://docs.novius-os.org/en/0.2/app_create/index.html" target="_blank">Have a look at the documentation</a>.</p>
 
-        <h2>I don't know</h2>
-        <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
+            <h2>I don't know</h2>
+            <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
+            <?php
+}
+        ?>
     </div>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /*globals $, Raphael, jQuery, document, window*/
 /*
  *
- * Wijmo Library 2.2.2
+ * Wijmo Library 2.3.7
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -142,6 +142,8 @@
 			/// </summary>
 			marginBottom: 5
 		},
+		
+		widgetEventPrefix: "wijlineargauge",
 
 		_setDefaultWidth: function () {
 			var o = this.options;
@@ -201,7 +203,7 @@
 					point.y = markBbox.y - labelBBox.height;
 				}
 				else {
-					point.y = markBbox.y + markBbox.width;
+					point.y = markBbox.y + markBbox.height + labelBBox.height / 2;
 				}
 
 				point.y += offset;
@@ -418,7 +420,8 @@
 		_setLinearPointer: function (value) {
 			var self = this,
 				o = self.options,
-				startPoint = self._valueToPoint(0, 0),
+				min = o.min,
+				startPoint = self._valueToPoint(min, 0),
 				endPoint = self._valueToPoint(value, 0),
 			//				fromBbox = self.pointer.wijGetBBox(),
 				animation = o.animation,
@@ -562,7 +565,8 @@
 
 		_valueToPoint: function (value, offset) {
 			var self = this,
-				o = self.options, alpha, minPoint, maxPoint;
+				o = self.options, 
+				isInverted = o.isInverted, alpha, minPoint, maxPoint;
 
 			if (o.max === o.min) {
 				return { x: 0, y: 0 };
@@ -572,10 +576,18 @@
 			minPoint = self._minScreenPoint(offset);
 			maxPoint = self._maxScreenPoint(offset);
 
-			return {
-				x: minPoint.x * (1 - alpha) + maxPoint.x * alpha,
-				y: minPoint.y * (1 - alpha) + maxPoint.y * alpha
-			};
+			if (isInverted) {
+				return {
+					x: minPoint.x * alpha + maxPoint.x * (1 - alpha),
+					y: minPoint.y * alpha + maxPoint.y * (1 - alpha)
+				};
+			}
+			else {
+				return {
+					x: minPoint.x * (1 - alpha) + maxPoint.x * alpha,
+					y: minPoint.y * (1 - alpha) + maxPoint.y * alpha
+				};
+			}
 		}
 
 	});

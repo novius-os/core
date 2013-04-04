@@ -9,7 +9,7 @@
 
 // File include in vendor.min.js
 // define all scripts that are in the bundle
-define('jquery.bgiframe');
+define('jquery.migrate');
 define('jquery.cookie');
 define('jquery.globalize');
 define('jquery.globalize.cultures');

@@ -11,51 +11,48 @@
 \Nos\I18n::current_dictionary('noviusos_user::common');
 
 $uniqid = uniqid('id_');
+$enable_roles = \Config::get('novius-os.users.enable_roles', false);
 
 echo View::forge('nos::crud/tab', $view_params, false);
 
-$view_params['container_id'] = $uniqid;
+if (!$enable_roles) {
+    $view_params['container_id'] = $uniqid;
+}
 
 echo View::forge('nos::crud/toolbar', $view_params, false);
 ?>
 <style type="text/css">
 /* ? */
 /* @todo check this */
-.ui-accordion-content-active {
+.wijmo-wijaccordion-content-active {
     overflow: visible !important;
 }
 </style>
-
-<div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
-    <ul style="width: 15%;">
-        <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
-        <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
-    </ul>
-    <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
-        <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false) ?>
-    </div>
-    <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
 <?php
-$role = reset($item->roles);
 
-\Config::load('nos::admin/permissions', 'permissions');
-$applications = array_merge(\Nos\Config_Data::get('app_installed', array()), \Config::get('permissions', array()));
-foreach ($applications as $app => $params) {
-    if (isset($params['permission'])) {
-        $apps[$app] = array_merge($params, $params['permission']);
-    }
-}
-unset($apps['local']);
-unset($apps['nos']);
-
-echo \View::forge('noviusos_user::admin/permission', array(
-    'user' => $item,
-    'role' => $role,
-    'apps' => $apps,
-), false);
-?>
+// If roles are not enabled, we create two "Details" and "Permissions" tabs
+if (!$enable_roles) {
+    ?>
+    <div id="<?= $uniqid ?>" class="fill-parent" style="width: 92.4%; clear:both; margin:30px auto 1em;padding:0;">
+        <ul style="width: 15%;">
+            <li><a href="#<?= $uniqid ?>_details"><?= __('User details') ?></a></li>
+            <li><a href="#<?= $uniqid ?>_permissions"><?= __('Permissions') ?></a></li>
+        </ul>
+        <div id="<?= $uniqid ?>_details" class="fill-parent" style="padding:0;">
+            <?= \View::forge('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false) ?>
+        </div>
+        <div id="<?= $uniqid ?>_permissions" class="fill-parent" style="overflow: auto;">
+            <?= \View::forge('noviusos_user::admin/permission_user', array(
+                'user' => $item,
+            ), false);
+            ?>
+        </div>
     </div>
-</div>
+    <?php
+} else {
+    echo \View::forge('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false);
+}
+?>
 
 <script type="text/javascript">
     require([

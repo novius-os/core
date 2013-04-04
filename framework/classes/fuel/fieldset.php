@@ -260,10 +260,14 @@ class Fieldset extends \Fuel\Core\Fieldset
         // Compatibility with 0.1 configuration (widgets have been renamed to renderers)
         foreach ($properties as &$property) {
             if (isset($property['widget'])) {
+                logger(\Fuel::L_WARNING, 'The widget key is deprecated ('.$property['widget'].'). Please use the renderer key and update class name.');
+
                 $property['renderer'] = preg_replace('`^Nos(.+)Widget_(.+)$`', 'Nos$1Renderer_$2', $property['widget']);
                 unset($property['widget']);
             }
             if (isset($property['widget_options'])) {
+                logger(\Fuel::L_WARNING, 'The widget_options key is deprecated. Please use the renderer_options key.');
+
                 $property['renderer_options'] =& $property['widget_options'];
                 unset($property['widget_options']);
             }
@@ -590,9 +594,21 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $json_response;
     }
 
-    public function is_expert($field_name)
+    protected function is_expert($field_name)
     {
         return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+    }
+
+    public function is_restricted($field_name)
+    {
+        if ($this->is_expert($field_name)) {
+            return true;
+        }
+        $show_when = \Arr::get($this->config_used[$field_name], 'show_when', false);
+        if ($show_when === false || !is_callable($show_when)) {
+            return false;
+        }
+        return !call_user_func($show_when);
     }
 
     public function getInstance()

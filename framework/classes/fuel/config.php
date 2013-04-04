@@ -57,8 +57,10 @@ class Config extends \Fuel\Core\Config
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$app_name])) {
-            foreach ($dependencies[$app_name] as $dependency) {
-                $config = \Arr::merge($config, \Config::load($dependency.'::'.$file_name, true));
+            foreach ($dependencies[$app_name] as $application => $dependency) {
+                if ($dependency['extend_configuration']) {
+                    $config = \Arr::merge($config, \Config::load($application.'::'.$file_name, true));
+                }
             }
         }
         $config = \Arr::recursive_filter(
@@ -81,23 +83,8 @@ class Config extends \Fuel\Core\Config
 
     public static function extendable_load($module_name, $file_name)
     {
-        $config = \Config::load($module_name.'::'.$file_name, true);
-        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-        if (!empty($dependencies[$module_name])) {
-            foreach ($dependencies[$module_name] as $dependency) {
-                \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name, array()));
-            }
-        }
-        $config = \Arr::recursive_filter(
-            $config,
-            function($var) {
-                return $var !== null;
-            }
-        );
-
-        return $config;
+        logger(\Fuel::L_WARNING, '\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
+        return static::loadConfiguration($module_name, $file_name);
     }
 
     public static function metadata($application_name)
@@ -124,13 +111,17 @@ class Config extends \Fuel\Core\Config
 
     public static function application($application_name)
     {
-        return static::extendable_load($application_name, 'config');
+        return static::loadConfiguration($application_name, 'config');
     }
 
     public static function actions($params = array())
     {
         if (!isset($params['models'])) {
             return array();
+        }
+
+        if (!isset($params['all_targets'])) {
+            $params['all_targets'] = false;
         }
 
         $selected_actions = array();
@@ -160,7 +151,7 @@ class Config extends \Fuel\Core\Config
 
             foreach ($selected_actions as $key => $action) {
                 if (!empty($params['item']) && isset($action['disabled'])) {
-                    $selected_actions[$key]['disabled'] = $action['disabled']($params['item']);
+                    $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item']);
                 }
             }
         }
@@ -168,13 +159,63 @@ class Config extends \Fuel\Core\Config
         return $selected_actions;
     }
 
+    static public function getActionDisabledState($disabled, $item)
+    {
+        $common_config = \Nos\Config_Common::load(get_class($item), array());
+        return static::processCallbackValue($disabled, false, $item, array('config' => $common_config));
+    }
+
+    /**
+     * General function to process callback value : can be simple values, callbacks, or array of callbacks
+     *
+     * @param  mixed  $value  Value to process
+     * @param  mixed  $positive_value   If the value is an array of callbacks, it defines which value is expected.
+     * If callback return the expected value, then we call next callback. Otherwise, we return the value.
+     *
+     * All appended parameters are sent to the callback functions (if there is any)
+     *
+     * @return mixed
+     */
+    static public function processCallbackValue()
+    {
+        $arg_list = func_get_args();
+        $value = $arg_list[0];
+        $expected_value = $arg_list[1];
+        $params = array_slice($arg_list, 2);
+        if (is_callable($value)) {
+            return call_user_func_array($value, $params);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $value_item) {
+                $new_arg_list = $arg_list;
+                $new_arg_list[0] = $value_item;
+                $return = call_user_func_array('static::processCallbackValue', $new_arg_list);
+                if ($return !== $expected_value) {
+                    return $return;
+                }
+            }
+            return $expected_value;
+        }
+
+        return $value;
+    }
+
     protected static function can_add_action($action, $params)
     {
+        if ($params['all_targets']) {
+            return true;
+        }
+
         if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
             return false;
         }
 
-        return !isset($action['visible']) || $action['visible']($params);
+        if (isset($action['visible'])) {
+            return static::processCallbackValue($action['visible'], true, $params);
+        }
+
+        return true;
     }
 
     /**

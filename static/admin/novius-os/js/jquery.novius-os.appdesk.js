@@ -939,13 +939,18 @@ define('jquery-nos-appdesk',
                 self.gridRendered = false;
                 self.uiGridTitle.html(o.texts.gridTitle);
 
-                self.uiThumbnail.thumbnailsgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiGrid.noslistgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiTreeGrid.nostreegrid('destroy')
+                // Use try/catch, widget can not be initialize
+                try {
+                    self.uiThumbnail.thumbnailsgrid('destroy');
+                } catch (e) {}
+                try {
+                    self.uiGrid.noslistgrid('destroy');
+                } catch (e) {}
+                try {
+                    self.uiTreeGrid.nostreegrid('destroy');
+                } catch (e) {}
+
+                self.uiThumbnail.add(self.uiGrid).add(self.uiTreeGrid)
                     .empty()
                     .hide();
                 if (o.defaultView === 'thumbnails') {
@@ -1971,13 +1976,22 @@ define('jquery-nos-appdesk',
                             .attr('title', action.label)
                             .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
 
+                        var actionValue = (action.name &&
+                            noParseData &&
+                            noParseData.actions &&
+                            typeof noParseData.actions[action.name] !== 'undefined')
+                            ? noParseData.actions[action.name] : true;
                         // Check whether action name is disabled
-                        if (action.name && noParseData && noParseData.actions && noParseData.actions[action.name] == false) {
+                        if (actionValue !== true
+                            ) {
                             uiAction.addClass('ui-state-disabled')
                                 .click(function(e) {
                                     e.stopImmediatePropagation();
                                     e.preventDefault();
                                 });
+                            if ($.type(actionValue) === 'string') {
+                                uiAction.attr('title', actionValue)
+                            }
                         } else {
                             uiAction.click(function(e) {
                                     e.stopImmediatePropagation();
@@ -2056,13 +2070,22 @@ define('jquery-nos-appdesk',
                                     li.addClass('ui-state-error');
                                 }
 
+                                var actionValue = (action.name &&
+                                    noParseData &&
+                                    noParseData.actions &&
+                                    typeof noParseData.actions[action.name] !== 'undefined')
+                                    ? noParseData.actions[action.name] : true;
+
                                 // Check whether action name is disabled
-                                if (action.name && noParseData.actions && noParseData.actions[action.name] == false) {
+                                if (actionValue !== true) {
                                     li.addClass('ui-state-disabled')
                                         .click(function(e) {
                                             e.stopImmediatePropagation();
                                             e.preventDefault();
                                         });
+                                    if ($.type(actionValue) === 'string') {
+                                        li.attr('title', actionValue)
+                                    }
                                 } else {
                                     li.click(function(e) {
                                         e.stopImmediatePropagation();

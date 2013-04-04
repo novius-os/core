@@ -93,8 +93,8 @@ define(
                 })
             });
 
-            var $page_virtual_name_container = $container.find('input[name=page_virtual_name]').closest('.ui-accordion-content');
-            var $page_meta_title_container = $container.find('input[name=page_meta_noindex]').closest('.ui-accordion-content');
+            var $page_virtual_name_container = $container.find('input[name=page_virtual_name]').closest('.wijmo-wijaccordion-content');
+            var $page_meta_title_container = $container.find('input[name=page_meta_noindex]').closest('.wijmo-wijaccordion-content');
             var $accordion = $container.find('.accordion');
 
             var $template_unit = $container.find('select[name=page_template]').closest('td');

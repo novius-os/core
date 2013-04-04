@@ -40,4 +40,89 @@ class Migrate extends \Fuel\Core\Migrate
         return $files;
     }
 
+    public static function set_table($table)
+    {
+        static::$table = $table;
+    }
+
+    // change migration prefix and changed include to include_once in order to prevent duplicate classes errors
+    protected static function find_migrations($name, $type, $start = null, $end = null, $direction = 'up')
+    {
+        if (static::generatePrefix($name, $type)) {
+            return parent::find_migrations($name, $type, $start, $end, $direction);
+        } else {
+            return array();
+        }
+    }
+
+    // Overloaded function in order to support \Nos\Migration
+    protected static function run($migrations, $name, $type, $method = 'up')
+    {
+        if (!static::generatePrefix($name, $type)) {
+            return array();
+        }
+        // storage for installed migrations
+        $done = array();
+
+        static::$connection === null or \DBUtil::set_connection(static::$connection);
+
+        // Loop through the runnable migrations and run them
+        foreach ($migrations as $ver => $migration) {
+            logger(Fuel::L_INFO, 'Migrating to version: '.$ver);
+
+            // <<<<<<<<<<<<<<<<<<< CHANGES ARE HERE
+            $migration_inst = new $migration['class']($migration['path']);
+            $result = $migration_inst->$method();
+            // >>>>>>>>>>>>>>>>>>>
+            if ($result === false) {
+                logger(Fuel::L_INFO, 'Skipped migration to '.$ver.'.');
+                return $done;
+            }
+
+            $file = basename($migration['path'], '.php');
+            $method == 'up' ? static::write_install($name, $type, $file) : static::write_revert($name, $type, $file);
+            $done[] = $file;
+        }
+
+        static::$connection === null or \DBUtil::set_connection(null);
+
+        empty($done) or logger(Fuel::L_INFO, 'Migrated to '.$ver.' successfully.');
+
+        return $done;
+    }
+
+    protected static function generatePrefix($name, $type)
+    {
+        if ($name == 'nos' && $type == 'package') {
+            static::$prefix = 'Nos\\Migrations\\';
+        } else if ($type == 'module') {
+            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
+            if ($namespace === null) {
+                return false;
+            }
+            static::$prefix = $namespace.'\\Migrations\\';
+        } else {
+            static::$prefix = 'Fuel\\Migrations\\';
+        }
+        return true;
+    }
+
+    public static function isLastVersion($name, $type)
+    {
+        if ($type == 'module') {
+            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
+            if ($namespace === null) {
+                return true; // Application doesn't have any namespace, so probably no migration files.
+            }
+        }
+
+        $current = \Config::get('migrations.version.'.$type.'.'.$name);
+        if (is_array($current)) {
+            $current = count($current) == 0? null : $current[count($current) - 1];
+        }
+
+        $migrations = static::find_migrations($name, $type, $current, null);
+        return count($migrations) == 0;
+    }
+
 }

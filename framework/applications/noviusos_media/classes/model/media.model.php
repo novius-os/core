@@ -15,6 +15,23 @@ class Model_Media extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media';
     protected static $_primary_key = array('media_id');
 
+    protected static $_properties = array(
+        'media_id',
+        'media_folder_id',
+        'media_path',
+        'media_file',
+        'media_ext',
+        'media_title',
+        'media_protected' => array(
+            'data_type' => 'int',
+            'default' => 0,
+        ),
+        'media_width',
+        'media_height',
+        'media_created_at',
+        'media_updated_at',
+    );
+
     public static $private_path = 'data/media/';
     public static $public_path  = 'media/';
 
@@ -160,7 +177,15 @@ class Model_Media extends \Nos\Orm\Model
             return $this->get_public_path();
         }
 
-        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$'.$this->virtual_path().'$'.$max_width.'$'.$max_height);
+
+        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s.%s',
+            (int) $max_width,
+            (int) $max_height,
+            substr($hash, 0, 6),
+            $this->media_ext
+        );
     }
 
     public function _event_before_save()

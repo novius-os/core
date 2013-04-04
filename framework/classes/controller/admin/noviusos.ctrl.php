@@ -149,6 +149,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
 
             // Compatibility with 0.1
             if (!empty($app['url']) && empty($app['action'])) {
+                logger(\Fuel::L_WARNING, 'On launchers, the url key is deprecated ('.$key.'). Please use the action key.');
+
                 $app['action'] = array(
                     'action' => 'nosTabs',
                     'tab' => array(
@@ -172,7 +174,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 }
 
                 // do we have to display the application?
-                if (empty($app['application']) || Permission::check($app['application'], 'access')) {
+                if (empty($app['application']) || User\Permission::check('nos::access', $app['application'])) {
                     // do we have the rights to access the application?
                     $apps[] = $app;
                 }
