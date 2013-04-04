@@ -25,6 +25,13 @@ class Config extends \Fuel\Core\Config
         return parent::load($file, $group, $reload, $overwrite);
     }
 
+    public static function save($file, $config)
+    {
+        if ($file !== \Fuel::$env.DS.'migrations') {
+            parent::save($file, $config);
+        }
+    }
+
     public static function mergeWithUser($item, $config)
     {
         $user = Session::user();
