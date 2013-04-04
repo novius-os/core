@@ -50,6 +50,7 @@ if (!MBSTRING) {
         'Command' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'command.php',
         'Config' => FUEL_EXTEND_PATH.'config.php',
         'Config_File' => FUEL_EXTEND_PATH.'config_file.php',
+        'Cache_Storage_File' => FUEL_EXTEND_PATH.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'file.php',
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
         'Event_Instance' => FUEL_EXTEND_PATH.'event/instance.php',
