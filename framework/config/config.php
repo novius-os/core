@@ -252,6 +252,7 @@ return array(
          * Whether to use minified assets (css & js)
          */
         'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
+        'migration_config_file' => true,
     ),
 );
 

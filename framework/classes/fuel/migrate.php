@@ -17,6 +17,16 @@
  */
 class Migrate extends \Fuel\Core\Migrate
 {
+
+    public static function _init()
+    {
+        if (\Config::get('novius-os.migration_config_file')) {
+            \Config::load('migrations', true);
+            \Config::set('migrations', array());
+        }
+        parent::_init();
+    }
+
     /**
      * finds migrations for the given package (or all if name is not given)
      *

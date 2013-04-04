@@ -27,7 +27,7 @@ class Config extends \Fuel\Core\Config
 
     public static function save($file, $config)
     {
-        if ($file !== \Fuel::$env.DS.'migrations') {
+        if ($file !== \Fuel::$env.DS.'migrations' || \Config::get('novius-os.migration_config_file')) {
             parent::save($file, $config);
         }
     }
