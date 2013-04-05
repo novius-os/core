@@ -215,7 +215,7 @@ class Nos
                     } else {
                         $media_url = $media->get_public_path();
                     }
-                    $content = str_replace($params['url'], $media_url, $content);
+                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', $media_url, $content);
                 }
             }
         );
@@ -233,7 +233,7 @@ class Nos
             $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
             foreach ($matches[1] as $match_id => $page_id) {
                 if (isset($pages[$page_id])) {
-                    $content = str_replace($matches[0][$match_id], $pages[$page_id]->url(), $content);
+                    $content = preg_replace('`'.preg_quote($matches[0][$match_id], '`').'(?!\d)`u', $pages[$page_id]->url(), $content);
                 } else {
                     $content = str_replace('href="'.$matches[0][$match_id].'"', '', $content);
                 }
