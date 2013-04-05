@@ -40,6 +40,12 @@ class FrontCache
         return static::$_php_begin;
     }
 
+    /**
+     * Write a HMVC call in cache for after cache execution.
+     *
+     * @param string    $uri    Route for the request.
+     * @param array     $args   The method parameters.
+     */
     public static function callHmvcUncached($uri, $args = array())
     {
         echo static::_phpBegin();
@@ -49,6 +55,13 @@ class FrontCache
         echo '?>';
     }
 
+    /**
+     * Write a View forge in cache for after cache execution.
+     *
+     * @param string    $file           The view filename
+     * @param array     $data           Array of values
+     * @param boolean   $auto_filter    Set to true or false to set auto encoding
+     */
     public static function viewForgeUncached($file = null, $data = null, $auto_filter = null)
     {
         echo static::_phpBegin();

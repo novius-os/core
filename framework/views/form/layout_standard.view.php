@@ -27,7 +27,7 @@ require(
 
 $has_restricted_fields = false;
 foreach ($fieldset->field() as $field) {
-    if ($field->is_restricted()) {
+    if ($field->isRestricted()) {
         if (!$has_restricted_fields) {
             echo '<div style="display:none;">';
             $has_restricted_fields = true;
@@ -131,7 +131,7 @@ if (!empty($subtitle) || !empty($publishable)) {
         $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
-            if ($field->type == 'hidden' || $field->is_restricted()) {
+            if ($field->type == 'hidden' || $field->isRestricted()) {
                 continue;
             }
             $field_template = $field->template;
