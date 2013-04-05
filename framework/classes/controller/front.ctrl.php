@@ -187,7 +187,7 @@ class Controller_Front extends Controller
                     $this->_cache->reset();
                     $this->_findPage();
 
-                    \Event::trigger('front.pageFound');
+                    \Event::trigger('front.pageFound', array('page' => $this->getPage()));
 
                     $this->_generateCache();
 
@@ -261,7 +261,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return string
+     * @return string The current context
      */
     public function getContext()
     {
@@ -269,7 +269,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return string
+     * @return string Absolute URL of the current context
      */
     public function getContextUrl()
     {
@@ -277,7 +277,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return mixed
+     * @return \Nos\Page\Model_Page Current Model_Page displayed.
      */
     public function getPage()
     {
@@ -285,7 +285,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return mixed
+     * @return mixed Current wysiwyg ID processed.
      */
     public function getWysiwygName()
     {
@@ -293,7 +293,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return string
+     * @return string Current absolute URL.
      */
     public function getUrl()
     {
@@ -301,7 +301,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return string
+     * @return string Relative (to getContextUrl()) URL of the current page.
      */
     public function getPageUrl()
     {
@@ -309,7 +309,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return mixed
+     * @return mixed Relative (to getContextUrl()) URL of the current URL enhancer. False if no current URL enhancer.
      */
     public function getEnhancedUrlPath()
     {
@@ -317,7 +317,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return mixed
+     * @return mixed Part of the URL processed by the URL enhancer. False if no current URL enhancer.
      */
     public function getEnhancerUrl()
     {
@@ -325,7 +325,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $base_href
+     * Sets a new <base href=""> for the current HTML output.
+     *
+     * @param string $base_href The new <base href="">.
      * @return Controller_Front
      */
     public function setBaseHref($base_href)
@@ -336,8 +338,10 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $title
-     * @param $template
+     * Set a new title for the current HTML.
+     *
+     * @param string    $title      The new title.
+     * @param string    $template   If set, use it to calculate the title. Placeholder :title will be replaced by $title.
      * @return Controller_Front
      */
     public function setTitle($title, $template = null)
@@ -355,7 +359,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $meta_description
+     * Set a meta description for the current HTML output.
+     *
+     * @param string $meta_description The new meta description.
      * @return Controller_Front
      */
     public function setMetaDescription($meta_description)
@@ -366,7 +372,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $meta_keywords
+     * Set a meta keywords for the current HTML output.
+     *
+     * @param string $meta_keywords The new meta keywords.
      * @return Controller_Front
      */
     public function setMetaKeywords($meta_keywords)
@@ -377,7 +385,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $meta_robots
+     * Set a meta robots for the current HTML output.
+     *
+     * @param string $meta_robots The new meta robots.
      * @return Controller_Front
      */
     public function setMetaRobots($meta_robots)
@@ -388,7 +398,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $meta
+     * Add a HTML meta tag in the current HTML output.
+     *
+     * @param string $meta A HTML meta tag.
      * @return Controller_Front
      */
     public function addMeta($meta)
@@ -399,8 +411,10 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $url
-     * @param  bool             $footer
+     * Add a JavaScript library in the current HTML output.
+     *
+     * @param string    $url    URL of a JavaScript library.
+     * @param boolean   $footer If true, add script at the end of HTML output. If false, add in the <head>.
      * @return Controller_Front
      */
     public function addJavascript($url, $footer = true)
@@ -415,8 +429,10 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $js
-     * @param  bool             $footer
+     * Add JavaScript code in the current HTML output.
+     *
+     * @param string    $js     Javascript code
+     * @param boolean   $footer If true, add at the end of HTML output. If false, add in the <head>.
      * @return Controller_Front
      */
     public function addJavascriptInline($js, $footer = true)
@@ -425,7 +441,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $url
+     * Add a CSS file in the current HTML output.
+     *
+     * @param string $url URL of a CSS file.
      * @return Controller_Front
      */
     public function addCss($url)
@@ -436,7 +454,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $css
+     * Add CSS code in the current HTML output.
+     *
+     * @param string $css CSS code.
      * @return Controller_Front
      */
     public function addCssInline($css)
@@ -445,7 +465,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @return bool
+     * @return boolean True if current page is requested in the preview mode.
      */
     public function isPreview()
     {
@@ -708,10 +728,12 @@ class Controller_Front extends Controller
             }
         }
 
-        \Event::trigger('front.pageFound');
+        \Event::trigger('front.pageFound', array('page' => $this->getPage()));
     }
 
     /**
+     * Disable caching and cache retrieve of the current page.
+     *
      * @return Controller_Front
      */
     public function disableCaching()
@@ -722,7 +744,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $cache_duration
+     * Set the cache duration of the current cache.
+     *
+     * @param int $cache_duration The new cache duration
      * @return Controller_Front
      */
     public function setCacheDuration($cache_duration)
@@ -733,7 +757,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param $status
+     * Set a new response status of the current response. This status will be saved in cache.
+     *
+     * @param int $status The new response status
      * @return Controller_Front
      */
     public function setStatus($status)
@@ -744,10 +770,11 @@ class Controller_Front extends Controller
     }
 
     /**
-     * @param string $name The header name
-     * @param string $value The header value
-     * @param bool|string $replace Whether to replace existing value for the header, will never overwrite/be overwritten when false
+     * Add or replace a header to current response. Headers will be saved in cache.
      *
+     * @param string    $name       The header name
+     * @param string    $value      The header value
+     * @param boolean   $replace    Whether to replace existing value for the header, will never overwrite/be overwritten when false
      * @return Controller_Front
      */
     public function setHeader($name, $value, $replace = true)
@@ -762,11 +789,11 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Returns a (dot notated) custom data
+     * Returns a (dot notated) custom data of the current process.
      *
-     * @param   string   $item      name of the custom data, can be dot notated
-     * @param   mixed    $default   the return value if the custom data isn't found
-     * @return  mixed               the custom data or default if not found
+     * @param string    $item       Name of the custom data, can be dot notated
+     * @param mixed     $default    The return value if the custom data isn't found
+     * @return  mixed The custom data or default if not found
      */
     public function getCustomData($item, $default = null)
     {
@@ -774,12 +801,12 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Sets a (dot notated) custom data
+     * Sets a (dot notated) custom data to the current process.
      *
-     * @param    string    $item a (dot notated) custom data key
-     * @param    mixed     $value the custom data value
-     * @param    boolean   $cached if custom data have to be cached
-     * @return   void      the \Arr::set result
+     * @param string    $item   A (dot notated) custom data key
+     * @param mixed     $value  The custom data value
+     * @param boolean   $cached If custom data have to be cached
+     * @return Controller_Front
      */
     public function setCustomData($item, $value, $cached = false)
     {
@@ -787,6 +814,7 @@ class Controller_Front extends Controller
         if ($cached) {
             $this->_custom_data_cached[] = $item;
         }
+        return $this;
     }
 
     /**
