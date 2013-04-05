@@ -12,18 +12,6 @@ namespace Nos\Media;
 
 class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
 {
-    protected function check_permission($action)
-    {
-        parent::check_permission($action);
-        // Can't edit or delete the root
-        if ($action === 'update' && empty($this->item->medif_parent_id)) {
-            throw new \Exception(__('You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'));
-        }
-        if ($action === 'delete' && empty($this->item->medif_parent_id)) {
-            throw new \Exception(__('You cannot edit the root folder. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'));
-        }
-    }
-
     protected function init_item()
     {
         parent::init_item();

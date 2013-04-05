@@ -135,7 +135,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'url_actions'  => $this->config['controller_url'].'/json_actions'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
-                'actions' => $this->get_actions(),
+                'actions' => array_values($this->get_actions()),
                 'dataset' => \Nos\Controller::dataset_item($this->item),
                 'tab_params' => $this->get_tab_params(),
             ),
@@ -166,7 +166,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if ($this->is_new) {
             $this->init_item();
         }
-        $this->check_permission($this->is_new ? 'insert' : 'update');
+        $this->checkPermission($this->is_new ? 'add' : 'edit');
 
         $fields = $this->fields($this->config['fields']);
         $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
@@ -507,7 +507,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->is_new = $this->item->is_new();
 
-        \Response::json($this->get_actions());
+        \Response::json(array_values($this->get_actions()));
     }
 
     /**
@@ -549,27 +549,24 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      * Get possible actions in the appdesk from the config
      * @return array
      */
-    protected function get_actions()
+    protected function get_actions($all_targets = false)
     {
-        $applicationActions = \Config::actions(array(
-            'models' => array(get_class($this->item)),
-            'target' => 'toolbar-edit',
-            'class' => get_called_class(),
-            'item' => $this->item,
-        ));
-        $actions = array_values($this->get_actions_context());
-
-        foreach ($applicationActions as $action) {
-            $actions[] = $action;
+        $actions = array();
+        $translate_action_content = $this->get_actions_context();
+        if ($translate_action_content !== false) {
+            $actions[$this->config['model'].'.translate'] = $translate_action_content;
         }
-        foreach ($this->config['actions'] as $action) {
-            if (is_callable($action)) {
-                $action = $action($this->item);
-            }
-            if (!empty($action)) {
-                $actions[] = $action;
-            }
-        }
+        $actions = array_merge(
+            $actions,
+            \Config::actions(array(
+                'models' => array(get_class($this->item)),
+                'target' => 'toolbar-edit',
+                'class' => get_called_class(),
+                'item' => $this->item,
+                'all_targets' => $all_targets
+            )),
+            \Nos\Config_Common::prefixActions($this->config['actions'], $this->config['model'])
+        );
 
         return $actions;
     }
@@ -583,7 +580,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $contexts = array_keys(Tools_Context::contexts());
 
         if (!$this->behaviours['twinnable'] || $this->is_new || count($contexts) == 1) {
-            return array();
+            return false;
         }
 
         $actions = array();
@@ -636,7 +633,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         return array(
-            array(
                 'label' => $label,
                 'menu' => array(
                     'options' => array(
@@ -648,8 +644,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'icons' => array(
                     'secondary' => 'triangle-1-s',
                 ),
-            ),
         );
+    }
+
+    /**
+     * @deprecated
+     */
+    protected function check_permission($action_name)
+    {
+        logger(\Fuel::L_WARNING, '\Nos\Controller_Admin_Crud->check_permission($action_name) is deprecated. Please use \Nos\Controller_Admin_Crud->checkPermission($action_name).');
+
+        return $this->checkPermission($action_name);
     }
 
     /**
@@ -657,10 +662,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      * @param string $action
      * @throws \Exception
      */
-    protected function check_permission($action)
+    protected function checkPermission($action_name)
     {
-        if ($action === 'delete' && $this->item->is_new()) {
-            throw new \Exception($this->config['i18n']['not found']);
+        $action_name = \Nos\Config_Common::prefixActionName($action_name, $this->config['model']);
+
+
+        $actions = $this->get_actions(true);
+        $action = $actions[$action_name];
+
+        $disabled = isset($action['disabled']) ? \Config::getActionDisabledState($action['disabled'], $this->item) : false;
+
+        if ($disabled !== false) {
+            if (!is_string($disabled)) {
+                $disabled = __('You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.');
+            }
+            $this->send_error(new \Exception($disabled));
         }
     }
 
@@ -677,7 +693,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             } else {
                 $this->item = $this->crud_item($id);
                 $this->is_new = $this->item->is_new();
-                $this->check_permission('delete');
+                $this->checkPermission('delete');
 
                 return \View::forge('nos::crud/delete_popup_layout', $this->view_params(), false);
             }
@@ -698,7 +714,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->item = $this->crud_item($id);
         $this->is_new = $this->item->is_new();
-        $this->check_permission('delete');
+        $this->checkPermission('delete');
 
         $dispatchEvent = array(
             'name' => $this->config['model'],

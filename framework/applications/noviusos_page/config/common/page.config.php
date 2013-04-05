@@ -82,7 +82,7 @@ return array(
                 'primary' => false,
                 'disabled' => array(
                     function($page) {
-                        return $page->page_lock == $page::LOCK_DELETION;
+                        return ($page->page_lock == $page::LOCK_DELETION) ? __('You can’t delete this page. It is locked.') : false;
                     }),
             ),
             'add' => array(
@@ -140,7 +140,7 @@ return array(
                 ),
                 'disabled' => array(
                     function($page) {
-                        return !!$page->page_home ? __('This page is already the home page.') : false;
+                        return !!$page->page_home ? __('This page is the home page already.') : false;
                     }),
             ),
             'duplicate' => array(

@@ -8,11 +8,8 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\User;
 
-class Permission_Tree extends Permission_Driver
+class Controller_Admin_Inspector_Role extends \Nos\Controller_Inspector_Model
 {
-    public function set_options(array $options = array())
-    {
-    }
 }

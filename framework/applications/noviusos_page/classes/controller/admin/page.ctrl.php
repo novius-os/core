@@ -76,14 +76,6 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         return $fieldset;
     }
 
-    protected function check_permission($action)
-    {
-        parent::check_permission($action);
-        if ($action === 'delete' && $this->item->page_lock == Model_Page::LOCK_DELETION) {
-            throw new \Exception(__('Permission denied'));
-        }
-    }
-
     public function action_set_homepage()
     {
         try {
@@ -92,7 +84,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                 $id = \Input::get('id');
             }
             $this->item = $this->crud_item($id);
-            $this->check_permission('homepage');
+            $this->checkPermission('homepage');
 
             $contexts = $this->item->get_all_context();
             $pages_context = $this->item->find_context('all');

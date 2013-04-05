@@ -42,6 +42,14 @@ $uniqid = uniqid('id_');
                     'fields' => array('user_email', 'user_password', 'password_confirmation', 'user_lang', 'user_expert'),
                 ), false)
             ), false),
+            \Config::get('novius-os.users.enable_roles', false) == false ? '' : \View::forge('form/expander', array(
+                'title' => __('Roles'),
+                'nomargin' => false,
+                'content' => \View::forge('noviusos_user::admin/user_roles_edit', array(
+                    'fieldset' => $fieldset,
+                    'user' => $item,
+                ), false)
+            ), false),
         ),
     ), false); ?>
 </div>

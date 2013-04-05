@@ -8,25 +8,27 @@
  * @link http://www.novius-os.org
  */
 
-$fieldset->form()->set_config('field_template', "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
+if (!empty($fieldset)) {
+    $fieldset->form()->set_config('field_template', "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} {error_msg}</span>\n");
 
-foreach ($fieldset->field() as $field) {
-    if ($field->type == 'checkbox') {
-        $template = $field->template;
-        if (empty($template)) {
-            $field->set_template("\t\t<span class=\"{error_class}\">{field} {label}{required} {error_msg}</span>\n");
+    foreach ($fieldset->field() as $field) {
+        if ($field->type == 'checkbox') {
+            $template = $field->template;
+            if (empty($template)) {
+                $field->set_template("\t\t<span class=\"{error_class}\">{field} {label}{required} {error_msg}</span>\n");
+            }
         }
     }
 }
 ?>
-<div class="accordion fieldset <?= !empty($classes) ? $classes : '' ?>">
+<div class="accordion <?= !empty($fieldset) ? 'fieldset' : '' ?> <?= !empty($classes) ? $classes : '' ?>">
 <?php
 foreach ((array) $accordions as $options) {
     if (!is_array($options)) {
         $options = array($options);
     }
-    if (!isset($options['fields']) && !isset($options['view'])) {
-        $options = array('fields' => $options);
+    if (!isset($options['fields'])) {
+        $options['fields'] = !isset($options['view']) ? $options : array();
     }
     if (!isset($options['field_template'])) {
         $options['field_template'] = '<p>{field}</p>';
@@ -35,14 +37,14 @@ foreach ((array) $accordions as $options) {
         $options['title'] = '';
     }
     if (empty($options['view'])) {
-        $exclude = true;
+        $ignore = true;
         foreach ((array) $options['fields'] as $field) {
-            if ($field instanceof \View || !$fieldset->field($field)->is_expert()) {
-                $exclude = false;
+            if ($field instanceof \View || !$fieldset->field($field)->isRestricted()) {
+                $ignore = false;
                 continue;
             }
         }
-        if ($exclude) {
+        if ($ignore) {
             continue;
         }
     }
@@ -51,14 +53,21 @@ foreach ((array) $accordions as $options) {
         <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
     <?php
     if (!empty($options['view'])) {
-        echo View::forge($options['view'], $view_params + (isset($options['params']) ? $options['params'] : array()), false);
+        echo View::forge(
+            $options['view'],
+            (isset($view_params) ? $view_params : array()) + (isset($options['params']) ? $options['params'] : array()),
+            false
+        );
     }
     foreach ((array) $options['fields'] as $field) {
         try {
             if ($field instanceof \View) {
                 echo $field;
-            } else {
-                echo strtr($options['field_template'], array('{field}' => $fieldset->field($field)->build()));
+                continue;
+            }
+            $field = $fieldset->field($field);
+            if (!$field->isRestricted()) {
+                echo strtr($options['field_template'], array('{field}' => $field->build()));
             }
         } catch (\Exception $e) {
             throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
