@@ -753,6 +753,7 @@ define('jquery-nos-ostabs',
                                             .appendTo(links)
                                             .find('a')
                                             .click(function() {
+                                                links.remove();
                                                 return action.click();
                                             });
                                     $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ' + action.iconClass)
