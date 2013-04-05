@@ -6,7 +6,6 @@ class Install extends \Nos\Migration
     public function up()
     {
         \Config::load('migrations', true);
-        $table = \Config::get('migrations.table');
 
         if (!in_array('nos_migration', \DB::list_tables())) {
             \DB::query('RENAME TABLE `migration` TO  `nos_migration`;')->execute();

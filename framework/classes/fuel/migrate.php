@@ -20,7 +20,7 @@ class Migrate extends \Fuel\Core\Migrate
 
     public static function _init()
     {
-        if (\Config::get('novius-os.migration_config_file')) {
+        if (!\Config::get('novius-os.migration_config_file')) {
             \Config::load('migrations', true);
             \Config::set('migrations', array());
         }
