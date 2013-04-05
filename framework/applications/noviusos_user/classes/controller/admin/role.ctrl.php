@@ -14,13 +14,13 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
 {
     public function save($item, $data)
     {
-        $this->save_permissions($item->role_id);
+        $this->savePermissions($item->role_id);
         return parent::save($item, $data);
     }
 
     public function action_save_permissions()
     {
-        $this->save_permissions(\Input::post('role_id'));
+        $this->savePermissions(\Input::post('role_id'));
         \Response::json(array(
             'notify' => __('OK, permissions saved.'),
             'dispatchEvent' => array(
@@ -29,7 +29,7 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
         ));
     }
 
-    protected function save_permissions($role_id)
+    protected function savePermissions($role_id)
     {
         $role = Model_Role::find($role_id);
 

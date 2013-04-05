@@ -15,7 +15,7 @@ class Permission
     public static function check($permission_name, $category_key = null)
     {
         $user = \Session::user();
-        return $user->check_permission($permission_name, $category_key);
+        return $user->checkPermission($permission_name, $category_key);
     }
 
     public static function add($permission_name, $category_key)

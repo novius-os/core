@@ -594,14 +594,14 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $json_response;
     }
 
-    protected function is_expert($field_name)
+    protected function isExpert($field_name)
     {
         return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
     }
 
-    public function is_restricted($field_name)
+    public function isRestricted($field_name)
     {
-        if ($this->is_expert($field_name)) {
+        if ($this->isExpert($field_name)) {
             return true;
         }
         $show_when = \Arr::get($this->config_used[$field_name], 'show_when', false);

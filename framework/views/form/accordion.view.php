@@ -39,7 +39,7 @@ foreach ((array) $accordions as $options) {
     if (empty($options['view'])) {
         $ignore = true;
         foreach ((array) $options['fields'] as $field) {
-            if ($field instanceof \View || !$fieldset->field($field)->is_restricted()) {
+            if ($field instanceof \View || !$fieldset->field($field)->isRestricted()) {
                 $ignore = false;
                 continue;
             }
@@ -66,7 +66,7 @@ foreach ((array) $accordions as $options) {
                 continue;
             }
             $field = $fieldset->field($field);
-            if (!$field->is_restricted()) {
+            if (!$field->isRestricted()) {
                 echo strtr($options['field_template'], array('{field}' => $field->build()));
             }
         } catch (\Exception $e) {

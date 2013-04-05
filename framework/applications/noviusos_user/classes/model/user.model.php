@@ -138,16 +138,27 @@ class Model_User extends \Nos\Orm\Model
         return mb_substr($password, 0, 1).$password.mb_substr($password, -1);
     }
 
+
+    /**
+     * @deprecated
+     */
+    public function check_permission($app, $key)
+    {
+        logger(\Fuel::L_WARNING, '\Nos\User\Model_User->check_permission($app, $key) is deprecated. Please use \Nos\User\Model_User->checkPermission($permission_name, $category_key).');
+
+        return $this->checkPermission($app, $key);
+    }
+
     /**
      * @param   string       $permission_name  Name of the permission to check against
      * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
      * @return  bool  Has the user the required authorisation?
      */
-    public function check_permission($permission_name, $category_key = null)
+    public function checkPermission($permission_name, $category_key = null)
     {
         $args = func_get_args();
         foreach ($this->roles as $g) {
-            if (call_user_func_array(array($g, 'check_permission'), $args)) {
+            if (call_user_func_array(array($g, 'checkPermission'), $args)) {
                 return true;
             }
         }

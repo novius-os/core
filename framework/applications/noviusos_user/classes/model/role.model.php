@@ -58,11 +58,21 @@ class Model_Role extends \Nos\Orm\Model
     }
 
     /**
+     * @deprecated
+     */
+    public function check_permission($application, $key)
+    {
+        logger(\Fuel::L_WARNING, '\Nos\User\Model_Role->check_permission($application, $key) is deprecated. Please use \Nos\User\Model_Role->checkPermission($permission_name, $category_key).');
+
+        return $this->checkPermission($application, $key);
+    }
+
+    /**
      * @param   string       $permission_name  Name of the permission to check against
      * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
      * @return  bool  Has the role the required authorisation?
      */
-    public function check_permission($permission_name, $category_key = null)
+    public function checkPermission($permission_name, $category_key = null)
     {
         if (!$this->_authorised($permission_name)) {
             return false;
@@ -98,7 +108,7 @@ class Model_Role extends \Nos\Orm\Model
         // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
         list($application, ) = explode($permission_name.'::', 2);
         // If this application is loaded, check the user has access to it
-        if (\Module::loaded($application) && !$this->check_permission('nos::access', $application)) {
+        if (\Module::loaded($application) && !$this->checkPermission('nos::access', $application)) {
             return false;
         }
 

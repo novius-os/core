@@ -11,7 +11,7 @@ foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
     ?>
     <li class="application ui-corner-all ui-widget-content">
         <div class="checkbox_hit_area ui-corner-tl ui-corner-bl">
-            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $app_name ?>" <?= $role->check_permission($permission_name, $app_name) ? 'checked' : '' ?> />
+            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $app_name ?>" <?= $role->checkPermission($permission_name, $app_name) ? 'checked' : '' ?> />
         </div>
         <?= empty($icon) ? '' : '<img class="app_icon" src="'.$icon.'"  />' ?> &nbsp; <?= $app['name'] ?>
     </li>

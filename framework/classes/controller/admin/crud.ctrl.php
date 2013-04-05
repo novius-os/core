@@ -166,7 +166,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if ($this->is_new) {
             $this->init_item();
         }
-        $this->check_permission($this->is_new ? 'add' : 'edit');
+        $this->checkPermission($this->is_new ? 'add' : 'edit');
 
         $fields = $this->fields($this->config['fields']);
         $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
@@ -648,11 +648,21 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     }
 
     /**
+     * @deprecated
+     */
+    protected function check_permission($action_name)
+    {
+        logger(\Fuel::L_WARNING, '\Nos\Controller_Admin_Crud->check_permission($action_name) is deprecated. Please use \Nos\Controller_Admin_Crud->checkPermission($action_name).');
+
+        return $this->checkPermission($action_name);
+    }
+
+    /**
      * Check if it's possible to delete an item, i.e. if it's not a new one.
      * @param string $action
      * @throws \Exception
      */
-    protected function check_permission($action_name)
+    protected function checkPermission($action_name)
     {
         $action_name = \Nos\Config_Common::prefixActionName($action_name, $this->config['model']);
 
@@ -683,7 +693,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             } else {
                 $this->item = $this->crud_item($id);
                 $this->is_new = $this->item->is_new();
-                $this->check_permission('delete');
+                $this->checkPermission('delete');
 
                 return \View::forge('nos::crud/delete_popup_layout', $this->view_params(), false);
             }
@@ -704,7 +714,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->item = $this->crud_item($id);
         $this->is_new = $this->item->is_new();
-        $this->check_permission('delete');
+        $this->checkPermission('delete');
 
         $dispatchEvent = array(
             'name' => $this->config['model'],
