@@ -5,7 +5,7 @@ Nos\I18n::current_dictionary(array('noviusos_user::common', 'nos::common'));
 return array(
     'data_mapping' => array(
         'role_name' => array(
-            'title' => __('Name'),
+            'title' => __('Role'),
             'cellFormatters' => array(
                 'link' => array(
                     'type' => 'link',
