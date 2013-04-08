@@ -475,8 +475,8 @@ class Fieldset extends \Fuel\Core\Fieldset
                 continue;
             }
 
-            // Don't populate password fields
-            if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
+            // Don't populate password fields and submit
+            if (in_array(\Arr::get($this->config_used, "$k.form.type"), array('password', 'submit'))) {
                 continue;
             }
             // Don't populate some fields (for example, the context)
