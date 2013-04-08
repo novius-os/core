@@ -17,12 +17,13 @@
  */
 class Migrate extends \Fuel\Core\Migrate
 {
+    protected static $table = 'nos_migration';
 
     public static function _init()
     {
         if (!\Config::get('novius-os.migration_config_file')) {
             \Config::load('migrations', true);
-            \Config::set('migrations', array());
+            \Config::set('migrations.version', array());
         }
         parent::_init();
     }
