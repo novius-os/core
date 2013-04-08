@@ -18,23 +18,66 @@ class Model_User extends \Nos\Orm\Model
     protected static $_primary_key = array('user_id');
 
     protected static $_properties = array(
-        'user_id',
-        'user_md5',
-        'user_name',
-        'user_firstname',
-        'user_email',
-        'user_password',
-        'user_lang' => array(
-            'data_type' => 'varchar',
-            'default' => 'en_GB',
+        'user_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
         ),
-        'user_last_connection',
-        'user_configuration',
-        'user_created_at',
-        'user_updated_at',
+        'user_md5' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'user_name' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'user_firstname' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'user_email' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'user_password' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'user_lang' => array(
+            'default' => 'en_GB',
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'user_last_connection' => array(
+            'default' => null,
+            'data_type' => 'datetime',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'user_configuration' => array(
+            'default' => null,
+            'data_type' => 'text',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
         'user_expert' => array(
-            'data_type' => 'int',
-            'default' => 0,
+            'default' => null,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'user_created_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'user_updated_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
         ),
     );
 

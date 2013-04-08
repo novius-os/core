@@ -15,21 +15,63 @@ class Model_Media extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media';
     protected static $_primary_key = array('media_id');
 
+    protected static $_title_property = 'media_title';
     protected static $_properties = array(
-        'media_id',
-        'media_folder_id',
-        'media_path',
-        'media_file',
-        'media_ext',
-        'media_title',
-        'media_protected' => array(
-            'data_type' => 'int',
-            'default' => 0,
+        'media_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
         ),
-        'media_width',
-        'media_height',
-        'media_created_at',
-        'media_updated_at',
+        'media_folder_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'media_path' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_file' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_ext' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_title' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_protected' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'media_width' => array(
+            'default' => null,
+            'data_type' => 'smallint unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'media_height' => array(
+            'default' => null,
+            'data_type' => 'smallint unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'media_created_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'media_updated_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
     );
 
     public static $private_path = 'data/media/';

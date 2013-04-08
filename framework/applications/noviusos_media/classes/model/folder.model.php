@@ -15,17 +15,44 @@ class Model_Folder extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media_folder';
     protected static $_primary_key = array('medif_id');
 
-    protected static $_properties = array(
-        'medif_id',
-        'medif_parent_id',
-        'medif_path',
-        'medif_dir_name',
-        'medif_title',
-        'medif_created_at',
-        'medif_updated_at',
-    );
-
     protected static $_title_property = 'medif_title';
+    protected static $_properties = array(
+        'medif_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'medif_parent_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'medif_path' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medif_dir_name' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'medif_title' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medif_created_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'medif_updated_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+    );
 
     protected static $_has_many = array(
         'children' => array(

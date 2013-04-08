@@ -582,6 +582,12 @@ class Model extends \Orm\Model
             $return = parent::set($property, $value);
         }
 
+        $class = get_called_class();
+        if ($value === '' && array_key_exists($property, static::$_properties_cached[$class]) &&
+            isset(static::$_properties_cached[$class][$property]['convert_empty_to_null']) && static::$_properties_cached[$class][$property]['convert_empty_to_null']) {
+            $return = parent::set($property, null);
+        }
+
         return $return;
     }
 

@@ -19,26 +19,35 @@ class Model_Content_Nuggets extends \Nos\Orm\Model
 
     protected static $_properties = array(
         'content_id' => array(
-            'data_type' => 'int',
+            'default' => null,
+            'data_type' => 'int unsigned',
             'null' => false,
         ),
         'content_catcher' => array(
+            'default' => null,
             'data_type' => 'varchar',
-            'null' => false,
+            'null' => true,
+            'convert_empty_to_null' => true,
             'character_maximum_length' => 25,
         ),
         'content_model_name' => array(
+            'default' => null,
             'data_type' => 'varchar',
-            'null' => false,
+            'null' => true,
             'character_maximum_length' => 100,
+            'convert_empty_to_null' => true,
         ),
         'content_model_id' => array(
-            'data_type' => 'int',
-            'null' => false,
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
         ),
         'content_data' => array(
+            'default' => null,
             'data_type' => 'serialize',
-            'null' => false,
+            'null' => true,
+            'convert_empty_to_null' => true,
         ),
     );
 
