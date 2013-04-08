@@ -55,13 +55,13 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     public function publicationStart($item)
     {
         $property = $this->_properties['publication_start_property'];
-        return $item->get($property);
+        return empty($property) ? null : $item->get($property);
     }
 
     public function publicationEnd($item)
     {
         $property = $this->_properties['publication_end_property'];
-        return $item->get($property);
+        return empty($property) ? null : $item->get($property);
     }
 
     /**
