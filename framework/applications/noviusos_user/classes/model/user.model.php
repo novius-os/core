@@ -67,7 +67,7 @@ class Model_User extends \Nos\Orm\Model
             'convert_empty_to_null' => true,
         ),
         'user_expert' => array(
-            'default' => null,
+            'default' => 0,
             'data_type' => 'tinyint',
             'null' => false,
         ),
