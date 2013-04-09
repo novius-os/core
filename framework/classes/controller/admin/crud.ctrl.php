@@ -666,8 +666,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     {
         $action_name = \Nos\Config_Common::prefixActionName($action_name, $this->config['model']);
 
-
         $actions = $this->get_actions(true);
+        if (!isset($actions[$action_name])) {
+            logger(\Fuel::L_WARNING, '\Nos\Controller_Admin_Crud->check_permission($action_name = '.$action_name.'). The action name was not found in the common configuration file, please double check for typo.');
+            return true;
+        }
+
         $action = $actions[$action_name];
 
         $disabled = isset($action['disabled']) ? \Config::getActionDisabledState($action['disabled'], $this->item) : false;
