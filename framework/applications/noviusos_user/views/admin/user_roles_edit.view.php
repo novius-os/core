@@ -23,13 +23,15 @@ foreach ($roles as $role) {
             <label>
                 <input type="checkbox" name="roles[]" value="<?= $role->role_id ?>" <?= in_array($role->role_id, $selected) ? 'checked' : '' ?>>
                 <?= htmlspecialchars($role->role_name) ?>
-                <a class="link_to_role" href="#" data-action="<?= htmlspecialchars(\Format::forge()->to_json(array(
-                    'action' => 'nosTabs',
-                    'tab' => array(
-                        'url' => 'admin/noviusos_user/role/insert_update/'.$role->role_id,
-                    ),
-                ))) ?>"><span class="nos-icon16 nos-icon16-eye"></span> <?= __('View and edit permissions') ?></a>
             </label>
+        </td>
+        <td style="width:50%">
+            <a class="link_to_role" href="#" data-auto-init="nosAction" data-action="<?= htmlspecialchars(\Format::forge()->to_json(array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'url' => 'admin/noviusos_user/role/insert_update/'.$role->role_id,
+                ),
+            ))) ?>"><span class="nos-icon16 nos-icon16-eye"></span> <?= __('View and edit permissions') ?></a>
         </td>
     </tr>
     <?php
