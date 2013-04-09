@@ -1,5 +1,7 @@
 <?php
 
+Nos\I18n::current_dictionary(array('nos::orm', 'nos::common'));
+
 $status = $item->planificationStatus();
 if ($status == 0) {
     echo '<img class="publication_status" src="static/novius-os/admin/novius-os/img/icons/status-red.png"> '.__('Not published');
