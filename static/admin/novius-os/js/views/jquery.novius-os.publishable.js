@@ -32,7 +32,8 @@ define('jquery-nos-publishable',
                         });
                     }
                 } else {
-                    Globalize.culture( $.nosLang.substr(0, 2) );
+                    // Globalize.culture('en-GB') (both lang + country, separated with a dash).
+                    Globalize.culture( $.nosLang.replace(/_/, '-'));
                     var date = $input.datetimepicker('getDate'),
                         formatted = Globalize.format(date, 'd') + ' ' + Globalize.format(date, 't');
 
@@ -144,7 +145,7 @@ define('jquery-nos-publishable',
 
                             $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
                             $input_start.datetimepicker({
-                                timeFormat: 'hh:mm:ss',
+                                timeFormat: 'HH:mm:ss',
                                 dateFormat: 'yy-mm-dd',
                                 maxDate: $input_end.val(),
                                 onClose: function(selectedDate ) {
@@ -152,7 +153,7 @@ define('jquery-nos-publishable',
                                 }
                             });
                             $input_end.datetimepicker({
-                                timeFormat: 'hh:mm:ss',
+                                timeFormat: 'HH:mm:ss',
                                 dateFormat: 'yy-mm-dd',
                                 minDate: $input_start.val(),
                                 onClose: function(selectedDate) {
