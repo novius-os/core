@@ -236,10 +236,10 @@ return array(
                 'flag' => 'fr',
             ),
             // @todo uncomment when the translations will be available
-            /*'ja_JP' =>  array(
-                'title' => '日本語'
+            'ja_JP' =>  array(
+                'title' => '日本語',
                 'flag' => 'jp',
-            ),*/
+            ),
         ),
 
         'default_locale' => 'en_GB',
