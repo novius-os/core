@@ -86,7 +86,6 @@ return array(
     'appdesk' => array(
         'vertical' => true,
         'label' => __('Types'),
-        'url' => 'admin/noviusos_media/inspector/extension/list',
         'inputName' => 'media_extension[]',
         'grid' => array(
             'columns' => array(
