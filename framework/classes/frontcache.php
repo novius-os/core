@@ -338,9 +338,28 @@ class FrontCache
 
     public function delete()
     {
+        // Delete plain file, like 'my/page.html.php'
         if (is_file($this->_path)) {
             @unlink($this->_path);
         }
+
+        // Delete sub-files
+        // Remove trailing .php to get 'my/page.html'
+        $path = substr($this->_path, 0, -4);
+        // Remove extension to get 'my/page'
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        if (!empty($extension)) {
+            $path = substr($path, 0, - strlen($extension) - 1);
+        }
+        // Delete the directory 'my/page/*'
+        if (is_dir($path)) {
+            try {
+                \File::delete_dir($path, true, true);
+            } catch (\Exception $e) {
+            }
+        }
+
+        // Delete suffixes directory 'my/page.cache.suffixes/*'
         if (is_dir($this->_path_suffix)) {
             try {
                 \File::delete_dir($this->_path_suffix, true, true);
