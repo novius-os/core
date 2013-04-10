@@ -89,6 +89,8 @@ class Finder extends Fuel\Core\Finder
             } else if ($dir === 'config') {
                 // Novius OS : load config in local if exist
                 $paths_add = array(APPPATH.'config'.DS.($dir_app === 'nos' ? 'novius-os'.DS : 'apps'.DS.$dir_app.DS));
+            } else if ($dir === 'lang' && $dir_app !== 'local') {
+                $paths_add = array(APPPATH.'lang'.DS.($dir_app === 'nos' ? 'novius-os'.DS : 'apps'.DS.$dir_app.DS));
             }
 
             // get the namespace path
