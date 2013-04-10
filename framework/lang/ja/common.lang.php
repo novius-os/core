@@ -108,21 +108,8 @@ return array(
     #: classes/tools/image.php:148
     'The format of this image is not allowed.' => 'この形式の画像は許可されていません。',
 
-    #: classes/renderer/media.php:76
-    'Image from the Media Centre' => 'メディアセンターの画像',
-
-    #: classes/renderer/media.php:78
     #: views/admin/html.view.php:440
     'Pick an image' => '画像を選択',
-
-    #: classes/renderer/media.php:79
-    'Pick another image' => '他の画像を選択',
-
-    #: classes/renderer/media.php:80
-    'No image' => '画像無し',
-
-    #: classes/renderer/media.php:81
-    'This extension is not allowed.' => 'この拡張子の画像は許可されていません。',
 
     #. Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
     #: classes/config/common.php:88

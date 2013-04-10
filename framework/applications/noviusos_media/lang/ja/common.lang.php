@@ -290,4 +290,19 @@ return array(
     #: views/admin/folder.view.php:57
     'Warning: moving a folder changes the URL of all the files it contains.' => '警告: フォルダを移動すると、そのフォルダ内の全てのファイルの URL が変わります。',
 
+    #: classes/renderer/media.php:76
+    'Image from the Media Centre' => 'メディアセンターの画像',
+
+    #: classes/renderer/media.php:78
+    #: views/admin/html.view.php:440
+    'Pick an image' => '画像を選択',
+
+    #: classes/renderer/media.php:79
+    'Pick another image' => '他の画像を選択',
+
+    #: classes/renderer/media.php:80
+    'No image' => '画像無し',
+
+    #: classes/renderer/media.php:81
+    'This extension is not allowed.' => 'この拡張子の画像は許可されていません。',
 );
