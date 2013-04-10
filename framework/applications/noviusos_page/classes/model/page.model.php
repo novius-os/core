@@ -335,6 +335,10 @@ class Model_Page extends \Nos\Orm\Model
             $cache = \Nos\FrontCache::forge('pages'.DS.$cache_path);
             $cache->delete();
         }
+
+        if ($this->page_menu || $this->is_changed('page_menu')) {
+            static::delete_cache_context($this->page_context);
+        }
     }
 
     /**
@@ -398,6 +402,8 @@ class Model_Page extends \Nos\Orm\Model
                 }
             }
         }
+
+        $this->delete_cache();
     }
 
     public function _event_before_delete()
@@ -409,6 +415,7 @@ class Model_Page extends \Nos\Orm\Model
     {
         static::_remove_url_enhanced($this->_page_id_for_delete);
         static::_remove_page_enhanced($this->_page_id_for_delete);
+        $this->delete_cache();
         $this->_page_id_for_delete = null;
     }
 
