@@ -307,6 +307,50 @@ class Model_Page extends \Nos\Orm\Model
         return $url;
     }
 
+
+    /**
+     *  Delete the cache for this page
+     */
+    public function delete_cache()
+    {
+        if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
+            return;
+        }
+        $url = $this->page_entrance ? '' : ltrim($this->virtual_path(), '/');
+        $contexts = \Nos\Tools_Context::contexts();
+        foreach ($contexts[$this->page_context] as $context_url) {
+            $host = parse_url($context_url, PHP_URL_HOST);
+            $path = ltrim(parse_url($context_url, PHP_URL_PATH), '/');
+
+            $url = $path.$url;
+            $cache_path = (empty($url) ? 'index/' : $url);
+            // This event mostly redirects, don't trigger it
+            //\Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
+            $cache_path = $host.DS.rtrim($cache_path, '/');
+
+            // Delete file
+            $cache = \Nos\FrontCache::forge('pages'.DS.$cache_path);
+            $cache->delete();
+        }
+    }
+
+    /**
+     * Delete the cache for this context
+     *
+     * @param  $context  string  Context to delete (e.g. 'main::en_GB')
+     */
+    public static function delete_cache_context($context)
+    {
+        $contexts = \Nos\Tools_Context::contexts();
+        foreach ($contexts[$context] as $context_url) {
+            $host = parse_url($context_url, PHP_URL_HOST);
+            $path = trim(parse_url($context_url, PHP_URL_PATH), '/');
+
+            $cache = \Nos\FrontCache::forge('pages'.DS.$host.DS.$path);
+            $cache->delete();
+        }
+    }
+
     public function _event_after_save()
     {
         \Nos\Config_Data::load('enhancers');
