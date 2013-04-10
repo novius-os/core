@@ -205,7 +205,7 @@ class Model extends \Orm\Model
                     'model_to' => 'Nos\Model_Wysiwyg',
                     'key_to' => 'wysiwyg_foreign_id',
                     'cascade_save' => true,
-                    'cascade_delete' => false,
+                    'cascade_delete' => true,
                     'conditions' => array(
                         'where' => array(
                             array('wysiwyg_join_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
@@ -220,7 +220,7 @@ class Model extends \Orm\Model
                     'model_to' => 'Nos\Media\Model_Link',
                     'key_to' => 'medil_foreign_id',
                     'cascade_save' => true,
-                    'cascade_delete' => false,
+                    'cascade_delete' => true,
                     'conditions' => array(
                         'where' => array(
                             array('medil_from_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
