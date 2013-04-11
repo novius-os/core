@@ -36,24 +36,11 @@ foreach ((array) $accordions as $options) {
     if (!isset($options['title'])) {
         $options['title'] = '';
     }
-    if (empty($options['view'])) {
-        $ignore = true;
-        foreach ((array) $options['fields'] as $field) {
-            if ($field instanceof \View || !$fieldset->field($field)->isRestricted()) {
-                $ignore = false;
-                continue;
-            }
-        }
-        if ($ignore) {
-            continue;
-        }
-    }
-    ?>
-        <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $options['title'] ?></a></h3>
-        <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
-    <?php
+
+    $content = array();
+
     if (!empty($options['view'])) {
-        echo View::forge(
+        $content[] = View::forge(
             $options['view'],
             (isset($view_params) ? $view_params : array()) + (isset($options['params']) ? $options['params'] : array()),
             false
@@ -62,19 +49,29 @@ foreach ((array) $accordions as $options) {
     foreach ((array) $options['fields'] as $field) {
         try {
             if ($field instanceof \View) {
-                echo $field;
+                $content[] = $field;
                 continue;
             }
             $field = $fieldset->field($field);
             if (!$field->isRestricted()) {
-                echo strtr($options['field_template'], array('{field}' => $field->build()));
+                $content[] = strtr($options['field_template'], array('{field}' => $field->build()));
             }
         } catch (\Exception $e) {
             throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
         }
     }
-    ?>
+
+    $content = implode('', $content);
+
+    if (!empty($content) || !empty($options['show_when_empty'])) {
+        ?>
+        <h3 class="<?= isset($options['header_class']) ? $options['header_class'] : '' ?>"><a href="#"><?= $options['title'] ?></a></h3>
+        <div class="<?= isset($options['content_class']) ? $options['content_class'] : '' ?>" style="overflow:visible;">
+            <?= $content ?>
         </div>
+        <?php
+    }
+    ?>
     <?php
 }
 ?>

@@ -8,23 +8,37 @@
  * @link http://www.novius-os.org
  */
 
-if (!empty($begin)) {
-    echo $begin;
-} else {
-    echo '<table class="fieldset">';
-}
+
+$content = array();
+
 foreach ($fields as $field_name) {
     $field = $fieldset->field($field_name);
-    if (!empty($field)) {
+    // Note: the isRestricted() check should not be strictly necessary, as restricted fields sould return empty content
+    if (!empty($field) && !$field->isRestricted()) {
         if (isset($callback)) {
-            $callback($field);
+            // The callback function can either echo things or returning the content.
+            ob_start();
+            echo $callback($field);
+            $content[] = ob_get_clean();
         } else {
-            echo $field->build();
+            $content[] = $field->build();
         }
     }
 }
-if (!empty($end)) {
-    echo $end;
-} else {
-    echo '</table>';
+$content = implode('', $content);
+
+if (!empty($content) || !empty($show_when_empty)) {
+    if (!empty($begin)) {
+        echo $begin;
+    } else {
+        echo '<table class="fieldset">';
+    }
+
+    echo $content;
+
+    if (!empty($end)) {
+        echo $end;
+    } else {
+        echo '</table>';
+    }
 }
