@@ -11,7 +11,6 @@
 ?>
 <html>
 <head>
-    <base href="<?= \Uri::base(false) ?>" />
 </head>
 <body>
 <script type="text/javascript">
@@ -19,7 +18,7 @@
     while (top.parent != top) {
         top = top.parent;
     }
-    top.location = 'admin/nos/login';
+    top.location = '<?= \Uri::base(false) ?>admin/nos/login';
 </script>
 </body>
 </html>
