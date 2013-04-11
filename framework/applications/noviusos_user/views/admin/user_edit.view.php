@@ -79,8 +79,6 @@ if (!$enable_roles) {
 
             var $password = $container.find('input[name=password_reset]');
 
-            log($container);
-
             // Password strength
             var strength_id = '<?= $uniqid ?>_strength';
             var $strength = $('<span id="' + strength_id + '"></span>');

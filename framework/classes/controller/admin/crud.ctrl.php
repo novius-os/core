@@ -371,7 +371,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $return = array(
             'notify' => $this->is_new ? $this->config['i18n']['notification item added'] : $this->config['i18n']['notification item saved'],
             'closeDialog' => true,
-            'dispatchEvent' => $dispatchEvent,
+            'dispatchEvent' => array($dispatchEvent),
         );
         if ($this->is_new) {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};

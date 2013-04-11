@@ -15,7 +15,11 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
     public function save($item, $data)
     {
         $this->savePermissions($item->role_id);
-        return parent::save($item, $data);
+        $return = parent::save($item, $data);
+        $return['dispatchEvent'][] = array(
+            'name' => 'Nos\Application',
+        );
+        return $return;
     }
 
     public function action_save_permissions()
