@@ -36,7 +36,7 @@ class Tools_Wysiwyg
     public static function parse_medias(&$content, $closure)
     {
         // Find all medias
-        preg_match_all('`<(img|a)(?:.+?)(?:src|href)="(nos://media/(\d+)(?:/(\d+)/(\d+))?)"(?:.+?)>`u', $content, $matches);
+        preg_match_all('`<(img|a)(?:.+?)(?:src|href)="(nos://media/(\d+)(?:/(\d+)/(\d+))?)"(?:.*?)>`u', $content, $matches);
         if (!empty($matches[0])) {
             $media_ids = array();
             foreach ($matches[3] as $match_id => $media_id) {

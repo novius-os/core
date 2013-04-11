@@ -15,10 +15,23 @@ class Model_Role extends \Nos\Orm\Model
     protected static $_table_name = 'nos_role';
     protected static $_primary_key = array('role_id');
 
+    protected static $_title_property = 'role_name';
     protected static $_properties = array(
-        'role_id',
-        'role_name',
-        'role_user_id',
+        'role_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'role_name' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'role_user_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
     );
 
     protected static $permissions;

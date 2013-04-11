@@ -13,7 +13,7 @@ $roles = Nos\User\Model_Role::find('all');
 $selected = array_keys($user->roles);
 
 ?>
-<table class="fieldset">
+<table class="fieldset" id="<?= $uniqid = uniqid('role_') ?>">
 <?php
 foreach ($roles as $role) {
     ?>
@@ -25,8 +25,27 @@ foreach ($roles as $role) {
                 <?= htmlspecialchars($role->role_name) ?>
             </label>
         </td>
+        <td style="width:50%">
+            <a class="link_to_role" href="#" data-auto-init="nosAction" data-action="<?= htmlspecialchars(\Format::forge()->to_json(array(
+                'action' => 'nosTabs',
+                'tab' => array(
+                    'url' => 'admin/noviusos_user/role/insert_update/'.$role->role_id,
+                ),
+            ))) ?>"><span class="nos-icon16 nos-icon16-eye"></span> <?= __('View and edit permissions') ?></a>
+        </td>
     </tr>
     <?php
 }
 ?>
 </table>
+<script type="text/javascript">
+require(['jquery-nos'], function($) {
+    $(function() {
+        $('#<?= $uniqid ?>').find('a.link_to_role').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            $this.nosAction($this.data('action'));
+        })
+    });
+});
+</script>

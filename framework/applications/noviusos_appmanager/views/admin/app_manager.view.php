@@ -30,6 +30,9 @@ Nos\I18n::current_dictionary('noviusos_appmanager::common');
         .app_manager label.tooltip {
             font-weight: bold;
         }
+        .app_manager tr {
+            height: 32px;
+        }
     </style>
 
     <div class="col c1"></div>

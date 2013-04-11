@@ -50,7 +50,9 @@ if (!$enable_roles) {
     </div>
     <?php
 } else {
+    echo '<div id="'.$uniqid.'">';
     echo \View::forge('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset, 'user' => $item), false);
+    echo '</div>';
 }
 ?>
 
@@ -62,18 +64,22 @@ if (!$enable_roles) {
     ], function($) {
         $(function() {
             var $container = $('#<?= $uniqid ?>');
-            $container.css('display', 'block')
-                .nosOnShow()
-                .wijtabs({
-                    alignment: 'left'
-                });
+            if ($container.hasClass('fill-parent')) {
+                $container.css('display', 'block')
+                    .nosOnShow()
+                    .wijtabs({
+                        alignment: 'left'
+                    });
 
-            $container.find('> div').addClass('fill-parent').css({
-                left: '15%',
-                width : '85%'
-            });
+                $container.find('> div').addClass('fill-parent').css({
+                    left: '15%',
+                    width : '85%'
+                });
+            }
 
             var $password = $container.find('input[name=password_reset]');
+
+            log($container);
 
             // Password strength
             var strength_id = '<?= $uniqid ?>_strength';

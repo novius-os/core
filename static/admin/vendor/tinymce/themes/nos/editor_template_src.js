@@ -1807,19 +1807,6 @@
 			});
 		},
 
-		_mceLink : function(ui, val) {
-			var ed = this.editor;
-
-			ed.windowManager.open({
-				url : this.url + '/link.htm',
-				width : 310 + parseInt(ed.getLang('nos.link_delta_width', 0)),
-				height : 200 + parseInt(ed.getLang('nos.link_delta_height', 0)),
-				inline : true
-			}, {
-				theme_url : this.url
-			});
-		},
-
 		_mceNewDocument : function() {
 			var ed = this.editor;
 
@@ -2009,6 +1996,8 @@
             var ed = this.editor,
                 e = ed.dom.getParent(ed.selection.getNode(), 'A');
 
+            var bookmark = ed.selection.getBookmark(1);
+
             var dialog = null;
             dialog = $nos(ed.getElement()).nosDialog({
                 contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
@@ -2021,6 +2010,10 @@
             dialog.bind('insert.link', function(event, link) {
                 // Cleanup
                 dialog.nosDialog('close');
+
+                if (tinymce.isIE) {
+                    ed.selection.moveToBookmark(bookmark);
+                }
 
                 if (e == null) {
                     ed.getDoc().execCommand("unlink", false, null);
@@ -2067,6 +2060,8 @@
 
             var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
 
+            var bookmark = ed.selection.getBookmark(1);
+
 			var dialog = null;
             dialog = $nos(ed.getElement()).nosDialog({
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
@@ -2079,6 +2074,10 @@
             dialog.bind('insert.media', function(e, img) {
                 // Cleanup
                 dialog.nosDialog('close');
+
+                if (tinymce.isIE) {
+                    ed.selection.moveToBookmark(bookmark);
+                }
 
                 var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
                 if (editCurrentImage) {

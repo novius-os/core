@@ -546,7 +546,13 @@ define('jquery-nos',
 
                             case 'document.location' :
                                 url = $.nosDataReplace(obj.url, data);
-                                document.location  = url;
+                                if (!(url.substr(0, 5) === 'http:' || url.substr(0, 6) === 'https:')) {
+                                    var $base = $('base');
+                                    if ($base.size()) {
+                                        url = $base.attr('href') + url;
+                                    }
+                                }
+                                document.location.href = url;
                                 break;
                         }
                     }

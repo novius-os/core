@@ -13,8 +13,7 @@ namespace Nos;
 class Renderer_Time_Picker extends \Fieldset_Field
 {
     static protected $DEFAULT_RENDERER_OPTIONS = array(
-        'timeFormat' => 'hh:mm',
-        'separator' => ' ',
+        'timeFormat' => 'HH:mm',
     );
 
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)

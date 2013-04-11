@@ -16,11 +16,31 @@ class Model_Link extends \Nos\Orm\Model
     protected static $_primary_key = array('medil_id');
 
     protected static $_properties = array(
-        'medil_id',
-        'medil_from_table',
-        'medil_foreign_id',
-        'medil_key',
-        'medil_media_id',
+        'medil_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'medil_from_table' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medil_foreign_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'medil_key' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medil_media_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
     );
 
     public static $_belongs_to = array(

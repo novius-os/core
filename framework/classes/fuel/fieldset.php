@@ -356,17 +356,17 @@ class Fieldset extends \Fuel\Core\Fieldset
         $this->require_js = array_merge($this->require_js, $require_js);
     }
 
-    public static function build_from_config($config, $model = null, $options = array())
+    public static function build_from_config($config, $item = null, $options = array())
     {
         $instance = null;
-        if (is_object($model)) {
-            $instance = $model;
+        if (is_object($item)) {
+            $instance = $item;
             empty($options['action']) && $options['action'] = 'edit';
-        } elseif (is_string($model)) {
+        } elseif (is_string($item)) {
             $instance = null;
             empty($options['action']) && $options['action'] = 'add';
-        } elseif (is_array($model)) {
-            $options = $model;
+        } elseif (is_array($item)) {
+            $options = $item;
             $instance = null;
         }
         $options['instance'] = $instance;
@@ -403,17 +403,10 @@ class Fieldset extends \Fuel\Core\Fieldset
             $fieldset->populate_with_instance($instance);
         }
 
-        $options['fieldset'] = $fieldset;
-
         if ($options['save'] && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
             $fieldset->repopulate();
             if ($fieldset->validation()->run($fieldset->value())) {
-                $data = $fieldset->validated();
-                if (!empty($options['complete']) && is_callable($options['complete'])) {
-                    $json = call_user_func($options['complete'], $data, $model, $config, $options);
-                } else {
-                    $json = static::defaultComplete($data, $model, $config, $options);
-                }
+                $json = $fieldset->triggerComplete($item, $fieldset->validated(), $options);
                 \Response::json($json);
             } else {
                 \Response::json(array(
@@ -423,6 +416,16 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
         }
         return $fieldset;
+    }
+
+    public function triggerComplete($item, $data, $options = array())
+    {
+        $options['fieldset'] = $this;
+        if (!empty($options['complete']) && is_callable($options['complete'])) {
+            return call_user_func($options['complete'], $data, $item, $this->config_used, $options);
+        } else {
+            return static::defaultComplete($data, $item, $this->config_used, $options);
+        }
     }
 
     public function readonly_context($instance)
@@ -475,8 +478,8 @@ class Fieldset extends \Fuel\Core\Fieldset
                 continue;
             }
 
-            // Don't populate password fields
-            if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
+            // Don't populate password fields and submit
+            if (in_array(\Arr::get($this->config_used, "$k.form.type"), array('password', 'submit'))) {
                 continue;
             }
             // Don't populate some fields (for example, the context)

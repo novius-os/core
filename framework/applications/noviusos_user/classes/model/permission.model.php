@@ -16,9 +16,22 @@ class Model_Permission extends \Nos\Orm\Model
 
     protected static $_primary_key = array('perm_role_id', 'perm_name', 'perm_category_key');
 
+    protected static $_title_property = 'perm_name';
     protected static $_properties = array(
-        'perm_role_id',
-        'perm_name',
-        'perm_category_key',
+        'perm_role_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'perm_name' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'perm_category_key' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
     );
 }

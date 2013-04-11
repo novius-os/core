@@ -25,6 +25,15 @@ class Config extends \Fuel\Core\Config
         return parent::load($file, $group, $reload, $overwrite);
     }
 
+    public static function save($file, $config)
+    {
+        if ($file !== \Fuel::$env.DS.'migrations' || \Config::get('novius-os.migration_config_file')) {
+            return parent::save($file, $config);
+        } else {
+            return true;
+        }
+    }
+
     public static function mergeWithUser($item, $config)
     {
         $user = Session::user();

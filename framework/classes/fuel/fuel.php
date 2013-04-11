@@ -17,6 +17,12 @@ class Fuel extends Fuel\Core\Fuel
     // We have a different base url because we changed the index.php
     protected static function generate_base_url()
     {
-	return \Input::protocol().'://'.\Input::server('http_host').'/';
+        // X-Forwarded-Proto is pretty standard
+        if (\Input::server('HTTP_X_FORWARDED_PROTO') === 'https') {
+            $protocol = 'https';
+        } else {
+            $protocol = \Input::protocol();
+        }
+        return $protocol.'://'.\Input::server('http_host').'/';
     }
 }

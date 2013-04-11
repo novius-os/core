@@ -918,6 +918,9 @@ define('jquery-nos-appdesk',
                                     if (presentation.size) {
                                         o.thumbnails.thumbnailSize = presentation.size;
                                     }
+                                    if (presentation.id === 'treeGrid') {
+                                        self.uiSearchInput.val('');
+                                    }
                                     self._uiList();
                                 }
                             });

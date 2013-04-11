@@ -290,4 +290,20 @@ return array(
     #: views/admin/folder.view.php:57
     'Warning: moving a folder changes the URL of all the files it contains.' => 'Attention&nbsp;: déplacer un dossier change l’URL de tous les fichiers qu’il contient.',
 
+
+    #: classes/renderer/media.php:76
+    'Image from the Media Centre' => 'Image de la Médiathèque',
+
+    #: classes/renderer/media.php:78
+    #: views/admin/html.view.php:439
+    'Pick an image' => 'Sélectionner une image',
+
+    #: classes/renderer/media.php:79
+    'Pick another image' => 'Sélectionner une autre image',
+
+    #: classes/renderer/media.php:80
+    'No image' => 'Pas d’image',
+
+    #: classes/renderer/media.php:81
+    'This extension is not allowed.' => 'Cette extension n’est pas autorisée.',
 );
