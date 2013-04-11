@@ -222,10 +222,9 @@ define('jquery-nos-preview',
                 var self = this,
                     o = self.options;
 
-                // wijsuperpanel can not be initialized
-                try{
+                if (self.element.data('wijmo-wijsuperpanel')) {
                     self.element.wijsuperpanel('destroy');
-                } catch (e) {}
+                }
                 self.element.empty();
 
                 self._uiHeader(o.texts.headerDefault);
