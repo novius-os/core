@@ -28,11 +28,14 @@ require(
 $has_restricted_fields = false;
 foreach ($fieldset->field() as $field) {
     if ($field->isRestricted()) {
+        // Only use one <div> to wrap all restricted fields (instead of one per field)
         if (!$has_restricted_fields) {
             echo '<div style="display:none;">';
             $has_restricted_fields = true;
         }
         echo $field->set_template('{field}')->build();
+        // We don't use the {description} placeholder, so build() should return an empty string
+        $field->set_template('{description}');
     }
 }
 if ($has_restricted_fields) {
