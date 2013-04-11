@@ -11,7 +11,7 @@
 if (is_array($content) && !empty($content['view'])) {
     $content = (string) View::forge($content['view'], $view_params + $content['params'], false);
 } else {
-    echo (string) is_callable($content) ? $content() : $content;
+    $content = (string) is_callable($content) ? $content() : $content;
 }
 
 if (!empty($content) || !empty($show_when_empty)) {
