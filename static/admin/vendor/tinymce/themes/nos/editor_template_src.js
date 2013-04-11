@@ -1807,19 +1807,6 @@
 			});
 		},
 
-		_mceLink : function(ui, val) {
-			var ed = this.editor;
-
-			ed.windowManager.open({
-				url : this.url + '/link.htm',
-				width : 310 + parseInt(ed.getLang('nos.link_delta_width', 0)),
-				height : 200 + parseInt(ed.getLang('nos.link_delta_height', 0)),
-				inline : true
-			}, {
-				theme_url : this.url
-			});
-		},
-
 		_mceNewDocument : function() {
 			var ed = this.editor;
 
