@@ -16,6 +16,8 @@ use \Config;
 
 class Controller_Inspector_Modeltree extends Controller_Inspector
 {
+    protected static $default_view = 'inspector/modeltree';
+
     protected $config = array();
 
     public function action_list($view = null, $view_data = array())
@@ -139,7 +141,6 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                     return $query;
                 };
             }
-
         }
         return parent::process_config($application, $config, $item_actions, $gridKey);
     }

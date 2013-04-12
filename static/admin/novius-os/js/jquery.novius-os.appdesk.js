@@ -801,7 +801,7 @@ define('jquery-nos-appdesk',
 
                 if ($.isFunction(inspector.url)) {
                     inspector.url.call(self, $li);
-                } else {
+                } else if (inspector.url) {
                     $.ajax({
                         url: inspector.url,
                         dataType: 'html'
@@ -814,6 +814,8 @@ define('jquery-nos-appdesk',
                         log(textStatus);
                         log(errorThrown);
                     });
+                } else {
+                    $li.html(inspector.view);
                 }
 
                 return self;

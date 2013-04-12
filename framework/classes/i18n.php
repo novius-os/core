@@ -91,9 +91,17 @@ class I18n
 
             $languages = array(static::$_locale, mb_substr(static::$_locale, 0, 2), static::$fallback);
 
+            if ($pos = strripos($file, '::')) {
+                $namespace = substr($file, 0, $pos + 2);
+                $local_file = substr($file, $pos + 2);
+            } else {
+                $namespace = '';
+                $local_file = $file;
+            }
+
             // Priority == 'en_GB', then 'en', then 'fallback'
             foreach ($languages as $lang) {
-                if ($path = \Finder::search('lang/'.$lang, $file, '.php', true)) {
+                if ($path = \Finder::search('lang', $namespace.$lang.DS.$local_file, '.php', true)) {
                     foreach ($path as $p) {
                         static::$_messages[static::$_locale][$group] = \Arr::merge(\Fuel::load($p), static::$_messages[static::$_locale][$group]);
                     }

@@ -3,6 +3,7 @@ namespace Nos;
 
 class Controller_Inspector extends Controller_Admin_Application
 {
+    protected static $default_view = null;
 
     public function before()
     {
@@ -17,8 +18,26 @@ class Controller_Inspector extends Controller_Admin_Application
         return $this->config;
     }
 
+    public function action_list()
+    {
+        return static::getView($this->config);
+    }
+
+    public static function getView($config)
+    {
+        return \View::forge(static::$default_view);
+    }
+
     public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
     {
+        if (!isset($config['appdesk'])) {
+            $config['appdesk'] = array();
+        }
+
+        if (!isset($config['appdesk']['view']) && !isset($config['appdesk']['url'])) {
+            $config['appdesk']['view'] = static::getView($config)->render();
+        }
+
         if (!empty($config['model'])) {
             $inspector_path = static::get_path();
             $model = $config['model'];
@@ -33,10 +52,6 @@ class Controller_Inspector extends Controller_Admin_Application
 
             if (!isset($config['appdesk']['contextChange'])) {
                 $config['appdesk']['contextChange'] = !!$model::behaviours('Nos\Orm_Behaviour_Twinnable', false);
-            }
-
-            if (!isset($config['appdesk']['url'])) {
-                $config['appdesk']['url'] = $inspector_path.'/list';
             }
 
             if (!isset($config['appdesk']['reloadEvent'])) {

@@ -65,6 +65,11 @@ class Pagination
      */
     protected $pagination_url;
 
+    public static function _init()
+    {
+        I18n::current_dictionary('nos::common');
+    }
+
     // --------------------------------------------------------------------
 
     public function __construct(array $config = array())
@@ -133,17 +138,15 @@ class Pagination
             return '';
         }
 
-        \Lang::load('pagination', true);
-
         if (!is_null($pagination_url)) {
             $old_pagination_url   = $this->pagination_url;
             $this->pagination_url = $pagination_url;
         }
 
         $pagination  = $this->template['wrapper_start'];
-        $pagination .= $this->prev_link(\Lang::get('pagination.previous'));
+        $pagination .= $this->prev_link(__('Previous'));
         $pagination .= $this->page_links();
-        $pagination .= $this->next_link(\Lang::get('pagination.next'));
+        $pagination .= $this->next_link(__('Next'));
         $pagination .= $this->template['wrapper_end'];
 
         if (!is_null($pagination_url)) {
