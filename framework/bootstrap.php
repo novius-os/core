@@ -168,8 +168,9 @@ if (!empty($config_app['base_url'])) {
 Fuel::init(Arr::merge($config_nos, $config_app));
 
 Module::load('nos', NOSPATH);
+require_once realpath(NOSROOT.'novius-os'.DS.'novius_cloud').DS.'bootstrap.php'; // AJOUT POUR NOVIUS CLOUD
 Module::load('local', APPPATH);
-
+\Event::trigger_function('novius_cloud.local_bootstrap_loaded'); // AJOUT POUR NOVIUS CLOUD
 Config::load('namespaces', true);
 
 foreach (Config::get('namespaces', array()) as $ns => $path) {
