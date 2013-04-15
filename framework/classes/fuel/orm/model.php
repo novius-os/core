@@ -360,7 +360,7 @@ class Model extends \Orm\Model
     public function __call($method, $args)
     {
         $return = static::_behaviours($method, $args, array('this' => $this, 'return' => true));
-        if (isset($return['return'])) {
+        if (array_key_exists('return', $return)) {
             return $return['return'];
         }
 
