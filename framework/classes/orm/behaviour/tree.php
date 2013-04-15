@@ -90,7 +90,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
      * @param  array          $where
      * @param  array          $order_by
      * @param  array          $options
-     * @return array          of \Orm\Model
+     * @return array(\Nos\Orm\Model)
      */
     public function find_children($item, $where = array(), $order_by = array(), $options = array())
     {
@@ -107,7 +107,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * return the parent of the object
      *
-     * @return Orm\Model The parent object
+     * @param \Nos\Orm\Model $item
+     * @return \Nos\Orm\Model The parent object
      */
     public function get_parent($item)
     {
@@ -117,10 +118,12 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Sets a new parent for the object
      *
-     * @param   Orm\Model The parent object
+     * @param \Nos\Orm\Model $item
+     * @param \Nos\Orm\Model The parent object
+     * @throws \Exception
      * @return void
      */
-    public function set_parent($item, $parent = null)
+    public function set_parent(Orm\Model $item, $parent = null)
     {
         if ($parent !== null) {
             // Check if the object is appropriate

@@ -20,10 +20,10 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
 
     /**
      *  Populates the dataset with a _context key containing the context of the current item
-     * @param Model $item
+     * @param \Nos\Orm\Model $item
      * @param $dataset
      */
-    public function dataset(Model $item, &$dataset)
+    public function dataset(Orm\Model $item, &$dataset)
     {
         $dataset['_context'] = array($item, 'get_context');
     }
@@ -31,9 +31,9 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
     /**
      * Fill in the context_common_id and context properties when creating the object
      *
-     * @param  Model $item The object
+     * @param  \Nos\Orm\Model $item The object
      */
-    public function before_insert(Model $item)
+    public function before_insert(Orm\Model $item)
     {
         $context_property      = $this->_properties['context_property'];
 
@@ -45,15 +45,15 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
     /**
      * Returns the locale of the current object
      *
-     * @param Model $item
+     * @param \Nos\Orm\Model $item
      * @return string
      */
-    public function get_context(Model $item)
+    public function get_context(Orm\Model $item)
     {
         return $item->get($this->_properties['context_property']);
     }
 
-    public function form_fieldset_fields(Model $item, &$fieldset)
+    public function form_fieldset_fields(Orm\Model $item, &$fieldset)
     {
         $context_property = $this->_properties['context_property'];
         // Empty array just so the data are retrieved from the input

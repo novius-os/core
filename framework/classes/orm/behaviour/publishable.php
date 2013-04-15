@@ -34,25 +34,25 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         }
     }
 
-    public function dataset(Model $item, &$dataset)
+    public function dataset(Orm\Model $item, &$dataset)
     {
         $dataset['publication_status'] = array($item, 'publication_status');
     }
 
-    public function publication_status(Model $item)
+    public function publication_status(Orm\Model $item)
     {
         return (string) \View::forge('nos::admin/orm/publishable_label', array(
             'item' => $item,
         ), false);
     }
 
-    public function planificationStatus(Model $item)
+    public function planificationStatus(Orm\Model $item)
     {
         $property = $this->_properties['publication_state_property'];
         return $item->get($property);
     }
 
-    public function publicationStart(Model $item)
+    public function publicationStart(Orm\Model $item)
     {
         if (empty($this->_properties['publication_start_property'])) {
             return null;
@@ -60,7 +60,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         return $item->get($this->_properties['publication_start_property']);
     }
 
-    public function publicationEnd(Model $item)
+    public function publicationEnd(Orm\Model $item)
     {
         if (empty($this->_properties['publication_end_property'])) {
             return null;
@@ -73,7 +73,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
      *
      * @return string
      */
-    public function published(Model $item)
+    public function published(Orm\Model $item)
     {
         $property = $this->_properties['publication_state_property'];
         $status = $item->get($property);
@@ -146,7 +146,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         }
     }
 
-    public function form_processing(Model $item, $data, $response_json)
+    public function form_processing(Orm\Model $item, $data, $response_json)
     {
         $publishable = $this->_properties['publication_state_property'];
         // $data[$publishable] can possibly be filled with the data (see multi-line comment below)
