@@ -269,7 +269,7 @@ class FrontCache
         }
         $this->_content = $prepend.$this->_content;
 
-        if (!static::store($this->_path, $this->_content)) {
+        if (!static::store($this->_path, $this->_content, $duration == -1)) {
             trigger_error('Cache could not be written! (path = '.$this->_path.')', E_USER_WARNING);
         }
         //flock($this->_lock_fp, LOCK_UN);
@@ -285,7 +285,7 @@ class FrontCache
                 '."\n";
             $content .= '?>';
 
-            if (!static::store($this->_init_path, $content)) {
+            if (!static::store($this->_init_path, $content, $duration == -1)) {
                 trigger_error('Cache could not be written! (path = '.$this->_init_path.')', E_USER_WARNING);
             }
         }
@@ -321,7 +321,7 @@ class FrontCache
                 }'."\n";
     }
 
-    protected static function store($path, $content)
+    protected static function store($path, $content, $temporary = false)
     {
         $dir = dirname($path);
         // check if specified subdir exists
@@ -332,6 +332,9 @@ class FrontCache
             }
         }
         file_put_contents($path, $content);
+        if ($temporary) {
+            register_shutdown_function('unlink', $path);
+        }
 
         return true;
     }

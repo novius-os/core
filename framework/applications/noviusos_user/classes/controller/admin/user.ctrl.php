@@ -52,7 +52,8 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             }
         }
 
-        if (\Config::get('novius-os.users.enable_roles', false)) {
+        $enable_roles = \Config::get('novius-os.users.enable_roles', false);
+        if ($enable_roles) {
             $roles = \Input::post('roles', array());
             if (!empty($roles)) {
                 $roles = Model_Role::find('all', array(
@@ -74,67 +75,12 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
             }
         }
 
-        return parent::save($item, $data);
-    }
-
-    public function action_save_permissions()
-    {
-        $role = Model_Role::find(\Input::post('role_id'));
-
-        $db = Model_Permission::find('all', array('where' => array(
-            array('perm_role_id', $role->role_id),
-        )));
-
-        $olds = array();
-        foreach ($db as $old) {
-            $olds[$old->perm_name][$old->perm_category_key] = $old;
-        }
-
-        $permissions = \Input::post('perm');
-        foreach ($permissions as $perm_name => $allowed) {
-            $existing = array();
-            list($app_name, ) = explode('::', $perm_name.'::', 2);
-            $app_removed = $app_name != 'nos' && !in_array($app_name, $permissions['nos::access']);
-
-            // Delete old authorisations
-            if (!empty($olds[$perm_name])) {
-                foreach ($olds[$perm_name] as $old) {
-                    // If the role has no longer access to the application, remove old authorisations related to this application
-                    if ($app_removed) {
-                        $old->delete();
-                    } else if (!in_array($old->perm_category_key, $allowed)) {
-                        $old->delete();
-                    } else {
-                        $existing[] = $old->perm_category_key;
-                    }
-                }
-                unset($olds[$perm_name]);
-            }
-
-            // Add new authorisations
-            foreach ($allowed as $category_key) {
-                if (!$app_removed && !in_array($category_key, $existing)) {
-                    $new = new Model_Permission();
-                    $new->perm_role_id      = $role->role_id;
-                    $new->perm_name         = $perm_name;
-                    $new->perm_category_key = $category_key;
-                    $new->save();
-                }
-            }
-        }
-
-        // None checked for perm_name
-        foreach ($olds as $perm_name => $old) {
-            foreach ($old as $delete) {
-                $delete->delete();
-            }
-        }
-
-        \Response::json(array(
-            'notify' => __('OK, permissions saved.'),
-            'dispatchEvent' => array(
+        $return = parent::save($item, $data);
+        if ($enable_roles) {
+            $return['dispatchEvent'][] = array(
                 'name' => 'Nos\Application',
-            ),
-        ));
+            );
+        }
+        return $return;
     }
 }

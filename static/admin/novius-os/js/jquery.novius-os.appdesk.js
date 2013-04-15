@@ -204,7 +204,8 @@ define('jquery-nos-appdesk',
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
                                 }
-                                if (rules[r].selectorText === '.wijmo-wijgrid tr.wijmo-wijgrid-row.ui-state-hover, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.wijmo-wijgrid-rowheader.ui-state-active') {
+                                if (rules[r].selectorText === '.wijmo-wijgrid tr.wijmo-wijgrid-row.ui-state-hover, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.wijmo-wijgrid-rowheader.ui-state-active'
+                                    || rules[r].selectorText === '.wijmo-wijgrid tr.ui-state-hover.wijmo-wijgrid-row, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.ui-state-active.wijmo-wijgrid-rowheader') {
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
                                 }
@@ -409,7 +410,9 @@ define('jquery-nos-appdesk',
                 self.element.nosSaveUserConfig(o.name + '.selectedContexts', o.selectedContexts);
 
                 self.uiSearchInput.val('');
-                self.uiInspectorsTags.wijsuperpanel('destroy');
+                if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
+                    self.uiInspectorsTags.wijsuperpanel('destroy');
+                }
                 self.uiInspectorsTags.empty();
                 self._uiList();
 
@@ -761,7 +764,9 @@ define('jquery-nos-appdesk',
                         }
 
                         self.pageIndex = 0;
-                        self.uiInspectorsTags.wijsuperpanel('destroy');
+                        if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
+                            self.uiInspectorsTags.wijsuperpanel('destroy');
+                        }
 
                         var span = $('<span></span>').addClass('nos-appdesk-inspectorstag ui-state-default ui-corner-all ' + name)
                             .html(label)
@@ -851,7 +856,9 @@ define('jquery-nos-appdesk',
                 self.uiResetSearch.click(function(e) {
                         e.preventDefault();
                         self.uiSearchInput.val('');
-                        self.uiInspectorsTags.wijsuperpanel('destroy');
+                        if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
+                            self.uiInspectorsTags.wijsuperpanel('destroy');
+                        }
                         self.uiInspectorsTags.empty();
                         self.gridReload();
                     });
@@ -942,16 +949,15 @@ define('jquery-nos-appdesk',
                 self.gridRendered = false;
                 self.uiGridTitle.html(o.texts.gridTitle);
 
-                // Use try/catch, widget can not be initialize
-                try {
+                if (self.uiThumbnail.data('nos-thumbnailsgrid')) {
                     self.uiThumbnail.thumbnailsgrid('destroy');
-                } catch (e) {}
-                try {
+                }
+                if (self.uiThumbnail.data('nos-noslistgrid')) {
                     self.uiGrid.noslistgrid('destroy');
-                } catch (e) {}
-                try {
+                }
+                if (self.uiTreeGrid.data('nos-nostreegrid')) {
                     self.uiTreeGrid.nostreegrid('destroy');
-                } catch (e) {}
+                }
 
                 self.uiThumbnail.add(self.uiGrid).add(self.uiTreeGrid)
                     .empty()
