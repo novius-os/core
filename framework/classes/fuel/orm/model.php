@@ -16,10 +16,6 @@ class UnknownBehaviourException extends \Exception
 {
 }
 
-class UnknownMethodBehaviourException extends \Exception
-{
-}
-
 use Arr;
 
 class Model extends \Orm\Model
@@ -310,6 +306,9 @@ class Model extends \Orm\Model
             }
 
             foreach ($_behaviours as $beha_k => $beha_v) {
+                if (!class_exists($beha_k)) {
+                    throw new UnknownBehaviourException('Unknown behaviour '.$beha_k.' for class '.$class);
+                }
                 if (is_int($beha_k)) {
                     $behaviours[$beha_v] = array();
                 } else {
@@ -349,24 +348,6 @@ class Model extends \Orm\Model
         return static::$_configs[$class];
     }
 
-    public function get_possible_context()
-    {
-        $twinnable = static::behaviours('Nos\Orm_Behaviour_Twinnable');
-        $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
-
-        if (!$twinnable || !$tree) {
-            return array_keys(\Nos\Tools_Context::contexts());
-        }
-
-        // Return contexts from parent if available
-        $parent = $this->get_parent();
-        if (!empty($parent)) {
-            return $parent->get_all_context();
-        }
-
-        return array_keys(\Nos\Tools_Context::contexts());
-    }
-
     /**
      * @see \Orm\Model::__construct()
      */
@@ -378,9 +359,9 @@ class Model extends \Orm\Model
 
     public function __call($method, $args)
     {
-        try {
-            return static::_callBehaviour($this, $method, $args);
-        } catch (\Nos\Orm\UnknownBehaviourException $e) {
+        $return = static::_behaviours($method, $args, array('this' => $this, 'return' => true));
+        if (isset($return['return'])) {
+            return $return['return'];
         }
 
         return parent::__call($method, $args);
@@ -388,39 +369,46 @@ class Model extends \Orm\Model
 
     public static function __callStatic($method, $args)
     {
-        try {
-            return static::_callBehaviour(get_called_class(), $method, $args);
-        } catch (\Nos\Orm\UnknownBehaviourException $e) {
+        $return = static::_behaviours($method, $args, array('return' => true));
+        if (isset($return['return'])) {
+            return $return['return'];
         }
 
         return parent::__callStatic($method, $args);
     }
 
-    private static function _callBehaviour($context, $method, $args)
+    public function event($method, $args)
     {
-        foreach (static::behaviours() as $behaviour => $settings) {
-            if (!class_exists($behaviour)) {
-                throw new \UnexpectedValueException($behaviour);
-            }
-            try {
-                return call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {
-            }
-        }
-        throw new \Nos\Orm\UnknownBehaviourException();
+        static::_behaviours($method, $args, array('this' => $this));
     }
 
-    public static function _callAllBehaviours($context, $method, $args)
+    public static function eventStatic($method, $args)
     {
-        foreach (static::behaviours() as $behaviour => $settings) {
-            if (!class_exists($behaviour)) {
-                throw new \UnexpectedValueException($behaviour);
-            }
+        static::_behaviours($method, $args);
+    }
 
-            try {
-                call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {
+    protected static function _behaviours($method, $args, $params = array())
+    {
+        $return = isset($params['return']) && $params['return'];
+        $class = get_called_class();
+        foreach (static::behaviours() as $behaviour => $settings) {
+            $methods = isset($settings['methods']) ? $settings['methods'] : array();
+            if (empty($methods) or in_array($methods, $method)) {
+                $behaviour_instance = $behaviour::instance($class);
+                if (method_exists($behaviour_instance, $method)) {
+                    if (isset($params['this']) && is_object($params['this'])) {
+                        $return_value = call_user_func_array(array($behaviour_instance, $method), array_merge(array($params['this']), $args));
+                    } else {
+                        $return_value = call_user_func_array(array($behaviour_instance, $method), $args);
+                    }
+                    if ($return) {
+                        return array('return' => $return_value);
+                    }
+                }
             }
+        }
+        if ($return) {
+            return array();
         }
     }
 
@@ -486,35 +474,11 @@ class Model extends \Orm\Model
         static::$_properties = Arr::merge(static::$_properties, $properties);
     }
 
-    public function import_dataset_behaviours(&$dataset)
-    {
-        try {
-            static::_callAllBehaviours(get_called_class(), 'dataset', array(&$dataset, $this));
-        } catch (\Exception $e) {
-        }
-    }
-
-    public function form_processing_behaviours($data, &$json_response)
-    {
-        try {
-            static::_callAllBehaviours($this, 'form_processing', array($data, &$json_response));
-        } catch (\Exception $e) {
-        }
-    }
-
-    public function form_fieldset_fields(&$fieldset)
-    {
-        try {
-            static::_callAllBehaviours($this, 'form_fieldset_fields', array(&$fieldset));
-        } catch (\Exception $e) {
-        }
-    }
-
     public static function query($options = array())
     {
-        static::_callAllBehaviours(get_called_class(), 'before_query', array(&$options));
+        static::_behaviours('before_query', array(&$options));
 
-        return Query::forge(get_called_class(), static::connection(), $options);
+        return parent::query($options);
     }
 
     public static function prefix()

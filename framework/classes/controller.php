@@ -749,7 +749,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $item = array();
         $actions = \Arr::get($dataset, 'actions', array());
         unset($dataset['actions']);
-        $object->import_dataset_behaviours($dataset);
+        $object->event('dataset', array(&$dataset));
         foreach ($dataset as $key => $data) {
             // Array with a 'value' key
             if (is_array($data) and !empty($data['value'])) {

@@ -27,11 +27,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Fill in the context_common_id and context properties when creating the object
      *
-     * @param Orm\Model $item
-     * @internal param \Nos\The $Model object
+     * @param Model $item
      * @return void
      */
-    public function before_insert(\Nos\Orm\Model $item)
+    public function before_insert(Model $item)
     {
         $common_id_property = $this->_properties['common_id_property'];
 
@@ -43,10 +42,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Updates the context_common_id property
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @return void
      */
-    public function after_insert(\Nos\Orm\Model $item)
+    public function after_insert(Model $item)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $is_main_property = $this->_properties['is_main_property'];
@@ -74,9 +73,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Copies all invariant fields from the main context
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      */
-    public function before_save(\Nos\Orm\Model $item)
+    public function before_save(Model $item)
     {
         if ($this->is_main_context($item) || $item->is_new()) {
             return;
@@ -94,7 +93,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
     }
 
-    public function after_delete(\Nos\Orm\Model $item)
+    public function after_delete(Model $item)
     {
         if (!$this->is_main_context($item)) {
             return;
@@ -115,10 +114,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     /**
      * Check if the parent exists in all the contexts of the child
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @throws \Exception
      */
-    public function change_parent(\Nos\Orm\Model $item)
+    public function change_parent(Model $item)
     {
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
         $new_parent = $item->get_parent();
@@ -173,9 +172,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Optimised operation for deleting all contexts
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      */
-    public function delete_all_context(\Nos\Orm\Model $item)
+    public function delete_all_context(Model $item)
     {
         foreach ($item->find_context('all') as $item) {
             // This is to trick the is_main_context() method
@@ -188,10 +187,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Returns null if the Model is not twinnable. Returns true or false whether the object is in the main context.
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @return bool
      */
-    public function is_main_context(\Nos\Orm\Model $item)
+    public function is_main_context(Model $item)
     {
         // use !! for cast to boolean
         return !!$item->get($this->_properties['is_main_property']);
@@ -200,10 +199,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Find the object in the main context
      *
-     * @param \Nos\Orm\Model $item
-     * @return \Nos\Orm\Model
+     * @param Model $item
+     * @return Model
      */
-    public function find_main_context(\Nos\Orm\Model $item)
+    public function find_main_context(Model $item)
     {
         return $item->find_context('main');
     }
@@ -211,15 +210,15 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Find the object in the specified context. Won't create it when it doesn't exists
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @param string | array $context Which locale to retrieve.
      *  - 'main' will return the main context
      *  - 'all'  will return all the available objects
      *  - any valid locale
      *  - array  if not empty, return only contexts specified
-     * @return \Nos\Orm\Model | array(\Nos\Orm\Model)
+     * @return Model | array(Model)
      */
-    public function find_context(\Nos\Orm\Model $item, $context)
+    public function find_context(Model $item, $context)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $common_id          = $item->get($common_id_property);
@@ -244,11 +243,11 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Find objects in other context that the item
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @param array $filter if not empty, return only contexts specified
-     * @return array(\Nos\Orm\Model)
+     * @return array(Model)
      */
-    public function find_other_context(\Nos\Orm\Model $item, array $filter = array())
+    public function find_other_context(Model $item, array $filter = array())
     {
         $common_id_property = $this->_properties['common_id_property'];
         $common_id          = $item->get($common_id_property);
@@ -266,11 +265,11 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Returns all available context for this object
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @param array $filter if not empty, return only contexts specified
      * @return array
      */
-    public function get_all_context(\Nos\Orm\Model $item, array $filter = array())
+    public function get_all_context(Model $item, array $filter = array())
     {
         $all = array();
         foreach ($item->find_context($filter) as $item) {
@@ -284,11 +283,11 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Returns all other available context for this object
      *
-     * @param \Nos\Orm\Model $item
+     * @param Model $item
      * @param array $filter if not empty, return only contexts specified
      * @return array
      */
-    public function get_other_context(\Nos\Orm\Model $item, array $filter = array())
+    public function get_other_context(Model $item, array $filter = array())
     {
         $other = array();
         foreach ($item->find_other_context($filter) as $item) {
@@ -299,6 +298,29 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         return $other;
     }
 
+    /**
+     * Returns all possible contexts for this object, depend of his parent.
+     *
+     * @param Model $item
+     * @return array
+     */
+    public function get_possible_context(Model $item)
+    {
+        $class = $this->_class;
+        $tree = $class::behaviours('Nos\Orm_Behaviour_Tree');
+
+        if (!$tree) {
+            return array_keys(\Nos\Tools_Context::contexts());
+        }
+
+        // Return contexts from parent if available
+        $parent = $item->get_parent();
+        if (!empty($parent)) {
+            return $parent->get_all_context();
+        }
+
+        return array_keys(\Nos\Tools_Context::contexts());
+    }
     /**
      * Returns all available contexts for the requested items
      *

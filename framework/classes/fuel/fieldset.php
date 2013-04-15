@@ -390,7 +390,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 
         if (isset($instance)) {
             // Let behaviours do their job (publication for example)
-            $instance->form_fieldset_fields($config);
+            $instance->event('form_fieldset_fields', array(&$config));
         }
 
         $fieldset->add_renderers($config, $options);
@@ -552,7 +552,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
 
             // Let behaviours do their job (publication for example)
-            $item->form_processing_behaviours($data, $json_response);
+            $item->event('form_processing', array($data, &$json_response));
 
             if (!empty($options['before_save']) && is_callable($options['before_save'])) {
                 call_user_func($options['before_save'], $item, $data);
