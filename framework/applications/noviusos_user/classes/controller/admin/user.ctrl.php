@@ -53,7 +53,7 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
         }
 
         $enable_roles = \Config::get('novius-os.users.enable_roles', false);
-        if ($enable_roles) {
+        if ($enable_roles && !$this->is_account) {
             $roles = \Input::post('roles', array());
             if (!empty($roles)) {
                 $roles = Model_Role::find('all', array(
