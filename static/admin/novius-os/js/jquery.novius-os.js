@@ -824,7 +824,12 @@ define('jquery-nos',
                 });
                 $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
-                    $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
+                    $this.wijexpander($.extend({
+                        expanded: true,
+                        afterExpand: function(e) {
+                            $(e.target).find('.ui-expander-content').nosOnShow();
+                        }
+                    }, $this.data('wijexpander-options')));
                 });
                 $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",
