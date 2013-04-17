@@ -385,7 +385,16 @@ define('jquery-nos',
                         break;
                 }
                 if (element.disabled && element.disabled !== false) {
-                    $element.attr('disabled', true);
+                    switch (element.type) {
+                        case 'button' :
+                            $element.attr('disabled', true);
+                            break;
+
+                        case 'link' :
+                            $element.addClass('faded');
+                            break;
+                    }
+
                     if ($.type(element.disabled) === 'string') {
                         $element.attr('title', element.disabled);
                     }
@@ -395,7 +404,9 @@ define('jquery-nos',
                     $.each(element.bind, function(event, action) {
                         $element.bind(event, function(e) {
                             e.preventDefault();
-                            $element.nosAction(action, data);
+                            if (!element.disabled) {
+                                $element.nosAction(action, data);
+                            }
                         });
                     });
 
