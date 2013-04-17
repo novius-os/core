@@ -615,7 +615,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if ($show_when === false || !is_callable($show_when)) {
             return false;
         }
-        return !call_user_func($show_when);
+        return !call_user_func($show_when, $this->instance);
     }
 
     public function getInstance()
