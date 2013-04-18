@@ -161,10 +161,14 @@ class Model extends \Orm\Model
                         'static $_properties setting in the model. Original exception: '.$e->getMessage());
                 }
             }
-            static::$_properties_cached[$class] = \Arr::merge(
-                $list_columns,
-                static::$_properties_cached[$class]
-            );
+            if (empty(static::$_properties_cached[$class])) {
+                static::$_properties_cached[$class] = $list_columns;
+            } else {
+                static::$_properties_cached[$class] = \Arr::merge(
+                    $list_columns,
+                    static::$_properties_cached[$class]
+                );
+            }
         }
 
         return static::$_properties_cached[$class];
