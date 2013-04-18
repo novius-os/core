@@ -6,6 +6,9 @@
 // 801 out of 801 words are translated (100%).
 
 return array(
+
+    'DATE_FORMAT_DEFAULT' => '%d %b %Y %H:%M',
+
     #: classes/controller/inspector/date.ctrl.php:147
     'Custom dates' => '日付を指定',
 

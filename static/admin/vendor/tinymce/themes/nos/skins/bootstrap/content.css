@@ -129,20 +129,21 @@ font[face=mceinline] {font-family:inherit !important}
 .nos_enhancer_action_block {
     float : right;
     display:none;
+    cursor: pointer;cursor: hand;
 }
 .nosEnhancer:hover .nos_enhancer_action_block {
-    cursor: pointer;
     display : block;
+    cursor: pointer;cursor: hand;
 }
 .nos_enhancer_action_before {
-    background-image:url(../../img/insert_before.png)
+    background-image:url(../../img/insert_before.png);
 }
 .nos_enhancer_action_after {
-    background-image:url(../../img/insert_after.png)
+    background-image:url(../../img/insert_after.png);
 }
 .nos_enhancer_action_edit {
-    background-image:url(../../img/edit.png)
+    background-image:url(../../img/edit.png);
 }
 .nos_enhancer_action_delete {
-    background-image:url(../../img/delete.png)
+    background-image:url(../../img/delete.png);
 }

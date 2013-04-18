@@ -1,41 +1,44 @@
 <?php
 
-// Generated on 20/02/2013 17:43:50
+// Generated on 17/04/2013 14:49:11
 
-// 21 out of 21 messages are translated (100%).
-// 95 out of 95 words are translated (100%).
+// 22 out of 22 messages are translated (100%).
+// 112 out of 112 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/appdesk.ctrl.php:156
-    'Default view' => 'Affichage par défaut',
-
     #. Note to translator: This is a submit button
     #: classes/controller/admin/crud.ctrl.php:316
     'Add' => 'Ajouter',
 
-    #: classes/controller/admin/crud.ctrl.php:403
+    #: classes/controller/admin/crud.ctrl.php:404
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'Cet item existe déjà dans {{context}}. Votre item ne peut donc être ajouté.',
 
-    #: classes/controller/admin/crud.ctrl.php:601
-    #: classes/controller/admin/crud.ctrl.php:608
+    #: classes/controller/admin/crud.ctrl.php:600
+    #: classes/controller/admin/crud.ctrl.php:607
     'Translate into {{context}}' => 'Traduire en {{context}}',
 
-    #: classes/controller/admin/crud.ctrl.php:603
-    #: classes/controller/admin/crud.ctrl.php:606
+    #: classes/controller/admin/crud.ctrl.php:602
+    #: classes/controller/admin/crud.ctrl.php:605
     'Add to {{context}}' => 'Ajouter à {{context}}',
 
-    #: classes/controller/admin/crud.ctrl.php:612
+    #: classes/controller/admin/crud.ctrl.php:611
     'Edit {{context}}' => 'Modifier {{context}}',
 
     #. Note to translator: action (button)
-    #: classes/controller/admin/crud.ctrl.php:629
+    #: classes/controller/admin/crud.ctrl.php:628
     'Translate' => 'Traduire',
 
-    #: classes/controller/admin/crud.ctrl.php:631
+    #: classes/controller/admin/crud.ctrl.php:630
     'Add to another site' => 'Ajouter à un autre site',
 
-    #: classes/controller/admin/crud.ctrl.php:633
+    #: classes/controller/admin/crud.ctrl.php:632
     'Translate / Add to another site' => 'Traduire / Ajouter à un autre site',
+
+    #: classes/controller/admin/crud.ctrl.php:681
+    'You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.' => 'Vous ne pouvez réaliser cette action, elle a été désactivée. Demandez à vos collègues pourquoi.',
+
+    #: classes/controller/admin/appdesk.ctrl.php:156
+    'Default view' => 'Affichage par défaut',
 
     #. Note to translator: this is an action (button)
     #: views/crud/blank_slate.view.php:61
