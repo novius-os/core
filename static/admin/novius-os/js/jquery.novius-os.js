@@ -25,8 +25,13 @@ define('jquery-nos',
                 dialogFocused : -1,
                 open : function($dialog) {
                     var self = this,
-                        callbacks = $dialog.data('callbacks.nosdialog');
-                    self.dialogOpened.push($dialog[0]);
+                        callbacks = $dialog.data('callbacks.nosdialog'),
+                        index = $.inArray($dialog[0], self.dialogOpened);
+
+                    // Check if dialog not already added, it can be by focus
+                    if (index === -1) {
+                        self.dialogOpened.push($dialog[0]);
+                    }
                     if (!$.isPlainObject(callbacks)) {
                         $dialog.data('callbacks.nosdialog', {});
                     }
