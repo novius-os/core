@@ -889,14 +889,17 @@ class Model_Media_Provider implements \Iterator
 
     public function __set($property, $value)
     {
-        // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
         $media_id = (string) ($value instanceof \Nos\Media\Model_Media ? $value->media_id : $value);
-        $media = \Nos\Media\Model_Media::find($media_id);
-        if (is_null($media)) {
-            $pk = $this->parent->primary_key();
-            throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
-                get_class($this->parent)
-            )."(".$this->parent->{$pk[0]}.")");
+
+        // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
+        if (!empty($media_id)) {
+            $media = \Nos\Media\Model_Media::find($media_id);
+            if (is_null($media)) {
+                $pk = $this->parent->primary_key();
+                throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
+                    get_class($this->parent)
+                )."(".$this->parent->{$pk[0]}.")");
+            }
         }
 
         // Reuse the getter
@@ -918,6 +921,11 @@ class Model_Media_Provider implements \Iterator
     {
         $value = $this->__get($value);
         return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
     }
 
     public function rewind()
@@ -1003,6 +1011,11 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $value = $this->__get($value);
         return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
     }
 
     public function rewind()
