@@ -12,6 +12,9 @@ return array(
             '^views/crud',
             '\Wappdesk[./]|\Wcrud[./]',
         ),
+        'front' => array(
+            '^classes/pagination.php',
+        ),
         // false == default dict
         'common' => false,
     ),

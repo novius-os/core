@@ -12,12 +12,6 @@ return array(
     #: classes/tools/image.php:148
     'The format of this image is not allowed.' => 'Le format de cette image n’est pas autorisé.',
 
-    #: classes/pagination.php:147
-    'Previous' => '',
-
-    #: classes/pagination.php:149
-    'Next' => '',
-
     #: classes/fuel/validation_error.php:47
     'The field ‘{{field}}’ doesn’t respect the rule ‘{{rule}}’' => 'Le champ «&nbsp;{{field}}&nbsp;» ne respecte pas la règle«&nbsp;{{rule}}&nbsp;»',
 
