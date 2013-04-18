@@ -952,7 +952,7 @@ define('jquery-nos-appdesk',
                 if (self.uiThumbnail.data('nos-thumbnailsgrid')) {
                     self.uiThumbnail.thumbnailsgrid('destroy');
                 }
-                if (self.uiThumbnail.data('nos-noslistgrid')) {
+                if (self.uiGrid.data('nos-noslistgrid')) {
                     self.uiGrid.noslistgrid('destroy');
                 }
                 if (self.uiTreeGrid.data('nos-nostreegrid')) {
