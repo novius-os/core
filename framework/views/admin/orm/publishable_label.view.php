@@ -18,7 +18,7 @@ if ($status == 0) {
     $now = strtotime('now');
 
     if (!empty($start) && strtotime($start) > $now) {
-        echo '<span class="publication_status ui-icon ui-icon-clock" /> '.strtr(__('Scheduled from {{date}}'), array(
+        echo '<span class="publication_status ui-icon ui-icon-clock" /> '.strtr(__('Scheduled for {{date}}'), array(
             '{{date}}' => \Date::formatPattern($start, 'DEFAULT'),
         ));
     } else if (!empty($end) && strtotime($end) < $now) {

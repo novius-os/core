@@ -239,7 +239,7 @@ return array(
     'We’re afraid we cannot find this image.' => 'Malheureusement nous n’arrivons pas à trouver cette image.',
 
     #: views/admin/orm/publishable_label.view.php:21
-    'Scheduled from {{date}}' => 'Planifié du {{date}}',
+    'Scheduled for {{date}}' => 'Planifié pour le {{date}}',
 
     #: views/admin/orm/publishable_label.view.php:22
     #: views/admin/orm/publishable_label.view.php:28
