@@ -905,7 +905,11 @@ define('jquery-nos-appdesk',
                         $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
                             .html(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
-                        $('<input type="radio" class="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
+
+                        $('<input type="radio" name="view" />')
+                            .attr('id', 'view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : ''))
+                            .prop('checked', (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize)))
+                            .addClass('view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : ''))
                             .appendTo(self.uiViewsButtons)
                             .button({
                                 text : false,
