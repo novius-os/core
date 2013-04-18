@@ -2057,7 +2057,9 @@ define('jquery-nos-appdesk',
                     dropDown.appendTo(container.find('tr')).click(function(e) {
 
                         $.each($.appdeskActionsList, function() {
-                            $(this).wijmenu('hideAllMenus');
+                            if ($(this).data('wijmo-wijmenu')) {
+                                $(this).wijmenu('hideAllMenus');
+                            }
                         });
 
                         if (!this.created) {
@@ -2100,7 +2102,9 @@ define('jquery-nos-appdesk',
                                         e.stopImmediatePropagation();
                                         e.preventDefault();
                                         // Hide me
-                                        ul.wijmenu('hideAllMenus');
+                                        if (ul.data('wijmo-wijmenu')) {
+                                            ul.wijmenu('hideAllMenus');
+                                        }
                                         li.nosAction(action.action, noParseData);
                                     });
                                 }
