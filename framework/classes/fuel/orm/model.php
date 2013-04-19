@@ -149,8 +149,11 @@ class Model extends \Orm\Model
             );
         }
 
-        if (($from_db && property_exists($class, '_properties')) || empty(static::$_properties_cached[$class])) {
+        if ($from_db || empty(static::$_properties_cached[$class])) {
             try {
+                if ($from_db) {
+                    throw new \CacheNotFoundException();
+                }
                 $list_columns = \Cache::get('list_columns.'.static::table());
             } catch (\CacheNotFoundException $e) {
                 try {
