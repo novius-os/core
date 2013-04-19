@@ -36,6 +36,12 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
         $this->config_build();
     }
 
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary(array('nos::common'));
+    }
+
     /**
      * Set properties from the config
      */
