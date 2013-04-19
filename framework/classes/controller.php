@@ -177,31 +177,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             }
         }
 
-        $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable');
-        $twinnable = $model::behaviours('Nos\Orm_Behaviour_Twinnable');
-        if ($twinnable || $contextable) {
-            if (!$contextable) {
-                $contextable = $twinnable;
-            }
-            if (empty($config['context'])) {
-                if ($twinnable) {
-                    // No inspector, we only search items in their primary context
-                    $query->where($twinnable['is_main_property'], 1);
-                }
-            } elseif (is_array($config['context']) && count($config['context']) > 1) {
-                // Multiple contexts
-                if ($twinnable) {
-                    $query->where($twinnable['is_main_property'], 1);
-                    $query->where($twinnable['common_id_property'], 'IN', \DB::select($twinnable['common_id_property'])->from($model::table())->where($twinnable['context_property'], 'IN', $config['context']));
-                } else {
-                    $query->where($contextable['context_property'], 'IN', $config['context']);
-                }
-            } else {
-                $query->where($contextable['context_property'], '=', is_array($config['context']) ? $config['context'][0] : $config['context']);
-            }
-            $common_ids = array();
-            $keys = array();
-        }
+        $model::eventStatic('gridQuery', array($config, &$query));
+
         $count = $query->count();
         if ($only_count) {
             return array(
@@ -262,63 +239,12 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             foreach ($objects as $object) {
                 $item = static::dataset_item($object, $config['dataset']);
 
-                if ($contextable && !$twinnable) {
-                    $item['context'] = Tools_Context::contextLabel($object->{$contextable['context_property']}, array('short' => true));
-                }
+                $model::eventStatic('gridItem', array($object, &$item));
+
                 $items[] = $item;
-                if ($twinnable) {
-                    $common_id = $object->{$twinnable['common_id_property']};
-                    $keys[] = $common_id;
-                    $common_ids[$twinnable['common_id_property']][] = $common_id;
-                }
             }
-            if ($twinnable) {
-                $contexts = $model::contexts($common_ids);
-                foreach ($contexts as $common_id => $list) {
-                    $contexts[$common_id] = explode(',', $list);
-                }
-                foreach ($keys as $key => $common_id) {
-                    $items[$key]['context'] = $contexts[$common_id];
-                }
 
-                $sites_count = count(Tools_Context::sites());
-                $locales_count = count(Tools_Context::locales());
-                $global_contexts = array_keys(Tools_Context::contexts());
-                foreach ($items as &$item) {
-                    $flags = '';
-                    $contexts = $item['context'];
-
-                    $site = false;
-                    foreach ($global_contexts as $context) {
-                        if (is_array($config['context']) && !in_array($context, $config['context'])) {
-                            continue;
-                        }
-                        $site_params = Tools_Context::site($context);
-                        // When the site change
-                        if ($sites_count > 1 && $site !== $site_params['alias']) {
-                            $site = $site_params['alias'];
-                            $in = false;
-                            // Check if the any context of the item exists in the site
-                            foreach ($contexts as $temp_context) {
-                                if (Tools_Context::siteCode($temp_context) === $site_params['code']) {
-                                    $in = true;
-                                    break;
-                                }
-                            }
-                            $flags .= (empty($flags) ? '' : '&nbsp;&nbsp;&nbsp;').'<span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span> ';
-
-                        }
-                        if ($locales_count > 1) {
-                            if (in_array($context, $contexts)) {
-                                $flags .= ' '.\Nos\Tools_Context::flag($context);
-                            } else {
-                                $flags .= ' <span style="display:inline-block; width:16px;"></span>';
-                            }
-                        }
-                    }
-                    $item['context'] = $flags;
-                }
-            }
+            $model::eventStatic('gridAfter', array($config, &$items));
         }
 
         return array(

@@ -62,6 +62,34 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
         }
     }
 
+    public function gridQuery($config, &$query)
+    {
+        $class = $this->_class;
+        $twinnable = $class::behaviours('Nos\Orm_Behaviour_Twinnable');
+
+        if (empty($config['context'])) {
+            if ($twinnable) {
+                // No inspector, we only search items in their primary context
+                $query->where($twinnable['is_main_property'], 1);
+            }
+        } elseif (is_array($config['context']) && count($config['context']) > 1) {
+            // Multiple contexts
+            if ($twinnable) {
+                $query->where($twinnable['is_main_property'], 1);
+                $query->where($twinnable['common_id_property'], 'IN', \DB::select($twinnable['common_id_property'])->from($class::table())->where($twinnable['context_property'], 'IN', $config['context']));
+            } else {
+                $query->where($this->_properties['context_property'], 'IN', $config['context']);
+            }
+        } else {
+            $query->where($this->_properties['context_property'], '=', is_array($config['context']) ? $config['context'][0] : $config['context']);
+        }
+    }
+
+    public function gridItem($object, &$item)
+    {
+        $item['context'] = Tools_Context::contextLabel($object->{$this->_properties['context_property']}, array('short' => true));
+    }
+
     public function before_query(&$options)
     {
         if (array_key_exists('where', $options)) {

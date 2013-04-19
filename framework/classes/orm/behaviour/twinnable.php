@@ -24,6 +24,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     protected $_properties = array();
 
+    protected $_itemsKeys = array();
+    protected $_commonIds = array();
+
     /**
      * Fill in the context_common_id and context properties when creating the object
      *
@@ -381,5 +384,76 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
             $options['where'] = $where;
         }
+    }
+
+    public function gridQuery($config, &$query)
+    {
+        parent::gridQuery($config, $query);
+
+        $this->_itemsKeys = array();
+        $this->_commonIds = array();
+    }
+
+    public function gridItem($object, &$item)
+    {
+        parent::gridItem($object, $item);
+
+        $common_id = $object->{$this->_properties['common_id_property']};
+        $this->_itemsKeys[] = $common_id;
+        $this->_commonIds[$this->_properties['common_id_property']][] = $common_id;
+    }
+
+    public function gridAfter($config, &$items)
+    {
+        $class = $this->_class;
+
+        $contexts = $class::contexts($this->_commonIds);
+        foreach ($contexts as $common_id => $list) {
+            $contexts[$common_id] = explode(',', $list);
+        }
+        foreach ($this->_itemsKeys as $key => $common_id) {
+            $items[$key]['context'] = $contexts[$common_id];
+        }
+
+        $sites_count = count(Tools_Context::sites());
+        $locales_count = count(Tools_Context::locales());
+        $global_contexts = array_keys(Tools_Context::contexts());
+        foreach ($items as &$item) {
+            $flags = '';
+            $contexts = $item['context'];
+
+            $site = false;
+            foreach ($global_contexts as $context) {
+                if (is_array($config['context']) && !in_array($context, $config['context'])) {
+                    continue;
+                }
+                $site_params = Tools_Context::site($context);
+                // When the site change
+                if ($sites_count > 1 && $site !== $site_params['alias']) {
+                    $site = $site_params['alias'];
+                    $in = false;
+                    // Check if the any context of the item exists in the site
+                    foreach ($contexts as $temp_context) {
+                        if (Tools_Context::siteCode($temp_context) === $site_params['code']) {
+                            $in = true;
+                            break;
+                        }
+                    }
+                    $flags .= (empty($flags) ? '' : '&nbsp;&nbsp;&nbsp;').'<span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span> ';
+
+                }
+                if ($locales_count > 1) {
+                    if (in_array($context, $contexts)) {
+                        $flags .= ' '.\Nos\Tools_Context::flag($context);
+                    } else {
+                        $flags .= ' <span style="display:inline-block; width:16px;"></span>';
+                    }
+                }
+            }
+            $item['context'] = $flags;
+        }
+
+        $this->_itemsKeys = array();
+        $this->_commonIds = array();
     }
 }
