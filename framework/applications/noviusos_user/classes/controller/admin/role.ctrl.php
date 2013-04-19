@@ -35,15 +35,13 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
 
     protected function savePermissions($role_id)
     {
-        $role = Model_Role::find($role_id);
+        $role = $this->crud_item($role_id);
         if (empty($role)) {
             $this->send_error(new \Exception($this->config['i18n']['notification item not found']));
         }
         \Cache::delete('role_permissions.'.$role_id);
 
-        $db = Model_Permission::find('all', array('where' => array(
-            array('perm_role_id', $role->role_id),
-        )));
+        $db = $role->permissions;
 
         $olds = array();
         foreach ($db as $old) {
