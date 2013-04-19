@@ -22,6 +22,7 @@ $uniqid = uniqid('id_');
             $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                 'save_field' => $fieldset_infos->field('save')
             ), false))->to_json() ?>)
+                .filter(':submit')
                 .click(function() {
                     $container.find('form:visible').submit();
                 });
