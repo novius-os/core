@@ -85,6 +85,7 @@ class Model_User extends \Nos\Orm\Model
         'roles' => array(),
     );
 
+    protected static $_has_many = array();
     protected static $_many_many = array(
         'roles' => array(
             'key_from' => 'user_id',
