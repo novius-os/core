@@ -507,4 +507,9 @@ return array(
     #: config/validation.config.php:21
     'They don’t match. Are you sure you’ve typed the same thing?' => 'La valeur n’est pas la même. Êtes-vous sûr(e) d’avoir tapé la même chose&nbsp;?',
 
+    #: classes/pagination.php:147
+    'Previous' => 'Précédent',
+
+    #: classes/pagination.php:149
+    'Next' => 'Suivant',
 );
