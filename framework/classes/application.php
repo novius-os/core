@@ -368,10 +368,12 @@ class Application
         }
 
         // Cache the metadata used to install the application
-        $config['app_installed'] = static::$rawAppInstalled;
-        $config['app_installed'][$this->folder] = $new_metadata;
-        $this->save_config($config);
-        static::$rawAppInstalled = $config['app_installed'];
+        if ($this->folder != 'local') {
+            $config['app_installed'] = static::$rawAppInstalled;
+            $config['app_installed'][$this->folder] = $new_metadata;
+            $this->save_config($config);
+            static::$rawAppInstalled = $config['app_installed'];
+        }
 
         if ($this->folder == 'local') {
             \Migrate::latest('default', 'app');
