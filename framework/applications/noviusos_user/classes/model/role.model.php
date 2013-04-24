@@ -36,6 +36,9 @@ class Model_Role extends \Nos\Orm\Model
 
     protected static $permissions;
 
+    protected static $_belongs_to = array();
+    protected static $_has_one = array();
+
     protected static $_many_many = array(
         'users' => array(
             'key_from' => 'role_id',

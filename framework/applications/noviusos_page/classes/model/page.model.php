@@ -178,6 +178,9 @@ class Model_Page extends \Nos\Orm\Model
         ),
     );
 
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'page_id',
