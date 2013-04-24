@@ -62,6 +62,17 @@ class Application
         return false;
     }
 
+    /*
+     * Allows us to migrate all applications without actually install them.
+     */
+    public static function migrateAll() {
+        \Migrate::latest('nos', 'package');
+        foreach (array_keys(\Nos\Config_Data::get('app_installed')) as $app) {
+            \Migrate::latest($app, 'module');
+        }
+        \Migrate::latest('default', 'app');
+    }
+
     public static function installNativeApplications($ignore_core_migrations = false)
     {
         if (!$ignore_core_migrations) {
