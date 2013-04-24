@@ -1,41 +1,44 @@
 <?php
 
-// Generated on 09/04/2013 16:13:10
+// Generated on 24/04/2013 17:47:52
 
-// 21 out of 21 messages are translated (100%).
-// 95 out of 95 words are translated (100%).
+// 22 out of 22 messages are translated (100%).
+// 112 out of 112 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/appdesk.ctrl.php:156
-    'Default view' => 'デフォルトビュー',
-
     #. Note to translator: This is a submit button
     #: classes/controller/admin/crud.ctrl.php:316
     'Add' => '追加',
 
-    #: classes/controller/admin/crud.ctrl.php:403
+    #: classes/controller/admin/crud.ctrl.php:404
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'このアイテムは既に{{context}}にあります。したがって追加することはできません。',
 
-    #: classes/controller/admin/crud.ctrl.php:601
-    #: classes/controller/admin/crud.ctrl.php:608
+    #: classes/controller/admin/crud.ctrl.php:600
+    #: classes/controller/admin/crud.ctrl.php:607
     'Translate into {{context}}' => '{{context}}に翻訳する',
 
-    #: classes/controller/admin/crud.ctrl.php:603
-    #: classes/controller/admin/crud.ctrl.php:606
+    #: classes/controller/admin/crud.ctrl.php:602
+    #: classes/controller/admin/crud.ctrl.php:605
     'Add to {{context}}' => '{{context}}に追加する',
 
-    #: classes/controller/admin/crud.ctrl.php:612
+    #: classes/controller/admin/crud.ctrl.php:611
     'Edit {{context}}' => '{{context}}を編集する',
 
     #. Note to translator: action (button)
-    #: classes/controller/admin/crud.ctrl.php:629
+    #: classes/controller/admin/crud.ctrl.php:628
     'Translate' => '翻訳する',
 
-    #: classes/controller/admin/crud.ctrl.php:631
+    #: classes/controller/admin/crud.ctrl.php:630
     'Add to another site' => '別のサイトに追加する',
 
-    #: classes/controller/admin/crud.ctrl.php:633
+    #: classes/controller/admin/crud.ctrl.php:632
     'Translate / Add to another site' => '別のサイトに翻訳 / 追加する',
+
+    #: classes/controller/admin/crud.ctrl.php:681
+    'You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.' => 'この動作を実行できません。無効化されています。管理者にお問い合わせください。',
+
+    #: classes/controller/admin/appdesk.ctrl.php:156
+    'Default view' => 'デフォルトビュー',
 
     #. Note to translator: this is an action (button)
     #: views/crud/blank_slate.view.php:61
