@@ -44,7 +44,8 @@ class Migration
 
     }
 
-    public function canUpdateMetadata() {
+    public function canUpdateMetadata()
+    {
         if (\Config::get('migrations.enabled_types.metadata')) {
             if (is_writeable(APPPATH.'metadata')) {
                 return true;
