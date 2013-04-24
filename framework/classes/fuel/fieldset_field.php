@@ -10,6 +10,11 @@
 
 class Fieldset_Field extends \Fuel\Core\Fieldset_Field
 {
+    public static function _init()
+    {
+        Nos\I18n::current_dictionary('nos::common');
+    }
+
     public function populate($input, $repopulate = false)
     {
         if (is_array($input)) {

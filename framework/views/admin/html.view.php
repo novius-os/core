@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary('nos::common');
+
 $assets_minified = \Config::get('novius-os.assets_minified', true);
 $config = array(
     'baseUrl' => $base,

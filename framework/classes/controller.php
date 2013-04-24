@@ -685,6 +685,11 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                             foreach ($tree_model['order_by'] as $order_by) {
                                 $query->order_by(is_array($order_by) ? $order_by : array($order_by));
                             }
+                            if (!empty($tree_model['callback'])) {
+                                foreach ($tree_model['callback'] as $callback) {
+                                    call_user_func($callback, $query);
+                                }
+                            }
 
                             return $query;
                         }
