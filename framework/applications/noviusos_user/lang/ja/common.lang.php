@@ -1,38 +1,91 @@
 <?php
 
-// Generated on 09/04/2013 16:13:10
+// Generated on 24/04/2013 17:47:52
 
-// 47 out of 47 messages are translated (100%).
-// 208 out of 208 words are translated (100%).
+// 56 out of 56 messages are translated (100%).
+// 246 out of 246 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/user.ctrl.php:39
-    #: classes/controller/admin/user.ctrl.php:48
+    #: classes/controller/admin/user.ctrl.php:51
     'Done, your password has been changed.' => 'はい、パスワードが変更されました。',
 
-    #: classes/controller/admin/user.ctrl.php:81
-    'OK, permissions saved.' => 'はい、権限が保存されました。',
-
-    #: classes/controller/admin/account.ctrl.php:85
+    #: classes/controller/admin/account.ctrl.php:84
     'Your Novius OS has switched to {{language}}. Okay, not quite. Actually it needs a <a>quick refresh</a>.' => 'Novius OS を{{language}}に設定変更しました。ええ、まだ表示は変わっていません。<a>再読み込み</a>してください。',
 
-    #: classes/controller/admin/account.ctrl.php:88
+    #: classes/controller/admin/account.ctrl.php:87
     'Sorry but your Novius OS doesn’t speak {{code}}.' => '申し訳ありませんが、{{code}}はNovius OSには理解できません。',
 
-    #: classes/controller/admin/account.ctrl.php:98
+    #: classes/controller/admin/account.ctrl.php:97
     'Wallpaper' => '壁紙',
 
-    #: classes/controller/admin/account.ctrl.php:122
+    #: classes/controller/admin/account.ctrl.php:121
     '‘{{title}}’ is your new gorgeous wallpaper. Go quick to the home tab to see it.' => '‘{{title}}’を新しい壁紙にしました。ホームタブをクリックして確認してください。',
 
-    #: classes/controller/admin/account.ctrl.php:130
+    #: classes/controller/admin/account.ctrl.php:129
     'This is unexpected: The selected image doesn’t exist any more. It must have been deleted while you were selecting it.' => '予期せぬ事態が発生しました。選択した画像が存在しません。選択後に削除されたかもしれません。',
 
-    #: classes/controller/admin/account.ctrl.php:135
+    #: classes/controller/admin/account.ctrl.php:134
     'Your wallpaper is now the default one.' => 'あなたの壁紙をデフォルトにしました。',
 
-    #: classes/controller/admin/account.ctrl.php:141
+    #: classes/controller/admin/account.ctrl.php:140
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'おかしな事態が発生しました。ブラウザを更新して、再度試してください。問題が解決しない場合は、開発者または Novius OS にご相談ください。ご迷惑をかけたことをお詫びします。',
+
+    #: classes/controller/admin/role.ctrl.php:29
+    'OK, permissions saved.' => 'はい、権限が保存されました。',
+
+    #: views/admin/user_details_edit.view.php:29
+    'Details' => '詳細',
+
+    #: views/admin/user_details_edit.view.php:38
+    #: views/admin/user_add.view.php:46
+    'Roles' => 'ロール（権限グループ）',
+
+    #: views/admin/user_details_edit.view.php:46
+    'Set a new password' => 'パスワードを更新する',
+
+    #: views/admin/user_edit.view.php:38
+    'User details' => 'ユーザーの詳細情報',
+
+    #: views/admin/user_edit.view.php:39
+    'Permissions' => '権限',
+
+    #. Password strength
+    #: views/admin/user_edit.view.php:91
+    #: views/admin/account.view.php:95
+    #: views/admin/user_add.view.php:75
+    'Insufficient' => '不十分',
+
+    #: views/admin/user_edit.view.php:92
+    #: views/admin/account.view.php:96
+    #: views/admin/user_add.view.php:76
+    'Weak' => '弱',
+
+    #: views/admin/user_edit.view.php:93
+    #: views/admin/account.view.php:97
+    #: views/admin/user_add.view.php:77
+    'Average' => '中',
+
+    #: views/admin/user_edit.view.php:94
+    #: views/admin/account.view.php:98
+    #: views/admin/user_add.view.php:78
+    'Strong' => '良',
+
+    #: views/admin/user_edit.view.php:95
+    #: views/admin/account.view.php:99
+    #: views/admin/user_add.view.php:79
+    'Outstanding' => '最良',
+
+    #: views/admin/user_roles_edit.view.php:33
+    'View and edit permissions' => 'パーミッションを閲覧／編集',
+
+    #: views/admin/account.view.php:30
+    'Sign out (see you!)' => 'ログアウトします。それではまた。',
+
+    #: views/admin/account.view.php:42
+    'My account' => '私のアカウント',
+
+    #: views/admin/account.view.php:43
+    'Theme' => 'テーマ',
 
     #: config/controller/admin/user.config.php:19
     #: config/common/user.config.php:47
@@ -65,25 +118,37 @@ return array(
 
     #. Note to translator: This is a submit button
     #: config/controller/admin/user.config.php:136
+    #: config/controller/admin/role.config.php:59
     'Save' => '保存',
 
-    #: config/controller/admin/appdesk.config.php:25
-    'user' => 'ユーザー',
+    #: config/controller/admin/inspector/role.config.php:22
+    #: config/common/role.config.php:8
+    'Role' => 'ロール（権限グループ）',
+
+    #: config/controller/admin/role.config.php:19
+    #: config/common/role.config.php:34
+    'Add a role' => 'ロールを追加',
+
+    #: config/controller/admin/role.config.php:41
+    'Title' => 'タイトル',
 
     #: config/controller/admin/appdesk.config.php:26
-    'users' => 'ユーザー',
+    'user' => 'ユーザー',
 
     #: config/controller/admin/appdesk.config.php:27
-    'Showing {{x}} users out of {{y}}' => '{{y}}人のユーザーのうち{{x}}人を表示しています',
+    'users' => 'ユーザー',
 
     #: config/controller/admin/appdesk.config.php:28
-    'Showing 1 user' => '1人のユーザーを表示しています',
+    'Showing {{x}} users out of {{y}}' => '{{y}}人のユーザーのうち{{x}}人を表示しています',
 
     #: config/controller/admin/appdesk.config.php:29
+    'Showing 1 user' => '1人のユーザーを表示しています',
+
+    #: config/controller/admin/appdesk.config.php:30
     'No users' => 'ユーザー無し',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:31
+    #: config/controller/admin/appdesk.config.php:32
     'Show all users' => '全てのユーザーを表示する',
 
     #: config/common/user.config.php:8
@@ -114,56 +179,26 @@ return array(
     #: config/common/user.config.php:43
     'Yes, delete this user' => 'はい、このユーザーを削除します',
 
-    #: views/admin/permission.view.php:27
-    'Full access to everything' => '全ての権限',
+    #. Crud
+    #: config/common/role.config.php:19
+    'All wrapped up! This new role is ready.' => 'おめでとうございます。新しいロールが利用可能になりました。',
 
-    #: views/admin/permission.view.php:49
-    'Application provided by {{provider_name}}' => '{{provider_name}}が提供するアプリケーション',
+    #: config/common/role.config.php:20
+    'The role has been deleted.' => 'ロールが削除されました。',
 
-    #: views/admin/user_details_edit.view.php:29
-    'Details' => '詳細',
+    #. General errors
+    #: config/common/role.config.php:23
+    'This role doesn’t exist any more. It has been deleted.' => 'ロールが存在しません。削除されました。',
 
-    #: views/admin/user_details_edit.view.php:37
-    'Set a new password' => 'パスワードを更新する',
+    #: config/common/role.config.php:24
+    'We cannot find this role.' => 'このロールは見つかりませんでした。',
 
-    #: views/admin/account.view.php:29
-    'Sign out (see you!)' => 'ログアウトします。それではまた。',
+    #. Deletion popup
+    #: config/common/role.config.php:27
+    'Deleting the role ‘{{title}}’' => 'ロール{{title}}を削除します',
 
-    #: views/admin/account.view.php:41
-    'My account' => '私のアカウント',
-
-    #: views/admin/account.view.php:42
-    'Theme' => 'テーマ',
-
-    #: views/admin/account.view.php:90
-    #: views/admin/user_add.view.php:67
-    #: views/admin/user_edit.view.php:90
-    'Insufficient' => '不十分',
-
-    #: views/admin/account.view.php:91
-    #: views/admin/user_add.view.php:68
-    #: views/admin/user_edit.view.php:91
-    'Weak' => '弱',
-
-    #: views/admin/account.view.php:92
-    #: views/admin/user_add.view.php:69
-    #: views/admin/user_edit.view.php:92
-    'Average' => '中',
-
-    #: views/admin/account.view.php:93
-    #: views/admin/user_add.view.php:70
-    #: views/admin/user_edit.view.php:93
-    'Strong' => '良',
-
-    #: views/admin/account.view.php:94
-    #: views/admin/user_add.view.php:71
-    #: views/admin/user_edit.view.php:94
-    'Outstanding' => '最良',
-
-    #: views/admin/user_edit.view.php:31
-    'User details' => 'ユーザーの詳細情報',
-
-    #: views/admin/user_edit.view.php:32
-    'Permissions' => '権限',
+    #. Delete action's labels
+    #: config/common/role.config.php:30
+    'Yes, delete this role' => 'はい、このロールを削除します',
 
 );
