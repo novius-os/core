@@ -7,13 +7,14 @@ class Install extends \Nos\Migration
     {
         \Config::load('migrations', true);
 
-        if (!in_array('nos_migration', \DB::list_tables())) {
+        if (in_array('migration', \DB::list_tables()) && count(\DB::query('SELECT * FROM nos_migration')->execute()) == 0) {
+            \DB::query('DROP TABLE IF EXISTS  `nos_migration`;')->execute();
             \DB::query('RENAME TABLE `migration` TO  `nos_migration`;')->execute();
             \Migrate::set_table('nos_migration');
             \Config::set('migrations.table', 'nos_migration');
         }
 
-        // test if there exists old migrations migrations
+        // test if there exists old migrations
         $old_migration = \DB::query('SELECT * FROM nos_migration WHERE
         type = "app" AND name="default" AND migration="001_installation_0_1";')->execute();
         if (count($old_migration) > 0) {
