@@ -10,10 +10,19 @@
 @import "compass/css3/box-shadow";
 @import "compass/css3/text-shadow";
 
+/* +-++-++-++-+
+ * |H||A||C||K|
+ * +-++-++-++-+ */
+
+
 .ui-dialog {
     .wijmo-checkbox label, .wijmo-wijradio label {
         z-index: inherit;
     }
+}
+
+.wijmo-wijgrid .wijmo-wijgrid-headerrow .ui-button .ui-icon {
+    z-index: auto;
 }
 
 /* +-++-++-++-++-++-+

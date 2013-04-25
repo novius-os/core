@@ -16,6 +16,11 @@ class Model_Permission extends \Nos\Orm\Model
 
     protected static $_primary_key = array('perm_role_id', 'perm_name', 'perm_category_key');
 
+    protected static $_has_many = array();
+    protected static $_belongs_to = array();
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
     protected static $_title_property = 'perm_name';
     protected static $_properties = array(
         'perm_role_id' => array(

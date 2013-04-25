@@ -907,7 +907,11 @@ define('jquery-nos-appdesk',
                         $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
                             .html(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
-                        $('<input type="radio" class="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
+
+                        $('<input type="radio" name="view" />')
+                            .attr('id', 'view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : ''))
+                            .prop('checked', (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize)))
+                            .addClass('view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : ''))
                             .appendTo(self.uiViewsButtons)
                             .button({
                                 text : false,
@@ -954,7 +958,7 @@ define('jquery-nos-appdesk',
                 if (self.uiThumbnail.data('nos-thumbnailsgrid')) {
                     self.uiThumbnail.thumbnailsgrid('destroy');
                 }
-                if (self.uiThumbnail.data('nos-noslistgrid')) {
+                if (self.uiGrid.data('nos-noslistgrid')) {
                     self.uiGrid.noslistgrid('destroy');
                 }
                 if (self.uiTreeGrid.data('nos-nostreegrid')) {
@@ -2059,7 +2063,9 @@ define('jquery-nos-appdesk',
                     dropDown.appendTo(container.find('tr')).click(function(e) {
 
                         $.each($.appdeskActionsList, function() {
-                            $(this).wijmenu('hideAllMenus');
+                            if ($(this).data('wijmo-wijmenu')) {
+                                $(this).wijmenu('hideAllMenus');
+                            }
                         });
 
                         if (!this.created) {
@@ -2102,7 +2108,9 @@ define('jquery-nos-appdesk',
                                         e.stopImmediatePropagation();
                                         e.preventDefault();
                                         // Hide me
-                                        ul.wijmenu('hideAllMenus');
+                                        if (ul.data('wijmo-wijmenu')) {
+                                            ul.wijmenu('hideAllMenus');
+                                        }
                                         li.nosAction(action.action, noParseData);
                                     });
                                 }

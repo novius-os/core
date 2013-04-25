@@ -43,7 +43,11 @@ class Model_Link extends \Nos\Orm\Model
         ),
     );
 
-    public static $_belongs_to = array(
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
+    protected static $_has_many = array();
+    protected static $_belongs_to = array(
         'media' => array(
             'key_from' => 'medil_media_id',
             'model_to' => 'Nos\Media\Model_Media',

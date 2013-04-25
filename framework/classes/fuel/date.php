@@ -70,11 +70,15 @@ class Date extends \Fuel\Core\Date
         return '/Date('.($this->timestamp * 1000).')/';
     }
 
-    public static function formatPattern($date, $pattern = 'normal')
+    public static function formatPattern($date, $pattern = 'DEFAULT')
     {
         $dictionary = \Nos\I18n::dictionary('nos::common');
-        return static::forge(strtotime($date))->format($dictionary('date_format.'.$pattern));
+        return static::forge(strtotime($date))->format($dictionary('DATE_FORMAT_'.$pattern, '%d %b %Y %H:%M'));
+
+        // Date syntax is the one from PHP strftime() function: http://php.net/strftime
+        // Example value: '%d %b %Y %H:%M' (day of month, month name, year, hour, minutes).
+        __('DATE_FORMAT_DEFAULT');
+        // Keep this line above. Useful for the translation extraction script
+
     }
 }
-
-/* End of file date.php */

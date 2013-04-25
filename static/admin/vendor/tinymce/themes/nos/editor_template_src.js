@@ -265,6 +265,7 @@
 				$body.find('.nosEnhancer, .nosEnhancerInline').each(function() {
 					var enhancer = $(this);
                     enhancer.html(ed.getLang('nos.enhancer_loading'));
+                    self.onEnhancerAdd(enhancer);
 
 					var enhancer_id = $(this).data('enhancer');
 					var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
@@ -279,7 +280,8 @@
 							self.onEnhancerAdd(enhancer, metadata);
 						},
 						error: function() {
-                            enhancer.html('Error when loading the preview of the application');
+                            enhancer.html(ed.getLang('nos.enhancer_loading_error'));
+                            self.onEnhancerAdd(enhancer);
 						}
 					});
 				});
@@ -2105,7 +2107,7 @@
 			    editLink = $('<a href="#" data-action="editEnhancer"></a>')
                     .text(ed.getLang('nos.enhancer_options'))
                     .attr('title', ed.getLang('nos.enhancer_options'))
-                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),f
+                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),
 			    insertAfter = $('<a href="#" data-action="addParagraphAfter"></a>')
                     .text(ed.getLang('nos.enhancer_p_after'))
                     .attr('title', ed.getLang('nos.enhancer_p_after'))
@@ -2118,7 +2120,7 @@
 			if (container.is('span')) {
 				container.addClass('nosEnhancerInline')
 				container.append(document.createTextNode(' '));
-                if ($.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
+                if (metadata && $.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
                     container.append(editLink);
                 }
 				container.append(deleteLink);
@@ -2128,7 +2130,7 @@
 				container.addClass('nosEnhancer');
                 container.prepend(insertAfter.addClass('nos_enhancer_action_block'));
 				container.prepend(insertBefore.addClass('nos_enhancer_action_block'));
-                if ($.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
+                if (metadata && $.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
                     container.prepend(editLink.addClass('nos_enhancer_action_block'));
                 }
                 container.prepend(deleteLink.addClass('nos_enhancer_action_block'));
