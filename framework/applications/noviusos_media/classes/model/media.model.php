@@ -77,6 +77,9 @@ class Model_Media extends \Nos\Orm\Model
     public static $private_path = 'data/media/';
     public static $public_path  = 'media/';
 
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
     protected static $_belongs_to = array(
         'folder' => array(
             'key_from'       => 'media_folder_id',

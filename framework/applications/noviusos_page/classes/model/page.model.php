@@ -178,6 +178,9 @@ class Model_Page extends \Nos\Orm\Model
         ),
     );
 
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'page_id',
@@ -307,6 +310,54 @@ class Model_Page extends \Nos\Orm\Model
         return $url;
     }
 
+
+    /**
+     *  Delete the cache for this page
+     */
+    public function delete_cache()
+    {
+        if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
+            return;
+        }
+        $url = $this->page_entrance ? '' : ltrim($this->virtual_path(), '/');
+        $contexts = \Nos\Tools_Context::contexts();
+        foreach ($contexts[$this->page_context] as $context_url) {
+            $host = parse_url($context_url, PHP_URL_HOST);
+            $path = ltrim(parse_url($context_url, PHP_URL_PATH), '/');
+
+            $url = $path.$url;
+            $cache_path = (empty($url) ? 'index/' : $url);
+            // This event mostly redirects, don't trigger it
+            //\Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
+            $cache_path = $host.DS.rtrim($cache_path, '/');
+
+            // Delete file
+            $cache = \Nos\FrontCache::forge('pages'.DS.$cache_path);
+            $cache->delete();
+        }
+
+        if ($this->page_menu || $this->is_changed('page_menu')) {
+            static::delete_cache_context($this->page_context);
+        }
+    }
+
+    /**
+     * Delete the cache for this context
+     *
+     * @param  $context  string  Context to delete (e.g. 'main::en_GB')
+     */
+    public static function delete_cache_context($context)
+    {
+        $contexts = \Nos\Tools_Context::contexts();
+        foreach ($contexts[$context] as $context_url) {
+            $host = parse_url($context_url, PHP_URL_HOST);
+            $path = trim(parse_url($context_url, PHP_URL_PATH), '/');
+
+            $cache = \Nos\FrontCache::forge('pages'.DS.$host.DS.$path);
+            $cache->delete();
+        }
+    }
+
     public function _event_after_save()
     {
         \Nos\Config_Data::load('enhancers');
@@ -351,6 +402,8 @@ class Model_Page extends \Nos\Orm\Model
                 }
             }
         }
+
+        $this->delete_cache();
     }
 
     public function _event_before_delete()
@@ -362,6 +415,7 @@ class Model_Page extends \Nos\Orm\Model
     {
         static::_remove_url_enhanced($this->_page_id_for_delete);
         static::_remove_page_enhanced($this->_page_id_for_delete);
+        $this->delete_cache();
         $this->_page_id_for_delete = null;
     }
 
