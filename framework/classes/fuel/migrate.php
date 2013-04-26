@@ -24,6 +24,7 @@ class Migrate extends \Fuel\Core\Migrate
         if (!\Config::get('novius-os.migration_config_file')) {
             \Config::load('migrations', true);
             \Config::set('migrations.version', array());
+            \Config::set('migrations.table', 'nos_migration');
         }
         parent::_init();
     }

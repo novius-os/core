@@ -28,6 +28,8 @@ define('jquery-nos-wysiwyg',
                         document_base_url : base_url,
                         language : $.nosLang.substr(0, 2),
                         script_url : base_url + 'static/novius-os/admin/vendor/tinymce/tiny_mce_jquery' + (module.config().minified ? '' : '_src') + '.js',
+                        // IE 10 bugfix to make div:hover working in CSS (to show enhancer actions)
+                        doctype : '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
                         theme      : 'nos',
                         skin : "bootstrap",
                         plugins    : 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking',

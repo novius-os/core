@@ -137,38 +137,41 @@ class Model extends \Orm\Model
             return static::$_properties_cached[$class];
         }
 
-        try {
-            if ($from_db) {
-                if ($init) {
-                    unset(static::$_properties_cached[$class]);
-                }
-                throw new \CacheNotFoundException();
-            }
-
-            static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
-        } catch (\CacheNotFoundException $e) {
+        if (property_exists($class, '_properties')) {
             parent::properties();
+        }
 
-            $config = static::_config();
-            if (!empty($config) && !empty($config['properties'])) {
+        $config = static::_config();
+        if (!empty($config) && !empty($config['properties'])) {
+            static::$_properties_cached[$class] = \Arr::merge(
+                static::$_properties_cached[$class],
+                $config['properties']
+            );
+        }
+
+        if ($from_db || empty(static::$_properties_cached[$class])) {
+            try {
+                if ($from_db) {
+                    throw new \CacheNotFoundException();
+                }
+                $list_columns = \Cache::get('list_columns.'.static::table());
+            } catch (\CacheNotFoundException $e) {
+                try {
+                    $list_columns = \DB::list_columns(static::table(), null, static::connection());
+                    \Cache::set('list_columns.'.static::table(), $list_columns);
+                } catch (\Exception $e) {
+                    throw new \FuelException('Listing columns failed, you have to set the model properties with a '.
+                        'static $_properties setting in the model. Original exception: '.$e->getMessage());
+                }
+            }
+            if (empty(static::$_properties_cached[$class])) {
+                static::$_properties_cached[$class] = $list_columns;
+            } else {
                 static::$_properties_cached[$class] = \Arr::merge(
-                    static::$_properties_cached[$class],
-                    $config['properties']
+                    $list_columns,
+                    static::$_properties_cached[$class]
                 );
             }
-
-            if ($from_db && property_exists($class, '_properties')) {
-                try {
-                    static::$_properties_cached[$class] = \Arr::merge(
-                        \DB::list_columns(static::table(), null, static::connection()),
-                        static::$_properties_cached[$class]
-                    );
-                } catch (\Exception $e) {
-                    // Do nothing, call from get() or set(), list_column not explicitly reclaimed
-                }
-            }
-
-            \Cache::set('model_properties.'.str_replace('\\', '_', $class), static::$_properties_cached[$class]);
         }
 
         return static::$_properties_cached[$class];
@@ -893,14 +896,17 @@ class Model_Media_Provider implements \Iterator
 
     public function __set($property, $value)
     {
-        // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
         $media_id = (string) ($value instanceof \Nos\Media\Model_Media ? $value->media_id : $value);
-        $media = \Nos\Media\Model_Media::find($media_id);
-        if (is_null($media)) {
-            $pk = $this->parent->primary_key();
-            throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
-                get_class($this->parent)
-            )."(".$this->parent->{$pk[0]}.")");
+
+        // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
+        if (!empty($media_id)) {
+            $media = \Nos\Media\Model_Media::find($media_id);
+            if (is_null($media)) {
+                $pk = $this->parent->primary_key();
+                throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
+                    get_class($this->parent)
+                )."(".$this->parent->{$pk[0]}.")");
+            }
         }
 
         // Reuse the getter
@@ -922,6 +928,11 @@ class Model_Media_Provider implements \Iterator
     {
         $value = $this->__get($value);
         return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
     }
 
     public function rewind()
@@ -1007,6 +1018,11 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $value = $this->__get($value);
         return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
     }
 
     public function rewind()

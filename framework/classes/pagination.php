@@ -147,7 +147,6 @@ class Pagination
         // Pagination
         $pagination .= $this->prev_link(__('Previous'));
         $pagination .= $this->page_links();
-        // Pagination
         $pagination .= $this->next_link(__('Next'));
         $pagination .= $this->template['wrapper_end'];
 

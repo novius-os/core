@@ -90,11 +90,20 @@ define('jquery-nos-preview',
                         .appendTo(self.uiContainer);
 
                     $.each(o.actions, function() {
+                        var disabled = false;
+                        if (data && data.actions) {
+                            var enabled = data.actions[this.name];
+                            if (enabled == false) {
+                                disabled = true;
+                            } else if ($.type(enabled) == 'string') {
+                                disabled = enabled;
+                            }
+                        }
                         var action = this,
                             element = $.extend(true, {
                                     type: action.primary ? 'button' : 'link'
                                 }, action, {
-                                    disabled : data && data.actions && data.actions[action.name] == false
+                                    disabled : disabled
                                 }),
                             $element = $.nosUIElement(element, data)
                                 .appendTo(self.uiFooter)
