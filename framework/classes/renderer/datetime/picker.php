@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Date_Picker extends \Fieldset_Field
+class Renderer_Datetime_Picker extends \Fieldset_Field
 {
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'datepicker' => array(
@@ -18,8 +18,11 @@ class Renderer_Date_Picker extends \Fieldset_Field
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
             'buttonImageOnly' => true,
             'autoSize' => true,
+            'timeFormat' => 'HH:mm:ss', // MySQL formatting
             'dateFormat' => 'yy-mm-dd', // MySQL formatting
             'altFormat' => 'dd/mm/yy', // Custom user formatting
+            'altTimeFormat' => 'HH:mm', // Custom user formatting
+            'altFieldTimeOnly' => false,
             'showButtonPanel' => true,
             'changeMonth' => true,
             'changeYear' => true,
@@ -74,13 +77,13 @@ class Renderer_Date_Picker extends \Fieldset_Field
         $attributes['type'] = 'text';
         $attributes['id'] = ltrim($datepicker_options['altField'], '#');
         unset($attributes['value']);
+        $this->set_value(static::processValue($this->value));
 
         $build = $this->template((string) parent::build());
         // A bit hacky, but can't see another way to keep the template
         $build = str_replace('<input ', '<input '.array_to_attr($attributes).' /><input ', $build);
         // Can't do something else here, since the label's ID is generated (late) within the parent::template() method.
         $build = str_replace('for="'.$this->attributes['id'].'"', 'for="'.$attributes['id'].'"', $build);
-
         return $build;
     }
 
@@ -99,7 +102,7 @@ class Renderer_Date_Picker extends \Fieldset_Field
         }
 
         if (empty($renderer['size'])) {
-            $renderer['size'] = 9;
+            $renderer['size'] = 20;
         }
 
         // Default options of the renderer
@@ -125,9 +128,24 @@ class Renderer_Date_Picker extends \Fieldset_Field
      */
     protected static function js_init($id, $renderer_options = array())
     {
-        return \View::forge('renderer/date_picker', array(
+        return \View::forge('renderer/datetime_picker', array(
             'id' => $id,
             'wrapper' => \Arr::get($renderer_options, 'wrapper', ''),
         ), false);
     }
+
+    protected static function processValue($value) {
+        if ($value && $value!='0000-00-00 00:00:00') {
+            return \Date::create_from_string($value, 'mysql')->format('%Y-%m-%d %H:%M:%S');
+        } else {
+            return \Date::forge()->format('%Y-%m-%d %H:%M:%S'); //'%Y-%m-%d %H:%M'
+        }
+    }
+
+    public function before_save($item, $data)
+    {
+        $data[$this->name] = \Date::create_from_string($data[$this->name], '%Y-%m-%d %H:%M:%S')->format('mysql');
+        return true;
+    }
+
 }
