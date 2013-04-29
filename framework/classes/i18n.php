@@ -107,7 +107,7 @@ class I18n
                     }
                 }
             }
-            \Event::register_function('i18n.'.static::$_locale.'|'.$file, array(&static::$_messages[static::$_locale][$group]));
+            \Event::trigger_function('i18n.'.static::$_locale.'|'.$file, array(&static::$_messages[static::$_locale][$group]));
             static::$_loaded_files[static::$_locale][$file] = true;
         }
     }
