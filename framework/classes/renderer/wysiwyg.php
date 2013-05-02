@@ -41,6 +41,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
         if ( !empty($renderer_options) ) {
             $attributes['data-wysiwyg-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
         }
+        $value = htmlentities($value);
 
         return '<textarea '.array_to_attr($attributes).'>'.$value.'</textarea>'.static::js_init($attributes['id'], $renderer_options);
     }
@@ -56,7 +57,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
 
         $this->value = Tools_Wysiwyg::prepare_renderer($this->value);
         $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
-
+        $this->value = htmlentities($this->value);
         return (string) parent::build();
     }
 
