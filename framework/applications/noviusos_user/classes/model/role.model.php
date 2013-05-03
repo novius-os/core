@@ -36,6 +36,9 @@ class Model_Role extends \Nos\Orm\Model
 
     protected static $permissions;
 
+    protected static $_belongs_to = array();
+    protected static $_has_one = array();
+
     protected static $_many_many = array(
         'users' => array(
             'key_from' => 'role_id',
@@ -127,9 +130,14 @@ class Model_Role extends \Nos\Orm\Model
 
         // Load permissions from the database
         if (!isset(static::$permissions[$this->role_id])) {
-            $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
-            foreach ($query->as_object()->execute() as $permission) {
-                static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
+            try {
+                static::$permissions[$this->role_id] = \Cache::get('role_permissions.'.$this->role_id);
+            } catch (\CacheNotFoundException $e) {
+                $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
+                foreach ($query->as_object()->execute() as $permission) {
+                    static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
+                }
+                \Cache::set('role_permissions.'.$this->role_id, static::$permissions[$this->role_id]);
             }
         }
         return true;

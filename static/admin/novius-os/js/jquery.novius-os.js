@@ -25,8 +25,13 @@ define('jquery-nos',
                 dialogFocused : -1,
                 open : function($dialog) {
                     var self = this,
-                        callbacks = $dialog.data('callbacks.nosdialog');
-                    self.dialogOpened.push($dialog[0]);
+                        callbacks = $dialog.data('callbacks.nosdialog'),
+                        index = $.inArray($dialog[0], self.dialogOpened);
+
+                    // Check if dialog not already added, it can be by focus
+                    if (index === -1) {
+                        self.dialogOpened.push($dialog[0]);
+                    }
                     if (!$.isPlainObject(callbacks)) {
                         $dialog.data('callbacks.nosdialog', {});
                     }
@@ -385,7 +390,16 @@ define('jquery-nos',
                         break;
                 }
                 if (element.disabled && element.disabled !== false) {
-                    $element.attr('disabled', true);
+                    switch (element.type) {
+                        case 'button' :
+                            $element.attr('disabled', true);
+                            break;
+
+                        case 'link' :
+                            $element.addClass('faded');
+                            break;
+                    }
+
                     if ($.type(element.disabled) === 'string') {
                         $element.attr('title', element.disabled);
                     }
@@ -395,7 +409,9 @@ define('jquery-nos',
                     $.each(element.bind, function(event, action) {
                         $element.bind(event, function(e) {
                             e.preventDefault();
-                            $element.nosAction(action, data);
+                            if (!element.disabled) {
+                                $element.nosAction(action, data);
+                            }
                         });
                     });
 
@@ -824,7 +840,12 @@ define('jquery-nos',
                 });
                 $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
-                    $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
+                    $this.wijexpander($.extend({
+                        expanded: true,
+                        afterExpand: function(e) {
+                            $(e.target).find('.ui-expander-content').nosOnShow();
+                        }
+                    }, $this.data('wijexpander-options')));
                 });
                 $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",

@@ -67,7 +67,7 @@ class Pagination
 
     public static function _init()
     {
-        I18n::current_dictionary('nos::common');
+        I18n::current_dictionary('nos::front');
     }
 
     // --------------------------------------------------------------------
@@ -144,6 +144,7 @@ class Pagination
         }
 
         $pagination  = $this->template['wrapper_start'];
+        // Pagination
         $pagination .= $this->prev_link(__('Previous'));
         $pagination .= $this->page_links();
         $pagination .= $this->next_link(__('Next'));

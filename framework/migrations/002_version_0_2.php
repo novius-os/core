@@ -9,36 +9,38 @@ class Version_0_2 extends \Nos\Migration
         $existing_migration = \DB::query('SELECT * FROM nos_migration WHERE
         type = "package" AND name="nos" AND migration="002_version_0_2";')->execute();
         if (count($existing_migration) > 0) {
-            return false;
+            return true;
         }
 
-        // Add new namespaces before everything else, or run into 'Fatal error: class Nos\Page\Model_Page not found!'
-        $app_namespaces = \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces', true, true) +
-            array(
-                'noviusos_appmanager' => 'Nos\Appmanager',
-                'noviusos_media' => 'Nos\Media',
-                'noviusos_page' => 'Nos\Page',
-                'noviusos_user' => 'Nos\User',
-            );
-        \Config::save(APPPATH.'metadata/app_namespaces.php', $app_namespaces);
-        \Config::set('data::app_namespaces', $app_namespaces);
+        if ($this->canUpdateMetadata()) {
+            // Add new namespaces before everything else, or run into 'Fatal error: class Nos\Page\Model_Page not found!'
+            $app_namespaces = \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces', true, true) +
+                array(
+                    'noviusos_appmanager' => 'Nos\Appmanager',
+                    'noviusos_media' => 'Nos\Media',
+                    'noviusos_page' => 'Nos\Page',
+                    'noviusos_user' => 'Nos\User',
+                );
+            \Config::save(APPPATH.'metadata/app_namespaces.php', $app_namespaces);
+            \Config::set('data::app_namespaces', $app_namespaces);
 
-        // Remove 'native apps' from 0.1
-        $app_installed = \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed', true, true);
-        unset($app_installed['nos']);
-        \Config::save(APPPATH.'metadata/app_installed.php', $app_installed);
-        \Config::set('data::app_installed', $app_installed);
+            // Remove 'native apps' from 0.1
+            $app_installed = \Config::load(APPPATH.'metadata/app_installed.php', 'data::app_installed', true, true);
+            unset($app_installed['nos']);
+            \Config::save(APPPATH.'metadata/app_installed.php', $app_installed);
+            \Config::set('data::app_installed', $app_installed);
 
-        // Remove 'native launchers' from 0.1
-        $launchers = \Config::load(APPPATH.'metadata/launchers.php', 'data::launchers', true, true);
-        unset($launchers['nos_page']);
-        unset($launchers['nos_media']);
-        unset($launchers['nos_user']);
-        \Config::save(APPPATH.'metadata/launchers.php', $launchers);
-        \Config::set('data::launchers', $launchers);
+            // Remove 'native launchers' from 0.1
+            $launchers = \Config::load(APPPATH.'metadata/launchers.php', 'data::launchers', true, true);
+            unset($launchers['nos_page']);
+            unset($launchers['nos_media']);
+            unset($launchers['nos_user']);
+            \Config::save(APPPATH.'metadata/launchers.php', $launchers);
+            \Config::set('data::launchers', $launchers);
 
-        // Update native apps into 0.2
-        \Nos\Application::installNativeApplications(true);
+            // Update native apps into 0.2
+            \Nos\Application::installNativeApplications(true);
+        }
 
         parent::up();
 

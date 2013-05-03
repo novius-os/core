@@ -1,5 +1,5 @@
 <?php
 
 return array(
-    'date_format.normal' => '%d %b %Y %H:%M',
+    'DATE_FORMAT_DEFAULT' => '%d %b %Y %H:%M',
 );

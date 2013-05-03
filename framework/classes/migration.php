@@ -43,4 +43,17 @@ class Migration
     {
 
     }
+
+    public function canUpdateMetadata()
+    {
+        if (\Config::get('migrations.enabled_types.metadata')) {
+            if (is_writeable(APPPATH.'metadata')) {
+                return true;
+            } else {
+                throw new \Exception('Metadata folder is not writeable.');
+            }
+        } else {
+            return false;
+        }
+    }
 }

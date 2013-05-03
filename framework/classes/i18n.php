@@ -107,7 +107,7 @@ class I18n
                     }
                 }
             }
-            \Event::register_function('i18n.'.static::$_locale.'|'.$file, array(&static::$_messages[static::$_locale][$group]));
+            \Event::trigger_function('i18n.'.static::$_locale.'|'.$file, array(&static::$_messages[static::$_locale][$group]));
             static::$_loaded_files[static::$_locale][$file] = true;
         }
     }
@@ -147,7 +147,29 @@ class I18n
     public static function translate_from_file($file, $message, $default)
     {
         if (empty(static::$_files_dict[$file])) {
-            return static::get($message, $default);
+            $application_name = false;
+            $parts = explode(DS, str_replace(NOSROOT, '', $file));
+            foreach ($parts as $i => $part) {
+                // If we reached one of these folders, the name is just before
+                if (in_array($part, array('views', 'classes', 'config'))) {
+                    $application_name = $parts[$i - 1];
+                    break;
+                }
+                // If we reached applications, the name is just after
+                if ($part == 'applications') {
+                    $application_name = $parts[$i + 1];
+                    break;
+                }
+            }
+            if (!empty($application_name)) {
+                // Framework use "nos" as application name
+                if ($application_name == 'framework') {
+                    $application_name = 'nos';
+                }
+                static::$_files_dict[$file] = call_user_func('static::dictionary', array($application_name.'::default'));
+            } else {
+                return static::get($message, $default);
+            }
         }
         $lookup = static::$_files_dict[$file];
         return call_user_func($lookup, $message, $default);

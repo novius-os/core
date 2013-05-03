@@ -196,6 +196,10 @@ if ($local->is_dirty()) {
                         labelDisplay: false
                     });
 
+<?php
+if (\Session::user()->user_expert) {
+    ?>
+
                     var $a = $('<a href="#" data-icon="wrench"><?= htmlspecialchars(__('Refresh all metadata')); ?></a>')
                         .on('click', function(e) {
                             e.preventDefault();
@@ -210,6 +214,9 @@ if ($local->is_dirty()) {
                         });
                     $container.nosToolbar($a);
 
+    <?php
+}
+?>
                     $(".app_list_available table, .app_list_installed table").wijgrid({
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();

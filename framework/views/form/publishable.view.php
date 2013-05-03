@@ -111,7 +111,7 @@ $nosPublishable = array(
             ),
             'modified' => array(
                 'scheduled' => $replacePlaceholders(__('<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
-                'published' => $replacePlaceholders(__('<row><cell>Will be published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
+                'published' => $replacePlaceholders(__('<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
                 'backdated' => $replacePlaceholders(__('<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>')),
             ),
             'pick' => __('Pick a date'),

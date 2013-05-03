@@ -85,6 +85,7 @@ tinyMCE.addI18n('en.nos',{
     enhancer_p_before:"New paragraph before",
     enhancer_new_paragraph : "New paragraph",
     enhancer_loading : "Loading...",
+    enhancer_loading_error : "Error when loading the preview of the application",
     visualthml_desc : "Show paragraphs",
     media_title: "Insert/Edit Embedded Media",
     media_label: "Embedded Media",
