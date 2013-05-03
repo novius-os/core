@@ -24,14 +24,16 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     protected $_properties = array();
 
+    protected $_itemsKeys = array();
+    protected $_commonIds = array();
+
     /**
      * Fill in the context_common_id and context properties when creating the object
      *
-     * @param Orm\Model $item
-     * @internal param \Nos\The $Model object
+     * @param \Nos\Orm\Model $item
      * @return void
      */
-    public function before_insert(\Nos\Orm\Model $item)
+    public function before_insert(Orm\Model $item)
     {
         $common_id_property = $this->_properties['common_id_property'];
 
@@ -46,7 +48,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param \Nos\Orm\Model $item
      * @return void
      */
-    public function after_insert(\Nos\Orm\Model $item)
+    public function after_insert(Orm\Model $item)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $is_main_property = $this->_properties['is_main_property'];
@@ -76,7 +78,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      *
      * @param \Nos\Orm\Model $item
      */
-    public function before_save(\Nos\Orm\Model $item)
+    public function before_save(Orm\Model $item)
     {
         if ($this->is_main_context($item) || $item->is_new()) {
             return;
@@ -94,7 +96,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
     }
 
-    public function after_delete(\Nos\Orm\Model $item)
+    public function after_delete(Orm\Model $item)
     {
         if (!$this->is_main_context($item)) {
             return;
@@ -118,7 +120,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param \Nos\Orm\Model $item
      * @throws \Exception
      */
-    public function change_parent(\Nos\Orm\Model $item)
+    public function change_parent(Orm\Model $item)
     {
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
         $new_parent = $item->get_parent();
@@ -175,7 +177,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      *
      * @param \Nos\Orm\Model $item
      */
-    public function delete_all_context(\Nos\Orm\Model $item)
+    public function delete_all_context(Orm\Model $item)
     {
         foreach ($item->find_context('all') as $item) {
             // This is to trick the is_main_context() method
@@ -191,7 +193,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param \Nos\Orm\Model $item
      * @return bool
      */
-    public function is_main_context(\Nos\Orm\Model $item)
+    public function is_main_context(Orm\Model $item)
     {
         // use !! for cast to boolean
         return !!$item->get($this->_properties['is_main_property']);
@@ -203,7 +205,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param \Nos\Orm\Model $item
      * @return \Nos\Orm\Model
      */
-    public function find_main_context(\Nos\Orm\Model $item)
+    public function find_main_context(Orm\Model $item)
     {
         return $item->find_context('main');
     }
@@ -219,7 +221,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      *  - array  if not empty, return only contexts specified
      * @return \Nos\Orm\Model | array(\Nos\Orm\Model)
      */
-    public function find_context(\Nos\Orm\Model $item, $context)
+    public function find_context(Orm\Model $item, $context)
     {
         $common_id_property = $this->_properties['common_id_property'];
         $common_id          = $item->get($common_id_property);
@@ -248,7 +250,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param array $filter if not empty, return only contexts specified
      * @return array(\Nos\Orm\Model)
      */
-    public function find_other_context(\Nos\Orm\Model $item, array $filter = array())
+    public function find_other_context(Orm\Model $item, array $filter = array())
     {
         $common_id_property = $this->_properties['common_id_property'];
         $common_id          = $item->get($common_id_property);
@@ -270,7 +272,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param array $filter if not empty, return only contexts specified
      * @return array
      */
-    public function get_all_context(\Nos\Orm\Model $item, array $filter = array())
+    public function get_all_context(Orm\Model $item, array $filter = array())
     {
         $all = array();
         foreach ($item->find_context($filter) as $item) {
@@ -288,7 +290,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param array $filter if not empty, return only contexts specified
      * @return array
      */
-    public function get_other_context(\Nos\Orm\Model $item, array $filter = array())
+    public function get_other_context(Orm\Model $item, array $filter = array())
     {
         $other = array();
         foreach ($item->find_other_context($filter) as $item) {
@@ -299,6 +301,29 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         return $other;
     }
 
+    /**
+     * Returns all possible contexts for this object, depend of his parent.
+     *
+     * @param \Nos\Orm\Model $item
+     * @return array
+     */
+    public function get_possible_context(Orm\Model $item)
+    {
+        $class = $this->_class;
+        $tree = $class::behaviours('Nos\Orm_Behaviour_Tree');
+
+        if (!$tree) {
+            return array_keys(\Nos\Tools_Context::contexts());
+        }
+
+        // Return contexts from parent if available
+        $parent = $item->get_parent();
+        if (!empty($parent)) {
+            return $parent->get_all_context();
+        }
+
+        return array_keys(\Nos\Tools_Context::contexts());
+    }
     /**
      * Returns all available contexts for the requested items
      *
@@ -359,5 +384,76 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
             $options['where'] = $where;
         }
+    }
+
+    public function gridQuery($config, &$query)
+    {
+        parent::gridQuery($config, $query);
+
+        $this->_itemsKeys = array();
+        $this->_commonIds = array();
+    }
+
+    public function gridItem($object, &$item)
+    {
+        parent::gridItem($object, $item);
+
+        $common_id = $object->{$this->_properties['common_id_property']};
+        $this->_itemsKeys[] = $common_id;
+        $this->_commonIds[$this->_properties['common_id_property']][] = $common_id;
+    }
+
+    public function gridAfter($config, &$items)
+    {
+        $class = $this->_class;
+
+        $contexts = $class::contexts($this->_commonIds);
+        foreach ($contexts as $common_id => $list) {
+            $contexts[$common_id] = explode(',', $list);
+        }
+        foreach ($this->_itemsKeys as $key => $common_id) {
+            $items[$key]['context'] = $contexts[$common_id];
+        }
+
+        $sites_count = count(Tools_Context::sites());
+        $locales_count = count(Tools_Context::locales());
+        $global_contexts = array_keys(Tools_Context::contexts());
+        foreach ($items as &$item) {
+            $flags = '';
+            $contexts = $item['context'];
+
+            $site = false;
+            foreach ($global_contexts as $context) {
+                if (is_array($config['context']) && !in_array($context, $config['context'])) {
+                    continue;
+                }
+                $site_params = Tools_Context::site($context);
+                // When the site change
+                if ($sites_count > 1 && $site !== $site_params['alias']) {
+                    $site = $site_params['alias'];
+                    $in = false;
+                    // Check if the any context of the item exists in the site
+                    foreach ($contexts as $temp_context) {
+                        if (Tools_Context::siteCode($temp_context) === $site_params['code']) {
+                            $in = true;
+                            break;
+                        }
+                    }
+                    $flags .= (empty($flags) ? '' : '&nbsp;&nbsp;&nbsp;').'<span style="'.(!$in ? 'visibility:hidden;' : '').'vertical-align:middle;" title="'.htmlspecialchars($site_params['title']).'">'.$site_params['alias'].'</span> ';
+
+                }
+                if ($locales_count > 1) {
+                    if (in_array($context, $contexts)) {
+                        $flags .= ' '.\Nos\Tools_Context::flag($context);
+                    } else {
+                        $flags .= ' <span style="display:inline-block; width:16px;"></span>';
+                    }
+                }
+            }
+            $item['context'] = $flags;
+        }
+
+        $this->_itemsKeys = array();
+        $this->_commonIds = array();
     }
 }

@@ -204,12 +204,10 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_observers = array(
         'Orm\\Observer_Self',
         'Orm\Observer_CreatedAt' => array(
-            'events' => array('before_insert'),
             'mysql_timestamp' => true,
             'property'=>'page_created_at'
         ),
         'Orm\Observer_UpdatedAt' => array(
-            'events' => array('before_save'),
             'mysql_timestamp' => true,
             'property'=>'page_updated_at'
         ),
@@ -217,26 +215,22 @@ class Model_Page extends \Nos\Orm\Model
 
     protected static $_behaviours = array(
         'Nos\Orm_Behaviour_Twinnable' => array(
-            'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'change_parent'),
             'context_property'      => 'page_context',
             'common_id_property' => 'page_context_common_id',
             'is_main_property' => 'page_context_is_main',
             'invariant_fields'   => array(),
         ),
         'Nos\Orm_Behaviour_Tree' => array(
-            'events' => array('before_query', 'before_delete'),
             'parent_relation' => 'parent',
             'children_relation' => 'children',
             'level_property' => 'page_level',
         ),
         'Nos\Orm_Behaviour_Virtualpath' => array(
-            'events' => array('before_save', 'after_save', 'check_change_parent'),
             'virtual_name_property' => 'page_virtual_name',
             'virtual_path_property' => 'page_virtual_url',
             'extension_property' => '.html',
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
-            'events' => array('before_insert', 'before_save', 'after_save'),
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(

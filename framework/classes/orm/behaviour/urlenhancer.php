@@ -17,7 +17,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      */
     protected $_properties = array();
 
-    public function dataset(&$dataset)
+    public function dataset(Orm\Model $item, &$dataset)
     {
         if (!isset($dataset['preview_url'])) {
             $dataset['preview_url'] = array($this, 'preview_url');

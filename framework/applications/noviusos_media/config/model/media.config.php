@@ -11,7 +11,6 @@
 return array(
     'behaviours'  => array(
         'Nos\Orm_Behaviour_Virtualpath' => array(
-            'events' => array('before_save', 'after_save', 'change_parent'),
             'virtual_name_property' => 'media_file',
             'virtual_path_property' => 'media_path',
             'parent_relation' => 'folder',
