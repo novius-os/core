@@ -476,7 +476,7 @@ class Model extends \Orm\Model
 
     public static function query($options = array())
     {
-        static::_behaviours('before_query', array(&$options));
+        static::eventStatic('before_query', array(&$options));
 
         return parent::query($options);
     }
