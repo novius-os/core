@@ -134,7 +134,8 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         ), false);
     }
 
-    protected static function processValue($value) {
+    protected static function processValue($value)
+    {
         if ($value && $value!='0000-00-00 00:00:00') {
             return \Date::create_from_string($value, 'mysql')->format('%Y-%m-%d %H:%M:%S');
         } else {
