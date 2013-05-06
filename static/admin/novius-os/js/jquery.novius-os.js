@@ -779,7 +779,7 @@ define('jquery-nos',
             nosFormUI : function() {
                 var $context = this;
 
-                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").filter(':not(.notransform)').wijtextbox();
+                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],:input[type='number'],textarea").filter(':not(.notransform)').wijtextbox();
                 $context.find(":input[type='submit'],button").filter(':not(.notransform)').each(function() {
                     var data = $(this).data(),
                         options = $.extend(true, {

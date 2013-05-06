@@ -5,13 +5,13 @@
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
-* 
+*
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
 * http://www.wijmo.com/license
 *
 * * Wijmo TextBoxDecorator widget.
-* 
+*
 * Depends:
 *  jquery-1.4.2.js
 *	jquery.ui.core.js
@@ -26,10 +26,12 @@
 		_create: function () {
 			var self = this, e = self.element,
 				allowedNodes = { 'input': true, 'textarea': true },
-				allowedInputTypes = { 'text': true, 'password': true, 
-					'email': true, 'url': true },
+				allowedInputTypes = { 'text': true, 'password': true,
+                    // Novius OS Fixed : add type= number in allowed types
+                    'number': true,
+                    'email': true, 'url': true },
 				nodeName = e.get(0).nodeName.toLowerCase();
-			
+
 			// enable touch support:
 			if (window.wijmoApplyWijTouchUtilEvents) {
 				$ = window.wijmoApplyWijTouchUtilEvents($);
@@ -58,7 +60,7 @@
 			}).bind("blur." + self.widgetName, function () {
 				e.removeClass("ui-state-focus");
 			});
-			
+
 			//for case 20899
 			if (e.is(":disabled")) {
 				self._setOption("disabled", true);
@@ -69,7 +71,7 @@
 			}
 		},
 		destroy: function () {
-			/// Remove the functionality completely. 
+			/// Remove the functionality completely.
 			/// This will return the element back to its pre-init state.
 			var self = this;
 			self.element.removeClass("ui-widget ui-state-default ui-corner-all " +
