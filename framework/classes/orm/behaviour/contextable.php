@@ -87,7 +87,11 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
 
     public function gridItem($object, &$item)
     {
-        $item['context'] = Tools_Context::contextLabel($object->{$this->_properties['context_property']}, array('short' => true));
+        $class = $this->_class;
+        $twinnable = $class::behaviours('Nos\Orm_Behaviour_Twinnable');
+        if ($twinnable) {
+            $item['context'] = Tools_Context::contextLabel($object->{$this->_properties['context_property']}, array('short' => true));
+        }
     }
 
     public function before_query(&$options)

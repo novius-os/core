@@ -24,9 +24,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     protected $_properties = array();
 
-    protected $_itemsKeys = array();
-    protected $_commonIds = array();
-
     /**
      * Fill in the context_common_id and context properties when creating the object
      *
@@ -386,32 +383,21 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
     }
 
-    public function gridQuery($config, &$query)
+    public function gridAfter($config, $objects, &$items)
     {
-        parent::gridQuery($config, $query);
+        foreach ($objects as $object) {
+            $common_id = $object->{$this->_properties['common_id_property']};
+            $itemsKeys[] = $common_id;
+            $commonIds[$this->_properties['common_id_property']][] = $common_id;
+        }
 
-        $this->_itemsKeys = array();
-        $this->_commonIds = array();
-    }
-
-    public function gridItem($object, &$item)
-    {
-        parent::gridItem($object, $item);
-
-        $common_id = $object->{$this->_properties['common_id_property']};
-        $this->_itemsKeys[] = $common_id;
-        $this->_commonIds[$this->_properties['common_id_property']][] = $common_id;
-    }
-
-    public function gridAfter($config, &$items)
-    {
         $class = $this->_class;
 
-        $contexts = $class::contexts($this->_commonIds);
+        $contexts = $class::contexts($commonIds);
         foreach ($contexts as $common_id => $list) {
             $contexts[$common_id] = explode(',', $list);
         }
-        foreach ($this->_itemsKeys as $key => $common_id) {
+        foreach ($itemsKeys as $key => $common_id) {
             $items[$key]['context'] = $contexts[$common_id];
         }
 
@@ -453,7 +439,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $item['context'] = $flags;
         }
 
-        $this->_itemsKeys = array();
-        $this->_commonIds = array();
+        $commonIds = array();
     }
 }

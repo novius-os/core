@@ -244,7 +244,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $items[] = $item;
             }
 
-            $model::eventStatic('gridAfter', array($config, &$items));
+            $model::eventStatic('gridAfter', array($config, $objects, &$items));
         }
 
         return array(
