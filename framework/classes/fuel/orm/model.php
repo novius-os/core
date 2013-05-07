@@ -129,44 +129,41 @@ class Model extends \Orm\Model
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
 
-        if ($init && !$from_db) {
-            return static::$_properties_cached[$class];
-        }
-
-        if (property_exists($class, '_properties')) {
-            parent::properties();
-        }
-
-        $config = static::_config();
-        if (!empty($config) && !empty($config['properties'])) {
-            static::$_properties_cached[$class] = \Arr::merge(
-                static::$_properties_cached[$class],
-                $config['properties']
-            );
-        }
-
-        if ($from_db || empty(static::$_properties_cached[$class])) {
+        if (!$init || $from_db) {
+            $cache_enabled = \Config::get('novius-os.cache_model_properties', false);
             try {
-                if ($from_db) {
+                if ($from_db || !$cache_enabled) {
+                    if ($init) {
+                        unset(static::$_properties_cached[$class]);
+                    }
                     throw new \CacheNotFoundException();
                 }
-                $list_columns = \Cache::get('list_columns.'.static::table());
+
+                static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
             } catch (\CacheNotFoundException $e) {
-                try {
-                    $list_columns = \DB::list_columns(static::table(), null, static::connection());
-                    \Cache::set('list_columns.'.static::table(), $list_columns);
-                } catch (\Exception $e) {
-                    throw new \FuelException('Listing columns failed, you have to set the model properties with a '.
-                        'static $_properties setting in the model. Original exception: '.$e->getMessage());
+                parent::properties();
+
+                $config = static::_config();
+                if (!empty($config) && !empty($config['properties'])) {
+                    static::$_properties_cached[$class] = \Arr::merge(
+                        static::$_properties_cached[$class],
+                        $config['properties']
+                    );
                 }
-            }
-            if (empty(static::$_properties_cached[$class])) {
-                static::$_properties_cached[$class] = $list_columns;
-            } else {
-                static::$_properties_cached[$class] = \Arr::merge(
-                    $list_columns,
-                    static::$_properties_cached[$class]
-                );
+
+                if ($cache_enabled) {
+                    if (property_exists($class, '_properties')) {
+                        try {
+                            static::$_properties_cached[$class] = \Arr::merge(
+                                \DB::list_columns(static::table(), null, static::connection()),
+                                static::$_properties_cached[$class]
+                            );
+                        } catch (\Exception $e) {
+                        }
+                    }
+
+                    \Cache::set('model_properties.'.str_replace('\\', '_', $class), static::$_properties_cached[$class]);
+                }
             }
         }
 
