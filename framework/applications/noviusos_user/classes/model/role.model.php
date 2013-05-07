@@ -62,6 +62,10 @@ class Model_Role extends \Nos\Orm\Model
         ),
     );
 
+    protected static $_observers = array(
+        'Orm\\Observer_Self',
+    );
+
     public function _event_before_delete()
     {
         // @todo delete this method when upgrading the ORM to 1.6
@@ -71,6 +75,11 @@ class Model_Role extends \Nos\Orm\Model
             $permission->delete();
         }
         unset($this->permissions);
+    }
+
+    public function _event_after_save()
+    {
+        \Cache::delete('role_permissions.'.$this->role_id);
     }
 
     /**

@@ -39,4 +39,18 @@ class Model_Permission extends \Nos\Orm\Model
             'null' => false,
         ),
     );
+
+    protected static $_observers = array(
+        'Orm\\Observer_Self',
+    );
+
+    public function _event_before_delete()
+    {
+        \Cache::delete('role_permissions.'.$this->perm_role_id);
+    }
+
+    public function _event_after_save()
+    {
+        \Cache::delete('role_permissions.'.$this->perm_role_id);
+    }
 }

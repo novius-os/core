@@ -39,7 +39,6 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
         if (empty($role)) {
             $this->send_error(new \Exception($this->config['i18n']['notification item not found']));
         }
-        \Cache::delete('role_permissions.'.$role_id);
 
         $db = $role->permissions;
 
