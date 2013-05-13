@@ -36,6 +36,9 @@ define('jquery-ui.effects.fade');
 
 define('jquery-ui.datepicker.i18n');
 
+define('wijmo.widget');
+define('wijmo.data');
+define('wijmo.data.wijdatasource');
 define('wijmo.wijtextselection');
 define('wijmo.wijutil');
 define('wijmo.wijinputcore');
