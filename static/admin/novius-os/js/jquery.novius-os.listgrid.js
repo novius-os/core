@@ -16,12 +16,6 @@ define('jquery-nos-listgrid',
                 loadingText : 'Loading...'
             },
 
-            _create: function() {
-                var self = this;
-
-                $.wijmo.wijgrid.prototype._create.call(self);
-            },
-
             _init: function() {
                 var self = this,
                     o = self.options;
@@ -54,7 +48,7 @@ define('jquery-nos-listgrid',
                     }
                 };
 
-                $.wijmo.wijgrid.prototype._init.call(self);
+                self._super();
             }
         });
         return $;
