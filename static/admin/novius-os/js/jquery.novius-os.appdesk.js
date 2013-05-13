@@ -1533,6 +1533,20 @@ define('jquery-nos-appdesk',
                                 }
                             },
 
+                            myHtmlspecialcharsParser = {
+                                parseDOM: function (value, culture, format, nullString) {
+                                    return this.parse(value.innerHTML, culture, format, nullString);
+                                },
+                                parse: function (value, culture, format, nullString) {
+                                    if (value === null) return nullString;
+                                    return (value + '').replace(/&lt;/g, '<');
+                                },
+                                toStr: function (value, culture, format, nullString) {
+                                    if (value === null) return nullString;
+                                    return (value + '').replace(/</g, '&lt;');
+                                }
+                            },
+
                             recursive = function(object) {
                                 $.each(object, function(key, val) {
                                     var i, nosContext,
@@ -1698,6 +1712,11 @@ define('jquery-nos-appdesk',
                                                         }
                                                     });
                                                 })();
+                                            }
+
+                                            // Add a default htmlspecialchars dataParser
+                                            if (!object[key][i].dataParser && !object[key][i].isSafeHtml && !object[key][i].dataType) {
+                                                object[key][i].dataParser = myHtmlspecialcharsParser;
                                             }
                                         }
                                     }

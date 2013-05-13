@@ -89,7 +89,7 @@ class Config_Common
             $actions_template,
             'delete.action.dialog.title',
             strtr($config['i18n']['deleting item title'], array(
-                '{{title}}' => '{{_title}}',
+                '{{title}}' => '{{htmlspecialchars:_title}}',
             ))
         );
 
