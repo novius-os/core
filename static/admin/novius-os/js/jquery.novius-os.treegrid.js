@@ -289,7 +289,7 @@ define('jquery-nos-treegrid',
                 if (self.mousePressed && (new Date().getTime() - self.mousePressed) > 500) {
                     if (!self._scroller) {
                         self._scroller = {
-                            superpanel : self._view()._scroller.data('wijsuperpanel')
+                            superpanel : self._view()._scroller.data('wijmo-wijsuperpanel')
                         };
                         var contentElement = self._scroller.superpanel.getContentElement(),
                             contentWrapper = contentElement.parent(),
