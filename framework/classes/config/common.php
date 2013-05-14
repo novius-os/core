@@ -25,6 +25,8 @@ class Config_Common
             $config['actions']['order'] = array();
         }
 
+        $model::eventStatic('common', array(&$config));
+
         static::process_actions($application_name, $model, $config);
 
         if (!isset($config['data_mapping'])) {
@@ -83,6 +85,7 @@ class Config_Common
         \Nos\I18n::current_dictionary(array('nos::application', 'nos::common'));
 
         $common_config = \Config::load('common', true);
+
         $actions_template = $common_config['actions'];
 
         \Arr::set(
