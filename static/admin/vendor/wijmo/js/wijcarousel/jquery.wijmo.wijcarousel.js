@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -804,7 +804,7 @@ var wijmo;
         };
         WijCarousel.prototype.destroy = function () {
             /// <summary>
-            /// Destroys this widget.
+            /// Removes the wijcarousel functionality completely. This returns the element to its pre-init state.
             /// </summary>
             this._wijdestroy();
             $.Widget.prototype.destroy.apply(this);
@@ -852,7 +852,7 @@ var wijmo;
         };
         WijCarousel.prototype.refresh = function () {
             /// <summary>
-            /// Refresh the carousel.
+            /// Refresh the carousel layout.
             /// Reset the layout, scrolled
             /// </summary>
                         var self = this, o = self.options, el = self.element;
@@ -865,7 +865,7 @@ var wijmo;
         };
         WijCarousel.prototype.play = function () {
             /// <summary>
-            /// Start displaying the images in order automatically.
+            /// Starts automatically displaying each of the images in order.
             /// </summary>
                         var self = this, o = self.options;
             if(self.isPlaying || o.disabled) {
@@ -896,7 +896,7 @@ var wijmo;
         };
         WijCarousel.prototype.pause = function () {
             /// <summary>
-            /// Stop displaying the images in order automatically.
+            /// Stops automatically displaying the images in order.
             /// </summary>
                         var self = this, o = self.options;
             if(o.showTimer && self.progressBar) {
@@ -915,7 +915,7 @@ var wijmo;
         };
         WijCarousel.prototype.next = function () {
             /// <summary>
-            /// Show the next picture.
+            /// Shows the next picture.
             /// </summary>
                         var self = this, step = self.options.step;
             if(typeof step !== "number" || step < 1) {
@@ -926,7 +926,7 @@ var wijmo;
         };
         WijCarousel.prototype.previous = function () {
             /// <summary>
-            /// Show the previous picture.
+            /// Shows the previous picture.
             /// </summary>
                         var self = this, step = self.options.step;
             if(typeof step !== "number" || step < 1) {
@@ -937,7 +937,11 @@ var wijmo;
         };
         WijCarousel.prototype.scrollTo = function (idx) {
             /// <summary>
-            /// Scroll to the specified index of picture.
+            /// Scrolls to the picture at the specified index.
+            /// Parameter:
+            /// index(number) - The zero - based index of the picture to which to scroll.
+            /// Code Example:
+            /// $("#element").wijcarousel("scrollTo", index);
             /// </summary>
                         var self = this, forward, step;
             self._stopAnimation();

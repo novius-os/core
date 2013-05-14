@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -2863,7 +2863,7 @@ var wijmo;
                 //$.wijraphael.addClass($(icon.node),
                 //o.wijCSS.legendIcon + " " + o.wijCSS.legend);
                 //self.legendIcons[idx] = icon;
-                icon = self._paintLegendIcon(x, iconY, iconWidth, iconHeight, chtStyle, $(leg0.node).data("legendIndex"), $(leg0.node).data("index"), o.wijCSS.legendIcon + " " + o.wijCSS.legend, legendSeries[$(leg0.node).data("index")], leg0);
+                icon = self._paintLegendIcon(x, iconY, iconWidth, iconHeight, chtStyle, $(leg0.node).data("legendIndex"), $(leg0.node).data("index"), o.wijCSS.legendIcon + " " + o.wijCSS.legend, legendSeries[$(leg0.node).data("legendIndex")], leg0);
                 if($(leg0.node).data("hidden") === true) {
                     $(leg0.node).data("iconOpacity", icon.attr("opacity") || 1);
                     icon.attr("opacity", 0.3);
@@ -5004,6 +5004,20 @@ var wijmo;
             if(!seriesList || seriesList.length === 0) {
                 return val;
             }
+            //handle the seriesList's xy data
+            $.each(seriesList, function (i, series) {
+                var data = series.data, vxs = [], vys = [], len, k = 0;
+                if(data.xy && $.isArray(data.xy)) {
+                    len = data.xy.length;
+                    while(k < len) {
+                        vxs.push(data.xy[k]);
+                        vys.push(data.xy[k + 1]);
+                        k += 2;
+                    }
+                    data.x = vxs;
+                    data.y = vys;
+                }
+            });
             if(self.seriesGroup) {
                 $.each(self.seriesGroup, function (key, seriesL) {
                     var valuesY = [], k = parseInt(key, 10);
@@ -5409,15 +5423,13 @@ var wijmo;
         // / data: {
         // / x: [1, 2, 3, 4, 5],
         // / y: [12, 21, 9, 29, 30]
-        // / },
-        // / offset: 0
+        // / }
         // / }, {
         // / label: "Q2",
         // / legendEntry: true,
         // / data: {
         // / xy: [1, 21, 2, 10, 3, 19, 4, 31, 5, 20]
-        // / },
-        // / offset: 0
+        // / }
         // / }]
         // / OR
         // / seriesList: [{
@@ -5426,8 +5438,7 @@ var wijmo;
         // / data: {
         // / x: ["A", "B", "C", "D", "E"],
         // / y: [12, 21, 9, 29, 30]
-        // / },
-        // / offset: 0
+        // / }
         // / }]
         // / OR
         // / seriesList: [{
@@ -5438,8 +5449,7 @@ var wijmo;
         // / new Date(1981, 0, 1), new Date(1982, 0, 1),
         // / new Date(1983, 0, 1)],
         // / y: [12, 21, 9, 29, 30]
-        // / },
-        // / offset: 0
+        // / }
         // / }]
         // / });
         // / </summary>

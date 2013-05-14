@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -79,7 +79,7 @@ var wijmo;
         };
         wijaccordion.prototype._handleHeaderChange = function (newHeaderSelector, prevHeaderSelector) {
             var prevHeaders = this.element.find(prevHeaderSelector);
-            prevHeaders.removeClass("wijmo-wijaccordion-header ui-helper-reset " + this.options.wijCSS.stateActive + " " + this._triangleIconOpened).siblings(".wijmo-wijaccordion-content").removeClass("wijmo-wijaccordion-content ui-helper-reset " + this.options.wijCSS.content + " wijmo-wijaccordion-content-active");
+            prevHeaders.removeClass("wijmo-wijaccordion-header " + this.options.wijCSS.stateActive + " " + this._triangleIconOpened).siblings(".wijmo-wijaccordion-content").removeClass("wijmo-wijaccordion-content " + this.options.wijCSS.content + " wijmo-wijaccordion-content-active");
             this._initHeaders(newHeaderSelector);
         };
         wijaccordion.prototype._initHeaders = function (selector) {
@@ -93,7 +93,7 @@ var wijmo;
                 header.remove();
                 header.insertAfter(content);
             }
-            header.addClass("wijmo-wijaccordion-header ui-helper-reset").attr("role", "tab");
+            header.addClass("wijmo-wijaccordion-header").attr("role", "tab");
             content.attr("role", "tabpanel");
             if(header.find("> a").length === 0) {
                 header.wrapInner('<a href="#"></a>');
@@ -114,7 +114,7 @@ var wijmo;
                 }).find("> .ui-icon").addClass(this._triangleIconClosed);
                 content.hide();
             }
-            content.addClass("wijmo-wijaccordion-content ui-helper-reset " + this.options.wijCSS.content);
+            content.addClass("wijmo-wijaccordion-content " + this.options.wijCSS.content);
         };
         wijaccordion.prototype._create = function () {
             var o = this.options;
@@ -122,7 +122,7 @@ var wijmo;
             if(window.wijmoApplyWijTouchUtilEvents) {
                 $ = window.wijmoApplyWijTouchUtilEvents($);
             }
-            this.element.addClass("wijmo-wijaccordion " + o.wijCSS.widget + " wijmo-wijaccordion-icons " + "ui-helper-reset ui-helper-clearfix");
+            this.element.addClass("wijmo-wijaccordion " + o.wijCSS.widget + " wijmo-wijaccordion-icons " + "ui-helper-clearfix");
             if(o.disabled) {
                 this.element.addClass(o.wijCSS.stateDisabled);
             }
@@ -138,7 +138,7 @@ var wijmo;
         wijaccordion.prototype.destroy = function () {
             var o = this.options;
             this._unbindLiveEvents();
-            this.element.removeClass("wijmo-wijaccordion " + o.wijCSS.widget + " ui-helper-reset wijmo-wijaccordion-icons").removeAttr("role");
+            this.element.removeClass("wijmo-wijaccordion " + o.wijCSS.widget + " wijmo-wijaccordion-icons").removeAttr("role");
             $.wijmo.widget.prototype.destroy.apply(this, arguments);
         };
         wijaccordion.prototype._getHeaders = function () {
@@ -158,10 +158,12 @@ var wijmo;
             return $(headersArr);
         };
         wijaccordion.prototype.activate = /// <summary>
-        /// Activates the accordion content pane by its index.
+        /// Activates the accordion content pane at the specified index.
+        ///You can use code like in the example below inside your document ready function
+        /// to activate the specified pane using the click event of a button.
         /// </summary>
         /// <param name="index" type="Number">
-        ///	Index of the accordion pane to be activated.
+        ///	The zero-based index of the accordion pane to activate.
         ///	</param>
         function (index) {
             var nextHeader, o = this.options, headers = this._getHeaders(), prevHeader, rightToLeft = this.element.data("rightToLeft"), newIndex, prevIndex, nextContent, prevContent, animOptions, proxied, proxiedDuration, animations, duration, easing;
@@ -440,18 +442,20 @@ var wijmo;
         /// </summary>
         ":jqmData(role='wijaccordion')",
         animated: /// <summary>
-        /// Sets the animation easing effect. Set this option to false in order to
-        ///	disable animation. Easing effects require UI Effects Core.
+        /// Sets the animation easing effect that users experience when they switch
+        /// between panes. Set this option to false in order to disable easing. This
+        /// results in a plain, abrupt shift from one pane to the next. You can also
+        /// create custom easing animations using jQuery UI Easings.
         /// Options available for the animation function include:
-        ///  down Ð²Ð‚â€œ If true, indicates that the index of the pane should be expanded
+        ///  down - If true, indicates that the index of the pane should be expanded
         ///			higher than the index of the pane that must be collapsed.
-        ///  horizontal Ð²Ð‚â€œ If true, indicates that the accordion have a horizontal
+        ///  horizontal - If true, indicates that the accordion have a horizontal
         ///			orientation (when the expandDirection is left or right).
-        ///  rightToLeft Ð²Ð‚â€œ If true, indicates that the content element is located
+        ///  rightToLeft - If true, indicates that the content element is located
         ///			before the header element (top and left expand direction).
-        ///  toShow Ð²Ð‚â€œ jQuery object that contains the content element(s) should be
+        ///  toShow - jQuery object that contains the content element(s) should be
         ///			shown.
-        ///  toHide Ð²Ð‚â€œjQuery object that contains the content element(s) should be
+        ///  toHide - jQuery object that contains the content element(s) should be
         ///			hidden.
         /// Type: String
         /// Default: "slide"
@@ -470,8 +474,8 @@ var wijmo;
         /// </summary>
         'slide',
         duration: /// <summary>
-        /// The animation duration in milliseconds. By default animation duration
-        ///	value depends on an animation effect specified by the animation option.
+        /// The animation duration in milliseconds. By default, the animation duration value
+        /// depends on an animation effect specified by the animation option.
         /// Type: Number
         /// Default: null
         /// Code example:
@@ -481,7 +485,23 @@ var wijmo;
         /// </summary>
         null,
         event: /// <summary>
-        /// Determines the event that triggers the accordion.
+        /// Determines the event that triggers the accordion to change panes.
+        /// To select multiple events, separate them by a space. Supported events include:.
+        ///		focus -- The pane opens when you click its header.
+        ///		click (default) -- The pane opens when you click its header.
+        ///		dblclick -- The pane opens when you double-click its header.
+        ///		mousedown -- The pane opens when you press the mouse button over its header.
+        ///		mouseup -- The pane opens when you release the mouse button over its header.
+        ///		mousemove -- The pane opens when you move the mouse pointer into its header.
+        ///		mouseover -- The pane opens when you hover the mouse pointer over its header.
+        ///		mouseout -- The pane opens when the mouse pointer leaves its header.
+        ///		mouseenter -- The pane opens when the mouse pointer enters its header.
+        ///		mouseleave -- The pane opens when the mouse pointer leaves its header.
+        ///		select -- The pane opens when you select its header by clicking and then pressing Enter
+        ///		submit -- The pane opens when you select its header by clicking and then pressing Enter.
+        ///		keydown -- The pane opens when you select its header by clicking and then pressing any key.
+        ///		keypress -- The pane opens when you select its header by clicking and then pressing any key.
+        ///		keyup -- The pane opens when you select its header by clicking and then pressing and releasing any key.
         /// Type: String
         /// Default: "click"
         /// Code example:
@@ -491,7 +511,8 @@ var wijmo;
         /// </summary>
         "click",
         disabled: /// <summary>
-        /// Determines whether the widget behavior is disabled.
+        /// Determines whether the widget behavior is disabled. If set to true, the
+        /// control appears dimmed and does not respond when clicked.
         /// Type: Boolean
         /// Default: false
         /// Code example:
@@ -499,8 +520,8 @@ var wijmo;
         /// </summary>
         false,
         expandDirection: /// <summary>
-        /// Determines the direction in which the content area expands. Available
-        ///	values include: top, right, bottom, and left.
+        /// Determines the direction in which the content area of the control expands.
+        /// Available values include: top, right, bottom, and left.
         /// Type: String
         /// Default: "bottom"
         /// Code example:
@@ -508,8 +529,9 @@ var wijmo;
         /// </summary>
         "bottom",
         header: /// <summary>
-        /// Selector for the header element. By using this option you can put
-        ///	header/content elements inside LI tags or into any other more complex
+        /// Determines the selector for the header element. Set this option to put header and
+        /// content elements inside the HTML tags of your choice.By default, the header is
+        /// the first child after an <LI> element, and the content is the second child
         ///	html markup.
         /// Type: String
         /// Default: "> li > :first-child,> :not(li):even"
@@ -517,8 +539,9 @@ var wijmo;
         /// </summary>
         "> li > :first-child,> :not(li):even",
         requireOpenedPane: /// <summary>
-        /// Determines whether clicking the header will close the currently opened
-        ///	pane (leaving all the accordion's panes closed).
+        /// Determines whether clicking a header closes the current pane before opening the new one.
+        /// Setting this value to false causes the headers to act as toggles for opening and
+        /// closing the panes, leaving all previously clicked panes open until you click them again.
         /// Type: Boolean
         /// Default: true
         /// Code example:
@@ -526,7 +549,9 @@ var wijmo;
         /// </summary>
         true,
         selectedIndex: /// <summary>
-        /// Gets or sets the index of the currently expanded accordion pane.
+        /// Gets or sets the zero-based index of the accordion pane to show expanded initially.
+        /// By default, the first pane is expanded. A setting of -1 specifies that no pane
+        /// is expanded initially, if you also set the requireOpenedPane option to false.
         /// Type: Number
         /// Default: 0
         /// Code example:

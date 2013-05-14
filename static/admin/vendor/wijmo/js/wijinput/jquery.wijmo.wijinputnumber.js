@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -112,11 +112,7 @@ var wijmo;
                 });
             }
         };
-        wijinputnumber.prototype.getValue = /// <summary>
-        /// Get the value
-        /// Code example
-        /// $("#element").wijinputnumber("getValue");
-        /// </summary>
+        wijinputnumber.prototype.getValue = /** Gets the value. */
         function () {
             var val = this._textProvider.getValue();
             if(val === undefined || val === null) {
@@ -124,11 +120,11 @@ var wijmo;
             }
             return val;
         };
-        wijinputnumber.prototype.setValue = /// <summary>
-        /// Sets the value.
-        /// Code example
-        /// $(".selector").wijinputnumber("setValue", 10, true)
-        /// </summary>
+        wijinputnumber.prototype.setValue = /** Sets the value.
+        * @remarks
+        * Code Example:
+        * <code>$(".selector").wijinputnumber("setValue", 10, true)</code>
+        */
         function (val, exact) {
             if (typeof exact === "undefined") { exact = false; }
             try  {
@@ -159,11 +155,7 @@ var wijmo;
                 return false;
             }
         };
-        wijinputnumber.prototype.isValueNull = /// <summary>
-        /// Determines whether the value is in null state
-        /// Code example
-        /// $(".selector").wijinputnumber("isValueNull")
-        /// </summary>
+        wijinputnumber.prototype.isValueNull = /** Determines whether the value is in null state. */
         function () {
             try  {
                 return (this._textProvider).isValueNull();
@@ -171,11 +163,11 @@ var wijmo;
                 return true;
             }
         };
-        wijinputnumber.prototype.getPostValue = /// <summary>
-        /// Gets the text value when the container form is posted back to server
-        /// Code example
-        /// $(".selector").wijinputnumber("getPostValue")
-        /// </summary>
+        wijinputnumber.prototype.getPostValue = /**
+        Gets the text value when the container form is posted back to the server.
+        Code Example:
+        $("#element").wijinputnumber("getPostValue");
+        */
         function () {
             if(!this._isInitialized()) {
                 return this.element.val();
@@ -259,98 +251,94 @@ var wijmo;
             this.wijCSS = {
                 wijinputnumber: wijmo.wijinputcore.prototype.options.wijCSS.wijinput + "-numeric"
             };
-            /// <summary>
-            /// Determines the type of the number input.
-            /// Possible values are: 'numeric', 'percent', 'currency'.
-            /// Type: String
-            /// Default: 'numeric'
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({type:¡¯currency¡¯});
-            /// </summary>
+            /** Determines the type of the number input.
+            * Possible values are: 'numeric', 'percent', 'currency'.
+            Type: String
+            Default: ¡®numeric¡¯
+            Code Example:
+            $(¡®.selector¡¯).wijinputnumber({type:¡¯currency¡¯});
+            */
             this.type = 'numeric';
-            /// <summary>
-            /// Determines the default numeric value.
-            /// Type: Number
-            /// Default: null
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({value: 100});
-            /// </summary>
+            /**
+            Determines the default numeric value.
+            Type: Number
+            Default: null
+            Code Example:
+            $(¡®.selector¡¯).wijinputnumber({value: 100});
+            */
             this.value = null;
-            /// <summary>
-            /// Determines the minimal value that can be entered for numeric/percent/currency inputs.
-            /// Type: Number
-            /// Default: -1000000000
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({minValue: -100});
-            /// </summary>
+            /**
+            Determines the minimal value that can be entered for numeric/percent/currency inputs.
+            Type: Number
+            Default: -1000000000
+            Code Example:
+            $(¡®.selector¡¯).wijinputnumber({minValue: -100});
+            */
             this.minValue = -1000000000;
-            /// <summary>
-            /// Determines the maximum value that can be entered for numeric/percent/currency inputs.
-            /// Type: Number
-            /// Default: 1000000000
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({maxValue: 100});
-            /// </summary>
+            /**
+            Determines the maximum value that can be entered for numeric/percent/currency inputs.
+            Type: Number
+            Default: 1000000000
+            Code Example:
+            $(¡®.selector¡¯).wijinputnumber({maxValue: 100});
+            */
             this.maxValue = 1000000000;
-            /// <summary>
-            /// Indicates whether the thousands group separator will be inserted between each
-            /// digital group. The number of digits in the thousands group depends on the
-            /// selected Culture.
-            /// Type: Boolean
-            /// Default: false
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({showGroup: true});
-            /// </summary>
+            /**
+            Indicates whether the thousands group separator will be inserted between each
+            digital group. The number of digits in the thousands group depends on the selected
+            Culture.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputnumber({showGroup: true});
+            */
             this.showGroup = false;
-            /// <summary>
-            /// Indicates the number of decimal places to display.
-            /// Possible values are integers from -2 to 8. They are:
-            ///		useDefault: -2,
-            ///		asIs: -1,
-            ///		zero: 0,
-            ///		one: 1,
-            ///		two: 2,
-            ///		three: 3,
-            ///		four: 4,
-            ///		five: 5,
-            ///		six: 6,
-            ///		seven: 7,
-            ///		eight: 8
-            /// Type: Number
-            /// Default: 2
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({decimalPlaces: 3});
-            /// </summary>
+            /**
+            Indicates the number of decimal places to display.
+            @remarks
+            Possible values are integers from -2 to 8. They are:
+            useDefault: -2,
+            asIs: -1,
+            zero: 0,
+            one: 1,
+            two: 2,
+            three: 3,
+            four: 4,
+            five: 5,
+            six: 6,
+            seven: 7,
+            eight: 8
+            Type: Number
+            Default: 2
+            */
             this.decimalPlaces = 2;
-            /// <summary>
-            /// Determines how much to increase/decrease the value for numeric/percent/currency inputs.
-            /// Type: Number
-            /// Default: 1
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({increment: 10});
-            /// </summary>
+            /**
+            Determines how much to increase/decrease the value for numeric/percent/currency inputs.
+            Type: Number
+            Default: 1
+            Code Example:
+            $(¡®.selector¡¯).wijinputnumber({increment: 10});
+            */
             this.increment = 1;
-            /// <summary>
-            /// The valueChanged event handler. A function called when the value of the input is changed.
-            /// Parameters:
-            ///		e: The jQuery.Event object.
-            ///		args.value: This is the new value.
-            /// Type: Function
-            /// Default: null
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({valueChanged: function(e, arg){}});
-            /// </summary>
+            /**
+            The valueChanged event handler.
+            * A function called when the value of the input is changed.
+            Type: Function
+            Default: Null
+            * @event
+            * @dataKey value The new value
+            Code Example::
+            $(¡®.selector¡¯).wijinputnumber({valueChanged: function(e, arg){}});
+            */
             this.valueChanged = null;
-            /// <summary>
-            /// The valueBoundsExceeded event handler. A function called when the value of the input
-            /// exceeds the valid range.
-            /// Parameters:
-            ///		e: The jQuery.Event object.
-            /// Type: Function
-            /// Default: null
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputnumber({valueBoundsExceeded: function(e){}});
-            /// </summary>
+            /**
+            The valueBoundsExceeded event handler. A function called when the value of the
+            input exceeds the valid range.
+            * @event
+            @param e The jQuery.Event object.
+            Code Example::
+            $(¡®.selector¡¯).wijinputnumber({valueBoundsExceeded: function(e){}});
+            */
             this.valueBoundsExceeded = null;
         }
         return wijinputnumber_options;

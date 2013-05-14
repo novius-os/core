@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -405,11 +405,11 @@ var wijmo;
         wijprogressbar.prototype.options = $.extend(true, {
         }, $.ui.progressbar.prototype.options, {
             labelAlign: /// <summary>
-            ///The label's alignment on the progress bar. The value should be "east",
+            /// The label's alignment on the progress bar. The value should be "east",
             /// "west", "center", "north", "south" or "running".
-            ///Default:"center".
-            ///Type:String.
-            ///Code sample:$('.selector').wijprogressbar('option','labelAlign','center').
+            /// Default:"center".
+            /// Type:String.
+            /// Code sample:$('.selector').wijprogressbar('option','labelAlign','center').
             ///</summary>
             "center",
             maxValue: /// <summary>
@@ -477,7 +477,7 @@ var wijmo;
             ///'indicatorIncrement',10).
             1,
             indicatorImage: /// <summary>
-            ///The Image's url of the indicator.
+            ///The Url of the image's indicator.
             ///Default:"".
             ///Type:String.
             ///Code sample:$('.selector').wijprogressbar('option','indicatorImage',
@@ -485,7 +485,7 @@ var wijmo;
             ///</summary>
             "",
             animationDelay: /// <summary>
-            ///The delay of the progressbar's animation.
+            ///Gets or sets the delay time of the progress bar's animation in milliseconds. The default value of this option is "0".
             ///Default:0.
             ///Type:Number.
             ///Code sample:$('.selector').wijprogressbar('option',
@@ -504,7 +504,7 @@ var wijmo;
                 duration: 500
             },
             progressChanging: /// <summary>
-            /// Fire upon running the progress.
+            /// Fire upon running the progress. The parameter is an object: {oldValue:xxx,newValue:xxx}. Returning "false" will stop the progress.
             /// Default: null.
             /// Type: Function
             /// Code example: $(".selector").wijprogressbar("progressChanging",
@@ -522,7 +522,7 @@ var wijmo;
             /// </returns>
             null,
             beforeProgressChanging: /// <summary>
-            /// Fires before running the progress.
+            /// Fires before running the progress. The parameters are an object: {oldValue:xxx,newValue:xxx}. Returning "false" prevents the running progress.
             /// Default: null.
             /// Type: Function
             /// Code example: $(".selector").wijprogressbar("beforeProgressChanging",
@@ -540,7 +540,7 @@ var wijmo;
             /// </returns>
             null,
             progressChanged: /// <summary>
-            /// Fires when the progress changes.
+            /// Fires when the progress changes. The parameter is an object: {oldValue:xxx,newValue:xxx}.
             /// Default: null.
             /// Type: Function
             /// Code example: $(".selector").wijprogressbar("progressChanged",

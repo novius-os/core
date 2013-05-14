@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -81,14 +81,14 @@ var wijmo;
             }
             // do not call base c1headercontentcontrol _create method here since we don't
             // want to place c1headercontentcontrol classes on the widget element
-            this.element.addClass("wijmo-wijexpander ui-expander " + o.wijCSS.widget + " ui-helper-reset ui-expander-icons");
+            this.element.addClass("wijmo-wijexpander ui-expander " + o.wijCSS.widget + " ui-expander-icons");
             header = $(elems[0]);
             content = $(elems[1]);
             if(o.expandDirection === "left" || o.expandDirection === "top") {
                 header.remove();
                 header.insertAfter(content);
             }
-            header.addClass("ui-expander-header ui-helper-reset");
+            header.addClass("ui-expander-header");
             // ARIA
             header.attr("role", "tab");
             content.attr("role", "tabpanel");
@@ -100,7 +100,7 @@ var wijmo;
             if(header.find("> .ui-icon").length === 0) {
                 $('<span class="ui-icon"></span>').insertBefore($("> a", header)[0]);
             }
-            content.addClass("ui-expander-content ui-helper-reset " + o.wijCSS.content);
+            content.addClass("ui-expander-content " + o.wijCSS.content);
         };
         wijexpander.prototype._init = // widget initialization:
         function () {
@@ -236,7 +236,7 @@ var wijmo;
         };
         wijexpander.prototype.collapse = /** public methods */
         /// <summary>
-        /// Collapse content panel.
+        /// Collapses the content panel.
         /// Code Example: $("#element").wijexpander("collapse");
         ///</summary>
         function () {
@@ -294,7 +294,7 @@ var wijmo;
             return true;
         };
         wijexpander.prototype.expand = /// <summary>
-        /// Expand content panel.
+        /// Expands the content panel.
         /// Code Example: $("#element").wijexpander("expand");
         ///</summary>
         function () {

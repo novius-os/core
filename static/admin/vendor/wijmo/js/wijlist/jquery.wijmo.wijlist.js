@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -865,11 +865,11 @@ var wijmo;
                         ul.empty();
             // returns if no items to render.
             items = self.items;
-            if(items === undefined) {
+            if(items === undefined || items === null) {
                 return;
             }
             count = items.length;
-            if(items === undefined || items === null && count === 0) {
+            if(count === 0) {
                 return;
             }
             singleMode = o.selectionMode === "single";

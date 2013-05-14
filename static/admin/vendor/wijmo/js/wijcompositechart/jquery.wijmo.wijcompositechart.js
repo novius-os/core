@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1056,6 +1056,7 @@ var wijmo;
                     pie.radius = series.radius;
                     pie.center = series.center;
                     pie.label = series.label;
+                    pSIndex = -1;
                     chart.push(pie);
                     return true;
                 } else if(type === "column") {
@@ -1195,6 +1196,7 @@ var wijmo;
                             tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
                             _chartRender = new wijmo.ScatterChartRender(self.chartElement, tmpOptions);
                             _chartRender.render();
+                            seriesIndexs = [];
                             $.each(subchart.seriesList, function (i, sl) {
                                 seriesIndexs.push(sl.sIndex);
                             });

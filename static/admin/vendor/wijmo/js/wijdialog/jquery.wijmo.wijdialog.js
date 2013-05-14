@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -137,7 +137,7 @@ var wijmo;
                     }
                 });
             }
-            this.overlay = $("<div>").addClass("ui-widget-overlay ui-front").appendTo(this._appendTo());
+            this.overlay = $("<div>").addClass("ui-widget-overlay ui-front ui-dialog-overlay").appendTo(this._appendTo());
             this._on(this.overlay, {
                 mousedown: "_keepFocus"
             });
@@ -232,6 +232,11 @@ var wijmo;
             return div;
         };
         WijDialog.prototype.destroy = function () {
+            ///	<summary>
+            ///	The destroy method removes the wijdialog functionality completely and returns the element to its pre-init state.
+            /// Code Example:
+            /// $("selector").wijdialog("destroy");
+            ///	</summary>
             var self = this;
             //Add for support disabled option at 2011/7/8
             if(self.disabledDiv) {
@@ -296,6 +301,30 @@ var wijmo;
                     });
                 }
             });
+        };
+        WijDialog.prototype._moveToTop = function (event, force) {
+            var self = this, options = self.options, saveScroll;
+            if((options.modal && !force) || (!options.stack && !options.modal)) {
+                return self._trigger('focus', event);
+            }
+            if(options.zIndex > $.ui.dialog.maxZ) {
+                $.ui.dialog.maxZ = options.zIndex;
+            }
+            if(self.overlay) {
+                $.ui.dialog.maxZ += 1;
+                self.overlay.css('z-index', $.ui.dialog.maxZ);
+            }
+            //Save and then restore scroll since Opera 9.5+ resets when parent z-Index is changed.
+            //  http://ui.jquery.com/bugs/ticket/3193
+            saveScroll = {
+                scrollTop: self.element.scrollTop(),
+                scrollLeft: self.element.scrollLeft()
+            };
+            $.ui.dialog.maxZ += 1;
+            self.uiDialog.css('z-index', $.ui.dialog.maxZ);
+            self.element.attr(saveScroll);
+            self._trigger('focus', event);
+            return self;
         };
         WijDialog.prototype._checkUrl = function () {
             var self = this, o = self.options, url = o.contentUrl, innerFrame = $('<iframe style="width:100%;height:99%;" frameborder="0"></iframe>');
@@ -412,7 +441,9 @@ var wijmo;
         };
         WijDialog.prototype.pin = function () {
             ///	<summary>
-            ///		Pins the wijdialog instance so that it could not be moved.
+            ///	The pin method prevents the wijdialog from being moved.
+            /// Code Example:
+            /// $("selector").wijdialog("pin");
             ///	</summary>
                         var drag = this.isPin, buttonIcon = this.pinButton.children("span");
             if(!drag) {
@@ -429,7 +460,9 @@ var wijmo;
         };
         WijDialog.prototype.refresh = function () {
             ///	<summary>
-            ///		Refreshes the iframe content in wijdialog.
+            ///	The refresh method refreshes the iframe content within the wijdialog.
+            /// Code Example:
+            /// $("selector").wijdialog("refresh");
             ///	</summary>
             var fr = this.innerFrame;
             if(fr !== undefined) {
@@ -437,7 +470,12 @@ var wijmo;
             }
         };
         WijDialog.prototype.toggle = function () {
-            var self = this, buttonIcon = self.toggleButton.children("span");
+            ///	<summary>
+            ///	The toggle method expands or collapses the content of the wijdialog.
+            /// Code Example:
+            /// $("selector").wijdialog("toggle");
+            ///	</summary>
+                        var self = this, buttonIcon = self.toggleButton.children("span");
             // TODO : toggle animation and event invoking.
             if(!self.minimized) {
                 if(self.collapsed === undefined || !self.collapsed) {
@@ -516,7 +554,9 @@ var wijmo;
         };
         WijDialog.prototype.minimize = function () {
             ///	<summary>
-            ///		Minimizes wijdialog.
+            ///	The minimize method minimizes the wijdialog.
+            /// Code Example:
+            /// $("selector").wijdialog("minimize");
             ///	</summary>
                         var self = this, dlg = self.uiDialog, o = self.options, miniZone = null, $from = $("<div></div>"), $to = $("<div></div>"), defaultZone, scrollTop, top, originalPosition, originalSize = {
                 width: undefined,
@@ -647,7 +687,12 @@ var wijmo;
             }
         };
         WijDialog.prototype.maximize = function () {
-            var self = this, w = $(window), originalPosition, originalSize = {
+            ///	<summary>
+            ///	The maximize  method maximizes the wijdialog.
+            /// Code Example:
+            /// $("selector").wijdialog("maximize ");
+            ///	</summary>
+                        var self = this, w = $(window), originalPosition, originalSize = {
                 width: undefined,
                 height: undefined
             }, position, size = {
@@ -776,7 +821,9 @@ var wijmo;
         };
         WijDialog.prototype.restore = function () {
             /// <summary>
-            ///		Restores wijdialog to normal size.
+            ///	The restore method restores the wijdialog to its normal size from either the minimized or the maximized state.
+            /// Code Example:
+            /// $("selector").wijdialog("restore");
             /// </summary>
                         var self = this, dlg = self.uiDialog, originalPosition, originalSize = {
                 width: undefined,
@@ -903,23 +950,30 @@ var wijmo;
         };
         WijDialog.prototype.getState = function () {
             /// <summary>
-            ///		Gets the state of this dialog, the possible values are:
-            //		"minimized", "maximized", "normal".
+            ///	The getState method gets the state of the dialog widget. Possible values are: minimized, maximized, and normal.
+            /// Code Example:
+            /// $("selector").wijdialog("getState");
             /// </summary>
             var self = this;
             return self.minimized ? "minimized" : (self.maximized ? "maximized" : "normal");
         };
         WijDialog.prototype.reset = function () {
             /// <summary>
-            ///		Resets the properties ("width" ,"height", "position")
-            ///     to their default values.
+            ///	The reset method resets dialog properties such as width and height to their default values.
+            /// Code Example:
+            /// $("selector").wijdialog("reset");
             /// </summary>
             var self = this;
             self.normalWidth = self.normalLeft = self.normalTop = self.normalHeight = self.normalInnerHeight = self.normalInnerWidth = self.normalInnerMinWidth = self.normalInnerMinHeight = undefined;
             self._setOption("position", self._originalPosition);
         };
         WijDialog.prototype.open = function () {
-            var self = this, o = self.options;
+            /// <summary>
+            ///	The open method opens an instance of the wijdialog.
+            /// Code Example:
+            /// $("selector").wijdialog("open");
+            /// </summary>
+                        var self = this, o = self.options;
             if((o.hide === "drop" || o.hide === "bounce") && $.browser.msie) {
                 //fixed bug when effect "drop" on IE
                 self.uiDialog.css("filter", "auto");
@@ -956,7 +1010,12 @@ var wijmo;
             }
         };
         WijDialog.prototype.close = function () {
-            var self = this, o = self.options;
+            /// <summary>
+            ///	The close method closes the dialog widget.
+            /// Code Example:
+            /// $("selector").wijdialog("close");
+            /// </summary>
+                        var self = this, o = self.options;
             if($.ui.dialog.prototype.close.apply(self, arguments)) {
                 if(self.innerFrame) {
                     self.innerFrame.attr("src", "");

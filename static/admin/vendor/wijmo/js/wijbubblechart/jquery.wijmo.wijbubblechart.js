@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -730,16 +730,14 @@ var wijmo;
         /// x: [1, 2, 3, 4, 5],
         /// y: [12, 21, 9, 29, 30],
         /// y1:[3, 5, 1, 6, 2]
-        /// },
-        /// offset: 0
+        /// }
         /// }, {
         /// label: "Q2",
         /// legendEntry: true,
         /// data: {
         /// xy: [1, 21, 2, 10, 3, 19, 4, 31, 5, 20],
         /// y1:[3, 5, 1, 6, 2]
-        /// },
-        /// offset: 0
+        /// }
         /// }]
         /// OR
         /// seriesList: [{
@@ -749,8 +747,7 @@ var wijmo;
         /// x: ["A", "B", "C", "D", "E"],
         /// y: [12, 21, 9, 29, 30],
         /// y1:[3, 5, 1, 6, 2]
-        /// },
-        /// offset: 0
+        /// }
         /// }]
         /// OR
         /// seriesList: [{
@@ -762,8 +759,7 @@ var wijmo;
         /// new Date(1983, 0, 1)],
         /// y: [12, 21, 9, 29, 30],
         /// y1:[3, 5, 1, 6, 2]
-        /// },
-        /// offset: 0
+        /// }
         /// }]
         /// });
         /// </summary>
@@ -1187,7 +1183,7 @@ var wijmo;
                     }
                     animationInfos.push(params);
                     bubble.wijAnimate(params, duration, easing, function () {
-                        if($(bubbleInfo.bubble.node).data("wijchartDataObj").visible) {
+                        if($(bubbleInfo.bubble.node).data("wijchartDataObj") && $(bubbleInfo.bubble.node).data("wijchartDataObj").visible) {
                             if(bubbleInfo.dcl) {
                                 bubbleInfo.dcl.show();
                             }
@@ -1200,7 +1196,7 @@ var wijmo;
                 self.fields.bubblesAnimationInfos = animationInfos;
             } else {
                 $.each(bubbleInfos, function (idx, bubbleInfo) {
-                    if($(bubbleInfo.bubble.node).data("wijchartDataObj").visible) {
+                    if($(bubbleInfo.bubble.node).data("wijchartDataObj") && $(bubbleInfo.bubble.node).data("wijchartDataObj").visible) {
                         if(bubbleInfo.dcl) {
                             bubbleInfo.dcl.show();
                         }

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -158,112 +158,101 @@ var wijmo;
             this.wijCSS = {
                 wijinputmask: wijmo.wijinputcore.prototype.options.wijCSS.wijinput + "-mask"
             };
-            /// <summary>
-            /// Determines the default text to display for a masked input.
-            /// Type: String
-            /// Default: null
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({text:¡¯555-5555¡¯});
-            /// </summary>
+            /**
+            Determines the default text to display for a masked input.
+            Type: String
+            Default: null
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({text:¡¯555-5555¡¯});
+            */
             this.text = null;
-            /// <summary>
-            /// Determines the input mask to use at run time. Mask must be a String composed of one or more of
-            /// the masking elements, enumeration parts, or numeric ranges.
-            /// Type: String
-            /// Default: ""
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({mask:¡¯999-9999¡¯});
-            /// </summary>
+            /**
+            Determines the input mask to use at run time. Mask must be a String composed
+            of one or more of the masking elements, enumeration parts, or numeric ranges.
+            Type: String
+            Default: ""
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({mask:¡¯999-9999¡¯});
+            */
             this.mask = "";
-            /// <summary>
-            /// Determines the character that appears when the widget has focus but no input
-            /// has been entered.
-            /// Type: String
-            /// Default: '_'
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({promptChar:¡¯*¡¯});
-            /// </summary>
+            /**
+            Determines the character that appears when the widget has focus but no input has been entered.
+            Type: String
+            Default: '_'
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({promptChar:¡¯*¡¯});
+            */
             this.promptChar = '_';
-            /// <summary>
-            /// Indicates whether the prompt characters in the input mask are hidden when
-            /// the mask loses focus.
-            /// Remarks:
-            /// Returns true if PromptChar is hidden when the mask does not have the focus;
-            /// otherwise, false.
-            /// Type: Boolean
-            /// Default: false
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({promptChar:¡¯*¡¯});
-            /// </summary>
+            /**
+            Indicates whether the prompt characters in the input mask are hidden when
+            the mask loses focus.
+            @remark
+            Returns true if PromptChar is hidden when the mask does not have the focus;
+            otherwise, false.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({hidePromptOnLeave: true});
+            */
             this.hidePromptOnLeave = false;
-            /// <summary>
-            /// Determines how a space input character should be handled.
-            /// Remarks:
-            /// Returns true if the space input character causes the current editable position
-            /// in the mask to be reset; otherwise, false to indicate that it is to be processed
-            /// as a normal input character.
-            // ResetOnSpace is useful when assigning text that was saved excluding the prompt,
-            /// where the prompt is replaced with a space. Before restoring such a string,
-            /// setting ResetOnSpace to true will reset the prompt characters at the positions
-            /// occupied by spaces in the input string.
-            /// otherwise, false.
-            /// Type: Boolean
-            /// Default: true
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({resetOnSpace: false});
-            /// </summary>
+            /**
+            Determines how an input character that matches the prompt character should be handled.
+            Remarks:
+            Returns true if the prompt character entered as input causes the current editable position in the mask to be reset; otherwise, false to indicate that the prompt character is to be processed as a normal input character.
+            Type: Boolean
+            Default: true
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({resetOnPrompt: false});
+            */
             this.resetOnPrompt = true;
-            /// <summary>
-            /// Indicates whether the promptChar can be entered as valid data by the user.
-            /// Remarks:
-            /// Even when AllowPromptAsInput is true, the prompt character must be valid for the
-            /// current location in the mask in order to be accepted. For example, if PromptChar
-            /// is "*" and the current location in the mask demands the user enter a digit,
-            /// entering an asterisk (*) will fail.
-            /// Type: Boolean
-            /// Default: false
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({allowPromptAdInput: false});
-            /// </summary>
+            /**
+            Indicates whether the promptChar can be entered as valid data by the user.
+            @remark
+            Even when AllowPromptAsInput is true, the prompt character must be valid for the current location in the mask in order to be accepted. For example, if PromptChar is "*" and the current location in the mask demands the user enter a digit, entering an asterisk (*) will fail.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({allowPromptAdInput: false});
+            */
             this.allowPromptAsInput = false;
-            /// <summary>
-            /// Determines the characters that appear in editable positions that have not yet
-            /// been assigned an input value.
-            /// Type: String
-            /// Default: ''
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({passwordChar: ¡®#¡¯});
-            /// </summary>
+            /**
+            Determines the characters that appear in editable positions that have not yet
+            been assigned an input value.
+            Type: String
+            Default: ' '
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({passwordChar: ¡®#¡¯});
+            */
             this.passwordChar = '';
-            /// <summary>
-            /// Determines how a space input character should be handled.
-            /// Remarks:
-            /// Returns true if the space input character causes the current editable position
-            /// in the mask to be reset; otherwise, false to indicate that it is to be processed
-            /// as a normal input character.
-            /// ResetOnSpace is useful when assigning text that was saved excluding the prompt,
-            /// where the prompt is replaced with a space. Before restoring such a string,
-            /// setting ResetOnSpace to true will reset the prompt characters at the positions
-            /// occupied by spaces in the input string.
-            /// Type: Boolean
-            /// Default: true
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({resetOnSpace: false});
-            /// </summary>
+            /**
+            Determines how a space input character should be handled.
+            @remark
+            Returns true if the space input character causes the current editable position
+            in the mask to be reset; otherwise, false to indicate that it is to be processed
+            as a normal input character.
+            ResetOnSpace is useful when assigning text that was saved excluding the
+            prompt, where the prompt is replaced with a space. Before restoring such a
+            string, setting ResetOnSpace to true will reset the prompt characters at
+            the positions occupied by spaces in the input string.
+            Type: Boolean
+            Default: true
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({resetOnSpace: false});
+            */
             this.resetOnSpace = true;
-            /// <summary>
-            /// Indicates whether the user is allowed to re-enter literal values.
-            /// Remarks:
-            /// Returns true to allow literals to be reentered; otherwise, false to prevent the
-            /// user from overwriting literal characters.
-            /// Masks can contain literal and editable characters. If an attempt is made to
-            /// add an input character to the position in a mask occupied by a literal, the
-            /// value of the SkipLiterals option determines the result.
-            /// Type: Boolean
-            /// Default: true
-            /// Code example
-            /// $(¡®.selector¡¯).wijinputmask({skipLiterals: false});
-            /// </summary>
+            /**
+            Indicates whether the user is allowed to re-enter literal values.
+            Remarks:
+            Returns true to allow literals to be reentered; otherwise, false to prevent
+            the user from overwriting literal characters.
+            Masks can contain literal and editable characters. If an attempt is made to
+            add an input character to the position in a mask occupied by a literal, the
+            value of the SkipLiterals option determines the result.
+            Type: Boolean
+            Default: true
+            Code Example:
+            $(¡®.selector¡¯).wijinputmask({skipLiterals: false});
+            */
             this.skipLiterals = true;
         }
         return wijinputmask_options;

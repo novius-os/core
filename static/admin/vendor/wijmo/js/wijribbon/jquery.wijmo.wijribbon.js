@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -658,6 +658,8 @@ var wijmo;
             var self = this;
             button.bind("click", function (e) {
                 if(self.options.disabled) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     return;
                 }
                 var commandName = button.data("commandName"), buttonObj = self.buttons[commandName], obj = {

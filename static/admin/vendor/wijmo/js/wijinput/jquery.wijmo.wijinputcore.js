@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -441,24 +441,18 @@ var wijmo;
         };
         wijinputcore.prototype._validateData = function () {
         };
-        wijinputcore.prototype.getText = /// <summary>
-        /// Sets the text displayed in the input box.
-        /// Parameter:
-        ///		value: The value to display in the input box.
-        /// Code example
-        /// $("#element").wijinputcore("setText", value);
-        /// </summary>
+        wijinputcore.prototype.getText = /** Gets the text displayed in the input box. */
         function () {
             if(!this._isInitialized()) {
                 return this.element.val();
             }
             return this._textProvider.toString(true, false, false);
         };
-        wijinputcore.prototype.setText = /// <summary>
-        /// Gets the text displayed in the input box.
-        /// Code example
-        /// $("#element").wijinputcore("getText");
-        /// </summary>
+        wijinputcore.prototype.setText = /** Sets the text displayed in the input box.
+        * @remarks
+        * Code example:
+        * <code>$("#selector").wijinputcore("setText", 11);</code>
+        */
         function (value) {
             if(!this._isInitialized()) {
                 this.element.val(value);
@@ -467,26 +461,22 @@ var wijmo;
                 this._updateText();
             }
         };
-        wijinputcore.prototype.getPostValue = /// <summary>
-        /// Gets the text value when the container form is posted back to the
-        /// server. This method returns the widget date text.
-        /// Code example
-        /// $("#element").wijinputcore("getPostValue");
-        /// </summary>
+        wijinputcore.prototype.getPostValue = /** Gets the text value when the container
+        * form is posted back to server.
+        */
         function () {
             if(!this._isInitialized()) {
                 return this.element.val();
             }
             return this._textProvider.toString(true, false, true);
         };
-        wijinputcore.prototype.selectText = /// <summary>
-        /// Selects a range of text in the widget.
-        /// Parameters:
-        ///		start: Start of the range.
-        ///		end: End of the range.
-        /// Code example
-        /// $("#element").wijinputcore("selectText", start, end);
-        /// </summary>
+        wijinputcore.prototype.selectText = /** Selects a range of text in the widget.
+        * @param {Number} start Start of the range.
+        * @param {Number} end End of the range.
+        * @remarks
+        * Code example:
+        * <code>$("#selector").wijinputcore("selectText", 0, 2);</code>
+        */
         function (start, end) {
             if (typeof start === "undefined") { start = 0; }
             if (typeof end === "undefined") { end = this.getText().length; }
@@ -495,22 +485,14 @@ var wijmo;
             }
             this.element.wijtextselection(start, end);
         };
-        wijinputcore.prototype.focus = /// <summary>
-        /// Determines whether the widget has focus.
-        /// Code example
-        /// $("#element").wijinputcore("isFocused");
-        /// </summary>
+        wijinputcore.prototype.focus = /** Set the focus to the widget. */
         function () {
             if(this.element.is(':disabled')) {
                 return;
             }
             this.element.get(0).focus();
         };
-        wijinputcore.prototype.isFocused = /// <summary>
-        /// Sets focus to the widget.
-        /// Code example
-        /// $("#element").wijinputcore("focus");
-        /// </summary>
+        wijinputcore.prototype.isFocused = /** Determines whether the widget has the focus. */
         function () {
             return this.outerDiv.hasClass(this.options.wijCSS.stateFocus);
         };
@@ -1108,158 +1090,169 @@ var wijmo;
                 wijinputSpinUp: classPrefix + "spinup",
                 wijinputSpinDown: classPrefix + "spindown"
             };
-            /** Determines the culture used to show values in the wijinputdate widget. */
+            /**
+            Determines the culture used to show values in the wijinputs widget.
+            Type: String
+            Default: ""
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({culture:¡¯zh-CN¡¯});
+            Remarks:
+            The culture ID is a combination of an ISO 639 two-letter lowercase
+            culture code for the language and a two-letter uppercase code for the country
+            or region. For example, "en-US" is the culture code for English in the United States.
+            */
             this.culture = '';
-            /// <summary>
-            /// The CSS class applied to the widget when an invalid value is entered.
-            /// Default: 'ui-state-error'
-            /// Type: String.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({invalidClass:¡¯alert¡¯});
-            /// </summary>
+            /**
+            The CSS class applied to the widget when an invalid value is entered.
+            Type: String
+            Default: ' ui-state-error'
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({invalidClass:¡¯alert¡¯});
+            */
             this.invalidClass = $.wijmo.wijCSS.stateError;
-            /// <summary>
-            /// Determines the text displayed when the widget is blank and contains no initial text.
-            /// Default: ""
-            /// Type: String.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({nullText: ¡®Type here¡­¡¯});
-            /// </summary>
+            /**
+            Determines the text displayed when the widget is blank and contains no initial text.
+            Type: String
+            Default: ""
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({nullText: ¡®Type here¡­¡¯});
+            */
             this.nullText = '';
-            /// <summary>
-            /// Shows the nullText value if the widget is blank and loses focus.
-            /// Default: false
-            /// Type: Boolean.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({showNullText: false});
-            /// </summary>
+            /**
+            ows the nullText value if the widget is blank and loses focus.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({showNullText: false});
+            */
             this.showNullText = false;
-            /// <summary>
-            /// If true, then the browser response is disabled when the ENTER key is pressed.
-            /// For example, if the focus is on the year field and the ENTER key is pressed,
-            /// then the focus will move to the default value or '0001' in this case.
-            /// Default: false
-            /// Type: Boolean.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({hideEnter: false});
-            /// </summary>
+            /**
+            If true, then the browser response is disabled when the ENTER key is pressed. For example,
+            if the focus is on the year field and the ENTER key is pressed, then the focus will move
+            to the default value or '0001' in this case.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({hideEnter: false});
+            */
             this.hideEnter = false;
-            /// <summary>
-            /// Determines whether the user can type a value.
-            /// Default: false
-            /// Type: Boolean.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({disableUserInput: false});
-            /// </summary>
+            /**
+            Determines whether the user can type a value.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({disableUserInput: false});
+            */
             this.disableUserInput = false;
-            /// <summary>
-            /// Determines the side, left or right, where the trigger or spinner buttons appear.
-            /// Remarks: Possible values are ¡®left¡¯ and ¡®right¡¯.
-            /// Default: 'right'
-            /// Type: String.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({buttonAlign:¡¯left¡¯ });
-            /// </summary>
+            /**
+            Determines the side, left or right, where the trigger or spinner buttons appear.
+            Remarks:
+            Possible values are ¡®left¡¯ and ¡®right¡¯.
+            Type: String
+            Default: right
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({buttonAlign:¡¯left¡¯ });
+            */
             this.buttonAlign = 'right';
-            /// <summary>
-            /// Determines whether a trigger button is displayed.
-            /// Default: false
-            /// Type: Boolean.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({showTrigger:true });
-            /// </summary>
+            /**
+            Determines whether a trigger button is displayed.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({showTrigger:true });
+            */
             this.showTrigger = false;
-            /// <summary>
-            /// Determines whether a spinner button is displayed.
-            /// Default: false
-            /// Type: Boolean.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({showSpinner:true });
-            /// </summary>
+            /**
+            Determines whether a spinner button is displayed.
+            Type: Boolean
+            Default: false
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({showSpinner:true });
+            */
             this.showSpinner = false;
-            /// <summary>
-            /// Array of data items for the drop-down list.
-            /// Default: undefined
-            /// Type: Array.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({comboItems: ['100-1000', '200-2000', '123-2909']});
-            /// </summary>
+            /**
+            Array of data items for the drop-down list.
+            Type: Array
+            Default: undefined
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({comboItems: ['100-1000', '200-2000', '123-2909']});
+            */
             this.comboItems = undefined;
-            /// <summary>
-            /// Determines the width of the drop-down list.
-            /// Default: undefined
-            /// Type: Number.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({comboWidth:220 });
-            /// </summary>
+            /**
+            Determines the width of the drop-down list.
+            Type: Number
+            Default: undefined
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({comboWidth:220 });
+            */
             this.comboWidth = undefined;
-            /// <summary>
-            /// Determines the height of the drop-down list.
-            /// Default: undefined
-            /// Type: Number.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputcore({comboHeight:180 });
-            /// </summary>
+            /**
+            Determines the height of the drop-down list.
+            Type: Number
+            Default: undefined
+            Code Example:
+            $(¡®.selector¡¯).wijinputcore({comboHeight:180 });
+            */
             this.comboHeight = undefined;
-            /// <summary>
-            /// Fired before the widget is initialized.
-            /// Default: null
-            /// Type: Function.
-            /// Code example:
-            /// $("#element").wijinputcore({ initializing: function () { } });
-            /// </summary>
+            /**
+            Fired before the widget is initialized.
+            Type: Function
+            Default: null
+            Code Example:
+            $("#element").wijinputcore({ initializing: function () { } });
+            * @event
+            */
             this.initializing = null;
-            /// <summary>
-            /// Fired after the widget is initialized.
-            /// Parameter:
-            ///		e: The jQuery.Event object.
-            /// Default: null
-            /// Type: Function.
-            /// Code example:
-            /// $("#element").wijinputcore({ initialized: function () { } });
-            /// </summary>
+            /**
+            Fired after the widget is initialized.
+            Type: Function
+            Default: null
+            Parameter:
+            e: The jQuery.Event object.
+            Code Example:
+            $("#element").wijinputcore({ initialized: function () { } });
+            * @event
+            */
             this.initialized = null;
-            /// <summary>
-            /// Fired when the mouse is pressed down on the trigger button.
-            /// Parameter:
-            ///		e: The jQuery.Event object.
-            /// Default: null
-            /// Type: Function.
-            /// Code example:
-            /// $("#element").wijinputcore({ triggerMouseDown: function (e) { } });
-            /// </summary>
+            /**
+            Fired when the mouse is pressed down on the trigger button.
+            Default: null
+            Parameter:
+            e: The jQuery.Event object.
+            Code Example:
+            $("#element").wijinputcore({ triggerMouseDown: function (e) { } });
+            * @event
+            */
             this.triggerMouseDown = null;
-            /// <summary>
-            /// Fired when the mouse is released on the trigger button.
-            /// Parameter:
-            ///		e: The jQuery.Event object.
-            /// Default: null
-            /// Type: Function.
-            /// Code example:
-            /// $("#element").wijinputcore({ triggerMouseUp: function (e) { } });
-            /// </summary>
+            /**
+            Fired when the mouse is released on the trigger button.
+            Default: null
+            Parameter:
+            e: The jQuery.Event object.
+            Code Example:
+            $("#element").wijinputcore({ triggerMouseUp: function (e) { } });
+            * @event
+            */
             this.triggerMouseUp = null;
-            /// <summary>
-            /// Fired when the widget text is changed.
-            /// Parameter:
-            ///		e: The jQuery.Event object.
-            ///		args: The data with this event.
-            ///			args.text: This is the new text.
-            /// Default: null
-            /// Type: Function.
-            /// Code example:
-            /// $("#element").wijinputcore({ textChanged: function (e, arg) { } });
-            /// </summary>
+            /**
+            Fired when the widget text is changed.
+            Default: null
+            Code Example:
+            $("#element").wijinputcore({ textChanged: function (e, arg) { } });
+            * @event
+            * @arg {String} text The new text.
+            */
             this.textChanged = null;
-            /// <summary>
-            /// Fired when an invalid character is entered.
-            /// Parameter:
-            ///		e: The jQuery.Event object.
-            /// Default: null
-            /// Type: Function.
-            /// Code example:
-            /// $("#element").wijinputcore({ invalidInput: function (e) { } });
-            /// </summary>
+            /**
+            Fired when the widget text is changed.
+            Default: null
+            Parameters:
+            e: The jQuery.Event object.
+            args: The data with this event.
+            args.text: This is the new text.
+            Code Example:
+            $("#element").wijinputcore({ textChanged: function (e, arg) { } });
+            */
             this.invalidInput = null;
         }
         return wijinputcore_options;

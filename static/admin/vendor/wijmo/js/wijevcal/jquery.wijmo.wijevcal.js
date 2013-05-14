@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1174,13 +1174,13 @@ var wijmo;
                 $.ajax({
                     url: o.webServiceUrl + "?clientId=" + this.element[0].id + "&command=loadEvents&timestamp=" + new Date().getTime(),
                     dataType: "text",
-                    contentType: /*dataType: "json",*/
-                    "application/json; charset=utf-8",
+                    cache: /*dataType: "json",*/
+                    false,
+                    contentType: "application/json; charset=utf-8",
                     type: "POST",
-                    data: "jsonData=" + this._jsonStringify({
-                        visibleCalendars: o.visibleCalendars
-                    }),
-                    success: loadEventsCallback,
+                    success: //data: "jsonData=" +
+                    //	this._jsonStringify({ visibleCalendars: o.visibleCalendars }),
+                    loadEventsCallback,
                     error: errorCallback
                 });
             } else {
@@ -1852,7 +1852,7 @@ var wijmo;
         };
         wijevcal.prototype.deleteCalendar = /** public methods */
         /// <summary>
-        /// Delete existent calendar from current data source.
+        /// Deletes the existing calendar from the current data source.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("deleteCalendar", "My calendar");
         ///</summary>
@@ -1943,7 +1943,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.addCalendar = /// <summary>
-        /// Add new calendar.
+        /// Adds a new calendar.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("addCalendar", {
         ///		name: "My calendar",
@@ -2050,7 +2050,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.updateCalendar = /// <summary>
-        /// Update existent calendar.
+        /// Updates the existing calendar.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("updateCalendar", {
         ///		name: "My calendar",
@@ -2157,7 +2157,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.addEvent = /// <summary>
-        /// Add new event.
+        /// Adds a new event.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("addEvent", {
         ///		start: new Date(2011, 4, 2, 0, 32),
@@ -2323,7 +2323,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.updateEvent = /// <summary>
-        /// Update existent event.
+        /// Updates the existing event.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("updateEvent", {
         ///		start: new Date(2011, 4, 2, 0, 32),
@@ -2878,7 +2878,7 @@ var wijmo;
             return false;
         };
         wijevcal.prototype.deleteEvent = /// <summary>
-        /// Delete event.
+        /// Deletes the event.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("deleteEvent", eventId);
         ///</summary>
@@ -3012,7 +3012,7 @@ var wijmo;
             this.hideLoadingLabel();
         };
         wijevcal.prototype.goToEvent = /// <summary>
-        /// Navigates event given by parameter id.
+        /// Navigates to the event given by the parameter id.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("goToEvent",
         ///								"apptid_dynid1ts1320322142549");
@@ -3043,7 +3043,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.isAllDayEvent = /// <summary>
-        /// Tests if event duration is more or equals 1 day
+        /// Tests to see if event duration is more or equals to one day.
         /// Code Example:
         ///	var isAllDay = $("#wijevcal").wijevcal("isAllDayEvent",
         ///								"apptid_dynid1ts1320322142549");
@@ -3065,7 +3065,7 @@ var wijmo;
             return false;
         };
         wijevcal.prototype.goToDate = /// <summary>
-        /// Navigates date given by parameter dt.
+        /// Navigates to the date given by parameter dt.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("goToDate", new Date());
         ///</summary>
@@ -3121,7 +3121,7 @@ var wijmo;
             this.element.find(".wijmo-wijev-scrollpanel").wijsuperpanel("vScrollTo", yt);
         };
         wijevcal.prototype.goToday = /// <summary>
-        /// Navigates today date.
+        /// Navigates to today's date.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("goToday");
         ///</summary>
@@ -3129,7 +3129,7 @@ var wijmo;
             this.goToDate(new Date());
         };
         wijevcal.prototype.goLeft = /// <summary>
-        /// Navigates previous date.
+        /// Navigates to the previous date.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("goLeft");
         ///</summary>
@@ -3146,7 +3146,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.goRight = /// <summary>
-        /// Navigates next date.
+        /// Navigates to the next date.
         /// Code Example:
         ///	$("#wijevcal").wijevcal("goRight");
         ///</summary>
@@ -3189,7 +3189,7 @@ var wijmo;
             }
         };
         wijevcal.prototype.showEditCalendarDialog = /// <summary>
-        /// Call this method in order to display built-in "edit calendar" dialog.
+        /// Call this method in order to display built-in "edit calendar" dialog box.
         /// Code Example:
         /// Display dialog for a new calendar:
         ///	$("#wijevcal").wijevcal("showEditCalendarDialog", null);
@@ -3226,7 +3226,7 @@ var wijmo;
             this._editCalendarDialog.wijdialog("open");
         };
         wijevcal.prototype.showEditEventDialog = /// <summary>
-        /// Call this method in order to display built-in "edit event" dialog.
+        /// Call this method in order to display built-in "edit event" dialog box.
         /// Code Example:
         /// Display dialog for a new event:
         ///	$("#wijevcal").wijevcal("showEditEventDialog", null);
@@ -4397,7 +4397,7 @@ var wijmo;
         };
         wijevcal.prototype.log = /// <summary>
         /// Sends a log message to built-in log console.
-        ///	Note, enableLogs option should be set to true.
+        ///	Note: n order to use this method, you must set the enableLogs option to true.
         /// </summary>
         /// <param name="msg" type="String">
         ///	Log message
@@ -4670,7 +4670,7 @@ var wijmo;
         /// </summary>
         ":jqmData(role='wijevcal')",
         culture: ///	<summary>
-        ///	Culture name, e.g. "de-DE".
+        ///	Determines the culture to be used, for example, "de-DE" is German.
         ///	Date and time formatting depends on the culture option.
         ///	</summary>
         "",
@@ -4762,8 +4762,7 @@ var wijmo;
         /// </summary>
         false,
         webServiceUrl: /// <summary>
-        /// The URL to the web service which will be used
-        ///	to store information about events.
+        /// Determines the URL of the web service which will be used to store information about events.
         /// Default: ""
         /// Type: String.
         /// Code example:
@@ -4774,8 +4773,7 @@ var wijmo;
         "",
         colors: //c1evcalservice.ashx
         /// <summary>
-        /// The colors option specifies the list of color name which
-        ///	will be shown in the color name drop down list.
+        /// The colors option specifies the name of the colors that will be shown in the color name drop-down list.
         /// Default: ["red", "darkorchid", "green",
         ///					"blue", "cornflowerblue", "yellow", "bronze"]
         /// Type: Array.
@@ -4841,7 +4839,8 @@ var wijmo;
         /// </summary>
         [],
         appointments: /// <summary>
-        /// The event objects array. This option is deprecated:
+        /// The event objects array. This option is read-only.
+        /// This option is deprecated:
         ///	please, use eventsData option, instead.
         /// Default: []
         /// Type: Array.
@@ -4855,7 +4854,7 @@ var wijmo;
         /// Available calendar objects array.
         ///	This option is read-only.
         ///	Use addCalendar/updateCalendar/deleteCalendar methods in order
-        ///	to add/edit or delete calendar.
+        ///	to add/edit or delete a calendar.
         /// Default: []
         /// Type: Array.
         /// Code example:
@@ -4872,7 +4871,7 @@ var wijmo;
         /// </summary>
         false,
         editCalendarTemplate: /// <summary>
-        /// The calendar dialog template.
+        /// The calendar dialog box template.
         /// Default: ""
         /// Type: String.
         /// Code example: $("#eventscalendar").wijevcal(
@@ -4880,7 +4879,7 @@ var wijmo;
         /// </summary>
         "",
         enableLogs: /// <summary>
-        /// Enables built-in log console.
+        /// Enables a built-in log console.
         /// Default: false
         /// Type: Boolean.
         /// Code example:
@@ -4900,7 +4899,7 @@ var wijmo;
         /// </summary>
         "{2}",
         titleFormat: /// <summary>
-        /// The title text format that will be shown under header bar.
+        /// The title text format that will be shown under the header bar.
         /// {0} = start date. {1} = end date.
         /// Default: {
         ///			day: false,
@@ -4994,7 +4993,7 @@ var wijmo;
         /// </summary>
         false,
         timeInterval: /// <summary>
-        /// Time interval for the Day view (in minutes).
+        /// The time interval in minutes for the Day view.
         /// Default: 30
         /// Type: Number.
         /// Code example: $("#eventscalendar").wijevcal(
@@ -5028,7 +5027,7 @@ var wijmo;
         /// </summary>
         "{0:h tt}",
         dayHeaderFormat: /// <summary>
-        /// Format of the text for the day cell header in the month view.
+        /// Format of the text for the day cell header(month view).
         /// Format argument:
         ///  {0} = Day date.
         /// Default: "{0:d }"
@@ -5039,8 +5038,7 @@ var wijmo;
         /// </summary>
         "{0:d }",
         firstRowDayHeaderFormat: /// <summary>
-        /// Format of the text for the first cell header in the first row
-        ///	of the month view.
+        /// Format of the text for the first cell header in the first row of the month view.
         /// Format argument:
         ///  {0} = Day date.
         /// Default: "{0:MMM d}"
@@ -5051,7 +5049,7 @@ var wijmo;
         /// </summary>
         "{0:ddd d}",
         dayViewHeaderFormat: /// <summary>
-        /// Format of the text for the day header in the day/week or list view.
+        /// Format of the text for the day header in the day view. Format argument: {0} = Day date.
         /// Format argument:
         ///  {0} = Day date.
         /// Default: {
@@ -5205,8 +5203,8 @@ var wijmo;
     /// </summary>
     /// <param name="e" type="Object">jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///		args.data - the event data.
-    ///		args.targetCell - target offset DOM element which can be used for popup callout.
+    ///		args.data - This is the event data.
+    ///		args.targetCell - This is target offset DOM element which can be used for popup callout.
     ///	</param>
     beforeEditEventDialogShow(e, args)
     
@@ -5233,9 +5231,9 @@ var wijmo;
     ///		...
     /// });
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is the jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.data - the new event data that should be added to a data source.
+    ///	args.data - This is the new event data that should be added to a data source.
     ///	</param>
     beforeAddEvent(e, args)
     
@@ -5262,10 +5260,10 @@ var wijmo;
     ///		...
     /// });
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is the jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.data - the new event data that should be updated.
-    ///	args.prevData - previous event data.
+    ///	args.data - This is the new event data that should be updated.
+    ///	args.prevData - This is previous event data.
     ///	</param>
     beforeUpdateEvent(e, args)
     
@@ -5292,9 +5290,9 @@ var wijmo;
     ///		...
     /// });
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is the jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.data - the event object that should be deleted.
+    ///	args.data - This is the event object that should be deleted.
     ///	</param>
     beforeDeleteEvent(e, args)
     
@@ -5321,9 +5319,9 @@ var wijmo;
     ///			...
     ///		});
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is the jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.data - the new calendar data that should be added to a data source.
+    ///	args.data -This is  the new calendar data that should be added to a data source.
     ///	</param>
     beforeAddCalendar(e, args)
     
@@ -5350,10 +5348,10 @@ var wijmo;
     ///			...
     ///		});
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.data - the new calendar data that should be updated.
-    ///	args.prevData - previous calendar data.
+    ///	args.data - This is the new calendar data that should be updated.
+    ///	args.prevData - This is previous calendar data.
     ///	</param>
     beforeUpdateCalendar(e, args)
     
@@ -5380,9 +5378,9 @@ var wijmo;
     ///			...
     ///		});
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is the jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.data - the calendar data that should be deleted from a data source.
+    ///	args.data - This is the calendar data that should be deleted from a data source.
     ///	</param>
     beforeDeleteCalendar(e, args)
     
@@ -5407,9 +5405,9 @@ var wijmo;
     ///			...
     ///		});
     /// </summary>
-    /// <param name="e" type="Object">jQuery.Event object.</param>
+    /// <param name="e" type="Object">This is the jQuery.Event object.</param>
     /// <param name="args" type="Object">
-    ///	args.args.eventsData - array of the event objects.
+    ///	args.args.eventsData - This is array of the event objects.
     ///	</param>
     eventsDataChanged(e, args)
     

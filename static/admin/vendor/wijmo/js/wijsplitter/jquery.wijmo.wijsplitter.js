@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -138,7 +138,12 @@ var wijmo;
             }
         };
         WijSplitter.prototype.destroy = function () {
-            var self = this, o = self.options, element = self.element, fields = self._fields, wrapper = fields.wrapper, expander = fields.expander, bar = fields.bar, panel1 = fields.panel1, panel2 = fields.panel2, originalStyle = fields.originalStyle, widgetName = self.widgetName, oriPnl1Content = fields.oriPnl1Content, oriPnl2Content = fields.oriPnl2Content, oriPnl1ContentStyle = fields.oriPnl1ContentStyle, oriPnl2ContentStyle = fields.oriPnl2ContentStyle, css = o.wijCSS, vSplitterCSS = css.vSplitterCss, vSplitterPre = css.vSplitterCssPrefix, hSplitterCSS = css.hSplitterCss, hSplitterPre = css.hSplitterCssPrefix, panelCss = css.panelCss;
+            /// <summary>
+            /// Removes the splitter functionality completely.This will return the element back to its pre - init state.
+            /// Code Example:
+            /// $("selector").wijsplitter("destroy");
+            /// </summary>
+                        var self = this, o = self.options, element = self.element, fields = self._fields, wrapper = fields.wrapper, expander = fields.expander, bar = fields.bar, panel1 = fields.panel1, panel2 = fields.panel2, originalStyle = fields.originalStyle, widgetName = self.widgetName, oriPnl1Content = fields.oriPnl1Content, oriPnl2Content = fields.oriPnl2Content, oriPnl1ContentStyle = fields.oriPnl1ContentStyle, oriPnl2ContentStyle = fields.oriPnl2ContentStyle, css = o.wijCSS, vSplitterCSS = css.vSplitterCss, vSplitterPre = css.vSplitterCssPrefix, hSplitterCSS = css.hSplitterCss, hSplitterPre = css.hSplitterCssPrefix, panelCss = css.panelCss;
             if($.fn.resizable) {
                 if(panel1 && panel1.n.is(":ui-resizable")) {
                     panel1.n.resizable('destroy');
@@ -676,7 +681,7 @@ var wijmo;
         ":jqmData(role='wijsplitter')",
         sizing: /// <summary>
         /// Gets or sets the javascript function name that
-        /// would be called at client side when dragging the splitter.
+        /// would be called at the client side when a user is dragging the splitter.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -688,7 +693,7 @@ var wijmo;
         null,
         sized: /// <summary>
         /// Gets or sets the javascript function name that
-        /// would be called at client side when finish dragging the splitter.
+        /// would be called at the client side when the user is done dragging the splitter.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -699,8 +704,7 @@ var wijmo;
         /// </summary>
         null,
         expand: /// <summary>
-        /// Gets or sets the javascript function name that
-        /// would be called before panel1 is expanded out.
+        /// Gets or sets the javascript function name to be called before panel1 is expanded.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -711,8 +715,7 @@ var wijmo;
         /// </summary>
         null,
         collapse: /// <summary>
-        /// Gets or sets the javascript function name that
-        /// would be called before panel1 is collapsed.
+        /// Gets or sets the javascript function name to be called before panel1 is collapsed.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -723,8 +726,7 @@ var wijmo;
         /// </summary>
         null,
         expanded: /// <summary>
-        /// Gets or sets the javascript function name that would be called
-        /// when panel1 is expanded out by clicking the collapse/expand image.
+        /// Gets or sets the javascript function name to be called when panel1 is expanded by clicking the collapse/expand image.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -735,8 +737,7 @@ var wijmo;
         /// </summary>
         null,
         collapsed: /// <summary>
-        /// Gets or sets the javascript function name that would be called
-        /// when panel1 is collapsed by clicking the collapse/expand image.
+        /// Gets or sets the javascript function name to be called when panel1 is collapsed by clicking the collapse/expand image.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -747,68 +748,65 @@ var wijmo;
         /// </summary>
         null,
         barZIndex: /// <summary>
-        /// A value indicates the z-index of Splitter bar.
+        /// A value that indicates the z-index (stack order) of the splitter bar.
         /// Default: -1.
         /// Type: Number.
         /// </summary>
         -1,
         showExpander: /// <summary>
-        /// A value determines whether the expander of Splitter
+        /// A Boolean value that determines whether the expander of the wijsplitter widget is shown.
         /// is allowed to be shown.
         /// Default: true.
         /// Type: Boolean.
         /// </summary>
         true,
         splitterDistance: ///	<summary>
-        ///	A value indicates the location of the splitter, in pixels,
-        /// from the left or top edge of the splitter.
+        /// Gets or sets the location of the splitter, in pixels, from the left or top edge of the SplitContainer.
         /// Default: 100.
         /// Type: Number.
         ///	</summary>
         100,
         orientation: ///	<summary>
-        ///	A value indicating the horizontal or vertical orientation
+        /// Gets or sets a value indicating the horizontal or vertical orientation of the SplitContainer panels.
         /// of the splitter panels.
         /// Default: 'vertical'.
         /// Type: String.
         ///	</summary>
         'vertical',
         fullSplit: ///	<summary>
-        ///	A value that indicates whether or not the control is full of document.
+        ///	Gets or sets a value that indicates whether the widget fills the whole page.
         /// Default: false.
         /// Type: Boolean.
         ///	</summary>
         false,
         resizeSettings: ///	<summary>
-        ///	A value defines the animation while the bar of splitter
-        /// is beeing dragged.
+        ///	Defines the animation while the bar of the splitter is being dragged.
         /// Default: {}.
         /// Type: Object.
         ///	</summary>
         {
             animationOptions: {
                 duration: ///	<summary>
-                ///	Define how long (in milliseconds) the animation of
-                /// the sliding will run.
+                ///	efines how long (in milliseconds) the sliding animation will run.
                 /// Default: 100.
                 /// Type: Number.
                 ///	</summary>
                 100,
                 easing: ///	<summary>
-                ///	The easing that is applied to the animation.
+                ///	The easing effect that is applied to the animation.
                 /// Default: 'swing'.
                 /// Type: String.
                 ///	</summary>
                 "swing",
                 disabled: ///	<summary>
-                ///	A value that determines whether use the animation.
+                ///	Determines whether use the animation.
                 /// Default: false.
                 /// Type: Boolean.
                 ///	</summary>
                 false
             },
             ghost: ///	<summary>
-            ///	A value that determines whether an outline of
+            ///	Gets or sets a value that determines whether an outline of a panel appears while dragging the splitter bar.
             /// the element is sized.
             /// Default: false.
             /// Type: Boolean.
@@ -816,7 +814,7 @@ var wijmo;
             false
         },
         panel1: ///	<summary>
-        ///	Defines the information for top or left panel of splitter.
+        ///	Defines the information for the top or left panel of the splitter.
         /// Default: {}.
         /// Type: Object.
         ///	</summary>
@@ -829,7 +827,7 @@ var wijmo;
             ///	</summary>
             1,
             collapsed: ///	<summary>
-            ///	A value determining whether splitter panel is
+            ///	Gets or sets a value determining whether splitter panel is
             /// collapsed or expanded.
             /// Default: false.
             /// Type: Boolean.
@@ -844,7 +842,7 @@ var wijmo;
             "auto"
         },
         panel2: ///	<summary>
-        ///	Defines the information for bottom or right panel of splitter.
+        ///	Defines the information for the bottom or right panel of the splitter.
         /// Default: {}.
         /// Type: Object.
         ///	</summary>
@@ -871,8 +869,9 @@ var wijmo;
             "auto"
         },
         collapsingPanel: /// <summary>
-        /// Specifies which panel should be collapsed after clicking the expander of splitter.
-        /// Possible values are: "panel1" & "panel2".
+        /// Specifies which panel should be collapsed after clicking the expander of the splitter. Possible values are "panel1" and "panel2".
+        /// Code example:
+        /// $('.selector¡¯).wijsplitter({collapsingPanel: "panel1"});
         /// Default: "panel1".
         /// Type: String.
         /// </summary>

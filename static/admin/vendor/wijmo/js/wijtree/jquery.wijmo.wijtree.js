@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -313,13 +313,17 @@ var wijmo;
         wijtree.prototype.getSelectedNodes = /*public methods*/
         function () {
             /// <summary>
-            /// Get the selected nodes
+            /// The getSelectedNodes method gets the selected nodes.
+            /// Code Example:
+            /// $("selector").wijtree("getSelectedNodes");
             /// </summary>
             return this._selectedNodes;
         };
         wijtree.prototype.getCheckedNodes = function () {
             /// <summary>
-            /// Get the checked nodes
+            /// The getCheckedNodes method gets the nodes which are checked.
+            /// Code Example:
+            /// $("selector").wijtree("getCheckedNodes");
             /// </summary>
                         var self = this, checkedNodes = [], nodeWidgetName = self.nodeWidgetName;
             $(self._nodeSelector(), self.element).each(function (idx, ele) {
@@ -331,7 +335,9 @@ var wijmo;
         };
         wijtree.prototype.destroy = function () {
             /// <summary>
-            /// Destroy the widget
+            /// The destroy method will remove the rating functionality completely and will return the element to its pre-init state.
+            /// Code Example:
+            /// $("selector").wijtree("destroy");
             /// </summary>
                         var self = this, $nodes = self.$nodes, o = self.options, c = [
                 "wijmo-wijtree", 
@@ -357,7 +363,9 @@ var wijmo;
         };
         wijtree.prototype.add = function (node, position) {
             /// <summary>
-            /// Add a node to the element.
+            /// The add method adds a node to the tree widget.
+            /// Code Example:
+            /// $("#tree").wijtree("add", "node 1", 1);
             /// </summary>
             /// <param name="node" type="String,Object">
             /// which node to be added
@@ -418,7 +426,9 @@ var wijmo;
                     };
         wijtree.prototype.remove = function (node) {
             /// <summary>
-            /// Remove a node to the element.
+            /// The remove method removes the indicated node from the wijtree element.
+            /// Code Example:
+            /// $("#tree").wijtree("remove", 1);
             /// </summary>
             /// <param name="node" type="String,Object">
             /// which node to be removed
@@ -452,14 +462,18 @@ var wijmo;
         };
         wijtree.prototype.getNodes = function () {
             /// <summary>
-            ///  Gets a array that contains the root nodes of the current tree.
+            /// The getNodes method gets an array that contains the root nodes of the current tree.
+            /// Code Example:
+            /// $("#tree").wijtree("getNodes");
             /// </summary>
             /// <returns type="array" />
             return this.nodes;
         };
         wijtree.prototype.findNodeByText = function (txt) {
             /// <summary>
-            /// Find node by the node text
+            /// The findNodeByText method finds a node by the specified node text.
+            /// Code Example:
+            /// $("#tree").wijtree("findNodeByText", "node 1");
             /// </summary>
             /// <param name="txt" type="String">
             /// the text of which node you want to find
@@ -1792,7 +1806,9 @@ var wijmo;
         };
         wijtreenode.prototype.getNodes = function () {
             /// <summary>
-            ///  Gets a array that contains the root nodes of the current tree node.
+            /// The getNodes method gets an array that contains the root nodes of the current tree node.
+            /// Code Example:
+            /// $('.selector¡¯).wijtreenode("getNodes");
             /// </summary>
             /// <returns type="array" />
             return this._getField("nodes");
@@ -1849,13 +1865,13 @@ var wijmo;
         };
         wijtreenode.prototype.expand = function () {
             /// <summary>
-            /// Expands the node
+            /// Expands the node.
             /// </summary>
             this._setOption("expanded", true);
         };
         wijtreenode.prototype.collapse = function () {
             /// <summary>
-            /// Collapses the node
+            /// Collapses the node.
             /// </summary>
             this._setOption("expanded", false);
         };
@@ -2182,14 +2198,14 @@ var wijmo;
         ":jqmData(role='wijtreenode')",
         accessKey: "",
         checked: ///	<summary>
-        ///	Checks the node when it set to true; otherwise, it unchecks the node.
+        ///	The checked option checks the tree node checkbox when it is set to true. It will uncheck the tree node checkbox when set to false.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtreenode("checked",true).
         ///	</summary>
         false,
         collapsedIconClass: ///	<summary>
-        ///	Sets the collapsed icon (base on ui-icon) of the node
+        ///	The collapsedIconClass option sets the collapsed node icon (based on ui-icon) for the specified nodes.
         /// Type:String.
         /// Default:"".
         /// Code example:
@@ -2197,66 +2213,63 @@ var wijmo;
         ///	</summary>
         "",
         expanded: ///	<summary>
-        ///	Sets the node to expanded (if true) or collapsed (if false).
+        ///	The expanded option will expand the tree node if set to "true." It will collapse the tree node if set to "false.".
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtreenode("expanded",true).
         ///	</summary>
         false,
         expandedIconClass: ///	<summary>
-        ///	Sets the expanded icon (base on ui-icon) of the node
+        ///	The expandedIconClass option sets the expanded node icon (based on ui-icon) for the specified nodes.
         /// Type:String.
         /// Default:"".
         /// Code example:$(".selector").wijtreenode("expandedIconClass","iconClass").
         ///	</summary>
         "",
         itemIconClass: ///	<summary>
-        ///	Sets the icon (base on ui-icon) of the node
-        /// It will displayed on both expanded and collapsed node
-        /// when expandedIconClass & collapsedIconClass is empty,
+        ///	The itemIconClass option sets the node icon (based on ui-icon). It will be displayed on both expanded and collapsed nodes when the expandedIconClass and collapsedIconClass options are not specified.
         /// Type:String.
         /// Default:"".
         /// Code example:$(".selector").wijtreenode("itemIconClass","iconClass").
         ///	</summary>
         "",
         navigateUrl: ///	<summary>
-        ///	Sets the navigate url link of the node
+        ///	The navigateUrl option sets the node's navigate url link.
         /// Type:String.
         /// Default:"".
         /// Code example:$(".selector").wijtreenode("navigateUrl","http://google.com).
         ///	</summary>
         "",
         selected: ///	<summary>
-        ///	Selects this node when it set to true,otherwise unselects the node
+        ///	The selected option selects the specified node when set to true, otherwise it unselects the node.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtreenode("selected",true).
         ///	</summary>
         false,
         text: ///	<summary>
-        ///	Sets the node's text.
+        ///	This option sets the node¡¯s text.
         /// Type:String.
         /// Default:"".
         /// Code example:$(".selector").wijtreenode("text","Hello World!").
         ///	</summary>
         "",
         toolTip: ///	<summary>
-        ///	Sets the node's tooltip.
+        ///	The toolTip option sets the node¡¯s tooltip.
         /// Type:String.
         /// Default:"".
         /// Code example:$(".selector").wijtreenode("toolTip","Node 1 toolTip").
         ///	</summary>
         "",
         hasChildren: ///	<summary>
-        ///	Determines whether this nodes has child nodes.
-        /// It's always use for custom add child nodes (like async load).
+        ///	The hasChildren option determines whether the specified node has child nodes. It's always used when you're custom adding child nodes, such as in an async load.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtreenode("hasChildren",true).
         ///	</summary>
         false,
         params: ///	<summary>
-        ///	The parameter need to pass when custom load child nodes.
+        ///	The params option sets the parameter needed to pass when the user is custom loading child nodes.
         /// Type:Boolean.
         /// Default:{}.
         /// Code example:$(".selector").wijtreenode("ajaxParams",{}).
@@ -2278,42 +2291,42 @@ var wijmo;
             stateActive: "ui-btn-down-c"
         },
         allowDrag: ///	<summary>
-        /// Allows tree nodes to be dragged
+        /// When the allowDrag option is set to true, the tree nodes can be dragged.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtree("option","allowDrag",true).
         ///	</summary>
         false,
         allowDrop: ///	<summary>
-        ///	Allows tree to be dropped within tree nodes.
+        ///	When allowDrop is set to true, one tree node can be dropped within another tree node.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtree("option","allowDrop",true).
         ///	</summary>
         false,
         allowEdit: ///	<summary>
-        ///	Allows tree nodes to be edited at run time.
+        ///	The allowEdit option allows a user to edit the tree nodes at run time.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:$(".selector").wijtree("option","allowEdit",true).
         ///	</summary>
         false,
         allowSorting: ///	<summary>
-        ///	Allows tree nodes to be sorted at run time.
+        ///	The allowSorting option allows the tree nodes to be sorted at run time when the user presses the "s" key.
         /// Type:Boolean.
         /// Default:true.
         /// Code example:$(".selector").wijtree("option","allowSorting",false).
         ///	</summary>
         true,
         allowTriState: ///	<summary>
-        ///	Allow triState of checkBox.
+        ///	The allowTriState option allows the tree nodes to exhibit triState behavior. This lets the node checkboxes be checked, unchecked, or indeterminate. This option must be used with the showCheckBoxes option.
         /// Type:Boolean.
         /// Default:true.
         /// Code example:$(".selector").wijtree("option","allowTriState",false).
         ///	</summary>
         true,
         autoCheckNodes: ///	<summary>
-        ///	Allows sub-nodes to be checked upon parent node check.
+        ///	The autoCheckNodes option allows the sub-nodes to be checked when the parent nodes are checked. To use this option, showCheckboxes must be set to "true."
         /// Type:Boolean.
         /// Default:true.
         /// Code example:$(".selector").wijtree("option","autoCheckNodes",false).
@@ -2336,8 +2349,7 @@ var wijmo;
         ///	</summary>
         false,
         expandCollapseHoverUsed: ///	<summary>
-        ///	If this option is set to true, the tree will be expand/Collapse
-        /// when the mouse hovers on the expand/Collapse button
+        ///	The expandCollapseHoverUsed option allows the tree to expand or collapse when the mouse hovers over the expand/collapse button.
         /// Type:Boolean.
         /// Default:false.
         /// Code example:
@@ -2345,7 +2357,7 @@ var wijmo;
         ///	</summary>
         false,
         showCheckBoxes: ///	<summary>
-        ///	Allows the CheckBox to be shown on tree nodes
+        ///	The showCheckBoxes option allows the node Check Box to be shown on the tree nodes.
         /// Type:Boolean.
         /// Default:true.
         /// Code example:
@@ -2353,15 +2365,14 @@ var wijmo;
         ///	</summary>
         false,
         showExpandCollapse: ///	<summary>
-        ///	Allows tree nodes to be expanded or collapsed
+        ///	The showExpandCollapse option determines if the tree is displayed in an expanded or collapsed state. If set to "false," then the wijtree widget will be displayed in the expanded state.
         /// Type:Boolean.
         /// Default:true.
         /// Code example:$(".selector").wijtree("option","showExpandCollapse",false).
         ///	</summary>
         true,
         expandAnimation: ///	<summary>
-        ///	Animation options for showing the child nodes
-        /// when the parent node is expanded.
+        ///	The expandAnimation option determines the animation effect, easing, and duration for showing child nodes when the parent node is expanded.
         /// Type:Object.
         /// Default:{ effect: "blind", easing: "linear", duration: 200 }.
         /// Code example:$(".selector").wijtree("option","expandAnimation",
@@ -2373,15 +2384,14 @@ var wijmo;
             duration: 200
         },
         expandDelay: ///	<summary>
-        ///	The duration of the time to delay before the node is expanded.
+        ///	The expandDelay option controls the length of time in milliseconds to delay before the node is expanded.
         /// Type:Number.
         /// Default:0.
         /// Code example:$(".selector").wijtree("option","expandDelay",100).
         ///	</summary>
         0,
         collapseAnimation: ///	<summary>
-        /// Animation options for hiding the child nodes
-        /// when the parent node is collapsed.
+        /// The collapseAnimation option determines the animation effect, easing, and duration for hiding child nodes when the parent node is collapsed.
         /// Type:Object.
         /// Default:{ effect: "blind", easing: "linear", duration: 200 }.
         /// Code example:$(".selector").wijtree("option","collapseAnimation",
@@ -2393,7 +2403,7 @@ var wijmo;
             duration: 200
         },
         collapseDelay: ///	<summary>
-        ///	The duration of the time to delay before the node is collapsed.
+        ///	This option controls the length of time in milliseconds to delay before the node collapses.
         /// Type:Number.
         /// Default:0.
         /// Code example:$(".selector").wijtree("option","collapseDelay",100).
@@ -2438,7 +2448,7 @@ var wijmo;
         /// </summary>
         null,
         nodeBlur: /// <summary>
-        /// The nodeBlur event handler. A function called when a node is blurred.
+        /// The nodeBlur event fired when the node loses focus.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2455,7 +2465,7 @@ var wijmo;
         /// </param>
         null,
         nodeFocus: // <summary>
-        /// The nodeFocus event handler. A function called when a node is focused.
+        /// The nodeFocus event fired when the node is focused.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2472,7 +2482,7 @@ var wijmo;
         /// </param>
         null,
         nodeClick: /// <summary>
-        /// The nodeClick event handler. A function called when a node is clicked.
+        /// The nodeClick event fires when a tree node is clicked.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2489,8 +2499,7 @@ var wijmo;
         /// </param>
         null,
         nodeCheckChanged: /// <summary>
-        /// The nodeCheckChanged event handler.
-        /// A function called when a node is checked or unchecked.
+        /// The nodeCheckChanged event fires when a node is checked.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2507,8 +2516,7 @@ var wijmo;
         /// </param>
         null,
         nodeCollapsed: /// <summary>
-        /// The nodeCollapsed event handler.
-        /// A function called when a node is collapsed.
+        /// The nodeCollapsed event fires when a tree node is collapsed.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2561,8 +2569,7 @@ var wijmo;
         /// </param>
         null,
         nodeDragStarted: /// <summary>
-        /// The nodeDragStarted event handler.
-        /// A function called when a user starts to drag a node.
+        /// The nodeDragStarted event fires when a user starts to drag a node.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2579,9 +2586,7 @@ var wijmo;
         /// </param>
         null,
         nodeBeforeDropped: /// <summary>
-        /// The nodeBeforeDropped event handler.
-        /// A function called before an acceptable draggable node
-        /// is dropped over to another position.
+        /// The nodeBeforeDropped event handler is called before a draggable node is dropped in another position. If the event handler returns false, the drop action will be prevented.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2598,9 +2603,7 @@ var wijmo;
         /// </param>
         null,
         nodeDropped: /// <summary>
-        /// The nodeDropped event handler.
-        /// A function called when an acceptable draggable node
-        /// is dropped over to another position.
+        /// The nodeDropped event is called when an acceptable draggable node is dropped over to another position.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2628,8 +2631,7 @@ var wijmo;
         /// </param>
         null,
         nodeMouseOver: /// <summary>
-        /// The nodeMouseOver event handler.
-        /// A function called when the user mouses over the node.
+        /// The nodeMouseOver event fires when a user places the mouse pointer over a node.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2646,8 +2648,7 @@ var wijmo;
         /// </param>
         null,
         nodeMouseOut: /// <summary>
-        /// The nodeMouseOut event handler.
-        /// A function called when the user mouses out of the node.
+        /// The nodeMouseOut event fires when the user moves the mouse pointer off of a node.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2664,8 +2665,7 @@ var wijmo;
         /// </param>
         null,
         nodeTextChanged: /// <summary>
-        /// The nodeTextChanged event handler.
-        /// A function called when the text of the node changes.
+        /// The nodeTextChanged event fires when the text of a node changes.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2682,8 +2682,7 @@ var wijmo;
         /// </param>
         null,
         selectedNodeChanged: /// <summary>
-        /// The selectedNodeChanged event handler.
-        /// A function called when the selected node changes.
+        /// The selectedNodeChanged event fires when the selected node changes.
         /// Default: null
         /// Type: Function
         /// Code example:
@@ -2700,7 +2699,7 @@ var wijmo;
         /// </param>
         null,
         nodeExpanding: /// <summary>
-        /// A function called before expanding the node,
+        /// The nodeExpanding event fires before a tree node is expanded.
         /// This event can be canceled, if return false
         /// Code example:
         /// Supply a function as an option.
@@ -2716,7 +2715,7 @@ var wijmo;
         /// </param>
         null,
         nodeCollapsing: /// <summary>
-        /// A function called before collapsing the node,
+        /// The nodeCollapsing event fires before a node collapses.
         /// This event can be canceled, if return false
         /// Code example:
         /// Supply a function as an option.

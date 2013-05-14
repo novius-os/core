@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -187,24 +187,23 @@ var wijmo;
             // so that it can be removed after the new version of the
             // page is loaded off the network.
             null, absUrl = this._makeAbsoluteUrl(url);
+            // ==== Disable caching for now ====
             // Check to see if the page already exists in the DOM.
             // NOTE do _not_ use the :jqmData psuedo selector because parenthesis
             //      are a valid url char and it breaks on the first occurence
-            page = $($.grep(this._pageStore, function (p) {
-                return p.jqmData("url") === absUrl;
-            })[0]).clone();
+            // page = $($.grep(this._pageStore, (p) => p.jqmData("url") === absUrl)[0]).clone();
             // If the page we are interested in is already in the DOM,
             // and the caller did not indicate that we should force a
             // reload of the file, we are done. Otherwise, track the
             // existing page as a duplicated.
-            if(page.length) {
-                if(isLocal || !settings.reloadPage) {
-                    // enhancePage(page, settings.role);
-                    deferred.resolve(absUrl, options, page);
-                    return deferred.promise();
-                }
-                dupCachedPage = page;
-            }
+            //if (page.length) {
+            //    if (isLocal || !settings.reloadPage) {
+            //	    // enhancePage(page, settings.role);
+            //	    deferred.resolve(absUrl, options, page);
+            //	    return deferred.promise();
+            //    }
+            //    dupCachedPage = page;
+            //}
             if(settings.data) {
                 switch(settings.type) {
                     case "get":

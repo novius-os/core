@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1177,7 +1177,11 @@ var wijmo;
             });
         };
         WijLightBox.prototype.show = function (index) {
-            /// <summary>Shows the content in specified index.</summary>
+            /// <summary>
+            /// Shows the content in specified index.
+            /// Code Example:
+            /// $("#id").wijlightbox('show');
+            /// </summary>
             this._show(index);
             return this;
         };
@@ -1310,7 +1314,11 @@ var wijmo;
             return this;
         };
         WijLightBox.prototype.next = function () {
-            /// <summary>Moves to the next panel.</summary>
+            /// <summary>
+            /// Moves to the next panel.
+            /// Code Example:
+            /// $("#id").wijlightbox('next');
+            /// </summary>
             var o = this.options;
             if(!this._groupMode()) {
                 return false;
@@ -1326,7 +1334,11 @@ var wijmo;
             return false;
         };
         WijLightBox.prototype.back = function () {
-            /// <summary>Moves to the previous panel.</summary>
+            /// <summary>
+            /// Moves to the previous panel.
+            /// Code Example:
+            /// $("#id").wijlightbox('back');
+            /// </summary>
             var o = this.options;
             if(!this._groupMode()) {
                 return false;
@@ -1343,13 +1355,19 @@ var wijmo;
         };
         WijLightBox.prototype.adjustPosition = function () {
             ///<summary>
-            /// Adjust the position of lightbox according to the "position" option.
+            /// Adjust the position of lightbox according to the "position" option set it originally to a new location. .
             /// It is usually called after window resized.
+            /// Code Example:
+            /// $("#id").wijlightbox('adjustPosition');
             ///</summary >
             this._position();
         };
         WijLightBox.prototype.isPlaying = function () {
-            /// <summary>Determines whether the slide playing is on process.</summary>
+            /// <summary>
+            ///	Determines whether the lightbox is currently displaying images automatically.See the play method for more information.
+            /// Code Example:
+            /// $("#id").wijlightbox('isPlaying');
+            /// </summary >
             return !!this.container.data('playing.wijlightbox');
         };
         WijLightBox.prototype._startTimer = function () {
@@ -1379,7 +1397,11 @@ var wijmo;
             }
         };
         WijLightBox.prototype.play = function () {
-            /// <summary>Starts displaying the images in order automatically.</summary>
+            /// <summary>
+            /// Starts displaying the images in order automatically.
+            /// Code Example:
+            /// $("#id").wijlightbox('isPlaying');
+            /// </summary>
             if(!this._groupMode()) {
                 return false;
             }
@@ -1391,7 +1413,11 @@ var wijmo;
             this._startTimer();
         };
         WijLightBox.prototype.stop = function () {
-            /// <summary>Stops the slide playing mode.</summary>
+            /// <summary>
+            /// Stops the slide playing mode.
+            /// Code Example:
+            /// $("#id").wijlightbox('stop');
+            ///</summary>
             this.container.removeData('playing.wijlightbox');
             this._refreshCtrlButtons();
             this._removeTimerBar();
@@ -1865,9 +1891,13 @@ var wijmo;
         ///	</summary>
         '',
         groupItems: ///	<summary>
-        ///	The array of data items.
+        ///	Determines the array of data items.
         /// Default: []
         /// Type: Array
+        /// Code example:
+        ///  $("#id").wijlightbox({
+        ///      groupItems: []
+        ///  });
         ///	</summary>
         null,
         rootUrl: ///	<summary>
@@ -1978,8 +2008,7 @@ var wijmo;
         ///	</summary>
         'inside',
         showControlsOnHover: ///	<summary>
-        ///	Determines whether to display the control buttons only
-        /// when hovering the mouse to the content.
+        ///	Determines whether to display the control buttons only when hovering the mouse over the content.
         /// Default: true
         /// Type: Boolean
         /// Code example:
@@ -2009,8 +2038,7 @@ var wijmo;
         ///	</summary>
         false,
         modal: ///	<summary>
-        ///	Determines whether the popped up
-        /// content is displayed in modal style container.
+        ///	Determines whether the window is modal.
         /// Default: false
         /// Type: Boolean
         /// Code example:
@@ -2020,7 +2048,7 @@ var wijmo;
         ///	</summary>
         false,
         position: ///	<summary>
-        ///	Determines the popup position of content window.
+        ///	Determines the pop-up position of content window.
         /// Please see jquery.ui.position for possible options.
         ///	</summary>
         {
@@ -2047,8 +2075,8 @@ var wijmo;
         ///	</summary>
         1000,
         closeOnEscape: ///	<summary>
-        ///	Determines whether to close the popup window
-        /// when user presses the ESC key.
+        ///	Determines whether to close the pop-up window
+        /// when a user presses the ESC key.
         /// Default: true
         /// Type: Boolean
         /// Code example:
@@ -2058,8 +2086,8 @@ var wijmo;
         ///	</summary>
         true,
         closeOnOuterClick: ///	<summary>
-        ///	Determines whether to close the popup window
-        /// when user clicks on the out side of content.
+        ///	Determines whether to close the pop-up window
+        /// when user clicks on the outside of content.
         /// Default: true
         /// Type: Boolean
         /// Code example:
@@ -2104,7 +2132,7 @@ var wijmo;
         ///	Store the latest active index in a cookie.
         ///	The cookie is then used to determine the initially active index
         /// if the activeIndex option is not defined.
-        ///	Requires cookie plugin.
+        ///	This requires cookie plugin.
         /// The object needs to have key/value pairs of
         /// the form the cookie plugin expects as options.
         /// e.g. { expires: 7, path: '/', domain: 'jquery.com', secure: true }
@@ -2112,8 +2140,9 @@ var wijmo;
         null,
         transAnimation: ///	<summary>
         ///	Determines the animation style when switching between pages.
+        /// Possible values are 'slide', 'fade', 'none'
         /// Default: {
-        ///     animated: 'fade', // Possible values are 'slide', 'fade', 'none'
+        ///     animated: 'fade',
         ///     duration: 400,
         ///     easing: 'easeInQuad'
         /// }
@@ -2158,7 +2187,7 @@ var wijmo;
             duration: 400
         },
         textShowOption: ///	<summary>
-        ///	Determines the animation style when showing out the text.
+        ///	Determines the animation style when showing the text.
         /// Default: {
         ///	    duration: 300,
         ///	    easing: 'linear'
@@ -2216,7 +2245,7 @@ var wijmo;
         ///	</summary>
         true,
         flashParams: ///	<summary>
-        ///	A hash object that contains parameters for flash object.
+        ///	Determines a hash object that contains parameters for a flash object.
         /// Default: {
         ///     bgcolor: "#000000",
         ///     allowfullscreen: true
@@ -2235,7 +2264,7 @@ var wijmo;
             allowfullscreen: true
         },
         flashVars: ///	<summary>
-        ///	A hash object that contains variants for flash object.
+        ///	Determines a hash object that contains variants for a flash object.
         /// Default: {}
         /// Type: Object
         /// Code example:
@@ -2249,7 +2278,7 @@ var wijmo;
         {
         },
         flashVersion: ///	<summary>
-        ///	Version of flash object.
+        ///	Version of Flash object.
         /// Default: "9.0.115"
         /// Type: String
         /// Code example:
@@ -2259,7 +2288,7 @@ var wijmo;
         ///	</summary>
         "9.0.115",
         flvPlayer: ///	<summary>
-        ///	The relative path and name of the flash vedio player.
+        ///	Determines the relative path and name of the flash vedio player.
         /// Default: 'player\\player.swf'
         /// Type: String
         /// Code example:
@@ -2269,7 +2298,7 @@ var wijmo;
         ///	</summary>
         'player\\player.swf',
         flashInstall: ///	<summary>
-        ///	The relative path and name of the flash installation guide.
+        ///	Determines the relative path and name of the flash installation guide.
         /// Default: 'player\\expressInstall.swf'
         /// Type: String
         /// Code example:

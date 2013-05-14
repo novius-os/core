@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -983,12 +983,21 @@ var wijmo;
             }
         };
         WijGallery.prototype.destroy = function () {
+            /// <summary>
+            /// Removes the wijgallery functionality completely. This returns the element to its pre-init state.
+            /// Code Example:
+            /// $("#element").wijgallery("destroy");
+            /// </summary>
             this._wijdestroy();
             $.Widget.prototype.destroy.apply(this);
         };
         WijGallery.prototype.show = function (index) {
             /// <summary>
-            /// Show the picture at specified index .
+            /// Shows the picture at the specified index.
+            /// Parameter:
+            /// index(number) - The zero - based index of the picture to show.
+            /// Code Example:
+            /// $("#element").wijgallery("show", 1);
             /// </summary>
             var self = this;
             self._resetState();
@@ -996,7 +1005,9 @@ var wijmo;
         };
         WijGallery.prototype.next = function () {
             /// <summary>
-            /// Show the next picture.
+            /// Shows the next picture in the gallery.
+            /// Code Example:
+            /// $("#element").wijgallery("next");
             /// </summary>
                         var self = this, idx;
             self._resetState();
@@ -1007,7 +1018,9 @@ var wijmo;
         };
         WijGallery.prototype.previous = function () {
             /// <summary>
-            /// Show the previous picture.
+            /// Shows the previous picture in the gallery.
+            /// Code Example:
+            /// $("#element").wijgallery("previous");
             /// </summary>
                         var self = this, idx;
             self._resetState();
@@ -1018,7 +1031,9 @@ var wijmo;
         };
         WijGallery.prototype.play = function (isFirst) {
             /// <summary>
-            /// Start displaying the images in order automatically.
+            /// Automatically displays each of the images in order.
+            /// Code Example:
+            /// $("#element").wijgallery("play");
             /// </summary>
                         var self = this, o = self.options;
             if(self.isPlaying || o.disabled) {
@@ -1060,6 +1075,8 @@ var wijmo;
         WijGallery.prototype.pause = function () {
             /// <summary>
             /// Stop displaying the images in order automatically.
+            /// Code Example:
+            /// $("#element").wijgallery("pause");
             /// </summary>
                         var self = this, o = self.options;
             if(o.showTimer && self.progressBar) {
@@ -1084,6 +1101,8 @@ var wijmo;
             /// it should be a jQuery Element or HTML string.
             /// The second parameter is the index of item to add ,
             /// If  no index specified the item will be added at the last of item collection.
+            /// Code Example:
+            /// $("#element").wijgallery("add", "<li><img..></li>", index);
             /// </summary>
                         var self = this, item, idx, data;
             if(typeof ui === "string") {
@@ -1116,6 +1135,8 @@ var wijmo;
             /// Removes the item at specified index.
             /// The parameter is the index of item to add ,
             /// If  no index specified the last item will be removed.
+            /// Code Example:
+            /// $("#element").wijgallery("remove", index);
             /// </summary>
                         var self = this, idx;
             if(isNaN(index) || index > self.count) {
@@ -1267,7 +1288,7 @@ var wijmo;
         /// </summary>
         false,
         scrollWithSelection: /// <summary>
-        /// If it is set to true the thumbnails will auto
+        /// If set to true, the thumbnails will auto
         /// scrolled after you select the image.
         /// Default: false.
         /// Type: Boolean.
@@ -1275,7 +1296,7 @@ var wijmo;
         /// </summary>
         false,
         showTimer: /// <summary>
-        /// Determines the time span between pictures in autoplay mode.
+        /// Determines if the timer bar should be shown.
         /// Default: false.
         /// Type: Boolean.
         /// Code example: $("#element").wijgallery( { interval: 3000 } );
@@ -1296,7 +1317,7 @@ var wijmo;
         /// </summary>
         true,
         showThumbnailCaptions: /// <summary>
-        /// Determines whether the caption of thumbnails should be shown.
+        /// Determines whether to show captions for the thumbnails in the gallery.
         /// Default: true.
         /// Type: Boolean.
         /// Code example: $("#element").wijgallery( { showThumbnailCaptions: true } );
@@ -1356,7 +1377,7 @@ var wijmo;
         /// </summary>
         // captionOrientation: "horizontal",
         /// <summary>
-        /// Determines if the counter should be shown.
+        /// Determines whether the controls should be shown after the dom element is created or hovered on.
         /// Default: true.
         /// Type: Boolean.
         /// Code example: $("#element").wijgallery( {
@@ -1405,8 +1426,7 @@ var wijmo;
         ///</summary>
         /// thumbnails: true,
         /// <summary>
-        /// Determines the orientation of the thumbnails.
-        /// Possible values are: "vertical" & "horizontal"
+        /// Determines the orientation of the thumbnails. Possible values are: "vertical" and "horizontal".
         /// Default: "horizontal".
         /// Type: String.
         /// Code example: $("#element").wijgallery( {
@@ -1415,8 +1435,7 @@ var wijmo;
         /// </summary>
         "horizontal",
         thumbnailDirection: /// <summary>
-        /// Determines the direction of the thumbnails.
-        /// Possible values are: "before" & "after"
+        /// Determines the direction of the thumbnails. Possible values are: "before" and "after".
         /// Default: "after".
         /// Type: String.
         /// Code example: $("#element").wijgallery( {
@@ -1426,8 +1445,7 @@ var wijmo;
         "after",
         transitions: //
         /// <summary>
-        /// A value determines the settings of the animation effect to
-        /// be used when the wijgallery is scrolling.
+        /// A value that determines the settings of the animation effect to be used when the wijgallery is scrolling.
         /// Type: Object.
         /// Code example: $("#element").wijgallery( {
         ///		transitions: {
@@ -1442,8 +1460,7 @@ var wijmo;
             easing: null
         },
         showControlsOnHover: /// <summary>
-        /// Determines whether the controls should be shown after created
-        /// or hover on the dom element.
+        /// Determines whether the controls should be shown after the dom element is created or hovered on.
         /// Default: true.
         /// Type: Boolean.
         /// Code example: $("#element").wijgallery( { showControlsOnHover: true } );
@@ -1457,15 +1474,14 @@ var wijmo;
         /// </summary>
         5,
         thumbsLength: /// <summary>
-        /// Determines how many thumbnails should be displayed.
+        /// Determines the length of the thumbnails.
         /// Default: 5.
         /// Type: Number.
         /// Code example: $("#element").wijgallery( { thumbsDisplay: 6 } );
         /// </summary>
         100,
         beforeTransition: /// <summary>
-        /// The beforeTransition event handler.
-        /// A function called before transition to another image.
+        /// This is the beforeTransition event handler. It is a function called before transitioning to another image.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -1484,8 +1500,7 @@ var wijmo;
         /// </param>
         null,
         afterTransition: /// <summary>
-        /// The afterTransition event handler.
-        /// A function called after transition played over.
+        /// The afterTransition event handler. A function called after the transition is over.
         /// Default: null.
         /// Type: Function.
         /// Code example:
@@ -1504,8 +1519,7 @@ var wijmo;
         /// </param>
         null,
         loadCallback: /// <summary>
-        /// The loadCallback event handler.
-        /// A function called after created the dom element.
+        /// The loadCallback event handler. A function called after the dom element is created.
         /// Default: null.
         /// Type: Function.
         /// Code example:

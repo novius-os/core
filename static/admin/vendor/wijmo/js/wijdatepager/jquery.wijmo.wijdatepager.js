@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -154,7 +154,7 @@ var wijmo;
             this.invalidate();
         };
         wijdatepager.prototype.invalidate = ///	<summary>
-        ///	Refreshes the widget layout.
+        ///	Redraws the widget layout.
         ///	</summary>
         function () {
             var selectedPage, selectedDate = this.options.selectedDate, newIndex, container = this.element.find(".wijmo-wijdatepager-container"), decBtn = this.element.find(".wijmo-wijdatepager-decrement"), incBtn = this.element.find(".wijmo-wijdatepager-increment"), innerWidth = this.element.innerWidth(), decBtnW = decBtn.is(":visible") ? decBtn.outerWidth(true) : 0, incBtnW = incBtn.is(":visible") ? incBtn.outerWidth(true) : 0, pagesBg, pageLabels, pageWidth;

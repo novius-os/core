@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1014,6 +1014,8 @@ var wijmo;
             getContentElement: function () {
                 /// <summary>
                 /// Gets the content element of wijsuperpanel.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("getContentElement");
                 /// </summary>
                 /// <returns type="JQueryObj" />
                 return this._fields().templateWrapper;
@@ -1669,7 +1671,10 @@ var wijmo;
         });
         wijsuperpanel.prototype.options = $.extend(true, {
         }, wijmo.wijmoWidget.prototype.options, {
-            wijMobileCSS: {
+            wijMobileCSS: /// <summary>
+            /// wijMobileCSS.
+            /// </summary>
+            {
                 header: "ui-header ui-bar-a",
                 content: "ui-body-c",
                 stateDefault: "ui-btn-up-c",
@@ -1682,21 +1687,29 @@ var wijmo;
             /// </summary>
             ":jqmData(role='wijsuperpanel')",
             allowResize: /// <summary>
-            /// This value determines whether the wijsuperpanel can be resized.
+            /// The value determines whether the wijsuperpanel can be resized.
             /// Default: false.
             /// Type: Boolean.
             /// </summary>
             false,
             autoRefresh: /// <summary>
-            /// This value determines whether wijsuperpanel to automatically refresh
-            /// when content size or wijsuperpanel size are changed.
+            /// This value determines whether wijsuperpanel is automatically refreshed when the content size or wijsuperpanel size are changed.
+            /// Set this value to true if you load images in the wijsuperpanel without specifying their sizes.
             /// Default: false.
             /// Type: Boolean.
             /// </summary>
             false,
             animationOptions: /// <summary>
-            /// The animation properties of wijsuperpanel scrolling.
+            /// The animationOptions function determines whether or not the animation is shown. If true, it defines the animation effect and controls other aspects of the widget's animation, such as duration, queue, and easing.
             /// Type: Object.
+            /// Code Example:
+            ///   $('#superPanel').wijsuperpanel({
+            ///     animationOptions: {
+            ///         disabled: false,
+            ///         duration: 1000,
+            ///         easing: easeInQuad
+            ///     }
+            ///   });
             /// </summary>
             /// <remarks>
             /// Set this options to null to disable animation.
@@ -1721,7 +1734,7 @@ var wijmo;
                 /// </summary>
                 250,
                 easing: /// <summary>
-                /// This value sets the animation easing of the scrolling animation.
+                /// Sets the type of animation easing effect that users experience as the panel is scrolled. You can create custom easing animations using jQuery UI Easings.
                 /// Default: undefined.
                 /// Type: string.
                 /// </summary>
@@ -1743,9 +1756,9 @@ var wijmo;
             /// </param>
             /// <param name="data" type="Object">
             /// The data that relates to this event.
-            /// data.direction: the direction of the scrollbar("horizontal" or "vertical").
-            /// data.targetBarLen: the height of the horizontal scrollbar.
-            /// data.contentLength: the height of the content.
+            /// data.direction: The direction of the scrollbar, Possible values are "v"(vertical) and "h"(horizontal)..
+            /// data.targetBarLen: The height of the horizontal scrollbar.
+            /// data.contentLength: The height of the content.
             /// </param>
             null,
             hScroller: /// <summary>
@@ -1773,9 +1786,9 @@ var wijmo;
                 /// <remarks>
                 /// Possible options are "auto", "visible" and "hidden".
                 /// "auto" - Shows the scroll when needed.
-                /// "visible" - Scroll bar will always be visible. It"s disabled
+                /// "visible" - The Scroll bar is always visible. It is disabled
                 /// when not needed.
-                /// "hidden" - Scroll bar will be hidden.
+                /// "hidden" - The Scroll bar is hidden.
                 /// </remarks>
                 "auto",
                 scrollMode: /// <summary>
@@ -1806,24 +1819,24 @@ var wijmo;
                 /// </summary>
                 null,
                 scrollMax: /// <summary>
-                /// This value sets the maximum value of horizontal scroller.
+                /// This value sets the maximum value of the horizontal scroller.
                 /// Default: 100.
                 /// Type: Number.
                 /// </summary>
                 100,
                 scrollMin: /// <summary>
-                /// This value sets the minimum value of horizontal scroller.
+                /// This value sets the minimum value of the horizontal scroller.
                 /// Default: 0.
                 /// Type: Number.
                 /// </summary>
                 0,
                 scrollLargeChange: /// <summary>
-                /// This value sets the large change value of horizontal scroller.
+                /// This value sets the large change value of the horizontal scroller.
                 /// Default: null.
                 /// Type: Number.
                 /// </summary>
                 /// <remarks>
-                /// wijsuperpanel will scroll a large change when a user clicks on the
+                /// Wijsuperpanel will scroll a large change when a user clicks on the
                 /// tracks of scroll bars or presses left or right arrow keys on the
                 /// keyboard with the shift key down.
                 /// When scrollLargeChange is null, wijsuperpanel will scroll
@@ -1831,12 +1844,12 @@ var wijmo;
                 /// </remarks>
                 null,
                 scrollSmallChange: /// <summary>
-                /// This value sets the small change value of horizontal scroller.
+                /// This value sets the small change value of the horizontal scroller.
                 /// Default: null.
                 /// Type: Number.
                 /// </summary>
                 /// <remarks>
-                /// wijsuperpanel will scroll a small change when a user clicks on
+                /// Wijsuperpanel will scroll a small change when a user clicks on
                 /// the arrows of scroll bars, clicks or hovers scroll buttons,
                 /// presses left or right arrow keys on keyboard,
                 /// and hovers on the edge of wijsuperpanel.
@@ -1852,7 +1865,7 @@ var wijmo;
                 /// </summary>
                 6,
                 increaseButtonPosition: /// <summary>
-                /// This object determines the increase button position.
+                /// This is an object that determines the increase button position.
                 /// Default: null.
                 /// Type: Object.
                 /// </summary>
@@ -1861,36 +1874,32 @@ var wijmo;
                 /// </remarks>
                 null,
                 decreaseButtonPosition: /// <summary>
-                /// This object determines the decrease button position.
+                /// This is an object that determines the decrease button position.
                 /// Default: 0.
                 /// Type: Object.
                 /// </summary>
                 null,
                 hoverEdgeSpan: /// <summary>
-                /// This value sets the width of horizontal hovering edge
-                /// which will trigger the horizontal scrolling.
+                /// This value sets the width, in pixels, of the horizontal hovering edge which will trigger the horizontal scrolling.
                 /// Default: 20.
                 /// Type: Number.
                 /// </summary>
                 20,
                 firstStepChangeFix: /// <summary>
-                /// The number specifies the value to add to smallchange or largechange
-                /// when scrolling the first step(scrolling from scrollMin).
+                /// This number specifies the value to add to smallchange or largechange when scrolling the first step (scrolling from scrollMin).
                 /// Default: 0.
                 /// Type: Number.
                 /// </summary>
                 0
             },
             keyboardSupport: /// <summary>
-            /// A value determins whether wijsuperpanel provides
-            /// keyboard scrolling support.
+            /// This value determines whether wijsuperpanel provides keyboard scrolling support.
             /// Default: false.
             /// Type: Boolean.
             /// </summary>
             false,
             keyDownInterval: /// <summary>
-            /// This value determines the time interval to call the scrolling
-            /// function when doing continuous scrolling.
+            /// This value determines the time interval to call the scrolling function when doing continuous scrolling.
             /// Default: 100.
             /// Type: Number.
             /// </summary>
@@ -1905,15 +1914,13 @@ var wijmo;
             /// </remarks>
             true,
             bubbleScrollingEvent: /// <summary>
-            /// This value determines whether to fire the mouse wheel event
-            /// when wijsuperpanel is scrolled to the end.
+            /// This value determines whether to fire the mouse wheel event when wijsuperpanel is scrolled to the end.
             /// Default: true.
             /// Type: Boolean.
             /// </summary>
             true,
             resizableOptions: /// <summary>
-            /// This option determines the behavior of resizable widget.
-            /// See JQuery UI resizable options document.
+            /// This option determines the behavior of the resizable widget. See the JQuery UI resizable options document for more information.
             /// Type: Object.
             /// </summary>
             {
@@ -1921,7 +1928,7 @@ var wijmo;
                 helper: "ui-widget-content wijmo-wijsuperpanel-helper"
             },
             resized: /// <summary>
-            /// Resized event handler. A function gets called when resized event is fired.
+            /// Resized event handler. This function gets called when the resized event is fired.
             /// Default: null.
             /// Type: Function.
             /// code example:
@@ -1932,7 +1939,7 @@ var wijmo;
             /// </summary>
             null,
             dragStop: /// <summary>
-            /// This function gets called when thumb buttons of scrollbars dragging stops.
+            /// This function gets called when the user stops dragging the thumb buttons of the scrollbars.
             /// Default: null.
             /// Type: Function.
             /// code example:
@@ -1984,7 +1991,7 @@ var wijmo;
             /// </param>
             null,
             scroll: /// <summary>
-            /// Scroll event handler. A function called immediately after scrolling occurs.
+            /// Scroll event handler. This function is called before scrolling occurs.
             /// Default: null.
             /// Type: Function.
             /// code example:
@@ -2005,7 +2012,7 @@ var wijmo;
             /// </param>
             null,
             scrolled: /// <summary>
-            /// Scrolled event handler.  A function called after scrolling occurs.
+            /// Scrolled event handler. This function gets called after scrolling occurs.
             /// Default: null.
             /// Type: Function.
             /// code example:
@@ -2032,8 +2039,7 @@ var wijmo;
             /// </summary>
             true,
             vScrollerActivating: /// <summary>
-            /// The vScrollerActivating event handler.
-            /// A function called when vertical scrollbar is activating.
+            /// A function called when the vertical scrollbar is activating.
             /// Default: null
             /// Type: Function
             /// Code example:
@@ -2057,7 +2063,7 @@ var wijmo;
             /// </summary>
             {
                 scrollBarPosition: /// <summary>
-                /// This value determines the position of vertical scroll bar.
+                /// This value determines the position of the vertical scroll bar.
                 /// Default: "right".
                 /// Type: String.
                 /// </summary>
@@ -2103,26 +2109,26 @@ var wijmo;
                 /// </remarks>
                 "scrollBar",
                 scrollValue: /// <summary>
-                /// This value determines the vertical scrolling position of
+                /// This number determines the vertical scrolling position of
                 /// wijsuperpanel.
                 /// Default: null.
                 /// Type: Number.
                 /// </summary>
                 null,
                 scrollMax: /// <summary>
-                /// This value sets the maximum value of vertical scroller.
+                /// This number sets the maximum value of the vertical scroller.
                 /// Default: 100.
                 /// Type: Number.
                 /// </summary>
                 100,
                 scrollMin: /// <summary>
-                /// This value sets the minimum value of vertical scroller.
+                /// This number sets the minimum value of the vertical scroller.
                 /// Default: 0.
                 /// Type: Number.
                 /// </summary>
                 0,
                 scrollLargeChange: /// <summary>
-                /// This value sets the large change value of vertical scroller.
+                /// This value sets the large change value of the vertical scroller.
                 /// Default: null.
                 /// Type: Number.
                 /// </summary>
@@ -2135,7 +2141,7 @@ var wijmo;
                 /// </remarks>
                 null,
                 scrollSmallChange: /// <summary>
-                /// This value sets the small change value of vertical scroller.
+                /// This value sets the small change value of the vertical scroller.
                 /// Default: null.
                 /// Type: Number.
                 /// </summary>
@@ -2174,15 +2180,13 @@ var wijmo;
                 /// </remarks>
                 null,
                 hoverEdgeSpan: /// <summary>
-                /// This value sets the width of horizontal hovering edge
-                /// which will trigger the vertical scrolling.
+                /// This value sets the width of the horizontal hovering edge which will trigger the vertical scrolling.
                 /// Default: 20.
                 /// Type: Number.
                 /// </summary>
                 20,
                 firstStepChangeFix: /// <summary>
-                /// The value to add to small change or largechange when scrolling
-                /// the first step(scrolling from value 0).
+                /// This number specifies the value to add to smallchange or largechange when scrolling the first step (scrolling from scrollMin).
                 /// Default: 0.
                 /// Type: Number.
                 /// </summary>
@@ -2195,7 +2199,7 @@ var wijmo;
             /// </summary>
             false,
             listenContentScroll: /// <summary>
-            /// Determines.
+            /// Determines if the native scroll events should be listened.
             /// Default: false.
             /// Type: Boolean.
             /// </summary>
@@ -2594,7 +2598,9 @@ var wijmo;
             },
             scrollChildIntoView: function (child1) {
                 /// <summary>
-                /// Scroll children DOM element to view.
+                /// Scroll child DOM element into view.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("scrollChildIntoView", $("li#reditem"));
                 /// </summary>
                 /// <param name="child" type="DOMElement/JQueryObj">
                 /// The child to scroll to.
@@ -2605,13 +2611,17 @@ var wijmo;
             getContentElement: function () {
                 /// <summary>
                 /// Gets the content element of wijsuperpanel.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("getContentElement");
                 /// </summary>
                 /// <returns type="JQueryObj" />
                 return this._fields().contentWrapper;
             },
             hScrollTo: function (x) {
                 /// <summary>
-                /// Scroll to horizontal position.
+                /// Scrolls to the indicated horizontal position.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("hScrollTo", 100);
                 /// </summary>
                 /// <param name="x" type="Number">
                 /// The position to scroll to.
@@ -2622,7 +2632,9 @@ var wijmo;
             },
             vScrollTo: function (y) {
                 /// <summary>
-                /// Scroll to vertical position.
+                /// Scrolls to the indicated vertical position.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("vScrollTo", 100);
                 /// </summary>
                 /// <param name="y" type="Number">
                 /// The position to scroll to.
@@ -2633,8 +2645,10 @@ var wijmo;
             },
             refresh: function () {
                 /// <summary>
-                /// Refreshes wijsuperpanel.
+                /// Refreshes the wijsuperpanel.
                 /// Needs to be called after content being changed.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("refresh");
                 /// </summary>
                 /// <returns type="Boolean">
                 /// Returns true if it is successful, else returns false.
@@ -2646,6 +2660,8 @@ var wijmo;
             scrollTo: function (x, y) {
                 /// <summary>
                 /// Scroll to specified position.
+                /// Code Example:
+                /// $("selector").wijsuperpanel("scrollTo", 100, 100);
                 /// </summary>
                 /// <param name="x" type="Number">
                 /// Horizontal position to scroll to.

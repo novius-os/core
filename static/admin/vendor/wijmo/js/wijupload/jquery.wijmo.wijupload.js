@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -665,6 +665,11 @@ var wijmo;
             return div;
         };
         wijupload.prototype.destroy = function () {
+            /// <summary>
+            /// Removes the wijupload functionality completely.This will return the element back to its pre - init state.
+            /// Code Example:
+            /// $(" selector ").wijupload("destroy");
+            /// </summary>
             var self = this;
             self.upload.removeClass(uploadClass);
             self.upload.undelegate(self.widgetName).undelegate("." + self.widgetName);
@@ -694,6 +699,11 @@ var wijmo;
             //end for disabled option
                     };
         wijupload.prototype.widget = function () {
+            /// <summary>
+            /// Returns the.wijmo - wijupload element.
+            /// Code Example:
+            /// $(" selector ").wijupload("widget");
+            /// </summary>
             return this.upload;
         };
         wijupload.prototype.supportXhr = function () {

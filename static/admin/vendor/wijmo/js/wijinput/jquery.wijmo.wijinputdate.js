@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.3
+ * Wijmo Library 3.20131.4
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -246,12 +246,11 @@ var wijmo;
             this.element.data('cursorPos', 0);
             this.element.data('timeStamp', new Date('1900/1/1'));
         };
-        wijinputdate.prototype.getPostValue = /// <summary>
-        /// Gets the text value when the container form is posted back to the
-        /// server. This method returns the widget date text.
-        /// Code example
-        /// $("#element").wijinputdata("getPostValue");
-        /// </summary>
+        wijinputdate.prototype.getPostValue = /**
+        Gets the text value when the container form is posted back to the server. This method returns the widget date text.
+        Code Example:
+        $("#element").wijinputnumber("getPostValue");
+        */
         function () {
             if(!this._isInitialized()) {
                 return this.element.val();
@@ -477,11 +476,11 @@ var wijmo;
                 });
             }
         };
-        wijinputdate.prototype.isDateNull = /// <summary>
-        /// Determines whether the date is a null value.
-        /// Code example
-        /// $("#element").wijinputnumber("isDateNull");
-        /// </summary>
+        wijinputdate.prototype.isDateNull = /**
+        Determines whether the date is a null value.
+        Code Example:
+        $("#element").wijinputnumber("isDateNull");
+        */
         function () {
             return this.options.date === null || this.options.date === undefined;
         };
@@ -618,164 +617,176 @@ var wijmo;
             this.wijCSS = {
                 wijinputdate: wijmo.wijinputcore.prototype.options.wijCSS.wijinput + "-date"
             };
-            /// <summary>
-            /// Determines the default date value for a date input.
-            /// Default: null
-            /// Type: Date/String/Number.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({date: ¡®2010/8/12¡¯});
-            /// </summary>
+            /**
+            Determines the default date value for a date input.
+            Type: Date/String/Number
+            Default: null
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({date: ¡®2010/8/12¡¯});
+            */
             this.date = null;
-            /// <summary>
-            /// Determines the minimal date that can be entered.
-            /// Default: null
-            /// Type: Date/String/Number.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({minDate: ¡®2010/5/01¡¯});
-            /// </summary>
+            /**
+            Determines the minimal date that can be entered.
+            Type: Date/String/Number
+            Default: null
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({minDate: ¡®2010/5/01¡¯});
+            */
             this.minDate = null;
-            /// <summary>
-            /// Determines the maximum date that can be entered.
-            /// Default: null
-            /// Type: Date/String/Number.
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({maxDate: ¡®2010/8/12¡¯});
-            /// </summary>
+            /**
+            Determines the maximum date that can be entered.
+            Type: Date/String/Number
+            Default: null
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({maxDate: ¡®2010/8/12¡¯});
+            */
             this.maxDate = null;
-            /// <summary>
-            /// The format pattern to display the date value of wijinputdate supports two
-            /// types of formats: Standard format and Custom format.A standard date and time
-            /// format string uses a single format specifier to define the text representation
-            /// of a date and time value.
-            /// Possible values for Standard format are:
-            ///		"d": ShortDatePattern
-            ///		"D": LongDatePattern
-            ///		"f": Full date and time (long date and short time)
-            ///		"F": FullDateTimePattern
-            ///		"g": General (short date and short time)
-            ///		"G": General (short date and long time)
-            ///		"m": MonthDayPattern
-            ///		"M": monthDayPattern
-            ///		"r": RFC1123Pattern
-            ///		"R": RFC1123Pattern
-            ///		"s": SortableDateTimePattern
-            ///		"t": shortTimePattern
-            ///		"T": LongTimePattern
-            ///		"u": UniversalSortableDateTimePattern
-            ///		"U": Full date and time (long date and long time) using universal time
-            ///		"y": YearMonthPattern
-            ///		"Y": yearMonthPattern
-            /// Any date and time format string that contains more than one character, including
-            /// white space, is interpreted as a custom date and time format string. For example:
-            /// "mmm-dd-yyyy", "mmmm d, yyyy", "mm/dd/yyyy", "d-mmm-yyyy", "ddd, mmmm dd, yyyy", and so on.
-            /// Below are the custom date and time format specifiers:
-            ///		"d": The day of the month, from 1 through 31.
-            ///		"dd": The day of the month, from 01 through 31.
-            ///		"ddd": The abbreviated name of the day of the week.
-            ///		"dddd": The full name of the day of the week.
-            ///		"m": The minute, from 0 through 59.
-            ///		"mm": The minute, from 00 through 59.
-            ///		"M": The month, from 1 through 12.
-            ///		"MM": The month, from 01 through 12.
-            ///		"MMM": The abbreviated name of the month.
-            ///		"MMMM": The full name of the month.
-            ///		"y": The year, from 0 to 99.
-            ///		"yy": The year, from 00 to 99
-            ///		"yyy": The year, with a minimum of three digits.
-            ///		"yyyy": The year as a four-digit number
-            ///		"h": The hour, using a 12-hour clock from 1 to 12.
-            ///		"hh": The hour, using a 12-hour clock from 01 to 12.
-            ///		"H": The hour, using a 24-hour clock from 0 to 23.
-            ///		"HH": The hour, using a 24-hour clock from 00 to 23.
-            ///		"s": The second, from 0 through 59.
-            ///		"ss": The second, from 00 through 59.
-            ///		"t": The first character of the AM/PM designator.
-            ///		"tt": The AM/PM designator.
-            /// Default: 'd'
-            /// Type: String
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({dateFormat: ¡®D¡¯});
-            /// </summary>
+            /** The format pattern to display the date value of wijinputdate supports two
+            types of formats: Standard format and Custom format. A standard date
+            and time format string uses a single format specifier to define the text
+            representation of a date and time value.
+            *
+            * @remarks
+            * wijinputdate supports two types of formats:
+            * Standard Format and Custom Format.
+            *
+            * A standard date and time format string uses a single format specifier
+            * to define the text representation of a date and time value.
+            *
+            * Possible values for Standard Format are:
+            * "d": ShortDatePattern
+            * "D": LongDatePattern
+            * "f": Full date and time (long date and short time)
+            * "F": FullDateTimePattern
+            * "g": General (short date and short time)
+            * "G": General (short date and long time)
+            * "m": MonthDayPattern
+            * "M": monthDayPattern
+            * "r": RFC1123Pattern
+            * "R": RFC1123Pattern
+            * "s": SortableDateTimePattern
+            * "t": shortTimePattern
+            * "T": LongTimePattern
+            * "u": UniversalSortableDateTimePattern
+            * "U": Full date and time (long date and long time) using universal time
+            * "y": YearMonthPattern
+            * "Y": yearMonthPattern
+            *
+            * Any date and time format string that contains more than one character,
+            * including white space, is interpreted as a custom date and time format
+            * string. For example:
+            * "mmm-dd-yyyy", "mmmm d, yyyy", "mm/dd/yyyy", "d-mmm-yyyy",
+            * "ddd, mmmm dd, yyyy" etc.
+            *
+            * Below are the custom date and time format specifiers:
+            *
+            * "d": The day of the month, from 1 through 31.
+            * "dd": The day of the month, from 01 through 31.
+            * "ddd": The abbreviated name of the day of the week.
+            * "dddd": The full name of the day of the week.
+            * "m": The minute, from 0 through 59.
+            * "mm": The minute, from 00 through 59.
+            * "M": The month, from 1 through 12.
+            * "MM": The month, from 01 through 12.
+            * "MMM": The abbreviated name of the month.
+            * "MMMM": The full name of the month.
+            * "y": The year, from 0 to 99.
+            * "yy": The year, from 00 to 99
+            * "yyy": The year, with a minimum of three digits.
+            * "yyyy": The year as a four-digit number
+            * "h": The hour, using a 12-hour clock from 1 to 12.
+            * "hh": The hour, using a 12-hour clock from 01 to 12.
+            * "H": The hour, using a 24-hour clock from 0 to 23.
+            * "HH": The hour, using a 24-hour clock from 00 to 23.
+            * "s": The second, from 0 through 59.
+            * "ss": The second, from 00 through 59.
+            * "t": The first character of the AM/PM designator.
+            * "tt": The AM/PM designator.
+            Type: String
+            Default: 'd'
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({dateFormat: ¡®D¡¯});
+            */
             this.dateFormat = 'd';
-            /// <summary>
-            /// Determines the value of the starting year to be used for the smart input year calculation.
-            /// Default: 1950
-            /// Type: Number
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({startYear: 2010});
-            /// </summary>
+            /**
+            Determines the value of the starting year to be used for the smart input year calculation.
+            Type: Number
+            Default: 1950
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({startYear: 2010});
+            */
             this.startYear = 1950;
-            /// <summary>
-            /// Allows smart input behavior. For example, if this option is true and the date's
-            /// startYear is '00', then the user can enter a character and the year will auto
-            /// calculate according the startYear option.
-            /// Default: true
-            /// Type: Boolean
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({smartInputMode: false});
-            /// </summary>
+            /**
+            Allows smart input behavior. For example, if this option is true and the
+            date's startYear is '00', then the user can enter a character and the year
+            will auto calculate according the startYear option.
+            Type: Boolean
+            Default: true
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({smartInputMode: false});
+            */
             this.smartInputMode = true;
-            /// <summary>
-            /// Determines the active field index.
-            /// Remarks: The active field is highlighted to accept a user¡¯s input.
-            /// Default: 0
-            /// Type: Number
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({activeField: 3});
-            /// </summary>
+            /**
+            Determines the active field index.
+            Remarks: The active field is highlighted to accept a user¡¯s input.
+            Type: Number
+            Default: 0
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({activeField: 3});
+            */
             this.activeField = 0;
-            /// <summary>
-            /// Determines the time span, in milliseconds, between two input intentions.
-            /// Default: 800
-            /// Type: Number
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({keyDelay: 500});
-            /// </summary>
+            /** Determines the time span, in milliseconds,
+            * between two input intentions.
+            * @remarks
+            * when press a keyboard, and the widget will delay a time and then handle
+            * the next keyboard press. Use this option to control the speed of the key press.
+            Type: Number
+            Default: 800
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({keyDelay: 500});
+            */
             this.keyDelay = 800;
-            /// <summary>
-            /// Determines whether to automatically move to the next field.
-            /// For example, if the user enters '2012-9-20' in the inputdate widget and the
-            /// option's value is true, when the user enters '2012', the focus will automatically
-            /// move to the next field. If the user enters '9' in the next field but the option's
-            /// value is false, then the user will have to manually move the focus to the next field.
-            /// Default: true
-            /// Type: Boolean
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({autoNextField:false});
-            /// </summary>
+            /** Determines whether to automatically move to the next field.
+            * @remarks
+            * For example, if user want input the '2012-9-20' in inputdate widget,
+            * if this option's value is true, when user type '2012' in textbox,
+            * it will auto focus in next field, user can type '9' in second field,
+            * if this option's value is false, user want to type '9' in second field,
+            * they should focus the second field by manual.
+            Type: Boolean
+            Default: true
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({autoNextField:false});
+            */
             this.autoNextField = true;
-            /// <summary>
-            /// Determines the calendar element for a date input. If the value is 'default',
-            /// then the widget will create a <div>, append it to a body element, and use this
-            /// element to initialize the calendar. A user can set this option's value to an
-            /// element, and the widget will initialize the calendar using this element.
-            /// Remarks: Set to 'default' to use the default calendar.
-            /// Default: 'default'
-            /// Type: String/DOMElement/jQuery
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({calendar:$("#calendar")});
-            /// </summary>
+            /** Determines the calendar element for a date input.
+            * @remarks
+            * If the value is 'default', the widget will create a div and
+            * append it to body element, and using this element to init calendar.
+            * User can set this option value to an element,
+            * and the widget will init the calendar using this element.
+            Type: String/DOMElement/jQuery
+            Default: 'default'
+            */
             this.calendar = 'default';
-            /// <summary>
-            /// Detemines the popup position of a calendar. See jQuery.ui.position for position options.
-            /// Default: {offset: '0 4'}
-            /// Type: Object
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({popupPosition:{collision: ¡®flip¡¯}});
-            /// </summary>
+            /** Detemines the popup position of a calendar.
+            * See jQuery.ui.position for position options.
+            Type: Object
+            Default: {offset: '0 4'}
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({popupPosition:{collision: ¡®flip¡¯}});
+            */
             this.popupPosition = {
                 offset: '0 4'
             };
-            /// <summary>
-            /// The dateChanged event handler. A function called when the date of the input is changed.
-            /// Parameters:
-            ///		e: The jQuery.Event object.
-            ///		args.date: The new date.
-            /// Default: null
-            /// Type: Function
-            /// Code example:
-            /// $(¡®.selector¡¯).wijinputdate({dateChanged: function(e, arg){}});
-            /// </summary>
+            /** The dateChanged event handler. A function called when the date of the input is changed.
+            * @event
+            * @dataKey {Date} date The data with this event.
+            Type: Function
+            Default: null
+            Code Example:
+            $(¡®.selector¡¯).wijinputdate({dateChanged: function(e, arg){}});
+            */
             this.dateChanged = null;
         }
         return wijinputdate_options;
