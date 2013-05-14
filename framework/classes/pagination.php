@@ -36,18 +36,19 @@ class Pagination
      * @var array The HTML for the display
      */
     public $template = array(
-        'wrapper_start'  => '<div class="pagination"> ',
-        'wrapper_end'    => ' </div>',
-        'page_start'     => '<span class="page-links"> ',
-        'page_end'       => ' </span>',
-        'previous_start' => '<span class="previous"> ',
-        'previous_end'   => ' </span>',
-        'previous_mark'  => '&laquo; ',
-        'next_start'     => '<span class="next"> ',
-        'next_end'       => ' </span>',
-        'next_mark'      => ' &raquo;',
-        'active_start'   => '<span class="active"> ',
-        'active_end'     => ' </span>',
+        'wrapper_start'  => '<div class="pagination">&nbsp;',
+        'wrapper_end'    => '&nbsp;</div>',
+        'page_start'     => '<span class="page-links">&nbsp;',
+        'page_end'       => '&nbsp;</span>',
+        'previous_start' => '<span class="previous">&nbsp;',
+        'previous_end'   => '&nbsp;</span>',
+        'previous_mark'  => '&laquo;&nbsp;',
+        'next_start'     => '<span class="next">&nbsp;',
+        'next_end'       => '&nbsp;</span>',
+        'next_mark'      => '&nbsp;&raquo;',
+        'active_start'   => '<span class="active">&nbsp;',
+        'active_end'     => '&nbsp;</span>',
+        'separator'      => '&nbsp;/&nbsp;',
     );
 
     /**
@@ -170,7 +171,7 @@ class Pagination
             return '';
         }
 
-        $pagination = '';
+        $pagination = array();
 
         // Let's get the starting page number, this is determined using num_links
         $start = (($this->current_page - $this->num_links) > 0) ? $this->current_page - ($this->num_links - 1) : 1;
@@ -180,13 +181,13 @@ class Pagination
 
         for ($i = $start; $i <= $end; $i++) {
             if ($this->current_page == $i) {
-                $pagination .= $this->template['active_start'].$i.$this->template['active_end'];
+                $pagination[] = $this->template['active_start'].$i.$this->template['active_end'];
             } else {
-                $pagination .= '<a href="'.call_user_func($this->pagination_url, $i).'">'.$i.'</a>';
+                $pagination[] = '<a href="'.call_user_func($this->pagination_url, $i).'">'.$i.'</a>';
             }
         }
-
-        return $this->template['page_start'].$pagination.$this->template['page_end'];
+        $string_pagination = implode($this->template['separator'], $pagination);
+        return $this->template['page_start'].$string_pagination.$this->template['page_end'];
     }
 
     // --------------------------------------------------------------------
