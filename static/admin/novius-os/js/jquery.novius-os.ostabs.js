@@ -896,7 +896,7 @@ define('jquery-nos-ostabs',
                 icon = self._icon( tab ).appendTo( a );
 
                 label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
-                    .html( tab.label ? tab.label : 'New tab' )
+                    .html( tab.label ? tab.label.replace(/</g, '&lt;') : 'New tab' )
                     .appendTo( a );
                 if ( !tab.labelDisplay ) {
                     label.hide();
@@ -1005,10 +1005,10 @@ define('jquery-nos-ostabs',
                 if ( title === undefined ) {
                     return $li.find( '.nos-ostabs-label' ).text();
                 } else {
-                    $li.find( '.nos-ostabs-label' ).html( title );
+                    $li.find( '.nos-ostabs-label' ).html( title.replace(/</g, '&lt;') );
 
                     if ( o.selected == index ) {
-                        $( 'title' ).html( title );
+                        $( 'title' ).html( title.replace(/</g, '&lt;') );
                     }
 
                     self._trigger( "title", null, self._ui( $li[ 0 ] ) );
@@ -1038,7 +1038,7 @@ define('jquery-nos-ostabs',
                     this.select(index);
                 } else {
                     if ( self.options.selected == index ) {
-                        $( 'title' ).html( tab.label );
+                        $( 'title' ).html( tab.label.replace(/</g, '&lt;') );
                         var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
                         if ('replaceState' in window.history) {
                             window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);

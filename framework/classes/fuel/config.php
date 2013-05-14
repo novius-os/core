@@ -258,7 +258,12 @@ class Config extends \Fuel\Core\Config
                 return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
             }, $array);
             $array = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
-                return urlencode($retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]));
+                $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
+                return $value === false ? $matches[0] : urlencode($value);
+            }, $array);
+            $array = preg_replace_callback('/{{htmlspecialchars:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
+                return $value === false ? $matches[0] : htmlspecialchars($value);
             }, $array);
         } else if (is_array($array)) {
             foreach ($array as $key => $value) {
