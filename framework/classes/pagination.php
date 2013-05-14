@@ -36,18 +36,18 @@ class Pagination
      * @var array The HTML for the display
      */
     public $template = array(
-        'wrapper_start'  => '<div class="pagination"> ',
-        'wrapper_end'    => ' </div>',
-        'page_start'     => '<span class="page-links"> ',
-        'page_end'       => ' </span>',
-        'previous_start' => '<span class="previous"> ',
-        'previous_end'   => ' </span>',
+        'wrapper_start'  => '<div class="pagination">',
+        'wrapper_end'    => '</div>',
+        'page_start'     => '<span class="page-links">',
+        'page_end'       => '</span>',
+        'previous_start' => '<span class="previous">',
+        'previous_end'   => '</span>',
         'previous_mark'  => '&laquo; ',
-        'next_start'     => '<span class="next"> ',
-        'next_end'       => ' </span>',
+        'next_start'     => '<span class="next">',
+        'next_end'       => '</span>',
         'next_mark'      => ' &raquo;',
-        'active_start'   => '<span class="active"> ',
-        'active_end'     => ' </span>',
+        'active_start'   => '<span class="active">',
+        'active_end'     => '</span>',
     );
 
     /**
