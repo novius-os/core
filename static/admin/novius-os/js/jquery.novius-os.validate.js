@@ -61,10 +61,10 @@ define('jquery-nos-validate',
                         : label.insertAfter(element);
 
 
-                var wijtooltip = label.data('wijtooltip');
-                wijtooltip._tooltip.addClass('nos-tooltip-error');
+                var wijtooltip = label.data('wijmo-wijtooltip');
+                wijtooltip._tooltipCache._$tooltip.addClass('nos-tooltip-error');
 
-                var tooltip = wijtooltip._tooltip;
+                var tooltip = wijtooltip._tooltipCache._$tooltip;
 
                 // Restyling the tooltip accordingly
                 tooltip.find('.wijmo-wijtooltip-close').click(function() {

@@ -65,7 +65,7 @@ define('jquery-nos-treegrid',
 
                 o.allowPaging = false;
 
-                $.nos.noslistgrid.prototype._create.call(self);
+                self._super();
             },
 
             _init: function() {
@@ -135,8 +135,7 @@ define('jquery-nos-treegrid',
                     this.sortDirection = 'none';
                 });
 
-                $.nos.noslistgrid.prototype._init.call(self);
-
+                self._super();
                 self._activateSpinner();
                 self._datasource();
                 self.treeDataSource.proxy.options.data.deep = 2;
@@ -151,7 +150,7 @@ define('jquery-nos-treegrid',
             _setOption: function(key, value){
                 var self = this;
 
-                $.nos.noslistgrid.prototype._setOption.apply(self, arguments);
+                self._superApply(arguments);
 
                 if (key === 'treeOptions') {
                     self._datasource()
@@ -175,7 +174,7 @@ define('jquery-nos-treegrid',
                         data: o.treeOptions || {}
                     }),
                     loaded: function(dataSource, data) {
-                        var nosGridData = self.data(),
+                        var nosGridData = $.extend([], self.data()),
                             toArray = function(objets) {
                                 return $.map(objets, function(el, key) {
                                     if (key === 'length') {
@@ -203,10 +202,7 @@ define('jquery-nos-treegrid',
                                 Array.prototype.splice.apply(nosGridData, [index, 0, data.node].concat(toArray(data.node.treeChilds)));
                             }
                         }
-                        // @todo ensureControl is failing when the element is hidden. Need to call 'doRefresh' when it gets visible again
-                        try {
-                            self.ensureControl(true);
-                        } catch (e) {}
+                        self._setOption('data', nosGridData);
                         self._deactivateSpinner();
                     },
                     reader: {
@@ -293,7 +289,7 @@ define('jquery-nos-treegrid',
                 if (self.mousePressed && (new Date().getTime() - self.mousePressed) > 500) {
                     if (!self._scroller) {
                         self._scroller = {
-                            superpanel : self._view()._scroller.data('wijsuperpanel')
+                            superpanel : self._view()._scroller.data('wijmo-wijsuperpanel')
                         };
                         var contentElement = self._scroller.superpanel.getContentElement(),
                             contentWrapper = contentElement.parent(),
