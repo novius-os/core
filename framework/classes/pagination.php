@@ -36,19 +36,18 @@ class Pagination
      * @var array The HTML for the display
      */
     public $template = array(
-        'wrapper_start'  => '<div class="pagination">',
-        'wrapper_end'    => '</div>',
-        'page_start'     => '<span class="page-links">',
-        'page_end'       => '</span>',
-        'previous_start' => '<span class="previous">',
-        'previous_end'   => '</span>',
-        'previous_mark'  => '&laquo;&nbsp;',
-        'next_start'     => '<span class="next">',
-        'next_end'       => '</span>',
-        'next_mark'      => '&nbsp;&raquo;',
-        'active_start'   => '<span class="active">',
-        'active_end'     => '</span>',
-        'separator'      => '&nbsp;/&nbsp;',
+        'wrapper_start'  => "<div class='pagination'>",
+        'wrapper_end'    => "</div>\n",
+        'page_start'     => "<span class='page-links'>",
+        'page_end'       => "</span>\n",
+        'previous_start' => "<span class='previous'>",
+        'previous_end'   => "</span>\n",
+        'previous_mark'  => "&laquo;",
+        'next_start'     => "<span class='next'>",
+        'next_end'       => "</span>\n",
+        'next_mark'      => "&raquo;",
+        'active_start'   => "<span class='active'>",
+        'active_end'     => "</span>\n",
     );
 
     /**
@@ -181,12 +180,12 @@ class Pagination
 
         for ($i = $start; $i <= $end; $i++) {
             if ($this->current_page == $i) {
-                $pagination[] = $this->template['active_start'].$i.$this->template['active_end'];
+                $pagination[] = '<span class="regular">'.$this->template['active_start'].$i.$this->template['active_end']."</span>\n";
             } else {
-                $pagination[] = '<a href="'.call_user_func($this->pagination_url, $i).'">'.$i.'</a>';
+                $pagination[] = '<span class="regular"><a href="'.call_user_func($this->pagination_url, $i).'">'.$i."</a></span>\n";
             }
         }
-        $string_pagination = implode($this->template['separator'], $pagination);
+        $string_pagination = implode('', $pagination);
         return $this->template['page_start'].$string_pagination.$this->template['page_end'];
     }
 
