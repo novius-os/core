@@ -41,11 +41,12 @@ class Renderer_Wysiwyg extends \Fieldset_Field
         if ( !empty($renderer_options) ) {
             $attributes['data-wysiwyg-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
         }
-        
+
         // Need to encode twice since timymce decodes its content one time (bug fix added for the enhancer bug)
         $value = htmlspecialchars($value);
 
-        return '<textarea '.array_to_attr($attributes).'>'.$value.'</textarea>'.static::js_init($attributes['id'], $renderer_options);
+        return '<textarea '.array_to_attr($attributes).'>'.$value.'</textarea>'.
+            static::js_init($attributes['id'], $renderer_options);
     }
 
     /**
