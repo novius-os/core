@@ -45,7 +45,7 @@ class Pagination
         'previous_mark'  => "&laquo;&nbsp;",
         'next_start'     => "<span class='next'>",
         'next_end'       => "</span>\n",
-        'next_mark'      => "&raquo;&nbsp;",
+        'next_mark'      => "&nbsp;&raquo;",
         'active_start'   => "<span class='active'>",
         'active_end'     => "</span>\n",
         'regular_start'   => "<span class='regular'>",
