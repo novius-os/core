@@ -34,10 +34,18 @@ define('jquery-nos-inspector-date',
                                 }
                             }),
                         inspectorData = parent.data('inspector'),
-                        dates = label_custom.find(':input').datepicker('option', 'onSelect', function(selectedDate, instance) {
+                        dates = label_custom.find(':input[type=hidden]').each(function() {
+                            var onSelect = $(this).datepicker('option', 'onSelect');
+                            $(this).datepicker('option', 'onSelect', function(selectedDate, instance) {
+                                if ($.isFunction(onSelect)) {
+                                    onSelect.call(this, selectedDate, instance);
+                                }
+
                                 var option = this === label_custom.find(':input:first')[0] ? "minDate" : "maxDate",
-                                    begin = label_custom.find(':input:first').val(),
-                                    end = label_custom.find(':input:last').val(),
+                                    begin = label_custom.find(':text:first').val(),
+                                    end = label_custom.find(':text:last').val(),
+                                    begin_mysql = label_custom.find(':input[type=hidden]:first').val(),
+                                    end_mysql = label_custom.find(':input[type=hidden]:last').val(),
                                     label;
 
                                 var date = $.datepicker.parseDate( instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
@@ -53,10 +61,11 @@ define('jquery-nos-inspector-date',
                                         label = $.nosDataReplace(params.texts['since begin'], {begin: begin});
                                     }
                                     if ($.isFunction(inspectorData.selectionChanged)) {
-                                        inspectorData.selectionChanged(begin + '|' + end, label);
+                                        inspectorData.selectionChanged(begin_mysql + '|' + end_mysql, label);
                                     }
                                 }
-                            }),
+                            });
+                        }),
                         rendered = false;
 
                     inspector.css({
