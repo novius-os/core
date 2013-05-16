@@ -547,10 +547,12 @@ class Model extends \Orm\Model
 
         $return = parent::set($property, $value);
 
-        if ($properties_reload && isset($this->_custom_data[$property])) {
-            static::properties(true);
-            unset($this->_custom_data[$property]);
-            $return = parent::set($property, $value);
+        if (\Config::get('novius-os.cache_model_properties', false)) {
+            if ($properties_reload && isset($this->_custom_data[$property])) {
+                static::properties(true);
+                unset($this->_custom_data[$property]);
+                $return = parent::set($property, $value);
+            }
         }
 
         $class = get_called_class();
@@ -669,10 +671,12 @@ class Model extends \Orm\Model
             $property = static::prefix().$property;
         }
 
-        try {
-            return parent::get($property);
-        } catch (\OutOfBoundsException $e) {
-            static::properties(true);
+        if (\Config::get('novius-os.cache_model_properties', false)) {
+            try {
+                return parent::get($property);
+            } catch (\OutOfBoundsException $e) {
+                static::properties(true);
+            }
         }
 
         return parent::get($property);
