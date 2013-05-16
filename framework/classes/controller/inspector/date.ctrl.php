@@ -106,7 +106,7 @@ class Controller_Inspector_Date extends Controller_Inspector
                     case 'custom' :
                         $content = array_merge($content, array(array(
                             'value' => 'custom',
-                            'title' => $config['label_custom'],
+                            'title' => $config['labels']['Custom dates'],
                             'group' => '',
                         )));
                         break;
@@ -127,7 +127,7 @@ class Controller_Inspector_Date extends Controller_Inspector
         }
 
         $view->set('content', $content, false);
-        $view->set('label_custom', $config['label_custom_inputs']);
+        $view->set('labels', $config['labels']);
 
         $view->set('date_begin', \Nos\Renderer_Date_Picker::renderer(array(
             'name' => $config['input_begin'],
@@ -146,8 +146,12 @@ class Controller_Inspector_Date extends Controller_Inspector
         $default_config = array(
             'input_begin'           => 'date_begin',
             'input_end'             => 'date_end',
-            'label_custom'          => __('Custom dates'),
-            'label_custom_inputs'   => __('from {{begin}} to {{end}}'),
+            'labels'                => array(
+                'Custom dates' => __('Custom dates'),
+                'from begin to end' => __('from {{begin}} to {{end}}'),
+                'until end' => __('until {{end}}'),
+                'since begin' => __('since {{begin}}'),
+            ),
             'options'               => array('custom', 'since', 'month', 'year'),
             'since'                 => array(
                 'optgroup'  => __('Since'),
