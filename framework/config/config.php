@@ -168,7 +168,6 @@ return array(
         * );
         */
         'packages'    => array(
-            'log',
             //'orm',
             //'parser',
         ),
