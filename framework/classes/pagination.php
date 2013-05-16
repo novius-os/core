@@ -36,18 +36,20 @@ class Pagination
      * @var array The HTML for the display
      */
     public $template = array(
-        'wrapper_start'  => '<div class="pagination"> ',
-        'wrapper_end'    => ' </div>',
-        'page_start'     => '<span class="page-links"> ',
-        'page_end'       => ' </span>',
-        'previous_start' => '<span class="previous"> ',
-        'previous_end'   => ' </span>',
-        'previous_mark'  => '&laquo; ',
-        'next_start'     => '<span class="next"> ',
-        'next_end'       => ' </span>',
-        'next_mark'      => ' &raquo;',
-        'active_start'   => '<span class="active"> ',
-        'active_end'     => ' </span>',
+        'wrapper_start'  => "<div class='pagination'>",
+        'wrapper_end'    => "</div>\n",
+        'page_start'     => "<span class='page-links'>",
+        'page_end'       => "</span>\n",
+        'previous_start' => "<span class='previous'>",
+        'previous_end'   => "</span>\n",
+        'previous_mark'  => "&laquo;&nbsp;",
+        'next_start'     => "<span class='next'>",
+        'next_end'       => "</span>\n",
+        'next_mark'      => "&nbsp;&raquo;",
+        'active_start'   => "<span class='active'>",
+        'active_end'     => "</span>\n",
+        'regular_start'   => "<span class='regular'>",
+        'regular_end'     => "</span>\n",
     );
 
     /**
@@ -180,9 +182,9 @@ class Pagination
 
         for ($i = $start; $i <= $end; $i++) {
             if ($this->current_page == $i) {
-                $pagination .= $this->template['active_start'].$i.$this->template['active_end'];
+                $pagination .= $this->template['regular_start'].$this->template['active_start'].$i.$this->template['active_end'].$this->template['regular_end']."\n";
             } else {
-                $pagination .= '<a href="'.call_user_func($this->pagination_url, $i).'">'.$i.'</a>';
+                $pagination .= $this->template['regular_start'].'<a href="'.call_user_func($this->pagination_url, $i).'">'.$i."</a>".$this->template['regular_end']."\n";
             }
         }
 
