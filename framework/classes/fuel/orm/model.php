@@ -332,20 +332,27 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
         if (!isset(static::$_configs[$class])) {
-            $namespace = trim(\Inflector::get_namespace($class), '\\');
-
-            $application = mb_strtolower($namespace);
+            $application = static::getApplication();
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
-
-            if ($application !== 'nos') {
-                $namespaces = \Nos\Config_Data::get('app_namespaces', array());
-                $application = array_search($namespace, $namespaces);
-            }
 
             static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
         }
 
         return static::$_configs[$class];
+    }
+
+    public static function getApplication()
+    {
+        $class = get_called_class();
+        $namespace = trim(\Inflector::get_namespace($class), '\\');
+        $application = mb_strtolower($namespace);
+
+        if ($application !== 'nos') {
+            $namespaces = \Nos\Config_Data::get('app_namespaces', array());
+            $application = array_search($namespace, $namespaces);
+        }
+
+        return $application;
     }
 
     /**
