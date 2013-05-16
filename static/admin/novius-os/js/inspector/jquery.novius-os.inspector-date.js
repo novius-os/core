@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-inspector-date',
-    ['jquery-nos-listgrid', 'jquery-ui.datepicker'],
+    ['jquery-nos-listgrid', 'jquery-ui.datepicker.i18n'],
     function($) {
         "use strict";
 
@@ -15,7 +15,9 @@ define('jquery-nos-inspector-date',
             nosInspectorDate : function(params) {
                 params = params || {
                     texts: {
-                        labelCustom: 'Custom'
+                        'from begin to end': 'from {{begin}} to {{end}}',
+                        'until end': 'until {{end}}',
+                        'since begin': 'since {{begin}}'
                     },
                     content: {}
                 };
@@ -32,26 +34,23 @@ define('jquery-nos-inspector-date',
                                 }
                             }),
                         inspectorData = parent.data('inspector'),
-                        dates = label_custom.find(':input').datepicker('option', 'onSelect', function( selectedDate ) {
+                        dates = label_custom.find(':input').datepicker('option', 'onSelect', function(selectedDate, instance) {
                                 var option = this === label_custom.find(':input:first')[0] ? "minDate" : "maxDate",
-                                    instance = $( this ).data( "datepicker" ),
                                     begin = label_custom.find(':input:first').val(),
                                     end = label_custom.find(':input:last').val(),
-                                    label = params.texts.labelCustom;
+                                    label;
 
                                 var date = $.datepicker.parseDate( instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
                                 dates.not( this ).datepicker( "option", option, date );
 
                                 if (begin || end) {
-                                    if (begin) {
-                                        label = label.replace('xxxbeginxxx', begin);
-                                    } else {
-                                        label = 'Until ' + end;
+                                    if (begin && end) {
+                                        label = $.nosDataReplace(params.texts['from begin to end'], {begin: begin, end: end});
+                                    } else if (!begin) {
+                                        label = $.nosDataReplace(params.texts['until end'], {end: end});
                                     }
-                                    if (end) {
-                                        label = label.replace('xxxendxxx', end);
-                                    } else {
-                                        label = 'Since ' + begin;
+                                    if (!end) {
+                                        label = $.nosDataReplace(params.texts['since begin'], {begin: begin});
                                     }
                                     if ($.isFunction(inspectorData.selectionChanged)) {
                                         inspectorData.selectionChanged(begin + '|' + end, label);

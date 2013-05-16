@@ -24,11 +24,17 @@ return array(
     #: classes/fuel/fieldset.php:571
     'OK, it’s done.' => 'C’est fait.',
 
-    #: classes/controller/inspector/date.ctrl.php:147
+    #: classes/controller/inspector/date.ctrl.php:148
     'Custom dates' => 'Choisir des dates',
 
-    #: classes/controller/inspector/date.ctrl.php:148
+    #: classes/controller/inspector/date.ctrl.php:149
     'from {{begin}} to {{end}}' => 'de {{begin}} à {{end}}',
+
+    #: classes/controller/inspector/date.ctrl.php:150
+    'until {{end}}' => 'jusqu’au {{end}}',
+
+    #: classes/controller/inspector/date.ctrl.php:151
+    'since {{begin}}' => 'depuis {{begin}}',
 
     #: classes/controller/inspector/date.ctrl.php:151
     'Since' => 'Depuis',
