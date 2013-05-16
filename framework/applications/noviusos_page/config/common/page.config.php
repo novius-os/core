@@ -31,6 +31,7 @@ return array(
         'page_published' => array(
             'title' => __('Status'),
             'method' => 'publication_status',
+            'isSafeHtml' => true,
             'multiContextHide' => true,
         ),
         'iconClasses' => array(

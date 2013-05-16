@@ -491,6 +491,8 @@ define('jquery-nos',
                             return data[p1] || '';
                         }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
                             return encodeURIComponent(data[p1] || '');
+                        }).replace(/{{htmlspecialchars:([\w]+)}}/g, function(str, p1, offset, s) {
+                            return (data[p1] || '').replace(/</g, '&lt;');
                         });
                 } else if ($.isPlainObject(obj)) {
                     $.each(obj, function(key, value) {

@@ -96,7 +96,7 @@ define('jquery-nos-inspector-tree-model-radio',
                                     if ($.isPlainObject(params.selected) && params.selected.id) {
                                         var radio = container.find(':radio[value=' + params.selected.id + ']')
                                                 .prop('checked', true),
-                                            nostreegrid = table.data('nostreegrid');
+                                            nostreegrid = table.data('nos-nostreegrid');
 
                                         nostreegrid._view()._getSuperPanel().scrollChildIntoView(radio);
                                     }

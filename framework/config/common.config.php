@@ -48,7 +48,7 @@ return array(
             'iconClasses' => 'nos-icon16 nos-icon16-eye',
             'action' => array(
                 'action' => 'window.open',
-                'url' => '{{preview_url}}?_preview=1',
+                'url' => '{{preview_url}}',
             ),
             'disabled' => array(
             function($item, $params)
