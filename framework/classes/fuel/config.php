@@ -60,8 +60,11 @@ class Config extends \Fuel\Core\Config
         return array($application, $file);
     }
 
-    public static function loadConfiguration($app_name, $file_name)
+    public static function loadConfiguration($app_name, $file_name = null)
     {
+        if ($file_name === null) {
+            list($app_name, $file_name) = explode('::', $app_name);
+        }
         $config = \Config::load($app_name.'::'.$file_name, true);
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 

@@ -13,6 +13,3 @@
 [submodule "packages/email"]
 	path = packages/email
 	url = git://github.com/fuel/email.git
-[submodule "packages/log"]
-	path = packages/log
-	url = git://github.com/fuel/log.git

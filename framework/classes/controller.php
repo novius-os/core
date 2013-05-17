@@ -719,4 +719,9 @@ class Controller extends \Fuel\Core\Controller_Hybrid
     {
         return static::$current_application;
     }
+
+    public static function overrideCurrentApplication($application)
+    {
+        static::$current_application = $application;
+    }
 }
