@@ -239,7 +239,7 @@ define('jquery-nos-appdesk',
                     if (button.primary) {
                         $el = $('<button></button>').html(button.label)
                             .data('icon', button.icon || 'plus')
-                            .addClass('primary')
+                            .addClass('ui-priority-primary')
                             .click(function(e) {
                                 e.preventDefault();
                                 e.stopImmediatePropagation();

@@ -32,7 +32,7 @@ define('jquery-nos-update-tab-crud',
                             id: params.itemId
                         }, function() {
                             var $close = $(params.closeEle);
-                            $close.find('button.primary').click(function() {
+                            $close.find('button.ui-priority-primary').click(function() {
                                 $(this).nosTabs('close');
                             });
                             $close.show().nosFormUI();

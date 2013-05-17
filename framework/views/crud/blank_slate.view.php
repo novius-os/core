@@ -85,7 +85,7 @@ if (!in_array($context, $possible)) {
                     <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
                         <?= Form::hidden('context', $context) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
-                        <button type="submit" class="primary" data-icon="plus"><?= __('Start from scratch') ?></button>
+                        <button type="submit" class="ui-priority-primary" data-icon="plus"><?= __('Start from scratch') ?></button>
                     </form>
                     <p style="font-style: italic; padding: 5px 0 2em 4em;"><?= __('(Blank form)') ?></p>
                 </li>
@@ -99,11 +99,11 @@ if (!in_array($context, $possible)) {
     $uniqid_wijmenu = 'wijmenu_'.$uniqid;
     echo '<input id="'.$uniqid_create_from_id.'" type="hidden" name="create_from_id" value="'.htmlspecialchars(key($labels)).'" />';
     if (count($labels) == 1) {
-        echo '<button type="submit" class="primary" data-icon="plus">'.current($labels).'</button>';
+        echo '<button type="submit" class="ui-priority-primary" data-icon="plus">'.current($labels).'</button>';
     } else {
         echo '<div class="buttonset">
-            <button type="submit" class="primary" data-icon="plus">'.current($labels).'</button>
-            <button id="'.$uniqid_wijmenu.'" type="button" class="primary without-text" data-icon="carat-1-s primary">&nbsp;</button>
+            <button type="submit" class="ui-priority-primary" data-icon="plus">'.current($labels).'</button>
+            <button id="'.$uniqid_wijmenu.'" type="button" class="ui-priority-primary without-text" data-icon="carat-1-s primary">&nbsp;</button>
         </div>';
 
         echo '<ul class="wijmenu">';

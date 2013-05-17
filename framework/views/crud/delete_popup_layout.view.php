@@ -16,7 +16,7 @@ $id = $uniqid = uniqid('form_');
 <p>
     <?= strtr($crud['config']['i18n']['deleting confirmation button'], array(
         '{{Button}}' => '
-                <button type="submit" class="primary ui-state-error" data-texts="'.htmlspecialchars(\Format::forge()->to_json(array(
+                <button type="submit" class="ui-priority-primary ui-state-error" data-texts="'.htmlspecialchars(\Format::forge()->to_json(array(
                     '0' => $crud['config']['i18n']['deleting button 0 items'],
                     '1' => $crud['config']['i18n']['deleting button 1 item'],
                     '+' => $crud['config']['i18n']['deleting button N items'],

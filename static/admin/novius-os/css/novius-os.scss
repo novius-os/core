@@ -262,7 +262,7 @@ input.ui-state-disabled {
 	/*z-index: 1100;*/
 }
 
-.title, .ui-widget .ui-widget.title {
+.title, .ui-widget .title, .ui-priority-primary, .ui-widget .ui-priority-primary {
 	font-size: 1.5em;
 }
 
@@ -290,7 +290,7 @@ input.ui-state-disabled {
     opacity: 0.5;
 }
 
-input.ui-widget.primary, button.ui-widget.primary {
+input.ui-widget.ui-priority-primary, button.ui-widget.ui-priority-primary, input.ui-widget.primary, button.ui-widget.primary {
 	border-width : 2px;
 	border-style : outset;
 	font-size    : 1.2em;

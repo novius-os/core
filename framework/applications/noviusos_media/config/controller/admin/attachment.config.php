@@ -43,7 +43,7 @@ return array(
                 'tag' => 'button',
                 // Note to translator: This is a submit button
                 'value' => __('Add'),
-                'class' => 'primary',
+                'class' => 'ui-priority-primary',
                 'data-icon' => 'check',
             ),
         ),

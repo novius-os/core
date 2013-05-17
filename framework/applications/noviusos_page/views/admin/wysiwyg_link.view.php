@@ -88,7 +88,7 @@ $title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the propert
                 </tr>
                 <tr>
                     <th></th>
-                    <td colspan="6"><button type="submit" class="primary" data-icon="check" data-id="save"><?= $edit ? __('Update this link') : __('Insert this link') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
+                    <td colspan="6"><button type="submit" class="ui-priority-primary" data-icon="check" data-id="save"><?= $edit ? __('Update this link') : __('Insert this link') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
                 </tr>
             </table>
         </form>

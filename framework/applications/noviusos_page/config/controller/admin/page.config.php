@@ -215,7 +215,7 @@ return array(
                 'tag' => 'button',
                 // Note to translator: This is a submit button
                 'value' => __('Save'),
-                'class' => 'primary',
+                'class' => 'ui-priority-primary',
                 'data-icon' => 'check',
             ),
         ),
