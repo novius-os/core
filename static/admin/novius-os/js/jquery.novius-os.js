@@ -1381,5 +1381,9 @@ define('jquery-nos',
             }
         });
 
+        $.widget('wijmo.wijtextbox', {});
+        $.widget('wijmo.wijradio', {});
+        $.widget('wijmo.wijcheckbox', {});
+        $.widget('wijmo.wijdropdown', {});
         return $;
     });
