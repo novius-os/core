@@ -469,7 +469,7 @@ if ($assets_minified) {
 <?= $js ?>
 </head>
 
-<body class="nos-dark-theme">
+<body>
     <?= !empty($body) ? $body : '' ?>
 </body>
 </html>
