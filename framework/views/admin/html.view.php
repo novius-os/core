@@ -81,13 +81,13 @@ $config = array(
         'wijmo.wijcalendar' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.wijcarousel' => 'static/novius-os/admin/vendor/wijmo/js/wijcarousel/jquery.wijmo.wijcarousel.min',
         'wijmo.wijchartcore' => 'static/novius-os/admin/vendor/wijmo/js/wijchartcore/jquery.wijmo.wijchartcore.min',
-        'wijmo.wijcheckbox' => 'static/novius-os/admin/bundle/vendor.min',
+        'wijmo.wijcheckbox' => 'static/novius-os/admin/vendor/wijmo/js/wijcheckbox/jquery.wijmo.wijcheckbox.min',
         'wijmo.wijcombobox' => 'static/novius-os/admin/vendor/wijmo/js/wijcombobox/jquery.wijmo.wijcombobox.min',
         'wijmo.wijcompositechart' => 'static/novius-os/admin/vendor/wijmo/js/wijcompositechart/jquery.wijmo.wijcompositechart.min',
         'wijmo.wijdatasource' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.wijdatepager' => 'static/novius-os/admin/vendor/wijmo/js/wijdatepager/jquery.wijmo.wijdatepager.min',
         'wijmo.wijdialog' => 'static/novius-os/admin/bundle/vendor.min',
-        'wijmo.wijdropdown' => 'static/novius-os/admin/bundle/vendor.min',
+        'wijmo.wijdropdown' => 'static/novius-os/admin/vendor/wijmo/js/wijdropdown/jquery.wijmo.wijdropdown.min',
         'wijmo.wijeditor' => 'static/novius-os/admin/vendor/wijmo/js/wijeditor/jquery.wijmo.wijeditor.min',
         'wijmo.wijevcal' => 'static/novius-os/admin/vendor/wijmo/js/wijevcal/jquery.wijmo.wijevcal.min',
         'wijmo.wijexpander' => 'static/novius-os/admin/bundle/vendor.min',
@@ -108,7 +108,7 @@ $config = array(
         'wijmo.wijpopup' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.wijprogressbar' => 'static/novius-os/admin/vendor/wijmo/js/wijprogressbar/jquery.wijmo.wijprogressbar.min',
         'wijmo.wijradialgauge' => 'static/novius-os/admin/vendor/wijmo/js/wijradialgauge/jquery.wijmo.wijradialgauge.min',
-        'wijmo.wijradio' => 'static/novius-os/admin/bundle/vendor.min',
+        'wijmo.wijradio' => 'static/novius-os/admin/vendor/wijmo/js/wijradio/jquery.wijmo.wijradio.min',
         'wijmo.wijrating' => 'static/novius-os/admin/vendor/wijmo/js/wijrating/jquery.wijmo.wijrating.min',
         'wijmo.wijribbon' => 'static/novius-os/admin/vendor/wijmo/js/wijribbon/jquery.wijmo.wijribbon.min',
         'wijmo.wijscatterchart' => 'static/novius-os/admin/vendor/wijmo/js/wijscatterchart/jquery.wijmo.wijscatterchart.min',
@@ -116,7 +116,7 @@ $config = array(
         'wijmo.wijsplitter' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.wijsuperpanel' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.wijtabs' => 'static/novius-os/admin/bundle/vendor.min',
-        'wijmo.wijtextbox' => 'static/novius-os/admin/bundle/vendor.min',
+        'wijmo.wijtextbox' => 'static/novius-os/admin/vendor/wijmo/js/wijtextbox/jquery.wijmo.wijtextbox.min',
         'wijmo.wijtooltip' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.wijtree' => 'static/novius-os/admin/vendor/wijmo/js/wijtree/jquery.wijmo.wijtree.min',
         'wijmo.wijupload' => 'static/novius-os/admin/vendor/wijmo/js/wijupload/jquery.wijmo.wijupload.min',
@@ -469,7 +469,7 @@ if ($assets_minified) {
 <?= $js ?>
 </head>
 
-<body>
+<body class="nos-dark-theme">
     <?= !empty($body) ? $body : '' ?>
 </body>
 </html>

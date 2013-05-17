@@ -72,7 +72,7 @@ require(
                 e.stopPropagation();
                 preventCheckAction = true;
                 var checked = $(this).is(':checked');
-                $ul.find(':checkbox').prop('checked', checked).wijcheckbox('refresh');
+                $ul.find(':checkbox').prop('checked', checked);
                 preventCheckAction = false;
 
                 if (!checked) {
@@ -87,7 +87,7 @@ require(
 
                 if (checked) {
                     e.stopPropagation();
-                    $checkbox.prop('checked', false).wijcheckbox('refresh').trigger('change');
+                    $checkbox.prop('checked', false).trigger('change');
                 }
             });
 
@@ -101,7 +101,7 @@ require(
                         $checkbox.trigger('change');
                     } else {
                         // Not checked yet
-                        $checkbox.trigger('click').wijcheckbox('refresh');
+                        $checkbox.trigger('click');
                     }
                 }
             });

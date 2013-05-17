@@ -27,7 +27,7 @@ $title_properties_3 = $edit ? __('Edit the properties') : __('3. Set the propert
         -webkit-box-sizing: border-box;
         height: 100%;
     }
-    .target_radio .wijmo-wijradio, .target_radio label {
+    .target_radio label {
         display: inline-block;
     }
 </style>

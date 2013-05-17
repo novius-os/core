@@ -76,7 +76,7 @@ $id = $uniqid = uniqid('form_');
 
 
                 $table.find('tr').css({cursor: 'pointer'}).click(function() {
-                    $(this).find(':checkbox').click().wijcheckbox('refresh');
+                    $(this).find(':checkbox').click();
                 });
 
                 $confirmButton.click(function(e) {

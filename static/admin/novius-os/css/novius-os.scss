@@ -15,12 +15,6 @@
  * +-++-++-++-+ */
 
 
-.ui-dialog {
-    .wijmo-checkbox label, .wijmo-wijradio label {
-        z-index: inherit;
-    }
-}
-
 .wijmo-wijgrid .wijmo-wijgrid-headerrow .ui-button .ui-icon {
     z-index: auto;
 }
@@ -35,7 +29,7 @@ strong {
 body, select, input, textarea {
 	color       : #444; /* 444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
 	font-family : franklin gothic medium, arial, verdana, helvetica, sans-serif; /* Set your base font here, to apply evenly */
-	font-size: 13px;
+	font-size: 10px;
 }
 
 /* Headers (h1, h2, etc) have no default font-size or margin; define those yourself */

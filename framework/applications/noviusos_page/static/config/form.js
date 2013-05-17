@@ -153,7 +153,7 @@ define(
                 }
             });
             if ($title.val() == $menu_title.val() || $menu_title.val() == '') {
-                $checkbox_menu.attr('checked', true).wijcheckbox("refresh");
+                $checkbox_menu.attr('checked', true);
             }
             $checkbox_menu.change(function() {
                 if ($(this).is(':checked')) {

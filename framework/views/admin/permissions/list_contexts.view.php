@@ -81,8 +81,7 @@ require(['jquery-nos', 'wijmo.wijgrid'], function($) {
                             if (checked === null) {
                                 checked = $checkbox.is(':checked');
                             }
-                            $checkbox.attr('checked', !checked)
-                                .wijcheckbox('refresh');
+                            $checkbox.attr('checked', !checked);
                         }
                     });
 
@@ -94,8 +93,7 @@ require(['jquery-nos', 'wijmo.wijgrid'], function($) {
                     e.stopImmediatePropagation();
 
                     var $checkbox = $tr.find(':checkbox');
-                    $checkbox.attr('checked', !$checkbox.is(':checked'))
-                        .wijcheckbox('refresh');
+                    $checkbox.attr('checked', !$checkbox.is(':checked'));
                 });
             }
         }

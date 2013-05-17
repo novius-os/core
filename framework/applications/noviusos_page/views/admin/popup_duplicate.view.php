@@ -168,7 +168,7 @@ if ($context_count > 1 || $children_count > 0) {
 
 
                     $tables.find('tr').css({cursor: 'pointer'}).click(function() {
-                        $(this).find(':checkbox').click().wijcheckbox('refresh');
+                        $(this).find(':checkbox').click();
                     });
 
 

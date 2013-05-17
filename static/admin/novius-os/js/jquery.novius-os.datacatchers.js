@@ -139,16 +139,10 @@ define('jquery-nos-datacatchers',
                         if ($(this).is(':checked')) {
                             $(this).closest('tr').find('td:eq(0) .ui-widget').each(function() {
                                 var data = $(this).attr('disabled', true).data();
-                                if (data.wijtextbox) {
-                                    data.wijtextbox.disable();
-                                }
                             });
                         } else {
                             $(this).closest('tr').find('td:eq(0) .ui-widget').each(function() {
                                 var data = $(this).removeAttr('disabled').data();
-                                if (data.wijtextbox) {
-                                    data.wijtextbox.enable();
-                                }
                             });
                         }
                     }).triggerHandler('change');
@@ -159,7 +153,7 @@ define('jquery-nos-datacatchers',
                     }, function() {
                         $(this).removeClass('ui-state-hover');
                     }).click(function() {
-                        $(this).find('input').prop('checked', true).wijradio('refresh');
+                        $(this).find('input').prop('checked', true);
                         $(this).addClass('ui-state-active').siblings().removeClass('ui-state-active');
                     });
 
