@@ -74,13 +74,13 @@ class Model_Media extends \Nos\Orm\Model
         ),
         'media_created_by_id' => array(
             'default' => null,
-            'data_type' => 'int',
+            'data_type' => 'int unsigned',
             'null' => true,
             'convert_empty_to_null' => true,
         ),
         'media_updated_by_id' => array(
             'default' => null,
-            'data_type' => 'int',
+            'data_type' => 'int unsigned',
             'null' => true,
             'convert_empty_to_null' => true,
         ),

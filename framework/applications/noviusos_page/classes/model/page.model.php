@@ -178,13 +178,13 @@ class Model_Page extends \Nos\Orm\Model
         ),
         'page_created_by_id' => array(
             'default' => null,
-            'data_type' => 'int',
+            'data_type' => 'int unsigned',
             'null' => true,
             'convert_empty_to_null' => true,
         ),
         'page_updated_by_id' => array(
             'default' => null,
-            'data_type' => 'int',
+            'data_type' => 'int unsigned',
             'null' => true,
             'convert_empty_to_null' => true,
         ),

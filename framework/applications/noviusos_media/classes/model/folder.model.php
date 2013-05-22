@@ -54,13 +54,13 @@ class Model_Folder extends \Nos\Orm\Model
         ),
         'medif_created_by_id' => array(
             'default' => null,
-            'data_type' => 'int',
+            'data_type' => 'int unsigned',
             'null' => true,
             'convert_empty_to_null' => true,
         ),
         'medif_updated_by_id' => array(
             'default' => null,
-            'data_type' => 'int',
+            'data_type' => 'int unsigned',
             'null' => true,
             'convert_empty_to_null' => true,
         ),
