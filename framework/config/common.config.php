@@ -64,4 +64,9 @@ return array(
             }),
         ),
     ),
+    'callable_keys' => array(
+        'item' => array(
+            'menu.menus'
+        )
+    )
 );

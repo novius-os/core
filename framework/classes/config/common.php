@@ -10,6 +10,9 @@ class Config_Common
 
         $config = \Config::loadConfiguration($application_name, $file);
 
+        $config = static::process_placeholders($model, $config);
+        $config = static::process_callable_keys($config);
+
         $i18n_default = \Config::load('nos::i18n_common', true);
         $config['i18n'] = array_merge($i18n_default, \Arr::get($config, 'i18n', array()));
 
@@ -37,6 +40,45 @@ class Config_Common
         $config['data_mapping'] = static::filter_data_mapping($config['data_mapping'], $filter_data_mapping);
         $config['icons']        = static::process_icons($application_name, $config);
         $config['tab']          = static::process_tab($application_name, $config);
+
+        return $config;
+    }
+
+    public static function process_callable_keys($config)
+    {
+        $common_config = \Config::load('common', true);
+
+        if (!isset($config['callable_keys'])) {
+            $config['callable_keys'] = array();
+        }
+
+        $config['callable_keys'] = \Arr::merge($config['callable_keys'], $common_config['callable_keys']);
+
+        return $config;
+    }
+
+    public static function process_placeholders($model, $config)
+    {
+        list($application_name, $file) = \Config::configFile($model);
+
+        $model_label = explode('_', $model);
+        $model_label = $model_label[count($model_label) - 1];
+
+        if (!isset($config['controller'])) {
+            $config['controller'] = strtolower($model_label);
+        }
+
+        if (!isset($config['placeholders'])) {
+            $config['placeholders'] = array();
+        }
+
+        if (!isset($config['placeholders']['controller_base_url'])) {
+            $config['placeholders']['controller_base_url'] = 'admin/'.$application_name.'/'.$config['controller'].'/';
+        }
+
+        if (!isset($config['placeholders']['model_label'])) {
+            $config['placeholders']['model_label'] = $model_label;
+        }
 
         return $config;
     }
@@ -113,17 +155,7 @@ class Config_Common
 
         $actions = \Arr::merge($actions_template, $list_actions);
 
-        $model_label = explode('_', $model);
-        $model_label = $model_label[count($model_label) - 1];
-
-        if (!isset($config['controller'])) {
-            $config['controller'] = strtolower($model_label);
-        }
-
-        $actions = \Config::placeholderReplace($actions, array(
-            'controller_base_url' => 'admin/'.$application_name.'/'.$config['controller'].'/',
-            'model_label' => $model_label,
-        ), false);
+        $actions = \Config::placeholderReplace($actions, $config['placeholders'], false);
 
         // Copy the action label into the tab or dialog label when necessary
         foreach ($actions as $name => $action) {
