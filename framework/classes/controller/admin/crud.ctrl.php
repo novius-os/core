@@ -551,13 +551,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function get_actions($all_targets = false)
     {
-        $actions = array();
-        $translate_action_content = $this->get_actions_context();
-        if ($translate_action_content !== false) {
-            $actions[$this->config['model'].'.translate'] = $translate_action_content;
-        }
         $actions = array_merge(
-            $actions,
             \Config::actions(array(
                 'models' => array(get_class($this->item)),
                 'target' => 'toolbar-edit',
@@ -569,82 +563,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         );
 
         return $actions;
-    }
-
-    /**
-     * get standard actions to translate an item
-     * @return type
-     */
-    protected function get_actions_context()
-    {
-        $contexts = array_keys(Tools_Context::contexts());
-
-        if (!$this->behaviours['twinnable'] || $this->is_new || count($contexts) == 1) {
-            return false;
-        }
-
-        $actions = array();
-
-        $sites = Tools_Context::sites();
-        $locales = Tools_Context::locales();
-
-        $main_context = $this->item->find_main_context();
-        foreach ($contexts as $context) {
-            if ($this->item->{$this->behaviours['twinnable']['context_property']} === $context) {
-                continue;
-            }
-            $item_context = $this->item->find_context($context);
-            $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
-            if (empty($item_context)) {
-                if (count($sites) === 1) {
-                    $label = __('Translate into {{context}}');
-                } elseif (count($locales) === 1) {
-                    $label = __('Add to {{context}}');
-                } else {
-                    if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
-                        $label = __('Add to {{context}}');
-                    } else {
-                        $label = __('Translate into {{context}}');
-                    }
-                }
-            } else {
-                $label = __('Edit {{context}}');
-            }
-            $label = strtr($label, array('{{context}}' => Tools_Context::contextLabel($context)));
-            $actions[] = array(
-                'content' => $label,
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'method' => empty($main_context) ? 'add' : 'open',
-                    'tab' => array(
-                        'url' => $url,
-                    ),
-                ),
-            );
-        }
-
-        if (count($sites) === 1) {
-            // Note to translator: action (button)
-            $label = __('Translate');
-        } elseif (count($locales) === 1) {
-            $label = __('Add to another site');
-        } else {
-            $label = __('Translate / Add to another site');
-        }
-
-        return array(
-                'label' => $label,
-                'menu' => array(
-                    'options' => array(
-                        'orientation' => 'vertical',
-                        'direction' => 'rtl',
-                    ),
-                    'menus' => $actions,
-                ),
-                'icons' => array(
-                    'secondary' => 'triangle-1-s',
-                ),
-        );
     }
 
     /**
