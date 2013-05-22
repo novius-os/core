@@ -25,7 +25,7 @@ class Config_Common
             $config['actions']['order'] = array();
         }
 
-        $model::eventStatic('common', array(&$config));
+        $model::eventStatic('commonConfig', array(&$config));
 
         static::process_actions($application_name, $model, $config);
 
@@ -73,7 +73,7 @@ class Config_Common
 
     /**
      * Generates default actions and add them into the common configuration.
-     * Default actions are: add, edit, visualise, share and delete.
+     * Default actions are: add, edit, visualise and delete.
      *
      * @param  string  $application_name
      * @param  string  $model
@@ -95,10 +95,6 @@ class Config_Common
                 '{{title}}' => '{{htmlspecialchars:_title}}',
             ))
         );
-
-        if ($model::behaviours('Nos\Orm_Behaviour_Urlenhancer', false) === false) {
-            unset($actions_template['visualise']);
-        }
 
         $actions_template = static::prefixActions($actions_template, $model);
         $list_actions = static::prefixActions($config['actions']['list'], $model);
