@@ -175,6 +175,16 @@ class Config extends \Fuel\Core\Config
                     }
                 }
             }
+
+            foreach ($selected_actions as $key => $action) {
+                if (!isset($action['label'])) {
+                    throw new \Exception('Action '.$key.' doesn\'t seem to have any label key defined. Maybe you forgot to specify this label or you thought you extended a native / behaviour action which is not enabled in this case.');
+                }
+
+                if (!isset($action['action']) && !isset($action['menu'])) {
+                    throw new \Exception('Action '.$key.' doesn\'t seem to have any action / menu key defined. Maybe you forgot to specify this action / menu key or you thought you extended a native / behaviour action which is not enabled in this case.');
+                }
+            }
         }
 
         return $selected_actions;
