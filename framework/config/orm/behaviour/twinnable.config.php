@@ -33,6 +33,7 @@ if (count($contexts) > 1) {
             'targets' => array(
                 'toolbar-edit' => true,
             ),
+            'align' => 'begin',
             'menu' => array(
                 'options' => array(
                     'orientation' => 'vertical',

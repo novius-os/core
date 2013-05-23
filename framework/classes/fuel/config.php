@@ -160,34 +160,63 @@ class Config extends \Fuel\Core\Config
                     $selected_actions[$key] = $action;
                 }
             }
+        }
 
-            if (!empty($params['item'])) {
-                foreach ($selected_actions as $key => $action) {
-                    if (isset($action['disabled'])) {
-                        $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item']);
-                    }
-
-                    foreach ($common_config['callable_keys']['item'] as $callable_item_key) {
-                        $value = \Arr::get($action, $callable_item_key);
-                        if (is_callable($value)) {
-                            \Arr::set($selected_actions[$key], 'menu.menus', $value($params['item']));
-                        }
-                    }
-                }
-            }
-
+        if (!empty($params['item'])) {
             foreach ($selected_actions as $key => $action) {
-                if (!isset($action['label'])) {
-                    throw new \Exception('Action '.$key.' doesn\'t seem to have any label key defined. Maybe you forgot to specify this label or you thought you extended a native / behaviour action which is not enabled in this case.');
+                if (isset($action['disabled'])) {
+                    $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item']);
                 }
 
-                if (!isset($action['action']) && !isset($action['menu'])) {
-                    throw new \Exception('Action '.$key.' doesn\'t seem to have any action / menu key defined. Maybe you forgot to specify this action / menu key or you thought you extended a native / behaviour action which is not enabled in this case.');
+                foreach ($common_config['callable_keys']['item'] as $callable_item_key) {
+                    $value = \Arr::get($action, $callable_item_key);
+                    if (is_callable($value)) {
+                        \Arr::set($selected_actions[$key], 'menu.menus', $value($params['item']));
+                    }
                 }
             }
         }
 
-        return $selected_actions;
+        foreach ($selected_actions as $key => $action) {
+            if (!isset($action['label'])) {
+                throw new \Exception('Action '.$key.' doesn\'t seem to have any label key defined. Maybe you forgot to specify this label or you thought you extended a native / behaviour action which is not enabled in this case.');
+            }
+
+            if (!isset($action['action']) && !isset($action['menu'])) {
+                throw new \Exception('Action '.$key.' doesn\'t seem to have any action / menu key defined. Maybe you forgot to specify this action / menu key or you thought you extended a native / behaviour action which is not enabled in this case.');
+            }
+        }
+
+        $ordered_actions_by_align = array();
+
+        foreach ($selected_actions as $key => $action) {
+            $align = 0;
+            if (isset($action['align'])) {
+                $align = $action['align'];
+            }
+            if ($align === 'begin') {
+                $align = -10;
+            }
+            if ($align === 'end') {
+                $align = 10;
+            }
+
+            if (!isset($ordered_actions_by_align[$align])) {
+                $ordered_actions_by_align[$align] = array();
+            }
+
+            $ordered_actions_by_align[$align][$key] = $action;
+        }
+
+        $ordered_selected_actions = array();
+        $ordered_keys = array_keys($ordered_actions_by_align);
+        asort($ordered_keys);
+
+        foreach ($ordered_keys as $key) {
+            $ordered_selected_actions = array_merge($ordered_selected_actions, $ordered_actions_by_align[$key]);
+        }
+
+        return $ordered_selected_actions;
     }
 
     protected static function canAddAction($action, $params)

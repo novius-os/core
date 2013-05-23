@@ -58,6 +58,7 @@ return array(
                 'grid' => true,
                 'toolbar-edit' => true,
             ),
+            'align' => 'end',
             'visible' => array(
             function($params) {
                 return !isset($params['item']) || !$params['item']->is_new();
