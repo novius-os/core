@@ -23,7 +23,7 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
     {
         if (array_key_exists('order_by', $options)) {
             $order_by = $options['order_by'];
-            if (!empty($order_by['default_sort'])) {
+            if (is_array($order_by) && !empty($order_by['default_sort'])) {
                 unset($order_by['default_sort']);
                 $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
             }
