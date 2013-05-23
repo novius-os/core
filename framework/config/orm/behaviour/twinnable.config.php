@@ -30,6 +30,9 @@ if (count($contexts) > 1) {
     $config['actions'] = array(
         'translate' => array(
             'label' => $label,
+            'targets' => array(
+                'toolbar-edit' => true,
+            ),
             'menu' => array(
                 'options' => array(
                     'orientation' => 'vertical',
