@@ -22,6 +22,7 @@ $uniqid = uniqid('id_');
             $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
                 'save_field' => $fieldset_infos->field('save')
             ), false))->to_json() ?>)
+                .filter(':submit')
                 .click(function() {
                     $container.find('form:visible').submit();
                 });
@@ -42,7 +43,11 @@ $uniqid = uniqid('id_');
             <li><a href="#display"><?= __('Theme') ?></a></li>
         </ul>
         <div id="infos">
-            <?= render('noviusos_user::admin/user_details_edit', array('fieldset' => $fieldset_infos, 'user' => $logged_user), false) ?>
+            <?= render('noviusos_user::admin/user_details_edit', array(
+                'fieldset' => $fieldset_infos,
+                'user' => $logged_user,
+                'no_role' => true,
+            ), false) ?>
         </div>
         <div id="display">
             <?= $fieldset_display ?>

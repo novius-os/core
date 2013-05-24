@@ -29,6 +29,7 @@ define('APPPATH', NOSROOT.'local'.DIRECTORY_SEPARATOR);
 define('PKGPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
 define('COREPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
 define('NOSPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
+define('VENDORPATH', NOSROOT.'vendor'.DIRECTORY_SEPARATOR);
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
@@ -50,6 +51,7 @@ if (!MBSTRING) {
         'Command' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'command.php',
         'Config' => FUEL_EXTEND_PATH.'config.php',
         'Config_File' => FUEL_EXTEND_PATH.'config_file.php',
+        'Cache_Storage_File' => FUEL_EXTEND_PATH.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'file.php',
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
         'Event_Instance' => FUEL_EXTEND_PATH.'event/instance.php',
@@ -66,6 +68,7 @@ if (!MBSTRING) {
         'Profiler' => FUEL_EXTEND_PATH.'profiler.php',
         'Refine' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'refine.php',
         'Response' => FUEL_EXTEND_PATH.'response.php',
+        'Security' => FUEL_EXTEND_PATH.'security.php',
         'Session' => FUEL_EXTEND_PATH.'session.php',
         'Str' => FUEL_EXTEND_PATH.'str.php',
         'Validation_Error'  => FUEL_EXTEND_PATH.'validation_error.php',
@@ -95,6 +98,10 @@ function ___($group, $message, $default = null)
 
 // Register the autoloader
 Autoloader::register();
+
+if (!defined('NOS_ENTRY_POINT')) {
+    define('NOS_ENTRY_POINT', 'front');
+}
 
 /**
  * Your environment.  Can be set to any of the following:
@@ -174,7 +181,7 @@ foreach (Config::get('namespaces', array()) as $ns => $path) {
 chdir(DOCROOT);
 
 // Remove leading /
-$_SERVER['NOS_URL'] = mb_substr($_SERVER['REQUEST_URI'], 1);
+$_SERVER['NOS_URL'] = mb_substr(urldecode($_SERVER['REQUEST_URI']), 1);
 if (defined('NOS_RELATIVE_DIR')) {
     $_SERVER['NOS_URL'] = mb_substr($_SERVER['NOS_URL'], mb_strlen(NOS_RELATIVE_DIR));
 }

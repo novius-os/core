@@ -89,14 +89,23 @@ define('jquery-nos-toolbar-crud',
                             });
                         };
 
+
+                    $container.add($container.find('form')).filter('form').bind('ajax_success', function(e, data) {
+                        if (data.dataset && data.dataset._model == params.dataset._model && data.dataset._id == params.dataset._id) {
+                            params.dataset = data.dataset;
+                        }
+                    });
+
                     $container.nosToolbar('add', params.saveField)
-                        .filter('button:first')
+                        .filter(':submit')
                         .click(function() {
+                            var $form;
                             if ($container.is('form')) {
-                                $container.submit();
+                                $form = $container;
                             } else {
-                                $container.find('form:visible').submit();
+                                $form = $container.find('form:visible');
                             }
+                            $form.submit();
                         });
 
                     if (!params.isNew) {

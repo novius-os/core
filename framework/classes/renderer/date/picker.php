@@ -18,7 +18,8 @@ class Renderer_Date_Picker extends \Fieldset_Field
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
             'buttonImageOnly' => true,
             'autoSize' => true,
-            'dateFormat' => 'yy-mm-dd',
+            'dateFormat' => 'yy-mm-dd', // MySQL formatting
+            'altFormat' => 'dd/mm/yy', // Custom user formatting
             'showButtonPanel' => true,
             'changeMonth' => true,
             'changeYear' => true,
@@ -39,10 +40,11 @@ class Renderer_Date_Picker extends \Fieldset_Field
      */
     public static function renderer($renderer = array())
     {
-        list($attributes, $renderer_options) = static::parse_options($renderer);
-        $attributes['data-datepicker-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options['datepicker']));
-
-        return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id'], $renderer_options);
+        $renderer['renderer'] = __CLASS__;
+        $fieldset = \Fieldset::build_from_config(array(
+            $renderer['name'] => $renderer,
+        ));
+        return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
     }
 
     protected $options = array();
@@ -60,11 +62,26 @@ class Renderer_Date_Picker extends \Fieldset_Field
     public function build()
     {
         parent::build();
-        $this->fieldset()->append(static::js_init($this->get_attribute('id'), $this->options));
+        $attributes = $this->attributes;
         $datepicker_options = $this->options['datepicker'];
-        $this->set_attribute('data-datepicker-options', htmlspecialchars(\Format::forge()->to_json($datepicker_options)));
+        $this->attributes = array();
+        $this->set_attribute(array(
+            'type' => 'hidden',
+            'id' => $attributes['id'],
+            'data-datepicker-options' => htmlspecialchars(\Format::forge()->to_json($datepicker_options)),
+        ));
+        $this->fieldset()->append(static::js_init($attributes['id'], $this->options));
+        $attributes['type'] = 'text';
+        $attributes['id'] = ltrim($datepicker_options['altField'], '#');
+        unset($attributes['value']);
 
-        return (string) parent::build();
+        $build = $this->template((string) parent::build());
+        // A bit hacky, but can't see another way to keep the template
+        $build = str_replace('<input ', '<input '.array_to_attr($attributes).' /><input ', $build);
+        // Can't do something else here, since the label's ID is generated (late) within the parent::template() method.
+        $build = str_replace('for="'.$this->attributes['id'].'"', 'for="'.$attributes['id'].'"', $build);
+
+        return $build;
     }
 
     /**
@@ -74,7 +91,7 @@ class Renderer_Date_Picker extends \Fieldset_Field
      */
     protected static function parse_options($renderer = array())
     {
-        $renderer['type'] = 'text';
+        $renderer['type'] = 'hidden';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' datepicker';
 
         if (empty($renderer['id'])) {
@@ -92,6 +109,10 @@ class Renderer_Date_Picker extends \Fieldset_Field
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
         }
         unset($renderer['renderer_options']);
+
+        if (empty($renderer_options['datepicker']['altField'])) {
+            $renderer_options['datepicker']['altField'] = '#alt_'.$renderer['id'];
+        }
 
         return array($renderer, $renderer_options);
     }

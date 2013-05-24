@@ -90,11 +90,20 @@ define('jquery-nos-preview',
                         .appendTo(self.uiContainer);
 
                     $.each(o.actions, function() {
+                        var disabled = false;
+                        if (data && data.actions) {
+                            var enabled = data.actions[this.name];
+                            if (enabled == false) {
+                                disabled = true;
+                            } else if ($.type(enabled) == 'string') {
+                                disabled = enabled;
+                            }
+                        }
                         var action = this,
                             element = $.extend(true, {
                                     type: action.primary ? 'button' : 'link'
                                 }, action, {
-                                    disabled : data && data.actions && data.actions[action.name] == false
+                                    disabled : disabled
                                 }),
                             $element = $.nosUIElement(element, data)
                                 .appendTo(self.uiFooter)
@@ -126,8 +135,8 @@ define('jquery-nos-preview',
             },
 
             _loadImg : function(item, thumbnail) {
-                var self = this,
-                    o = self.options;
+                var self = this;
+                var o = self.options;
 
                 $('<img />')
                     .error(function() {
@@ -222,8 +231,10 @@ define('jquery-nos-preview',
                 var self = this,
                     o = self.options;
 
-                self.element.wijsuperpanel('destroy')
-                    .empty();
+                if (self.element.data('wijmo-wijsuperpanel')) {
+                    self.element.wijsuperpanel('destroy');
+                }
+                self.element.empty();
 
                 self._uiHeader(o.texts.headerDefault);
 

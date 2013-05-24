@@ -32,15 +32,16 @@ class Module extends Fuel\Core\Module
             }
 
             // Load the bootstrap if it exists
-            if ($module !== 'nos' && is_file($path.'bootstrap.php')) {
+            // If module isn't local, we need the application to be installed
+            if ((!empty($namespace) || $module == 'local') && is_file($path.'bootstrap.php')) {
                 Fuel::load($path.'bootstrap.php');
             }
 
             // Load dependent applications
             $dependencies = \Nos\Config_Data::get('app_dependencies', array());
             if (!empty($dependencies[$module])) {
-                foreach ($dependencies[$module] as $dependence) {
-                    static::load($dependence);
+                foreach ($dependencies[$module] as $application => $dependence) {
+                    static::load($application);
                 }
             }
         }

@@ -16,18 +16,13 @@ use \Config;
 
 class Controller_Inspector_Model extends Controller_Inspector
 {
+    protected static $default_view = 'inspector/model';
+
     protected $config = array(
         'model' => '',
         'limit' => 20,
         'order_by' => null,
     );
-
-    public function action_list()
-    {
-        $view = View::forge('inspector/model');
-
-        return $view;
-    }
 
     public function action_json()
     {
@@ -38,8 +33,17 @@ class Controller_Inspector_Model extends Controller_Inspector
             return $query;
         };
 
+        $callback = array($where);
+        if (isset($this->config['query']['callback'])) {
+            $custom_callback = $this->config['query']['callback'];
+            if (!is_array($custom_callback)) {
+                $custom_callback = array($custom_callback);
+            }
+            $callback = array_merge($callback, $custom_callback);
+        }
+
         $return = $this->items(array_merge($this->config['query'], array(
-            'callback' => array($where),
+            'callback' => $callback,
             'dataset' => $this->config['dataset'],
             'context' => Input::get('context', null),
             'limit' => intval(Input::get('limit', $this->config['limit'])),
@@ -126,8 +130,6 @@ class Controller_Inspector_Model extends Controller_Inspector
                     return $query;
                 };
             }
-
-
         }
 
 

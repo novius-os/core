@@ -10,6 +10,11 @@
 
 class Fieldset_Field extends \Fuel\Core\Fieldset_Field
 {
+    public static function _init()
+    {
+        Nos\I18n::current_dictionary('nos::common');
+    }
+
     public function populate($input, $repopulate = false)
     {
         if (is_array($input)) {
@@ -67,9 +72,9 @@ class Fieldset_Field extends \Fuel\Core\Fieldset_Field
         return $return;
     }
 
-    public function is_expert()
+    public function isRestricted()
     {
-        return $this->fieldset->is_expert($this->name);
+        return $this->fieldset->isRestricted($this->name);
     }
 
     public function before_save($item, $data)

@@ -265,6 +265,7 @@
 				$body.find('.nosEnhancer, .nosEnhancerInline').each(function() {
 					var enhancer = $(this);
                     enhancer.html(ed.getLang('nos.enhancer_loading'));
+                    self.onEnhancerAdd(enhancer);
 
 					var enhancer_id = $(this).data('enhancer');
 					var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
@@ -279,7 +280,8 @@
 							self.onEnhancerAdd(enhancer, metadata);
 						},
 						error: function() {
-                            enhancer.html('Error when loading the preview of the application');
+                            enhancer.html(ed.getLang('nos.enhancer_loading_error'));
+                            self.onEnhancerAdd(enhancer);
 						}
 					});
 				});
@@ -1362,7 +1364,7 @@
 			a = s.theme_nos_toolbar_align.toLowerCase();
 			a = 'mce' + t._ufirst(a);
 
-			n = DOM.add(DOM.add(c, 'tr', {role: 'toolbar'}), 'td', {'class' : 'mceToolbar ' + a, "role":"presentation"});
+			n = DOM.add(DOM.add(c, 'tr', {role: 'presentation'}), 'td', {'class' : 'mceToolbar ' + a, "role":"presentation"});
 
 			// Create toolbar and add the controls
 			for (i=1; (v = s['theme_nos_buttons' + i]); i++) {
@@ -1807,19 +1809,6 @@
 			});
 		},
 
-		_mceLink : function(ui, val) {
-			var ed = this.editor;
-
-			ed.windowManager.open({
-				url : this.url + '/link.htm',
-				width : 310 + parseInt(ed.getLang('nos.link_delta_width', 0)),
-				height : 200 + parseInt(ed.getLang('nos.link_delta_height', 0)),
-				inline : true
-			}, {
-				theme_url : this.url
-			});
-		},
-
 		_mceNewDocument : function() {
 			var ed = this.editor;
 
@@ -1905,11 +1894,11 @@
                     return data;
                 })(),
                 data_config = edit ? $.extend(true, {
-                        nosContext : self.settings.theme_nos_context,
+                        nosContext : $(ed.getElement()).closest('.nos-dispatcher').data('nosContext'),
                         enhancer: metadata.id,
                         enhancerAction: 'update'
                     }, config) : {
-                        nosContext : self.settings.theme_nos_context,
+                        nosContext : $(ed.getElement()).closest('.nos-dispatcher').data('nosContext'),
                         enhancer: metadata.id,
                         enhancerAction: 'insert'
                     },
@@ -1926,22 +1915,16 @@
                         edit = ed.dom.get('__mce_tmp');
                     }
                     $(edit).attr({
-                        'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
-                        'data-enhancer': metadata.id
-                    });
-
-                    edit.id = null;
-                    $(edit).html($(json.preview).html());
+                            'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
+                            'data-enhancer': metadata.id
+                        })
+                        .removeAttr('id')
+                        .html($(json.preview).html());
 
                     // Add special links (this is also called onInit())
                     self.onEnhancerAdd(edit, metadata);
 
-                    // @todo search why this doesn't work
-                    // This is an unsuccessful attempt to refocus the editor after the nonEditable block content has been added
-                    // Right now, the undo/redo buttons are disabled after insertion, which is a bug
-                    ed.selection.select(edit, true);
-                    ed.selection.collapse(true);
-                    //ed.focus(false);
+                    ed.focus(true);
                 };
 
             if (!$.isPlainObject(metadata.dialog) || !metadata.dialog.contentUrl) {
@@ -2015,6 +1998,8 @@
             var ed = this.editor,
                 e = ed.dom.getParent(ed.selection.getNode(), 'A');
 
+            var bookmark = ed.selection.getBookmark(1);
+
             var dialog = null;
             dialog = $nos(ed.getElement()).nosDialog({
                 contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
@@ -2027,6 +2012,10 @@
             dialog.bind('insert.link', function(event, link) {
                 // Cleanup
                 dialog.nosDialog('close');
+
+                if (tinymce.isIE) {
+                    ed.selection.moveToBookmark(bookmark);
+                }
 
                 if (e == null) {
                     ed.getDoc().execCommand("unlink", false, null);
@@ -2073,6 +2062,8 @@
 
             var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
 
+            var bookmark = ed.selection.getBookmark(1);
+
 			var dialog = null;
             dialog = $nos(ed.getElement()).nosDialog({
 				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
@@ -2085,6 +2076,10 @@
             dialog.bind('insert.media', function(e, img) {
                 // Cleanup
                 dialog.nosDialog('close');
+
+                if (tinymce.isIE) {
+                    ed.selection.moveToBookmark(bookmark);
+                }
 
                 var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
                 if (editCurrentImage) {
@@ -2112,7 +2107,7 @@
 			    editLink = $('<a href="#" data-action="editEnhancer"></a>')
                     .text(ed.getLang('nos.enhancer_options'))
                     .attr('title', ed.getLang('nos.enhancer_options'))
-                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),f
+                    .addClass('nos_enhancer_action nos_enhancer_action_edit'),
 			    insertAfter = $('<a href="#" data-action="addParagraphAfter"></a>')
                     .text(ed.getLang('nos.enhancer_p_after'))
                     .attr('title', ed.getLang('nos.enhancer_p_after'))
@@ -2125,7 +2120,7 @@
 			if (container.is('span')) {
 				container.addClass('nosEnhancerInline')
 				container.append(document.createTextNode(' '));
-                if ($.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
+                if (metadata && $.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
                     container.append(editLink);
                 }
 				container.append(deleteLink);
@@ -2135,7 +2130,7 @@
 				container.addClass('nosEnhancer');
                 container.prepend(insertAfter.addClass('nos_enhancer_action_block'));
 				container.prepend(insertBefore.addClass('nos_enhancer_action_block'));
-                if ($.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
+                if (metadata && $.isPlainObject(metadata.dialog) && metadata.dialog.contentUrl) {
                     container.prepend(editLink.addClass('nos_enhancer_action_block'));
                 }
                 container.prepend(deleteLink.addClass('nos_enhancer_action_block'));

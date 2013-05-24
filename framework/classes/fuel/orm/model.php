@@ -16,10 +16,6 @@ class UnknownBehaviourException extends \Exception
 {
 }
 
-class UnknownMethodBehaviourException extends \Exception
-{
-}
-
 use Arr;
 
 class Model extends \Orm\Model
@@ -88,7 +84,8 @@ class Model extends \Orm\Model
 
             if (empty($_title_property)) {
                 foreach ($properties as $column => $props) {
-                    if ($props['data_type'] === 'varchar') {
+                    // if data_type is not set then it is considered as varchar
+                    if (isset($props['data_type']) && $props['data_type'] === 'varchar') {
                         $_title_property = $column;
                         break;
                     }
@@ -128,17 +125,46 @@ class Model extends \Orm\Model
     /**
      * @see \Orm\Model::properties()
      */
-    public static function properties()
+    public static function properties($from_db = false)
     {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
 
-        if (!$init) {
-            parent::properties();
+        if (!$init || $from_db) {
+            $cache_enabled = \Config::get('novius-os.cache_model_properties', false);
+            try {
+                if ($from_db || !$cache_enabled) {
+                    if ($init) {
+                        unset(static::$_properties_cached[$class]);
+                    }
+                    throw new \CacheNotFoundException();
+                }
 
-            $config = static::_config();
-            if (!empty($config) && !empty($config['properties'])) {
-                static::$_properties_cached[$class] = \Arr::merge(static::$_properties_cached[$class], $config['properties']);
+                static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
+            } catch (\CacheNotFoundException $e) {
+                parent::properties();
+
+                $config = static::_config();
+                if (!empty($config) && !empty($config['properties'])) {
+                    static::$_properties_cached[$class] = \Arr::merge(
+                        static::$_properties_cached[$class],
+                        $config['properties']
+                    );
+                }
+
+                if ($cache_enabled) {
+                    if (property_exists($class, '_properties')) {
+                        try {
+                            static::$_properties_cached[$class] = \Arr::merge(
+                                \DB::list_columns(static::table(), null, static::connection()),
+                                static::$_properties_cached[$class]
+                            );
+                        } catch (\Exception $e) {
+                        }
+                    }
+
+                    \Cache::set('model_properties.'.str_replace('\\', '_', $class), static::$_properties_cached[$class]);
+                }
             }
         }
 
@@ -176,7 +202,7 @@ class Model extends \Orm\Model
                     'model_to' => 'Nos\Model_Wysiwyg',
                     'key_to' => 'wysiwyg_foreign_id',
                     'cascade_save' => true,
-                    'cascade_delete' => false,
+                    'cascade_delete' => true,
                     'conditions' => array(
                         'where' => array(
                             array('wysiwyg_join_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
@@ -191,7 +217,7 @@ class Model extends \Orm\Model
                     'model_to' => 'Nos\Media\Model_Link',
                     'key_to' => 'medil_foreign_id',
                     'cascade_save' => true,
-                    'cascade_delete' => false,
+                    'cascade_delete' => true,
                     'conditions' => array(
                         'where' => array(
                             array('medil_from_table', '=', \DB::expr(\DB::quote(static::$_table_name))),
@@ -281,6 +307,9 @@ class Model extends \Orm\Model
             }
 
             foreach ($_behaviours as $beha_k => $beha_v) {
+                if (!class_exists($beha_k)) {
+                    throw new UnknownBehaviourException('Unknown behaviour '.$beha_k.' for class '.$class);
+                }
                 if (is_int($beha_k)) {
                     $behaviours[$beha_v] = array();
                 } else {
@@ -304,52 +333,27 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
         if (!isset(static::$_configs[$class])) {
-            $namespace = trim(\Inflector::get_namespace($class), '\\');
-
-            $application = mb_strtolower($namespace);
+            $application = static::getApplication();
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
-            if ($application !== 'nos') {
-                $namespaces = \Nos\Config_Data::get('app_namespaces', array());
-                $application = array_search($namespace, $namespaces);
-            }
-
-            $config = \Config::load($application.'::'.$file_name, true);
-            $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-            if (!empty($dependencies[$application])) {
-                foreach ($dependencies[$application] as $dependency) {
-                    \Config::load($dependency.'::'.$file_name, true);
-                    $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name));
-                }
-            }
-            static::$_configs[$class] = \Arr::recursive_filter(
-                $config,
-                function ($var) {
-                    return $var !== null;
-                }
-            );
+            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
         }
 
         return static::$_configs[$class];
     }
 
-    public function get_possible_context()
+    public static function getApplication()
     {
-        $twinnable = static::behaviours('Nos\Orm_Behaviour_Twinnable');
-        $tree = static::behaviours('Nos\Orm_Behaviour_Tree');
+        $class = get_called_class();
+        $namespace = trim(\Inflector::get_namespace($class), '\\');
+        $application = mb_strtolower($namespace);
 
-        if (!$twinnable || !$tree) {
-            return array_keys(\Nos\Tools_Context::contexts());
+        if ($application !== 'nos') {
+            $namespaces = \Nos\Config_Data::get('app_namespaces', array());
+            $application = array_search($namespace, $namespaces);
         }
 
-        // Return contexts from parent if available
-        $parent = $this->get_parent();
-        if (!empty($parent)) {
-            return $parent->get_all_context();
-        }
-
-        return array_keys(\Nos\Tools_Context::contexts());
+        return $application;
     }
 
     /**
@@ -363,9 +367,9 @@ class Model extends \Orm\Model
 
     public function __call($method, $args)
     {
-        try {
-            return static::_callBehaviour($this, $method, $args);
-        } catch (\Nos\Orm\UnknownBehaviourException $e) {
+        $return = static::_behaviours($method, $args, array('this' => $this, 'return' => true));
+        if (array_key_exists('return', $return)) {
+            return $return['return'];
         }
 
         return parent::__call($method, $args);
@@ -373,39 +377,46 @@ class Model extends \Orm\Model
 
     public static function __callStatic($method, $args)
     {
-        try {
-            return static::_callBehaviour(get_called_class(), $method, $args);
-        } catch (\Nos\Orm\UnknownBehaviourException $e) {
+        $return = static::_behaviours($method, $args, array('return' => true));
+        if (isset($return['return'])) {
+            return $return['return'];
         }
 
         return parent::__callStatic($method, $args);
     }
 
-    private static function _callBehaviour($context, $method, $args)
+    public function event($method, $args)
     {
-        foreach (static::behaviours() as $behaviour => $settings) {
-            if (!class_exists($behaviour)) {
-                throw new \UnexpectedValueException($behaviour);
-            }
-            try {
-                return call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {
-            }
-        }
-        throw new \Nos\Orm\UnknownBehaviourException();
+        static::_behaviours($method, $args, array('this' => $this));
     }
 
-    public static function _callAllBehaviours($context, $method, $args)
+    public static function eventStatic($method, $args)
     {
-        foreach (static::behaviours() as $behaviour => $settings) {
-            if (!class_exists($behaviour)) {
-                throw new \UnexpectedValueException($behaviour);
-            }
+        static::_behaviours($method, $args);
+    }
 
-            try {
-                call_user_func_array(array($behaviour, 'behaviour'), array($context, $method, $args));
-            } catch (\Nos\Orm\UnknownMethodBehaviourException $e) {
+    protected static function _behaviours($method, $args, $params = array())
+    {
+        $return = isset($params['return']) && $params['return'];
+        $class = get_called_class();
+        foreach (static::behaviours() as $behaviour => $settings) {
+            $methods = isset($settings['methods']) ? $settings['methods'] : array();
+            if (empty($methods) or in_array($methods, $method)) {
+                $behaviour_instance = $behaviour::instance($class);
+                if (method_exists($behaviour_instance, $method)) {
+                    if (isset($params['this']) && is_object($params['this'])) {
+                        $return_value = call_user_func_array(array($behaviour_instance, $method), array_merge(array($params['this']), $args));
+                    } else {
+                        $return_value = call_user_func_array(array($behaviour_instance, $method), $args);
+                    }
+                    if ($return) {
+                        return array('return' => $return_value);
+                    }
+                }
             }
+        }
+        if ($return) {
+            return array();
         }
     }
 
@@ -471,35 +482,11 @@ class Model extends \Orm\Model
         static::$_properties = Arr::merge(static::$_properties, $properties);
     }
 
-    public function import_dataset_behaviours(&$dataset)
-    {
-        try {
-            static::_callAllBehaviours(get_called_class(), 'dataset', array(&$dataset, $this));
-        } catch (\Exception $e) {
-        }
-    }
-
-    public function form_processing_behaviours($data, &$json_response)
-    {
-        try {
-            static::_callAllBehaviours($this, 'form_processing', array($data, &$json_response));
-        } catch (\Exception $e) {
-        }
-    }
-
-    public function form_fieldset_fields(&$fieldset)
-    {
-        try {
-            static::_callAllBehaviours($this, 'form_fieldset_fields', array(&$fieldset));
-        } catch (\Exception $e) {
-        }
-    }
-
     public static function query($options = array())
     {
-        static::_callAllBehaviours(get_called_class(), 'before_query', array(&$options));
+        static::eventStatic('before_query', array(&$options));
 
-        return Query::forge(get_called_class(), static::connection(), $options);
+        return Query::forge(get_called_class(), array(static::connection(), static::connection(true)), $options);
     }
 
     public static function prefix()
@@ -547,13 +534,35 @@ class Model extends \Orm\Model
         return null;
     }
 
-    public function set($name, $value = null)
+    public function set($property, $value = null)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
-            $name = static::prefix().$name;
+        if (is_array($property)) {
+            return parent::set($property, $value);
         }
 
-        return parent::set($name, $value);
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+            $property = static::prefix().$property;
+        }
+
+        $properties_reload = !isset($this->_custom_data[$property]);
+
+        $return = parent::set($property, $value);
+
+        if (\Config::get('novius-os.cache_model_properties', false)) {
+            if ($properties_reload && isset($this->_custom_data[$property])) {
+                static::properties(true);
+                unset($this->_custom_data[$property]);
+                $return = parent::set($property, $value);
+            }
+        }
+
+        $class = get_called_class();
+        if ($value === '' && array_key_exists($property, static::$_properties_cached[$class]) &&
+            isset(static::$_properties_cached[$class][$property]['convert_empty_to_null']) && static::$_properties_cached[$class][$property]['convert_empty_to_null']) {
+            $return = parent::set($property, null);
+        }
+
+        return $return;
     }
 
     public function __set($name, $value)
@@ -657,13 +666,21 @@ class Model extends \Orm\Model
         return $obj;
     }
 
-    public function & get($name)
+    public function & get($property)
     {
-        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$name])) {
-            $name = static::prefix().$name;
+        if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
+            $property = static::prefix().$property;
         }
 
-        return parent::get($name);
+        if (\Config::get('novius-os.cache_model_properties', false)) {
+            try {
+                return parent::get($property);
+            } catch (\OutOfBoundsException $e) {
+                static::properties(true);
+            }
+        }
+
+        return parent::get($property);
     }
 
     public function & __get($name)
@@ -815,6 +832,16 @@ class Model extends \Orm\Model
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
+
+    public function __sleep()
+    {
+        return array('_data', '_is_new');
+    }
+
+    public function __wakeup()
+    {
+        $this->initProviders();
+    }
 }
 
 
@@ -842,14 +869,17 @@ class Model_Media_Provider implements \Iterator
 
     public function __set($property, $value)
     {
-        // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
         $media_id = (string) ($value instanceof \Nos\Media\Model_Media ? $value->media_id : $value);
-        $media = \Nos\Media\Model_Media::find($media_id);
-        if (is_null($media)) {
-            $pk = $this->parent->primary_key();
-            throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
-                get_class($this->parent)
-            )."(".$this->parent->{$pk[0]}.")");
+
+        // Check existence of the media, the ORM will throw an exception anyway upon save if it doesn't exists
+        if (!empty($media_id)) {
+            $media = \Nos\Media\Model_Media::find($media_id);
+            if (is_null($media)) {
+                $pk = $this->parent->primary_key();
+                throw new \Exception("The media with ID $media_id doesn't exists, cannot assign it as \"$property\" for ".\Inflector::denamespace(
+                    get_class($this->parent)
+                )."(".$this->parent->{$pk[0]}.")");
+            }
         }
 
         // Reuse the getter
@@ -871,6 +901,11 @@ class Model_Media_Provider implements \Iterator
     {
         $value = $this->__get($value);
         return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
     }
 
     public function rewind()
@@ -956,6 +991,11 @@ class Model_Wysiwyg_Provider implements \Iterator
     {
         $value = $this->__get($value);
         return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
     }
 
     public function rewind()

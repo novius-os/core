@@ -18,7 +18,7 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
 
         if (!empty($page)) {
             $dataset = \Arr::get($this->config, 'dataset');
-            $page->import_dataset_behaviours($dataset);
+            $page->event('dataset', array(&$dataset));
             unset($dataset['actions']);
             $item = array();
             foreach ($dataset as $key => $data) {

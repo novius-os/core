@@ -17,6 +17,182 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_table_name = 'nos_page';
     protected static $_primary_key = array('page_id');
 
+    protected static $_title_property = 'page_title';
+    protected static $_properties = array(
+        'page_id' => array(
+            'default' => null,
+            'data_type' => 'int',
+            'null' => false,
+        ),
+        'page_parent_id' => array(
+            'default' => null,
+            'data_type' => 'int',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_template' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_level' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_title' => array(
+            'default' => '',
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'page_context' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'page_context_common_id' => array(
+            'default' => null,
+            'data_type' => 'int',
+            'null' => false,
+        ),
+        'page_context_is_main' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_menu_title' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_meta_title' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_sort' => array(
+            'default' => null,
+            'data_type' => 'float',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_menu' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_type' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_published' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_publication_start' => array(
+            'default' => null,
+            'data_type' => 'datetime',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_publication_end' => array(
+            'default' => null,
+            'data_type' => 'datetime',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_meta_noindex' => array(
+            'default' => 0,
+            'data_type' => 'tinyint unsigned',
+            'null' => false,
+        ),
+        'page_lock' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_entrance' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_home' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'page_cache_duration' => array(
+            'default' => null,
+            'data_type' => 'int',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_virtual_name' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_virtual_url' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_external_link' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_external_link_type' => array(
+            'default' => null,
+            'data_type' => 'tinyint',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_created_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'page_updated_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'page_meta_description' => array(
+            'default' => null,
+            'data_type' => 'text',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_meta_keywords' => array(
+            'default' => null,
+            'data_type' => 'text',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_created_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_updated_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+    );
+
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
     protected static $_has_many = array(
         'children' => array(
             'key_from'       => 'page_id',
@@ -40,12 +216,10 @@ class Model_Page extends \Nos\Orm\Model
     protected static $_observers = array(
         'Orm\\Observer_Self',
         'Orm\Observer_CreatedAt' => array(
-            'events' => array('before_insert'),
             'mysql_timestamp' => true,
             'property'=>'page_created_at'
         ),
         'Orm\Observer_UpdatedAt' => array(
-            'events' => array('before_save'),
             'mysql_timestamp' => true,
             'property'=>'page_updated_at'
         ),
@@ -53,30 +227,32 @@ class Model_Page extends \Nos\Orm\Model
 
     protected static $_behaviours = array(
         'Nos\Orm_Behaviour_Twinnable' => array(
-            'events' => array('before_insert', 'after_insert', 'before_save', 'after_delete', 'change_parent'),
             'context_property'      => 'page_context',
             'common_id_property' => 'page_context_common_id',
             'is_main_property' => 'page_context_is_main',
             'invariant_fields'   => array(),
         ),
         'Nos\Orm_Behaviour_Tree' => array(
-            'events' => array('before_query', 'before_delete'),
             'parent_relation' => 'parent',
             'children_relation' => 'children',
             'level_property' => 'page_level',
         ),
         'Nos\Orm_Behaviour_Virtualpath' => array(
-            'events' => array('before_save', 'after_save', 'check_change_parent'),
             'virtual_name_property' => 'page_virtual_name',
             'virtual_path_property' => 'page_virtual_url',
             'extension_property' => '.html',
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
-            'events' => array('before_insert', 'before_save', 'after_save'),
             'sort_property' => 'page_sort',
         ),
         'Nos\Orm_Behaviour_Publishable' => array(
-            'publication_bool_property' => 'page_published',
+            'publication_state_property' => 'page_published',
+            'publication_start_property' => 'page_publication_start',
+            'publication_end_property' => 'page_publication_end',
+        ),
+        'Nos\Orm_Behaviour_Author' => array(
+            'created_by_property' => 'page_created_by_id',
+            'updated_by_property' => 'page_updated_by_id',
         ),
     );
 
@@ -144,6 +320,54 @@ class Model_Page extends \Nos\Orm\Model
         return $url;
     }
 
+
+    /**
+     *  Delete the cache for this page
+     */
+    public function delete_cache()
+    {
+        if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
+            return;
+        }
+        $url = $this->page_entrance ? '' : ltrim($this->virtual_path(), '/');
+        $contexts = \Nos\Tools_Context::contexts();
+        foreach ($contexts[$this->page_context] as $context_url) {
+            $host = parse_url($context_url, PHP_URL_HOST);
+            $path = ltrim(parse_url($context_url, PHP_URL_PATH), '/');
+
+            $url = $path.$url;
+            $cache_path = (empty($url) ? 'index/' : $url);
+            // This event mostly redirects, don't trigger it
+            //\Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
+            $cache_path = $host.DS.rtrim($cache_path, '/');
+
+            // Delete file
+            $cache = \Nos\FrontCache::forge('pages'.DS.$cache_path);
+            $cache->delete();
+        }
+
+        if ($this->page_menu || $this->is_changed('page_menu')) {
+            static::delete_cache_context($this->page_context);
+        }
+    }
+
+    /**
+     * Delete the cache for this context
+     *
+     * @param  $context  string  Context to delete (e.g. 'main::en_GB')
+     */
+    public static function delete_cache_context($context)
+    {
+        $contexts = \Nos\Tools_Context::contexts();
+        foreach ($contexts[$context] as $context_url) {
+            $host = parse_url($context_url, PHP_URL_HOST);
+            $path = trim(parse_url($context_url, PHP_URL_PATH), '/');
+
+            $cache = \Nos\FrontCache::forge('pages'.DS.$host.DS.$path);
+            $cache->delete();
+        }
+    }
+
     public function _event_after_save()
     {
         \Nos\Config_Data::load('enhancers');
@@ -177,7 +401,10 @@ class Model_Page extends \Nos\Orm\Model
                     $page_enhanced[$name][$this->page_id] = array(
                         'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
                         'context' => $this->page_context,
-                        'published' => $this->published(),
+                        'published' => $this->planificationStatus() == 2 ? array(
+                            'start' => $this->publicationStart(),
+                            'end' => $this->publicationEnd(),
+                        ) : $this->published(),
                     );
 
                     \Nos\Config_Data::save('page_enhanced', $page_enhanced);
@@ -185,6 +412,8 @@ class Model_Page extends \Nos\Orm\Model
                 }
             }
         }
+
+        $this->delete_cache();
     }
 
     public function _event_before_delete()
@@ -196,6 +425,7 @@ class Model_Page extends \Nos\Orm\Model
     {
         static::_remove_url_enhanced($this->_page_id_for_delete);
         static::_remove_page_enhanced($this->_page_id_for_delete);
+        $this->delete_cache();
         $this->_page_id_for_delete = null;
     }
 

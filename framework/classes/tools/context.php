@@ -64,6 +64,9 @@ class Tools_Context
                     static::$_contexts[$context_code] = $domains;
                 }
             }
+            if (empty(static::$_contexts)) {
+                throw new \RuntimeException('No context has been defined.');
+            }
         }
 
         return static::$_contexts;
@@ -156,7 +159,7 @@ class Tools_Context
     public static function flag($context)
     {
         $locale = self::locale($context);
-        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" />';
+        return '<img src="static/novius-os/admin/novius-os/img/flags/'.$locale['flag'].'.png" alt="'.htmlspecialchars($locale['title']).'" title="'.htmlspecialchars($locale['title']).'" style="vertical-align:middle;" />';
     }
 
     /**

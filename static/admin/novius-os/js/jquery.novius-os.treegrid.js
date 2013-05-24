@@ -24,6 +24,7 @@ define('jquery-nos-treegrid',
             },
 
             oldFirstColumn : null,
+            gridData: null,
             treeData : {},
             treeDataSource : null,
 
@@ -65,7 +66,7 @@ define('jquery-nos-treegrid',
 
                 o.allowPaging = false;
 
-                $.nos.noslistgrid.prototype._create.call(self);
+                self._super();
             },
 
             _init: function() {
@@ -135,8 +136,7 @@ define('jquery-nos-treegrid',
                     this.sortDirection = 'none';
                 });
 
-                $.nos.noslistgrid.prototype._init.call(self);
-
+                self._super();
                 self._activateSpinner();
                 self._datasource();
                 self.treeDataSource.proxy.options.data.deep = 2;
@@ -151,7 +151,7 @@ define('jquery-nos-treegrid',
             _setOption: function(key, value){
                 var self = this;
 
-                $.nos.noslistgrid.prototype._setOption.apply(self, arguments);
+                self._superApply(arguments);
 
                 if (key === 'treeOptions') {
                     self._datasource()
@@ -175,7 +175,7 @@ define('jquery-nos-treegrid',
                         data: o.treeOptions || {}
                     }),
                     loaded: function(dataSource, data) {
-                        var nosGridData = self.data(),
+                        var nosGridData = self._gridData(),
                             toArray = function(objets) {
                                 return $.map(objets, function(el, key) {
                                     if (key === 'length') {
@@ -203,10 +203,7 @@ define('jquery-nos-treegrid',
                                 Array.prototype.splice.apply(nosGridData, [index, 0, data.node].concat(toArray(data.node.treeChilds)));
                             }
                         }
-                        // @todo ensureControl is failing when the element is hidden. Need to call 'doRefresh' when it gets visible again
-                        try {
-                            self.ensureControl(true);
-                        } catch (e) {}
+                        self._setGridData(nosGridData);
                         self._deactivateSpinner();
                     },
                     reader: {
@@ -293,7 +290,7 @@ define('jquery-nos-treegrid',
                 if (self.mousePressed && (new Date().getTime() - self.mousePressed) > 500) {
                     if (!self._scroller) {
                         self._scroller = {
-                            superpanel : self._view()._scroller.data('wijsuperpanel')
+                            superpanel : self._view()._scroller.data('wijmo-wijsuperpanel')
                         };
                         var contentElement = self._scroller.superpanel.getContentElement(),
                             contentWrapper = contentElement.parent(),
@@ -479,7 +476,7 @@ define('jquery-nos-treegrid',
                                     $tr;
 
                                 if (newParent) {
-                                    newParentIndex = $.inArray(newParent, self.data());
+                                    newParentIndex = $.inArray(newParent, self._gridData());
                                     $tr = self.element.find('tr.wijmo-wijgrid-row').eq(newParentIndex);
                                 }
 
@@ -532,7 +529,7 @@ define('jquery-nos-treegrid',
                 var self = this,
                     removeIndex = false,
                     removeLength = 0,
-                    data = self.data();
+                    data = self._gridData();
                 $.each(data, function(i, item) {
                     var remove = node.treeHash === item.treeHash || $.inArray(node.treeHash, item.treePath) !== -1;
                     if (remove) {
@@ -550,6 +547,21 @@ define('jquery-nos-treegrid',
                 }
 
                 return removeLength;
+            },
+
+            _gridData: function() {
+                var self = this;
+                if (!self.gridData) {
+                    self.gridData = $.extend([], self.data())
+                }
+                return self.gridData;
+            },
+
+            _setGridData: function(data) {
+                var self = this;
+                self._setOption('data', data);
+                self.gridData = null;
+                return self;
             },
 
             reload : function() {

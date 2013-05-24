@@ -16,6 +16,58 @@ class Model_Folder extends \Nos\Orm\Model
     protected static $_primary_key = array('medif_id');
 
     protected static $_title_property = 'medif_title';
+    protected static $_properties = array(
+        'medif_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'medif_parent_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'medif_path' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medif_dir_name' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'medif_title' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medif_created_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'medif_updated_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'medif_created_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'medif_updated_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+    );
+
+    protected static $_has_one = array();
+    protected static $_many_many = array();
 
     protected static $_has_many = array(
         'children' => array(
@@ -46,12 +98,10 @@ class Model_Folder extends \Nos\Orm\Model
 
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(
-            'events' => array('before_insert'),
             'mysql_timestamp' => true,
             'property'=>'medif_created_at'
         ),
         'Orm\Observer_UpdatedAt' => array(
-            'events' => array('before_save'),
             'mysql_timestamp' => true,
             'property'=>'medif_updated_at'
         )
@@ -59,15 +109,17 @@ class Model_Folder extends \Nos\Orm\Model
 
     protected static $_behaviours = array(
         'Nos\Orm_Behaviour_Tree' => array(
-            'events' => array('before'),
             'parent_relation' => 'parent',
             'children_relation' => 'children',
         ),
         'Nos\Orm_Behaviour_Virtualpath' => array(
-            'events' => array('before_save', 'after_save', 'change_parent'),
             'virtual_name_property' => 'medif_dir_name',
             'virtual_path_property' => 'medif_path',
             'extension_property' => '/',
+        ),
+        'Nos\Orm_Behaviour_Author' => array(
+            'created_by_property' => 'medif_created_by_id',
+            'updated_by_property' => 'medif_updated_by_id',
         ),
     );
 

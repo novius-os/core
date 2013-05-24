@@ -16,7 +16,7 @@ $uniqid = uniqid('id_');
 <style type="text/css">
 /* ? */
 /* @todo check this */
-.ui-accordion-content-active {
+.wijmo-wijaccordion-content-active {
     overflow: visible !important;
 }
 </style>
@@ -40,6 +40,14 @@ $uniqid = uniqid('id_');
                 'content' => \View::forge('form/fields', array(
                     'fieldset' => $fieldset,
                     'fields' => array('user_email', 'user_password', 'password_confirmation', 'user_lang', 'user_expert'),
+                ), false)
+            ), false),
+            \Config::get('novius-os.users.enable_roles', false) == false ? '' : \View::forge('form/expander', array(
+                'title' => __('Roles'),
+                'nomargin' => false,
+                'content' => \View::forge('noviusos_user::admin/user_roles_edit', array(
+                    'fieldset' => $fieldset,
+                    'user' => $item,
                 ), false)
             ), false),
         ),

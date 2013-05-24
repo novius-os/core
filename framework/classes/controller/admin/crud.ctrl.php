@@ -135,7 +135,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'url_insert_update' => $this->config['controller_url'].'/insert_update'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'url_actions'  => $this->config['controller_url'].'/json_actions'.($this->is_new ? '' : '/'.$this->item->{$this->pk}),
                 'is_new' => $this->is_new,
-                'actions' => $this->get_actions(),
+                'actions' => array_values($this->get_actions()),
                 'dataset' => \Nos\Controller::dataset_item($this->item),
                 'tab_params' => $this->get_tab_params(),
             ),
@@ -166,7 +166,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if ($this->is_new) {
             $this->init_item();
         }
-        $this->check_permission($this->is_new ? 'insert' : 'update');
+        $this->checkPermission($this->is_new ? 'add' : 'edit');
 
         $fields = $this->fields($this->config['fields']);
         $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
@@ -371,7 +371,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $return = array(
             'notify' => $this->is_new ? $this->config['i18n']['notification item added'] : $this->config['i18n']['notification item saved'],
             'closeDialog' => true,
-            'dispatchEvent' => $dispatchEvent,
+            'dispatchEvent' => array($dispatchEvent),
         );
         if ($this->is_new) {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};
@@ -384,6 +384,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     'label' => (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
                 ),
             );
+            $return['dataset'] = \Nos\Controller::dataset_item($this->item);
         }
 
         return $return;
@@ -501,12 +502,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $this->item = $this->crud_item($id);
 
         if (empty($this->item)) {
-            return $this->send_error(new \Exception($this->config['messages']['item deleted']));
+            return $this->send_error(new \Exception($this->config['i18n']['notification item deleted']));
         }
 
         $this->is_new = $this->item->is_new();
 
-        \Response::json($this->get_actions());
+        \Response::json(array_values($this->get_actions()));
     }
 
     /**
@@ -548,106 +549,30 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      * Get possible actions in the appdesk from the config
      * @return array
      */
-    protected function get_actions()
+    protected function get_actions($all_targets = false)
     {
-        $applicationActions = \Config::actions(array(
-            'models' => array(get_class($this->item)),
-            'target' => 'toolbar-edit',
-            'class' => get_called_class(),
-            'item' => $this->item,
-        ));
-        $actions = array_values($this->get_actions_context());
-
-        foreach ($applicationActions as $action) {
-            $actions[] = $action;
-        }
-        foreach ($this->config['actions'] as $action) {
-            if (is_callable($action)) {
-                $action = $action($this->item);
-            }
-            if (!empty($action)) {
-                $actions[] = $action;
-            }
-        }
+        $actions = array_merge(
+            \Config::actions(array(
+                'models' => array(get_class($this->item)),
+                'target' => 'toolbar-edit',
+                'class' => get_called_class(),
+                'item' => $this->item,
+                'all_targets' => $all_targets
+            )),
+            \Nos\Config_Common::prefixActions($this->config['actions'], $this->config['model'])
+        );
 
         return $actions;
     }
 
     /**
-     * get standard actions to translate an item
-     * @return type
+     * @deprecated
      */
-    protected function get_actions_context()
+    protected function check_permission($action_name)
     {
-        if (!$this->behaviours['twinnable'] || $this->is_new) {
-            return array();
-        }
+        logger(\Fuel::L_WARNING, '\Nos\Controller_Admin_Crud->check_permission($action_name) is deprecated. Please use \Nos\Controller_Admin_Crud->checkPermission($action_name).');
 
-        $actions = array();
-
-        $contexts = array_keys(Tools_Context::contexts());
-        $sites = Tools_Context::sites();
-        $locales = Tools_Context::locales();
-
-        $main_context = $this->item->find_main_context();
-        foreach ($contexts as $context) {
-            if ($this->item->{$this->behaviours['twinnable']['context_property']} === $context) {
-                continue;
-            }
-            $item_context = $this->item->find_context($context);
-            $url = $this->config['controller_url'].'/insert_update'.(empty($item_context) ? (empty($main_context) ? '' : '/'.$main_context->id).'?context='.$context : '/'.$item_context->id);
-            if (empty($item_context)) {
-                if (count($sites) === 1) {
-                    $label = __('Translate into {{context}}');
-                } elseif (count($locales) === 1) {
-                    $label = __('Add to {{context}}');
-                } else {
-                    if (Tools_Context::localeCode($context) === Tools_Context::localeCode($this->item->get_context())) {
-                        $label = __('Add to {{context}}');
-                    } else {
-                        $label = __('Translate into {{context}}');
-                    }
-                }
-            } else {
-                $label = __('Edit {{context}}');
-            }
-            $label = strtr($label, array('{{context}}' => Tools_Context::contextLabel($context)));
-            $actions[] = array(
-                'content' => $label,
-                'action' => array(
-                    'action' => 'nosTabs',
-                    'method' => empty($main_context) ? 'add' : 'open',
-                    'tab' => array(
-                        'url' => $url,
-                    ),
-                ),
-            );
-        }
-
-        if (count($sites) === 1) {
-            // Note to translator: action (button)
-            $label = __('Translate');
-        } elseif (count($locales) === 1) {
-            $label = __('Add to another site');
-        } else {
-            $label = __('Translate / Add to another site');
-        }
-
-        return array(
-            array(
-                'label' => $label,
-                'menu' => array(
-                    'options' => array(
-                        'orientation' => 'vertical',
-                        'direction' => 'rtl',
-                    ),
-                    'menus' => $actions,
-                ),
-                'icons' => array(
-                    'secondary' => 'triangle-1-s',
-                ),
-            ),
-        );
+        return $this->checkPermission($action_name);
     }
 
     /**
@@ -655,10 +580,25 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      * @param string $action
      * @throws \Exception
      */
-    protected function check_permission($action)
+    protected function checkPermission($action_name)
     {
-        if ($action === 'delete' && $this->item->is_new()) {
-            throw new \Exception($this->config['i18n']['not found']);
+        $action_name = \Nos\Config_Common::prefixActionName($action_name, $this->config['model']);
+
+        $actions = $this->get_actions(true);
+        if (!isset($actions[$action_name])) {
+            logger(\Fuel::L_WARNING, '\Nos\Controller_Admin_Crud->check_permission($action_name = '.$action_name.'). The action name was not found in the common configuration file, please double check for typo.');
+            return true;
+        }
+
+        $action = $actions[$action_name];
+
+        $disabled = isset($action['disabled']) ? \Config::getActionDisabledState($action['disabled'], $this->item) : false;
+
+        if ($disabled !== false) {
+            if (!is_string($disabled)) {
+                $disabled = __('You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.');
+            }
+            $this->send_error(new \Exception($disabled));
         }
     }
 
@@ -675,7 +615,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             } else {
                 $this->item = $this->crud_item($id);
                 $this->is_new = $this->item->is_new();
-                $this->check_permission('delete');
+                $this->checkPermission('delete');
 
                 return \View::forge('nos::crud/delete_popup_layout', $this->view_params(), false);
             }
@@ -696,7 +636,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         $this->item = $this->crud_item($id);
         $this->is_new = $this->item->is_new();
-        $this->check_permission('delete');
+        $this->checkPermission('delete');
 
         $dispatchEvent = array(
             'name' => $this->config['model'],
@@ -768,14 +708,5 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
     public function delete()
     {
-        return array(
-            'dispatchEvent' => array(
-                array(
-                    'name' => 'Nos\User\Model_User',
-                    'action' => 'delete',
-                    'id' => array((int) 1),
-                ),
-            ),
-        );
     }
 }

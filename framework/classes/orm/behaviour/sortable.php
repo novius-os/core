@@ -17,13 +17,13 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
      */
     protected $_properties = array();
 
-    protected $_sort_change = false;
+    protected $_sort_change = array();
 
     public function before_query(&$options)
     {
         if (array_key_exists('order_by', $options)) {
             $order_by = $options['order_by'];
-            if (!empty($order_by['default_sort'])) {
+            if (is_array($order_by) && !empty($order_by['default_sort'])) {
                 unset($order_by['default_sort']);
                 $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
             }
@@ -34,10 +34,10 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
     /**
      * Sets a new parent for the object
      *
-     * @param   Orm\Model The parent object
-     * @return void
+     * @param \Nos\Orm\Model $item The parent object
+     * @param float $before
      */
-    public function move_before($item, $before = null)
+    public function move_before(Orm\Model $item, $before = null)
     {
         $this->_move($item, $before->get_sort() - 0.5);
     }
@@ -110,14 +110,14 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
         $sort_property = $this->_properties['sort_property'];
         if ($item->is_changed($sort_property)) {
-            $this->_sort_change = true;
+            $this->_sort_change[$item::implode_pk($item)] = true;
         }
     }
 
     public function after_save(\Nos\Orm\Model $item)
     {
-        if ($this->_sort_change) {
-            $this->_sort_change = false;
+        if (isset($this->_sort_change[$item::implode_pk($item)])) {
+            unset($this->_sort_change[$item::implode_pk($item)]);
             $sort_property = $this->_properties['sort_property'];
             $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
             $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');

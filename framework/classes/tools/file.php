@@ -17,7 +17,7 @@ class Tools_File
 
     public static function _init()
     {
-        static::$use_xsendfile = \Config::get('use_xsendfile', null);
+        static::$use_xsendfile = \Config::get('novius-os.use_xsendfile', null);
         if (null === static::$use_xsendfile) {
             // No config defined: auto detection
             static::$use_xsendfile = self::xsendfile_available();

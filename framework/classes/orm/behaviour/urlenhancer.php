@@ -13,12 +13,16 @@ namespace Nos;
 class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 {
     /**
-     * publication_bool_property
-     * publication_start_property
-     * publication_end_property
+     * enhancers
      */
     protected $_properties = array();
 
+    public function dataset(Orm\Model $item, &$dataset)
+    {
+        if (!isset($dataset['preview_url'])) {
+            $dataset['preview_url'] = array($this, 'preview_url');
+        }
+    }
     /**
      * Returns an array of all available URL for this item. The array contains:
      *

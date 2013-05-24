@@ -14,26 +14,28 @@ use Date, View;
 
 class Controller_Inspector_Date extends Controller_Inspector
 {
+    protected static $default_view = 'inspector/date';
+
     public function prepare_i18n()
     {
         parent::prepare_i18n();
         I18n::current_dictionary('nos::common');
     }
 
-    public function action_list()
+    public static function getView($config)
     {
-        $view = View::forge('inspector/date');
+        $view = View::forge(static::$default_view);
 
         $content = array();
         $since = array();
         $month = array();
         $year = array();
-        if (is_array($this->config['options'])) {
-            foreach ($this->config['options'] as $type) {
+        if (is_array($config['options'])) {
+            foreach ($config['options'] as $type) {
                 switch ($type) {
                     case 'since' :
-                        if (is_array($this->config['since']) && is_array($this->config['since']['options'])) {
-                            foreach ($this->config['since']['options'] as $key => $label) {
+                        if (is_array($config['since']) && is_array($config['since']['options'])) {
+                            foreach ($config['since']['options'] as $key => $label) {
                                 if ($key == 'current month') {
                                     $dateBegin = new Date();
                                     $dateBegin->modify('first day of this month');
@@ -46,7 +48,7 @@ class Controller_Inspector_Date extends Controller_Inspector
                                 $since[] = array(
                                     'value' => $dateBegin->format('%Y-%m-%d').'|',
                                     'title' => $label,
-                                    'group' => $this->config['since']['optgroup'],
+                                    'group' => $config['since']['optgroup'],
                                 );
                             }
                         }
@@ -54,13 +56,13 @@ class Controller_Inspector_Date extends Controller_Inspector
 
                     case 'month' :
                         $date = new Date();
-                        $date->modify($this->config['month']['first_month']);
+                        $date->modify($config['month']['first_month']);
                         $date->modify('first day of this month');
                         $date_limit = clone $date;
-                        if ($this->config['month']['limit_type'] == 'year') {
-                            $date_limit->modify('-'.intval($this->config['month']['limit_value']).' year');
-                        } elseif ($this->config['month']['limit_type'] == 'month') {
-                            $date_limit->modify('-'.intval($this->config['month']['limit_value']).' month');
+                        if ($config['month']['limit_type'] == 'year') {
+                            $date_limit->modify('-'.intval($config['month']['limit_value']).' year');
+                        } elseif ($config['month']['limit_type'] == 'month') {
+                            $date_limit->modify('-'.intval($config['month']['limit_value']).' month');
                         }
                         while (1 == 1) {
                             $dateEnd = clone $date;
@@ -68,7 +70,7 @@ class Controller_Inspector_Date extends Controller_Inspector
                             $month[] = array(
                                 'value' => $date->format('%Y-%m-%d').'|'.$dateEnd->format('%Y-%m-%d'),
                                 'title' => $date->format('%B %Y'),
-                                'group' => $this->config['month']['optgroup'],
+                                'group' => $config['month']['optgroup'],
                             );
                             if (Date::compare($date, $date_limit) <= 0) {
                                 break;
@@ -79,17 +81,17 @@ class Controller_Inspector_Date extends Controller_Inspector
 
                     case 'year' :
                         $date = new Date();
-                        $date->modify($this->config['year']['first_year']);
+                        $date->modify($config['year']['first_year']);
                         $date->modify('first day of January');
                         $date_limit = clone $date;
-                        $date_limit->modify('-'.intval($this->config['year']['limit']).' year');
+                        $date_limit->modify('-'.intval($config['year']['limit']).' year');
                         while (1 == 1) {
                             $dateEnd = clone $date;
                             $dateEnd->modify('last day of December');
                             $year[] = array(
                                 'value' => $date->format('%Y-%m-%d').'|'.$dateEnd->format('%Y-%m-%d'),
                                 'title' => $date->format('%Y'),
-                                'group' => $this->config['year']['optgroup'],
+                                'group' => $config['year']['optgroup'],
                             );
                             if (Date::compare($date, $date_limit) <= 0) {
                                 break;
@@ -99,12 +101,12 @@ class Controller_Inspector_Date extends Controller_Inspector
                         break;
                 }
             }
-            foreach ($this->config['options'] as $type) {
+            foreach ($config['options'] as $type) {
                 switch ($type) {
                     case 'custom' :
                         $content = array_merge($content, array(array(
                             'value' => 'custom',
-                            'title' => $this->config['label_custom'],
+                            'title' => $config['labels']['Custom dates'],
                             'group' => '',
                         )));
                         break;
@@ -125,13 +127,13 @@ class Controller_Inspector_Date extends Controller_Inspector
         }
 
         $view->set('content', $content, false);
-        $view->set('label_custom', $this->config['label_custom_inputs']);
+        $view->set('labels', $config['labels']);
 
         $view->set('date_begin', \Nos\Renderer_Date_Picker::renderer(array(
-            'name' => $this->config['input_begin'],
+            'name' => $config['input_begin'],
         )), false);
         $view->set('date_end', \Nos\Renderer_Date_Picker::renderer(array(
-            'name' => $this->config['input_end'],
+            'name' => $config['input_end'],
         )), false);
 
         return $view;
@@ -144,8 +146,12 @@ class Controller_Inspector_Date extends Controller_Inspector
         $default_config = array(
             'input_begin'           => 'date_begin',
             'input_end'             => 'date_end',
-            'label_custom'          => __('Custom dates'),
-            'label_custom_inputs'   => __('from {{begin}} to {{end}}'),
+            'labels'                => array(
+                'Custom dates' => __('Custom dates'),
+                'from begin to end' => __('from {{begin}} to {{end}}'),
+                'until end' => __('until {{end}}'),
+                'since begin' => __('since {{begin}}'),
+            ),
             'options'               => array('custom', 'since', 'month', 'year'),
             'since'                 => array(
                 'optgroup'  => __('Since'),
@@ -174,7 +180,6 @@ class Controller_Inspector_Date extends Controller_Inspector
             ),
             'appdesk' => array(
                 'vertical'  => true,
-                'url'       => $inspector_path.'/list',
                 'inputName' => $config['input']['key']
             ),
         );
@@ -203,6 +208,8 @@ class Controller_Inspector_Date extends Controller_Inspector
                 return $query;
             };
         }
+
+        $config['appdesk']['view'] = static::getView($config)->render();
 
         return $config;
     }

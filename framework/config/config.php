@@ -30,7 +30,19 @@ return array(
     */
     'index_file'    => false,
 
-    'profiling'        => false,
+    'profiling'        => Fuel::$env === Fuel::DEVELOPMENT,
+
+    /**
+     * profiling_paths - The paths to show in profiler.
+     *
+     * If you do not wish to see path set to 'NULL'
+     * You can also add other paths that you wish not to see
+     */
+    'profiling_paths' => array(
+        'APPPATH' => APPPATH,
+        'COREPATH' => COREPATH,
+        'PKGPATH' => PKGPATH,
+    ),
 
     'caching'            => false,
     'cache_dir'            => APPPATH.'cache/',
@@ -146,7 +158,6 @@ return array(
     'module_paths' => array(
         realpath(APPPATH.'applications').DS,
         // Strip trailing "novius-os/framework/"
-        realpath(mb_substr(NOSPATH, 0, -20).'lib').DS,
         realpath(NOSPATH.'applications').DS,
     ),
 
@@ -221,8 +232,10 @@ return array(
     ),
 
     'novius-os' => array(
-        'cache_duration_page' => 5,
-        'cache_duration_function' => 10,
+        'cache' => true,
+        'cache_duration_page' => \Fuel::$env !== \Fuel::PRODUCTION ? 3600 : 600,
+        'cache_duration_function' => \Fuel::$env !== \Fuel::PRODUCTION ? 3600 : 600,
+        'cache_model_properties' => false,
 
         'locales' => array(
             'en_GB' => array(
@@ -234,10 +247,10 @@ return array(
                 'flag' => 'fr',
             ),
             // @todo uncomment when the translations will be available
-            /*'ja_JP' =>  array(
-                'title' => '日本語'
+            'ja_JP' =>  array(
+                'title' => '日本語',
                 'flag' => 'jp',
-            ),*/
+            ),
         ),
 
         'default_locale' => 'en_GB',
@@ -250,6 +263,8 @@ return array(
          * Whether to use minified assets (css & js)
          */
         'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
+
+        'migration_config_file' => false,
     ),
 );
 

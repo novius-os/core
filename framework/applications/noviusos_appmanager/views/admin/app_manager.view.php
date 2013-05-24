@@ -27,6 +27,12 @@ Nos\I18n::current_dictionary('noviusos_appmanager::common');
         .app_manager .app_list_available {
             width : 600px;
         }
+        .app_manager label.tooltip {
+            font-weight: bold;
+        }
+        .app_manager tr {
+            height: 32px;
+        }
     </style>
 
     <div class="col c1"></div>
@@ -67,7 +73,27 @@ foreach ($installed as $app) {
     ?>
                         </td>
                         <td>
+    <?php
+    if ($app->canUninstall()) {
+        ?>
                             <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'remove'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-s"><?= __('Uninstall') ?></button></a>
+    <?php
+    } else {
+        $dependents = $app->installedDependentApplications();
+        foreach ($dependents as &$dependent) {
+            $dependent = \Nos\Application::forge($dependent)->get_name();
+        }
+        unset($dependent);
+        if (count($dependents) == 1) {
+            echo strtr(__('Cannot be uninstalled. Uninstall ‘{{application}}’ first.'), array('{{application}}' => $dependents[0]));
+        } else {
+            echo  preg_replace('`<a>(.*)</a>`',
+                render('noviusos_appmanager::admin/applications_tooltip', array('app_folder' => $app->folder, 'applications' => $dependents), true),
+                __('Cannot be uninstalled. Uninstall <a>these applications</a> first.')
+            );
+        }
+    }
+        ?>
                         </td>
                     </tr>
     <?php
@@ -92,6 +118,7 @@ if (empty($installed)) {
 <?php
 foreach ($others as $app) {
     $metadata = $app->getRealMetadata();
+    $can_install = $app->canInstall();
     ?>
                     <tr>
                         <td><?= e($app->get_name_translated()) ?> </td>
@@ -101,10 +128,23 @@ foreach ($others as $app) {
         ?>
                             <em><?php echo __('No metadata found') ?>.</em>
         <?php
-    } else {
+    } else if ($can_install) {
         ?>
                              <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
         <?php
+    } else {
+        // @note: we can't get application names here since they don't exist therefore there aren't any metadata
+        $unavailable_applications = $app->applicationsRequiredAndUnavailable();
+        if (count($unavailable_applications) == 1) {
+            echo strtr(__('Cannot be installed. Install ‘{{application}}’ first.'), array('{{application}}' => $unavailable_applications[0]));
+        } else {
+            echo  preg_replace('`<a>(.*)</a>`',
+                render('noviusos_appmanager::admin/applications_tooltip', array('app_folder' => $app->folder, 'applications' => $unavailable_applications), true),
+                __('Cannot be installed. Install <a>these applications</a> first.')
+            );
+        }
+
+
     }
     ?>
                     </tr>
@@ -156,17 +196,44 @@ if ($local->is_dirty()) {
                         labelDisplay: false
                     });
 
-                    $(".app_list_installed table").wijgrid({
-                        rendered: function(args) {
-                            $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
-                        },
-                        selectionMode: 'none',
-                        highlightCurrentCell: false
-                    });
+<?php
+if (\Session::user()->user_expert) {
+    ?>
 
-                    $(".app_list_available table").wijgrid({
+                    var $a = $('<a href="#" data-icon="wrench"><?= htmlspecialchars(__('Refresh all metadata')); ?></a>')
+                        .on('click', function(e) {
+                            e.preventDefault();
+                            $container.nosAjax({
+                                url: 'admin/noviusos_appmanager/appmanager/refresh_metadata',
+                                complete: function() {
+                                    $container.load('admin/noviusos_appmanager/appmanager', function() {
+                                        $container.find(':first').unwrap();
+                                    });
+                                }
+                            })
+                        });
+                    $container.nosToolbar($a);
+
+    <?php
+}
+?>
+                    $(".app_list_available table, .app_list_installed table").wijgrid({
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
+
+                            var $tooltip = $(args.target).find('.tooltip');
+                            $tooltip.wijtooltip({
+                                showCallout: false,
+                                calloutFilled : true,
+                                closeBehavior: 'sticky',
+                                position : {
+                                    my : 'center top',
+                                    at : 'center bottom',
+                                    offset : '0 0'
+                                },
+                                triggers : 'click',
+                                content : $tooltip.find('div.content').html()
+                            });
                         },
                         selectionMode: 'none',
                         highlightCurrentCell: false
@@ -190,6 +257,7 @@ if ($local->is_dirty()) {
                             }
                         });
                     })
+
 
 <?php
 $flash = \Session::get_flash('notification.plugins');

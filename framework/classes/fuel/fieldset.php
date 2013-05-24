@@ -43,7 +43,7 @@ class Fieldset extends \Fuel\Core\Fieldset
     {
         $build = parent::build($action);
 
-        return $build.$this->build_append();
+        return $build.$this->build_append().$this->build_js_validation();
     }
 
     public function close()
@@ -52,7 +52,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             ? $this->form()->close().PHP_EOL
             : $this->form()->{$this->fieldset_tag.'_close'}();
 
-        return $close.$this->build_append();
+        return $close.$this->build_append().$this->build_js_validation();
     }
 
     public function build_hidden_fields()
@@ -70,7 +70,21 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $output;
     }
 
-    protected function build_append()
+    public function build_append()
+    {
+        $append = array();
+        foreach ($this->append as $a) {
+            if (is_callable($a)) {
+                $append[] = call_user_func($a, $this);
+            } else {
+                $append[] = $a;
+            }
+        }
+
+        return implode('', $append);
+    }
+
+    public function build_js_validation()
     {
         $json = array();
         if ($this->js_validation) {
@@ -108,22 +122,12 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
         }
 
-        $append = array();
-        foreach ($this->append as $a) {
-            if (is_callable($a)) {
-                $append[] = call_user_func($a, $this);
-            } else {
-                $append[] = $a;
-            }
-        }
         $form_attributes = $this->get_config('form_attributes', array());
-        $append[] = (string) \View::forge('form/fieldset_js', array(
+        return (string) \View::forge('form/fieldset_js', array(
             'id' => $form_attributes['id'],
             'rules' => \Format::forge()->to_json($json),
             'require_js' => $this->require_js,
         ), false);
-
-        return implode('', $append);
     }
 
     public function form_name($value)
@@ -260,10 +264,14 @@ class Fieldset extends \Fuel\Core\Fieldset
         // Compatibility with 0.1 configuration (widgets have been renamed to renderers)
         foreach ($properties as &$property) {
             if (isset($property['widget'])) {
+                logger(\Fuel::L_WARNING, 'The widget key is deprecated ('.$property['widget'].'). Please use the renderer key and update class name.');
+
                 $property['renderer'] = preg_replace('`^Nos(.+)Widget_(.+)$`', 'Nos$1Renderer_$2', $property['widget']);
                 unset($property['widget']);
             }
             if (isset($property['widget_options'])) {
+                logger(\Fuel::L_WARNING, 'The widget_options key is deprecated. Please use the renderer_options key.');
+
                 $property['renderer_options'] =& $property['widget_options'];
                 unset($property['widget_options']);
             }
@@ -278,10 +286,10 @@ class Fieldset extends \Fuel\Core\Fieldset
             $label      = isset($settings['label']) ? $settings['label'] : $p;
             $attributes = isset($settings['form']) ? $settings['form'] : array();
             if (!empty($settings['renderer'])) {
-                 $class = $settings['renderer'];
-                 $attributes['renderer_options'] = \Arr::get($settings, 'renderer_options', array());
-                 $field = new $class($p, $label, $attributes, array(), $this);
-                 $this->add_field($field);
+                $class = $settings['renderer'];
+                $attributes['renderer_options'] = \Arr::get($settings, 'renderer_options', array());
+                $field = new $class($p, $label, $attributes, array(), $this);
+                $this->add_field($field);
             } else {
                 if (\Arr::get($attributes, 'type', '') == 'checkbox') {
                     unset($attributes['empty']);
@@ -348,17 +356,17 @@ class Fieldset extends \Fuel\Core\Fieldset
         $this->require_js = array_merge($this->require_js, $require_js);
     }
 
-    public static function build_from_config($config, $model = null, $options = array())
+    public static function build_from_config($config, $item = null, $options = array())
     {
         $instance = null;
-        if (is_object($model)) {
-            $instance = $model;
+        if (is_object($item)) {
+            $instance = $item;
             empty($options['action']) && $options['action'] = 'edit';
-        } elseif (is_string($model)) {
+        } elseif (is_string($item)) {
             $instance = null;
             empty($options['action']) && $options['action'] = 'add';
-        } elseif (is_array($model)) {
-            $options = $model;
+        } elseif (is_array($item)) {
+            $options = $item;
             $instance = null;
         }
         $options['instance'] = $instance;
@@ -382,7 +390,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 
         if (isset($instance)) {
             // Let behaviours do their job (publication for example)
-            $instance->form_fieldset_fields($config);
+            $instance->event('form_fieldset_fields', array(&$config));
         }
 
         $fieldset->add_renderers($config, $options);
@@ -395,26 +403,29 @@ class Fieldset extends \Fuel\Core\Fieldset
             $fieldset->populate_with_instance($instance);
         }
 
-        $options['fieldset'] = $fieldset;
-
         if ($options['save'] && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
             $fieldset->repopulate();
             if ($fieldset->validation()->run($fieldset->value())) {
-                $data = $fieldset->validated();
-                if (!empty($options['complete']) && is_callable($options['complete'])) {
-                    $json = call_user_func($options['complete'], $data, $model, $config, $options);
-                } else {
-                    $json = static::defaultComplete($data, $model, $config, $options);
-                }
+                $json = $fieldset->triggerComplete($item, $fieldset->validated(), $options);
                 \Response::json($json);
             } else {
-                 \Response::json(array(
+                \Response::json(array(
                     'error' => (string) current($fieldset->error()),
                     'config' => $config,
                 ));
             }
         }
         return $fieldset;
+    }
+
+    public function triggerComplete($item, $data, $options = array())
+    {
+        $options['fieldset'] = $this;
+        if (!empty($options['complete']) && is_callable($options['complete'])) {
+            return call_user_func($options['complete'], $data, $item, $this->config_used, $options);
+        } else {
+            return static::defaultComplete($data, $item, $this->config_used, $options);
+        }
     }
 
     public function readonly_context($instance)
@@ -467,8 +478,8 @@ class Fieldset extends \Fuel\Core\Fieldset
                 continue;
             }
 
-            // Don't populate password fields
-            if (\Arr::get($this->config_used, "$k.form.type") == 'password') {
+            // Don't populate password fields and submit
+            if (in_array(\Arr::get($this->config_used, "$k.form.type"), array('password', 'submit'))) {
                 continue;
             }
             // Don't populate some fields (for example, the context)
@@ -541,7 +552,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
 
             // Let behaviours do their job (publication for example)
-            $item->form_processing_behaviours($data, $json_response);
+            $item->event('form_processing', array($data, &$json_response));
 
             if (!empty($options['before_save']) && is_callable($options['before_save'])) {
                 call_user_func($options['before_save'], $item, $data);
@@ -590,9 +601,21 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $json_response;
     }
 
-    public function is_expert($field_name)
+    protected function isExpert($field_name)
     {
         return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+    }
+
+    public function isRestricted($field_name)
+    {
+        if ($this->isExpert($field_name)) {
+            return true;
+        }
+        $show_when = \Arr::get($this->config_used[$field_name], 'show_when', false);
+        if ($show_when === false || !is_callable($show_when)) {
+            return false;
+        }
+        return !call_user_func($show_when, $this->instance);
     }
 
     public function getInstance()

@@ -15,8 +15,82 @@ class Model_Media extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media';
     protected static $_primary_key = array('media_id');
 
+    protected static $_title_property = 'media_title';
+    protected static $_properties = array(
+        'media_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'media_folder_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'media_path' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_file' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_ext' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_title' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'media_protected' => array(
+            'default' => 0,
+            'data_type' => 'tinyint',
+            'null' => false,
+        ),
+        'media_width' => array(
+            'default' => null,
+            'data_type' => 'smallint unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'media_height' => array(
+            'default' => null,
+            'data_type' => 'smallint unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'media_created_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'media_updated_at' => array(
+            'data_type' => 'timestamp',
+            'null' => false,
+        ),
+        'media_created_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'media_updated_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+    );
+
     public static $private_path = 'data/media/';
     public static $public_path  = 'media/';
+
+    protected static $_has_one = array();
+    protected static $_many_many = array();
 
     protected static $_belongs_to = array(
         'folder' => array(
@@ -40,18 +114,22 @@ class Model_Media extends \Nos\Orm\Model
 
     protected static $_observers = array(
         '\Orm\Observer_Self' => array(
-            'events' => array('before_save'),
         ),
         'Orm\Observer_CreatedAt' => array(
-            'events' => array('before_insert'),
             'mysql_timestamp' => true,
             'property'=>'media_created_at'
         ),
         'Orm\Observer_UpdatedAt' => array(
-            'events' => array('before_save'),
             'mysql_timestamp' => true,
             'property'=>'media_updated_at'
-        )
+        ),
+    );
+
+    protected static $_behaviours = array(
+        'Nos\Orm_Behaviour_Author' => array(
+            'created_by_property' => 'media_created_by_id',
+            'updated_by_property' => 'media_updated_by_id',
+        ),
     );
 
     /**
@@ -133,7 +211,7 @@ class Model_Media extends \Nos\Orm\Model
         if (!$this->is_image()) {
             return false;
         }
-        if (!empty($max_width) || !empty($params['max_height'])) {
+        if (!empty($max_width) || !empty($max_height)) {
             list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $max_width, $max_height);
             $src = $this->get_public_path_resized($max_width, $max_height);
         } else {
@@ -160,7 +238,15 @@ class Model_Media extends \Nos\Orm\Model
             return $this->get_public_path();
         }
 
-        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').(int) $max_width.'-'.(int) $max_height.'.'.$this->media_ext;
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$'.$this->virtual_path().'$'.$max_width.'$'.$max_height);
+
+        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s.%s',
+            (int) $max_width,
+            (int) $max_height,
+            substr($hash, 0, 6),
+            $this->media_ext
+        );
     }
 
     public function _event_before_save()

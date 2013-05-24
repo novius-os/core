@@ -8,9 +8,9 @@ JAVA_CMD='java'
 export JAVA_CMD
 
 JS_COMBINED_FILE="vendor.min.js"
-PLUGIN_FILES=( log jquery/bgiframe/jquery.bgiframe-2.1.3-pre jquery/cookie/jquery.cookie jquery/globalize/globalize jquery/globalize/cultures/globalize.cultures jquery/mousewheel/jquery.mousewheel.min jquery/jquery-form/jquery.form.min )
-UI_FILES=( ui.core ui.widget ui.position ui.mouse ui.draggable ui.droppable ui.resizable ui.sortable ui.dialog ui.button ui.datepicker effects.core effects.blind effects.slide effects.scale effects.transfer effects.fade )
-WIJMO_FILES=( wijmo.wijutil plugin.wijtextselection wijmo.wijinputcore wijmo.wijinputdate wijmo.wijinputmask wijmo.wijinputnumber wijmo.wijlist wijmo.wijpopup wijmo.wijcalendar wijmo.wijtabs wijmo.wijdatasource wijmo.wijsplitter wijmo.wijsuperpanel wijmo.wijdropdown wijmo.wijmenu wijmo.wijcheckbox wijmo.wijradio wijmo.wijexpander wijmo.wijaccordion wijmo.wijdialog wijmo.wijpager wijmo.wijtextbox wijmo.wijgrid wijmo.wijlightbox wijmo.wijtooltip )
+PLUGIN_FILES=( log jquery/cookie/jquery.cookie.min jquery/globalize/globalize jquery/globalize/cultures/globalize.cultures.min jquery/mousewheel/jquery.mousewheel.min jquery/jquery-form/jquery.form.min )
+UI_FILES=( core widget position mouse draggable droppable resizable sortable dialog button datepicker effect effect-blind effect-slide effect-scale effect-transfer effect-fade )
+WIJMO_FILES=( Base/jquery.wijmo.widget data/wijmo.data data/wijmo.data.wijdatasource wijutil/jquery.wijmo.wijutil wijutil/jquery.plugin.wijtextselection wijinput/jquery.wijmo.wijinputcore wijinput/jquery.wijmo.wijinputdate wijinput/jquery.wijmo.wijinputmask wijinput/jquery.wijmo.wijinputnumber wijlist/jquery.wijmo.wijlist wijpopup/jquery.wijmo.wijpopup wijcalendar/jquery.wijmo.wijcalendar wijtabs/jquery.wijmo.wijtabs wijdatasource/jquery.wijmo.wijdatasource wijsplitter/jquery.wijmo.wijsplitter wijsuperpanel/jquery.wijmo.wijsuperpanel wijmenu/jquery.wijmo.wijmenu wijexpander/jquery.wijmo.wijexpander wijaccordion/jquery.wijmo.wijaccordion wijdialog/jquery.wijmo.wijdialog wijpager/jquery.wijmo.wijpager wijgrid/jquery.wijmo.wijgrid wijlightbox/jquery.wijmo.wijlightbox wijtooltip/jquery.wijmo.wijtooltip )
 
 
 #clear the files
@@ -25,7 +25,7 @@ done
 
 
 for F in ${UI_FILES[@]}; do
-  cat "../vendor/jquery-ui/minified/jquery.$F.min.js" >> $JS_COMBINED_FILE
+  cat "../vendor/jquery-ui/minified/jquery.ui.$F.min.js" >> $JS_COMBINED_FILE
   echo ';' >> $JS_COMBINED_FILE
 done
 
@@ -35,7 +35,7 @@ echo ';' >> $JS_COMBINED_FILE
 
 
 for F in ${WIJMO_FILES[@]}; do
-  cat "../vendor/wijmo/js/minified/jquery.$F.min.js" >> $JS_COMBINED_FILE
+  cat "../vendor/wijmo/js/$F.min.js" >> $JS_COMBINED_FILE
   echo ';' >> $JS_COMBINED_FILE
 done
 

@@ -7,10 +7,11 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-ostabs',
-    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'wijmo.wijmenu'],
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'wijmo.wijmenu', 'modernizr'],
     function( $ ) {
         "use strict";
         var undefined = void(0);
+
         $.widget( "nos.ostabs", {
             options: {
                 initTabs: [], // e.g. [{"url":"http://www.google.com","iconUrl":"img/google-32.png","label":"Google","iconSize":32,"labelDisplay":false},{"url":"http://www.twitter.com","iconClasses":"ui-icon ui-icon-signal-diag","label":"Twitter"}]
@@ -124,7 +125,7 @@ define('jquery-nos-ostabs',
 
                 // initialization from scratch
                 if ( init ) {
-                    self.element.addClass( "nos-ostabs ui-widget ui-widget-content" );
+                    self.element.addClass('nos-ostabs ui-widget ui-widget-content' + (Modernizr.touch ? ' nos-ostabs-touch' : ''));
 
                     self.uiOstabsHeader = $( '<div></div>' )
                         .addClass( 'nos-ostabs-header' )
@@ -147,7 +148,7 @@ define('jquery-nos-ostabs',
                         self.uiOstabsAppsTab = $( '<ul></ul>' )
                             .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
                             .prependTo( self.uiOstabsHeader );
-                        self._add( o.appsTab, self.uiOstabsAppsTab )
+                        self._add(o.appsTab, self.uiOstabsAppsTab, true)
                             .addClass( 'nos-ostabs-appstab' )
                             .removeClass( 'ui-state-default' );
                     } else {
@@ -206,7 +207,7 @@ define('jquery-nos-ostabs',
                     }
 
                     if ( newTab ) {
-                        self.uiOstabsNewTab = self._add( newTab ).addClass( 'nos-ostabs-newtab' );
+                        self.uiOstabsNewTab = self._add(newTab, null, true).addClass( 'nos-ostabs-newtab' );
                     } else {
                         self.uiOstabsNewTab = $ ( '<li>/<li>' );
                     }
@@ -328,7 +329,7 @@ define('jquery-nos-ostabs',
                                 .addClass( "nos-ostabs-panel ui-widget-content ui-corner-bottom nos-ostabs-hide")
                                 .appendTo( self.element );
 
-                            self._actions($panel, i, tab.actions || []);
+                            self._actions($panel, i);
                         }
                         self.panels = self.panels.add( $panel );
                     }
@@ -460,6 +461,7 @@ define('jquery-nos-ostabs',
                 var showTab = showFx
                     ? function( clicked, $show ) {
                         var $li = $( clicked ).closest( "li" ).addClass( "nos-ostabs-selected ui-state-active" );
+                        self._tabsWidth();
                         $show.hide().removeClass( "nos-ostabs-hide" ) // avoid flicker that way
                             .animate( showFx, showFx.duration || "normal", function() {
                                 if ( $li.hasClass( 'nos-ostabs-newtab' ) ) {
@@ -481,6 +483,7 @@ define('jquery-nos-ostabs',
                         }
                         self.uiOstabsSuperPanel.wijsuperpanel('scrollChildIntoView', $li.find('a'));
                         $li.addClass( "nos-ostabs-selected ui-state-active" );
+                        self._tabsWidth();
                         $show.removeClass( "nos-ostabs-hide" );
                         fireCallbacks($show);
                         self._firePanelEvent($show, $.Event('showPanel'));
@@ -494,6 +497,7 @@ define('jquery-nos-ostabs',
                                 self._tabsWidth();
                             }
                             self.lis.removeClass( "nos-ostabs-selected ui-state-active" );
+                            self._tabsWidth();
                             $hide.addClass( "nos-ostabs-hide" );
                             resetStyle( $hide, hideFx );
                             self.element.dequeue( "tabs" );
@@ -505,6 +509,7 @@ define('jquery-nos-ostabs',
                             self._tabsWidth();
                         }
                         self.lis.removeClass( "nos-ostabs-selected ui-state-active" );
+                        self._tabsWidth();
                         $hide.addClass( "nos-ostabs-hide" );
                         self.element.dequeue( "tabs" );
                         $hide.trigger( "hidePanel.ostabs");
@@ -601,110 +606,182 @@ define('jquery-nos-ostabs',
                 return index;
             },
 
-            _actions: function( $panel, index, other_actions) {
+            _actions: function($panel, index) {
                 var self = this,
                     o = self.options,
-                    actions, links, closable, reloadable, close, closeOtherTabs, reload, reversed_actions,
                     li = self.lis.eq(index),
-                    a =  self.anchors.eq(index);
+                    a =  self.anchors.eq(index),
+                    closable = li.not( '.nos-ostabs-appstab' ).length,
+                    reloadable = a.data( "iframe.tabs"),
+                    actions = [], $action_bar, $links;
 
                 $panel.find('.nos-ostabs-actions').remove();
 
-                actions = $( '<div></div>' )
+                $action_bar = $( '<div></div>' )
                     .addClass( 'nos-ostabs-actions ui-state-active' )
                     .prependTo( $panel );
 
-                links = $( '<div></div>' )
-                    .addClass( 'nos-ostabs-actions-links' )
-                    .prependTo( actions );
-
-                closable = li.not( '.nos-ostabs-appstab' ).length;
-                reloadable = a.data( "iframe.tabs" );
-
-                if ( closable ) {
-                    close = $( '<a href="#"></a>' )
-                        .addClass( 'nos-ostabs-close' )
-                        .click(function() {
-                            self.remove( self.lis.index(li) ); // On recalcule l'index au cas où l'onglet est été déplacé
-                            return false;
-                        })
-                        .appendTo( links );
-                    $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
-                        .html( o.texts.closeTab )
-                        .appendTo( close );
-                    $( '<span></span>' ).html( o.texts.closeTab )
-                        .appendTo( close );
+                if (!Modernizr.touch && !closable) {
+                    return;
                 }
 
-                closeOtherTabs = $( '<a href="#"></a>' )
-                    .addClass( 'nos-ostabs-close-allothers' )
-                    .click(function() {
-                        if (confirm($.nosCleanupTranslation(closable ? o.texts.confirmCloseOtherTabs : o.texts.confirmCloseTabs))) {
-                            self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
-                                var $liTemp = this;
-                                if ($liTemp !== li[0]) {
-                                    self.remove( self.lis.index($liTemp) );
+                if (closable) {
+                    actions.push({
+                            classes: 'nos-ostabs-close',
+                            click: function() {
+                                self.remove( self.lis.index(li) ); // Recalculate index if tab have been move
+                                return false;
+                            },
+                            label: o.texts.closeTab,
+                            iconClass: 'ui-icon-closethick',
+                            iconUrl: 'static/novius-os/admin/novius-os/img/16/close.png'
+                        },
+                        {
+                            classes: 'nos-ostabs-close-allothers',
+                            click: function() {
+                                if (confirm($.nosCleanupTranslation(o.texts.confirmCloseOtherTabs))) {
+                                    self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                        var $liTemp = this;
+                                        if ($liTemp !== li[0]) {
+                                            self.remove( self.lis.index($liTemp) );
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                        return false;
-                    })
-                    .appendTo( links );
-                $( '<span></span>' ).addClass( 'ui-icon ui-icon-closethick' )
-                    .html(closable ? o.texts.closeOtherTabs : o.texts.closeTabs)
-                    .appendTo( closeOtherTabs );
-                $( '<span></span>' ).html(closable ? o.texts.closeOtherTabs : o.texts.closeTabs)
-                    .appendTo( closeOtherTabs );
+                                return false;
+                            },
+                            label: o.texts.closeOtherTabs,
+                            iconClass: 'ui-icon-closethick',
+                            iconUrl: 'static/novius-os/admin/novius-os/img/16/close.png'
+                        });
+                }
+
+                if (!Modernizr.touch || !closable) {
+                    actions.push({
+                        classes: 'nos-ostabs-close-all',
+                        click: function() {
+                            if (confirm($.nosCleanupTranslation(o.texts.confirmCloseTabs))) {
+                                self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                    self.remove(self.lis.index(this));
+                                });
+                            }
+                            return false;
+                        },
+                        label: o.texts.closeTabs,
+                        iconClass: 'ui-icon-closethick',
+                        iconUrl: 'static/novius-os/admin/novius-os/img/16/close.png'
+                    });
+                }
 
                 if ( reloadable ) {
-                    reload = $( '<a href="#"></a>' )
-                        .addClass( 'nos-ostabs-reload' )
-                        .click(function() {
+                    actions.push({
+                        classes: 'nos-ostabs-reload',
+                        click: function() {
                             var fr = $panel.find( 'iframe.nos-ostabs-panel-content' );
                             if (fr !== undefined) {
                                 fr.attr("src", fr.attr("src"));
                             }
                             return false;
-                        })
-                        .html( o.texts.reloadTab )
-                        .appendTo( links );
-                    $( '<span></span>' ).addClass( 'ui-icon ui-icon-refresh' )
-                        .html( o.texts.reloadTab )
-                        .appendTo( reload );
+                        },
+                        label: o.texts.reloadTab,
+                        iconClass: 'ui-icon-refresh',
+                        iconUrl: 'static/novius-os/admin/novius-os/img/16/refresh.png'
+                    });
                 }
 
-                // slice() = clone()
-                reversed_actions = other_actions.slice(0).reverse();
-                $.each(reversed_actions, function() {
-                    var action = this,
-                        icon,
-                        $el = $( '<a href="#"></a>' )
-                            .addClass( 'nos-ostabs-action' )
-                            .click(function(e) {
-                                e.preventDefault();
-                                $(this).nosAction(action.action);
+
+                if (Modernizr.touch) {
+                    $links = $( '<div></div>' )
+                        .addClass( 'nos-ostabs-actions-links' )
+                        .prependTo( $action_bar );
+
+                    $.each(actions, function() {
+                        var action = this,
+                            link = $('<a href="#"></a>')
+                                .addClass(action.classes)
+                                .click(function() {
+                                    return action.click();
+                                })
+                                .appendTo( $links );
+                        $('<span></span>').addClass('ui-icon ' + action.iconClass)
+                            .html(action.label)
+                            .appendTo(link);
+                        $('<span></span>').html(action.label)
+                            .appendTo(link);
+                    });
+                } else {
+                    if (('HTMLMenuItemElement' in window) && ('HTMLCommandElement' in window)) {
+                        self.element.find('#' + $panel.attr('id') + '-menucontext').remove();
+
+                        $links = $('<menu></menu>')
+                            .attr({
+                                'type': 'context',
+                                id: $panel.attr('id') + '-menucontext'
                             })
-                            .appendTo( links );
+                            .prependTo(self.element);
 
-                    if (action.faded) {
-                       $el.addClass('faded');
-                    }
-                    icon = $( '<span></span>' ).addClass( 'ui-icon' )
-                        .html( action.label || '' )
-                        .appendTo( $el );
-                    if ( action.iconUrl ) {
-                        icon.css({
-                            'background-image' : 'url("' + action.iconUrl + '")',
-                            'background-position' : 'center center',
-                            'padding-left': '6px'
+                        $.each(actions, function() {
+                            var action = this;
+                            $('<menuitem></menuitem>')
+                                .attr({
+                                    label: 'Novius OS - ' + action.label,
+                                    icon: action.iconUrl
+                                })
+                                .click(function() {
+                                    return action.click();
+                                })
+                                .appendTo($links);
                         });
-                    } else {
-                        icon.addClass( action.iconClasses );
-                    }
-                    $( '<span></span>' ).html( action.label || '' )
-                        .appendTo( $el );
 
-                });
+                        li.attr('contextmenu', $panel.attr('id') + '-menucontext');
+                    } else {
+                        li.off('contextmenu.nosostabs')
+                            .on('contextmenu.nosostabs', function(e) {
+                                var links;
+
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                self.element.find('ul.nos-ostabs-menuactions').remove();
+
+                                links = $( '<ul></ul>' )
+                                    .addClass( 'nos-ostabs-menuactions' )
+                                    .prependTo(self.element);
+
+                                $.each(actions, function() {
+                                    var action = this,
+                                        menu = $('<li><a href="#"></a></li>')
+                                            .appendTo(links)
+                                            .find('a')
+                                            .click(function() {
+                                                links.remove();
+                                                return action.click();
+                                            });
+                                    $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ' + action.iconClass)
+                                        .appendTo(menu);
+                                    $('<span></span>').addClass('wijmo-wijmenu-text')
+                                        .html(action.label)
+                                        .appendTo(menu);
+                                });
+
+                                links.wijmenu({
+                                        orientation: 'vertical'
+                                    })
+                                    .closest('.wijmo-wijmenu')
+                                    .position({
+                                        my: 'center top',
+                                        at: 'center bottom',
+                                        of: li
+                                    });
+
+                                setTimeout(function() {
+                                    $(document).on('click.nosostabs', function (e) {
+                                        $(document).off('click.nosostabs');
+                                        links.remove();
+                                    });
+                                }, 500)
+                            });
+                    }
+                }
             },
 
             _tabsWidth: function() {
@@ -745,9 +822,9 @@ define('jquery-nos-ostabs',
                 }
 
                 if ( self.tabsWidth < self.uiOstabsTabs.width() ) {
-                    self.uiOstabsSuperPanel.find('.wijmo-wijsuperpanel-buttonleft, .wijmo-wijsuperpanel-buttonright').show();
+                    self.uiOstabsSuperPanel.find('.wijmo-wijsuperpanel-buttonleft, .wijmo-wijsuperpanel-buttonright').css('visibility', 'visible');
                 } else {
-                    self.uiOstabsSuperPanel.find('.wijmo-wijsuperpanel-buttonleft, .wijmo-wijsuperpanel-buttonright').hide();
+                    self.uiOstabsSuperPanel.find('.wijmo-wijsuperpanel-buttonleft, .wijmo-wijsuperpanel-buttonright').css('visibility', 'hidden');
                 }
             },
 
@@ -781,8 +858,10 @@ define('jquery-nos-ostabs',
                 return index;
             },
 
-            _add: function(tab, target) {
-                var self = this;
+            _add: function(tab, target, notClosable) {
+                var self = this,
+                    o = self.options,
+                    a, icon, label, li;
 
                 if ( !$.isPlainObject(tab) || tab.url === undefined ) {
                     return false;
@@ -799,15 +878,14 @@ define('jquery-nos-ostabs',
                     iconUrl: '',
                     openRank: false,
                     iconSize: 16,
-                    panelId: false,
-                    actions : []
+                    panelId: false
                 }, tab);
 
                 if (tab.openRank !== false && tab.openRank >= self.openRank) {
                     self.openRank = tab.openRank + 1;
                 }
 
-                var a = $( '<a href="' + tab.url + '" onclick="return false;"></a>' );
+                a = $( '<a href="' + tab.url + '" onclick="return false;"></a>' );
                 if (tab.iframe) {
                     a.data( "iframe.tabs", true );
                 }
@@ -815,18 +893,36 @@ define('jquery-nos-ostabs',
                     a.data( "panelid.tabs", tab.panelId );
                 }
 
-                var icon = self._icon( tab ).appendTo( a );
+                icon = self._icon( tab ).appendTo( a );
 
-                var label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
-                    .html( tab.label ? tab.label : 'New tab' )
+                label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
+                    .html( tab.label ? tab.label.replace(/</g, '&lt;') : 'New tab' )
                     .appendTo( a );
                 if ( !tab.labelDisplay ) {
                     label.hide();
                 }
-                var li = $( '<li></li>' ).append( a )
+                li = $( '<li></li>' ).append( a )
                     .attr('title', label.text())
-                    .addClass( 'ui-corner-top ui-state-default').data( 'ui-ostab', tab )
+                    .addClass( 'ui-corner-top ui-state-default')
+                    .data( 'ui-ostab', tab )
                     .appendTo( target );
+
+                if (!Modernizr.touch && !notClosable) {
+                    $('<span><span></span></span>').addClass('nos-ostabs-closetab')
+                        .attr('title', o.texts.closeTab)
+                        .click(function(e) {
+                            var el = this,
+                                $li = $(el).closest( "li");
+
+                            e.preventDefault();
+                            self.remove( self.lis.index($li), !$li.hasClass( "nos-ostabs-selected" ) );
+                        })
+                        .find('span')
+                        .addClass('ui-icon ui-icon-closethick')
+                        .text(o.texts.closeTab)
+                        .end()
+                        .appendTo(li);
+                }
 
                 if ( !isNaN( tab.iconSize ) && tab.iconSize !== 16 && target !== self.uiOstabsTabs) {
                     li.css({
@@ -909,10 +1005,10 @@ define('jquery-nos-ostabs',
                 if ( title === undefined ) {
                     return $li.find( '.nos-ostabs-label' ).text();
                 } else {
-                    $li.find( '.nos-ostabs-label' ).html( title );
+                    $li.find( '.nos-ostabs-label' ).html( title.replace(/</g, '&lt;') );
 
                     if ( o.selected == index ) {
-                        $( 'title' ).html( title );
+                        $( 'title' ).html( title.replace(/</g, '&lt;') );
                     }
 
                     self._trigger( "title", null, self._ui( $li[ 0 ] ) );
@@ -942,7 +1038,7 @@ define('jquery-nos-ostabs',
                     this.select(index);
                 } else {
                     if ( self.options.selected == index ) {
-                        $( 'title' ).html( tab.label );
+                        $( 'title' ).html( tab.label.replace(/</g, '&lt;') );
                         var url = encodeURIComponent(tab.url).replace(/%2F/g, '/');
                         if ('replaceState' in window.history) {
                             window.history.replaceState({}, '', document.location.pathname + '?tab=' + url);
@@ -966,7 +1062,7 @@ define('jquery-nos-ostabs',
                         .empty()
                         .append($newA.children());
 
-                    self._actions($panel, index, tab.actions || []);
+                    self._actions($panel, index);
 
                     $newLi.remove();
 
@@ -1116,7 +1212,6 @@ define('jquery-nos-ostabs',
                 self.uiOstabsTabs.find( 'li:not(.nos-ostabs-newtab)' )
                     .each(function() {
                         var tab = $.extend({}, $(this).data('ui-ostab'));
-                        delete tab.actions;
                         delete tab.openRank;
                         tabs.push(tab);
                     });

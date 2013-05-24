@@ -25,13 +25,30 @@ class Config extends \Fuel\Core\Config
         return parent::load($file, $group, $reload, $overwrite);
     }
 
-    public static function mergeWithUser($item, $config)
+    public static function save($file, $config)
+    {
+        if ($file !== \Fuel::$env.DS.'migrations' || \Config::get('novius-os.migration_config_file')) {
+            return parent::save($file, $config);
+        } else {
+            return true;
+        }
+    }
+
+    public static function mergeWithUser($key, $config)
     {
         $user = Session::user();
 
-        Arr::set($config, 'configuration_id', static::getDbName($item));
+        Arr::set($config, 'configuration_id', static::getDbName($key));
 
-        return \Arr::merge($config, \Arr::get($user->getConfiguration(), static::getDbName($item), array()));
+        return \Arr::merge($config, \Arr::get($user->getConfiguration(), static::getDbName($key), array()));
+    }
+
+    public static function getDbName($key)
+    {
+        $key = str_replace('::', '/config/', $key);
+        $key = str_replace('/', '.', $key);
+
+        return $key;
     }
 
     public static function configFile($class)
@@ -51,14 +68,19 @@ class Config extends \Fuel\Core\Config
         return array($application, $file);
     }
 
-    public static function loadConfiguration($app_name, $file_name)
+    public static function loadConfiguration($application_name, $file_name = null)
     {
-        $config = \Config::load($app_name.'::'.$file_name, true);
+        if ($file_name === null) {
+            list($application_name, $file_name) = explode('::', $application_name);
+        }
+        $config = \Config::load($application_name.'::'.$file_name, true);
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
-        if (!empty($dependencies[$app_name])) {
-            foreach ($dependencies[$app_name] as $dependency) {
-                $config = \Arr::merge($config, \Config::load($dependency.'::'.$file_name, true));
+        if (!empty($dependencies[$application_name])) {
+            foreach ($dependencies[$application_name] as $application => $dependency) {
+                if ($dependency['extend_configuration']) {
+                    $config = \Arr::merge($config, \Config::load($application.'::'.$file_name, true));
+                }
             }
         }
         $config = \Arr::recursive_filter(
@@ -69,35 +91,12 @@ class Config extends \Fuel\Core\Config
         );
 
         return $config;
-    }
-
-    public static function getDbName($item)
-    {
-        $item = str_replace('::', '/config/', $item);
-        $item = str_replace('/', '.', $item);
-
-        return $item;
     }
 
     public static function extendable_load($module_name, $file_name)
     {
-        $config = \Config::load($module_name.'::'.$file_name, true);
-        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
-
-        if (!empty($dependencies[$module_name])) {
-            foreach ($dependencies[$module_name] as $dependency) {
-                \Config::load($dependency.'::'.$file_name, true);
-                $config = \Arr::merge($config, \Config::get($dependency.'::'.$file_name, array()));
-            }
-        }
-        $config = \Arr::recursive_filter(
-            $config,
-            function($var) {
-                return $var !== null;
-            }
-        );
-
-        return $config;
+        logger(\Fuel::L_WARNING, '\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
+        return static::loadConfiguration($module_name, $file_name);
     }
 
     public static function metadata($application_name)
@@ -124,13 +123,17 @@ class Config extends \Fuel\Core\Config
 
     public static function application($application_name)
     {
-        return static::extendable_load($application_name, 'config');
+        return static::loadConfiguration($application_name, 'config');
     }
 
     public static function actions($params = array())
     {
         if (!isset($params['models'])) {
             return array();
+        }
+
+        if (!isset($params['all_targets'])) {
+            $params['all_targets'] = false;
         }
 
         $selected_actions = array();
@@ -146,80 +149,183 @@ class Config extends \Fuel\Core\Config
                     throw new \Exception('You are trying to order an action which key would be "'.$key.'" but such an action doesn\'t seem to exist.');
                 }
                 $action = $actions[$key];
-                if (static::can_add_action($action, $params)) {
+                if (static::canAddAction($action, $params)) {
                     $selected_actions[$key] = $action;
                 }
                 unset($actions[$key]);
             }
 
             foreach ($actions as $key => $action) {
-                if (static::can_add_action($action, $params)) {
+                if (static::canAddAction($action, $params)) {
                     $selected_actions[$key] = $action;
-                }
-            }
-
-            foreach ($selected_actions as $key => $action) {
-                if (!empty($params['item']) && isset($action['disabled'])) {
-                    $selected_actions[$key]['disabled'] = $action['disabled']($params['item']);
                 }
             }
         }
 
-        return $selected_actions;
+        if (!empty($params['item'])) {
+            foreach ($selected_actions as $key => $action) {
+                if (isset($action['disabled'])) {
+                    $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item']);
+                }
+
+                foreach ($common_config['callable_keys']['item'] as $callable_item_key) {
+                    $value = \Arr::get($action, $callable_item_key);
+                    if (is_callable($value)) {
+                        \Arr::set($selected_actions[$key], 'menu.menus', $value($params['item']));
+                    }
+                }
+            }
+        }
+
+        foreach ($selected_actions as $key => $action) {
+            if (!isset($action['label'])) {
+                throw new \Exception('Action '.$key.' doesn\'t seem to have any label key defined. Maybe you forgot to specify this label or you thought you extended a native / behaviour action which is not enabled in this case.');
+            }
+
+            if (!isset($action['action']) && !isset($action['menu'])) {
+                throw new \Exception('Action '.$key.' doesn\'t seem to have any action / menu key defined. Maybe you forgot to specify this action / menu key or you thought you extended a native / behaviour action which is not enabled in this case.');
+            }
+        }
+
+        $ordered_actions_by_align = array();
+
+        foreach ($selected_actions as $key => $action) {
+            $align = 0;
+            if (isset($action['align'])) {
+                $align = $action['align'];
+            }
+            if ($align === 'begin') {
+                $align = -10;
+            }
+            if ($align === 'end') {
+                $align = 10;
+            }
+
+            if (!isset($ordered_actions_by_align[$align])) {
+                $ordered_actions_by_align[$align] = array();
+            }
+
+            $ordered_actions_by_align[$align][$key] = $action;
+        }
+
+        $ordered_selected_actions = array();
+        $ordered_keys = array_keys($ordered_actions_by_align);
+        asort($ordered_keys);
+
+        foreach ($ordered_keys as $key) {
+            $ordered_selected_actions = array_merge($ordered_selected_actions, $ordered_actions_by_align[$key]);
+        }
+
+        return $ordered_selected_actions;
     }
 
-    protected static function can_add_action($action, $params)
+    protected static function canAddAction($action, $params)
     {
+        if ($params['all_targets']) {
+            return true;
+        }
+
         if (isset($action['targets']) && (!isset($action['targets'][$params['target']]) || !$action['targets'][$params['target']])) {
             return false;
         }
 
-        return !isset($action['visible']) || $action['visible']($params);
+        if (isset($action['visible'])) {
+            return static::processCallbackValue($action['visible'], true, $params);
+        }
+
+        return true;
+    }
+
+    static public function getActionDisabledState($disabled, $item)
+    {
+        $common_config = \Nos\Config_Common::load(get_class($item), array());
+        return static::processCallbackValue($disabled, false, $item, array('config' => $common_config));
+    }
+
+    /**
+     * General function to process callback value : can be simple values, callbacks, or array of callbacks
+     *
+     * @param  mixed  $value  Value to process
+     * @param  mixed  $positive_value   If the value is an array of callbacks, it defines which value is expected.
+     * If callback return the expected value, then we call next callback. Otherwise, we return the value.
+     *
+     * All appended parameters are sent to the callback functions (if there is any)
+     *
+     * @return mixed
+     */
+    static public function processCallbackValue()
+    {
+        $arg_list = func_get_args();
+        $value = $arg_list[0];
+        $expected_value = $arg_list[1];
+        $params = array_slice($arg_list, 2);
+        if (is_callable($value)) {
+            return call_user_func_array($value, $params);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $value_item) {
+                $new_arg_list = $arg_list;
+                $new_arg_list[0] = $value_item;
+                $return = call_user_func_array('static::processCallbackValue', $new_arg_list);
+                if ($return !== $expected_value) {
+                    return $return;
+                }
+            }
+            return $expected_value;
+        }
+
+        return $value;
     }
 
     /**
      * Replace placeholders recursively in an array
      *
-     * @param  array  $array  Array to look placeholders inside
-     * @param  mixed  $data   Array or object used to fetch placeholders
+     * @param  mixed  $to_be_replaced  Array to look placeholders inside
+     * @param  mixed  $placeholders   Array or object used to fetch placeholders
      * @param  bool   $remove_unset  Should placeholders not found in data be removed?
      * @return array  A new array with replacement done
      */
-    public static function placeholderReplace($array, $data, $remove_unset = true)
+    public static function placeholderReplace($to_be_replaced, $placeholders, $remove_unset = true)
     {
-        if (is_string($array)) {
-            $retrieveFromData = function($placeholder, $fallback) use ($data) {
-                if (is_array($data) && isset($data[$placeholder])) {
-                    return $data[$placeholder];
+        if (is_string($to_be_replaced)) {
+            $retrieveFromData = function($placeholder, $fallback) use ($placeholders) {
+                if (is_array($placeholders) && isset($placeholders[$placeholder])) {
+                    return $placeholders[$placeholder];
                 }
-                if (is_object($data)) {
-                    if (isset($data->{$placeholder})) {
-                        return $data->{$placeholder};
+                if (is_object($placeholders)) {
+                    if (isset($placeholders->{$placeholder})) {
+                        return $placeholders->{$placeholder};
                     }
                     try {
-                        return $data->{$placeholder}();
+                        return $placeholders->{$placeholder}();
                     } catch (\Exception $e) {
                     }
                 }
                 return $fallback;
             };
 
-            $array = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+            $to_be_replaced = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
                 return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
-            }, $array);
-            $array = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
-                return urlencode($retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]));
-            }, $array);
-        } else if (is_array($array)) {
-            foreach ($array as $key => $value) {
-                $new_key = static::placeholderReplace($key, $data, $remove_unset);
-                $array[$new_key] = static::placeholderReplace($value, $data, $remove_unset);
+            }, $to_be_replaced);
+            $to_be_replaced = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
+                return $value === false ? $matches[0] : urlencode($value);
+            }, $to_be_replaced);
+            $to_be_replaced = preg_replace_callback('/{{htmlspecialchars:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+                $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
+                return $value === false ? $matches[0] : htmlspecialchars($value);
+            }, $to_be_replaced);
+        } else if (is_array($to_be_replaced)) {
+            foreach ($to_be_replaced as $key => $value) {
+                $new_key = static::placeholderReplace($key, $placeholders, $remove_unset);
+                $to_be_replaced[$new_key] = static::placeholderReplace($value, $placeholders, $remove_unset);
                 if ($new_key !== $key) {
-                    unset($array[$key]);
+                    unset($to_be_replaced[$key]);
                 }
             }
         }
-        return $array;
+        return $to_be_replaced;
     }
 
     public static function icon($application_or_model_name, $icon_key)

@@ -51,6 +51,9 @@ return array(
     'deleting with 1 child' => __('This item has <strong>1 sub-item</strong>.'),
     'deleting with N children' => __('This item has <strong>{{children_count}} sub-items</strong>.'),
 
+    // Visualise action's labels
+    'visualising no url' => __('This application hasn’t yet been added to a page. Visualising is therefore impossible.'),
+
     // Appdesk: allLanguages
     'allLanguages' =>__('All languages'),
     'allSites' =>__('All sites'),

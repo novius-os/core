@@ -9,7 +9,7 @@
 
 // File include in vendor.min.js
 // define all scripts that are in the bundle
-define('jquery.bgiframe');
+define('jquery.migrate');
 define('jquery.cookie');
 define('jquery.globalize');
 define('jquery.globalize.cultures');
@@ -36,6 +36,9 @@ define('jquery-ui.effects.fade');
 
 define('jquery-ui.datepicker.i18n');
 
+define('wijmo.widget');
+define('wijmo.data');
+define('wijmo.data.wijdatasource');
 define('wijmo.wijtextselection');
 define('wijmo.wijutil');
 define('wijmo.wijinputcore');
@@ -49,15 +52,11 @@ define('wijmo.wijtabs');
 define('wijmo.wijdatasource');
 define('wijmo.wijsplitter');
 define('wijmo.wijsuperpanel');
-define('wijmo.wijdropdown');
 define('wijmo.wijmenu');
-define('wijmo.wijcheckbox');
 define('wijmo.wijexpander');
 define('wijmo.wijaccordion');
 define('wijmo.wijdialog');
 define('wijmo.wijpager');
-define('wijmo.wijtextbox');
-define('wijmo.wijradio');
 define('wijmo.wijgrid');
 define('wijmo.wijlightbox');
 define('wijmo.wijtooltip');

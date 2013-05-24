@@ -60,40 +60,17 @@ define('jquery-nos-contextable-invariant-fields',
                             };
 
                     $container.find('[context_invariant_field]').each(function() {
-                            var $element = $(this),
-                                $elementUI = $element;
-                            if ($element.is(':radio')) {
-                                $elementUI = $element.closest('.wijmo-radio');
-                            } else if ($element.is(':checkbox')) {
-                                $elementUI = $element.closest('.wijmo-checkbox');
-                            } else if ($element.is('select')) {
-                                $elementUI = $element.closest('.wijmo-wijdropdown');
-                            }
-                            if ($elementUI.size() === 0) {
-                                $elementUI = $element;
-                            }
+                            var $element = $(this);
                             var $div = $('<div></div>').css({
                                         position: 'absolute',
-                                        width: $elementUI.outerWidth() + 'px',
-                                        height: $elementUI.outerHeight() + 'px'
+                                        width: $element.outerWidth() + 'px',
+                                        height: $element.outerHeight() + 'px'
                                     })
-                                    .insertAfter($elementUI)
+                                    .insertAfter($element)
                                     .click(function() {
                                         if ($element.is(':disabled')) {
                                             dialog.call($element, function() {
-                                                if ($element !== $elementUI || $element.is('.wijmo-wijtextbox')) {
-                                                    if ($element.is(':text')) {
-                                                        $element.wijtextbox('option', 'disabled', false);
-                                                    } else if ($element.is(':radio')) {
-                                                        $element.wijradio('option', 'disabled', false);
-                                                    } else if ($element.is(':checkbox')) {
-                                                        $element.wijcheckbox('option', 'disabled', false);
-                                                    } else if ($element.is('select')) {
-                                                        $element.wijdropdown('option', 'disabled', false);
-                                                    }
-                                                } else {
-                                                    $element.attr('disabled', false);
-                                                }
+                                                $element.attr('disabled', false);
                                                 $div.detach();
                                             });
                                         }
@@ -102,7 +79,7 @@ define('jquery-nos-contextable-invariant-fields',
                                         my: 'top left',
                                         at: 'top left',
                                         collision: 'none',
-                                        of: $elementUI
+                                        of: $element
                                     });
                     });
                 });

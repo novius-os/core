@@ -8,7 +8,7 @@
  */
 
 define('jquery-nos-appdesk',
-    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-thumbnailsgrid', 'jquery-nos-listgrid', 'jquery-nos-treegrid', 'jquery-nos-preview', 'jquery-ui.button', 'wijmo.wijdropdown', 'wijmo.wijtabs', 'wijmo.wijsuperpanel', 'wijmo.wijsplitter', 'wijmo.wijgrid', 'wijmo.wijmenu'],
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-thumbnailsgrid', 'jquery-nos-listgrid', 'jquery-nos-treegrid', 'jquery-nos-preview', 'jquery-ui.button', 'wijmo.wijtabs', 'wijmo.wijsuperpanel', 'wijmo.wijsplitter', 'wijmo.wijgrid', 'wijmo.wijmenu'],
     function($) {
         "use strict";
         var undefined = void(0);
@@ -204,7 +204,8 @@ define('jquery-nos-appdesk',
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow {background:' + rules[r].style['background'] + ';}';
                                 }
-                                if (rules[r].selectorText === '.wijmo-wijgrid tr.wijmo-wijgrid-row.ui-state-hover, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.wijmo-wijgrid-rowheader.ui-state-active') {
+                                if (rules[r].selectorText === '.wijmo-wijgrid tr.wijmo-wijgrid-row.ui-state-hover, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.wijmo-wijgrid-rowheader.ui-state-active'
+                                    || rules[r].selectorText === '.wijmo-wijgrid tr.ui-state-hover.wijmo-wijgrid-row, .wijmo-wijgrid .wijmo-wijgrid-current-cell, .wijmo-wijgrid td.ui-state-active.wijmo-wijgrid-rowheader') {
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel2 .wijmo-wijsplitter-h-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
                                     css += '.nos-appdesk .nos-appdesk-splitter-v .wijmo-wijsplitter-v-panel1 .wijmo-wijgrid-alternatingrow.ui-state-hover {background:' + rules[r].style['background'] + ';}';
                                 }
@@ -238,7 +239,7 @@ define('jquery-nos-appdesk',
                     if (button.primary) {
                         $el = $('<button></button>').html(button.label)
                             .data('icon', button.icon || 'plus')
-                            .addClass('primary')
+                            .addClass('ui-priority-primary')
                             .click(function(e) {
                                 e.preventDefault();
                                 e.stopImmediatePropagation();
@@ -335,7 +336,6 @@ define('jquery-nos-appdesk',
                             $.each(o.selectedContexts, function(i, context) {
                                 self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
                             });
-                            self.uiToolbarContextsDialog.find(':checkbox').wijcheckbox('refresh');
                             self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
                         }
                     })
@@ -374,8 +374,7 @@ define('jquery-nos-appdesk',
                                                 if (checked === null) {
                                                     checked = $checkbox.is(':checked');
                                                 }
-                                                $checkbox.attr('checked', !checked)
-                                                    .wijcheckbox('refresh');
+                                                $checkbox.attr('checked', !checked);
                                             }
                                         });
 
@@ -387,8 +386,7 @@ define('jquery-nos-appdesk',
                                         e.stopImmediatePropagation();
 
                                         var $checkbox = $tr.find(':checkbox');
-                                        $checkbox.attr('checked', !$checkbox.is(':checked'))
-                                            .wijcheckbox('refresh');
+                                        $checkbox.attr('checked', !$checkbox.is(':checked'));
                                     });
                                 }
                             }
@@ -409,7 +407,9 @@ define('jquery-nos-appdesk',
                 self.element.nosSaveUserConfig(o.name + '.selectedContexts', o.selectedContexts);
 
                 self.uiSearchInput.val('');
-                self.uiInspectorsTags.wijsuperpanel('destroy');
+                if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
+                    self.uiInspectorsTags.wijsuperpanel('destroy');
+                }
                 self.uiInspectorsTags.empty();
                 self._uiList();
 
@@ -761,7 +761,9 @@ define('jquery-nos-appdesk',
                         }
 
                         self.pageIndex = 0;
-                        self.uiInspectorsTags.wijsuperpanel('destroy');
+                        if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
+                            self.uiInspectorsTags.wijsuperpanel('destroy');
+                        }
 
                         var span = $('<span></span>').addClass('nos-appdesk-inspectorstag ui-state-default ui-corner-all ' + name)
                             .html(label)
@@ -796,7 +798,7 @@ define('jquery-nos-appdesk',
 
                 if ($.isFunction(inspector.url)) {
                     inspector.url.call(self, $li);
-                } else {
+                } else if (inspector.url) {
                     $.ajax({
                         url: inspector.url,
                         dataType: 'html'
@@ -809,6 +811,8 @@ define('jquery-nos-appdesk',
                         log(textStatus);
                         log(errorThrown);
                     });
+                } else {
+                    $li.html(inspector.view);
                 }
 
                 return self;
@@ -851,7 +855,9 @@ define('jquery-nos-appdesk',
                 self.uiResetSearch.click(function(e) {
                         e.preventDefault();
                         self.uiSearchInput.val('');
-                        self.uiInspectorsTags.wijsuperpanel('destroy');
+                        if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
+                            self.uiInspectorsTags.wijsuperpanel('destroy');
+                        }
                         self.uiInspectorsTags.empty();
                         self.gridReload();
                     });
@@ -898,7 +904,11 @@ define('jquery-nos-appdesk',
                         $('<label for="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '"></label>')
                             .html(presentation.text + (presentation.size ? ' ' + presentation.size + 'px' : ''))
                             .appendTo(self.uiViewsButtons);
-                        $('<input type="radio" class="view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" id="view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : '') + '" name="view" ' + (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize) ? 'checked="checked"' : '') + '" />')
+
+                        $('<input type="radio" name="view" />')
+                            .attr('id', 'view_' + id + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : ''))
+                            .prop('checked', (o.defaultView === presentation.id && (!presentation.size || presentation.size === o.thumbnails.thumbnailSize)))
+                            .addClass('view_' + presentation.id.toLowerCase() + (presentation.size ? '_' + presentation.size : ''))
                             .appendTo(self.uiViewsButtons)
                             .button({
                                 text : false,
@@ -917,6 +927,9 @@ define('jquery-nos-appdesk',
                                     o.defaultView = presentation.id;
                                     if (presentation.size) {
                                         o.thumbnails.thumbnailSize = presentation.size;
+                                    }
+                                    if (presentation.id === 'treeGrid') {
+                                        self.uiSearchInput.val('');
                                     }
                                     self._uiList();
                                 }
@@ -939,13 +952,17 @@ define('jquery-nos-appdesk',
                 self.gridRendered = false;
                 self.uiGridTitle.html(o.texts.gridTitle);
 
-                self.uiThumbnail.thumbnailsgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiGrid.noslistgrid('destroy')
-                    .empty()
-                    .hide();
-                self.uiTreeGrid.nostreegrid('destroy')
+                if (self.uiThumbnail.data('nos-thumbnailsgrid')) {
+                    self.uiThumbnail.thumbnailsgrid('destroy');
+                }
+                if (self.uiGrid.data('nos-noslistgrid')) {
+                    self.uiGrid.noslistgrid('destroy');
+                }
+                if (self.uiTreeGrid.data('nos-nostreegrid')) {
+                    self.uiTreeGrid.nostreegrid('destroy');
+                }
+
+                self.uiThumbnail.add(self.uiGrid).add(self.uiTreeGrid)
                     .empty()
                     .hide();
                 if (o.defaultView === 'thumbnails') {
@@ -1077,6 +1094,7 @@ define('jquery-nos-appdesk',
                                 $.each(self.uiGrid.noslistgrid('data') || [], function(dataRowIndex, data) {
                                     if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                         sel.addRows(dataRowIndex);
+                                        self.element.trigger('selectionChanged.appdesk', data);
                                     }
                                 });
                             }
@@ -1173,6 +1191,7 @@ define('jquery-nos-appdesk',
                                 $.each(self.uiTreeGrid.nostreegrid('data') || [], function(dataRowIndex, data) {
                                     if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
                                         sel.addRows(dataRowIndex);
+                                        self.element.trigger('selectionChanged.appdesk', data);
                                     }
                                 });
                             }
@@ -1511,6 +1530,20 @@ define('jquery-nos-appdesk',
                                 }
                             },
 
+                            myHtmlspecialcharsParser = {
+                                parseDOM: function (value, culture, format, nullString) {
+                                    return this.parse(value.innerHTML, culture, format, nullString);
+                                },
+                                parse: function (value, culture, format, nullString) {
+                                    if (value === null) return nullString;
+                                    return (value + '').replace(/&lt;/g, '<');
+                                },
+                                toStr: function (value, culture, format, nullString) {
+                                    if (value === null) return nullString;
+                                    return (value + '').replace(/</g, '&lt;');
+                                }
+                            },
+
                             recursive = function(object) {
                                 $.each(object, function(key, val) {
                                     var i, nosContext,
@@ -1676,6 +1709,11 @@ define('jquery-nos-appdesk',
                                                         }
                                                     });
                                                 })();
+                                            }
+
+                                            // Add a default htmlspecialchars dataParser
+                                            if (!object[key][i].dataParser && !object[key][i].isSafeHtml && !object[key][i].dataType) {
+                                                object[key][i].dataParser = myHtmlspecialcharsParser;
                                             }
                                         }
                                     }
@@ -1969,13 +2007,22 @@ define('jquery-nos-appdesk',
                             .attr('title', action.label)
                             .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
 
+                        var actionValue = (action.name &&
+                            noParseData &&
+                            noParseData.actions &&
+                            typeof noParseData.actions[action.name] !== 'undefined')
+                            ? noParseData.actions[action.name] : true;
                         // Check whether action name is disabled
-                        if (action.name && noParseData && noParseData.actions && noParseData.actions[action.name] == false) {
+                        if (actionValue !== true
+                            ) {
                             uiAction.addClass('ui-state-disabled')
                                 .click(function(e) {
                                     e.stopImmediatePropagation();
                                     e.preventDefault();
                                 });
+                            if ($.type(actionValue) === 'string') {
+                                uiAction.attr('title', actionValue)
+                            }
                         } else {
                             uiAction.click(function(e) {
                                     e.stopImmediatePropagation();
@@ -2032,7 +2079,9 @@ define('jquery-nos-appdesk',
                     dropDown.appendTo(container.find('tr')).click(function(e) {
 
                         $.each($.appdeskActionsList, function() {
-                            $(this).wijmenu('hideAllMenus');
+                            if ($(this).data('wijmo-wijmenu')) {
+                                $(this).wijmenu('hideAllMenus');
+                            }
                         });
 
                         if (!this.created) {
@@ -2054,19 +2103,30 @@ define('jquery-nos-appdesk',
                                     li.addClass('ui-state-error');
                                 }
 
+                                var actionValue = (action.name &&
+                                    noParseData &&
+                                    noParseData.actions &&
+                                    typeof noParseData.actions[action.name] !== 'undefined')
+                                    ? noParseData.actions[action.name] : true;
+
                                 // Check whether action name is disabled
-                                if (action.name && noParseData.actions && noParseData.actions[action.name] == false) {
+                                if (actionValue !== true) {
                                     li.addClass('ui-state-disabled')
                                         .click(function(e) {
                                             e.stopImmediatePropagation();
                                             e.preventDefault();
                                         });
+                                    if ($.type(actionValue) === 'string') {
+                                        li.attr('title', actionValue)
+                                    }
                                 } else {
                                     li.click(function(e) {
                                         e.stopImmediatePropagation();
                                         e.preventDefault();
                                         // Hide me
-                                        ul.wijmenu('hideAllMenus');
+                                        if (ul.data('wijmo-wijmenu')) {
+                                            ul.wijmenu('hideAllMenus');
+                                        }
                                         li.nosAction(action.action, noParseData);
                                     });
                                 }

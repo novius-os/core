@@ -46,6 +46,16 @@ define(
             $container.find('select[name=page_template]').bind('change', function() {
                 $container.data('already-processed', true);
                 var $wysiwyg = $container.find('[data-id=wysiwyg]');
+                var save = {};
+                // tinyMCE won't be initialised until the first Wysiwyg is transformed
+                if (window.tinyMCE) {
+                    tinyMCE.triggerSave();
+                    $wysiwyg.find('[name^=wysiwyg]').each(function() {
+                        var $this = $(this);
+                        // Extract name between [ and ]. Example "wysiwyg[content]" will save "content"
+                        save[$this.attr('name').match(/\[([^\]]+)\]/)[1]] = $this.val();
+                    })
+                }
                 $.ajax({
                     url: 'admin/noviusos_page/ajax/wysiwyg/' + from_id,
                     data: {
@@ -70,7 +80,7 @@ define(
                                     height: Math.round(coords[3] / data.rows * ratio)
                                 }).append(
                                     $('<textarea></textarea>')
-                                    .val(data.content[i])
+                                    .val(save[i] || data.content[i])
                                     .attr({name: 'wysiwyg[' + i + ']'})
                                     .addClass('wysiwyg')
                                     .css({
@@ -93,8 +103,8 @@ define(
                 })
             });
 
-            var $page_virtual_name_container = $container.find('input[name=page_virtual_name]').closest('.ui-accordion-content');
-            var $page_meta_title_container = $container.find('input[name=page_meta_noindex]').closest('.ui-accordion-content');
+            var $page_virtual_name_container = $container.find('input[name=page_virtual_name]').closest('.wijmo-wijaccordion-content');
+            var $page_meta_title_container = $container.find('input[name=page_meta_noindex]').closest('.wijmo-wijaccordion-content');
             var $accordion = $container.find('.accordion');
 
             var $template_unit = $container.find('select[name=page_template]').closest('td');
@@ -143,7 +153,7 @@ define(
                 }
             });
             if ($title.val() == $menu_title.val() || $menu_title.val() == '') {
-                $checkbox_menu.attr('checked', true).wijcheckbox("refresh");
+                $checkbox_menu.attr('checked', true);
             }
             $checkbox_menu.change(function() {
                 if ($(this).is(':checked')) {

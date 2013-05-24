@@ -24,9 +24,24 @@ require(
 </script>
 
 <?php
+
+$has_restricted_fields = false;
 foreach ($fieldset->field() as $field) {
-    $field->is_expert() && $field->set_type('hidden')->set_template('{field}');
+    if ($field->isRestricted()) {
+        // Only use one <div> to wrap all restricted fields (instead of one per field)
+        if (!$has_restricted_fields) {
+            echo '<div style="display:none;">';
+            $has_restricted_fields = true;
+        }
+        echo $field->set_template('{field}')->build();
+        // We don't use the {description} placeholder, so build() should return an empty string
+        $field->set_template('{description}');
+    }
 }
+if ($has_restricted_fields) {
+    echo '</div>';
+}
+
 echo $fieldset->build_hidden_fields();
 
 $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
@@ -67,7 +82,7 @@ if (!empty($item) && count($contexts) > 1) {
             }
             ?>
                 </ul>
-            </div>
+            </td>
             <?php
         } else {
             echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'short' => true)).'</td>';
@@ -92,8 +107,8 @@ if (!empty($title)) {
         echo ' '.$field
                 ->set_attribute('placeholder', $placeholder)
                 ->set_attribute('title', $placeholder)
-                ->set_attribute('class', $field->get_attribute('class').' title')
-                ->set_template($field->type == 'file' ? '<span class="title">{label} {field}</span>': '{field}')
+                ->set_attribute('class', $field->get_attribute('class').' ui-priority-primary')
+                ->set_template($field->type == 'file' ? '<span class="ui-priority-primary">{label} {field}</span>': '{field}')
                 ->build();
     }
 }
@@ -108,7 +123,7 @@ $publishable = (string) \View::forge('form/publishable', array(
 
 if (!empty($subtitle) || !empty($publishable)) {
     ?>
-                    <div class="line" style="overflow:visible;margin-bottom:1em;">
+                    <div class="line crud_subtitle">
                         <table style="width:100%;">
                             <tr>
     <?php
@@ -119,7 +134,7 @@ if (!empty($subtitle) || !empty($publishable)) {
         $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
-            if ($field->is_expert()) {
+            if ($field->type == 'hidden' || $field->isRestricted()) {
                 continue;
             }
             $field_template = $field->template;
@@ -146,8 +161,6 @@ if (!empty($subtitle) || !empty($publishable)) {
 ?>
             </div>
         </div>
-        <div class="col c1"></div>
-        <div class="col c3"></div>
         <?= $large ? '' : '<div class="col c1"></div>' ?>
     </div>
 

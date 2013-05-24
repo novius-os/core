@@ -67,6 +67,8 @@ class Nos
             $response = $request->execute($args['args']);
 
             echo $response;
+        } catch (\Nos\FrontIgnoreTemplateException $e) {
+            throw $e;
         } catch (\Nos\NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -107,8 +109,14 @@ class Nos
         static::_parse_internals($content);
 
         $content = preg_replace(
-            '`href="#([^"])`iUu',
+            '`href="#([^#"])`iUu',
             'href="'.static::main_controller()->getUrl().(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
+            $content
+        );
+
+        $content = str_replace(
+            'href="##',
+            'href="#',
             $content
         );
 
@@ -136,14 +144,22 @@ class Nos
 
     public static function parse_enhancers($content, $closure)
     {
-        preg_match_all('`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
-        foreach ($matches[2] as $match_id => $enhancer) {
-            $closure($enhancer, $matches[3][$match_id], $matches[0][$match_id]);
-        }
+        preg_match_all('`<(\w+)\s[^>]*data-enhancer=[^>]*>.*?</\\1>`u', $content, $matches);
+        foreach ($matches[0] as $enhancer_content) {
+            if (preg_match_all('`data-enhancer="([^"]+)"`u', $enhancer_content, $matches2)) {
+                $enhancer = $matches2[1][0];
+            } elseif (preg_match_all('`data-enhancer=\'([^\']+)\'`u', $enhancer_content, $matches2)) {
+                $enhancer = $matches2[1][0];
+            }
+            if (preg_match_all('`data-config="([^"]+)"`u', $enhancer_content, $matches2)) {
+                $config = $matches2[1][0];
+            } elseif (preg_match_all('`data-config=\'([^\']+)\'`u', $enhancer_content, $matches2)) {
+                $config = $matches2[1][0];
+            }
 
-        preg_match_all('`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u', $content, $matches);
-        foreach ($matches[3] as $match_id => $enhancer) {
-            $closure($enhancer, $matches[2][$match_id], $matches[0][$match_id]);
+            if (!empty($enhancer) && !empty($config)) {
+                $closure($enhancer, $config, $enhancer_content);
+            }
         }
     }
 
@@ -207,7 +223,7 @@ class Nos
                     } else {
                         $media_url = $media->get_public_path();
                     }
-                    $content = str_replace($params['url'], $media_url, $content);
+                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', $media_url, $content);
                 }
             }
         );
@@ -225,7 +241,7 @@ class Nos
             $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
             foreach ($matches[1] as $match_id => $page_id) {
                 if (isset($pages[$page_id])) {
-                    $content = str_replace($matches[0][$match_id], $pages[$page_id]->url(), $content);
+                    $content = preg_replace('`'.preg_quote($matches[0][$match_id], '`').'(?!\d)`u', $pages[$page_id]->url(), $content);
                 } else {
                     $content = str_replace('href="'.$matches[0][$match_id].'"', '', $content);
                 }

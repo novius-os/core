@@ -24,7 +24,11 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
             'layout' => array(),
             'params' => array(),
         ),
+        'fields' => array(
+        ),
     );
+
+    protected $placeholders = array();
 
     public function before()
     {
@@ -34,6 +38,12 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
         }
         parent::before();
         $this->config_build();
+    }
+
+    public function prepare_i18n()
+    {
+        parent::prepare_i18n();
+        \Nos\I18n::current_dictionary(array('nos::common'));
     }
 
     /**
@@ -50,10 +60,40 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
         if (empty($this->config['controller_url'])) {
             $this->config['controller_url'] = static::get_path();
         }
+        if (!empty($this->config['fields']) && empty($this->config['popup']['layout'])) {
+            $this->config['popup']['layout'] = array(
+                'fields' => array(
+                    'view' => 'nos::form/fields',
+                    'params' => array(
+                        'fields' => array_keys($this->config['fields']),
+                        'begin' => ' ',
+                        'end' => ' ',
+                    ),
+                ),
+            );
+        }
+        $this->placeholders['_parent_context'] = \Input::get('nosContext', false) ?: \Nos\Tools_Context::defaultContext();
+
+        $this->config = \Config::placeholderReplace($this->config, $this->placeholders, false);
     }
 
     public function action_popup()
     {
+        if (!empty($this->config['fields'])) {
+            $fieldset = \Fieldset::build_from_config($this->config['fields'], array('save' => false));
+            $fieldset->repopulate();
+            $fieldset->set_config(array(
+                'field_template' => '<p style="margin-bottom:0.5em;">{label}{required}<br />{field} {error_msg}</p>',
+                'multi_field_template' => "<p style='margin-bottom:0.5em;'> {group_label}{required} {fields} \n {field} {label} \n{fields}\n{error_msg}</p>",
+            ));
+            foreach ($this->config['popup']['layout'] as &$view) {
+                if (isset($view['view'])) {
+                    $view['params']['fieldset'] = $fieldset;
+                    $view['params']['view_params'] = &$view['params'];
+                }
+            }
+            unset($view);
+        }
         return \View::forge($this->config['popup']['view'], array(
                 'url' => $this->config['controller_url'].'/save',
                 'layout' => $this->config['popup']['layout'],

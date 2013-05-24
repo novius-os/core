@@ -15,7 +15,39 @@ class Model_Link extends \Nos\Orm\Model
     protected static $_table_name = 'nos_media_link';
     protected static $_primary_key = array('medil_id');
 
-    public static $_belongs_to = array(
+    protected static $_properties = array(
+        'medil_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'medil_from_table' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medil_foreign_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+        'medil_key' => array(
+            'default' => null,
+            'data_type' => 'varchar',
+            'null' => false,
+        ),
+        'medil_media_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => false,
+        ),
+    );
+
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+
+    protected static $_has_many = array();
+    protected static $_belongs_to = array(
         'media' => array(
             'key_from' => 'medil_media_id',
             'model_to' => 'Nos\Media\Model_Media',

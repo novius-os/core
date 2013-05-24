@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos',
-    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijtextbox', 'wijmo.wijcheckbox', 'wijmo.wijradio', 'wijmo.wijdropdown', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
+    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
     function($) {
         "use strict";
         var undefined = void(0),
@@ -25,8 +25,13 @@ define('jquery-nos',
                 dialogFocused : -1,
                 open : function($dialog) {
                     var self = this,
-                        callbacks = $dialog.data('callbacks.nosdialog');
-                    self.dialogOpened.push($dialog[0]);
+                        callbacks = $dialog.data('callbacks.nosdialog'),
+                        index = $.inArray($dialog[0], self.dialogOpened);
+
+                    // Check if dialog not already added, it can be by focus
+                    if (index === -1) {
+                        self.dialogOpened.push($dialog[0]);
+                    }
                     if (!$.isPlainObject(callbacks)) {
                         $dialog.data('callbacks.nosdialog', {});
                     }
@@ -384,15 +389,29 @@ define('jquery-nos',
                         }
                         break;
                 }
-                if (element.disabled && element.disabled === true) {
-                    $element.attr('disabled', true);
+                if (element.disabled && element.disabled !== false) {
+                    switch (element.type) {
+                        case 'button' :
+                            $element.attr('disabled', true);
+                            break;
+
+                        case 'link' :
+                            $element.addClass('faded');
+                            break;
+                    }
+
+                    if ($.type(element.disabled) === 'string') {
+                        $element.attr('title', element.disabled);
+                    }
                 }
 
                 if ($element) {
                     $.each(element.bind, function(event, action) {
                         $element.bind(event, function(e) {
                             e.preventDefault();
-                            $element.nosAction(action, data);
+                            if (!element.disabled) {
+                                $element.nosAction(action, data);
+                            }
                         });
                     });
 
@@ -472,6 +491,8 @@ define('jquery-nos',
                             return data[p1] || '';
                         }).replace(/{{urlencode:([\w]+)}}/g, function(str, p1, offset, s) {
                             return encodeURIComponent(data[p1] || '');
+                        }).replace(/{{htmlspecialchars:([\w]+)}}/g, function(str, p1, offset, s) {
+                            return (data[p1] || '').replace(/</g, '&lt;');
                         });
                 } else if ($.isPlainObject(obj)) {
                     $.each(obj, function(key, value) {
@@ -543,7 +564,13 @@ define('jquery-nos',
 
                             case 'document.location' :
                                 url = $.nosDataReplace(obj.url, data);
-                                document.location  = url;
+                                if (!(url.substr(0, 5) === 'http:' || url.substr(0, 6) === 'https:')) {
+                                    var $base = $('base');
+                                    if ($base.size()) {
+                                        url = $base.attr('href') + url;
+                                    }
+                                }
+                                document.location.href = url;
                                 break;
                         }
                     }
@@ -754,7 +781,6 @@ define('jquery-nos',
             nosFormUI : function() {
                 var $context = this;
 
-                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],textarea").filter(':not(.notransform)').wijtextbox();
                 $context.find(":input[type='submit'],button").filter(':not(.notransform)').each(function() {
                     var data = $(this).data(),
                         options = $.extend(true, {
@@ -802,25 +828,19 @@ define('jquery-nos',
                             });
                     });
                 });
-                $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
-                    var $wijdropdown = $(this).wijdropdown().closest('.wijmo-wijdropdown');
-                    // Cross browser compatibility: prevent the dropdown from protruding over 2 lines
-                    $wijdropdown.width($wijdropdown.width() + 5);
-                });
-                $context.find(":input[type=checkbox]").filter(':not(.notransform)').nosOnShow('one', function() {
-                    $(this).wijcheckbox();
-                });
-                $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
-                    $(this).wijradio();
-                });
                 $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
-                    $this.wijexpander($.extend({expanded: true}, $this.data('wijexpander-options')));
+                    $this.wijexpander($.extend({
+                        expanded: true,
+                        afterExpand: function(e) {
+                            $(e.target).find('.ui-expander-content').nosOnShow();
+                        }
+                    }, $this.data('wijexpander-options')));
                 });
                 $context.find('.accordion').add($context.filter('.accordion')).filter(':not(.notransform)').wijaccordion({
                     header: "h3",
                     selectedIndexChanged : function(e, args) {
-                        $(e.target).find('.ui-accordion-content').eq(args.newIndex).nosOnShow();
+                        $(e.target).find('.wijmo-wijaccordion-content').eq(args.newIndex).nosOnShow();
                     }
                 });
                 // @todo Check usefulness of this
@@ -1361,5 +1381,9 @@ define('jquery-nos',
             }
         });
 
+        $.widget('wijmo.wijtextbox', {});
+        $.widget('wijmo.wijradio', {});
+        $.widget('wijmo.wijcheckbox', {});
+        $.widget('wijmo.wijdropdown', {});
         return $;
     });
