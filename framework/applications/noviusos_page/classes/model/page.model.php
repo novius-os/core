@@ -176,6 +176,18 @@ class Model_Page extends \Nos\Orm\Model
             'null' => true,
             'convert_empty_to_null' => true,
         ),
+        'page_created_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'page_updated_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
     );
 
     protected static $_has_one = array();
@@ -237,6 +249,10 @@ class Model_Page extends \Nos\Orm\Model
             'publication_state_property' => 'page_published',
             'publication_start_property' => 'page_publication_start',
             'publication_end_property' => 'page_publication_end',
+        ),
+        'Nos\Orm_Behaviour_Author' => array(
+            'created_by_property' => 'page_created_by_id',
+            'updated_by_property' => 'page_updated_by_id',
         ),
     );
 

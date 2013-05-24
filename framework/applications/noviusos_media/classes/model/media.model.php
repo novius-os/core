@@ -72,6 +72,18 @@ class Model_Media extends \Nos\Orm\Model
             'data_type' => 'timestamp',
             'null' => false,
         ),
+        'media_created_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'media_updated_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
     );
 
     public static $private_path = 'data/media/';
@@ -110,7 +122,14 @@ class Model_Media extends \Nos\Orm\Model
         'Orm\Observer_UpdatedAt' => array(
             'mysql_timestamp' => true,
             'property'=>'media_updated_at'
-        )
+        ),
+    );
+
+    protected static $_behaviours = array(
+        'Nos\Orm_Behaviour_Author' => array(
+            'created_by_property' => 'media_created_by_id',
+            'updated_by_property' => 'media_updated_by_id',
+        ),
     );
 
     /**

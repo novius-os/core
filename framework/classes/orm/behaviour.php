@@ -18,10 +18,44 @@ abstract class Orm_Behaviour extends \Orm\Observer
 {
     protected $_class = null;
     protected $_properties = array();
+    protected $_config = null;
 
     public function __construct($class)
     {
         $this->_class = $class;
         $this->_properties = call_user_func($class . '::observers', get_class($this));
+        $this->_config();
+    }
+
+    protected function _config()
+    {
+        list($application, $relative_path) = \Config::configFile(get_called_class());
+        $this->_config = \Config::loadConfiguration($application, $relative_path);
+    }
+
+    public function commonConfig(&$config)
+    {
+        static::processConfigKey($config, 'data_mapping', 'data_mapping');
+        static::processConfigKey($config, 'actions', 'actions.list');
+    }
+
+    protected function processConfigKey(&$config, $keyFrom, $keyTo)
+    {
+        $valuesFrom = \Arr::get($this->_config, $keyFrom, array());
+        foreach ($valuesFrom as $key => $value) {
+            $valueTo = \Arr::get($config, $keyTo.'.'.$key);
+            if ($valueTo === null) {
+                $valueTo = array();
+            }
+
+            if ($valueTo !== false) {
+                \Arr::set($config, $keyTo.'.'.$key,
+                    \Arr::merge(
+                        $value,
+                        $valueTo
+                    )
+                );
+            }
+        }
     }
 }

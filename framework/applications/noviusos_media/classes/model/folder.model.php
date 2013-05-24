@@ -52,6 +52,18 @@ class Model_Folder extends \Nos\Orm\Model
             'data_type' => 'timestamp',
             'null' => false,
         ),
+        'medif_created_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'medif_updated_by_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
     );
 
     protected static $_has_one = array();
@@ -104,6 +116,10 @@ class Model_Folder extends \Nos\Orm\Model
             'virtual_name_property' => 'medif_dir_name',
             'virtual_path_property' => 'medif_path',
             'extension_property' => '/',
+        ),
+        'Nos\Orm_Behaviour_Author' => array(
+            'created_by_property' => 'medif_created_by_id',
+            'updated_by_property' => 'medif_updated_by_id',
         ),
     );
 

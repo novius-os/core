@@ -42,65 +42,6 @@ return array(
                 'grid' => true,
             ),
         ),
-        'visualise' => array(
-            'label' => __('Visualise'),
-            'primary' => true,
-            'iconClasses' => 'nos-icon16 nos-icon16-eye',
-            'action' => array(
-                'action' => 'window.open',
-                'url' => '{{preview_url}}',
-            ),
-            'disabled' => array(
-            function($item, $params)
-            {
-                if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                    $url = $item->url_canonical(array('preview' => true));
-                    if ($item->is_new()) {
-                        return true;
-                    }
-                    if (!!empty($url)) {
-                        return $params['config']['i18n']['visualising no url'];
-                    }
-
-                    return false;
-                }
-                return true;
-            }),
-            'targets' => array(
-                'grid' => true,
-                'toolbar-edit' => true,
-            ),
-            'visible' => array(
-            function($params) {
-                if (isset($params['item']) && $params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                    $url = $params['item']->url_canonical(array('preview' => true));
-                    return !$params['item']->is_new() && !empty($url);
-                }
-                if (isset($params['model']) && $params['model']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
-                    return true;
-                }
-                return false;
-            }),
-        ),
-        'share' => array(
-            'label' => __('Share'),
-            'iconClasses' => 'nos-icon16 nos-icon16-share',
-            'action' => array(
-                'action' => 'share',
-                'data' => array(
-                    'model_id' => '{{_id}}',
-                    'model_name' => '{{_model}}',
-                ),
-            ),
-            'targets' => array(
-                'toolbar-edit' => true,
-            ),
-            'visible' => array(
-            function($params) {
-                $model = get_class($params['item']);
-                return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
-            }),
-        ),
         'delete' => array(
             'action' => array(
                 'action' => 'confirmationDialog',
@@ -117,10 +58,16 @@ return array(
                 'grid' => true,
                 'toolbar-edit' => true,
             ),
+            'align' => 'end',
             'visible' => array(
             function($params) {
                 return !isset($params['item']) || !$params['item']->is_new();
             }),
         ),
     ),
+    'callable_keys' => array(
+        'item' => array(
+            'menu.menus'
+        )
+    )
 );

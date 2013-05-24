@@ -211,7 +211,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $objects = $new_query->execute($query->connection())->as_array('group_by_pk');
 
         if (!empty($objects)) {
-            $query = $model::find()->where(array($select, 'in', array_keys($objects)));
+            $query = \Nos\Orm\Query::forge($model)->where(array($select, 'in', array_keys($objects)));
             foreach ($config['related'] as $related) {
                 $query->related($related);
             }

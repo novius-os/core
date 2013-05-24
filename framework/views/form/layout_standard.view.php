@@ -82,7 +82,7 @@ if (!empty($item) && count($contexts) > 1) {
             }
             ?>
                 </ul>
-            </div>
+            </td>
             <?php
         } else {
             echo '<td style="width:16px;text-align:center;">'.\Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'short' => true)).'</td>';
@@ -161,8 +161,6 @@ if (!empty($subtitle) || !empty($publishable)) {
 ?>
             </div>
         </div>
-        <div class="col c1"></div>
-        <div class="col c3"></div>
         <?= $large ? '' : '<div class="col c1"></div>' ?>
     </div>
 

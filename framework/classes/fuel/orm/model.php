@@ -485,7 +485,7 @@ class Model extends \Orm\Model
     {
         static::eventStatic('before_query', array(&$options));
 
-        return parent::query($options);
+        return Query::forge(get_called_class(), array(static::connection(), static::connection(true)), $options);
     }
 
     public static function prefix()

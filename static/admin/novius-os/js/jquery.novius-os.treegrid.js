@@ -24,6 +24,7 @@ define('jquery-nos-treegrid',
             },
 
             oldFirstColumn : null,
+            gridData: null,
             treeData : {},
             treeDataSource : null,
 
@@ -174,7 +175,7 @@ define('jquery-nos-treegrid',
                         data: o.treeOptions || {}
                     }),
                     loaded: function(dataSource, data) {
-                        var nosGridData = $.extend([], self.data()),
+                        var nosGridData = self._gridData(),
                             toArray = function(objets) {
                                 return $.map(objets, function(el, key) {
                                     if (key === 'length') {
@@ -202,7 +203,7 @@ define('jquery-nos-treegrid',
                                 Array.prototype.splice.apply(nosGridData, [index, 0, data.node].concat(toArray(data.node.treeChilds)));
                             }
                         }
-                        self._setOption('data', nosGridData);
+                        self._setGridData(nosGridData);
                         self._deactivateSpinner();
                     },
                     reader: {
@@ -475,7 +476,7 @@ define('jquery-nos-treegrid',
                                     $tr;
 
                                 if (newParent) {
-                                    newParentIndex = $.inArray(newParent, self.data());
+                                    newParentIndex = $.inArray(newParent, self._gridData());
                                     $tr = self.element.find('tr.wijmo-wijgrid-row').eq(newParentIndex);
                                 }
 
@@ -528,7 +529,7 @@ define('jquery-nos-treegrid',
                 var self = this,
                     removeIndex = false,
                     removeLength = 0,
-                    data = self.data();
+                    data = self._gridData();
                 $.each(data, function(i, item) {
                     var remove = node.treeHash === item.treeHash || $.inArray(node.treeHash, item.treePath) !== -1;
                     if (remove) {
@@ -546,6 +547,21 @@ define('jquery-nos-treegrid',
                 }
 
                 return removeLength;
+            },
+
+            _gridData: function() {
+                var self = this;
+                if (!self.gridData) {
+                    self.gridData = $.extend([], self.data())
+                }
+                return self.gridData;
+            },
+
+            _setGridData: function(data) {
+                var self = this;
+                self._setOption('data', data);
+                self.gridData = null;
+                return self;
             },
 
             reload : function() {
