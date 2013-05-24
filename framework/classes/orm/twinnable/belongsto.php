@@ -12,6 +12,8 @@
 
 namespace Nos;
 
+use \DB;
+
 class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 {
     protected $column_context_from = 'context';
@@ -34,7 +36,7 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         if (!$from_behaviour) {
             throw new \FuelException('Model not have Twinnable behaviour');
         }
-        $this->key_to = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
+        $config['key_to'] = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
 
         parent::__construct($from, $name, $config);
 
@@ -130,15 +132,13 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         $pks = call_user_func(array($this->model_to, 'primary_key'));
 
         $props = call_user_func(array($this->model_to, 'properties'));
-        $i = 0;
         $properties = array();
         $primary_key = array();
         foreach ($props as $pk => $pv) {
-            $properties[] = array(DB::expr('COALESCE('.$table_fallback.'.'.$pk.','.$table.'.'.$pk.')'), $table.'_c'.$i);
+            $properties[] = array(\DB::expr('COALESCE('.$table_fallback.'.'.$pk.','.$table.'.'.$pk.')'), $table.'_'.$pk);
             if (in_array($pk, $pks)) {
-                $primary_key[$table.'_c'.$i] = $pk;
+                $primary_key[$table.'_'.$pk] = $pk;
             }
-            $i++;
         }
 
         return array(
