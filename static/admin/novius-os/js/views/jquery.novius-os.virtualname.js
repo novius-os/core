@@ -29,7 +29,7 @@ define('jquery-nos-virtualname',
                         $virtual_name = $(this),
                         id = $virtual_name.attr('id'),
                         $use_title_checkbox = $('#' + id + '__use_title_checkbox'),
-                        $title = $virtual_name.closest('form').find('input.title');
+                        $title = $virtual_name.closest('form').find('input.ui-priority-primary');
 
                     var useTitle = $virtual_name.data('usetitle');
 
