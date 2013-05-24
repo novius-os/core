@@ -34,12 +34,36 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         if (!$from_behaviour) {
             throw new \FuelException('Model not have Twinnable behaviour');
         }
+        $this->key_to = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
 
         parent::__construct($from, $name, $config);
 
         $this->column_context_from = array_key_exists('column_context_from', $config) ? $config['column_context_from'] : $from_behaviour['context_property'];
         $this->column_context_to = array_key_exists('column_context_to', $config) ? $config['column_context_to'] : $to_behaviour['context_property'];
         $this->column_context_is_main_to = array_key_exists('column_context_from', $config) ? $config['column_context_from'] : $to_behaviour['is_main_property'];
+    }
+
+    public function get(\Orm\Model $from)
+    {
+        $query = call_user_func(array($this->model_to, 'query'));
+        reset($this->key_to);
+        foreach ($this->key_from as $key) {
+            // no point running a query when a key value is null
+            if ($from->{$key} === null) {
+                return null;
+            }
+            $query->where(current($this->key_to), $from->{$key});
+            next($this->key_to);
+        }
+
+        foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition) {
+            is_array($condition) or $condition = array($key, '=', $condition);
+            $query->where($condition);
+        }
+        $query->order_by(DB::expr($this->column_context_to.' = '.DB::quote($from->{$this->column_context_from})), 'DESC');
+        $query->order_by($this->column_context_is_main_to, 'DESC');
+
+        return $query->get_one();
     }
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
@@ -85,15 +109,17 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         }
         $models[$rel_name]['where'][] = array($alias_to.'.'.$this->column_context_is_main_to, 1);
         $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$this->column_context_from, '=', $alias_to.'_fallback'.'.'.$this->column_context_to);
-        foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition) {
-            !is_array($condition) and $condition = array($key, '=', $condition);
-            if (!$condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
-                $condition[0] = $alias_to.'.'.$condition[0];
-            }
-            is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
+        foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
+            foreach ($c as $key => $condition) {
+                !is_array($condition) and $condition = array($key, '=', $condition);
+                if (!$condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
+                    $condition[0] = $alias_to.'.'.$condition[0];
+                }
+                is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
 
-            $models[$rel_name]['join_on'][] = $condition;
-            $models[$rel_name.'_fallback']['join_on'][] = $condition;
+                $models[$rel_name]['join_on'][] = $condition;
+                $models[$rel_name.'_fallback']['join_on'][] = $condition;
+            }
         }
 
         return $models;
@@ -108,7 +134,7 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         $properties = array();
         $primary_key = array();
         foreach ($props as $pk => $pv) {
-            $properties[] = array(\Fuel\Core\DB::expr('COALESCE('.$table_fallback.'.'.$pk.','.$table.'.'.$pk.')'), $table.'_c'.$i);
+            $properties[] = array(DB::expr('COALESCE('.$table_fallback.'.'.$pk.','.$table.'.'.$pk.')'), $table.'_c'.$i);
             if (in_array($pk, $pks)) {
                 $primary_key[$table.'_c'.$i] = $pk;
             }
