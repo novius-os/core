@@ -68,6 +68,7 @@ if (!MBSTRING) {
         'Profiler' => FUEL_EXTEND_PATH.'profiler.php',
         'Refine' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'refine.php',
         'Response' => FUEL_EXTEND_PATH.'response.php',
+        'Security' => FUEL_EXTEND_PATH.'security.php',
         'Session' => FUEL_EXTEND_PATH.'session.php',
         'Str' => FUEL_EXTEND_PATH.'str.php',
         'Validation_Error'  => FUEL_EXTEND_PATH.'validation_error.php',
