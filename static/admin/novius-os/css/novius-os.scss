@@ -694,6 +694,7 @@ div.wijmo-wijtooltip.tooltip {
 input[type=text], input[type=password], input[type=email], input[type=number], input[type=date], input[type=datetime],
 input[type=datetime-local], input[type=color], input[type=tel], input[type=time], input[type=url], input[type=week],
 textarea, select {
+  background: #fff;
   -moz-box-shadow:inset 0 2px 2px rgba(143,143,143,0.50);
   -webkit-box-shadow:inset 0 2px 2px rgba(143,143,143,0.50);
   box-shadow:inset 0 2px 2px rgba(143,143,143,0.50);
