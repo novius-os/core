@@ -30,6 +30,7 @@ class Model extends \Orm\Model
         'twinnable_belongs_to'  => 'Nos\\Orm_Twinnable_BelongsTo',
         'twinnable_has_one'     => 'Nos\\Orm_Twinnable_HasOne',
         'twinnable_has_many'    => 'Nos\\Orm_Twinnable_HasMany',
+        'twinnable_many_many'   => 'Nos\\Orm_Twinnable_ManyMany',
     );
 
     protected static $_has_many = array();

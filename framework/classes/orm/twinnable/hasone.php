@@ -28,11 +28,11 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$to_behaviour) {
-            throw new \FuelException('Related model not have Twinnable behaviour "'.$name.'"');
+            throw new \FuelException('The related model of the twinnable_has_one relation "'.$name.'" of the model "'.$from.'" not have Twinnable behaviour.');
         }
         $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('Model not have Twinnable behaviour');
+            throw new \FuelException('The model "'.$from.'" has a twinnable_has_one relation but not a Twinnable behaviour.');
         }
         $config['key_from'] = array_key_exists('key_from', $config) ? (array) $config['key_from'] : $from_behaviour['common_id_property'];
 
@@ -111,8 +111,9 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
             $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to.'_fallback'.'.'.current($this->key_to));
             next($this->key_to);
         }
-        $models[$rel_name]['where'][] = array($alias_to.'.'.$this->column_context_is_main_to, 1);
+        $models[$rel_name]['join_on'][] = array($alias_to.'.'.$this->column_context_is_main_to, '=', DB::expr(1));
         $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$this->column_context_from, '=', $alias_to.'_fallback'.'.'.$this->column_context_to);
+
         foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
             foreach ($c as $key => $condition) {
                 !is_array($condition) and $condition = array($key, '=', $condition);
