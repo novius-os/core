@@ -260,23 +260,36 @@ class Controller extends \Fuel\Core\Controller_Hybrid
     protected function build_tree($tree)
     {
         $list_models = array();
-        foreach ($tree['models'] as $model) {
+        foreach ($tree['models'] as $key => $model) {
             if (!is_array($model)) {
                 $model = array('model' => $model);
             }
-            $class = $model['model'];
-            if (!isset($model['pk'])) {
-                $model['pk'] = \Arr::get($class::primary_key(), 0);
+            // When the key is a string, it's the Model name (useful when extending the config)
+            if (!is_numeric($key)) {
+
+                $class = $key;
+            } else {
+                $class = $model['model'];
+
+                if (!isset($model['pk'])) {
+                    $model['pk'] = \Arr::get($class::primary_key(), 0);
+                }
+                if (!isset($model['order_by'])) {
+                    $model['order_by'] = array($model['pk']);
+                } elseif (!is_array($model['order_by'])) {
+                    $model['order_by'] = array($model['order_by']);
+                }
+                if (!isset($model['childs'])) {
+                    $model['childs'] = array();
+                }
             }
-            if (!isset($model['order_by'])) {
-                $model['order_by'] = array($model['pk']);
-            } elseif (!is_array($model['order_by'])) {
-                $model['order_by'] = array($model['order_by']);
+
+            // Merge or create the model array
+            if (isset($list_models[$class])) {
+                $list_models[$class] = array_merge($list_models[$class], $model);
+            } else {
+                $list_models[$class] = $model;
             }
-            if (!isset($model['childs'])) {
-                $model['childs'] = array();
-            }
-            $list_models[$model['model']] = $model;
         }
 
         foreach ($list_models as $model) {

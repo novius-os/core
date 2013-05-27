@@ -76,6 +76,11 @@
 
                 var $input = $('input#<?= $id ?>'), options = $input.data('datepicker-options');
 
+                options.altFormat = options.dateFormat;
+                options.altTimeFormat = options.timeFormat;
+                options.dateFormat = options.hiddenDateFormat;
+                options.timeFormat = options.hiddenTimeFormat;
+
                 $.datepicker.setDefaults($.datepicker.regional[$.nosLang.substr(0, 2)]);
                 var inputDate = $input.val();
                 $input<?= !empty($wrapper) ? '.wrap('.\Format::forge()->to_json($wrapper).')' : '' ?>.datetimepicker(options);
