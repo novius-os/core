@@ -67,11 +67,28 @@ class Application
      */
     public static function migrateAll()
     {
+        $existingMigrations = \Migrate::executedMigrations();
         \Migrate::latest('nos', 'package');
         foreach (array_keys(\Nos\Config_Data::get('app_installed')) as $app) {
             \Migrate::latest($app, 'module');
         }
         \Migrate::latest('default', 'app');
+        $executedMigrations = \Migrate::executedMigrations();
+
+        $migrations = array();
+        foreach ($executedMigrations as $type => $instances) {
+            $migrations[$type] = array();
+            foreach ($instances as $instance => $instanceMigrations) {
+                $migrations[$type][$instance] = array();
+                $existingMigrationsInstance = \Arr::get($existingMigrations, $type.'.'.$instance, array());
+                foreach ($instanceMigrations as $migration) {
+                    $migrations[$type][$instance][$migration] = array();
+                    $migrations[$type][$instance][$migration]['state'] = in_array($migration, $existingMigrationsInstance) ? 'already_executed' : 'successfully_executed';
+                }
+            }
+        }
+
+        return $migrations;
     }
 
     public static function installNativeApplications($ignore_core_migrations = false)
