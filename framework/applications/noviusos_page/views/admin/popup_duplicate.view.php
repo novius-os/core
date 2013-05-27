@@ -95,7 +95,7 @@ if ($context_count > 1 || $children_count > 0) {
 ?>
 
     <p style="margin: 1em 0;">
-    <button type="submit" class="primary ui-state-default" data-texts="<?= htmlspecialchars(\Format::forge()->to_json(array(
+    <button type="submit" class="ui-priority-primary ui-state-default" data-texts="<?= htmlspecialchars(\Format::forge()->to_json(array(
                     '0' => __('Nothing to duplicate'),
                     '1' => __('Duplicate this page'),
                     '+' => __('Duplicate these {{count}} pages'),
@@ -168,7 +168,7 @@ if ($context_count > 1 || $children_count > 0) {
 
 
                     $tables.find('tr').css({cursor: 'pointer'}).click(function() {
-                        $(this).find(':checkbox').click().wijcheckbox('refresh');
+                        $(this).find(':checkbox').click();
                     });
 
 

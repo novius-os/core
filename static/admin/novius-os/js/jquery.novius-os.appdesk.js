@@ -8,7 +8,7 @@
  */
 
 define('jquery-nos-appdesk',
-    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-thumbnailsgrid', 'jquery-nos-listgrid', 'jquery-nos-treegrid', 'jquery-nos-preview', 'jquery-ui.button', 'wijmo.wijdropdown', 'wijmo.wijtabs', 'wijmo.wijsuperpanel', 'wijmo.wijsplitter', 'wijmo.wijgrid', 'wijmo.wijmenu'],
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-thumbnailsgrid', 'jquery-nos-listgrid', 'jquery-nos-treegrid', 'jquery-nos-preview', 'jquery-ui.button', 'wijmo.wijtabs', 'wijmo.wijsuperpanel', 'wijmo.wijsplitter', 'wijmo.wijgrid', 'wijmo.wijmenu'],
     function($) {
         "use strict";
         var undefined = void(0);
@@ -239,7 +239,7 @@ define('jquery-nos-appdesk',
                     if (button.primary) {
                         $el = $('<button></button>').html(button.label)
                             .data('icon', button.icon || 'plus')
-                            .addClass('primary')
+                            .addClass('ui-priority-primary')
                             .click(function(e) {
                                 e.preventDefault();
                                 e.stopImmediatePropagation();
@@ -336,7 +336,6 @@ define('jquery-nos-appdesk',
                             $.each(o.selectedContexts, function(i, context) {
                                 self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
                             });
-                            self.uiToolbarContextsDialog.find(':checkbox').wijcheckbox('refresh');
                             self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
                         }
                     })
@@ -375,8 +374,7 @@ define('jquery-nos-appdesk',
                                                 if (checked === null) {
                                                     checked = $checkbox.is(':checked');
                                                 }
-                                                $checkbox.attr('checked', !checked)
-                                                    .wijcheckbox('refresh');
+                                                $checkbox.attr('checked', !checked);
                                             }
                                         });
 
@@ -388,8 +386,7 @@ define('jquery-nos-appdesk',
                                         e.stopImmediatePropagation();
 
                                         var $checkbox = $tr.find(':checkbox');
-                                        $checkbox.attr('checked', !$checkbox.is(':checked'))
-                                            .wijcheckbox('refresh');
+                                        $checkbox.attr('checked', !$checkbox.is(':checked'));
                                     });
                                 }
                             }

@@ -11,7 +11,7 @@
 \Nos\I18n::current_dictionary('nos::common');
 
 ?>
-<button type="submit" data-icon="check" class="primary">
+<button type="submit" data-icon="check" class="ui-priority-primary">
     <?= __('Save') ?>
 </button>
 &nbsp; <?= __('or') ?> &nbsp;

@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos',
-    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijtextbox', 'wijmo.wijcheckbox', 'wijmo.wijradio', 'wijmo.wijdropdown', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
+    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
     function($) {
         "use strict";
         var undefined = void(0),
@@ -781,7 +781,6 @@ define('jquery-nos',
             nosFormUI : function() {
                 var $context = this;
 
-                $context.find(":input[type='text'],:input[type='password'],:input[type='email'],:input[type='number'],textarea").filter(':not(.notransform)').wijtextbox();
                 $context.find(":input[type='submit'],button").filter(':not(.notransform)').each(function() {
                     var data = $(this).data(),
                         options = $.extend(true, {
@@ -828,17 +827,6 @@ define('jquery-nos',
                                 backgroundImage: 'url(' + url + ')'
                             });
                     });
-                });
-                $context.find("select").filter(':not(.notransform)').nosOnShow('one', function() {
-                    var $wijdropdown = $(this).wijdropdown().closest('.wijmo-wijdropdown');
-                    // Cross browser compatibility: prevent the dropdown from protruding over 2 lines
-                    $wijdropdown.width($wijdropdown.width() + 5);
-                });
-                $context.find(":input[type=checkbox]").filter(':not(.notransform)').nosOnShow('one', function() {
-                    $(this).wijcheckbox();
-                });
-                $context.find(":input[type=radio]").filter(':not(.notransform)').nosOnShow('one', function() {
-                    $(this).wijradio();
                 });
                 $context.find('.expander').add($context.filter('.expander')).filter(':not(.notransform)').each(function() {
                     var $this = $(this);
@@ -1393,5 +1381,9 @@ define('jquery-nos',
             }
         });
 
+        $.widget('wijmo.wijtextbox', {});
+        $.widget('wijmo.wijradio', {});
+        $.widget('wijmo.wijcheckbox', {});
+        $.widget('wijmo.wijdropdown', {});
         return $;
     });

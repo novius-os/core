@@ -131,7 +131,7 @@ return array(
                 'type' => 'submit',
                 'tag' => 'button',
                 'data-icon' => 'check',
-                'class' => 'primary',
+                'class' => 'ui-priority-primary',
                 // Note to translator: This is a submit button
                 'value' => __('Save'),
             ),
