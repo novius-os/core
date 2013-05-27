@@ -12,7 +12,7 @@ namespace Nos;
 
 use \DB;
 
-class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
+class Orm_Twinnable_HasMany extends \Orm\HasMany
 {
     protected $column_context_from = 'context';
 
@@ -24,7 +24,7 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
     {
         $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
         if (!class_exists($to)) {
-            throw new \FuelException('Related model not found by Belongs_To relation "'.$name.'": '.$to);
+            throw new \FuelException('Related model not found by Has_Many relation "'.$this->name.'": '.$this->model_to);
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$to_behaviour) {
@@ -34,11 +34,12 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         if (!$from_behaviour) {
             throw new \FuelException('Model not have Twinnable behaviour');
         }
-        $config['key_to'] = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
+        $config['key_from'] = array_key_exists('key_from', $config) ? (array) $config['key_from'] : $from_behaviour['common_id_property'];
 
         parent::__construct($from, $name, $config);
 
         $this->column_context_from = array_key_exists('column_context_from', $config) ? $config['column_context_from'] : $from_behaviour['context_property'];
+        $this->column_context_common_id_to = array_key_exists('column_context_common_id_to', $config) ? $config['column_context_common_id_to'] : $to_behaviour['common_id_property'];
         $this->column_context_to = array_key_exists('column_context_to', $config) ? $config['column_context_to'] : $to_behaviour['context_property'];
         $this->column_context_is_main_to = array_key_exists('column_context_is_main_to', $config) ? $config['column_context_is_main_to'] : $to_behaviour['is_main_property'];
     }
@@ -50,20 +51,44 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         foreach ($this->key_from as $key) {
             // no point running a query when a key value is null
             if ($from->{$key} === null) {
-                return null;
+                return array();
             }
             $query->where(current($this->key_to), $from->{$key});
             next($this->key_to);
         }
+        $query->and_where_open();
+        $query->where($this->column_context_to, $from->{$this->column_context_from});
+        $query->or_where($this->column_context_is_main_to, 1);
+        $query->and_where_close();
 
         foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition) {
             is_array($condition) or $condition = array($key, '=', $condition);
             $query->where($condition);
         }
-        $query->order_by(DB::expr($this->column_context_to.' = '.DB::quote($from->{$this->column_context_from})), 'DESC');
-        $query->order_by($this->column_context_is_main_to, 'DESC');
 
-        return $query->get_one();
+        foreach (\Arr::get($this->conditions, 'order_by', array()) as $field => $direction) {
+            if (is_numeric($field)) {
+                $query->order_by($direction);
+            } else {
+                $query->order_by($field, $direction);
+            }
+        }
+
+        $result = array();
+        $result_context = array();
+        foreach ($query->get() as $pk => $model) {
+            if (isset($result_context[$model->{$this->column_context_common_id_to}])) {
+                if ($model->{$this->column_context_to} !== $from->{$this->column_context_from}) {
+                    continue;
+                } else {
+                    unset($result[$result_context[$model->{$this->column_context_common_id_to}]]);
+                }
+            }
+            $result_context[$model->{$this->column_context_common_id_to}] = $pk;
+            $result[$pk] = $model;
+        }
+
+        return $result;
     }
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
