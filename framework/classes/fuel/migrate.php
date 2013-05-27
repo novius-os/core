@@ -137,4 +137,9 @@ class Migrate extends \Fuel\Core\Migrate
         return count($migrations) == 0;
     }
 
+    public static function executedMigrations()
+    {
+        return static::$migrations;
+    }
+
 }
