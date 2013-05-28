@@ -34,7 +34,7 @@ define('jquery-nos-virtualname',
                     var useTitle = $virtual_name.data('usetitle');
 
                     if (typeof useTitle !== 'undefined' && useTitle == 1) {
-                        $use_title_checkbox.attr('checked', true);
+                        $use_title_checkbox.prop('checked', true);
                     }
 
                     $use_title_checkbox.change(function() {
