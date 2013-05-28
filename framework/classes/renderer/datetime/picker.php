@@ -54,7 +54,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
 
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        list($attributes, $this->options) = static::parse_options($renderer);
+        list($attributes, $this->options) = static::parseOptions($renderer);
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
@@ -73,7 +73,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             'id' => $attributes['id'],
             'data-datepicker-options' => htmlspecialchars(\Format::forge()->to_json($datepicker_options)),
         ));
-        $this->fieldset()->append(static::js_init($attributes['id'], $this->options));
+        $this->fieldset()->append(static::jsInit($attributes['id'], $this->options));
         $attributes['type'] = 'text';
         $attributes['id'] = ltrim($datepicker_options['altField'], '#');
         unset($attributes['value']);
@@ -92,7 +92,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($renderer = array())
+    protected static function parseOptions($renderer = array())
     {
         $renderer['type'] = 'hidden';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' datepicker';
@@ -126,7 +126,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
      * @param   string  HTML ID attribute of the <input> tag
      * @return string JavaScript to execute to initialise the renderer
      */
-    protected static function js_init($id, $renderer_options = array())
+    protected static function jsInit($id, $renderer_options = array())
     {
         return \View::forge('renderer/datetime_picker', array(
             'id' => $id,
