@@ -18,10 +18,10 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
             'buttonImageOnly' => true,
             'autoSize' => true,
-            'timeFormat' => 'HH:mm:ss', // MySQL formatting
-            'dateFormat' => 'yy-mm-dd', // MySQL formatting
-            'altFormat' => 'dd/mm/yy', // Custom user formatting
-            'altTimeFormat' => 'HH:mm', // Custom user formatting
+            'dateFormat' => 'dd/mm/yy', // MySQL formatting
+            'timeFormat' => 'HH:mm', // MySQL formatting
+            'altFormat' => 'yy-mm-dd', // Custom user formatting
+            'altTimeFormat' => 'HH:mm:ss', // Custom user formatting
             'altFieldTimeOnly' => false,
             'showButtonPanel' => true,
             'changeMonth' => true,
@@ -54,8 +54,8 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
 
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        list($attributes, $this->options) = static::parseOptions($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
+        list($this->attributes, $this->options) = static::parseOptions($renderer);
+        parent::__construct($name, $label, $this->attributes, $rules, $fieldset);
     }
 
     /**
@@ -75,7 +75,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         ));
         $this->fieldset()->append(static::jsInit($attributes['id'], $this->options));
         $attributes['type'] = 'text';
-        $attributes['id'] = ltrim($datepicker_options['altField'], '#');
+        $attributes['id'] = ltrim($attributes['id'].'_displayed', '#');
         unset($attributes['value']);
         $this->set_value(static::processValue($this->value));
 
@@ -102,7 +102,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         }
 
         if (empty($renderer['size'])) {
-            $renderer['size'] = 20;
+            $renderer['size'] = 17;
         }
 
         // Default options of the renderer
@@ -112,10 +112,6 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
         }
         unset($renderer['renderer_options']);
-
-        if (empty($renderer_options['datepicker']['altField'])) {
-            $renderer_options['datepicker']['altField'] = '#alt_'.$renderer['id'];
-        }
 
         return array($renderer, $renderer_options);
     }
