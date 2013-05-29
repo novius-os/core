@@ -13,11 +13,6 @@ define('jquery-nos-renderer-datetimepicker',
 
             var $input = this.element, datetimeOptions = $input.data('datepicker-options');
 
-            datetimeOptions.altFormat = datetimeOptions.dateFormat;
-            datetimeOptions.altTimeFormat = datetimeOptions.timeFormat;
-            datetimeOptions.dateFormat = datetimeOptions.hiddenDateFormat;
-            datetimeOptions.timeFormat = datetimeOptions.hiddenTimeFormat;
-
             $.datepicker.setDefaults($.datepicker.regional[$.nosLang.substr(0, 2)]);
             var inputDate = $input.val();
 
