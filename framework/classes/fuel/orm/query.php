@@ -46,4 +46,8 @@ class Query extends \Orm\Query
     {
         return $this->connection;
     }
+    public function model()
+    {
+        return $this->model;
+    }
 }
