@@ -18,10 +18,10 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
             'buttonImageOnly' => true,
             'autoSize' => true,
-            'hiddenTimeFormat' => 'HH:mm:ss', // MySQL formatting
-            'hiddenDateFormat' => 'yy-mm-dd', // MySQL formatting
             'dateFormat' => 'dd/mm/yy', // Custom user formatting
             'timeFormat' => 'HH:mm', // Custom user formatting
+            'altFormat' => 'yy-mm-dd', // MySQL formatting
+            'altTimeFormat' => 'HH:mm:ss', // MySQL formatting
             'altFieldTimeOnly' => false,
             'showButtonPanel' => true,
             'changeMonth' => true,
@@ -54,8 +54,8 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
 
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        list($attributes, $this->options) = static::parse_options($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
+        list($this->attributes, $this->options) = static::parseOptions($renderer);
+        parent::__construct($name, $label, $this->attributes, $rules, $fieldset);
     }
 
     /**
@@ -73,9 +73,9 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             'id' => $attributes['id'],
             'data-datepicker-options' => htmlspecialchars(\Format::forge()->to_json($datepicker_options)),
         ));
-        $this->fieldset()->append(static::js_init($attributes['id'], $this->options));
+        $this->fieldset()->append(static::jsInit($attributes['id'], $this->options));
         $attributes['type'] = 'text';
-        $attributes['id'] = ltrim($datepicker_options['altField'], '#');
+        $attributes['id'] = ltrim($attributes['id'].'_displayed', '#');
         unset($attributes['value']);
         $this->set_value(static::processValue($this->value));
 
@@ -92,7 +92,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($renderer = array())
+    protected static function parseOptions($renderer = array())
     {
         $renderer['type'] = 'hidden';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' datepicker';
@@ -102,7 +102,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         }
 
         if (empty($renderer['size'])) {
-            $renderer['size'] = 20;
+            $renderer['size'] = 17;
         }
 
         // Default options of the renderer
@@ -113,10 +113,6 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         }
         unset($renderer['renderer_options']);
 
-        if (empty($renderer_options['datepicker']['altField'])) {
-            $renderer_options['datepicker']['altField'] = '#alt_'.$renderer['id'];
-        }
-
         return array($renderer, $renderer_options);
     }
 
@@ -126,7 +122,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
      * @param   string  HTML ID attribute of the <input> tag
      * @return string JavaScript to execute to initialise the renderer
      */
-    protected static function js_init($id, $renderer_options = array())
+    protected static function jsInit($id, $renderer_options = array())
     {
         return \View::forge('renderer/datetime_picker', array(
             'id' => $id,

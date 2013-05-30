@@ -524,10 +524,19 @@ table.publication_status {
     textarea {
         resize: vertical;
     }
-    input[size], textarea[cols] {
+    input[size], textarea[cols], input[type=checkbox], input[type=radio] {
         width: auto;
         -moz-box-sizing: content-box;
         box-sizing: content-box;
+    }
+    input[type=checkbox] {
+        width: 16px;
+        height: 16px;
+    }
+    label {
+        cursor: pointer;
+        cursor: hand;
+        vertical-align: middle;
     }
 }
 
