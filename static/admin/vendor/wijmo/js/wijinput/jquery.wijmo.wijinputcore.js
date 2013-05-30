@@ -4,7 +4,7 @@
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
- * 
+ *
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
@@ -83,24 +83,25 @@ var wijmo;
             //$.effects.save(this.element, ['width', 'height']);
             if($.effects && $.effects.save) {
                 $.effects.save(this.element, [
-                    'width', 
+                    'width',
                     'height'
                 ]);
             } else if($.save) {
                 $.save(this.element, [
-                    'width', 
+                    'width',
                     'height'
                 ]);
             }
             var wijCSS = this.options.wijCSS;
-            this.element.wrap("<div><span/></div");
+            // Novius OS : add forgotten ending >
+            this.element.wrap("<div><span/></div>");
             this.wrapper = this.element.parent();
             this.outerDiv = this.wrapper.parent();
             this.outerDiv.addClass([
-                wijCSS.wijinput, 
-                wijCSS.widget, 
-                wijCSS.helperClearFix, 
-                wijCSS.stateDefault, 
+                wijCSS.wijinput,
+                wijCSS.widget,
+                wijCSS.helperClearFix,
+                wijCSS.stateDefault,
                 wijCSS.cornerAll
             ].join(" "));
             this.wrapper.addClass(wijCSS.wijinputWrapper);
@@ -112,7 +113,7 @@ var wijmo;
                 } catch (e) {
                     this.element[0].setAttribute('aria-multiline', "false");
                 }//self.element.attr('aria-multiline', false);
-                
+
             }
             var leftBtn = this.options.buttonAlign === 'left';
             if(this.options.showTrigger) {
@@ -405,12 +406,12 @@ var wijmo;
             //$.effects.restore(this.element, ['width', 'height']);
             if($.effects && $.effects.restore) {
                 $.effects.restore(this.element, [
-                    'width', 
+                    'width',
                     'height'
                 ]);
             } else if($.restore) {
                 $.restore(this.element, [
-                    'width', 
+                    'width',
                     'height'
                 ]);
             }
@@ -575,7 +576,7 @@ var wijmo;
             var cls;
             if($.isFunction(this.options.invalidInput) && this._trigger('invalidInput', null, {
                 widget: this,
-                char: chr
+                'char': chr
             }) === true) {
                 return;
             }
@@ -602,7 +603,7 @@ var wijmo;
         };
         wijinputcore.prototype._keyDownPreview = function (e) {
             return false;// true means handled.
-            
+
         };
         wijinputcore.prototype._onDoubleByteCharacter = function () {
             var prev = this.element.data("lastDbsState");
@@ -1075,7 +1076,7 @@ var wijmo;
         };
         return wijinputcore;
     })(wijmo.wijmoWidget);
-    wijmo.wijinputcore = wijinputcore;    
+    wijmo.wijinputcore = wijinputcore;
     ;
     var wijinputClass = "wijmo-wijinput", classPrefix = wijinputClass + "-";
     var wijinputcore_options = (function () {
@@ -1256,7 +1257,7 @@ var wijmo;
             this.invalidInput = null;
         }
         return wijinputcore_options;
-    })();    
+    })();
     wijinputcore.prototype.options = $.extend(true, {
     }, wijmo.wijmoWidget.prototype.options, new wijinputcore_options());
     var wijInputResult = (function () {
@@ -1287,7 +1288,7 @@ var wijmo;
         };
         return wijInputResult;
     })();
-    wijmo.wijInputResult = wijInputResult;    
+    wijmo.wijInputResult = wijInputResult;
     var wijTextProvider = (function () {
         function wijTextProvider() { }
         wijTextProvider.prototype.set = function (value, rh) {
@@ -1295,7 +1296,7 @@ var wijmo;
         wijTextProvider.prototype.toString = function (ignorePasswordChar, includePrompt, includeLiterals, start, length) {
             return "";
         };
-        wijTextProvider.prototype.insertAt = function (char, index, rh) {
+        wijTextProvider.prototype.insertAt = function (character, index, rh) {
             return false;
         };
         wijTextProvider.prototype.removeAt = function (start, end, rh, skipCheck) {
@@ -1310,5 +1311,5 @@ var wijmo;
         };
         return wijTextProvider;
     })();
-    wijmo.wijTextProvider = wijTextProvider;    
+    wijmo.wijTextProvider = wijTextProvider;
 })(wijmo || (wijmo = {}));

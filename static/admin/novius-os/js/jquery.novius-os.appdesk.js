@@ -607,11 +607,8 @@ define('jquery-nos-appdesk',
 
                     views_count++;
                     $viewsDropDown.append(
-                        $('<option></option>')
-                            .attr({
-                                'value': key,
-                                'selected': (o.selectedView == key)
-                            })
+                        $('<option></option>').attr('value', key)
+                            .prop('selected', o.selectedView == key)
                             .append(view.name)
                     );
                 });

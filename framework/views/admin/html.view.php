@@ -22,6 +22,7 @@ $config = array(
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
         'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.9.1.min',
+        'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize' => 'static/novius-os/admin/bundle/vendor.min',
@@ -161,6 +162,7 @@ $config = array(
         'jquery-ui.datetimepicker.i18n' => array('jquery-ui.datetimepicker', 'jquery-ui.datepicker.i18n'),
         'jquery.passwordstrength' => array('jquery', 'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'),
         'jquery-ui.tag-it' => array('jquery', 'jquery-ui.autocomplete', 'link!static/novius-os/admin/vendor/jquery/ui-tag-it/css/jquery.tagit.css'),
+        'jquery-migrate' => array('jquery'),
 
         'jquery-ui.core' => array('jquery'),
         'jquery-ui.widget' => array('jquery'),
@@ -261,6 +263,10 @@ $config = array(
 );
 
 if (!$assets_minified) {
+    if (Fuel::$env === Fuel::DEVELOPMENT) {
+        $config['deps'][] = 'jquery-migrate';
+    }
+
     $config['paths'] = array_merge($config['paths'], array(
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
         'log' => 'static/novius-os/admin/vendor/log',
