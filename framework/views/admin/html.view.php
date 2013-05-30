@@ -22,6 +22,7 @@ $config = array(
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
         'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.9.1.min',
+        'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize' => 'static/novius-os/admin/bundle/vendor.min',
@@ -150,6 +151,7 @@ $config = array(
         'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model-checkbox',
         'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-tree-model-radio',
         'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-plain-data',
+        'jquery-nos-renderer-datetimepicker' => 'static/novius-os/admin/novius-os/js/renderer/minified/jquery.novius-os.renderer.datetime-picker',
     ),
     'shim' => array(
         'jquery.cookie' => array('jquery'),
@@ -161,6 +163,7 @@ $config = array(
         'jquery-ui.datetimepicker.i18n' => array('jquery-ui.datetimepicker', 'jquery-ui.datepicker.i18n'),
         'jquery.passwordstrength' => array('jquery', 'link!static/novius-os/admin/vendor/jquery/jquery-password_strength/jquery.password_strength.css'),
         'jquery-ui.tag-it' => array('jquery', 'jquery-ui.autocomplete', 'link!static/novius-os/admin/vendor/jquery/ui-tag-it/css/jquery.tagit.css'),
+        'jquery-migrate' => array('jquery'),
 
         'jquery-ui.core' => array('jquery'),
         'jquery-ui.widget' => array('jquery'),
@@ -261,6 +264,10 @@ $config = array(
 );
 
 if (!$assets_minified) {
+    if (Fuel::$env === Fuel::DEVELOPMENT) {
+        $config['deps'][] = 'jquery-migrate';
+    }
+
     $config['paths'] = array_merge($config['paths'], array(
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
         'log' => 'static/novius-os/admin/vendor/log',
@@ -394,6 +401,7 @@ if (!$assets_minified) {
         'jquery-nos-inspector-tree-model-checkbox' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-checkbox',
         'jquery-nos-inspector-tree-model-radio' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-tree-model-radio',
         'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/jquery.novius-os.inspector-plain-data',
+        'jquery-nos-renderer-datetimepicker' => 'static/novius-os/admin/novius-os/js/renderer/jquery.novius-os.renderer.datetime-picker',
     ));
 }
 ?>

@@ -142,11 +142,11 @@ define('jquery-nos-image-wysiwyg',
                                 $style.val(image_dom.attr('style'));
 
                                 if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {
-                                    $proportional.prop('checked', false).removeAttr('checked', true).change();
+                                    $proportional.prop('checked', false).change();
                                 }
 
                                 if ($title.val() != $alt.val()) {
-                                    $same_title_alt.prop('checked', false).removeAttr('checked').change();
+                                    $same_title_alt.prop('checked', false).change();
                                 }
                             },
                         ed = $dialog.data('tinymce'),

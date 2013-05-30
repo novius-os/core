@@ -26,7 +26,7 @@ for F in ${JS_FILES[@]}; do
 done
 
 shopt -s globstar
-SUB_DIR=( inspector media page views )
+SUB_DIR=( inspector media page views renderer )
 for D in ${SUB_DIR[@]}; do
     cd $DIR/../static/admin/novius-os/js/$D
     for file in *.js

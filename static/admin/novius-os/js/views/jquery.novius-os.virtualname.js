@@ -34,15 +34,15 @@ define('jquery-nos-virtualname',
                     var useTitle = $virtual_name.data('usetitle');
 
                     if (typeof useTitle !== 'undefined' && useTitle == 1) {
-                        $use_title_checkbox.attr('checked', true);
+                        $use_title_checkbox.prop('checked', true);
                     }
 
                     $use_title_checkbox.change(function() {
                         if ($(this).is(':checked')) {
-                            $virtual_name.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                            $virtual_name.attr('readonly', true).addClass('ui-state-disabled');
                             $title.triggerHandler('change');
                         } else {
-                            $virtual_name.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                            $virtual_name.removeAttr('readonly').removeClass('ui-state-disabled');
                         }
                     }).triggerHandler('change');
 

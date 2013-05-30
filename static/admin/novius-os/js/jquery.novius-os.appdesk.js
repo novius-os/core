@@ -332,9 +332,9 @@ define('jquery-nos-appdesk',
                         modal: true,
                         open: function() {
                             self.uiToolbarContextsDialog.nosOnShow('show');
-                            self.uiToolbarContextsDialog.find(':checkbox').attr('checked', false);
+                            self.uiToolbarContextsDialog.find(':checkbox').prop('checked', false);
                             $.each(o.selectedContexts, function(i, context) {
-                                self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').attr('checked', true);
+                                self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').prop('checked', true);
                             });
                             self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
                         }
@@ -374,7 +374,7 @@ define('jquery-nos-appdesk',
                                                 if (checked === null) {
                                                     checked = $checkbox.is(':checked');
                                                 }
-                                                $checkbox.attr('checked', !checked);
+                                                $checkbox.prop('checked', !checked);
                                             }
                                         });
 
@@ -386,7 +386,7 @@ define('jquery-nos-appdesk',
                                         e.stopImmediatePropagation();
 
                                         var $checkbox = $tr.find(':checkbox');
-                                        $checkbox.attr('checked', !$checkbox.is(':checked'));
+                                        $checkbox.prop('checked', !$checkbox.is(':checked'));
                                     });
                                 }
                             }
@@ -607,11 +607,8 @@ define('jquery-nos-appdesk',
 
                     views_count++;
                     $viewsDropDown.append(
-                        $('<option></option>')
-                            .attr({
-                                'value': key,
-                                'selected': (o.selectedView == key)
-                            })
+                        $('<option></option>').attr('value', key)
+                            .prop('selected', o.selectedView == key)
                             .append(view.name)
                     );
                 });

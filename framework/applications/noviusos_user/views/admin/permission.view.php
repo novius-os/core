@@ -82,13 +82,10 @@ require(
 
             // Augment hit area
             $ul.find('.checkbox_hit_area').on('click', function(e) {
+                e.stopPropagation();
                 var $checkbox = $(this).find(':checkbox');
                 var checked = $checkbox.is(':checked');
-
-                if (checked) {
-                    e.stopPropagation();
-                    $checkbox.prop('checked', false).trigger('change');
-                }
+                $checkbox.prop('checked', !checked).trigger('change');
             });
 
             // Allow selecting applications by clicking on the list item rather than the checkbox
@@ -124,7 +121,10 @@ require(
                     $li.removeClass('ui-state-active');
                     $accordion.hide();
                 }
-            });
+            }).on('click', function(e) {
+                    log('ceckbox:click');
+                    e.stopPropagation();
+                });
         });
     });
 
