@@ -201,13 +201,16 @@ class Tools_File
         return $content_types[$extension] ? : 'application/force-download';
     }
 
-    public static function symlink($target, $link)
+    public static function symlink($target, $link, $is_directory = null)
     {
+        if ($is_directory === null) {
+            $is_directory = pathinfo($target, PATHINFO_EXTENSION) === '';
+        }
         if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
             return symlink($target, $link);
         } else {
             $command = 'mklink ';
-            if (is_dir($target)) {
+            if ($is_directory) {
                 $command .= '/D ';
             }
             $command .= escapeshellarg($link).' '.escapeshellarg($target);
