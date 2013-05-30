@@ -18,10 +18,10 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
             'buttonImageOnly' => true,
             'autoSize' => true,
-            'dateFormat' => 'dd/mm/yy', // MySQL formatting
-            'timeFormat' => 'HH:mm', // MySQL formatting
-            'altFormat' => 'yy-mm-dd', // Custom user formatting
-            'altTimeFormat' => 'HH:mm:ss', // Custom user formatting
+            'dateFormat' => 'dd/mm/yy', // Custom user formatting
+            'timeFormat' => 'HH:mm', // Custom user formatting
+            'altFormat' => 'yy-mm-dd', // MySQL formatting
+            'altTimeFormat' => 'HH:mm:ss', // MySQL formatting
             'altFieldTimeOnly' => false,
             'showButtonPanel' => true,
             'changeMonth' => true,
