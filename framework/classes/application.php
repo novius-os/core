@@ -599,7 +599,7 @@ class Application
 
                 $dirname = dirname($public);
                 $relative = Tools_File::relativePath($dirname, $private);
-                if (symlink($relative, $public)) {
+                if (\Nos\Tools_File::symlink($relative, $public)) {
                     return true;
                 }
 
@@ -608,7 +608,7 @@ class Application
                     return true;
                 }
 
-                if (symlink($private, $public)) {
+                if (\Nos\Tools_File::symlink($private, $public)) {
                     return true;
                 }
 

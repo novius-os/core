@@ -200,4 +200,19 @@ class Tools_File
 
         return $content_types[$extension] ? : 'application/force-download';
     }
+
+    public static function symlink($target, $link)
+    {
+        if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+            return symlink($target, $link);
+        } else {
+            $command = 'mklink ';
+            if (is_dir($target)) {
+                $command .= '/D ';
+            }
+            $command .= escapeshellarg($link).' '.escapeshellarg($target);
+            \exec($command);
+            return true;
+        }
+    }
 }
