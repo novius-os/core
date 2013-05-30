@@ -271,7 +271,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             );
 
             if (count($this->behaviours['twinnable']['invariant_fields']) > 0 &&
-                ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 1) ||
+                ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
                 ($this->is_new && !empty($this->item_from)))) {
                 if ($this->is_new) {
                     $contexts = $this->item_from->get_all_context();

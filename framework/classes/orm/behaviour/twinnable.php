@@ -77,19 +77,29 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     public function before_save(Orm\Model $item)
     {
-        if ($this->is_main_context($item) || $item->is_new()) {
-            return;
-        }
         $obj_main = $this->find_main_context($item);
-
         // No main context found => we just created a new main item :)
         if (empty($obj_main)) {
             $item->set($this->_properties['is_main_property'], true);
-        } else {
-            // The main context exists => update the common properties
-            foreach ($this->_properties['invariant_fields'] as $invariant) {
-                $item->set($invariant, $obj_main->get($invariant));
+        }
+
+        static $in_progress_before_save = array();
+
+        // Prevents looping in the observer
+        if (!in_array($item->id, $in_progress_before_save)) {
+            $items = $this->find_other_context($item);
+            $in_progress_before_save = array_keys($items);
+
+            foreach ($items as $it) {
+                foreach ($this->_properties['invariant_fields'] as $invariant) {
+                    $it->set($invariant, $item->get($invariant));
+                }
             }
+
+            foreach ($items as $it) {
+                $it->save();
+            }
+            $in_progress_before_save = array();
         }
     }
 
