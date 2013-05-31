@@ -589,7 +589,7 @@ class Application
             $private = static::get_application_path($this->folder).DS.$folder;
             if (is_dir($private)) {
                 $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-                if (is_link($public)) {
+                if (\Nos\Tools_File::is_link($public)) {
                     unlink($public);
                 }
 
@@ -604,7 +604,7 @@ class Application
                 }
 
                 exec('cd '.$dirname.'; ln -s '.$relative.' '.$this->folder);
-                if (is_link($public)) {
+                if (\Nos\Tools_File::is_link($public)) {
                     return true;
                 }
 
@@ -613,7 +613,7 @@ class Application
                 }
 
                 exec('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
-                if (is_link($public)) {
+                if (\Nos\Tools_File::is_link($public)) {
                     return true;
                 }
 
@@ -628,7 +628,7 @@ class Application
     protected function unsymlink($folder)
     {
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-        if (is_link($public) || file_exists($public)) {
+        if (\Nos\Tools_File::is_link($public) || file_exists($public)) {
             return unlink($public);
         }
 
@@ -640,13 +640,13 @@ class Application
         $private =  static::get_application_path($this->folder).DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private)) {
-            return is_link($public) && in_array(readlink($public), array(
+            return \Nos\Tools_File::is_link($public) && in_array(readlink($public), array(
                 $private,
                 Tools_File::relativePath(dirname($public), $private)
             ));
         }
 
-        return !is_link($public);
+        return !\Nos\Tools_File::is_link($public);
     }
 
     public function addPermission()

@@ -204,6 +204,7 @@ class Tools_File
     public static function symlink($target, $link, $is_directory = null)
     {
         if ($is_directory === null) {
+            // directory doesn't necessary exists so is_dir is irrelevant
             $is_directory = pathinfo($target, PATHINFO_EXTENSION) === '';
         }
         if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
@@ -216,6 +217,15 @@ class Tools_File
             $command .= escapeshellarg($link).' '.escapeshellarg($target);
             \exec($command);
             return true;
+        }
+    }
+
+    public static function is_link($filename)
+    {
+        if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+            return is_link($filename);
+        } else {
+            return is_file($filename) || is_dir($filename); // @todo: search for is_link equivalent ?
         }
     }
 }
