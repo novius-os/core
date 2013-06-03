@@ -48,49 +48,8 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
 
     public function get(\Orm\Model $from)
     {
-        $query = call_user_func(array($this->model_to, 'query'));
-        reset($this->key_to);
-        foreach ($this->key_from as $key) {
-            // no point running a query when a key value is null
-            if ($from->{$key} === null) {
-                return array();
-            }
-            $query->where(current($this->key_to), $from->{$key});
-            next($this->key_to);
-        }
-        $query->and_where_open();
-        $query->where($this->column_context_to, $from->{$this->column_context_from});
-        $query->or_where($this->column_context_is_main_to, 1);
-        $query->and_where_close();
-
-        foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition) {
-            is_array($condition) or $condition = array($key, '=', $condition);
-            $query->where($condition);
-        }
-
-        foreach (\Arr::get($this->conditions, 'order_by', array()) as $field => $direction) {
-            if (is_numeric($field)) {
-                $query->order_by($direction);
-            } else {
-                $query->order_by($field, $direction);
-            }
-        }
-
-        $result = array();
-        $result_context = array();
-        foreach ($query->get() as $pk => $model) {
-            if (isset($result_context[$model->{$this->column_context_common_id_to}])) {
-                if ($model->{$this->column_context_to} !== $from->{$this->column_context_from}) {
-                    continue;
-                } else {
-                    unset($result[$result_context[$model->{$this->column_context_common_id_to}]]);
-                }
-            }
-            $result_context[$model->{$this->column_context_common_id_to}] = $pk;
-            $result[$pk] = $model;
-        }
-
-        return $result;
+        $class = $this->model_to;
+        return $class::findMainOrContext( $from->{$this->column_context_from}, $this->conditions);
     }
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
