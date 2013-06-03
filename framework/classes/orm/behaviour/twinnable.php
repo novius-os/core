@@ -271,12 +271,12 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     public function before_save(Orm\Model $item)
     {
-        $w_keys = array_keys($this->linked_shared_wysiwygs_context);
+        $w_keys = array_keys($item->linked_shared_wysiwygs_context);
         foreach ($w_keys as $i) {
             // Remove empty wysiwyg
-            if (empty($this->linked_shared_wysiwygs_context[$i]->wysiwyg_text)) {
+            if (empty($item->linked_shared_wysiwygs_context[$i]->wysiwyg_text)) {
                 $this->linked_shared_wysiwygs_context[$i]->delete();
-                unset($this->linked_shared_wysiwygs_context[$i]);
+                unset($item->linked_shared_wysiwygs_context[$i]);
             }
         }
 
