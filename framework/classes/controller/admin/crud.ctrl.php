@@ -596,7 +596,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         if ($disabled !== false) {
             if (!is_string($disabled)) {
-                $disabled = __('You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.');
+                $disabled = $this->config['i18n']['action not allowed'];
             }
             $this->send_error(new \Exception($disabled));
         }
