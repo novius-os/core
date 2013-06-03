@@ -55,6 +55,11 @@ class Model_Permission extends \Nos\Orm\Model
 
     public function _event_before_delete()
     {
+        $role = $this->role;
+        // If the sibling relation exists, break it
+        if (isset($role->permissions)) {
+            unset($role->permissions[static::implode_pk($this)]);
+        }
         \Cache::delete('role_permissions.'.$this->perm_role_id);
     }
 
