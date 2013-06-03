@@ -60,17 +60,22 @@ define('jquery-nos-contextable-invariant-fields',
                             };
 
                     $container.find('[context_invariant_field]').each(function() {
-                            var $element = $(this);
-                            var $div = $('<div></div>').css({
+                        var $element = $(this),
+                            $div,
+                            init = function($el, click) {
+                                $div = $('<div></div>').css({
                                         position: 'absolute',
-                                        width: $element.outerWidth() + 'px',
-                                        height: $element.outerHeight() + 'px'
+                                        width: $el.outerWidth() + 'px',
+                                        height: $el.outerHeight() + 'px'
                                     })
-                                    .insertAfter($element)
+                                    .insertAfter($el)
                                     .click(function() {
                                         if ($element.is(':disabled')) {
                                             dialog.call($element, function() {
                                                 $element.attr('disabled', false);
+                                                if ($.isFunction(click)) {
+                                                    click();
+                                                }
                                                 $div.detach();
                                             });
                                         }
@@ -79,8 +84,23 @@ define('jquery-nos-contextable-invariant-fields',
                                         my: 'top left',
                                         at: 'top left',
                                         collision: 'none',
-                                        of: $element
+                                        of: $el
                                     });
+                            };
+
+                        init($element);
+
+                        $element.one('inputfilethumbenter', function() {
+                            init($element.parents('.ui-inputfilethumb'), function() {
+                                $element.inputFileThumb('option', 'disabled', false);
+                            });
+                            return false;
+                        });
+                        $element.one('inputfilethumbinit', function() {
+                            $element.inputFileThumb('option', 'disabled', true);
+                            $div.remove();
+                        });
+
                     });
                 });
             }

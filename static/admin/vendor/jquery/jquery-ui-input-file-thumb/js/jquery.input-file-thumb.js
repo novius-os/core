@@ -117,7 +117,10 @@
 			self.uiThumb = $('<span><span></span></span>')
 				.addClass('ui-widget-content ui-corner-all ui-inputfilethumb-thumb')
 				.mouseenter(function() {
-				   self.show();
+                    if (!self._trigger('enter')) {
+                        return false;
+                    }
+				    self.show();
 				})
 				.appendTo(self.uiWidget)
 				.find('span')
@@ -224,6 +227,8 @@
 			self.uiWidget[o.disabled ? 'addClass' : 'removeClass']('ui-state-disabled');
 
 			self._change(file);
+
+            self._trigger('init');
 		},
 
 		destroy: function() {

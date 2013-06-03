@@ -29,7 +29,12 @@ class Model_Link extends \Nos\Orm\Model
         'medil_foreign_id' => array(
             'default' => null,
             'data_type' => 'int unsigned',
-            'null' => false,
+            'null' => true,
+        ),
+        'medil_foreign_context_common_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
         ),
         'medil_key' => array(
             'default' => null,

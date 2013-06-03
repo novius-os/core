@@ -270,7 +270,8 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 )
             );
 
-            if (count($this->behaviours['twinnable']['invariant_fields']) > 0 &&
+            $model = $this->config['model'];
+            if ($model::hasInvariantFields() &&
                 ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
                 ($this->is_new && !empty($this->item_from)))) {
                 if ($this->is_new) {
@@ -283,7 +284,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
 
                 foreach ($fields as $key => $field) {
-                    if (in_array($key, $this->behaviours['twinnable']['invariant_fields'])) {
+                    if ($model::isInvariantField($key)) {
                         $fields[$key]['form']['disabled'] = true;
                         $fields[$key]['form']['context_invariant_field'] = true;
                         $fields[$key]['form']['data-other-contexts'] = $context_labels;
