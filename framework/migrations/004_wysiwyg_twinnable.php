@@ -1,5 +1,5 @@
 <?php
-namespace Nos;
+namespace Nos\Migration;
 
 class Wysiwyg_twinnable extends \Nos\Migration
 {
