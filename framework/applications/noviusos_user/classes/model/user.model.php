@@ -197,7 +197,7 @@ class Model_User extends \Nos\Orm\Model
      * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
      * @return  bool  Has the user the required authorisation?
      */
-    public function checkPermission($permission_name, $category_key = null)
+    public function checkPermission($permission_name, $category_key = null, $allowEmpty = false)
     {
         $args = func_get_args();
         foreach ($this->roles as $g) {
