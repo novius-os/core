@@ -68,13 +68,9 @@ class Model_Role extends \Nos\Orm\Model
 
     public function _event_before_delete()
     {
-        // @todo delete this method when upgrading the ORM to 1.6
-        // The FK on permission is part of the primary key so it doesn't work in 1.5
-        // https://github.com/fuel/orm/commit/a17324bf1912b36f9413306d017a39db1003b978
-        foreach ($this->permissions as $permission) {
-            $permission->delete();
-        }
-        unset($this->permissions);
+        // @todo change upon FuelPHP feedback, only loaded relations will get deleted
+        // Load the relation
+        $this->permissions;
     }
 
     public function _event_after_save()
