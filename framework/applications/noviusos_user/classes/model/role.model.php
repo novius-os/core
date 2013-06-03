@@ -68,13 +68,9 @@ class Model_Role extends \Nos\Orm\Model
 
     public function _event_before_delete()
     {
-        // @todo delete this method when upgrading the ORM to 1.6
-        // The FK on permission is part of the primary key so it doesn't work in 1.5
-        // https://github.com/fuel/orm/commit/a17324bf1912b36f9413306d017a39db1003b978
-        foreach ($this->permissions as $permission) {
-            $permission->delete();
-        }
-        unset($this->permissions);
+        // @todo change upon FuelPHP feedback, only loaded relations will get deleted
+        // Load the relation
+        $this->permissions;
     }
 
     public function _event_after_save()
@@ -91,13 +87,24 @@ class Model_Role extends \Nos\Orm\Model
 
         return $this->checkPermission($application, $key);
     }
+    /**
+     * @param   string       $permission_name  Name of the permission to check against
+     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @param   bool         $allowEmpty       (optional) If the permission has categories, authorise the chosen category if it's not configured (useful for default value)
+     * @return  bool  Has the role the required authorisation?
+     */
+    public function checkPermissionOrEmpty($permission_name, $category_key = null)
+    {
+        return $this->checkPermission($permission_name, $category_key, true);
+    }
 
     /**
      * @param   string       $permission_name  Name of the permission to check against
      * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @param   bool         $allowEmpty       (optional) If the permission has categories, authorise the chosen category if it's not configured (useful for default value)
      * @return  bool  Has the role the required authorisation?
      */
-    public function checkPermission($permission_name, $category_key = null)
+    public function checkPermission($permission_name, $category_key = null, $allowEmpty = false)
     {
         if (!$this->_authorised($permission_name)) {
             return false;
@@ -110,6 +117,9 @@ class Model_Role extends \Nos\Orm\Model
         }
 
         // For permission with categories, also check the existence of the category
+        if ($allowEmpty && !$isset) {
+            return true;
+        }
         return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
     }
 
