@@ -26,7 +26,7 @@ define('jquery-nos-contextable-invariant-fields',
                         dialog = function(click) {
                                 var $div = $('<div><p></p><ul></ul></div>')
                                     .find('p')
-                                    .text(params.texts.popin_content)
+                                    .html(params.texts.popin_content)
                                     .end(),
                                 $ul = $div.find('ul'),
                                 contexts = this.data('other-contexts');
