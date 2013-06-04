@@ -333,13 +333,13 @@ class Model_Page extends \Nos\Orm\Model
         $contexts = \Nos\Tools_Context::contexts();
         foreach ($contexts[$this->page_context] as $context_url) {
             $host = parse_url($context_url, PHP_URL_HOST);
-            $path = ltrim(parse_url($context_url, PHP_URL_PATH), '/');
+            $path = ltrim(parse_url(str_replace($context_url, '/', DS), PHP_URL_PATH), DS);
 
             $url = $path.$url;
-            $cache_path = (empty($url) ? 'index/' : $url);
+            $cache_path = (empty($url) ? 'index'.DS : $url);
             // This event mostly redirects, don't trigger it
             //\Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
-            $cache_path = $host.DS.rtrim($cache_path, '/');
+            $cache_path = $host.DS.rtrim($cache_path, DS);
 
             // Delete file
             $cache = \Nos\FrontCache::forge('pages'.DS.$cache_path);
