@@ -20,7 +20,7 @@ class Permission
 
     public static function checkOrEmpty($permission_name, $category_key = null)
     {
-       return static::check($permission_name, $category_key, true);
+        return static::check($permission_name, $category_key, true);
     }
 
     public static function add($permission_name, $category_key)
