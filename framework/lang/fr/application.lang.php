@@ -68,8 +68,14 @@ return array(
     #: views/crud/invariant_fields.view.php:21
     'This field is common to all contexts' => 'Ce champ est commun à tous les contextes',
 
+    #: views/crud/invariant_fields.view.php:21
+    'This field is common to all languages' => 'Ce champ est commun à toutes les langues',
+
     #: views/crud/invariant_fields.view.php:22
     'When you modify the value of this field, the change applies to the following contexts:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussi aux contextes suivants&nbsp;:',
+
+    #: views/crud/invariant_fields.view.php:22
+    'When you modify the value of this field, the change applies to the following languages:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussi aux langues suivantes&nbsp;:',
 
     #: views/crud/invariant_fields.view.php:23
     'Go ahead, I understand' => 'Allons-y, je comprends',
