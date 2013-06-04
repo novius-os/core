@@ -397,6 +397,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     public function before_save($item, $data)
     {
+        $this->checkPermission($this->is_new ? 'add' : 'edit');
         if ($this->behaviours['twinnable'] && $this->is_new) {
 
             $item_context = $this->item->get_context();
