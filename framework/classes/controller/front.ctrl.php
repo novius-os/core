@@ -71,7 +71,7 @@ class Controller_Front extends Controller
         $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
     }
 
-    public function router($action, array $params, $status = 200)
+    public function router($action, $params, $status = 200)
     {
         $this->_status = $status;
 

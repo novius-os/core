@@ -1,5 +1,5 @@
-ALTER TABLE `nos_role_permission` CHANGE  `perm_application`  `perm_key2` VARCHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE  `perm_key`  `perm_application` VARCHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-ALTER TABLE `nos_role_permission` CHANGE  `perm_key2`  `perm_key` VARCHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `nos_role_permission` CHANGE  `perm_application`  `perm_key2` VARCHAR( 30 ) NOT NULL, CHANGE  `perm_key`  `perm_application` VARCHAR( 30 ) NOT NULL;
+ALTER TABLE `nos_role_permission` CHANGE  `perm_key2`  `perm_key` VARCHAR( 30 ) NOT NULL;
 
 UPDATE `nos_role_permission` SET `perm_application` = "noviusos_page" WHERE `perm_application` = "nos_page";
 UPDATE `nos_role_permission` SET `perm_application` = "noviusos_media" WHERE `perm_application` = "nos_media";
