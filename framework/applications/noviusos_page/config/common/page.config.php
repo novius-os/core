@@ -82,9 +82,30 @@ return array(
             'delete' => array(
                 'primary' => false,
                 'disabled' => array(
-                    function($page) {
+                    'check_locked' => function($page) {
                         return ($page->page_lock == $page::LOCK_DELETION) ? __('You can’t delete this page. It is locked.') : false;
-                    }),
+                    },
+                    'check_draft' => function($page) {
+                        // Not published => not disabled
+                        if ($page->planificationStatus() == 0) {
+                            return false;
+                        }
+                        // Published or scheduled => disabled
+                        return \Nos\User\Permission::check('noviusos_page::access', 'draft');
+                    },
+                ),
+            ),
+            'edit' => array(
+                'disabled' => array(
+                    'check_draft' => function($page) {
+                        // Not published => not disabled
+                        if ($page->planificationStatus() == 0) {
+                            return false;
+                        }
+                        // Published or scheduled => disabled
+                        return \Nos\User\Permission::check('noviusos_page::access', 'draft');
+                    },
+                ),
             ),
             'add' => array(
                 'label' => __('Add a page'),
@@ -103,9 +124,10 @@ return array(
                     'toolbar-edit' => true,
                 ),
                 'visible' => array(
-                function($params) {
-                    return !isset($params['item']) || !$params['item']->is_new();
-                })
+                    'is_new' => function($params) {
+                        return !isset($params['item']) || !$params['item']->is_new();
+                    },
+                ),
             ),
             'add_subpage' => array(
                 'label' => __('Add a sub-page to this page'),
@@ -140,9 +162,10 @@ return array(
                     'grid' => true,
                 ),
                 'disabled' => array(
-                    function($page) {
+                    'check_home' => function($page) {
                         return !!$page->page_home ? __('This page is the home page already.') : false;
-                    }),
+                    },
+                ),
             ),
             'duplicate' => array(
                 'action' => array(
@@ -157,6 +180,7 @@ return array(
                 'targets' => array(
                     'grid' => true,
                 ),
+                // Don't disable, duplicated pages are always unpublished
             ),
             'renew_cache' => array(
                 'label' => __('Renew pages’ cache'),
