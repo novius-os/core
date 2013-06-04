@@ -273,9 +273,12 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $model = $this->config['model'];
             if ($model::hasInvariantFields() &&
                 ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
-                ($this->is_new && !empty($this->item_from)))) {
+                ($this->is_new && !empty($this->item->{$this->behaviours['twinnable']['common_id_property']})))) {
                 if ($this->is_new) {
-                    $contexts = $this->item_from->get_all_context();
+                    $contexts = $this->item->get_all_context();
+                    if (empty($this->item_from)) {
+                        $from = $this->item->find_main_context();
+                    }
                 }
                 $context_labels = array();
                 foreach ($contexts as $context) {
@@ -288,6 +291,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                         $fields[$key]['form']['disabled'] = true;
                         $fields[$key]['form']['context_invariant_field'] = true;
                         $fields[$key]['form']['data-other-contexts'] = $context_labels;
+
+                        if ($this->is_new && !empty($from)) {
+                            $this->item->{$key} = $from->{$key};
+                        }
                     }
                 }
             }
