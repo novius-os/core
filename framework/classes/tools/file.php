@@ -203,6 +203,7 @@ class Tools_File
 
     public static function symlink($target, $link, $is_directory = null)
     {
+        $link = str_replace(array('/', '\\'), array(DS, DS), $link);
         if ($is_directory === null) {
             // directory doesn't necessary exists so is_dir is irrelevant
             $is_directory = pathinfo($target, PATHINFO_EXTENSION) === '';
