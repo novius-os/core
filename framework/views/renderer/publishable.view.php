@@ -18,6 +18,15 @@ if (empty($publishable)) {
     return;
 }
 
+if (!isset($allow_publish) || $allow_publish === null) {
+    if (isset($publishable['options']) && isset($publishable['options']['allow_publish'])) {
+        $allow_publish = \Config::processCallbackValue($publishable['options']['allow_publish'], true, $item['item']);
+    } else {
+        // No configuration = it's allowed
+        $allow_publish = true;
+    }
+}
+
 $state_property     = !empty($publishable['publication_state_property']) ? $publishable['publication_state_property'] : (!empty($publishable['publication_bool_property']) ? $publishable['publication_bool_property'] : '');
 $yes_no_mode        = ($state_property !== '');
 $planification_mode = !empty($publishable['publication_start_property']) && !empty($publishable['publication_end_property']);
@@ -54,17 +63,17 @@ if ($planification_mode) {
 <?php
 if ($yes_no_mode) {
     ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> <?= (!$allow_publish && $planification_status != 0) ? 'disabled' : '' ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
     <?php
 }
 if ($planification_mode) {
     ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> /><label for="<?= $uniqid_planned ?>"><span class="ui-icon ui-icon-clock" /></label>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> <?= !$allow_publish ? 'disabled' : '' ?> /><label for="<?= $uniqid_planned ?>"><span class="ui-icon ui-icon-clock" /></label>
     <?php
 }
 if ($yes_no_mode) {
     ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
+    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> <?= !$allow_publish ? 'disabled' : '' ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
     <?php
 }
 ?>
