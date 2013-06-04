@@ -72,14 +72,23 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
         }
 
-        $this->config['views']['insert'] = !empty($this->config['views']['insert']) ? $this->config['views']['insert'] : $this->config['views']['form'];
-        $this->config['views']['update'] = !empty($this->config['views']['update']) ? $this->config['views']['update'] : $this->config['views']['form'];
+        foreach (array('insert', 'update') as $layout_suffix) {
+            $this->config['views'][$layout_suffix] = !empty($this->config['views'][$layout_suffix]) ? $this->config['views'][$layout_suffix] : $this->config['views']['form'];
 
-        if (empty($this->config['layout_insert']) && !empty($this->config['layout'])) {
-            $this->config['layout_insert'] = $this->config['layout'];
-        }
-        if (empty($this->config['layout_update']) && !empty($this->config['layout'])) {
-            $this->config['layout_update'] = $this->config['layout'];
+            if (empty($this->config['layout_'.$layout_suffix]) && !empty($this->config['layout'])) {
+                $this->config['layout_'.$layout_suffix] = $this->config['layout'];
+            }
+
+            $layout = $this->config['layout_'.$layout_suffix];
+            $view = current($layout);
+            if (!is_array($view) || empty($view['view'])) {
+                $this->config['layout_'.$layout_suffix] = array(
+                    array(
+                        'view' => 'nos::form/layout_standard',
+                        'params' =>  $layout,
+                    ),
+                );
+            }
         }
 
         $this->behaviours = array(
@@ -270,34 +279,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 )
             );
 
-            $model = $this->config['model'];
-            if ($model::hasInvariantFields() &&
-                ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
-                ($this->is_new && !empty($this->item->{$this->behaviours['twinnable']['common_id_property']})))) {
-                if ($this->is_new) {
-                    $contexts = $this->item->get_all_context();
-                    if (empty($this->item_from)) {
-                        $from = $this->item->find_main_context();
-                    }
-                }
-                $context_labels = array();
-                foreach ($contexts as $context) {
-                    $context_labels[] = Tools_Context::contextLabel($context);
-                }
-                $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
-
-                foreach ($fields as $key => $field) {
-                    if ($model::isInvariantField($key)) {
-                        $fields[$key]['form']['disabled'] = true;
-                        $fields[$key]['form']['context_invariant_field'] = true;
-                        $fields[$key]['form']['data-other-contexts'] = $context_labels;
-
-                        if ($this->is_new && !empty($from)) {
-                            $this->item->{$key} = $from->{$key};
-                        }
-                    }
-                }
-            }
+            $fields = $this->invariantFields($fields);
         }
         if ($this->is_new) {
             if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
@@ -326,6 +308,44 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     ),
                 )
             );
+        }
+
+        return $fields;
+    }
+
+    protected function invariantFields($fields)
+    {
+        $model = $this->config['model'];
+        if ($model::hasInvariantFields() &&
+            ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
+                ($this->is_new && !empty($this->item->{$this->behaviours['twinnable']['common_id_property']})))) {
+
+            $this->config['layout_insert']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+            $this->config['layout_update']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+
+            if ($this->is_new) {
+                $contexts = $this->item->get_all_context();
+                if (empty($this->item_from)) {
+                    $from = $this->item->find_main_context();
+                }
+            }
+            $context_labels = array();
+            foreach ($contexts as $context) {
+                $context_labels[] = Tools_Context::contextLabel($context);
+            }
+            $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
+
+            foreach ($fields as $key => $field) {
+                if ($model::isInvariantField($key)) {
+                    $fields[$key]['form']['disabled'] = true;
+                    $fields[$key]['form']['context_invariant_field'] = true;
+                    $fields[$key]['form']['data-other-contexts'] = $context_labels;
+
+                    if ($this->is_new && !empty($from)) {
+                        $this->item->{$key} = $from->{$key};
+                    }
+                }
+            }
         }
 
         return $fields;

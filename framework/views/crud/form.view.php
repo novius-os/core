@@ -14,15 +14,6 @@ echo View::forge('nos::crud/tab', $view_params, false);
 echo View::forge('nos::crud/toolbar', $view_params, false);
 
 $layout = $crud['config'][$crud['is_new'] ? 'layout_insert' : 'layout_update'];
-$view = current($layout);
-if (!is_array($view) || empty($view['view'])) {
-    $layout = array(
-        array(
-            'view' => 'nos::form/layout_standard',
-            'params' =>  $layout,
-        ),
-    );
-}
 foreach ($layout as $view) {
     if (!empty($view['view'])) {
         $view['params'] = empty($view['params']) ? array() : $view['params'];
@@ -31,5 +22,3 @@ foreach ($layout as $view) {
 }
 
 echo $fieldset->close();
-
-echo View::forge('nos::crud/invariant_fields', $view_params, false);
