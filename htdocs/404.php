@@ -67,7 +67,7 @@ if ($is_media) {
     } else {
         if ($is_resized) {
             $source = APPPATH.$media->get_private_path();
-            $target = $m[0];
+            $target = str_replace('/', DS, $m[0]);
             $dest = APPPATH.$target;
             $dir = dirname($dest);
             if (!is_dir($dir)) {
@@ -93,6 +93,7 @@ if ($is_media) {
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
+
         \Nos\Tools_File::symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
         $send_file = $source;
     }

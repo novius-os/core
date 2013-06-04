@@ -145,6 +145,11 @@ class Model_Media extends \Nos\Orm\Model
      * media_height
      */
 
+    public static function _init() {
+        static::$public_path = str_replace('/', DS, static::$public_path);
+        static::$private_path = str_replace('/', DS, static::$private_path);
+    }
+
     public function delete_from_disk()
     {
         $file = APPPATH.$this->get_private_path();
@@ -159,7 +164,7 @@ class Model_Media extends \Nos\Orm\Model
     {
         // Delete cached media entries
         $path_public     = DOCROOT.$this->get_public_path();
-        $path_thumbnails = dirname(DOCROOT.str_replace('media/', 'cache/media', static::$public_path).$this->media_path);
+        $path_thumbnails = dirname(DOCROOT.str_replace('media'.DS, 'cache'.DS.'media', static::$public_path).$this->media_path);
         try {
             // delete_dir($path, $recursive, $delete_top)
             \Nos\Tools_File::is_link($path_public)    and \File::delete($path_public);
@@ -175,7 +180,7 @@ class Model_Media extends \Nos\Orm\Model
 
     public function get_path()
     {
-        return ltrim($this->virtual_path(), '/');
+        return str_replace('/', DS, ltrim($this->virtual_path(), '/'));
     }
 
     public function get_public_path()
@@ -241,7 +246,7 @@ class Model_Media extends \Nos\Orm\Model
         \Config::load('crypt', true);
         $hash = md5(\Config::get('crypt.crypto_hmac').'$'.$this->virtual_path().'$'.$max_width.'$'.$max_height);
 
-        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s.%s',
+        return str_replace('media'.DS, 'cache'.DS.'media'.DS, static::$public_path).ltrim($this->virtual_path(true), DS).sprintf('%s-%s-%s.%s',
             (int) $max_width,
             (int) $max_height,
             substr($hash, 0, 6),
