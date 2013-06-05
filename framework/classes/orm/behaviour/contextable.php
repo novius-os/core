@@ -123,4 +123,20 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
             $options['where'] = $where;
         }
     }
+
+    public function crudFields(&$fields, $crud)
+    {
+        $fields = \Arr::merge(
+            $fields,
+            array(
+                $this->_properties['context_property'] => array(
+                    'form' => array(
+                        'type' => 'hidden',
+                        'value' => $crud->item->{$this->_properties['context_property']},
+                        'class' => 'input-context',
+                    ),
+                ),
+            )
+        );
+    }
 }

@@ -259,50 +259,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 ),
             );
         }
-        if ($this->behaviours['contextable']) {
-            $fields = \Arr::merge(
-                $fields,
-                array(
-                    $this->behaviours['contextable']['context_property'] => array(
-                        'form' => array(
-                            'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['contextable']['context_property']},
-                            'class' => 'input-context',
-                        ),
-                    ),
-                )
-            );
-        }
-        if ($this->behaviours['twinnable']) {
-            $fields = \Arr::merge(
-                $fields,
-                array(
-                    $this->behaviours['twinnable']['common_id_property'] => array(
-                        'form' => array(
-                            'type' => 'hidden',
-                            'value' => $this->item->{$this->behaviours['twinnable']['common_id_property']},
-                        ),
-                    ),
-                )
-            );
+        $model = $this->config['model'];
+        $model::eventStatic('crudFields', array(&$fields, $this));
 
-            $fields = $this->invariantFields($fields);
-        }
         if ($this->is_new) {
-            if ($this->behaviours['contextable'] && $this->behaviours['tree']) {
-                $parent_id = $this->item->parent_relation()->key_from[0];
-                $fields = \Arr::merge(
-                    $fields,
-                    array(
-                        $parent_id => array(
-                            'renderer_options' => array(
-                                'context' => $this->item->{$this->behaviours['contextable']['context_property']},
-                            ),
-                        ),
-                    )
-                );
-            }
-
             $fields = \Arr::merge(
                 $fields,
                 array(
@@ -315,44 +275,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     ),
                 )
             );
-        }
-
-        return $fields;
-    }
-
-    protected function invariantFields($fields)
-    {
-        $model = $this->config['model'];
-        if ($model::hasInvariantFields() &&
-            ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
-                ($this->is_new && !empty($this->item->{$this->behaviours['twinnable']['common_id_property']})))) {
-
-            $this->config['layout_insert']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
-            $this->config['layout_update']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
-
-            if ($this->is_new) {
-                $contexts = $this->item->get_all_context();
-                if (empty($this->item_from)) {
-                    $from = $this->item->find_main_context();
-                }
-            }
-            $context_labels = array();
-            foreach ($contexts as $context) {
-                $context_labels[] = Tools_Context::contextLabel($context);
-            }
-            $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
-
-            foreach ($fields as $key => $field) {
-                if ($model::isInvariantField($key)) {
-                    $fields[$key]['form']['disabled'] = true;
-                    $fields[$key]['form']['context_invariant_field'] = true;
-                    $fields[$key]['form']['data-other-contexts'] = $context_labels;
-
-                    if ($this->is_new && !empty($from)) {
-                        $this->item->{$key} = $from->{$key};
-                    }
-                }
-            }
         }
 
         return $fields;

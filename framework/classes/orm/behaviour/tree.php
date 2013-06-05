@@ -208,4 +208,21 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $item->{$this->_properties['level_property']} = $parent === null ? 1 : $parent->{$this->_properties['level_property']} + 1;
         }
     }
+
+    public function crudFields(&$fields, $crud)
+    {
+        if ($crud->behaviours['contextable']) {
+            $parent_id = $crud->item->parent_relation()->key_from[0];
+            $fields = \Arr::merge(
+                $fields,
+                array(
+                    $parent_id => array(
+                        'renderer_options' => array(
+                            'context' => $crud->item->{$crud->behaviours['contextable']['context_property']},
+                        ),
+                    ),
+                )
+            );
+        }
+    }
 }

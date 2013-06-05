@@ -686,7 +686,52 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
             $item['context'] = $flags;
         }
+    }
 
-        $commonIds = array();
+    public function crudFields(&$fields, $crud)
+    {
+        $fields = \Arr::merge(
+            $fields,
+            array(
+                $this->_properties['common_id_property'] => array(
+                    'form' => array(
+                        'type' => 'hidden',
+                        'value' => $crud->item->{$this->_properties['common_id_property']},
+                    ),
+                ),
+            )
+        );
+
+        if ($this->hasInvariantFields() &&
+            ((!$crud->is_new && count($contexts = $crud->item->get_other_context()) > 0) ||
+                ($crud->is_new && !empty($crud->item->{$this->_properties['common_id_property']})))) {
+
+            $crud->config['layout_insert']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+            $crud->config['layout_update']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+
+            if ($crud->is_new) {
+                $contexts = $crud->item->get_all_context();
+                if (empty($this->item_from)) {
+                    $from = $crud->item->find_main_context();
+                }
+            }
+            $context_labels = array();
+            foreach ($contexts as $context) {
+                $context_labels[] = Tools_Context::contextLabel($context);
+            }
+            $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
+
+            foreach ($fields as $key => $field) {
+                if ($this->isInvariantField($key)) {
+                    $fields[$key]['form']['disabled'] = true;
+                    $fields[$key]['form']['context_invariant_field'] = true;
+                    $fields[$key]['form']['data-other-contexts'] = $context_labels;
+
+                    if ($crud->is_new && !empty($from)) {
+                        $crud->item->{$key} = $from->{$key};
+                    }
+                }
+            }
+        }
     }
 }
