@@ -22,11 +22,15 @@ class Model extends \Orm\Model
 {
 
     protected static $_valid_relations = array(
-        'belongs_to' => 'Orm\\BelongsTo',
-        'has_one' => 'Orm\\HasOne',
-        'has_many' => 'Orm\\HasMany',
-        'many_many' => 'Orm\\ManyMany',
-        'attachment' => 'Nos\\Orm_Attachment',
+        'belongs_to'            => 'Orm\\BelongsTo',
+        'has_one'               => 'Orm\\HasOne',
+        'has_many'              => 'Orm\\HasMany',
+        'many_many'             => 'Orm\\ManyMany',
+        'attachment'            => 'Nos\\Orm_Attachment',
+        'twinnable_belongs_to'  => 'Nos\\Orm_Twinnable_BelongsTo',
+        'twinnable_has_one'     => 'Nos\\Orm_Twinnable_HasOne',
+        'twinnable_has_many'    => 'Nos\\Orm_Twinnable_HasMany',
+        'twinnable_many_many'   => 'Nos\\Orm_Twinnable_ManyMany',
     );
 
     protected static $_has_many = array();
