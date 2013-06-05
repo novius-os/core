@@ -591,7 +591,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
 
         } catch (Exception $e) {
-            if (empty($options['error']) && is_callable($options['error'])) {
+            if (is_callable($options['error'])) {
                 $json_response = call_user_func($options['error'], $e, $item, $data);
             } else {
                 $json_response['error'] = $e->getMessage();
