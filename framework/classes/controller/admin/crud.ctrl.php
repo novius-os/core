@@ -73,8 +73,9 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
 
         foreach (array('insert', 'update') as $layout_suffix) {
-            $this->config['views'][$layout_suffix] = !empty($this->config['views'][$layout_suffix]) ? $this->config['views'][$layout_suffix] : $this->config['views']['form'];
-
+            if (empty($this->config['views'][$layout_suffix])) {
+                $this->config['views'][$layout_suffix] = $this->config['views']['form'];
+            }
             if (empty($this->config['layout_'.$layout_suffix]) && !empty($this->config['layout'])) {
                 $this->config['layout_'.$layout_suffix] = $this->config['layout'];
             }
