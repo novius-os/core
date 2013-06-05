@@ -16,7 +16,7 @@ empty($role) && $role = $item;
 
 <!--<input type="hidden" name="role_id" value="<?= $role->role_id ?>" />-->
 
-<div class="line" id="<?= $uniqid = uniqid('id_') ?>">
+<div class="line fieldset" id="<?= $uniqid = uniqid('id_') ?>">
     <div class="col c6 native_permissions">
 <?php
 

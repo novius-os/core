@@ -1026,6 +1026,10 @@ define('jquery-nos',
                             $dialog.addClass(options['class']);
                         }
 
+                        if (options.title) {
+                            options.title = $.nosCleanupTranslation(options.title);
+                        }
+
                         var proceed = true;
                         if (options.ajax && options.contentUrl) {
                             var contentUrl = options.contentUrl;

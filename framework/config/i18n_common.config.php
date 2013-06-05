@@ -14,6 +14,7 @@ return array(
     'notification item not found' => __('We cannot find this item.'),
     'deleted popup title' => __('Bye bye'),
     'deleted popup close' => __('Close tab'),
+    'action not allowed' => __('You’re not allowed to carry out this action. Ask your colleagues to find out why.'),
 
     // Blank slate
     'translate error parent not available in context' => __('We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.'),

@@ -72,16 +72,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
         }
 
-        $this->config['views']['insert'] = !empty($this->config['views']['insert']) ? $this->config['views']['insert'] : $this->config['views']['form'];
-        $this->config['views']['update'] = !empty($this->config['views']['update']) ? $this->config['views']['update'] : $this->config['views']['form'];
-
-        if (empty($this->config['layout_insert']) && !empty($this->config['layout'])) {
-            $this->config['layout_insert'] = $this->config['layout'];
-        }
-        if (empty($this->config['layout_update']) && !empty($this->config['layout'])) {
-            $this->config['layout_update'] = $this->config['layout'];
-        }
-
         $this->behaviours = array(
             'contextable' => $model::behaviours('Nos\Orm_Behaviour_Contextable', false),
             'twinnable' => $model::behaviours('Nos\Orm_Behaviour_Twinnable', false),
@@ -101,6 +91,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $common_config = \Nos\Config_Common::load($model, array());
         $i18n_default = \Config::load('nos::i18n_common', true);
         $this->config['i18n'] = array_merge($i18n_default, \Arr::get($common_config, 'i18n', array()));
+
+        $model::eventStatic('crudConfig', array(&$this->config, $this));
+
+        $this->config['views']['insert'] = !empty($this->config['views']['insert']) ? $this->config['views']['insert'] : $this->config['views']['form'];
+        $this->config['views']['update'] = !empty($this->config['views']['update']) ? $this->config['views']['update'] : $this->config['views']['form'];
+
+        if (empty($this->config['layout_insert']) && !empty($this->config['layout'])) {
+            $this->config['layout_insert'] = $this->config['layout'];
+        }
+        if (empty($this->config['layout_update']) && !empty($this->config['layout'])) {
+            $this->config['layout_update'] = $this->config['layout'];
+        }
     }
 
     /**
@@ -271,7 +273,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             );
 
             if (count($this->behaviours['twinnable']['invariant_fields']) > 0 &&
-                ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 1) ||
+                ((!$this->is_new && count($contexts = $this->item->get_other_context()) > 0) ||
                 ($this->is_new && !empty($this->item_from)))) {
                 if ($this->is_new) {
                     $contexts = $this->item_from->get_all_context();
@@ -395,6 +397,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     public function before_save($item, $data)
     {
+        $this->checkPermission($this->is_new ? 'add' : 'edit');
         if ($this->behaviours['twinnable'] && $this->is_new) {
 
             $item_context = $this->item->get_context();
@@ -596,7 +599,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         if ($disabled !== false) {
             if (!is_string($disabled)) {
-                $disabled = __('You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.');
+                $disabled = $this->config['i18n']['action not allowed'];
             }
             $this->send_error(new \Exception($disabled));
         }

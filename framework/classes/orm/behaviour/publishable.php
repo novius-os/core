@@ -170,16 +170,36 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         $response_json['publication_initial_status'] = $status;
     }
 
-    /*
-    // This is only needed if we want the $data variable from the above function to be filled with the publishable attribute
-
-    public function form_fieldset_fields($item, &$fieldset)
+    public function crudConfig(&$config, $crud)
     {
-        $props = $item->behaviours(__CLASS__);
-        $publishable = $props['publication_state_property'];
-        // Empty array just so the data are retrieved from the input
-        $fieldset[$publishable] = array();
-    }
-    */
+        // 1. adding the Renderer in the fields list
+        if (!isset($config['fields']['publishable'])) {
+            $config['fields']['_publishable'] = array();
+        }
+        $config['fields']['_publishable'] = \Arr::merge(array(
+            'renderer' => 'Nos\Renderer_Publishable',
+            'label' => '',
+        ), $config['fields']['_publishable']);
 
+        // 2. injecting the field as the first one of the 'subtitle' section of layout_standard
+        if (isset($config['layout']['subtitle'])) {
+            // Simplified syntax
+            array_unshift($config['layout']['subtitle'], '_publishable');
+        } else {
+            // Full syntax
+            foreach ($config['layout'] as $name => $layout) {
+                if (isset($layout['view']) && in_array($layout['view'], array('nos::form/layout_standard', 'form/layout_standard'))) {
+                    if (!isset($config['layout'][$name]['params'])) {
+                        $config['layout'][$name]['params'] = array();
+                    }
+                    if (!isset($config['layout'][$name]['params']['subtitle'])) {
+                        $config['layout'][$name]['params']['subtitle'] = array('_publishable');
+                    } else {
+                        array_unshift($config['layout'][$name]['params']['subtitle'], '_publishable');
+                    }
+                    break;
+                }
+            }
+        }
+    }
 }

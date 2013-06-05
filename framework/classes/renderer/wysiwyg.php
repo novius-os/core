@@ -58,6 +58,13 @@ class Renderer_Wysiwyg extends \Fieldset_Field
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
 
+        $item = $this->fieldset()->getInstance();
+        $model = get_class($item);
+        $pk = \Arr::get($model::primary_key(), 0);
+        $this->options['container'] = array(
+            'model' => $model,
+            'id' => $item->{$pk},
+        );
         $this->value = Tools_Wysiwyg::prepare_renderer($this->value);
         $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
 
@@ -107,5 +114,4 @@ class Renderer_Wysiwyg extends \Fieldset_Field
             'id' => $id,
         ), false);
     }
-
 }

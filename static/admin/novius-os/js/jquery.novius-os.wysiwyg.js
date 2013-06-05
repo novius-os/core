@@ -16,11 +16,17 @@ define('jquery-nos-wysiwyg',
     function(module, $) {
         $.fn.wysiwyg = function(options) {
             var self = $(this);
-            options = options || {};
+            options = $.extend({
+                urlEnhancers: null,
+                container: null
+            }, options || {});
             $.ajax({
                 dataType: 'json',
                 url: 'admin/nos/wysiwyg/enhancers',
-                data : options.urlEnhancers ? {urlEnhancers : true} : null,
+                data : {
+                    urlEnhancers: options.urlEnhancers,
+                    container: options.container
+                },
                 success: function(enhancers) {
                     var base_url = $('base').attr('href');
                     options = $.extend({

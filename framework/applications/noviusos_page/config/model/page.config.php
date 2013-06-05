@@ -30,5 +30,14 @@ return array(
                 ),
             ),
         ),
+        'Nos\Orm_Behaviour_Publishable' => array(
+            'options' => array(
+                'allow_publish' => array(
+                    'check_draft' => function() {
+                        return !Nos\User\Permission::check('noviusos_page::access', 'draft');
+                    },
+                ),
+            ),
+        ),
     ),
 );

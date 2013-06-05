@@ -607,11 +607,8 @@ define('jquery-nos-appdesk',
 
                     views_count++;
                     $viewsDropDown.append(
-                        $('<option></option>')
-                            .attr({
-                                'value': key,
-                                'selected': (o.selectedView == key)
-                            })
+                        $('<option></option>').attr('value', key)
+                            .prop('selected', o.selectedView == key)
                             .append(view.name)
                     );
                 });
@@ -1685,21 +1682,25 @@ define('jquery-nos-appdesk',
                                                                             break;
 
                                                                         case 'link':
-                                                                            args.$container.wrapInner(
-                                                                                $('<a href="#"></a>')
-                                                                                    .click(function(e) {
-                                                                                        e.preventDefault();
-                                                                                        if (formatter.action === 'default' && actions.length && actions[0].action) {
-                                                                                            formatter.action = actions[0].action;
-                                                                                        }
-                                                                                        if (formatter.action && $.type(formatter.action) !== 'object' && appdesk.actions && appdesk.actions[formatter.action]) {
-                                                                                            formatter.action = appdesk.actions[formatter.action].action;
-                                                                                        }
-                                                                                        if ($.type(formatter.action) === 'object') {
+                                                                            if (formatter.action === 'default' && actions.length && actions[0].action) {
+                                                                                formatter.action = actions[0].name;
+                                                                            }
+                                                                            if (formatter.action && $.type(formatter.action) !== 'object' && appdesk.actions && appdesk.actions[formatter.action]) {
+                                                                                formatter._action_name = formatter.action;
+                                                                                formatter.action = appdesk.actions[formatter.action].action;
+                                                                            }
+                                                                            if (formatter._action_name && args.row.data.actions && $.type(args.row.data.actions[formatter._action_name]) === 'string') {
+                                                                                break;
+                                                                            }
+                                                                            if ($.type(formatter.action) === 'object') {
+                                                                                args.$container.wrapInner(
+                                                                                    $('<a href="#"></a>')
+                                                                                        .click(function(e) {
+                                                                                            e.preventDefault();
                                                                                             $(this).nosAction(formatter.action, args.row.data);
-                                                                                        }
-                                                                                    })
-                                                                            )
+                                                                                        })
+                                                                                );
+                                                                            }
                                                                             break;
                                                                     }
                                                                 });

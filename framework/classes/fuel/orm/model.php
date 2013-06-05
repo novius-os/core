@@ -128,6 +128,10 @@ class Model extends \Orm\Model
     {
         $class = get_called_class();
         $init = array_key_exists($class, static::$_properties_cached);
+        static $from_db_cached = array();
+        if ($from_db && isset($from_db_cached[$class])) {
+            $from_db = false;
+        }
 
         if (!$init || $from_db) {
             $cache_enabled = \Config::get('novius-os.cache_model_properties', false);
@@ -141,6 +145,7 @@ class Model extends \Orm\Model
 
                 static::$_properties_cached[$class] = \Cache::get('model_properties.'.str_replace('\\', '_', $class));
             } catch (\CacheNotFoundException $e) {
+                $from_db_cached[$class] = $class;
                 parent::properties();
 
                 $config = static::_config();

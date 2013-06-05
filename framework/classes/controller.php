@@ -684,9 +684,9 @@ class Controller extends \Fuel\Core\Controller_Hybrid
     {
         $model = get_class($object);
         $pk = \Arr::get($model::primary_key(), 0);
+        $common_config = \Nos\Config_Common::load($model, array());
 
         if (count($dataset) === 0) {
-            $common_config = \Nos\Config_Common::load($model, array());
             $dataset = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array();
         }
 
@@ -719,7 +719,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $item['actions'] = array();
         foreach ($actions as $action => $value) {
             $action_disabled = \Config::getActionDisabledState($value, $object);
-            $item['actions'][$action] = is_string($action_disabled) ? $action_disabled : !$action_disabled;
+            $item['actions'][$action] = is_string($action_disabled) ? $action_disabled : ($action_disabled ? $common_config['i18n']['action not allowed'] : true);
         }
         $item['_id'] = $object->{$pk};
         $item['_model'] = $model;

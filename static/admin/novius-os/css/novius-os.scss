@@ -532,6 +532,7 @@ table.publication_status {
     input[type=checkbox] {
         width: 16px;
         height: 16px;
+        vertical-align: middle;
     }
     label {
         cursor: pointer;
@@ -633,17 +634,7 @@ table.title-fields {
             width: $checkbox_hit_area_size;
             height: $checkbox_hit_area_size;
             cursor: pointer;
-
-            .wijmo-checkbox {
-                line-height: $checkbox_hit_area_size;
-                text-align: center;
-                margin: 0;
-            }
-            .wijmo-checkbox-box {
-                position: absolute;
-                top: -10px;
-                left: ($checkbox_hit_area_size - 16px) / 2; /* 16 = wijmo-checkbox width */
-            }
+            text-align: center;
         }
 
         img.app_icon {
@@ -738,4 +729,8 @@ textarea, select {
     box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
   }
 
+  &:disabled {
+    opacity: .35;
+    filter: Alpha(Opacity=35);
+  }
 }
