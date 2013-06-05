@@ -249,6 +249,7 @@ class Model_Page extends \Nos\Orm\Model
             'publication_state_property' => 'page_published',
             'publication_start_property' => 'page_publication_start',
             'publication_end_property' => 'page_publication_end',
+            // Permissions to deny publication is in the config file
         ),
         'Nos\Orm_Behaviour_Author' => array(
             'created_by_property' => 'page_created_by_id',

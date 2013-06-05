@@ -268,7 +268,8 @@ class Config extends \Fuel\Core\Config
                 $new_arg_list = $arg_list;
                 $new_arg_list[0] = $value_item;
                 $return = call_user_func_array('static::processCallbackValue', $new_arg_list);
-                if ($return !== $expected_value) {
+                // $return is null when the function didn't return anything (= has no return statement)
+                if ($return !== null && $return !== $expected_value) {
                     return $return;
                 }
             }

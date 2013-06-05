@@ -117,19 +117,13 @@ if (!empty($title)) {
                     </tr>
                 </table>
 <?php
-$publishable = (string) \View::forge('form/publishable', array(
-    'item' => !empty($item) ? $item : null,
-), false);
 
-if (!empty($subtitle) || !empty($publishable)) {
+if (!empty($subtitle)) {
     ?>
                     <div class="line crud_subtitle">
                         <table style="width:100%;">
                             <tr>
     <?php
-    if (!empty($publishable)) {
-        echo $publishable;
-    }
     if (!empty($subtitle)) {
         $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
