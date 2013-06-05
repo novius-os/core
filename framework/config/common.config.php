@@ -60,14 +60,15 @@ return array(
             ),
             'align' => 'end',
             'visible' => array(
-            function($params) {
-                return !isset($params['item']) || !$params['item']->is_new();
-            }),
+                'check_is_new' => function($params) {
+                    return !isset($params['item']) || !$params['item']->is_new();
+                },
+            ),
         ),
     ),
     'callable_keys' => array(
         'item' => array(
             'menu.menus'
-        )
-    )
+        ),
+    ),
 );

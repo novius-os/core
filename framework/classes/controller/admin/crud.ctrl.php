@@ -72,23 +72,18 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
         }
 
-        foreach (array('insert', 'update') as $layout_suffix) {
-            if (empty($this->config['views'][$layout_suffix])) {
-                $this->config['views'][$layout_suffix] = $this->config['views']['form'];
-            }
-            if (empty($this->config['layout_'.$layout_suffix]) && !empty($this->config['layout'])) {
-                $this->config['layout_'.$layout_suffix] = $this->config['layout'];
-            }
-
-            $layout = $this->config['layout_'.$layout_suffix];
-            $view = current($layout);
-            if (!is_array($view) || empty($view['view'])) {
-                $this->config['layout_'.$layout_suffix] = array(
-                    array(
-                        'view' => 'nos::form/layout_standard',
-                        'params' =>  $layout,
-                    ),
-                );
+        foreach (array('layout', 'layout_insert', 'layout_update') as $layout_name) {
+            if (!empty($this->config[$layout_name])) {
+                $layout = $this->config[$layout_name];
+                $view = current($layout);
+                if (!is_array($view) || empty($view['view'])) {
+                    $this->config[$layout_name] = array(
+                        array(
+                            'view' => 'nos::form/layout_standard',
+                            'params' =>  $layout,
+                        ),
+                    );
+                }
             }
         }
 
@@ -111,6 +106,17 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $common_config = \Nos\Config_Common::load($model, array());
         $i18n_default = \Config::load('nos::i18n_common', true);
         $this->config['i18n'] = array_merge($i18n_default, \Arr::get($common_config, 'i18n', array()));
+
+        $model::eventStatic('crudConfig', array(&$this->config, $this));
+
+        foreach (array('insert', 'update') as $layout_suffix) {
+            if (empty($this->config['views'][$layout_suffix])) {
+                $this->config['views'][$layout_suffix] = $this->config['views']['form'];
+            }
+            if (empty($this->config['layout_'.$layout_suffix]) && !empty($this->config['layout'])) {
+                $this->config['layout_'.$layout_suffix] = $this->config['layout'];
+            }
+        }
     }
 
     /**
@@ -424,6 +430,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     public function before_save($item, $data)
     {
+        $this->checkPermission($this->is_new ? 'add' : 'edit');
         if ($this->behaviours['twinnable'] && $this->is_new) {
 
             $item_context = $this->item->get_context();
@@ -625,7 +632,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
 
         if ($disabled !== false) {
             if (!is_string($disabled)) {
-                $disabled = __('You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.');
+                $disabled = $this->config['i18n']['action not allowed'];
             }
             $this->send_error(new \Exception($disabled));
         }
