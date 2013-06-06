@@ -593,32 +593,9 @@ class Application
                     unlink($public);
                 }
 
-                // It seems that symlink() does not work every time (confs, right?)
-                // Several trials with native version and exec(), in relative and absolute
-                // http://forums.novius-os.org/support-forums/contributions/petit-probleme,feed,98.html
-
-                $dirname = dirname($public);
-                $relative = Tools_File::relativePath($dirname, $private);
-                if (\File::symlink($relative, $public)) {
-                    return true;
+                if (!\File::relativeSymlink($private, $public)) {
+                    throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
                 }
-
-                exec('cd '.$dirname.'; ln -s '.$relative.' '.$this->folder);
-                if (\File::is_link($public)) {
-                    return true;
-                }
-
-                if (\File::symlink($private, $public)) {
-                    return true;
-                }
-
-                exec('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
-                if (\File::is_link($public)) {
-                    return true;
-                }
-
-                \Log::error('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
-                throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
             }
         }
 

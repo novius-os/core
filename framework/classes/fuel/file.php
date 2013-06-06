@@ -10,24 +10,59 @@
 
 class File extends Fuel\Core\File
 {
-    public static function symlink($target, $link, $is_directory = null)
+    public static function relativeSymlink($target, $link)
     {
-        $link = static::validOSPath($link, DS);
-        if ($is_directory === null) {
-            // directory doesn't necessary exists so is_dir is irrelevant
-            $is_directory = pathinfo($target, PATHINFO_EXTENSION) === '';
-        }
-        if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
-            return symlink($target, $link);
-        } else {
-            $command = 'mklink ';
-            if ($is_directory) {
-                $command .= '/D ';
+        $dirname = dirname($link);
+        $relative = \Nos\Tools_File::relativePath($dirname, $target);
+
+        return static::symlink($relative, $link) ? true : static::symlink($target, $link);
+    }
+
+    public static function symlink($target, $link, $is_file = null, $area = null)
+    {
+        $methods = array(
+            function($target, $link, $is_file) {
+                return symlink($target, $link);
+            },
+            function($target, $link, $is_file) {
+                if (defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+                    return false;
+                }
+                $dirname = dirname($link);
+                $basename = basename($link);
+                exec('cd '.$dirname.'; ln -s '.$target.' '.$basename);
+                return \File::is_link($link);
+            },
+            function($target, $link, $is_file) {
+                if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+                    return false;
+                }
+                $command = 'mklink ';
+                if (!$is_file) {
+                    $command .= '/D ';
+                }
+                $command .= escapeshellarg($link).' '.escapeshellarg($target);
+                \exec($command);
+                return \File::is_link($link);
             }
-            $command .= escapeshellarg($link).' '.escapeshellarg($target);
-            \exec($command);
-            return true;
+        );
+
+        if ($is_file === null) {
+            $is_file = !pathinfo($target, PATHINFO_EXTENSION) === '';
         }
+
+        $target      = rtrim(static::instance($area)->get_path($target), '\\/');
+        $link = rtrim(static::instance($area)->get_path($link), '\\/');
+
+        $link = static::validOSPath($link, DS);
+
+        foreach ($methods as $method) {
+            if ($method($target, $link, $is_file)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function is_link($filename)

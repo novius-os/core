@@ -94,7 +94,7 @@ if ($is_media) {
             mkdir($dir, 0755, true);
         }
 
-        \File::symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target);
+        \File::relativeSymlink($source, $target);
         $send_file = $source;
     }
 
@@ -168,7 +168,7 @@ if ($is_attachment) {
                     exit("Can't create dir ".$dir);
                 }
             }
-            if (!@\File::symlink(Nos\Tools_File::relativePath(dirname($target), $source), $target)) {
+            if (!@\File::relativeSymlink($source, $target)) {
                 Log::error("Can't symlink in ".$source);
                 exit("Can't symlink in ".$source);
             }
