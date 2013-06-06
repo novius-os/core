@@ -58,6 +58,7 @@ if (!MBSTRING) {
         'Email' => FUEL_EXTEND_PATH.'email.php',
         'Email_Driver' => FUEL_EXTEND_PATH.'email'.DIRECTORY_SEPARATOR.'driver.php',
         'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
+        'File' => FUEL_EXTEND_PATH.'file.php',
         'Finder' => FUEL_EXTEND_PATH.'finder.php',
         'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
         'Fieldset_Field' => FUEL_EXTEND_PATH.'fieldset_field.php',

@@ -15,7 +15,11 @@ class Config extends \Fuel\Core\Config
 {
     public static function load($file, $group = null, $reload = false, $overwrite = false)
     {
-        $file = \Nos\Tools_File::validPath($file);
+        if (is_string($file)) {
+            // Can't use \File::validOSPath($file); since it is possible this class is not loaded (when loading
+            // configuration from bootstrap).
+            $file = str_replace(array('/', '\\'), array(DS, DS), $file);
+        }
         if ($file == 'db') {
             $group = 'db';
         }

@@ -589,7 +589,7 @@ class Application
             $private = static::get_application_path($this->folder).DS.$folder;
             if (is_dir($private)) {
                 $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-                if (\Nos\Tools_File::is_link($public)) {
+                if (\File::is_link($public)) {
                     unlink($public);
                 }
 
@@ -599,21 +599,21 @@ class Application
 
                 $dirname = dirname($public);
                 $relative = Tools_File::relativePath($dirname, $private);
-                if (\Nos\Tools_File::symlink($relative, $public)) {
+                if (\File::symlink($relative, $public)) {
                     return true;
                 }
 
                 exec('cd '.$dirname.'; ln -s '.$relative.' '.$this->folder);
-                if (\Nos\Tools_File::is_link($public)) {
+                if (\File::is_link($public)) {
                     return true;
                 }
 
-                if (\Nos\Tools_File::symlink($private, $public)) {
+                if (\File::symlink($private, $public)) {
                     return true;
                 }
 
                 exec('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
-                if (\Nos\Tools_File::is_link($public)) {
+                if (\File::is_link($public)) {
                     return true;
                 }
 
@@ -628,7 +628,7 @@ class Application
     protected function unsymlink($folder)
     {
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-        if (\Nos\Tools_File::is_link($public) || file_exists($public)) {
+        if (\File::is_link($public) || file_exists($public)) {
             return unlink($public);
         }
 
@@ -640,13 +640,13 @@ class Application
         $private =  static::get_application_path($this->folder).DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private)) {
-            return \Nos\Tools_File::is_link($public) && in_array(readlink($public), array(
+            return \File::is_link($public) && in_array(readlink($public), array(
                 $private,
                 Tools_File::relativePath(dirname($public), $private)
             ));
         }
 
-        return !\Nos\Tools_File::is_link($public);
+        return !\File::is_link($public);
     }
 
     public function addPermission()
