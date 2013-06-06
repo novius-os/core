@@ -347,7 +347,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $id = \Input::get('id', null);
         $model = \Input::get('model');
         $selected = \Input::get('selected');
-        $deep = intval(\Input::get('deep', 1));
+        $depth = intval(\Input::get('depth', 1));
         $context = \Input::get('context');
 
         if (empty($tree_config['id'])) {
@@ -356,7 +356,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
         $tree_config = $this->build_tree($tree_config);
 
-        if ($deep === -1) {
+        if ($depth === -1) {
             \Session::set('tree.'.$tree_config['id'].'.'.$model.'|'.$id, false);
             $count = $this->tree_items(
                 $tree_config,
@@ -410,7 +410,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 array(
                     'model' => $model,
                     'id' => $id,
-                    'deep' => $deep,
+                    'depth' => $depth,
                     'context' => $context,
                 )
             );
@@ -581,7 +581,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 'countProcess' => false,
                 'model' => null,
                 'id' => null,
-                'deep' => 1,
+                'depth' => 1,
                 'context' => null,
             ),
             $params
@@ -639,13 +639,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                             'treeChilds' =>
                                 function ($item) use ($controller, $tree_config, $params, $child, $pk) {
                                     $open = \Session::get('tree.'.$tree_config['id'].'.'.$child['model'].'|'.$item->{$pk}, null);
-                                    if ($open === true || ($params['deep'] > 1 && $open !== false)) {
+                                    if ($open === true || ($params['depth'] > 1 && $open !== false)) {
                                         $items = $controller->tree_items(
                                             $tree_config,
                                             array(
                                                 'model' => $child['model'],
                                                 'id' => $item->{$pk},
-                                                'deep' => $params['deep'] - 1,
+                                                'depth' => $params['depth'] - 1,
                                                 'context' => $params['context'],
                                             )
                                         );

@@ -66,6 +66,7 @@ define('jquery-nos-inspector-tree-model-radio',
                                 treeColumnIndex : 1,
                                 treeOptions : treeOptions,
                                 preOpen : params.selected || {},
+                                initialDepth : params.initialDepth || 2,
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',
                                 cellStyleFormatter: function(args) {
