@@ -14,9 +14,10 @@ define(
     ],
     function($) {
         "use strict";
-        return function() {
+        return function(wysiwyg_options) {
 
             var $container = $(this);
+            wysiwyg_options = wysiwyg_options || {};
             if ($container.data('already-processed')) {
                 return;
             }
@@ -92,7 +93,7 @@ define(
                                     }));
                                 $wysiwyg.append(bloc);
                                 // The bottom row from TinyMCE is roughly 21px
-                                $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg({
+                                $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg($.extend({}, wysiwyg_options, {
                                     urlEnhancers : true,
                                     container: {
                                         model: 'Nos\\Page\\Model_Page',
@@ -100,7 +101,7 @@ define(
                                     },
                                     height: (coords[3] / data.rows * ratio) - 21,
                                     content_css: data.content_css || ''
-                                });
+                                }));
                             });
                         });
                     }
