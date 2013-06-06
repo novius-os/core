@@ -9,7 +9,7 @@ abstract class Config_File extends \Fuel\Core\Config_File
         } catch (\ConfigException $e) {
             $config = array();
         }
-        Event::trigger_function('config|'.$this->group(), array(&$config));
+        \Config::trigger_function($this->group(), array(&$config));
 
         return $config;
     }

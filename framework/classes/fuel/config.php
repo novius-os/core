@@ -15,11 +15,12 @@ class Config extends \Fuel\Core\Config
 {
     public static function load($file, $group = null, $reload = false, $overwrite = false)
     {
+        $file = \Nos\Tools_File::validPath($file);
         if ($file == 'db') {
             $group = 'db';
         }
         if (!$reload and is_array($file) and is_string($group)) {
-            Event::trigger_function('config|'.$group, array(&$file));
+            static::trigger_function($group, array(&$file));
         }
 
         return parent::load($file, $group, $reload, $overwrite);
@@ -341,6 +342,21 @@ class Config extends \Fuel\Core\Config
             return $metadata['icons'][$icon_key];
         }
         return '';
+    }
+
+    /*
+     * Allows to trigger a event function related to a configuration file path. Allows to handle different directory
+     * separators.
+     */
+    public static function trigger_function($filepath, $args = array(), $return_type = 'array')
+    {
+        $firstPath = str_replace('/', '\\', $filepath);
+        $secondPath = str_replace('\\', '/', $filepath);
+
+        \Event::trigger_function('config|'.$firstPath, $args, $return_type);
+        if ($firstPath !== $secondPath) {
+            \Event::trigger_function('config|'.$secondPath, $args, $return_type);
+        }
     }
 
 }

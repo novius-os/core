@@ -180,12 +180,12 @@ class Model_Media extends \Nos\Orm\Model
 
     public function get_public_path()
     {
-        return str_replace('/', DS, static::$public_path.$this->get_path());
+        return static::$public_path.$this->get_path();
     }
 
     public function get_private_path()
     {
-        return str_replace('/', DS, static::$private_path.$this->get_path());
+        return static::$private_path.$this->get_path();
     }
 
     public function get_img_tag($params = array())

@@ -203,7 +203,7 @@ class Tools_File
 
     public static function symlink($target, $link, $is_directory = null)
     {
-        $link = str_replace(array('/', '\\'), array(DS, DS), $link);
+        $link = static::validPath($link, DS);
         if ($is_directory === null) {
             // directory doesn't necessary exists so is_dir is irrelevant
             $is_directory = pathinfo($target, PATHINFO_EXTENSION) === '';
@@ -223,10 +223,16 @@ class Tools_File
 
     public static function is_link($filename)
     {
+        $filename = static::validPath($filename);
         if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
             return is_link($filename);
         } else {
             return is_file($filename) || is_dir($filename); // @todo: search for is_link equivalent ?
         }
+    }
+
+    public static function validPath($path, $default = DS)
+    {
+        return str_replace(array('/', '\\'), array($default, $default), $path);
     }
 }

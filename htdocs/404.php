@@ -67,7 +67,7 @@ if ($is_media) {
     } else {
         if ($is_resized) {
             $source = APPPATH.$media->get_private_path();
-            $target = str_replace('/', DS, $m[0]);
+            $target = $m[0];
             $dest = APPPATH.$target;
             $dir = dirname($dest);
             if (!is_dir($dir)) {

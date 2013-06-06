@@ -45,7 +45,7 @@ return array(
     ),
 
     'caching'            => false,
-    'cache_dir'            => APPPATH.'cache'.DS,
+    'cache_dir'            => APPPATH.'cache/',
     'cache_lifetime'    => 3600, // In Seconds
 
     /**
