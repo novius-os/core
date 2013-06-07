@@ -12,8 +12,6 @@ namespace Nos;
 
 class Renderer_Wysiwyg extends \Fieldset_Field
 {
-    protected static $DEFAULT_RENDERER_OPTIONS = 'default';
-
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
         list($attributes, $this->options) = static::parse_options($renderer);
@@ -81,7 +79,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
         }
 
         // Default options of the renderer
-        $renderer_options = Tools_Wysiwyg::jsOptions(static::$DEFAULT_RENDERER_OPTIONS);
+        $renderer_options = Tools_Wysiwyg::jsOptions();
 
         if (!empty($renderer['renderer_options'])) {
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
