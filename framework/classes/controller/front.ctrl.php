@@ -71,7 +71,6 @@ class Controller_Front extends Controller
         $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
     }
 
-    // removed array because of method compatibility (PHP 5.4)
     public function router($action, $params, $status = 200)
     {
         $this->_status = $status;
