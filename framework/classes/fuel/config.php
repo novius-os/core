@@ -354,13 +354,7 @@ class Config extends \Fuel\Core\Config
      */
     public static function trigger_function($filepath, $args = array(), $return_type = 'array')
     {
-        $firstPath = str_replace('/', '\\', $filepath);
-        $secondPath = str_replace('\\', '/', $filepath);
-
-        \Event::trigger_function('config|'.$firstPath, $args, $return_type);
-        if ($firstPath !== $secondPath) {
-            \Event::trigger_function('config|'.$secondPath, $args, $return_type);
-        }
+        \Event::trigger_function('config|'.$filepath, $args, $return_type);
     }
 
 }

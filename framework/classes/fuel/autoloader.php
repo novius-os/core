@@ -94,7 +94,7 @@ class Autoloader extends Fuel\Core\Autoloader
 
     public static function get_valid_class_path($path)
     {
-        $path_parts = explode('/', $path);
+        $path_parts = explode(DS, $path);
         $suffix = false;
         for ($i = 0; $i < count($path_parts) - 1; $i++) {
             if (isset(static::$suffixed[$path_parts[$i]])) {

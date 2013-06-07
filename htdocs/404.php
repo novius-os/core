@@ -168,7 +168,7 @@ if ($is_attachment) {
                     exit("Can't create dir ".$dir);
                 }
             }
-            if (!@\File::relativeSymlink($source, $target)) {
+            if (!\File::relativeSymlink($source, $target)) {
                 Log::error("Can't symlink in ".$source);
                 exit("Can't symlink in ".$source);
             }

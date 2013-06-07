@@ -33,6 +33,8 @@ define('VENDORPATH', NOSROOT.'vendor'.DIRECTORY_SEPARATOR);
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
+define('OS_WIN', defined('PHP_WINDOWS_VERSION_PLATFORM'));
+
 // Load in the Autoloader
 require FUEL_EXTEND_PATH.'autoloader.php';
 //class_alias('Fuel\\Core\\Autoloader', 'Autoloader');

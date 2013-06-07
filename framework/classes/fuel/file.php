@@ -25,7 +25,7 @@ class File extends Fuel\Core\File
                 return symlink($target, $link);
             },
             function($target, $link, $is_file) {
-                if (defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+                if (OS_WIN) {
                     return false;
                 }
                 $dirname = dirname($link);
@@ -34,7 +34,7 @@ class File extends Fuel\Core\File
                 return \File::is_link($link);
             },
             function($target, $link, $is_file) {
-                if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+                if (!OS_WIN) {
                     return false;
                 }
                 $command = 'mklink ';
@@ -68,7 +68,7 @@ class File extends Fuel\Core\File
     public static function is_link($filename)
     {
         $filename = static::validOSPath($filename);
-        if (!defined('PHP_WINDOWS_VERSION_PLATFORM')) {
+        if (!OS_WIN) {
             return is_link($filename);
         } else {
             return is_file($filename) || is_dir($filename); // @todo: search for is_link equivalent ?
