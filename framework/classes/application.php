@@ -589,36 +589,13 @@ class Application
             $private = static::get_application_path($this->folder).DS.$folder;
             if (is_dir($private)) {
                 $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-                if (is_link($public)) {
+                if (\File::is_link($public)) {
                     unlink($public);
                 }
 
-                // It seems that symlink() does not work every time (confs, right?)
-                // Several trials with native version and exec(), in relative and absolute
-                // http://forums.novius-os.org/support-forums/contributions/petit-probleme,feed,98.html
-
-                $dirname = dirname($public);
-                $relative = Tools_File::relativePath($dirname, $private);
-                if (symlink($relative, $public)) {
-                    return true;
+                if (!\File::relativeSymlink($private, $public)) {
+                    throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
                 }
-
-                exec('cd '.$dirname.'; ln -s '.$relative.' '.$this->folder);
-                if (is_link($public)) {
-                    return true;
-                }
-
-                if (symlink($private, $public)) {
-                    return true;
-                }
-
-                exec('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
-                if (is_link($public)) {
-                    return true;
-                }
-
-                \Log::error('cd '.$dirname.'; ln -s '.$private.' '.$this->folder);
-                throw new \Exception('Can\'t create symlink for "'.$folder.DS.'apps'.DS.$this->folder.'"');
             }
         }
 
@@ -628,7 +605,7 @@ class Application
     protected function unsymlink($folder)
     {
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-        if (is_link($public) || file_exists($public)) {
+        if (\File::is_link($public) || file_exists($public)) {
             return unlink($public);
         }
 
@@ -640,13 +617,13 @@ class Application
         $private =  static::get_application_path($this->folder).DS.$folder;
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (file_exists($private)) {
-            return is_link($public) && in_array(readlink($public), array(
+            return \File::is_link($public) && in_array(readlink($public), array(
                 $private,
                 Tools_File::relativePath(dirname($public), $private)
             ));
         }
 
-        return !is_link($public);
+        return !\File::is_link($public);
     }
 
     public function addPermission()
