@@ -33,6 +33,8 @@ define('VENDORPATH', NOSROOT.'vendor'.DIRECTORY_SEPARATOR);
 
 define('FUEL_EXTEND_PATH', NOSPATH.'classes'.DIRECTORY_SEPARATOR.'fuel'.DIRECTORY_SEPARATOR);
 
+define('OS_WIN', defined('PHP_WINDOWS_VERSION_PLATFORM'));
+
 // Load in the Autoloader
 require FUEL_EXTEND_PATH.'autoloader.php';
 //class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
@@ -58,6 +60,7 @@ if (!MBSTRING) {
         'Email' => FUEL_EXTEND_PATH.'email.php',
         'Email_Driver' => FUEL_EXTEND_PATH.'email'.DIRECTORY_SEPARATOR.'driver.php',
         'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
+        'File' => FUEL_EXTEND_PATH.'file.php',
         'Finder' => FUEL_EXTEND_PATH.'finder.php',
         'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
         'Fieldset_Field' => FUEL_EXTEND_PATH.'fieldset_field.php',

@@ -734,4 +734,12 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
         }
     }
+
+    public function wysiwygOptions(Orm\Model $item, &$options)
+    {
+        $context_options = \Config::get('wysiwyg.setups.'.$item->{$this->_properties['context_property']}, false);
+        if ($context_options) {
+            $options = array_merge($options, $context_options);
+        }
+    }
 }

@@ -612,7 +612,6 @@ define('jquery-nos-ostabs',
                     li = self.lis.eq(index),
                     a =  self.anchors.eq(index),
                     closable = li.not( '.nos-ostabs-appstab' ).length,
-                    reloadable = a.data( "iframe.tabs"),
                     actions = [], $action_bar, $links;
 
                 $panel.find('.nos-ostabs-actions').remove();
@@ -672,14 +671,12 @@ define('jquery-nos-ostabs',
                     });
                 }
 
-                if ( reloadable ) {
+                if (closable)  {
                     actions.push({
                         classes: 'nos-ostabs-reload',
                         click: function() {
-                            var fr = $panel.find( 'iframe.nos-ostabs-panel-content' );
-                            if (fr !== undefined) {
-                                fr.attr("src", fr.attr("src"));
-                            }
+                            var index = self.lis.index(li);
+                            self.reload(index);
                             return false;
                         },
                         label: o.texts.reloadTab,
@@ -1060,7 +1057,8 @@ define('jquery-nos-ostabs',
                         })
                         .find('a')
                         .empty()
-                        .append($newA.children());
+                        .append($newA.children())
+                        .data("href.tabs", tab.url );
 
                     self._actions($panel, index);
 
@@ -1183,6 +1181,81 @@ define('jquery-nos-ostabs',
                         .prependTo( panel.data('callbacks.ostabs', {}) );
 
                     $.data( a, "cache.tabs", true );
+                }
+
+                // last, so that load event is fired before show...
+                self.element.dequeue( "tabs" );
+
+                return self;
+            },
+
+            reload: function( index ) {
+                var self = this;
+                index = self._getIndex( index );
+                var o = self.options,
+                    a = self.anchors.eq( index )[ 0 ],
+                    url = $.data( a, "load.tabs" ),
+                    iframe = $.data( a, "iframe.tabs"),
+                    $frame, $panel;
+
+                self.select(index);
+                self._abort();
+
+                // not remote or from cache
+                if ( (!url && iframe) || self.element.queue( "tabs" ).length !== 0 && $.data( a, "cache.tabs" ) ) {
+                    self.element.dequeue( "tabs" );
+                    return;
+                }
+
+                $panel = self.element.find( self._sanitizeSelector( $(a).data('anchor.tabs') ));
+
+                // load remote from here on
+                self.lis.eq( index ).addClass( "ui-state-processing" );
+
+                if ( $.isFunction($.fn.loadspinner) ) {
+                    $( "span.nos-ostabs-icon", a ).each(function() {
+                        var $a = $( this );
+                        $a.addClass( 'ui-state-processing' )
+                            .loadspinner({
+                                diameter : $a.width(),
+                                scaling : true
+                            });
+                    });
+                }
+
+                if (!iframe) {
+                    self.xhr = $.ajax({
+                        url: url,
+                        success: function( r, s, xhr ) {
+                            var json;
+
+                            $panel.find('.nos-ostabs-panel-content')
+                                .html( r );
+
+                            // case error, response not html but json (tab item was deleted)
+                            // If response looks like JSON, execute standard success callback
+                            try {
+                                json = $.parseJSON(xhr.responseText);
+                                self.element.nosAjaxSuccess(json);
+
+                            } catch (e) {}
+                        },
+                        complete: function(xhr) {
+                            // take care of tab labels
+                            self._cleanup();
+
+                            self._trigger( "load", null, self._ui( self.lis[index] ) );
+                        },
+                        error : function (xhr, s) {
+                            self.remove(index)
+
+                            // If response looks like JSON, execute standard success callback
+                            self.element.nosAjaxError(xhr, s);
+                        }
+                    });
+                } else {
+                    $frame = $panel.find('iframe.nos-ostabs-panel-content');
+                    $frame.attr("src", $frame.attr("src"));
                 }
 
                 // last, so that load event is fired before show...

@@ -113,6 +113,7 @@ class FrontCache
 
     public function __construct($path = false)
     {
+        $path = \File::validOSPath($path);
         if ($path == false) {
             $this->_path = false;
         } else {

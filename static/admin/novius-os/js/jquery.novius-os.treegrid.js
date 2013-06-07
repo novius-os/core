@@ -20,6 +20,7 @@ define('jquery-nos-treegrid',
                 sortable : true,
                 movable : true,
                 data : [],
+                initialDepth: 2,
                 preOpen : null
             },
 
@@ -139,7 +140,7 @@ define('jquery-nos-treegrid',
                 self._super();
                 self._activateSpinner();
                 self._datasource();
-                self.treeDataSource.proxy.options.data.deep = 2;
+                self.treeDataSource.proxy.options.data.depth = o.initialDepth;
                 if ($.isPlainObject(o.preOpen)) {
                     self.treeDataSource.proxy.options.data.preOpen = o.preOpen;
                 }
@@ -514,7 +515,7 @@ define('jquery-nos-treegrid',
 
                 $tr.find('.nostreegrid-toggle').addClass(open ? 'ui-icon-clock' : 'ui-icon-triangle-1-e')
                     .removeClass(open ? 'ui-icon-triangle-1-e' : 'ui-icon-triangle-1-se');
-                self.treeDataSource.proxy.options.data.deep = open ? 1 : -1;
+                self.treeDataSource.proxy.options.data.depth = open ? 1 : -1;
                 self.treeDataSource.proxy.options.data.id = node._id;
                 self.treeDataSource.proxy.options.data.model = node._model;
                 self.treeDataSource.load({
@@ -565,9 +566,10 @@ define('jquery-nos-treegrid',
             },
 
             reload : function() {
-                var self = this;
+                var self = this,
+                    o = self.options;
 
-                self.treeDataSource.proxy.options.data.deep = 2;
+                self.treeDataSource.proxy.options.data.depth = o.initialDepth;
                 delete self.treeDataSource.proxy.options.data.id;
                 delete self.treeDataSource.proxy.options.data.model;
                 self.treeDataSource.load();

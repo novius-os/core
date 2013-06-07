@@ -1130,6 +1130,7 @@ define('jquery-nos-appdesk',
                         treeOptions : {
                             context : o.selectedContexts || ''
                         },
+                        initialDepth : o.treeGrid.initialDepth || 2,
                         columnsAutogenerationMode : 'none',
                         selectionMode: 'singleRow',
                         allowSorting: true,

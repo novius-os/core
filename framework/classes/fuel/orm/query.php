@@ -42,6 +42,7 @@ class Query extends \Orm\Query
     {
         return $this->alias;
     }
+
     public function connection()
     {
         return $this->connection;
