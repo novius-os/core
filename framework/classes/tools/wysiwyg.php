@@ -101,8 +101,8 @@ class Tools_Wysiwyg
                 if (empty($enhancer['iconUrl']) && !empty($enhancer['application'])) {
                     $enhancers[$key]['iconUrl'] = \Config::icon($enhancer['application'], 16);
                 }
-                if (!empty($enhancer['check_container']) && is_callable($enhancer['check_container']) &&
-                    !call_user_func($enhancer['check_container'], $enhancer, $item)) {
+                if (!empty($enhancer['valid_container']) && is_callable($enhancer['valid_container']) &&
+                    call_user_func($enhancer['valid_container'], $enhancer, $item) === false) {
 
                     unset($enhancers[$key]);
                 }
