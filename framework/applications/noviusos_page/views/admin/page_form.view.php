@@ -8,17 +8,13 @@
  * @link http://www.novius-os.org
  */
 
-\Config::load('wysiwyg', true);
-empty($options) and $options = \Config::get('wysiwyg.default_setup', 'default');
-is_string($options) and $options = \Config::get('wysiwyg.setups.'.$options, array());
-$wysiwyg_options = array_merge(\Config::get('wysiwyg.default', array()), $options);
-
-$item->event('wysiwygOptions', array(&$wysiwyg_options));
+$wysiwyg_options = \Nos\Tools_Wysiwyg::jsOptions(null, $fieldset->getInstance(), true);
 ?>
 <script type="text/javascript">
     require(['jquery-nos', 'static/apps/noviusos_page/config/form.js'], function ($, callback_fn) {
         $(function () {
-            callback_fn.call($('#<?= $fieldset->form()->get_attribute('id') ?>'), <?= \Format::forge($wysiwyg_options)->to_json() ?>);
+            callback_fn.call($('#<?= $fieldset->form()->get_attribute('id') ?>'),
+                <?= \Format::forge($wysiwyg_options)->to_json() ?>);
         });
     });
 </script>

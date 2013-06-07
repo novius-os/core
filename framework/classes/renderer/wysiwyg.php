@@ -12,14 +12,7 @@ namespace Nos;
 
 class Renderer_Wysiwyg extends \Fieldset_Field
 {
-    protected static $DEFAULT_RENDERER_OPTIONS = array();
-
-    public static function _init()
-    {
-        \Config::load('wysiwyg', true);
-        static::$DEFAULT_RENDERER_OPTIONS = \Config::get('wysiwyg.default');
-        parent::_init();
-    }
+    protected static $DEFAULT_RENDERER_OPTIONS = 'default';
 
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
@@ -63,15 +56,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
 
-        $item = $this->fieldset()->getInstance();
-        $model = get_class($item);
-        $pk = \Arr::get($model::primary_key(), 0);
-        $this->options['container'] = array(
-            'model' => $model,
-            'id' => $item->{$pk},
-        );
-
-        $item->event('wysiwygOptions', array(&$this->options));
+        $this->options = Tools_Wysiwyg::jsOptions($this->options, $this->fieldset()->getInstance());
 
         $this->value = Tools_Wysiwyg::prepare_renderer($this->value);
         $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
@@ -95,11 +80,8 @@ class Renderer_Wysiwyg extends \Fieldset_Field
             $renderer['id'] = uniqid('wysiwyg_');
         }
 
-        empty($options) and $options = \Config::get('wysiwyg.default_setup', 'default');
-        is_string($options) and $options = \Config::get('wysiwyg.setups.'.$options, array());
-
         // Default options of the renderer
-        $renderer_options = array_merge(static::$DEFAULT_RENDERER_OPTIONS, $options);
+        $renderer_options = Tools_Wysiwyg::jsOptions(static::$DEFAULT_RENDERER_OPTIONS);
 
         if (!empty($renderer['renderer_options'])) {
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);

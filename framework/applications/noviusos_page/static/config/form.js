@@ -94,11 +94,6 @@ define(
                                 $wysiwyg.append(bloc);
                                 // The bottom row from TinyMCE is roughly 21px
                                 $wysiwyg.find('[name="wysiwyg[' + i + ']"]').wysiwyg($.extend({}, wysiwyg_options, {
-                                    urlEnhancers : true,
-                                    container: {
-                                        model: 'Nos\\Page\\Model_Page',
-                                        id: $page_id.val()
-                                    },
                                     height: (coords[3] / data.rows * ratio) - 21,
                                     content_css: data.content_css || ''
                                 }));
