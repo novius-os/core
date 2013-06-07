@@ -18,7 +18,7 @@ return array(
         'paste_text_use_dialog' => true,
     ),
 
-    'default_setup' => 'default',
+    'active_setup' => 'default',
 
     'setups' => array(
         'default' => array(),

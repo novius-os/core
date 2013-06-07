@@ -76,7 +76,7 @@ class Tools_Wysiwyg
      */
     public static function jsOptions($options = null, Orm\Model $item = null, $urlEnhancers = false)
     {
-        empty($options) and $options = \Config::get('wysiwyg.default_setup', 'default');
+        empty($options) and $options = \Config::get('wysiwyg.active_setup', 'default');
         is_string($options) and $options = \Config::get('wysiwyg.setups.'.$options, array());
 
         $options = array_merge(static::$_options, $options);
