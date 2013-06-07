@@ -1185,7 +1185,7 @@ define('jquery-nos',
                             return false;
                         },
                     self = this;
-                if (args.length > 0 && $.inArray(args[0], ['open', 'close', 'add', 'update', 'init', 'current']) !== -1) {
+                if (args.length > 0 && $.inArray(args[0], ['open', 'close', 'add', 'update', 'reload', 'init', 'current']) !== -1) {
                     method = args.shift();
                 }
 
@@ -1276,6 +1276,18 @@ define('jquery-nos',
                             } else if (self.size() && !self.closest('.ui-dialog-content').size() && noviusos().length) {
                                 var index = getIndex(self);
                                 noviusos().ostabs('update', index, tab);
+                            }
+                        })();
+                        break;
+
+                    case 'reload' :
+                        (function() {
+                            var tab = args[0];
+                            if (window.parent != window && window.parent.$nos) {
+                                window.parent.$nos(window.frameElement).nosTabs('reload');
+                            } else if (self.size() && !self.closest('.ui-dialog-content').size() && noviusos().length) {
+                                var index = getIndex(self);
+                                noviusos().ostabs('reload', index);
                             }
                         })();
                         break;
