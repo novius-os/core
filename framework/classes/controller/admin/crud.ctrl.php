@@ -72,6 +72,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             }
         }
 
+        // Convert simplified layout syntax into the full syntax
         foreach (array('layout', 'layout_insert', 'layout_update') as $layout_name) {
             if (!empty($this->config[$layout_name])) {
                 $layout = $this->config[$layout_name];

@@ -31,7 +31,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * Add relations for linked media and wysiwyg shared with other context
      */
-    public function before_relations()
+    public function buildRelations()
     {
         $class = $this->_class;
 

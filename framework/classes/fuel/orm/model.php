@@ -179,7 +179,7 @@ class Model extends \Orm\Model
      *
      * @return  boolean
      */
-    public static function canBeLinkedWysiwygs()
+    public static function canHaveLinkedWysiwygs()
     {
         $class = get_called_class();
 
@@ -191,7 +191,7 @@ class Model extends \Orm\Model
      *
      * @return  boolean
      */
-    public static function canBeLinkedMedias()
+    public static function canHaveLinkedMedias()
     {
         $class = get_called_class();
 
@@ -210,7 +210,7 @@ class Model extends \Orm\Model
             // unset potential's relations stored in Nos\Orm\Model
             unset(static::$_has_many['linked_wysiwygs']);
             unset(static::$_has_many['linked_medias']);
-            if (static::canBeLinkedWysiwygs()) {
+            if (static::canHaveLinkedWysiwygs()) {
                 static::$_has_many['linked_wysiwygs'] = array(
                     'key_from' => static::$_primary_key[0],
                     'model_to' => 'Nos\Model_Wysiwyg',
@@ -225,7 +225,7 @@ class Model extends \Orm\Model
                 );
             }
 
-            if (static::canBeLinkedMedias()) {
+            if (static::canHaveLinkedMedias()) {
                 static::$_has_many['linked_medias'] = array(
                     'key_from' => static::$_primary_key[0],
                     'model_to' => 'Nos\Media\Model_Link',
@@ -257,7 +257,7 @@ class Model extends \Orm\Model
         parent::relations($specific);
 
         if (!$init) {
-            static::eventStatic('before_relations');
+            static::eventStatic('buildRelations');
         }
 
         if ($specific) {
@@ -480,7 +480,7 @@ class Model extends \Orm\Model
     public function _event_before_save()
     {
         $class = get_called_class();
-        if (static::canBeLinkedWysiwygs()) {
+        if (static::canHaveLinkedWysiwygs()) {
             $w_keys = array_keys($this->linked_wysiwygs);
             foreach ($w_keys as $i) {
                 // Remove empty wysiwyg
@@ -491,7 +491,7 @@ class Model extends \Orm\Model
             }
         }
 
-        if (static::canBeLinkedMedias()) {
+        if (static::canHaveLinkedMedias()) {
             $w_keys = array_keys($this->linked_medias);
             foreach ($w_keys as $i) {
                 // Remove empty medias
@@ -625,7 +625,7 @@ class Model extends \Orm\Model
 
         if (count($arr_name) > 1) {
             $class = get_called_class();
-            if (static::canBeLinkedWysiwygs() && $arr_name[0] == 'wysiwygs') {
+            if (static::canHaveLinkedWysiwygs() && $arr_name[0] == 'wysiwygs') {
                 $key = $arr_name[1];
                 $linked_wysiwygs = $this->getLinkedWysiwygs();
                 foreach ($linked_wysiwygs as $linked_wysiwyg) {
@@ -659,7 +659,7 @@ class Model extends \Orm\Model
                 return $this;
             }
 
-            if (static::canBeLinkedMedias() && $arr_name[0] == 'medias') {
+            if (static::canHaveLinkedMedias() && $arr_name[0] == 'medias') {
                 $key = $arr_name[1];
                 $linked_medias = $this->getLinkedMedias();
                 foreach ($linked_medias as $linked_media) {
@@ -751,7 +751,7 @@ class Model extends \Orm\Model
         $arr_name = explode('->', $name);
         if (count($arr_name) > 1) {
             $class = get_called_class();
-            if (static::canBeLinkedWysiwygs() && $arr_name[0] == 'wysiwygs') {
+            if (static::canHaveLinkedWysiwygs() && $arr_name[0] == 'wysiwygs') {
                 $key = $arr_name[1];
                 $linked_wysiwygs = $this->getLinkedWysiwygs();
                 foreach ($linked_wysiwygs as $linked_wysiwyg) {
@@ -768,7 +768,7 @@ class Model extends \Orm\Model
                 return $ref;
             }
 
-            if (static::canBeLinkedMedias() && $arr_name[0] == 'medias') {
+            if (static::canHaveLinkedMedias() && $arr_name[0] == 'medias') {
                 $key = $arr_name[1];
                 $linked_medias = $this->getLinkedMedias();
                 foreach ($linked_medias as $linked_media) {
