@@ -91,7 +91,7 @@ return array(
                             return false;
                         }
                         // Published or scheduled => disabled
-                        return \Nos\User\Permission::check('noviusos_page::access', 'draft');
+                        return \Nos\User\Permission::atMost('noviusos_page::page', '1_draftonly', 2);
                     },
                 ),
             ),
@@ -103,7 +103,7 @@ return array(
                             return false;
                         }
                         // Published or scheduled => disabled
-                        return \Nos\User\Permission::check('noviusos_page::access', 'draft');
+                        return \Nos\User\Permission::atMost('noviusos_page::page', '1_draftonly', 2);
                     },
                 ),
             ),
