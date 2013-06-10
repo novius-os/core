@@ -10,12 +10,7 @@
 
 if (\Input::is_ajax()) {
 
-    foreach ($backtrace as &$trace) {
-        $trace = array_intersect_key($trace, array(
-            'file' => true,
-            'line' => true,
-        ));
-    }
+    $backtrace = \Debug::filter_backtrace($backtrace);
 
     \Response::json(array(
         'error' => 'An internal server error has been detected.',
@@ -25,7 +20,7 @@ if (\Input::is_ajax()) {
             'message' => $message,
             'filepath' => $filepath,
             'error_line' => $error_line,
-            'backtrace' => $backtrace
+            'backtrace' => $backtrace,
         ),
     ));
 }
