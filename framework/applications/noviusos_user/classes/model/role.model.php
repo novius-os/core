@@ -87,32 +87,22 @@ class Model_Role extends \Nos\Orm\Model
 
         return $this->checkPermission($application, $key);
     }
-    /**
-     * @param   string       $permission_name  Name of the permission to check against
-     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
-     * @param   bool         $allowEmpty       (optional) If the permission has categories, authorise the chosen category if it's not configured (useful for default value)
-     * @return  bool  Has the role the required authorisation?
-     */
-    public function checkPermissionOrEmpty($permission_name, $category_key = null)
-    {
-        return $this->checkPermission($permission_name, $category_key, true);
-    }
 
     /**
-     * @param   string       $permission_name  Name of the permission to check against
-     * @param   null|string  $category_key     (optional) If the permission has categories, the category key to check against
+     * @param   string       $permissionName  Name of the permission to check against
+     * @param   null|string  $categoryKey     (optional) If the permission has categories, the category key to check against
      * @param   bool         $allowEmpty       (optional) If the permission has categories, authorise the chosen category if it's not configured (useful for default value)
      * @return  bool  Has the role the required authorisation?
      */
-    public function checkPermission($permission_name, $category_key = null, $allowEmpty = false)
+    public function checkPermission($permissionName, $categoryKey = null, $allowEmpty = false)
     {
-        if (!$this->_authorised($permission_name)) {
+        if (!$this->_authorised($permissionName)) {
             return false;
         }
 
         // For permissions without category, just check the existence of the permission
-        $isset = isset(static::$permissions[$this->role_id][$permission_name]);
-        if ($category_key == null) {
+        $isset = isset(static::$permissions[$this->role_id][$permissionName]);
+        if ($categoryKey == null) {
             return $isset;
         }
 
@@ -120,7 +110,7 @@ class Model_Role extends \Nos\Orm\Model
         if ($allowEmpty && !$isset) {
             return true;
         }
-        return $isset && in_array($category_key, static::$permissions[$this->role_id][$permission_name]);
+        return $isset && in_array($categoryKey, static::$permissions[$this->role_id][$permissionName]);
     }
 
     /**
@@ -136,6 +126,52 @@ class Model_Role extends \Nos\Orm\Model
             return false;
         }
         return isset(static::$permissions[$this->role_id][$permission_name]) ? static::$permissions[$this->role_id][$permission_name] : false;
+    }
+
+    public function checkPermissionOrEmpty($permissionName, $categoryKey)
+    {
+        return $this->checkPermission($permissionName, $categoryKey, true);
+    }
+
+    public function checkPermissionExists($permissionName, $categoryKey, $allowEmpty = false)
+    {
+        return $this->checkPermission($permissionName, $categoryKey, $allowEmpty);
+    }
+
+    public function checkPermissionExistsOrEmpty($permissionName, $categoryKey)
+    {
+        return $this->checkPermission($permissionName, $categoryKey, true);
+    }
+
+    public function checkPermissionAtLeast($permissionName, $threshold, $valueWhenEmpty = 0)
+    {
+        $value = $this->getPermissionValue($permissionName, $valueWhenEmpty);
+        return  ($value === false) ? false : ($value >= $threshold);
+    }
+
+    public function checkPermissionAtMost($permissionName, $threshold, $valueWhenEmpty = 0)
+    {
+        $value = $this->getPermissionValue($permissionName, $valueWhenEmpty);
+        return  ($value === false) ? false : ($value <= $threshold);
+    }
+
+    public function checkPermissionIsAllowed($permissionName, $valueWhenEmpty = false)
+    {
+        if (!$this->_authorised($permissionName)) {
+            return false;
+        }
+        return  isset(static::$permissions[$this->role_id][$permissionName]) ? true : $valueWhenEmpty;
+    }
+
+    public function getPermissionValue($permissionName, $default = null)
+    {
+        if (!$this->_authorised($permissionName)) {
+            return false;
+        }
+        if (isset(static::$permissions[$this->role_id][$permissionName])) {
+            return static::$permissions[$this->role_id][$permissionName][0];
+        }
+        return $default;
     }
 
     protected function _authorised($permission_name)

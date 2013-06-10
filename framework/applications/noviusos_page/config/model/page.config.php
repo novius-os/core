@@ -34,7 +34,7 @@ return array(
             'options' => array(
                 'allow_publish' => array(
                     'check_draft' => function() {
-                        return !Nos\User\Permission::check('noviusos_page::access', 'draft');
+                        return Nos\User\Permission::atLeast('noviusos_page::page', '2_fullaccess', 2);
                     },
                 ),
             ),

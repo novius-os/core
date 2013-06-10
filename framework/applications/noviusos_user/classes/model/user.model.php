@@ -199,13 +199,23 @@ class Model_User extends \Nos\Orm\Model
      */
     public function checkPermission($permission_name, $category_key = null, $allowEmpty = false)
     {
+        return $this->checkRolesPermissions('exists', func_get_args());
+    }
+
+    /**
+     * @param $method Method to check: isAllowed, exists, atLeast, atMost
+     * @param string $args
+     * @return bool
+     */
+    public function checkRolesPermission()
+    {
         $args = func_get_args();
-        foreach ($this->roles as $g) {
-            if (call_user_func_array(array($g, 'checkPermission'), $args)) {
+        $method = array_shift($args);
+        foreach ($this->roles as $role) {
+            if (call_user_func_array(array($role, 'checkPermission'.$method), $args)) {
                 return true;
             }
         }
-
         return false;
     }
 

@@ -12,15 +12,74 @@ namespace Nos\User;
 
 class Permission
 {
-    public static function check($permission_name, $category_key = null, $allowEmpty = false)
+    /**
+     * @alias Use exists() instead
+     */
+    public static function check($permissionName, $categoryKey = null, $allowEmpty = false)
     {
-        $user = \Session::user();
-        return $user->checkPermission($permission_name, $category_key, $allowEmpty);
+        return \Session::user()->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
     }
 
-    public static function checkOrEmpty($permission_name, $category_key = null)
+    /**
+     * Check whether a permissions exists
+     *
+     * @param $permissionName Name of the permission
+     * @param null $categoryKey (optional) If the permission has categories, the category key to check against
+     * @return bool
+     */
+    public function exists($permissionName, $categoryKey = null, $allowEmpty = false)
     {
-        return static::check($permission_name, $category_key, true);
+        return \Session::user()->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
+    }
+
+    /**
+     * Check whether a permissions exists or is not configured
+     *
+     * @param $permissionName Name of the permission
+     * @param null $categoryKey (optional) If the permission has categories, the category key to check against
+     * @return bool
+     */
+    public static function existsOrEmpty($permissionName, $categoryKey = null)
+    {
+        return \Session::user()->checkRolesPermission('ExistsOrEmpty', $permissionName, $categoryKey);
+    }
+
+    /**
+     * Check against a binary permission (value is either 0 or 1).
+     *
+     * @param $permissionName  Name of the permission
+     * @param bool $allowEmpty Should we grant access when nothing is configured?
+     * @return bool
+     */
+    public function isAllowed($permissionName, $allowEmpty = false)
+    {
+        return  \Session::user()->checkRolesPermission('IsAllowed', $permissionName, $allowEmpty);
+    }
+
+    /**
+     * Check against a numeric (range) permission.
+     *
+     * @param $permissionName  Name of the permission
+     * @param $threshold Minimum value to grant access
+     * @param bool $valueWhenEmpty Default value to compare with when nothing is configured?
+     * @return bool
+     */
+    public function atLeast($permissionName, $threshold, $valueWhenEmpty = 0)
+    {
+        return  \Session::user()->checkRolesPermission('AtLeast', $permissionName, (int) $threshold, $valueWhenEmpty);
+    }
+
+    /**
+     * Check against a numeric (range) permission.
+     *
+     * @param $permissionName  Name of the permission
+     * @param $threshold Maximum value to grant access
+     * @param bool $valueWhenEmpty Default value to compare with when nothing is configured?
+     * @return bool
+     */
+    public function atMost($permissionName, $threshold, $valueWhenEmpty = 0)
+    {
+        return  \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, $valueWhenEmpty);
     }
 
     public static function add($permission_name, $category_key)
