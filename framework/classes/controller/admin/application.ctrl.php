@@ -69,6 +69,6 @@ class Controller_Admin_Application extends Controller_Admin_Auth
     public static function get_path()
     {
         list($application, $file_name) = \Config::configFile(get_called_class());
-        return 'admin/'.$application.'/'.substr($file_name, strlen('controller/admin/'));
+        return 'admin/'.$application.'/'.substr(\File::validOSPath($file_name, '/'), strlen('controller/admin/'));
     }
 }

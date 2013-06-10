@@ -56,6 +56,9 @@ class Tools_File
      */
     public static function relativePath($from, $to, $ds = DIRECTORY_SEPARATOR)
     {
+        $from = \File::validOSPath($from);
+        $to = \File::validOSPath($to);
+
         $arFrom = explode($ds, rtrim($from, $ds));
         $arTo = explode($ds, rtrim($to, $ds));
         $similar = 0;

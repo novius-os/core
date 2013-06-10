@@ -437,7 +437,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($behaviour_twinnable) || $instance->is_main_context()) {
             return;
         }
-        foreach ($behaviour_twinnable['invariant_fields'] as $f) {
+        foreach ($behaviour_twinnable['common_fields'] as $f) {
             $field = $this->field($f);
             if (!empty($field)) {
                 $field->set_attribute('readonly', true);

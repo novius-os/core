@@ -25,11 +25,11 @@ $options = array(
 ?>
 <script type="text/javascript">
 require(
-    ['jquery-nos-contextable-invariant-fields'],
+    ['jquery-nos-context-common-fields'],
     function($) {
         $(function() {
             $('#<?= isset($container_id) ? $container_id : $fieldset->form()->get_attribute('id') ?>')
-                .nosContextableinvariantFields(<?= \Format::forge($options)->to_json() ?>);
+                .nosContextCommonFields(<?= \Format::forge($options)->to_json() ?>);
         });
     });
 </script>

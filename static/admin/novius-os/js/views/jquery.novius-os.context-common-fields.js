@@ -6,13 +6,13 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-define('jquery-nos-contextable-invariant-fields',
+define('jquery-nos-context-common-fields',
     ['jquery-nos'],
     function($) {
         "use strict";
 
         $.fn.extend({
-            nosContextableinvariantFields : function(params) {
+            nosContextCommonFields : function(params) {
                 params = params || {
                     texts : {
                         popin_title: 'This field is common to all contexts/languages/sites',
@@ -59,7 +59,7 @@ define('jquery-nos-contextable-invariant-fields',
                                 });
                             };
 
-                    $container.find('[context_invariant_field]').each(function() {
+                    $container.find('[context_common_field]').each(function() {
                         var $element = $(this),
                             $div,
                             init = function($el, click) {

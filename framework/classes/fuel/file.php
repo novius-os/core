@@ -12,6 +12,9 @@ class File extends Fuel\Core\File
 {
     public static function relativeSymlink($target, $link)
     {
+        $link = static::validOSPath($link);
+        $target = static::validOSPath($target);
+
         $dirname = dirname($link);
         $relative = \Nos\Tools_File::relativePath($dirname, $target);
 
@@ -22,7 +25,7 @@ class File extends Fuel\Core\File
     {
         $methods = array(
             function($target, $link, $is_file) {
-                return symlink($target, $link);
+                return @symlink($target, $link);
             },
             function($target, $link, $is_file) {
                 if (OS_WIN) {
@@ -48,13 +51,11 @@ class File extends Fuel\Core\File
         );
 
         if ($is_file === null) {
-            $is_file = !pathinfo($target, PATHINFO_EXTENSION) === '';
+            $is_file = pathinfo($target, PATHINFO_EXTENSION) !== '';
         }
 
-        $target      = rtrim(static::instance($area)->get_path($target), '\\/');
-        $link = rtrim(static::instance($area)->get_path($link), '\\/');
-
-        $link = static::validOSPath($link, DS);
+        $link = static::validOSPath($link);
+        $target = static::validOSPath($target);
 
         foreach ($methods as $method) {
             if ($method($target, $link, $is_file)) {
@@ -78,5 +79,14 @@ class File extends Fuel\Core\File
     public static function validOSPath($path, $default = DS)
     {
         return str_replace(array('/', '\\'), array($default, $default), $path);
+    }
+
+    public static function delete($path, $area = null)
+    {
+        if (is_dir($path)) {
+            return rmdir($path);
+        } else {
+            return unlink($path);
+        }
     }
 }

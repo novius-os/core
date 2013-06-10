@@ -6,7 +6,7 @@ class Config_Common
     public static function load($model, $filter_data_mapping = array())
     {
         list($application_name, $file) = \Config::configFile($model);
-        $file = 'common'.substr($file, strrpos($file, '/'));
+        $file = 'common'.substr($file, strrpos($file, DS));
 
         $config = \Config::loadConfiguration($application_name, $file);
 
