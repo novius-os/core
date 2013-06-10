@@ -25,7 +25,7 @@ class File extends Fuel\Core\File
     {
         $methods = array(
             function($target, $link, $is_file) {
-                return symlink($target, $link);
+                return @symlink($target, $link);
             },
             function($target, $link, $is_file) {
                 if (OS_WIN) {
@@ -79,5 +79,13 @@ class File extends Fuel\Core\File
     public static function validOSPath($path, $default = DS)
     {
         return str_replace(array('/', '\\'), array($default, $default), $path);
+    }
+
+    public static function delete($path, $area = null) {
+        if (is_dir($path)) {
+            return rmdir($path);
+        } else {
+            return unlink($path);
+        }
     }
 }

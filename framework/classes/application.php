@@ -606,7 +606,7 @@ class Application
     {
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
         if (\File::is_link($public) || file_exists($public)) {
-            return unlink($public);
+            return \File::delete($public);
         }
 
         return true;
