@@ -28,7 +28,9 @@ if (in_array($nos_url, array(
     exit();
 }
 
+
 $is_media = preg_match('`^(?:cache/)?media/`', $nos_url);
+
 if ($is_media) {
     $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m);
 
@@ -86,6 +88,8 @@ if ($is_media) {
             $send_file = APPPATH.$media->get_private_path();
             $target = $media->get_public_path();
         }
+
+        $send_file =  \File::validOSPath($send_file);
 
         $source = $send_file;
         $target = DOCROOT.$target;

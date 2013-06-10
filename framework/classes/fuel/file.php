@@ -12,6 +12,9 @@ class File extends Fuel\Core\File
 {
     public static function relativeSymlink($target, $link)
     {
+        $link = static::validOSPath($link);
+        $target = static::validOSPath($target);
+
         $dirname = dirname($link);
         $relative = \Nos\Tools_File::relativePath($dirname, $target);
 
@@ -48,13 +51,11 @@ class File extends Fuel\Core\File
         );
 
         if ($is_file === null) {
-            $is_file = !pathinfo($target, PATHINFO_EXTENSION) === '';
+            $is_file = pathinfo($target, PATHINFO_EXTENSION) !== '';
         }
 
-        $target      = rtrim(static::instance($area)->get_path($target), '\\/');
-        $link = rtrim(static::instance($area)->get_path($link), '\\/');
-
-        $link = static::validOSPath($link, DS);
+        $link = static::validOSPath($link);
+        $target = static::validOSPath($target);
 
         foreach ($methods as $method) {
             if ($method($target, $link, $is_file)) {
