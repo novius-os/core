@@ -81,7 +81,8 @@ class File extends Fuel\Core\File
         return str_replace(array('/', '\\'), array($default, $default), $path);
     }
 
-    public static function delete($path, $area = null) {
+    public static function delete($path, $area = null)
+    {
         if (is_dir($path)) {
             return rmdir($path);
         } else {
