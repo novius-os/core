@@ -24,7 +24,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     /**
      * common_id_property
      * is_main_property
-     * invariant_fields
+     * common_fields
      */
     protected $_properties = array();
 
@@ -141,7 +141,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     public function hasInvariantFields()
     {
         $class = $this->_class;
-        return count($this->_properties['invariant_fields']) > 0 ||
+        return count($this->_properties['common_fields']) > 0 ||
             static::sharedWysiwygsContext($class) > 0 ||
             static::sharedMediaContext($class) > 0;
     }
@@ -152,7 +152,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     public function isInvariantField($name)
     {
-        if (in_array($name, $this->_properties['invariant_fields'])) {
+        if (in_array($name, $this->_properties['common_fields'])) {
             return true;
         }
         $arr_name = explode('->', $name);
@@ -303,7 +303,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $in_progress_before_save = array_keys($items);
 
             foreach ($items as $it) {
-                foreach ($this->_properties['invariant_fields'] as $invariant) {
+                foreach ($this->_properties['common_fields'] as $invariant) {
                     $it->set($invariant, $item->get($invariant));
                 }
             }
@@ -706,8 +706,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             ((!$crud->is_new && count($contexts = $crud->item->get_other_context()) > 0) ||
                 ($crud->is_new && !empty($crud->item->{$this->_properties['common_id_property']})))) {
 
-            $crud->config['layout_insert']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
-            $crud->config['layout_update']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+            $crud->config['layout_insert']['common_fields'] = array('view' => 'nos::crud/context_common_fields');
+            $crud->config['layout_update']['common_fields'] = array('view' => 'nos::crud/context_common_fields');
 
             if ($crud->is_new) {
                 $contexts = $crud->item->get_all_context();

@@ -65,16 +65,16 @@ return array(
     #: views/crud/blank_slate.view.php:118
     '(Form filled with the contents from the original version)' => '(元のコンテンツが挿入された状態から)',
 
-    #: views/crud/invariant_fields.view.php:21
+    #: views/crud/common_fields.view.php:21
     'This field is common to all contexts' => 'このフィールドは全てのコンテキストに共通です。',
 
-    #: views/crud/invariant_fields.view.php:22
+    #: views/crud/common_fields.view.php:22
     'When you modify the value of this field, the change applies to the following contexts:' => 'このフィールドの値を変更すると、以下のコンテキストに適用されます。',
 
-    #: views/crud/invariant_fields.view.php:23
+    #: views/crud/common_fields.view.php:23
     'Go ahead, I understand' => 'はい、了解しました',
 
-    #: views/crud/invariant_fields.view.php:24
+    #: views/crud/common_fields.view.php:24
     'Cancel, I won’t modify it' => 'いいえ、変更しません',
 
 );
