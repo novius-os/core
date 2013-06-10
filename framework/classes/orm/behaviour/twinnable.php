@@ -12,6 +12,10 @@ namespace Nos;
 
 class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 {
+    protected static $_shared_medias_context_cached = array();
+
+    protected static $_shared_wysiwygs_context_cached = array();
+
     public static function _init()
     {
         I18n::current_dictionary('nos::orm');
@@ -23,6 +27,196 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * invariant_fields
      */
     protected $_properties = array();
+
+    /**
+     * Add relations for linked media and wysiwyg shared with other context
+     */
+    public function buildRelations()
+    {
+        $class = $this->_class;
+
+        $class::addRelation('has_many', 'linked_shared_wysiwygs_context', array(
+            'key_from' => $this->_properties['common_id_property'],
+            'model_to' => 'Nos\Model_Wysiwyg',
+            'key_to' => 'wysiwyg_foreign_context_common_id',
+            'cascade_save' => true,
+            'cascade_delete' => true,
+            'conditions' => array(
+                'where' => array(
+                    array('wysiwyg_join_table', '=', \DB::expr(\DB::quote($class::table()))),
+                ),
+            ),
+        ));
+
+        $class::addRelation('has_many', 'linked_shared_medias_context', array(
+            'key_from' => $this->_properties['common_id_property'],
+            'model_to' => 'Nos\Media\Model_Link',
+            'key_to' => 'medil_foreign_context_common_id',
+            'cascade_save' => true,
+            'cascade_delete' => true,
+            'conditions' => array(
+                'where' => array(
+                    array('medil_from_table', '=', \DB::expr(\DB::quote($class::table()))),
+                ),
+            ),
+        ));
+    }
+
+    /**
+     * Add linked wysiwygs shared by twin contexts in linked wysiwygs array
+     *
+     * @param \Nos\Orm\Model $item
+     * @param array $linked_wysiwygs Array of linked wysiwygs, Passed by reference.
+     */
+    public function getLinkedWysiwygs(Orm\Model $item, &$linked_wysiwygs)
+    {
+        $linked_wysiwygs = $linked_wysiwygs + $item->linked_shared_wysiwygs_context;
+    }
+
+    /**
+     * Add linked medias shared by twin contexts in linked medias array
+     *
+     * @param \Nos\Orm\Model $item
+     * @param array $linked_medias Array of linked medias, Passed by reference.
+     */
+    public function getLinkedMedias(Orm\Model $item, &$linked_medias)
+    {
+        $linked_medias = $linked_medias + $item->linked_shared_medias_context;
+    }
+
+    /**
+     * Add linked wysiwyg to the item if is shared by twin contexts
+     *
+     * @param \Nos\Orm\Model $item
+     * @param bool $added Passed by reference. Set to true if the wysiwyg is a linked wysiwyg shared by context.
+     * @param string $name Name of the linked wysiwyg,
+     * @param string $value Content of the wysiwyg.
+     */
+    public function addLinkedWysiwyg(Orm\Model $item, &$added, $name, $value)
+    {
+        $class = $this->_class;
+
+        if (in_array($name, static::sharedWysiwygsContext($class))) {
+            $wysiwyg = new \Nos\Model_Wysiwyg();
+            $wysiwyg->wysiwyg_text = $value;
+            $wysiwyg->wysiwyg_join_table = $class::table();
+            $wysiwyg->wysiwyg_key = $name;
+            $wysiwyg->wysiwyg_foreign_context_common_id = $item->{$this->_properties['common_id_property']};
+            // Don't save the link here, it's done with cascade_save = true
+            //$wysiwyg->save();
+            $this->linked_shared_wysiwygs_context[] = $wysiwyg;
+
+            $added = true;
+        }
+    }
+
+    /**
+     * Add linked media to the item if is shared by twin contexts
+     *
+     * @param \Nos\Orm\Model $item
+     * @param bool $added Passed by reference. Set to true if the media is a linked media shared by context.
+     * @param string $name Name of the linked media,
+     * @param int $value Id of the media.
+     */
+    public function addLinkedMedia(Orm\Model $item, &$added, $name, $value)
+    {
+        $class = $this->_class;
+
+        if (in_array($name, static::sharedMediaContext($class))) {
+            $medil = new \Nos\Media\Model_Link();
+            $medil->medil_from_table = $class::table();
+            $medil->medil_key = $name;
+            $medil->medil_foreign_context_common_id = $item->{$this->_properties['common_id_property']};
+            $medil->medil_media_id = $value;
+            // Don't save the link here, it's done with cascade_save = true
+            $item->linked_shared_medias_context[] = $medil;
+
+            $added = true;
+        }
+    }
+
+    /**
+     * @return bool Return true if model has invariant fields (fields, linked medias or wysiwyg)
+     */
+    public function hasInvariantFields()
+    {
+        $class = $this->_class;
+        return count($this->_properties['invariant_fields']) > 0 ||
+            static::sharedWysiwygsContext($class) > 0 ||
+            static::sharedMediaContext($class) > 0;
+    }
+
+    /**
+     * @param string $name Name of the field
+     * @return bool Return true the field is context invariant (fields, linked medias or wysiwyg)
+     */
+    public function isInvariantField($name)
+    {
+        if (in_array($name, $this->_properties['invariant_fields'])) {
+            return true;
+        }
+        $arr_name = explode('->', $name);
+        if (count($arr_name) > 1) {
+            $class = $this->_class;
+            if ($arr_name[0] == 'wysiwygs' && in_array($arr_name[1], static::sharedWysiwygsContext($class))) {
+                return true;
+            }
+            if ($arr_name[0] == 'medias' && in_array($arr_name[1], static::sharedMediaContext($class))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $model Model name
+     * @return array Array of wysiwyg keys which is context invariant
+     */
+    public static function sharedWysiwygsContext($model)
+    {
+        $init = array_key_exists($model, static::$_shared_wysiwygs_context_cached);
+
+        if (!$init) {
+            $shared_wysiwygs_context = array();
+            if (property_exists($model, 'shared_wysiwygs_context')) {
+                $shared_wysiwygs_context = $model::${'shared_wysiwygs_context'};
+            }
+
+            $config = $model::configModel();
+            if (!empty($config) && !empty($config['shared_wysiwygs_context'])) {
+                $shared_wysiwygs_context = array_merge($shared_wysiwygs_context, $config['shared_wysiwygs_context']);
+            }
+
+            static::$_shared_wysiwygs_context_cached[$model] = $shared_wysiwygs_context;
+        }
+
+        return static::$_shared_wysiwygs_context_cached[$model];
+    }
+
+    /**
+     * @param $model Model name
+     * @return array Array of media keys which is context invariant for the model
+     */
+    public static function sharedMediaContext($model)
+    {
+        $init = array_key_exists($model, static::$_shared_medias_context_cached);
+
+        if (!$init) {
+            $shared_medias_context = array();
+            if (property_exists($model, 'shared_medias_context')) {
+                $shared_medias_context = $model::${'shared_medias_context'};
+            }
+
+            $config = $model::configModel();
+            if (!empty($config) && !empty($config['shared_medias_context'])) {
+                $shared_medias_context = array_merge($shared_medias_context, $config['shared_medias_context']);
+            }
+
+            static::$_shared_medias_context_cached[$model] = $shared_medias_context;
+        }
+
+        return static::$_shared_medias_context_cached[$model];
+    }
 
     /**
      * Fill in the context_common_id and context properties when creating the object
@@ -71,12 +265,30 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Copies all invariant fields from the main context
+     * Copies all invariant fields from the main context. Remove empty context linked wysiwygs and medias.
      *
      * @param \Nos\Orm\Model $item
      */
     public function before_save(Orm\Model $item)
     {
+        $w_keys = array_keys($item->linked_shared_wysiwygs_context);
+        foreach ($w_keys as $i) {
+            // Remove empty wysiwyg
+            if (empty($item->linked_shared_wysiwygs_context[$i]->wysiwyg_text)) {
+                $this->linked_shared_wysiwygs_context[$i]->delete();
+                unset($item->linked_shared_wysiwygs_context[$i]);
+            }
+        }
+
+        $w_keys = array_keys($item->linked_shared_medias_context);
+        foreach ($w_keys as $i) {
+            // Remove empty medias
+            if (empty($item->linked_shared_medias_context[$i]->medil_media_id)) {
+                $item->linked_shared_medias_context[$i]->delete();
+                unset($item->linked_shared_medias_context[$i]);
+            }
+        }
+
         $obj_main = $this->find_main_context($item);
         // No main context found => we just created a new main item :)
         if (empty($obj_main)) {
@@ -367,6 +579,32 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         return $data;
     }
 
+    public function findMainOrContext($context, array $options = array())
+    {
+        $class = $this->_class;
+        $query = $class::query($options)
+            ->and_where_open()
+                ->where($this->_properties['context_property'], '=', $context)
+                ->or_where($this->_properties['is_main_property'], '=', 1)
+            ->and_where_close();
+
+        $result = array();
+        $result_context = array();
+        foreach ($query->get() as $pk => $item) {
+            if (isset($result_context[$item->{$this->_properties['common_id_property']}])) {
+                if ($item->{$this->_properties['context_property']} !== $context) {
+                    continue;
+                } else {
+                    unset($result[$result_context[$item->{$this->_properties['common_id_property']}]]);
+                }
+            }
+            $result_context[$item->{$this->_properties['common_id_property']}] = $pk;
+            $result[$pk] = $item;
+        }
+
+        return $result;
+    }
+
     public function before_query(&$options)
     {
         if (array_key_exists('where', $options)) {
@@ -448,7 +686,60 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
             $item['context'] = $flags;
         }
+    }
 
-        $commonIds = array();
+    public function crudFields(&$fields, $crud)
+    {
+        $fields = \Arr::merge(
+            $fields,
+            array(
+                $this->_properties['common_id_property'] => array(
+                    'form' => array(
+                        'type' => 'hidden',
+                        'value' => $crud->item->{$this->_properties['common_id_property']},
+                    ),
+                ),
+            )
+        );
+
+        if ($this->hasInvariantFields() &&
+            ((!$crud->is_new && count($contexts = $crud->item->get_other_context()) > 0) ||
+                ($crud->is_new && !empty($crud->item->{$this->_properties['common_id_property']})))) {
+
+            $crud->config['layout_insert']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+            $crud->config['layout_update']['invariant_fields'] = array('view' => 'nos::crud/invariant_fields');
+
+            if ($crud->is_new) {
+                $contexts = $crud->item->get_all_context();
+                if (empty($this->item_from)) {
+                    $from = $crud->item->find_main_context();
+                }
+            }
+            $context_labels = array();
+            foreach ($contexts as $context) {
+                $context_labels[] = Tools_Context::contextLabel($context);
+            }
+            $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
+
+            foreach ($fields as $key => $field) {
+                if ($this->isInvariantField($key)) {
+                    $fields[$key]['form']['disabled'] = true;
+                    $fields[$key]['form']['context_invariant_field'] = true;
+                    $fields[$key]['form']['data-other-contexts'] = $context_labels;
+
+                    if ($crud->is_new && !empty($from)) {
+                        $crud->item->{$key} = $from->{$key};
+                    }
+                }
+            }
+        }
+    }
+
+    public function wysiwygOptions(Orm\Model $item, &$options)
+    {
+        $context_options = \Config::get('wysiwyg.setups.'.$item->{$this->_properties['context_property']}, false);
+        if ($context_options) {
+            $options = array_merge($options, $context_options);
+        }
     }
 }

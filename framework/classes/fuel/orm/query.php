@@ -42,6 +42,7 @@ class Query extends \Orm\Query
     {
         return $this->alias;
     }
+
     public function connection()
     {
         return $this->connection;
@@ -50,5 +51,26 @@ class Query extends \Orm\Query
     public function model()
     {
         return $this->model;
+    }
+
+    public function hydrate(&$row, $models, &$result, $model = null, $select = null, $primary_key = null)
+    {
+        $alias = false;
+        foreach ($primary_key as $alias => $pk) {
+            if (!is_int($alias)) {
+                $alias = true;
+                break;
+            }
+        }
+        if ($alias) {
+            foreach ($select as $i => $s) {
+                if ($s[0] instanceof \Database_Expression) {
+                    $f = substr($s[1], 0, strpos($s[1], '_')).'.'.substr($s[1], strpos($s[1], '_') + 1);
+                    $select[$i][0] = $f;
+                }
+            }
+        }
+
+        return parent::hydrate($row, $models, $result, $model, $select, $primary_key);
     }
 }

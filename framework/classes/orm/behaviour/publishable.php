@@ -181,23 +181,20 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             'label' => '',
         ), $config['fields']['_publishable']);
 
-        // 2. injecting the field as the first one of the 'subtitle' section of layout_standard
-        if (isset($config['layout']['subtitle'])) {
-            // Simplified syntax
-            array_unshift($config['layout']['subtitle'], '_publishable');
-        } else {
-            // Full syntax
-            foreach ($config['layout'] as $name => $layout) {
-                if (isset($layout['view']) && in_array($layout['view'], array('nos::form/layout_standard', 'form/layout_standard'))) {
-                    if (!isset($config['layout'][$name]['params'])) {
-                        $config['layout'][$name]['params'] = array();
+        foreach (array('layout', 'layout_insert', 'layout_update') as $layout_name) {
+            if (!empty($config[$layout_name])) {
+                foreach ($config[$layout_name] as $name => $layout) {
+                    if (isset($layout['view']) && in_array($layout['view'], array('nos::form/layout_standard', 'form/layout_standard'))) {
+                        if (!isset($config[$layout_name][$name]['params'])) {
+                            $config[$layout_name][$name]['params'] = array();
+                        }
+                        if (!isset($config[$layout_name][$name]['params']['subtitle'])) {
+                            $config[$layout_name][$name]['params']['subtitle'] = array('_publishable');
+                        } else {
+                            array_unshift($config[$layout_name][$name]['params']['subtitle'], '_publishable');
+                        }
+                        break;
                     }
-                    if (!isset($config['layout'][$name]['params']['subtitle'])) {
-                        $config['layout'][$name]['params']['subtitle'] = array('_publishable');
-                    } else {
-                        array_unshift($config['layout'][$name]['params']['subtitle'], '_publishable');
-                    }
-                    break;
                 }
             }
         }

@@ -39,7 +39,12 @@ class Model_Wysiwyg extends \Nos\Orm\Model
         'wysiwyg_foreign_id' => array(
             'default' => null,
             'data_type' => 'int unsigned',
-            'null' => false,
+            'null' => true,
+        ),
+        'wysiwyg_foreign_context_common_id' => array(
+            'default' => null,
+            'data_type' => 'int unsigned',
+            'null' => true,
         ),
     );
 }

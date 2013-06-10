@@ -12,6 +12,14 @@ namespace Nos;
 
 class Tools_Wysiwyg
 {
+    protected static $_options = array();
+
+    public static function _init()
+    {
+        \Config::load('wysiwyg', true);
+        static::$_options = \Config::get('wysiwyg.default');
+    }
+
     public static function prepare_renderer($content)
     {
         $replaces = array();
@@ -56,5 +64,55 @@ class Tools_Wysiwyg
                 );
             }
         }
+    }
+
+    /**
+     * Return an array of options for the initialisation of wysiwyg
+     *
+     * @param mixed $options Can be a string (the name of the default setup) or an array of options to merge with.
+     * @param Orm\Model $item Model instance of the container of the wysiwyg
+     * @param bool $urlEnhancers If true, the wysiwyg will accept URL enhancers in applications selector.
+     * @return array Options for wysiwyg
+     */
+    public static function jsOptions($options = null, Orm\Model $item = null, $urlEnhancers = false)
+    {
+        empty($options) and $options = \Config::get('wysiwyg.active_setup', 'default');
+        is_string($options) and $options = \Config::get('wysiwyg.setups.'.$options, array());
+
+        $options = array_merge(static::$_options, $options);
+
+        if (!empty($item)) {
+            $model = get_class($item);
+            $pk = \Arr::get($model::primary_key(), 0);
+            $options['container'] = array(
+                'model' => $model,
+                'id' => $item->{$pk},
+            );
+
+            $enhancers = Config_Data::get('enhancers', array());
+
+            if (!$urlEnhancers) {
+                $enhancers = array_filter($enhancers, function($enhancer) {
+                    return empty($enhancer['urlEnhancer']);
+                });
+            }
+
+            foreach ($enhancers as $key => $enhancer) {
+                if (empty($enhancer['iconUrl']) && !empty($enhancer['application'])) {
+                    $enhancers[$key]['iconUrl'] = \Config::icon($enhancer['application'], 16);
+                }
+                if (!empty($enhancer['valid_container']) && is_callable($enhancer['valid_container']) &&
+                    call_user_func($enhancer['valid_container'], $enhancer, $item) === false) {
+
+                    unset($enhancers[$key]);
+                }
+            }
+
+            $options['theme_nos_enhancers'] = $enhancers;
+
+            $item->event('wysiwygOptions', array(&$options));
+        }
+
+        return $options;
     }
 }
