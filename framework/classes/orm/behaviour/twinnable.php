@@ -702,7 +702,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             )
         );
 
-        if ($this->hasCommonFields()Fields() &&
+        if ($this->hasCommonFields() &&
             ((!$crud->is_new && count($contexts = $crud->item->get_other_context()) > 0) ||
                 ($crud->is_new && !empty($crud->item->{$this->_properties['common_id_property']})))) {
 
