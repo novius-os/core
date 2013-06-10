@@ -40,7 +40,7 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 
         foreach ($this->key_from as $key_from) {
             if (!in_array($key_from, $from_behaviour['common_fields'])) {
-                throw new \FuelException('The field "'.$key_from.'" of the model "'.$from.'" has to be declared invariant in Twinnable behaviour');
+                throw new \FuelException('The field "'.$key_from.'" of the model "'.$from.'" has to be declared common in Twinnable behaviour');
             }
         }
 

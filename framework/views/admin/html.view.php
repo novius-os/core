@@ -133,7 +133,7 @@ $config = array(
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
 
-        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.contextable-invariant-fields',
+        'jquery-nos-context-common-fields' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.context-common-fields',
         'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.appstab',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.layout-standard',
@@ -383,7 +383,7 @@ if (!$assets_minified) {
         'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
 
-        'jquery-nos-contextable-invariant-fields' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.contextable-invariant-fields',
+        'jquery-nos-context-common-fields' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.context-common-fields',
         'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.appstab',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.layout-standard',

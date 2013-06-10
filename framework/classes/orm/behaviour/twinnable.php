@@ -136,9 +136,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * @return bool Return true if model has invariant fields (fields, linked medias or wysiwyg)
+     * @return bool Return true if model has common fields (fields, linked medias or wysiwyg)
      */
-    public function hasInvariantFields()
+    public function hasCommonFields()
     {
         $class = $this->_class;
         return count($this->_properties['common_fields']) > 0 ||
@@ -148,9 +148,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     /**
      * @param string $name Name of the field
-     * @return bool Return true the field is context invariant (fields, linked medias or wysiwyg)
+     * @return bool Return true the field is common to contexts (fields, linked medias or wysiwyg)
      */
-    public function isInvariantField($name)
+    public function isCommonField($name)
     {
         if (in_array($name, $this->_properties['common_fields'])) {
             return true;
@@ -170,7 +170,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     /**
      * @param $model Model name
-     * @return array Array of wysiwyg keys which is context invariant
+     * @return array Array of wysiwyg keys which is common to all contexts
      */
     public static function sharedWysiwygsContext($model)
     {
@@ -195,7 +195,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     /**
      * @param $model Model name
-     * @return array Array of media keys which is context invariant for the model
+     * @return array Array of media keys which is common to all contexts for the model
      */
     public static function sharedMediaContext($model)
     {
@@ -265,7 +265,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Copies all invariant fields from the main context. Remove empty context linked wysiwygs and medias.
+     * Copies all common fields from the main context. Remove empty context linked wysiwygs and medias.
      *
      * @param \Nos\Orm\Model $item
      */
@@ -303,8 +303,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $in_progress_before_save = array_keys($items);
 
             foreach ($items as $it) {
-                foreach ($this->_properties['common_fields'] as $invariant) {
-                    $it->set($invariant, $item->get($invariant));
+                foreach ($this->_properties['common_fields'] as $common_field) {
+                    $it->set($common_field, $item->get($common_field));
                 }
             }
 
@@ -702,7 +702,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             )
         );
 
-        if ($this->hasInvariantFields() &&
+        if ($this->hasCommonFields()Fields() &&
             ((!$crud->is_new && count($contexts = $crud->item->get_other_context()) > 0) ||
                 ($crud->is_new && !empty($crud->item->{$this->_properties['common_id_property']})))) {
 
@@ -722,9 +722,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $context_labels = htmlspecialchars(\Format::forge($context_labels)->to_json());
 
             foreach ($fields as $key => $field) {
-                if ($this->isInvariantField($key)) {
+                if ($this->isCommonField($key)) {
                     $fields[$key]['form']['disabled'] = true;
-                    $fields[$key]['form']['context_invariant_field'] = true;
+                    $fields[$key]['form']['context_common_field'] = true;
                     $fields[$key]['form']['data-other-contexts'] = $context_labels;
 
                     if ($crud->is_new && !empty($from)) {
