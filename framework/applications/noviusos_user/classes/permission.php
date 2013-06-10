@@ -27,7 +27,7 @@ class Permission
      * @param null $categoryKey (optional) If the permission has categories, the category key to check against
      * @return bool
      */
-    public function exists($permissionName, $categoryKey = null, $allowEmpty = false)
+    public static function exists($permissionName, $categoryKey = null, $allowEmpty = false)
     {
         return \Session::user()->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
     }
@@ -51,7 +51,7 @@ class Permission
      * @param bool $allowEmpty Should we grant access when nothing is configured?
      * @return bool
      */
-    public function isAllowed($permissionName, $allowEmpty = false)
+    public static function isAllowed($permissionName, $allowEmpty = false)
     {
         return  \Session::user()->checkRolesPermission('IsAllowed', $permissionName, $allowEmpty);
     }
@@ -64,7 +64,7 @@ class Permission
      * @param bool $valueWhenEmpty Default value to compare with when nothing is configured?
      * @return bool
      */
-    public function atLeast($permissionName, $threshold, $valueWhenEmpty = 0)
+    public static function atLeast($permissionName, $threshold, $valueWhenEmpty = 0)
     {
         return  \Session::user()->checkRolesPermission('AtLeast', $permissionName, (int) $threshold, $valueWhenEmpty);
     }
@@ -77,9 +77,9 @@ class Permission
      * @param bool $valueWhenEmpty Default value to compare with when nothing is configured?
      * @return bool
      */
-    public function atMost($permissionName, $threshold, $valueWhenEmpty = 0)
+    public static function atMost($permissionName, $threshold, $valueWhenEmpty = 0)
     {
-        return  \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, $valueWhenEmpty);
+        return  \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, (int) $valueWhenEmpty);
     }
 
     public static function add($permission_name, $category_key)

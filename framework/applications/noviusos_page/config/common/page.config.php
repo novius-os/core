@@ -2,6 +2,15 @@
 
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::application', 'nos::common'));
 
+$check_draft = function($page) {
+    // Not published => not disabled
+    if ($page->planificationStatus() == 0) {
+        return false;
+    }
+    // Published or scheduled => disabled
+    return \Nos\User\Permission::atMost('noviusos_page::page', '1_draft_only', '2_full_access');
+};
+
 return array(
     'data_mapping' => array(
         'page_title' => array(
@@ -85,26 +94,12 @@ return array(
                     'check_locked' => function($page) {
                         return ($page->page_lock == $page::LOCK_DELETION) ? __('You can’t delete this page. It is locked.') : false;
                     },
-                    'check_draft' => function($page) {
-                        // Not published => not disabled
-                        if ($page->planificationStatus() == 0) {
-                            return false;
-                        }
-                        // Published or scheduled => disabled
-                        return \Nos\User\Permission::atMost('noviusos_page::page', '1_draftonly', 2);
-                    },
+                    'check_draft' => $check_draft,
                 ),
             ),
             'edit' => array(
                 'disabled' => array(
-                    'check_draft' => function($page) {
-                        // Not published => not disabled
-                        if ($page->planificationStatus() == 0) {
-                            return false;
-                        }
-                        // Published or scheduled => disabled
-                        return \Nos\User\Permission::atMost('noviusos_page::page', '1_draftonly', 2);
-                    },
+                    'check_draft' => $check_draft,
                 ),
             ),
             'add' => array(
@@ -201,6 +196,6 @@ return array(
             'visualise',
             'share',
             'delete',
-        )
+        ),
     ),
 );

@@ -7,7 +7,7 @@ return array(
         'view' => 'nos::form/accordion',
         'params' => array(
             'accordions' => array(
-                'noviusos_form' => array(
+                'general' => array(
                     'title' => __('Permissions for this application'),
                     'view' => 'noviusos_page::admin/permissions',
                 ),
