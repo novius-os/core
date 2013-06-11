@@ -219,6 +219,18 @@ class Model_User extends \Nos\Orm\Model
         return false;
     }
 
+    public function listPermissionCategories($permissionName)
+    {
+        $categories = array();
+        foreach ($this->roles as $role) {
+            $roleCategories = $role->listPermissionCategories($permissionName);
+            if (!empty($roleCategories)) {
+                $categories = $categories + $roleCategories;
+            }
+        }
+        return $categories;
+    }
+
     public function fullname()
     {
         return $this->user_firstname.(empty($this->user_firstname) ? '' : ' ').$this->user_name;
