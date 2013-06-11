@@ -104,10 +104,22 @@ return array(
         ),
     ),
     'actions' => array(
-        'Nos\Media\Model_Media.add' => array(
+        'add' => array(
             'label' => __('Add a media file'),
+            'visible' => array(
+                'check_permission' => array('Nos\Media\Permission', 'checkMediaVisible'),
+            ),
+            'disabled' => array(
+                'check_draft' => array('Nos\Media\Permission', 'checkPermissionDraft'),
+            ),
         ),
-        'Nos\Media\Model_Media.visualise' => array(
+        'edit' => array(
+            'disabled' => array(
+                'check_draft' => array('Nos\Media\Permission', 'checkPermissionDraft'),
+                'check_folder_restriction' => array('Nos\Media\Permission', 'isMediaInRestrictedFolder'),
+            ),
+        ),
+        'visualise' => array(
             'iconClasses' => 'nos-icon16 nos-icon16-eye',
             'label' => __('Visualise'),
             'action' => array(
@@ -121,6 +133,12 @@ return array(
                 return !isset($params['item']) || !$params['item']->is_new();
             }),
             'disabled' => false,
+        ),
+        'delete' => array(
+            'disabled' => array(
+                'check_draft' => array('Nos\Media\Permission', 'checkPermissionDraft'),
+                'check_folder_restriction' => array('Nos\Media\Permission', 'isMediaInRestrictedFolder'),
+            ),
         ),
     ),
 );

@@ -38,20 +38,34 @@ return array(
         'deleting button 1 item' => __('Yes, delete this folder'),
     ),
     'actions' => array(
-        'Nos\Media\Model_Folder.add' => array(
+        'add' => array(
             'label' => __('Add a folder'),
+            'visible' => array(
+                'check_permission' => array('Nos\Media\Permission', 'checkFolderVisible'),
+            ),
+            'disabled' => array(
+                'check_permission' => array('Nos\Media\Permission', 'checkFolderDisabled'),
+            ),
         ),
-        'Nos\Media\Model_Folder.edit' => array(
-            'disabled' => array(function($item) {
-                return empty($item->medif_parent_id) ? __('You can’t edit the root folder.') : false;
-            }),
+        'edit' => array(
+            'disabled' => array(
+                'check_root' => function($item) {
+                    return empty($item->medif_parent_id) ? __('You can’t edit the root folder.') : false;
+                },
+                'check_permission' => array('Nos\Media\Permission', 'checkFolderDisabled'),
+                'check_folder_restriction' => array('Nos\Media\Permission', 'isFolderRestricted'),
+            ),
         ),
-        'Nos\Media\Model_Folder.delete' => array(
-            'disabled' => array(function($item) {
-                return empty($item->medif_parent_id) ? __('You can’t delete the root folder.') : false;
-            }),
+        'delete' => array(
+            'disabled' => array(
+                'check_root' => function($item) {
+                    return empty($item->medif_parent_id) ? __('You can’t delete the root folder.') : false;
+                },
+                'check_permission' => array('Nos\Media\Permission', 'checkFolderDisabled'),
+                'check_folder_restriction' => array('Nos\Media\Permission', 'isFolderRestricted'),
+            ),
         ),
-        'Nos\Media\Model_Folder.add_media' => array(
+        'add_media' => array(
             'label' => __('Add a media file in this folder'),
             'icon' => 'plus',
             'action' => array(
@@ -63,8 +77,11 @@ return array(
             'targets' => array(
                 'grid' => true,
             ),
+            'disabled' => array(
+                'check_permission' => array('Nos\Media\Permission', 'checkMediaDisabled'),
+            ),
         ),
-        'Nos\Media\Model_Folder.add_subfolder' => array(
+        'add_subfolder' => array(
             'label' => __('Add a sub-folder to this folder'),
             'icon' => 'folder-open',
             'action' => array(
@@ -79,6 +96,9 @@ return array(
             ),
             'targets' => array(
                 'grid' => true,
+            ),
+            'disabled' => array(
+                'check_permission' => array('Nos\Media\Permission', 'checkFolderDisabled'),
             ),
         ),
     ),
