@@ -28,6 +28,10 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
      */
     public function before_save($page, $data)
     {
+        if ($this->item->page_entrance && !$this->item->published()) {
+            $this->send_error(new \Exception(__('The home page must be published. To unpublish this page, set another page as home page first.')));
+        }
+
         parent::before_save($page, $data);
 
         //Set up the first page created in a context as the homepage.
