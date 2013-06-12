@@ -10,7 +10,7 @@
 
     $id = uniqid('temp_');
 ?>
-<div id="<?= $id ?>"></div>
+<div id="<?= $id ?>" class="<?= ($model === null ? '' : str_replace(array('\\', '_'), '-', strtolower($model))).' '.$application ?>"></div>
 <script type="text/javascript">
 require(
     ['jquery-nos-appdesk'],
