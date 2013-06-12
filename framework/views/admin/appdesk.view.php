@@ -8,7 +8,11 @@
  * @link http://www.novius-os.org
  */
 
-    $id = uniqid('temp_');
+$id = uniqid('temp_');
+
+if ($css !== null) {
+    echo render('nos::admin/load_css', array('css_files' => $css));
+}
 ?>
 <div id="<?= $id ?>" class="<?= ($model === null ? '' : str_replace(array('\\', '_'), '-', strtolower($model))).' '.$application ?>"></div>
 <script type="text/javascript">
