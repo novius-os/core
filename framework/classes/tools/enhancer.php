@@ -12,16 +12,45 @@ namespace Nos;
 
 class Tools_Enhancer
 {
+    /**
+     * Get an array of URLs matching to enhancer name, an item and additional parameters.
+     *
+     * @param string $enhancer_name The enhancer name
+     * @param Orm\Model $item A Model item.
+     * @param array $params Array of additional parameters for build URL.
+     * @return array Array of URLs matching to enhancer name, an item and additional parameters.
+     * @throws \RuntimeException If the enhancer is not a URL enhancer
+     */
     public static function url_item($enhancer_name, $item, $params = array())
     {
+        $params['item'] = $item;
+        return static::_urls($enhancer_name, $params, true);
+    }
+
+
+    /**
+     * Get an array of URLs matching to enhancer name and additional parameters.
+     *
+     * @param string $enhancer_name The enhancer name
+     * @param array $params Array of additional parameters for build URL.
+     * @return array Array of URLs matching to enhancer name and additional params.
+     * @throws \RuntimeException If the enhancer is not a URL enhancer
+     */
+    public static function urls($enhancer_name, $params = array())
+    {
+        return static::_urls($enhancer_name, $params);
+    }
+
+    protected static function _urls($enhancer_name, $params, $key_has_url_enhanced = false)
+    {
         // Check if any page contains this enhancer
-        $page_enhanced = \Nos\Config_Data::get('page_enhanced.'.$enhancer_name, array());
+        $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
         if (empty($page_enhanced)) {
             return array();
         }
 
         // Check if this enhancer exists
-        $enhancer = \Nos\Config_Data::get('enhancers.'.$enhancer_name, array());
+        $enhancer = Config_Data::get('enhancers.'.$enhancer_name, array());
         if (empty($enhancer)) {
             logger(\Fuel::L_WARNING, 'The urlEnhancer "'.$enhancer_name.'" don\'t exist anymore.', __METHOD__);
             return array();
@@ -45,78 +74,71 @@ class Tools_Enhancer
         $controller_name = \Inflector::words_to_upper($controller_name);
 
         // Check if the application exists
-        $namespace = \Nos\Config_Data::get('app_namespaces.'.$application_name, '');
+        $namespace = Config_Data::get('app_namespaces.'.$application_name, '');
         if (empty($namespace)) {
             return array();
         }
 
         // This files contains all the urlPath for the pages containing an URL enhancer
-        $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
+        $url_enhanced = Config_Data::get('url_enhanced', array());
 
-        $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
-        $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable', false);
-        if ($twinnable) {
-            $item_context = $item->get_context();
-        }
-        $urlItem   = call_user_func($callback, $item, $params);
-        // Now fetch all the possible URLS
-        $urls = array();
         $urlPath = \Arr::get($params, 'urlPath', false);
         $preview = \Arr::get($params, 'preview', false);
+
+        $callback = array($namespace.'\\'.$controller_name, 'getUrlEnhanced');
+
+        $urlEnhanced = call_user_func($callback, $params);
+
+        // Now fetch all the possible URLS
+        $urls = array();
         if ($urlPath === false) {
-            foreach ($page_enhanced as $page_id => $params) {
-                $now = \Date::forge()->format('mysql');
-                if (is_array($params['published'])) {
-                    $published = (empty($params['published']['start']) || $params['published']['start'] < $now) && (empty($params['published']['end']) || $now < $params['published']['end']);
-                } else {
-                    $published = $params['published'] == true;
+
+            $item = \Arr::get($params, 'item', false);
+            $context = \Arr::get($params, 'context', false);
+            if ($item && !$context) {
+                $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable', false);
+                if ($twinnable) {
+                    $context = $item->get_context();
                 }
-                if ((!$twinnable || $params['context'] == $item_context) && ($preview || $published)) {
-                    $page_params = \Arr::get($url_enhanced, $page_id, false);
-                    if ($page_params) {
-                        $urls[$page_id.'::'.$urlItem] = \Nos\Tools_Url::context(
-                            $page_params['context']).$page_params['url'].$urlItem.($preview ? '?_preview=1' : ''
-                        );
+            }
+
+            foreach ($page_enhanced as $page_id => $page_params) {
+                if (is_array($page_params['published'])) {
+                    $now = \Date::forge()->format('mysql');
+                    $published = (empty($page_params['published']['start']) ||
+                            $page_params['published']['start'] < $now) &&
+                        (empty($page_params['published']['end']) ||
+                            $now < $page_params['published']['end']);
+                } else {
+                    $published = $page_params['published'] == true;
+                }
+                if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
+                    $url_params = \Arr::get($url_enhanced, $page_id, false);
+                    if ($url_params) {
+                        if (empty($urlEnhanced) && !empty($page_params['url'])) {
+                            $url_params['url'] = substr($page_params['url'], 0, -1).'.html';
+                        }
+                        $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
+                            Tools_Url::context($url_params['context']).
+                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
                     }
                 }
             }
         } else {
-            $urls[] = $params['urlPath'].$urlItem.($preview ? '?_preview=1' : '');
+            $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
         }
 
         return $urls;
     }
 
-    public static function urls($enhancer_name, $params = array())
-    {
-        // Check if any page contains this enhancer
-        $page_enhanced = \Nos\Config_Data::get('page_enhanced.'.$enhancer_name, array());
-        if (empty($page_enhanced)) {
-            return array();
-        }
-
-        // @todo: check if this enhancer exists?
-        // @todo: check if the application exists?
-
-        // This files contains all the urlPath for the pages containing an URL enhancer
-        $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
-
-        // Now fetch all the possible URLS
-        $urls = array();
-        $preview = \Arr::get($params, 'preview', false);
-        $context    = \Arr::get($params, 'context', false);
-        foreach ($page_enhanced as $page_id => $params) {
-            if (($context === false || $params['context'] == $context) && ($preview || $params['published'])) {
-                $page_params = \Arr::get($url_enhanced, $page_id, false);
-                if ($page_params) {
-                    $urls[$page_id] = Tools_Url::page($page_id);
-                }
-            }
-        }
-
-        return $urls;
-    }
-
+    /**
+     * Get first URL matching to enhancer name and additional parameters.
+     *
+     * @param string $enhancer_name The enhancer name
+     * @param array $params Array of additional parameters for build URL.
+     * @return string URL matching to enhancer name and additional params, null if no match.
+     * @throws \RuntimeException If the enhancer is not a URL enhancer
+     */
     public static function url($enhancer_name, $params = array())
     {
         $urls = static::urls($enhancer_name, $params);
