@@ -1708,6 +1708,13 @@ define('jquery-nos-appdesk',
                                                                                 );
                                                                             }
                                                                             break;
+
+                                                                        default:
+                                                                            if (typeof formatter.type !== 'undefined') {
+                                                                                require([formatter.type], function(ret) {
+                                                                                    ret.format(formatter, args);
+                                                                                });
+                                                                            }
                                                                     }
                                                                 });
 
