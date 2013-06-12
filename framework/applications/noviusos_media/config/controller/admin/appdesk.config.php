@@ -14,6 +14,23 @@ return array(
     'model' => 'Nos\\Media\\Model_Media',
     'query' => array(
         'limit' => 10,
+        'callback' => array(
+            'permissions' => function($query) {
+                $restricted_folders = \Nos\Media\Permission::getRestrictedFolders();
+                if (empty($restricted_folders)) {
+                    return $query;
+                }
+
+                $query->related('folder');
+                $query->where_open();
+                $query->or_where(array('folder.medif_path', '=', '/'));
+                foreach ($restricted_folders as $restricted_folder) {
+                    $query->or_where(array('folder.medif_path', 'LIKE', $restricted_folder->medif_path.'%'));
+                }
+                $query->where_close();
+                return $query;
+            },
+        ),
     ),
     'search_text' => 'media_title',
     'inspectors' => array(

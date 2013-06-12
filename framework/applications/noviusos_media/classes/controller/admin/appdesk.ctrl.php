@@ -14,6 +14,21 @@ use Fuel\Core\Config;
 
 class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
 {
+    public function before()
+    {
+        try {
+            parent::before();
+        } catch (\Nos\Access_Exception $e) {
+            if (\Input::is_ajax()) {
+                \Response::json(array(
+                    'error' => 'Sorry but you don\'t have access to the Media Centre.'
+                ));
+            } else {
+                throw $e;
+            }
+        }
+    }
+
     public function action_info($id)
     {
         $media = Model_Media::find($id);

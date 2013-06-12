@@ -100,9 +100,9 @@ class Controller_Front extends Controller
         \Event::trigger('front.start');
         \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
 
-        $cache_path = str_replace(array('http://', 'https://', '/'), array('', '', '_'), rtrim($this->_base_href, '/')).DS.rtrim($cache_path, '/');
+        $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $this->_url);
 
-        $this->_cache = FrontCache::forge('pages'.DS.$cache_path);
+        $this->_cache = FrontCache::forge($cache_path);
 
         try {
             if (!$this->_use_cache) {

@@ -79,7 +79,12 @@ class Permission
      */
     public static function atMost($permissionName, $threshold, $valueWhenEmpty = 0)
     {
-        return  \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, (int) $valueWhenEmpty);
+        return \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, (int) $valueWhenEmpty);
+    }
+
+    public function listPermissionCategories($permissionName)
+    {
+        return \Session::user()->listPermissionCategories($permissionName);
     }
 
     public static function add($permission_name, $category_key)
