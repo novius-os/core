@@ -83,7 +83,7 @@ class File extends Fuel\Core\File
 
     public static function delete($path, $area = null)
     {
-        if (is_dir($path)) {
+        if (is_dir($path) && OS_WIN) {
             return rmdir($path);
         } else {
             return unlink($path);
