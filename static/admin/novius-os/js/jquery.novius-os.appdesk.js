@@ -1713,6 +1713,8 @@ define('jquery-nos-appdesk',
                                                                             if (typeof formatter.type !== 'undefined') {
                                                                                 require([formatter.type], function(ret) {
                                                                                     ret.format(formatter, args);
+                                                                                }, function () {
+                                                                                    log('Could not load formatter: ' + formatter.type);
                                                                                 });
                                                                             }
                                                                     }
