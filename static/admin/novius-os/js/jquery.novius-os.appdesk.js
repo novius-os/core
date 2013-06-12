@@ -317,6 +317,11 @@ define('jquery-nos-appdesk',
                                     self.uiToolbarContextsDialog.find(':checked').each(function() {
                                         o.selectedContexts.push($(this).val());
                                     });
+                                    if (o.selectedContexts.length === 0) {
+                                        self.uiToolbarContextsDialog.find(':checkbox').each(function() {
+                                            o.selectedContexts.push($(this).val());
+                                        });
+                                    }
 
                                     self._selectContexts();
                                 }
