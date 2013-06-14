@@ -8,6 +8,7 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary('noviusos_user::common');
 
 $roles = Nos\User\Model_Role::find('all');
 $selected = array_keys($user->roles);
