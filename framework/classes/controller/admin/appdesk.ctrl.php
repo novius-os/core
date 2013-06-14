@@ -54,9 +54,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view = View::forge('admin/appdesk');
 
-        $contexts = Tools_Context::contexts();
-        $locales = Tools_Context::locales();
-        $sites = Tools_Context::sites();
+        $contexts = \Nos\User\Permission::contexts();
+        $locales = \Nos\User\Permission::locales();
+        $sites = \Nos\User\Permission::sites();
 
         foreach ($contexts as $context => $params) {
             $site = Tools_Context::siteCode($context);

@@ -12,7 +12,7 @@ $config = array(
     'actions' => array(),
 );
 
-$contexts = array_keys(\Nos\Tools_Context::contexts());
+$contexts = array_keys(\Nos\User\Permission::contexts());
 
 if (count($contexts) > 1) {
     $sites = \Nos\Tools_Context::sites();
@@ -32,6 +32,11 @@ if (count($contexts) > 1) {
             'label' => $label,
             'targets' => array(
                 'toolbar-edit' => true,
+            ),
+            'visible' => array(
+                'check_is_new' => function($params) {
+                    return !isset($params['item']) || !$params['item']->is_new();
+                },
             ),
             'align' => 'begin',
             'menu' => array(

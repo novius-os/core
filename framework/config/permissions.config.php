@@ -16,11 +16,11 @@ return array(
         'view' => 'nos::admin/permissions/core',
         'params' => array(
             'list' => array(
-                /*'contexts' => array(
+                'contexts' => array(
                     'permission_name' => 'nos::context',
-                    'title' => __('Can access the following contexts:'),
+                    'title' => __('Is granted access to the following contexts:'),
                     'view' => 'nos::admin/permissions/list_contexts',
-                ),*/
+                ),
                 'apps' => array(
                     'permission_name' => 'nos::access',
                     'title' => __('Is granted access to the following applications:'),

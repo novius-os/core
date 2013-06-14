@@ -69,7 +69,8 @@ $contexts = array_keys(\Nos\Tools_Context::contexts());
 if (!empty($item) && count($contexts) > 1) {
     $contextable = $item->behaviours('Nos\Orm_Behaviour_Twinnable') !== null || $item->behaviours('Nos\Orm_Behaviour_Contextable') !== null;
     if ($contextable) {
-        if ($item->is_new()) {
+        $allowed_contexts = \Nos\User\Permission::contexts();
+        if ($item->is_new() && count($allowed_contexts) > 1) {
             $flag = \Nos\Tools_Context::flagUrl($item->get_context());
             $site = \Nos\Tools_Context::site($item->get_context());
             ?>
@@ -77,7 +78,7 @@ if (!empty($item) && count($contexts) > 1) {
                 <button class="change-context" type="button"><?= \Nos\Tools_Context::contextLabel($item->get_context(), array('template' => '{site}<br />{locale}', 'short' => true)) ?></button>
                 <ul style="display: none;">
             <?php
-            foreach (\Nos\Tools_Context::contexts() as $context => $domains) {
+            foreach ($allowed_contexts as $context => $domains) {
                 echo '<li data-context="'.e(\Format::forge(array('code' => $context, 'label' => \Nos\Tools_Context::contextLabel($context, array('template' => '{site}<br />{locale}', 'short' => true))))->to_json()).'"><a>'.strtr(__('Add to {{context}}'), array('{{context}}' => \Nos\Tools_Context::contextLabel($context))).'</a></li>';
             }
             ?>

@@ -3,11 +3,11 @@
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::application', 'nos::common'));
 
 $check_draft = function($page) {
-    // Not published => not disabled
+    // Not published => don't disable
     if ($page->planificationStatus() == 0) {
         return false;
     }
-    // Published or scheduled => disabled
+    // Published or scheduled => disable
     return \Nos\User\Permission::atMost('noviusos_page::page', '1_draft_only', '2_full_access');
 };
 
@@ -95,6 +95,35 @@ return array(
                         return ($page->page_lock == $page::LOCK_DELETION) ? __('You can’t delete this page. It is locked.') : false;
                     },
                     'check_draft' => $check_draft,
+                    'check_draft_children' => function($item, $params = array()) {
+                        // This will check if any children is published to ensure people with the draft access
+                        // cannot delete an unpublished page which contains published children
+
+                        // Only do this in the popup because it could be a bit resource-hungry
+                        if (!isset($params['delete_popup'])) {
+                            return false;
+                        }
+
+                        // If user has full access to the pages application, allow the action
+                        if (\Nos\User\Permission::atLeast('noviusos_page::page', '2_full_access', '2_full_access')) {
+                            return false;
+                        }
+
+                        // If there is no children, allow the action
+                        $ids = $item->get_ids_children(false);
+                        if (empty($ids)) {
+                            return false;
+                        }
+
+                        $count_unpublished = $item::query(array(
+                            'where' => array(
+                                array(\Arr::get($item->primary_key(), 0), 'IN', $ids),
+                                array('published', false),
+                            ),
+                        ))->count();
+                        // If any child is published, deny the action
+                        return $count_unpublished != count($ids);
+                    },
                 ),
             ),
             'edit' => array(

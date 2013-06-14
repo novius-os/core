@@ -173,7 +173,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             return array();
         }
 
-        return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $this->get_ids_children($item, $include_self)))));
+        return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $ids))));
     }
 
     protected static function _populate_id_children($current_item, $children_relation, &$array)

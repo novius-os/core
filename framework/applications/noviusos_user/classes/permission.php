@@ -112,4 +112,64 @@ class Permission
 
         return true;
     }
+
+    public static function contexts()
+    {
+        static $contexts = null;
+        if ($contexts !== null) {
+            return $contexts;
+        }
+
+        $contexts = \Nos\Tools_Context::contexts();
+
+        $full_access = \Nos\User\Permission::check('nos::context', 'does_not_exists', true);
+        if (!$full_access) {
+            $allowedContexts = \Nos\User\Permission::listPermissionCategories('nos::context');
+            $contexts = array_intersect_key(array_combine($allowedContexts, $allowedContexts), $contexts);
+        }
+
+        return $contexts;
+    }
+
+    public static function locales()
+    {
+        static $locales = null;
+        if ($locales !== null) {
+            return $locales;
+        }
+
+        $locales = \Nos\Tools_Context::locales();
+
+        foreach (static::contexts() as $context => $config) {
+            $allowedLocales[\Nos\Tools_Context::localeCode($context)] = true;
+        }
+
+        foreach ($locales as $code => $locale) {
+            if (!isset($allowedLocales[$code])) {
+                unset($locales[$code]);
+            }
+        }
+        return $locales;
+    }
+
+    public static function sites()
+    {
+        static $sites = null;
+        if ($sites !== null) {
+            return $sites;
+        }
+
+        $sites = \Nos\Tools_Context::sites();
+
+        foreach (static::contexts() as $context => $config) {
+            $allowedSites[\Nos\Tools_Context::siteCode($context)] = true;
+        }
+
+        foreach ($sites as $code => $site) {
+            if (!isset($allowedLocales[$code])) {
+                unset($sites[$code]);
+            }
+        }
+        return $sites;
+    }
 }

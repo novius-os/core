@@ -41,6 +41,17 @@ return array(
             'targets' => array(
                 'grid' => true,
             ),
+            'disabled' => array(
+                'check_context' => function($item) {
+                    try {
+                        $context = $item->get_context();
+                    } catch (\Exception $e) {
+                        // No context on the item => no permission to check
+                        return false;
+                    }
+                    return !in_array($context, array_keys(\Nos\User\Permission::contexts()));
+                },
+            ),
         ),
         'delete' => array(
             'action' => array(
@@ -62,6 +73,17 @@ return array(
             'visible' => array(
                 'check_is_new' => function($params) {
                     return !isset($params['item']) || !$params['item']->is_new();
+                },
+            ),
+            'disabled' => array(
+                'check_context' => function($item) {
+                    try {
+                        $context = $item->get_context();
+                    } catch (\Exception $e) {
+                        // No context on the item => no permission to check
+                        return false;
+                    }
+                    return !in_array($context, array_keys(\Nos\User\Permission::contexts()));
                 },
             ),
         ),

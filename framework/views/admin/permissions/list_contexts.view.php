@@ -30,7 +30,7 @@ foreach (\Nos\Tools_Context::sites() as $site => $site_params) {
         $category_key = $site.'::'.$locale;
         if (isset($contexts[$category_key])) {
             ?>
-            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $category_key ?>" <?= $role->checkPermission($permission_name, $category_key) ? 'checked' : '' ?> />
+            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $category_key ?>" <?= $role->checkPermissionOrEmpty($permission_name, $category_key) ? 'checked' : '' ?> />
             <?php
         }
         ?>

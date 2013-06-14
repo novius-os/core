@@ -649,9 +649,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $items[$key]['context'] = $contexts[$common_id];
         }
 
-        $sites_count = count(Tools_Context::sites());
-        $locales_count = count(Tools_Context::locales());
-        $global_contexts = array_keys(Tools_Context::contexts());
+        $sites_count = count(\Nos\User\Permission::sites());
+        $locales_count = count(\Nos\User\Permission::locales());
+        $global_contexts = array_keys(\Nos\User\Permission::contexts());
         foreach ($items as &$item) {
             $flags = '';
             $contexts = $item['context'];

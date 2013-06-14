@@ -63,19 +63,22 @@ if ($children_count > 0 || $context_count > 1) {
 }
 
 if ($context_count > 1) {
-    $contexts = \Nos\Tools_Context::contexts();
+    $contexts = \Nos\User\Permission::contexts();
     $contexts_list = array();
     ?>
     <table class="grid">
     <?php
     foreach ($item_contexts as $item_context) {
+        $is_disabled = \Nos\Config_Common::checkActionDisabled('delete', $item_context, array(
+            'delete_popup' => true,
+        ));
         $context = $item_context->get_context();
         $count = isset($children_context[$context]) ? $children_context[$context] : 1;
         ?>
         <tr>
             <td><?= Nos\Tools_Context::contextLabel($item_context->get_context()) ?></td>
             <td><?= strtr($crud['config']['i18n'][$count == 1 ? '1 item' : 'N items'], array('{{count}}' => $count)) ?></td>
-            <td><input type="checkbox" name="contexts[]" class="count" data-count="<?= $count ?>" value="<?= $context ?>" checked /></td>
+            <td><input type="checkbox" name="contexts[]" class="count" data-count="<?= $count ?>" value="<?= $context ?>" <?= $is_disabled ? 'disabled' : 'checked' ?> /></td>
         </tr>
         <?php
     }
