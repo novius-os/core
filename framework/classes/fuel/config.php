@@ -176,7 +176,7 @@ class Config extends \Fuel\Core\Config
         if (!empty($params['item'])) {
             foreach ($selected_actions as $key => $action) {
                 if (isset($action['disabled'])) {
-                    $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item']);
+                    $selected_actions[$key]['disabled'] = static::getActionDisabledState($action['disabled'], $params['item'], $params);
                 }
 
                 foreach ($common_config['callable_keys']['item'] as $callable_item_key) {
@@ -247,10 +247,10 @@ class Config extends \Fuel\Core\Config
         return true;
     }
 
-    static public function getActionDisabledState($disabled, $item)
+    static public function getActionDisabledState($disabled, $item, $params = array())
     {
         $common_config = \Nos\Config_Common::load(get_class($item), array());
-        return static::processCallbackValue($disabled, false, $item, array('config' => $common_config));
+        return static::processCallbackValue($disabled, false, $item, array('config' => $common_config) + $params);
     }
 
     /**

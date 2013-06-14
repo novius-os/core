@@ -287,4 +287,21 @@ class Config_Common
             return $initial_data_mapping;
         }
     }
+
+    /**
+     * @param   $action  string      Name of an action from the common config
+     * @param   $item    \Orm\Model  Model instance
+     * @return  bool|string          false when enabled, true or a string when disabled (when it's a string, it's the reason why it's disabled)
+     */
+    public static function checkActionDisabled($action, $item, $params = array())
+    {
+        $model = get_class($item);
+        $action_name = \Nos\Config_Common::prefixActionName($action, $model);
+        $actions = \Config::actions(array(
+            'models' => array($model),
+            'item' => $item,
+            'all_targets' => true,
+        ) + $params);
+        return \Arr::get($actions[$action_name], 'disabled', false);
+    }
 }
