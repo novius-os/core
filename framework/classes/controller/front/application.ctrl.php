@@ -22,7 +22,7 @@ class Controller_Front_Application extends Controller
 
     public function before()
     {
-        $this->main_controller = \Nos\Nos::main_controller();
+        $this->main_controller = Nos::main_controller();
 
         return parent::before();
     }
@@ -64,5 +64,24 @@ class Controller_Front_Application extends Controller
         }
 
         return $views;
+    }
+
+    public static function getUrlEnhanced($params = array())
+    {
+        $class = get_called_class();
+        if (method_exists($class, 'get_url_model')) {
+            static $classes = array();
+            if (!in_array($class, $classes)) {
+                logger(\Fuel::L_WARNING, '\Nos\Controller_Front_Application::get_url_model($item, $params) is deprecated.'.
+                    ' Please use \Nos\Controller_Front_Application::getURLEnhanced($params) and $item in a key "item" of $params.');
+
+                $classes[] = $class;
+            }
+
+            $item = \Arr::get($params, 'item', null);
+            return static::get_url_model($item, $params);
+        }
+
+        throw new \RuntimeException('This application front controller "'.$class.'" not implements a getUrlEnhanced() method.');
     }
 }

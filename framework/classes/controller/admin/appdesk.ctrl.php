@@ -84,12 +84,21 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         $view->set('appdesk', \Format::forge($params)->to_json(), false);
 
+        list($application) = \Config::configFile(get_called_class());
+        $view->set('application', $application);
+
+        $view->set('model', isset($this->config['model']) ? $this->config['model'] : null);
+
+        $view->set('css', isset($this->config['css']) ? $this->config['css'] : null);
+
+        $view->set('notify', isset($this->config['notify']) ? $this->config['notify'] : null);
+
         return $view;
     }
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts', 'i18n');
+        $valid_keys = array('model', 'css', 'notify', 'query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts', 'i18n', 'custom');
         if (isset($config['model'])) {
             $config['model'] = ltrim($config['model'], '\\');
             $namespace_model = \Inflector::get_namespace($config['model']);

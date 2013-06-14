@@ -11,10 +11,16 @@
 class Fieldset extends \Fuel\Core\Fieldset
 {
     protected $append = array();
+    protected $prepend = array();
     protected $config_used = array();
     protected $js_validation = false;
     protected $require_js = array();
     protected $instance = null;
+
+    public function prepend($content)
+    {
+        $this->prepend[] = $content;
+    }
 
     public function append($content)
     {
@@ -52,7 +58,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             ? $this->form()->close().PHP_EOL
             : $this->form()->{$this->fieldset_tag.'_close'}();
 
-        return $close.$this->build_append().$this->build_js_validation();
+        return $this->build_prepend().$close.$this->build_append().$this->build_js_validation();
     }
 
     public function build_hidden_fields()
@@ -70,10 +76,21 @@ class Fieldset extends \Fuel\Core\Fieldset
         return $output;
     }
 
+    public function build_prepend()
+    {
+        return $this->build_list($this->prepend);
+    }
+
     public function build_append()
     {
+        return $this->build_list($this->append);
+    }
+
+    public function build_list($list)
+    {
         $append = array();
-        foreach ($this->append as $a) {
+
+        foreach ($list as $a) {
             if (is_callable($a)) {
                 $append[] = call_user_func($a, $this);
             } else {
@@ -415,6 +432,7 @@ class Fieldset extends \Fuel\Core\Fieldset
                 ));
             }
         }
+
         return $fieldset;
     }
 
@@ -455,6 +473,8 @@ class Fieldset extends \Fuel\Core\Fieldset
             // Generate a new ID for the form
             $form_attributes = $this->get_config('form_attributes', array());
             $form_attributes['id'] = 'form_id_'.$uniqid;
+            list($application) = \Config::configFile($instance);
+            $form_attributes['class'] = str_replace(array('\\', '_'), '-', strtolower(get_class($instance))).' '.$application;
             $this->set_config('auto_id_prefix', 'form'.$uniqid.'_');
             $this->set_config('form_attributes', $form_attributes);
             foreach ($this->fields as $field) {

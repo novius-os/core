@@ -154,7 +154,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                 'is_new' => $this->is_new,
                 'actions' => array_values($this->get_actions()),
                 'dataset' => \Nos\Controller::dataset_item($this->item),
-                'tab_params' => $this->get_tab_params(),
+                'tab_params' => $this->get_tab_params()
             ),
             'item' => $this->item,
         );
@@ -188,6 +188,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $fields = $this->fields($this->config['fields']);
         $fieldset = \Fieldset::build_from_config($fields, $this->item, $this->build_from_config());
         $fieldset = $this->fieldset($fieldset);
+
+        if (isset($this->config['css'])) {
+            $fieldset->prepend(render('nos::admin/load_css', array('css_files' => $this->config['css'])));
+        }
 
         $view_params = $this->view_params();
         $view_params['fieldset'] = $fieldset;

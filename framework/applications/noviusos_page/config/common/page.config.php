@@ -91,6 +91,9 @@ return array(
             'delete' => array(
                 'primary' => false,
                 'disabled' => array(
+                    'check_home' => function($page) {
+                        return !!$page->page_home ? __('The home page cannot be deleted. To delete this page, set another page as home page first.') : false;
+                    },
                     'check_locked' => function($page) {
                         return ($page->page_lock == $page::LOCK_DELETION) ? __('You can’t delete this page. It is locked.') : false;
                     },
@@ -186,6 +189,9 @@ return array(
                     'grid' => true,
                 ),
                 'disabled' => array(
+                    'check_published' => function($page) {
+                        return !$page->published() ? __('You cannot set this page as home page because it isn’t published. Publish it first.') : false;
+                    },
                     'check_home' => function($page) {
                         return !!$page->page_home ? __('This page is the home page already.') : false;
                     },
