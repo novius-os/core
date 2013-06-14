@@ -50,6 +50,9 @@ define('jquery-nos-link-wysiwyg',
                             .find('> form')
                             .nosFormValidate({
                                 submitHandler : function() {
+                                    if (link_type === 'external' && !/^\w+\:/.test($input_url.val())) {
+                                        $input_url.val('http://' + $input_url.val());
+                                    }
                                     var a = {
                                         href : $input_url.val() + (link_type === 'internal' ? $input_url_params.val() : ''),
                                         title : $input_title.val()
