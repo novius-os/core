@@ -189,6 +189,25 @@ return array(
                     'grid' => true,
                 ),
                 'disabled' => array(
+                    'check_monocontext' => function($page) {
+                        $controller = \Nos\Nos::main_controller();
+                        static $disabled = null;
+                        if ($disabled === null) {
+                            $disabled = false;
+                            if (is_subclass_of($controller, 'Nos\Controller_Admin_Appdesk')) {
+                                $context = Input::get('context', null);
+                                if (empty($context) || (is_array($context) && count($context) > 1)) {
+                                    $one_site = count(Nos\Tools_Context::sites()) === 1;
+                                    if ($one_site) {
+                                        $disabled = __('We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.');
+                                    } else {
+                                        $disabled = __('We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.');
+                                    }
+                                }
+                            }
+                        }
+                        return $disabled;
+                    },
                     'check_published' => function($page) {
                         return !$page->published() ? __('You cannot set this page as home page because it isn’t published. Publish it first.') : false;
                     },
