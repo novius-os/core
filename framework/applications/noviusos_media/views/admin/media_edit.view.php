@@ -52,6 +52,20 @@ if ($item->is_image()) {
                     <th style="vertical-align: top;"><?= $fieldset->field('media_folder_id')->label; ?></th>
                     <td><?= $fieldset->field('media_folder_id')->build(); ?></td>
                 </tr>
+                <tr>
+                    <th style="vertical-align: top;"><?= __('File size:') ?></th>
+                    <td class="media_filesize"><?= \Str::humanFileSize($item->media_filesize) ?></td>
+                </tr>
+<?php
+if ($item->is_image()) {
+    ?>
+                <tr>
+                    <th style="vertical-align: top;"><?= __('Dimensions:') ?></th>
+                    <td class="media_dimensions"><?= $item->media_width.' × '.$item->media_height ?></td>
+                </tr>
+    <?php
+}
+?>
             </table>
         </div>
     </div>

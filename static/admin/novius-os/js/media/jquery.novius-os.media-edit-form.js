@@ -41,11 +41,17 @@ define('jquery-nos-media-edit-form',
                                 src: json.thumbnailUrl + '?' + (new Date().getTime())
                             });
                         }
-                        if (json.media_file) {
-                            $slug.val(json.media_file);
+                        if (json.dataset.file) {
+                            $slug.val(json.dataset.file);
                         }
-                        if (json.media_ext) {
-                            $container.find('.media_extension').text(json.media_ext);
+                        if (json.dataset.ext) {
+                            $container.find('.media_extension').text(json.dataset.ext);
+                        }
+                        if (json.dataset.filesize) {
+                            $container.find('.media_filesize').text(json.dataset.filesize);
+                        }
+                        if (json.dataset.dimensions) {
+                            $container.find('.media_dimensions').text(json.dataset.dimensions);
                         }
                     });
                 });

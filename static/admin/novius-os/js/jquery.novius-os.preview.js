@@ -207,21 +207,23 @@ define('jquery-nos-preview',
                         .addClass('ui-widget-content wijmo-wijgrid-data');
 
                 $.each(o.meta, function(key, meta) {
-                    var tr = $('<tr></tr>').addClass('wijmo-wijgrid-row ui-widget-content wijmo-wijgrid-datarow' + (i%2 ? ' wijmo-wijgrid-alternatingrow' : ''))
-                        .appendTo(table);
+                    if (data[key]) {
+                        var tr = $('<tr></tr>').addClass('wijmo-wijgrid-row ui-widget-content wijmo-wijgrid-datarow' + (i%2 ? ' wijmo-wijgrid-alternatingrow' : ''))
+                            .appendTo(table);
 
-                    $('<th><div></div></th>').addClass('wijgridtd wijdata-type-string')
-                        .appendTo(tr)
-                        .find('div')
-                        .addClass('wijmo-wijgrid-innercell')
-                        .html(meta.label || '');
+                        $('<th><div></div></th>').addClass('wijgridtd wijdata-type-string')
+                            .appendTo(tr)
+                            .find('div')
+                            .addClass('wijmo-wijgrid-innercell')
+                            .html(meta.label || '');
 
-                    $('<td><div></div></td>').addClass('wijgridtd wijdata-type-string')
-                        .appendTo(tr)
-                        .find('div')
-                        .addClass('wijmo-wijgrid-innercell')
-                        .text(data[key] || '');
-                    i++;
+                        $('<td><div></div></td>').addClass('wijgridtd wijdata-type-string')
+                            .appendTo(tr)
+                            .find('div')
+                            .addClass('wijmo-wijgrid-innercell')
+                            .text(data[key] || '');
+                        i++;
+                    }
                 });
 
                 return self;

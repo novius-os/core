@@ -43,14 +43,14 @@ return array(
                 'preview' => true,
                 'options' => array(
                     'meta' => array(
-                        'fileName' => array(
+                        'filename' => array(
                             'label' => __('File name:'),
                         ),
-                        'pathFolder' => array(
-                            'label' => __('Path:'),
+                        'filesize' => array(
+                            'label' => __('File size:'),
                         ),
-                        'extension' => array(
-                            'label' => __('Extension:'),
+                        'dimensions' => array(
+                            'label' => __('Dimensions:'),
                         ),
                     ),
                     'actions' => array('Nos\Media\Model_Media.edit', 'Nos\Media\Model_Media.delete', 'Nos\Media\Model_Media.visualise'),

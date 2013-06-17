@@ -64,6 +64,12 @@ class Model_Media extends \Nos\Orm\Model
             'null' => true,
             'convert_empty_to_null' => true,
         ),
+        'media_filesize' => array(
+            'default' => null,
+            'data_type' => 'smallint unsigned',
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
         'media_created_at' => array(
             'data_type' => 'timestamp',
             'null' => false,
@@ -113,7 +119,7 @@ class Model_Media extends \Nos\Orm\Model
     );
 
     protected static $_observers = array(
-        '\Orm\Observer_Self' => array(
+        'Orm\Observer_Self' => array(
         ),
         'Orm\Observer_CreatedAt' => array(
             'mysql_timestamp' => true,
@@ -252,9 +258,15 @@ class Model_Media extends \Nos\Orm\Model
     public function _event_before_save()
     {
         parent::_event_before_save();
-        $is_image = @getimagesize(APPPATH.$this->get_private_path());
-        if ($is_image !== false) {
-            list($this->media_width, $this->media_height) = $is_image;
+
+        $file = APPPATH.$this->get_private_path();
+        if (is_file($file)) {
+            $is_image = @getimagesize($file);
+            if ($is_image !== false) {
+                list($this->media_width, $this->media_height) = $is_image;
+            }
+
+            $this->media_filesize = filesize($file);
         }
     }
 }
