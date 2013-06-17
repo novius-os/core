@@ -24,7 +24,6 @@ abstract class Orm_Behaviour extends \Orm\Observer
     {
         $this->_class = $class;
         $this->_properties = call_user_func($class . '::observers', get_class($this));
-        $this->_config();
     }
 
     protected function _config()
@@ -35,6 +34,7 @@ abstract class Orm_Behaviour extends \Orm\Observer
 
     public function commonConfig(&$config)
     {
+        $this->_config();
         static::processConfigKey($config, 'data_mapping', 'data_mapping');
         static::processConfigKey($config, 'actions', 'actions.list');
     }
