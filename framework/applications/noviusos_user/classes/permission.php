@@ -87,32 +87,12 @@ class Permission
         return \Session::user()->listPermissionCategories($permissionName);
     }
 
-    public static function add($permission_name, $category_key)
-    {
-        // Can't tell on which role to add the permission, skip
-        if (\Config::get('novius-os.users.enable_roles', false)) {
-            return true;
-        }
-
-        $user = \Session::user();
-        // If no user is connected, can't do
-        if (empty($user)) {
-            return false;
-        }
-
-        $role = reset($user->roles);
-        try {
-            $access = new Model_Permission();
-            $access->perm_role_id      = $role->role_id;
-            $access->perm_name         = $permission_name;
-            $access->perm_category_key = $category_key;
-            $access->save();
-        } catch (\Exception $e) {
-        }
-
-        return true;
-    }
-
+    /**
+     * Retrieve the list of contexts available to the connected user
+     *
+     * @see Nos\Tools_Context::contexts
+     * @return array
+     */
     public static function contexts()
     {
         static $contexts = null;
@@ -131,6 +111,12 @@ class Permission
         return $contexts;
     }
 
+    /**
+     * Retrieve the list of locales available to the connected user
+     *
+     * @see Nos\Tools_Context::locales
+     * @return array
+     */
     public static function locales()
     {
         static $locales = null;
@@ -152,6 +138,12 @@ class Permission
         return $locales;
     }
 
+    /**
+     * Retrieve the list of sites available to the connected user
+     *
+     * @see Nos\Tools_Context::sites
+     * @return array
+     */
     public static function sites()
     {
         static $sites = null;
