@@ -579,15 +579,8 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
 
             if (!empty($options['success']) && is_callable($options['success'])) {
-                if ($item->is_new()) {
-                    // The callback is called after save() to access the ID
-                    $item->save();
-                    $json_user = call_user_func($options['success'], $item, $data);
-                } else {
-                    // The callback is called before save() to allow a check for is_changed() properties
-                    $json_user = call_user_func($options['success'], $item, $data);
-                    $item->save();
-                }
+                $item->save();
+                $json_user = call_user_func($options['success'], $item, $data);
                 $json_response = \Arr::merge($json_response, $json_user);
             } else {
                 $item->save();

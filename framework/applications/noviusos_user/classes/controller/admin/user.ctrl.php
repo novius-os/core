@@ -13,6 +13,9 @@ namespace Nos\User;
 class Controller_Admin_User extends \Nos\Controller_Admin_Crud
 {
     protected $is_account = false;
+
+    protected $_password_is_changed = false;
+
     public function prepare_i18n()
     {
         parent::prepare_i18n();
@@ -44,12 +47,17 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
         return $fields;
     }
 
+    public function before_save($item, $data)
+    {
+        parent::before_save($item, $data);
+
+        $this->_password_is_changed = $item->is_changed('user_password');
+    }
+
     public function save($item, $data)
     {
-        if (!$this->is_new) {
-            if ($item->is_changed('user_password')) {
-                $this->config['messages']['successfully saved'] = __('Done, your password has been changed.');
-            }
+        if (!$this->is_new && $this->_password_is_changed) {
+            $this->config['i18n']['notification item saved'] = __('Done, your password has been changed.');
         }
 
         $enable_roles = \Config::get('novius-os.users.enable_roles', false);
