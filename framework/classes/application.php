@@ -628,7 +628,42 @@ class Application
 
     public function addPermission()
     {
-        User\Permission::add('nos::access', $this->folder);
+        $user = \Session::user();
+        // If no user is connected, can't do
+        if (empty($user)) {
+            return;
+        }
+
+        // Multi-roles: create a role dedicated to this application if needed
+        if (\Config::get('novius-os.users.enable_roles', false)) {
+            $permission = \Nos\User\Model_Permission::find('first', array(
+                'where' => array(
+                    array('perm_name', 'nos::access'),
+                    array('perm_category_key', $this->folder),
+                ),
+            ));
+            // No already exists: skip
+            if (!empty($permission)) {
+                return;
+            }
+
+            // No permission exists yet: create dedicated to this application
+            $role = \Nos\User\Model_Role::forge(array(
+                'role_name' => $this->get_name(),
+                'role_user_id' => 0,
+            ));
+            $role->save();
+            $user->roles[] = $role;
+            $user->save();
+        } else {
+            $role = reset($user->roles);
+        }
+
+        $access = new \Nos\User\Model_Permission();
+        $access->perm_role_id      = $role->role_id;
+        $access->perm_name         = 'nos::access';
+        $access->perm_category_key = $this->folder;
+        $access->save();
     }
 
     public function __get($property)
