@@ -295,6 +295,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $item->set($this->_properties['is_main_property'], true);
         }
 
+        if (empty($this->_properties['common_fields'])) {
+            return;
+        }
+
         static $in_progress_before_save = array();
 
         // Prevents looping in the observer
