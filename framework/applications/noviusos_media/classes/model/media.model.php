@@ -199,17 +199,29 @@ class Model_Media extends \Nos\Orm\Model
         if (!$this->is_image()) {
             return false;
         }
-        list($src, $width, $height, $ratio) = $this->get_img_infos($params['max_width'], $params['max_height']);
+        $params_default = array(
+            'max_width' => null,
+            'max_height' => null,
+        );
+        $params = array_merge($params_default, $params);
 
-        return '<img src="'.$src.'" width="'.$width.'" height="'.$height.'" />';
+        list($src, $width, $height) = $this->get_img_infos($params['max_width'], $params['max_height']);
+
+        $params = array_diff_key(array_merge(array(
+            'width' => $width,
+            'height' => $height,
+            'alt' => $this->media_title,
+        ), $params), $params_default);
+
+        return \Html::img($src, $params);
     }
 
-    public function get_img_tag_resized($max_width = null, $max_height = null)
+    public function get_img_tag_resized($max_width = null, $max_height = null, $params = array())
     {
-        return $this->get_img_tag(array(
+        return $this->get_img_tag(array_merge($params, array(
             'max_width'  => $max_width,
             'max_height' => $max_height,
-        ));
+        )));
     }
 
     public function get_img_infos($max_width = null, $max_height = null)
