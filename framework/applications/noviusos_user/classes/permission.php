@@ -87,6 +87,20 @@ class Permission
         return \Session::user()->listPermissionCategories($permissionName);
     }
 
+    public static function isApplicationAuthorised($applicationName)
+    {
+        // If it's in the database, it's authorised
+        // Alternatively, load the 'app_installed' metadata file to see if the application wants permissions
+        return static::check('nos::access', $applicationName) || !static::permissionsExistsInMetadata($applicationName);
+    }
+
+    protected static function permissionsExistsInMetadata($application_name)
+    {
+        // Don't translated the file
+        $metadata = \Nos\Config_Data::load('app_installed', false);
+        return isset($metadata[$application_name]['permission']);
+    }
+
     /**
      * Retrieve the list of contexts available to the connected user
      *
