@@ -354,8 +354,7 @@ class Model_Page extends \Nos\Orm\Model
             $host = parse_url($context_url, PHP_URL_HOST);
             $path = trim(parse_url($context_url, PHP_URL_PATH), '/');
 
-            $cache = \Nos\FrontCache::forge('pages'.DS.$host.DS.$path);
-            $cache->delete();
+            \Nos\FrontCache::deleteDir('pages'.DS.$host.DS.$path);
         }
     }
 

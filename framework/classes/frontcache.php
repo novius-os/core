@@ -118,13 +118,8 @@ class FrontCache
             $this->_path = false;
         } else {
             $path = \Config::get('cache_dir').$path;
-            if (is_dir($path)) {
-                $this->_init_path = $path;
-                $this->_path_suffix = $path;
-            } else {
-                $this->_init_path = $path.'.php';
-                $this->_path_suffix = $path.'.cache.suffixes/';
-            }
+            $this->_init_path = $path.'.php';
+            $this->_path_suffix = $path.'.cache.suffixes/';
             $this->reset();
         }
     }
@@ -375,6 +370,11 @@ class FrontCache
             } catch (\Exception $e) {
             }
         }
+    }
+
+    public static function deleteDir($path)
+    {
+        \File::delete_dir(\Config::get('cache_dir').$path, true, true);
     }
 
     public function get_path()
