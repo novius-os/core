@@ -172,7 +172,7 @@ class Permission
         }
 
         foreach ($sites as $code => $site) {
-            if (!isset($allowedLocales[$code])) {
+            if (!isset($allowedSites[$code])) {
                 unset($sites[$code]);
             }
         }
