@@ -1,4 +1,6 @@
-<p class="check_all">
+<?php
+Nos\I18n::current_dictionary('nos::common');
+?><p class="check_all">
     <label><input type="checkbox" class="check_all" /> <?= __('Check all') ?></label>
 </p>
 <ul class="applications">
