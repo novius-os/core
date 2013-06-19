@@ -355,7 +355,7 @@ img.publication_status, span.publication_status {
     margin:0 2em 0 0em;
 }
 
-.publishable_radio {
+.publishable_radio, .buttonset.flat {
     white-space: nowrap;
 
     .ui-button-text {
@@ -401,6 +401,16 @@ table.publication_status {
 
 .nos-notification {
 	top : 69px;
+}
+
+.buttonset.flat {
+    .ui-button-text {
+        padding : 0 4px;
+    }
+}
+
+.buttonset_side_label {
+    margin-left: 10px;
 }
 
 
