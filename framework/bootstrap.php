@@ -67,6 +67,7 @@ if (!MBSTRING) {
         'Fieldset' => FUEL_EXTEND_PATH.'fieldset.php',
         'Fieldset_Field' => FUEL_EXTEND_PATH.'fieldset_field.php',
         'Generate' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'generate.php',
+        'Image' => FUEL_EXTEND_PATH.'image.php',
         'Migrate' => FUEL_EXTEND_PATH.'migrate.php',
         'Module' => FUEL_EXTEND_PATH.'module.php',
         'ModuleNotFoundException' => FUEL_EXTEND_PATH.'module.php',
