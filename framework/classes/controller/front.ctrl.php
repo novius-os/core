@@ -98,6 +98,7 @@ class Controller_Front extends Controller
         }
 
         \Event::trigger('front.start');
+
         \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
 
         $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $this->_url);
@@ -238,7 +239,7 @@ class Controller_Front extends Controller
             }
 
             if ($_404) {
-                \Event::trigger('front.404NotFound', array('url' => $this->_page_url));
+                \Event::trigger('front.404NotFound', array('url' => rtrim($this->_page_url, '/')));
 
                 // If no redirection then we display 404
                 if (!empty($url)) {
@@ -644,6 +645,7 @@ class Controller_Front extends Controller
                 if (!empty($page)) {
                     $this->_page = $page;
                     $this->_page_url = $url;
+
                     if ($page->page_entrance && !empty($url)) {
                         \Response::redirect($domain, 'location', 301);
                         exit();
