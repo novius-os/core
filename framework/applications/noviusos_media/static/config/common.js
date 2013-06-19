@@ -43,9 +43,7 @@ define(
                                         title : item.media_title,
                                         thumbnail : (item.image ? item.thumbnail.replace(/64/g, 256) : item.thumbnailAlternate),
                                         thumbnailAlternate : (item.image ? item.thumbnailAlternate : ''),
-                                        fileName : item.file,
-                                        pathFolder : item.path_folder + '/',
-                                        extension : item.ext
+                                        fileName : item.file + '.' + item.ext
                                     });
                                 }
                             }

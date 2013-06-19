@@ -659,11 +659,15 @@ class Application
             $role = reset($user->roles);
         }
 
-        $access = new \Nos\User\Model_Permission();
-        $access->perm_role_id      = $role->role_id;
-        $access->perm_name         = 'nos::access';
-        $access->perm_category_key = $this->folder;
-        $access->save();
+        // Try-catch to handle duplicate...
+        try {
+            $access = new \Nos\User\Model_Permission();
+            $access->perm_role_id      = $role->role_id;
+            $access->perm_name         = 'nos::access';
+            $access->perm_category_key = $this->folder;
+            $access->save();
+        } catch (\Exception $e) {
+        }
     }
 
     public function __get($property)

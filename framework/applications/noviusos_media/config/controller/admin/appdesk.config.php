@@ -43,7 +43,7 @@ return array(
                 'preview' => true,
                 'options' => array(
                     'meta' => array(
-                        'filename' => array(
+                        'fileName' => array(
                             'label' => __('File name:'),
                         ),
                         'filesize' => array(

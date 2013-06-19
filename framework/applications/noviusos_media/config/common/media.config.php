@@ -67,11 +67,6 @@ return array(
             'ensurePxWidth' => true,
             'allowSizing' => false,
         ),
-        'filename' => array(
-            'value' => function ($item) {
-                return $item->media_file.'.'.$item->media_ext;
-            },
-        ),
         'file' => array(
             'column' => 'media_file',
          ),
