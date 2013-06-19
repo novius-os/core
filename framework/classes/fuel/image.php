@@ -10,7 +10,7 @@
 
 class Image extends \Fuel\Core\Image
 {
-    static public function gravatar($email, $options = array())
+    static public function gravatarUrl($email, $options = array())
     {
         $params = \Arr::merge(
             array(
