@@ -374,7 +374,10 @@ class FrontCache
 
     public static function deleteDir($path)
     {
-        \File::delete_dir(\Config::get('cache_dir').$path, true, true);
+        try {
+            \File::delete_dir(\Config::get('cache_dir').$path, true, true);
+        } catch (\Exception $e) {
+        }
     }
 
     public function get_path()
