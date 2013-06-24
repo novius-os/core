@@ -1,0 +1,2 @@
+ALTER TABLE `nos_page` CHANGE `page_virtual_name` `page_virtual_name` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
+CHANGE `page_virtual_url` `page_virtual_url` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
