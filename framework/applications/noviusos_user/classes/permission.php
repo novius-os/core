@@ -82,11 +82,17 @@ class Permission
         return \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, (int) $valueWhenEmpty);
     }
 
-    public function listPermissionCategories($permissionName)
+    public static function listPermissionCategories($permissionName)
     {
         return \Session::user()->listPermissionCategories($permissionName);
     }
 
+    /**
+     * Check whether a user can access a particular application
+     *
+     * @param  $applicationName  Name of the application
+     * @return bool
+     */
     public static function isApplicationAuthorised($applicationName)
     {
         // If it's in the database, it's authorised
