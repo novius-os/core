@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 18 out of 24 messages are translated (75%).
-// 58 out of 90 words are translated (75%).
+// 24 out of 24 messages are translated (100%).
+// 90 out of 90 words are translated (100%).
 
 return array(
     #: classes/controller/admin/appmanager.ctrl.php:60
@@ -19,7 +19,7 @@ return array(
 
     #. The tab will be refreshed by the javaScript within the view
     #: classes/controller/admin/appmanager.ctrl.php:133
-    'Metadata was refreshed.' => '',
+    'Metadata was refreshed.' => 'メタデータが更新されました。',
 
     #: views/admin/app_manager.view.php:41
     'Native applications' => '標準アプリケーション',
@@ -49,10 +49,10 @@ return array(
     'Uninstall' => 'アンインストール',
 
     #: views/admin/app_manager.view.php:88
-    'Cannot be uninstalled. Uninstall ‘{{application}}’ first.' => '',
+    'Cannot be uninstalled. Uninstall ‘{{application}}’ first.' => 'アンインストールできません。まず{{application}}をアンインストールしてください。',
 
     #: views/admin/app_manager.view.php:92
-    'Cannot be uninstalled. Uninstall <a>these applications</a> first.' => '',
+    'Cannot be uninstalled. Uninstall <a>these applications</a> first.' => 'アンインストールできません。まず<a>これらのアプリケーション</a>をアンインストールしてください。',
 
     #: views/admin/app_manager.view.php:108
     #: views/admin/app_manager.view.php:159
@@ -68,10 +68,10 @@ return array(
     'Install' => 'インストール',
 
     #: views/admin/app_manager.view.php:139
-    'Cannot be installed. Install ‘{{application}}’ first.' => '',
+    'Cannot be installed. Install ‘{{application}}’ first.' => 'インストールできません。まず{{application}}をインストールしてください。',
 
     #: views/admin/app_manager.view.php:143
-    'Cannot be installed. Install <a>these applications</a> first.' => '',
+    'Cannot be installed. Install <a>these applications</a> first.' => 'インストールできません。まず<a>これらのアプリケーション</a>をインストールしてください。',
 
     #: views/admin/app_manager.view.php:167
     'Website configuration' => 'ウェブサイト設定',
@@ -82,7 +82,7 @@ return array(
     #: views/admin/app_manager.view.php:190
     'Applications manager' => 'アプリケーションマネージャ',
 
-    #: views/admin/app_manager.view.php:198
-    'Refresh all metadata' => '',
+    #: views/admin/app_manager.view.php:202
+    'Refresh all metadata' => 'すべてのメタデータを更新する',
 
 );

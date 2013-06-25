@@ -1,12 +1,12 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 45 out of 56 messages are translated (80%).
-// 200 out of 246 words are translated (80%).
+// 56 out of 56 messages are translated (100%).
+// 246 out of 246 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/user.ctrl.php:51
+    #: classes/controller/admin/user.ctrl.php:60
     'Done, your password has been changed.' => 'はい、パスワードが変更されました。',
 
     #: classes/controller/admin/account.ctrl.php:84
@@ -38,7 +38,7 @@ return array(
 
     #: views/admin/user_details_edit.view.php:38
     #: views/admin/user_add.view.php:46
-    'Roles' => '',
+    'Roles' => 'ロール（権限グループ）',
 
     #: views/admin/user_details_edit.view.php:46
     'Set a new password' => 'パスワードを更新する',
@@ -51,40 +51,40 @@ return array(
 
     #. Password strength
     #: views/admin/user_edit.view.php:91
-    #: views/admin/account.view.php:94
+    #: views/admin/account.view.php:95
     #: views/admin/user_add.view.php:75
     'Insufficient' => '不十分',
 
     #: views/admin/user_edit.view.php:92
-    #: views/admin/account.view.php:95
+    #: views/admin/account.view.php:96
     #: views/admin/user_add.view.php:76
     'Weak' => '弱',
 
     #: views/admin/user_edit.view.php:93
-    #: views/admin/account.view.php:96
+    #: views/admin/account.view.php:97
     #: views/admin/user_add.view.php:77
     'Average' => '中',
 
     #: views/admin/user_edit.view.php:94
-    #: views/admin/account.view.php:97
+    #: views/admin/account.view.php:98
     #: views/admin/user_add.view.php:78
     'Strong' => '良',
 
     #: views/admin/user_edit.view.php:95
-    #: views/admin/account.view.php:98
+    #: views/admin/account.view.php:99
     #: views/admin/user_add.view.php:79
     'Outstanding' => '最良',
 
-    #: views/admin/user_roles_edit.view.php:33
-    'View and edit permissions' => '',
+    #: views/admin/user_roles_edit.view.php:35
+    'View and edit permissions' => 'パーミッションを閲覧／編集',
 
-    #: views/admin/account.view.php:29
+    #: views/admin/account.view.php:30
     'Sign out (see you!)' => 'ログアウトします。それではまた。',
 
-    #: views/admin/account.view.php:41
+    #: views/admin/account.view.php:42
     'My account' => '私のアカウント',
 
-    #: views/admin/account.view.php:42
+    #: views/admin/account.view.php:43
     'Theme' => 'テーマ',
 
     #: config/controller/admin/user.config.php:19
@@ -123,14 +123,14 @@ return array(
 
     #: config/controller/admin/inspector/role.config.php:22
     #: config/common/role.config.php:8
-    'Role' => '',
+    'Role' => 'ロール（権限グループ）',
 
     #: config/controller/admin/role.config.php:19
     #: config/common/role.config.php:34
-    'Add a role' => '',
+    'Add a role' => 'ロールを追加',
 
     #: config/controller/admin/role.config.php:41
-    'Title' => '',
+    'Title' => 'タイトル',
 
     #: config/controller/admin/appdesk.config.php:26
     'user' => 'ユーザー',
@@ -181,24 +181,24 @@ return array(
 
     #. Crud
     #: config/common/role.config.php:19
-    'All wrapped up! This new role is ready.' => '',
+    'All wrapped up! This new role is ready.' => 'おめでとうございます。新しいロールが利用可能になりました。',
 
     #: config/common/role.config.php:20
-    'The role has been deleted.' => '',
+    'The role has been deleted.' => 'ロールが削除されました。',
 
     #. General errors
     #: config/common/role.config.php:23
-    'This role doesn’t exist any more. It has been deleted.' => '',
+    'This role doesn’t exist any more. It has been deleted.' => 'ロールが存在しません。削除されました。',
 
     #: config/common/role.config.php:24
-    'We cannot find this role.' => '',
+    'We cannot find this role.' => 'このロールは見つかりませんでした。',
 
     #. Deletion popup
     #: config/common/role.config.php:27
-    'Deleting the role ‘{{title}}’' => '',
+    'Deleting the role ‘{{title}}’' => 'ロール{{title}}を削除します',
 
     #. Delete action's labels
     #: config/common/role.config.php:30
-    'Yes, delete this role' => '',
+    'Yes, delete this role' => 'はい、このロールを削除します',
 
 );

@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 141 out of 157 messages are translated (89%).
-// 786 out of 840 words are translated (89%).
+// 143 out of 164 messages are translated (87%).
+// 790 out of 880 words are translated (87%).
 
 return array(
     #: classes/tools/image.php:129
@@ -12,64 +12,69 @@ return array(
     #: classes/tools/image.php:148
     'The format of this image is not allowed.' => 'Le format de cette image n’est pas autorisé.',
 
+    #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
+    #. Example value: '%d %b %Y %H:%M' (day of month, month name, year, hour, minutes).
+    #: classes/fuel/date.php:79
+    'DATE_FORMAT_DEFAULT' => '',
+
     #: classes/fuel/validation_error.php:47
     'The field ‘{{field}}’ doesn’t respect the rule ‘{{rule}}’' => 'Le champ «&nbsp;{{field}}&nbsp;» ne respecte pas la règle«&nbsp;{{rule}}&nbsp;»',
 
-    #: classes/fuel/fieldset_field.php:54
+    #: classes/fuel/fieldset_field.php:59
     'Mandatory' => 'Obligatoire',
 
-    #: classes/fuel/fieldset.php:512
+    #: classes/fuel/fieldset.php:532
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Quelque chose n’a pas bien marché. Merci d’actualiser la fenêtre de votrenavigateur et d’essayer à nouveau. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
 
-    #: classes/fuel/fieldset.php:574
+    #: classes/fuel/fieldset.php:587
     'OK, it’s done.' => 'C’est fait.',
 
-    #: classes/controller/inspector/date.ctrl.php:148
+    #: classes/controller/inspector/date.ctrl.php:150
     'Custom dates' => 'Choisir des dates',
 
-    #: classes/controller/inspector/date.ctrl.php:149
+    #: classes/controller/inspector/date.ctrl.php:151
     'from {{begin}} to {{end}}' => 'de {{begin}} à {{end}}',
 
-    #: classes/controller/inspector/date.ctrl.php:150
+    #: classes/controller/inspector/date.ctrl.php:152
     'until {{end}}' => 'jusqu’au {{end}}',
 
-    #: classes/controller/inspector/date.ctrl.php:151
+    #: classes/controller/inspector/date.ctrl.php:153
     'since {{begin}}' => 'depuis {{begin}}',
 
-    #: classes/controller/inspector/date.ctrl.php:151
+    #: classes/controller/inspector/date.ctrl.php:157
     'Since' => 'Depuis',
 
-    #: classes/controller/inspector/date.ctrl.php:155
+    #: classes/controller/inspector/date.ctrl.php:159
     '3 last days' => '3 derniers jours',
 
-    #: classes/controller/inspector/date.ctrl.php:156
+    #: classes/controller/inspector/date.ctrl.php:160
     'Week beginning' => 'Début de la semaine',
 
-    #: classes/controller/inspector/date.ctrl.php:157
+    #: classes/controller/inspector/date.ctrl.php:161
     'Less than a week' => 'Moins d’une semaine',
 
-    #: classes/controller/inspector/date.ctrl.php:158
+    #: classes/controller/inspector/date.ctrl.php:162
     'Month beginning' => 'Début du mois',
 
-    #: classes/controller/inspector/date.ctrl.php:159
+    #: classes/controller/inspector/date.ctrl.php:163
     'Less than one month' => 'Moins d’un mois',
 
-    #: classes/controller/inspector/date.ctrl.php:160
+    #: classes/controller/inspector/date.ctrl.php:164
     'Less than two months' => 'Moins de deux mois',
 
-    #: classes/controller/inspector/date.ctrl.php:161
+    #: classes/controller/inspector/date.ctrl.php:165
     'Less than three months' => 'Moins de trois mois',
 
-    #: classes/controller/inspector/date.ctrl.php:162
+    #: classes/controller/inspector/date.ctrl.php:166
     'Less than six months' => 'Moins de six mois',
 
-    #: classes/controller/inspector/date.ctrl.php:163
+    #: classes/controller/inspector/date.ctrl.php:167
     'Less than one year' => 'Moins d’un an',
 
-    #: classes/controller/inspector/date.ctrl.php:167
+    #: classes/controller/inspector/date.ctrl.php:171
     'Previous months' => 'Mois précédents',
 
-    #: classes/controller/inspector/date.ctrl.php:173
+    #: classes/controller/inspector/date.ctrl.php:177
     'Years' => 'Années',
 
     #: classes/controller/inspector.ctrl.php:77
@@ -120,57 +125,11 @@ return array(
     'Reload tab' => 'Recharger l’onglet',
 
     #: classes/controller/admin/noviusos.ctrl.php:123
-    #: config/i18n_common.config.php:65
+    #: config/i18n_common.config.php:66
     'Loading...' => 'Chargement...',
 
-    #: classes/controller/admin/enhancer.ctrl.php:82
+    #: classes/controller/admin/enhancer.ctrl.php:122
     'I’m an application. Give me a name!' => 'Je suis une application. Donnez-moi un nom&nbsp;!',
-
-    #: views/form/publishable.view.php:108
-    '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
-
-    #: views/form/publishable.view.php:109
-    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
-
-    #: views/form/publishable.view.php:110
-    '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
-
-    #: views/form/publishable.view.php:113
-    '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
-
-    #: views/form/publishable.view.php:114
-    '<row><cell>Will be published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
-
-    #: views/form/publishable.view.php:115
-    '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
-
-    #: views/form/publishable.view.php:117
-    'Pick a date' => '',
-
-    #: views/form/publishable.view.php:118
-    'Clear' => '',
-
-    #: views/form/publishable.view.php:123
-    'Will not be published' => 'Ne sera pas publié',
-
-    #: views/form/publishable.view.php:124
-    #: views/form/publishable.view.php:128
-    #: views/form/publishable.view.php:136
-    'Will be published' => 'Sera publié',
-
-    #: views/form/publishable.view.php:127
-    #: views/admin/orm/publishable_label.view.php:7
-    #: views/admin/orm/publishable_label.view.php:25
-    'Not published' => 'Non publié',
-
-    #: views/form/publishable.view.php:131
-    #: views/form/publishable.view.php:135
-    'Will be unpublished' => 'Sera dé-publié',
-
-    #: views/form/publishable.view.php:132
-    #: views/admin/orm/publishable_label.view.php:9
-    #: views/admin/orm/publishable_label.view.php:31
-    'Published' => 'Publié',
 
     #: views/form/layout_save.view.php:20
     #: views/form/action_or_cancel.view.php:17
@@ -185,20 +144,68 @@ return array(
     #: views/admin/data_catcher/form.view.php:166
     'Save' => 'Enregistrer',
 
-    #: views/form/layout_standard.view.php:81
+    #: views/form/layout_standard.view.php:82
+    #: config/orm/behaviour/twinnable.config.php:66
+    #: config/orm/behaviour/twinnable.config.php:69
     'Add to {{context}}' => 'Ajouter à {{context}}',
+
+    #: views/renderer/publishable.view.php:117
+    '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+
+    #: views/renderer/publishable.view.php:118
+    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+
+    #: views/renderer/publishable.view.php:119
+    '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+
+    #: views/renderer/publishable.view.php:122
+    '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+
+    #: views/renderer/publishable.view.php:123
+    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+
+    #: views/renderer/publishable.view.php:124
+    '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+
+    #: views/renderer/publishable.view.php:126
+    'Pick a date' => '',
+
+    #: views/renderer/publishable.view.php:127
+    'Clear' => '',
+
+    #: views/renderer/publishable.view.php:132
+    'Will not be published' => 'Ne sera pas publié',
+
+    #: views/renderer/publishable.view.php:133
+    #: views/renderer/publishable.view.php:137
+    #: views/renderer/publishable.view.php:145
+    'Will be published' => 'Sera publié',
+
+    #: views/renderer/publishable.view.php:136
+    #: views/admin/orm/publishable_label.view.php:7
+    #: views/admin/orm/publishable_label.view.php:25
+    'Not published' => 'Non publié',
+
+    #: views/renderer/publishable.view.php:140
+    #: views/renderer/publishable.view.php:144
+    'Will be unpublished' => 'Sera dé-publié',
+
+    #: views/renderer/publishable.view.php:141
+    #: views/admin/orm/publishable_label.view.php:9
+    #: views/admin/orm/publishable_label.view.php:31
+    'Published' => 'Publié',
 
     #: views/renderer/virtualname/use_title_checkbox.view.php:15
     'Use title' => 'Reprendre le titre',
 
-    #: views/errors/php_fatal_error.view.php:87
-    #: views/errors/php_fatal_error.view.php:192
+    #: views/errors/php_fatal_error.view.php:82
+    #: views/errors/php_fatal_error.view.php:187
     'Something went wrong' => 'Quelque chose n’a pas bien marché',
 
-    #: views/errors/php_fatal_error.view.php:99
+    #: views/errors/php_fatal_error.view.php:94
     'You won’t like this: Something went wrong' => 'Ça ne va pas vous plaire&nbsp; Quelque chose n’a pas bien marché.',
 
-    #: views/errors/php_fatal_error.view.php:100
+    #: views/errors/php_fatal_error.view.php:95
     'What went wrong? <a>If you’re a developer, just click to find out</a>. If you’re not, go ask a developer to help you.' => 'Qu’est-ce qui n’a pas bien marché&nbsp;? <a>Si vous êtes développeur(se), il vous suffit de cliquer pour le savoir</a>. Si vous ne l’êtes pas, appelez votre développeur(se) à l’aide.',
 
     #: views/admin/login_popup.view.php:21
@@ -229,27 +236,23 @@ return array(
     #: views/admin/enhancer/popup.view.php:54
     '{{Save}} or <a>Cancel</a>' => '{{Save}} ou <a>Annuler</a>',
 
-    #: views/admin/permissions/list_app.view.php:2
+    #: views/admin/permissions/list_app.view.php:4
     'Check all' => '',
 
     #: views/admin/login.view.php:45
     'Let’s get started' => 'Allez, au travail',
 
-    #: views/admin/html.view.php:452
+    #: views/admin/html.view.php:465
     'Select a media file' => 'Sélectionner un média',
 
-    #: views/admin/html.view.php:453
+    #: views/admin/html.view.php:466
     'Pick an image' => 'Sélectionner une image',
 
-    #: views/admin/html.view.php:454
+    #: views/admin/html.view.php:467
     'We’re afraid we cannot find this image.' => 'Malheureusement nous n’arrivons pas à trouver cette image.',
 
     #: views/admin/orm/publishable_label.view.php:21
-    'Scheduled from {{date}}' => '',
-
-    #: views/admin/orm/publishable_label.view.php:22
-    #: views/admin/orm/publishable_label.view.php:28
-    'date_format.normal' => '',
+    'Scheduled for {{date}}' => '',
 
     #: views/admin/orm/publishable_label.view.php:27
     'Published until {{date}}' => '',
@@ -278,8 +281,8 @@ return array(
     #: views/admin/tray/inside.view.php:16
     'About Novius OS' => 'À propos de Novius OS',
 
-    #: views/admin/appstab.view.php:17
-    #: config/i18n_common.config.php:67
+    #: views/admin/appstab.view.php:19
+    #: config/i18n_common.config.php:68
     'Search' => 'Recherche',
 
     #: views/admin/data_catcher/applications.view.php:59
@@ -324,29 +327,49 @@ return array(
     #: views/admin/data_catcher/panel.view.php:47
     'Applications' => 'Applications',
 
+    #: config/permissions.config.php:21
+    'Is granted access to the following contexts:' => '',
+
     #: config/permissions.config.php:26
     'Is granted access to the following applications:' => '',
 
     #. Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
-    #: config/common.config.php:6
+    #: config/common.config.php:17
     'Add {{model_label}}' => 'Ajouter {{model_label}}',
 
     #. Standard, most frequent actions (Edit, Visualise, Share, etc.)
-    #: config/common.config.php:27
+    #: config/common.config.php:38
     'Edit' => 'Modifier',
 
-    #: config/common.config.php:35
-    'Visualise' => 'Visualiser',
-
-    #: config/common.config.php:75
-    'Share' => 'Partager',
-
-    #: config/common.config.php:98
-    #: config/i18n_common.config.php:24
+    #: config/common.config.php:61
+    #: config/i18n_common.config.php:25
     'Deleting the item ‘{{title}}’' => 'Supprimer l’item «&nbsp;{{title}}&nbsp;»',
 
-    #: config/common.config.php:101
+    #: config/common.config.php:64
     'Delete' => 'Supprimer',
+
+    #. Note to translator: action (button)
+    #: config/orm/behaviour/twinnable.config.php:23
+    'Translate' => '',
+
+    #: config/orm/behaviour/twinnable.config.php:25
+    'Add to another site' => '',
+
+    #: config/orm/behaviour/twinnable.config.php:27
+    'Translate / Add to another site' => '',
+
+    #: config/orm/behaviour/twinnable.config.php:64
+    #: config/orm/behaviour/twinnable.config.php:71
+    'Translate into {{context}}' => '',
+
+    #: config/orm/behaviour/twinnable.config.php:75
+    'Edit {{context}}' => '',
+
+    #: config/orm/behaviour/sharable.config.php:5
+    'Share' => 'Partager',
+
+    #: config/orm/behaviour/urlenhancer.config.php:5
+    'Visualise' => 'Visualiser',
 
     #. Crud
     #. Note to translator: Default copy meant to be overwritten by applications (e.g. The item has been deleted > The page has been deleted). The word 'item' is not to feature in Novius OS.
@@ -366,129 +389,132 @@ return array(
     #: config/i18n_common.config.php:15
     'Bye bye' => 'Adieu',
 
+    #: config/i18n_common.config.php:17
+    'You’re not allowed to carry out this action. Ask your colleagues to find out why.' => '',
+
     #. Blank slate
-    #: config/i18n_common.config.php:19
+    #: config/i18n_common.config.php:20
     'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cet item ne peut être ajouté à {{context}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans ce contexte.',
 
-    #: config/i18n_common.config.php:20
+    #: config/i18n_common.config.php:21
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cet item ne peut être traduit en {{language}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans cette langue.',
 
-    #: config/i18n_common.config.php:21
+    #: config/i18n_common.config.php:22
     'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Cet item ne peut être ajouté à {{context}}. (Mais comment avez-vous obtenu ce message&nbsp;? Vous bidouillez le système, non&nbsp;?)',
 
-    #: config/i18n_common.config.php:25
+    #: config/i18n_common.config.php:26
     'Last chance, there’s no undo. Are you sure you want to do this?' => 'Attention, vous ne pouvez revenir en arrière. Êtes-vous bien sûr(e) de vouloir faire ça ?',
 
     #. Delete action's labels
-    #: config/i18n_common.config.php:28
+    #: config/i18n_common.config.php:29
     '{{Button}} or <a>No, cancel</a>' => '{{Button}} ou <a>Non, annuler</a>',
 
-    #: config/i18n_common.config.php:29
+    #: config/i18n_common.config.php:30
     'Yes, delete' => 'Oui, supprimer',
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:31
     'Nothing to delete' => 'Rien à supprimer',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:32
     'Yes, delete this item' => 'Oui, supprimer cet item',
 
-    #: config/i18n_common.config.php:32
+    #: config/i18n_common.config.php:33
     'Yes, delete these {{count}} items' => 'Oui, supprimer ces {{count}} items',
 
-    #: config/i18n_common.config.php:34
+    #: config/i18n_common.config.php:35
     'To confirm the deletion, you need to enter this number in the field below:' => 'Pour confirmer la suppression, vous devez entrer ce nombre dans le champ ci-dessous&nbsp;:',
 
-    #: config/i18n_common.config.php:35
+    #: config/i18n_common.config.php:36
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Nous ne pouvons supprimer cet item car le nombre de sous-items indiqué est faux. Merci de le corriger.',
 
-    #: config/i18n_common.config.php:37
+    #: config/i18n_common.config.php:38
     '1 item' => '1 item',
 
-    #: config/i18n_common.config.php:38
+    #: config/i18n_common.config.php:39
     '{{count}} items' => '{{count}} items',
 
     #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:41
+    #: config/i18n_common.config.php:42
     'This item exists in <strong>{{context_count}} contexts</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong>.',
 
-    #: config/i18n_common.config.php:42
+    #: config/i18n_common.config.php:43
     'This item exists in <strong>{{language_count}} languages</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong>.',
 
     #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:45
+    #: config/i18n_common.config.php:46
     'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>{{children_count}} sous-items</strong>.',
 
-    #: config/i18n_common.config.php:46
+    #: config/i18n_common.config.php:47
     'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>un sous-item</strong>.',
 
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:48
     'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>{{children_count}} sous-items</strong>.',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:49
     'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>un sous-item</strong>.',
 
     #. Keep only if the model has the behaviour Tree
-    #: config/i18n_common.config.php:51
+    #: config/i18n_common.config.php:52
     'This item has <strong>1 sub-item</strong>.' => 'Cet item a <strong>un sous-item</strong>.',
 
-    #: config/i18n_common.config.php:52
+    #: config/i18n_common.config.php:53
     'This item has <strong>{{children_count}} sub-items</strong>.' => 'Cet item a <strong>{{children_count}} sous-items</strong>.',
 
     #. Visualise action's labels
-    #: config/i18n_common.config.php:55
+    #: config/i18n_common.config.php:56
     'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => '',
 
     #. Appdesk: allLanguages
-    #: config/i18n_common.config.php:58
+    #: config/i18n_common.config.php:59
     'All languages' => 'Toutes les langues',
 
-    #: config/i18n_common.config.php:59
+    #: config/i18n_common.config.php:60
     'All sites' => 'Tous les sites',
 
-    #: config/i18n_common.config.php:60
+    #: config/i18n_common.config.php:61
     'All contexts' => 'Tous les contextes',
 
-    #: config/i18n_common.config.php:61
+    #: config/i18n_common.config.php:62
     'List' => 'Liste',
 
-    #: config/i18n_common.config.php:62
+    #: config/i18n_common.config.php:63
     'Tree' => 'Arborescence',
 
-    #: config/i18n_common.config.php:63
+    #: config/i18n_common.config.php:64
     'Thumbnails' => 'Vignettes',
 
-    #: config/i18n_common.config.php:64
+    #: config/i18n_common.config.php:65
     'Preview' => 'Prévisualisation',
 
-    #: config/i18n_common.config.php:66
-    #: config/i18n_common.config.php:77
+    #: config/i18n_common.config.php:67
+    #: config/i18n_common.config.php:78
     'Languages' => 'Langues',
 
-    #: config/i18n_common.config.php:68
+    #: config/i18n_common.config.php:69
     'Select the site(s) to show' => 'Sélectionner quel(s) site(s) afficher',
 
-    #: config/i18n_common.config.php:69
+    #: config/i18n_common.config.php:70
     'Select the language(s) to show' => 'Sélectionner quelle(s) langue(s) afficher',
 
-    #: config/i18n_common.config.php:70
+    #: config/i18n_common.config.php:71
     'Select the context(s) to show' => 'Sélectionner quel(s) contexte(s) afficher',
 
-    #: config/i18n_common.config.php:71
+    #: config/i18n_common.config.php:72
     'Show {{context}}' => 'Afficher {{context}}',
 
-    #: config/i18n_common.config.php:72
+    #: config/i18n_common.config.php:73
     'Other sites' => 'Autres sites',
 
-    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:74
     'Other languages' => 'Autres langues',
 
-    #: config/i18n_common.config.php:74
+    #: config/i18n_common.config.php:75
     'Other contexts' => 'Autres contextes',
 
-    #: config/i18n_common.config.php:75
+    #: config/i18n_common.config.php:76
     'Contexts' => 'Contextes',
 
-    #: config/i18n_common.config.php:76
+    #: config/i18n_common.config.php:77
     'Sites' => 'Sites',
 
     #: config/validation.config.php:15

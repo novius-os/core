@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 87 out of 89 messages are translated (97%).
-// 479 out of 491 words are translated (97%).
+// 87 out of 95 messages are translated (91%).
+// 489 out of 543 words are translated (91%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -49,6 +49,18 @@ return array(
 
     #: classes/renderer/media.php:81
     'This extension is not allowed.' => 'Cette extension n’est pas autorisée.',
+
+    #: views/admin/permissions/folders.view.php:14
+    'Note: when nothing is selected, there is no restriction and this user can access all folders. The root folder is always accessible.' => '',
+
+    #: views/admin/permissions/general.view.php:16
+    'Can add, edit and delete media files' => '',
+
+    #: views/admin/permissions/general.view.php:23
+    'Can visualise and use media files only' => '',
+
+    #: views/admin/permissions/general.view.php:30
+    'Can add, edit and delete folders' => '',
 
     #: views/admin/media_delete.view.php:20
     'The media is not used anywhere and can be safely deleted.' => 'Ce média n’est utilisé nulle part et peut ainsi être supprimé sans problème.',
@@ -113,6 +125,14 @@ return array(
     #: views/admin/wysiwyg_image.view.php:76
     'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inhabituel&nbsp;: Il semble qu’aucune image n’ait étésélectionnée. Merci de ré-essayer. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
 
+    #: views/admin/media_edit.view.php:56
+    #: config/controller/admin/appdesk.config.php:50
+    'File size:' => '',
+
+    #: views/admin/media_edit.view.php:63
+    #: config/controller/admin/appdesk.config.php:53
+    'Dimensions:' => '',
+
     #: views/admin/folder_delete.view.php:20
     'The folder is empty and can be safely deleted.' => 'Le dossier est vide et peut donc être supprimé sans problème.',
 
@@ -131,7 +151,13 @@ return array(
     #: views/admin/folder.view.php:57
     'Warning: moving a folder changes the URL of all the files it contains.' => 'Attention&nbsp;: déplacer un dossier change l’URL de tous les fichiers qu’il contient.',
 
-    #: config/controller/admin/inspector/folder.config.php:20
+    #: config/permissions.config.php:19
+    'Permissions for this application' => '',
+
+    #: config/permissions.config.php:23
+    'Restrict access to specific folders' => '',
+
+    #: config/controller/admin/inspector/folder.config.php:40
     #: config/common/folder.config.php:17
     'Folder' => 'Dossier',
 
@@ -193,54 +219,48 @@ return array(
     'Save' => 'Enregistrer',
 
     #: config/controller/admin/media.config.php:20
-    #: config/common/media.config.php:108
+    #: config/common/media.config.php:118
     'Add a media file' => 'Ajouter un média',
 
     #: config/controller/admin/media.config.php:53
     'File from your hard drive:' => 'Fichier sur votre disque dur&nbsp;:',
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:47
     'File name:' => 'Nom du fichier&nbsp;:',
 
-    #: config/controller/admin/appdesk.config.php:33
-    'Path:' => 'Chemin&nbsp;:',
-
-    #: config/controller/admin/appdesk.config.php:36
-    'Extension:' => 'Extension&nbsp;:',
-
     #. Note to translator: 'Preview' here is a label, not an action
-    #: config/controller/admin/appdesk.config.php:43
+    #: config/controller/admin/appdesk.config.php:60
     'Preview' => 'Prévisualisation',
 
-    #: config/controller/admin/appdesk.config.php:44
+    #: config/controller/admin/appdesk.config.php:61
     'Click on a media file to preview it.' => 'Cliquez sur un média pour le prévisualiser.',
 
-    #: config/controller/admin/appdesk.config.php:52
+    #: config/controller/admin/appdesk.config.php:69
     'Default view' => 'Affichage par défaut',
 
-    #: config/controller/admin/appdesk.config.php:58
+    #: config/controller/admin/appdesk.config.php:75
     'Flick through view' => 'Feuilleter',
 
-    #: config/controller/admin/appdesk.config.php:80
+    #: config/controller/admin/appdesk.config.php:97
     'media file' => 'média',
 
-    #: config/controller/admin/appdesk.config.php:81
+    #: config/controller/admin/appdesk.config.php:98
     'media files' => 'médias',
 
-    #: config/controller/admin/appdesk.config.php:82
+    #: config/controller/admin/appdesk.config.php:99
     'Showing {{x}} media files out of {{y}}' => '{{x}} médias sur {{y}} affichés',
 
-    #: config/controller/admin/appdesk.config.php:83
+    #: config/controller/admin/appdesk.config.php:100
     'Showing 1 media file' => '1 média affiché',
 
-    #: config/controller/admin/appdesk.config.php:84
+    #: config/controller/admin/appdesk.config.php:101
     'No media files' => 'Pas de média',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:86
+    #: config/controller/admin/appdesk.config.php:103
     'Show all media files' => 'Afficher tous les médias',
 
-    #: config/controller/admin/appdesk.config.php:88
+    #: config/controller/admin/appdesk.config.php:105
     'Pick' => 'Choisir',
 
     #. Crud
@@ -265,16 +285,16 @@ return array(
     #: config/common/folder.config.php:38
     'Yes, delete this folder' => 'Oui, supprimer ce dossier',
 
-    #: config/common/folder.config.php:46
-    'You can’t edit the root folder.' => '',
+    #: config/common/folder.config.php:53
+    'You can’t edit the root folder.' => 'Vous ne pouvez modifier le dossier racine.',
 
-    #: config/common/folder.config.php:51
-    'You can’t delete the root folder.' => '',
+    #: config/common/folder.config.php:62
+    'You can’t delete the root folder.' => 'Vous ne pouvez supprimer le dossier racine.',
 
-    #: config/common/folder.config.php:55
+    #: config/common/folder.config.php:69
     'Add a media file in this folder' => 'Ajouter un média dans ce dossier',
 
-    #: config/common/folder.config.php:68
+    #: config/common/folder.config.php:85
     'Add a sub-folder to this folder' => 'Ajouter un sous-dossier dans ce dossier',
 
     #. Crud
@@ -302,7 +322,7 @@ return array(
     #: config/common/media.config.php:59
     'Extension' => 'Extension',
 
-    #: config/common/media.config.php:112
+    #: config/common/media.config.php:134
     'Visualise' => 'Visualiser',
 
 );

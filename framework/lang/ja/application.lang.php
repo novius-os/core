@@ -1,44 +1,38 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 21 out of 22 messages are translated (95%).
-// 95 out of 112 words are translated (95%).
+// 15 out of 17 messages are translated (88%).
+// 76 out of 98 words are translated (88%).
 
 return array(
     #. Note to translator: This is a submit button
-    #: classes/controller/admin/crud.ctrl.php:316
+    #: classes/controller/admin/crud.ctrl.php:280
     'Add' => '追加',
 
-    #: classes/controller/admin/crud.ctrl.php:404
+    #: classes/controller/admin/crud.ctrl.php:369
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'このアイテムは既に{{context}}にあります。したがって追加することはできません。',
 
-    #: classes/controller/admin/crud.ctrl.php:600
-    #: classes/controller/admin/crud.ctrl.php:607
-    'Translate into {{context}}' => '{{context}}に翻訳する',
-
-    #: classes/controller/admin/crud.ctrl.php:602
-    #: classes/controller/admin/crud.ctrl.php:605
-    'Add to {{context}}' => '{{context}}に追加する',
-
-    #: classes/controller/admin/crud.ctrl.php:611
-    'Edit {{context}}' => '{{context}}を編集する',
-
-    #. Note to translator: action (button)
-    #: classes/controller/admin/crud.ctrl.php:628
-    'Translate' => '翻訳する',
-
-    #: classes/controller/admin/crud.ctrl.php:630
-    'Add to another site' => '別のサイトに追加する',
-
-    #: classes/controller/admin/crud.ctrl.php:632
-    'Translate / Add to another site' => '別のサイトに翻訳 / 追加する',
-
-    #: classes/controller/admin/crud.ctrl.php:681
-    'You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.' => '',
-
-    #: classes/controller/admin/appdesk.ctrl.php:156
+    #: classes/controller/admin/appdesk.ctrl.php:165
     'Default view' => 'デフォルトビュー',
+
+    #: views/crud/context_common_fields.view.php:17
+    'This field is common to all languages' => '',
+
+    #: views/crud/context_common_fields.view.php:17
+    'This field is common to all contexts' => 'このフィールドは全てのコンテキストに共通です。',
+
+    #: views/crud/context_common_fields.view.php:19
+    'When you modify the value of this field, the change applies to the following languages:' => '',
+
+    #: views/crud/context_common_fields.view.php:20
+    'When you modify the value of this field, the change applies to the following contexts:' => 'このフィールドの値を変更すると、以下のコンテキストに適用されます。',
+
+    #: views/crud/context_common_fields.view.php:21
+    'Go ahead, I understand' => 'はい、了解しました',
+
+    #: views/crud/context_common_fields.view.php:22
+    'Cancel, I won’t modify it' => 'いいえ、変更しません',
 
     #. Note to translator: this is an action (button)
     #: views/crud/blank_slate.view.php:61
@@ -64,17 +58,5 @@ return array(
 
     #: views/crud/blank_slate.view.php:118
     '(Form filled with the contents from the original version)' => '(元のコンテンツが挿入された状態から)',
-
-    #: views/crud/common_fields.view.php:21
-    'This field is common to all contexts' => 'このフィールドは全てのコンテキストに共通です。',
-
-    #: views/crud/common_fields.view.php:22
-    'When you modify the value of this field, the change applies to the following contexts:' => 'このフィールドの値を変更すると、以下のコンテキストに適用されます。',
-
-    #: views/crud/common_fields.view.php:23
-    'Go ahead, I understand' => 'はい、了解しました',
-
-    #: views/crud/common_fields.view.php:24
-    'Cancel, I won’t modify it' => 'いいえ、変更しません',
 
 );
