@@ -70,6 +70,135 @@ class Tools_Image
     }
 
     /**
+     *
+     * @param  string $source     a
+     * @param  int    $dest_width  Destination width
+     * @param  int    $dest_height Destination height
+     * @param  int    $vertical_position Vertical alignement for the cro. Can be m for middle, t for top and b for bottom
+     * @param  int    $horizontal_position Horizontal alignement for the crop. Can be c for center, r for right and l for left
+     * @param  string $dest       Destination file
+     * @return bool
+     */
+    public static function crop($source, $dest_width = null, $dest_height = null, $vertical_position = 'm', $horizontal_position = 'c',$dest = null)
+    {
+        if (!is_file($source)) {
+            throw new \Exception('This image doesn’t exist.');
+        }
+        $image_info = @getimagesize($source);
+        list($width, $height, $image_type, ) = $image_info;
+
+        if (!in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+            throw new \Exception('Only GIF, JPG and PNG are allowed.');
+        }
+
+        $extention = explode('.', $source);
+        $extention = strtolower(end($extention));
+        switch ($extention) {
+            case 'jpg' :
+            case 'jpeg' :
+                $function_type = 'jpeg';
+                break;
+            case 'bmp' :
+            case 'png' :
+            default:
+                $function_type = $extention;
+                break;
+
+
+        }
+        if (is_callable('imagecreatefrom'.$function_type)) {
+            $image = call_user_func('imagecreatefrom'.$function_type, $source);
+        } else {
+            throw new \Exception('No image create from '.$function_type.' function');
+        }
+        if (is_callable('image'.$function_type)) {
+            $function_image = 'image'.$function_type;
+        } else {
+            throw new \Exception('No image '.$function_type.' function');
+        }
+
+        $thumb_width = $dest_width;
+        $thumb_height = $dest_height;
+
+        $original_aspect = $width / $height;
+        $thumb_aspect = $thumb_width / $thumb_height;
+
+        if ( $original_aspect >= $thumb_aspect )
+        {
+            // If image is wider than thumbnail (in aspect ratio sense)
+            $new_height = $thumb_height;
+            $new_width = $width / ($height / $thumb_height);
+        }
+        else
+        {
+            // If the thumbnail is wider than the image
+            $new_width = $thumb_width;
+            $new_height = $height / ($width / $thumb_width);
+        }
+
+        // If color space is not RGB and resize method is the convert command-line binary, resize anyway (we want a RGB color space)
+        if ($image_type == IMAGETYPE_JPEG && $image_info['channels'] != 3 && !is_null(static::$cmd_convert)) {
+            $resize = true;
+        }
+
+        if (!$resize && empty($dest)) {
+            return true;
+        }
+        if (!is_writeable(dirname($dest))) {
+            throw new \Exception('Files cannot be saved in this directory.');
+        }
+        if (!$resize && !@copy($source, $dest)) {
+            throw new \Exception('An error has occured when resizing the image.');
+        }
+
+        $thumb = imagecreatetruecolor( $thumb_width, $thumb_height );
+
+        switch ($vertical_position) {
+            case 't' :
+                $v_position = 0;
+                break;
+            case 'b' :
+                $v_position = 0 - ($new_height - $thumb_height);
+                break;
+            case 'm' :
+            default :
+                $v_position = 0 - ($new_height - $thumb_height) / 2;
+                break;
+        }
+
+        switch ($horizontal_position) {
+            case 'l' :
+                $h_position = 0;
+                break;
+            case 'r' :
+                $h_position = 0 - ($new_width - $thumb_width);
+                break;
+            case 'c' :
+            default :
+                $h_position = 0 - ($new_width - $thumb_width) / 2;
+                break;
+        }
+
+        // Resize and crop
+        if (imagecopyresampled($thumb,
+            $image,
+            $h_position,
+            $v_position,
+            0, 0,
+            $new_width, $new_height,
+            $width, $height))
+        {
+            if (call_user_func($function_image, $thumb, $dest, 80)) {
+                return '';
+            }
+        } else {
+            throw new \Exception('Crop and resize failure');
+        }
+
+        return true;
+    }
+
+    /**
      * Calculates aspect-ratio from an original size to a maximum size
      *
      * @param  int   $orig_width  Original width

@@ -177,25 +177,28 @@ class Model_Media extends \Nos\Orm\Model
         if (!$this->is_image()) {
             return false;
         }
-        list($src, $width, $height, $ratio) = $this->get_img_infos($params['max_width'], $params['max_height']);
+        list($src, $width, $height, $ratio) = $this->get_img_infos($params['max_width'], $params['max_height'], $params['crop']);
 
         return '<img src="'.$src.'" width="'.$width.'" height="'.$height.'" />';
     }
 
-    public function get_img_tag_resized($max_width = null, $max_height = null)
+    public function get_img_tag_resized($max_width = null, $max_height = null, $crop = array())
     {
         return $this->get_img_tag(array(
             'max_width'  => $max_width,
             'max_height' => $max_height,
+            'crop' => $crop
         ));
     }
 
-    public function get_img_infos($max_width = null, $max_height = null)
+    public function get_img_infos($max_width = null, $max_height = null, $crop = array())
     {
         if (!$this->is_image()) {
             return false;
         }
-        if (!empty($max_width) || !empty($max_height)) {
+        if ((!empty($max_width) || !empty($max_height)) && !empty($crop)) {
+            $src = $this->get_public_path_croped($max_width, $max_height, $crop['vertical_position'], $crop['horizontal_position']);
+        } else if (!empty($max_width) || !empty($max_height)) {
             list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $max_width, $max_height);
             $src = $this->get_public_path_resized($max_width, $max_height);
         } else {
@@ -228,6 +231,29 @@ class Model_Media extends \Nos\Orm\Model
         return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s.%s',
             (int) $max_width,
             (int) $max_height,
+            substr($hash, 0, 6),
+            $this->media_ext
+        );
+    }
+
+    public function get_public_path_croped($width = 0, $height = 0, $vertical_position = 'm', $horizontal_position = 'c')
+    {
+        if (!$this->is_image()) {
+            return false;
+        }
+
+        if ($this->media_width == $width && $this->media_height == $height) {
+            return $this->get_public_path();
+        }
+
+        \Config::load('crypt', true);
+        $hash = md5(\Config::get('crypt.crypto_hmac').'$'.$this->virtual_path().'$'.$width.'$'.$height.'$'.$vertical_position.'$'.$horizontal_position);
+
+        return str_replace('media/', 'cache/media/crop/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s-%s-%s.%s',
+            (int) $width,
+            (int) $height,
+            $vertical_position,
+            $horizontal_position,
             substr($hash, 0, 6),
             $this->media_ext
         );
