@@ -207,11 +207,6 @@ if ($is_attachment) {
         }
     }
 
-    //On regarde si on appel une image croppé
-    if (!$send_file) {
-
-    }
-
     if (false !== $send_file && is_file($send_file)) {
         //Nos\Tools_File::$use_xsendfile = false;
         // This is a 404 error handler, so force status 200
