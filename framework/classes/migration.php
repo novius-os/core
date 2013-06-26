@@ -12,6 +12,7 @@ namespace Nos;
 
 class Migration
 {
+    public static $complete_sql = array();
     public $path = null;
     public $sql_file = null;
 
@@ -30,7 +31,9 @@ class Migration
 
     public static function executeSqlFile($sql_file)
     {
-        $queries = explode(';', file_get_contents($sql_file));//@todo: might not work everywhere (; in values)
+        $content = file_get_contents($sql_file);
+        static::$complete_sql[] = $content;
+        $queries = explode(';', $content);//@todo: might not work everywhere (; in values)
         foreach ($queries as $query) {
             if (trim($query) != '') {
                 // @todo: might not work for comments
@@ -55,5 +58,10 @@ class Migration
         } else {
             return false;
         }
+    }
+
+    public static function getCompleteSql()
+    {
+        return implode("\n;\n", static::$complete_sql);
     }
 }
