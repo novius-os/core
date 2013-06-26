@@ -12,6 +12,12 @@ namespace Nos;
 
 class Tools_Image
 {
+    protected static $_gd_resource_types = array(
+        IMAGETYPE_GIF  => 'gif',
+        IMAGETYPE_JPEG => 'jpeg',
+        IMAGETYPE_PNG  => 'png',
+    );
+
     public static $cmd_convert = null;
 
     public static function _init()
@@ -91,32 +97,6 @@ class Tools_Image
             throw new \Exception('Only GIF, JPG and PNG are allowed.');
         }
 
-        $extention = explode('.', $source);
-        $extention = strtolower(end($extention));
-        switch ($extention) {
-            case 'jpg' :
-            case 'jpeg' :
-                $function_type = 'jpeg';
-                break;
-            case 'bmp' :
-            case 'png' :
-            default:
-                $function_type = $extention;
-                break;
-
-
-        }
-        if (is_callable('imagecreatefrom'.$function_type)) {
-            $image = call_user_func('imagecreatefrom'.$function_type, $source);
-        } else {
-            throw new \Exception('No image create from '.$function_type.' function');
-        }
-        if (is_callable('image'.$function_type)) {
-            $function_image = 'image'.$function_type;
-        } else {
-            throw new \Exception('No image '.$function_type.' function');
-        }
-
         $thumb_width = $dest_width;
         $thumb_height = $dest_height;
 
@@ -135,23 +115,6 @@ class Tools_Image
             $new_width = $thumb_width;
             $new_height = $height / ($width / $thumb_width);
         }
-
-        // If color space is not RGB and resize method is the convert command-line binary, resize anyway (we want a RGB color space)
-        if ($image_type == IMAGETYPE_JPEG && $image_info['channels'] != 3 && !is_null(static::$cmd_convert)) {
-            $resize = true;
-        }
-
-        if (!$resize && empty($dest)) {
-            return true;
-        }
-        if (!is_writeable(dirname($dest))) {
-            throw new \Exception('Files cannot be saved in this directory.');
-        }
-        if (!$resize && !@copy($source, $dest)) {
-            throw new \Exception('An error has occured when resizing the image.');
-        }
-
-        $thumb = imagecreatetruecolor( $thumb_width, $thumb_height );
 
         switch ($vertical_position) {
             case 't' :
@@ -179,21 +142,22 @@ class Tools_Image
                 break;
         }
 
-        // Resize and crop
-        if (imagecopyresampled($thumb,
-            $image,
-            $h_position,
-            $v_position,
-            0, 0,
-            $new_width, $new_height,
-            $width, $height))
-        {
-            if (call_user_func($function_image, $thumb, $dest, 80)) {
-                return '';
-            }
-        } else {
-            throw new \Exception('Crop and resize failure');
+        // If color space is not RGB and resize method is the convert command-line binary, resize anyway (we want a RGB color space)
+        if ($image_type == IMAGETYPE_JPEG && $image_info['channels'] != 3 && !is_null(static::$cmd_convert)) {
+            $resize = true;
         }
+
+        if (!$resize && empty($dest)) {
+            return true;
+        }
+        if (!is_writeable(dirname($dest))) {
+            throw new \Exception('Files cannot be saved in this directory.');
+        }
+        if (!$resize && !@copy($source, $dest)) {
+            throw new \Exception('An error has occured when resizing the image.');
+        }
+
+        static::_crop_gd($image_info, $source, $thumb_width, $thumb_height, $new_width, $new_height, $h_position, $v_position, $dest);
 
         return true;
     }
@@ -272,23 +236,7 @@ class Tools_Image
     protected static function _resize_gd($image_info, $source, $width, $height, $dest)
     {
         $image_type = $image_info[2];
-
-        if (!in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
-            throw new \Exception(__('The format of this image is not allowed.'));
-        }
-
-        static $create_resource = array(
-            IMAGETYPE_GIF  => 'imagecreatefromgif',
-            IMAGETYPE_JPEG => 'imagecreatefromjpeg',
-            IMAGETYPE_PNG  => 'imagecreatefrompng',
-        );
-        static $save_resource = array(
-            IMAGETYPE_GIF  => 'imagegif',
-            IMAGETYPE_JPEG => 'imagejpeg',
-            IMAGETYPE_PNG  => 'imagepng',
-        );
-
-        $old_img = $create_resource[$image_type]($source);
+        $old_img = call_user_func('imagecreatefrom'.static::$_gd_resource_types[$image_type], $source);
         $new_img = imagecreatetruecolor($width, $height);
 
         // Allow transparency
@@ -300,9 +248,34 @@ class Tools_Image
         }
 
         imagecopyresampled($new_img, $old_img, 0, 0, 0, 0, $width, $height, $image_info[0], $image_info[1]);
-        $save_resource[$image_type]($new_img, $dest);
+        call_user_func('image'.static::$_gd_resource_types[$image_type], $new_img, $dest);
 
         imagedestroy($old_img);
         imagedestroy($new_img);
     }
+
+    protected static function _crop_gd($image_info, $source, $thumb_width, $thumb_height, $new_width, $new_height, $h_position, $v_position, $dest) {
+
+        list($width, $height, $image_type, ) = $image_info;
+
+        $image = call_user_func('imagecreatefrom'.static::$_gd_resource_types[$image_type], $source);
+
+        $thumb = imagecreatetruecolor( $thumb_width, $thumb_height );
+
+        // Allow transparency
+        if (in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_PNG))) {
+            imagealphablending($thumb, false);
+            imagesavealpha($thumb, true);
+            $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+            imagefilledrectangle($thumb, 0, 0, $thumb_width, $thumb_height, $transparent);
+        }
+
+        // Resize and crop
+        if (imagecopyresampled($thumb, $image, $h_position, $v_position, 0, 0, $new_width, $new_height, $width, $height)) {
+            call_user_func('image'.static::$_gd_resource_types[$image_type], $thumb, $dest);
+        } else {
+            throw new \Exception('Crop and resize failure');
+        }
+    }
+
 }
