@@ -31,13 +31,13 @@ if (in_array($nos_url, array(
 $is_media = preg_match('`^(?:cache/)?media/`', $nos_url);
 if ($is_media) {
     $is_resized = preg_match('`cache/media/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m);
-    $is_croped = preg_match('`cache/media/crop/(.+/(\d+)-(\d+)-([tmb])-([lcr])(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m_crop);
+    $is_cropped = preg_match('`cache/media/crop/(.+/(\d+)-(\d+)-([tmb])-([lcr])(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m_crop);
 
-    if ($is_resized || $is_croped) {
+    if ($is_resized || $is_cropped) {
         if ($is_resized) {
             list(, $path, $max_width, $max_height, $verification, $extension) = $m;
             $media_url = str_replace("/$max_width-$max_height-$verification", '', $path);
-        } else if ($is_croped) {
+        } else if ($is_cropped) {
             list(, $path, $max_width, $max_height, $vertical_position, $horizontal_position, $verification, $extension) = $m_crop;
             $media_url = str_replace("/$max_width-$max_height-$vertical_position-$horizontal_position-$verification", '', $path);
         }
@@ -45,7 +45,7 @@ if ($is_media) {
         \Config::load('crypt', true);
         if ($is_resized) {
             $hash = md5(\Config::get('crypt.crypto_hmac').'$/'.$media_url.'$'.$max_width.'$'.$max_height);
-        } else if ($is_croped) {
+        } else if ($is_cropped) {
             $m = $m_crop;
             $hash = md5(\Config::get('crypt.crypto_hmac').'$/'.$media_url.'$'.$max_width.'$'.$max_height.'$'.$vertical_position.'$'.$horizontal_position);
         }
@@ -76,7 +76,7 @@ if ($is_media) {
     if (false === $media || !is_file(APPPATH.$media->get_private_path())) {
         $send_file = false;
     } else {
-        if ($is_resized || $is_croped) {
+        if ($is_resized || $is_cropped) {
             $source = APPPATH.$media->get_private_path();
             $target = $m[0];
             $dest = APPPATH.$target;
@@ -90,7 +90,7 @@ if ($is_media) {
             try {
                 if ($is_resized) {
                     \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
-                } else if ($is_croped) {
+                } else if ($is_cropped) {
                     \Nos\Tools_Image::crop($source, $max_width, $max_height, $vertical_position, $horizontal_position, $dest);
                 }
                 $send_file = $dest;
@@ -137,9 +137,9 @@ if ($is_attachment) {
     }
 
     if (!$is_resized) {
-        $is_croped = preg_match('`cache/media/crop/(.+/(\d+)-(\d+)-([tmb])-([lcr])(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m);
+        $is_cropped = preg_match('`cache/media/crop/(.+/(\d+)-(\d+)-([tmb])-([lcr])(?:-(\w+))?.([a-z]+))$`u', $nos_url, $m);
 
-        if ($is_croped) {
+        if ($is_cropped) {
             list($target_resized, $path, $max_width, $max_height, $vertical_position, $horizontal_position ,$verification, $extension) = $m;
             $attachment_url = str_replace("/$max_width-$max_height-$vertical_position-$horizontal_position-$verification", '', $path);
             $attachment_url = str_replace("/$max_width-$max_height-$vertical_position-$horizontal_position", '', $attachment_url);
@@ -169,7 +169,7 @@ if ($is_attachment) {
             }
         }
 
-        if ($send_file && ($is_resized || $is_croped)) {
+        if ($send_file && ($is_resized || $is_cropped)) {
             $source = $send_file;
             $target_relative = $target_resized;
             $send_file = APPPATH.$target_relative;
@@ -178,7 +178,7 @@ if ($is_attachment) {
                 !is_dir($dir) && \File::create_dir(APPPATH.'cache', \Str::sub($dir, \Str::length(APPPATH.'cache')));
                 if ($is_resized) {
                     \Nos\Tools_Image::resize($source, $max_width, $max_height, $send_file);
-                } else if ($is_croped) {
+                } else if ($is_cropped) {
                     \Nos\Tools_Image::crop($source, $max_width, $max_height, $vertical_position, $horizontal_position, $send_file);
                 }
 

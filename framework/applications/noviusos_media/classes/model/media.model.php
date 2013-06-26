@@ -197,7 +197,7 @@ class Model_Media extends \Nos\Orm\Model
             return false;
         }
         if ((!empty($max_width) || !empty($max_height)) && !empty($crop)) {
-            $src = $this->get_public_path_croped($max_width, $max_height, $crop['vertical_position'], $crop['horizontal_position']);
+            $src = $this->get_public_path_cropped($max_width, $max_height, $crop['vertical_position'], $crop['horizontal_position']);
         } else if (!empty($max_width) || !empty($max_height)) {
             list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $max_width, $max_height);
             $src = $this->get_public_path_resized($max_width, $max_height);
@@ -236,7 +236,7 @@ class Model_Media extends \Nos\Orm\Model
         );
     }
 
-    public function get_public_path_croped($width = 0, $height = 0, $vertical_position = 'm', $horizontal_position = 'c')
+    public function get_public_path_cropped($width = 0, $height = 0, $vertical_position = 'm', $horizontal_position = 'c')
     {
         if (!$this->is_image()) {
             return false;
