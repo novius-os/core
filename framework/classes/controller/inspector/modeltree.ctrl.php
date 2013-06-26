@@ -76,7 +76,8 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             }
 
             if (!isset($config['order_by']) && !!$config['model']::behaviours('Nos\Orm_Behaviour_Sortable', false)) {
-                $config['order_by'] = $config['model']::prefix().'sort';
+                $sortable_behaviours = $config['model']::behaviours('Nos\Orm_Behaviour_Sortable', false);
+                $config['order_by'] = $sortable_behaviours['sort_property'];
             }
 
             if (!isset($config['models'])) {
