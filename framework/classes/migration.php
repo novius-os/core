@@ -32,7 +32,12 @@ class Migration
     public static function executeSqlFile($sql_file)
     {
         $content = file_get_contents($sql_file);
-        static::$complete_sql[] = $content;
+        $formatted_sql_filename = str_replace(NOSROOT, 'NOSROOT'.DIRECTORY_SEPARATOR, $sql_file);
+        $line = '# |'.str_repeat('-', strlen($formatted_sql_filename) + 2)."|\n";
+        $header = $line;
+        $header .= '# | '.$formatted_sql_filename." |\n";
+        $header .= $line."\n";
+        static::$complete_sql[] = $header.$content."\n\n";
         $queries = explode(';', $content);//@todo: might not work everywhere (; in values)
         foreach ($queries as $query) {
             if (trim($query) != '') {
@@ -62,6 +67,6 @@ class Migration
 
     public static function getCompleteSql()
     {
-        return implode("\n;\n", static::$complete_sql);
+        return implode("\n", static::$complete_sql);
     }
 }
