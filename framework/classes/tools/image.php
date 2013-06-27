@@ -12,6 +12,12 @@ namespace Nos;
 
 class Tools_Image
 {
+    protected static $_gd_resource_types = array(
+        IMAGETYPE_GIF  => 'gif',
+        IMAGETYPE_JPEG => 'jpeg',
+        IMAGETYPE_PNG  => 'png',
+    );
+
     public static $cmd_convert = null;
 
     public static function _init()
@@ -65,6 +71,93 @@ class Tools_Image
         }
         // Fallback to GD if not
         static::_resize_gd($image_info, $source, $new_width, $new_height, $dest);
+
+        return true;
+    }
+
+    /**
+     *
+     * @param  string $source     a
+     * @param  int    $dest_width  Destination width
+     * @param  int    $dest_height Destination height
+     * @param  int    $vertical_position Vertical alignement for the cro. Can be m for middle, t for top and b for bottom
+     * @param  int    $horizontal_position Horizontal alignement for the crop. Can be c for center, r for right and l for left
+     * @param  string $dest       Destination file
+     * @return bool
+     */
+    public static function crop($source, $dest_width = null, $dest_height = null, $vertical_position = 'm', $horizontal_position = 'c',$dest = null)
+    {
+        if (!is_file($source)) {
+            throw new \Exception('This image doesn’t exist.');
+        }
+        $image_info = @getimagesize($source);
+        list($width, $height, $image_type, ) = $image_info;
+
+        if (!in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+            throw new \Exception('Only GIF, JPG and PNG are allowed.');
+        }
+
+        $thumb_width = $dest_width;
+        $thumb_height = $dest_height;
+
+        $original_aspect = $width / $height;
+        $thumb_aspect = $thumb_width / $thumb_height;
+
+        if ( $original_aspect >= $thumb_aspect )
+        {
+            // If image is wider than thumbnail (in aspect ratio sense)
+            $new_height = $thumb_height;
+            $new_width = $width / ($height / $thumb_height);
+        }
+        else
+        {
+            // If the thumbnail is wider than the image
+            $new_width = $thumb_width;
+            $new_height = $height / ($width / $thumb_width);
+        }
+
+        switch ($vertical_position) {
+            case 't' :
+                $v_position = 0;
+                break;
+            case 'b' :
+                $v_position = 0 - ($new_height - $thumb_height);
+                break;
+            case 'm' :
+            default :
+                $v_position = 0 - ($new_height - $thumb_height) / 2;
+                break;
+        }
+
+        switch ($horizontal_position) {
+            case 'l' :
+                $h_position = 0;
+                break;
+            case 'r' :
+                $h_position = 0 - ($new_width - $thumb_width);
+                break;
+            case 'c' :
+            default :
+                $h_position = 0 - ($new_width - $thumb_width) / 2;
+                break;
+        }
+
+        // If color space is not RGB and resize method is the convert command-line binary, resize anyway (we want a RGB color space)
+        if ($image_type == IMAGETYPE_JPEG && $image_info['channels'] != 3 && !is_null(static::$cmd_convert)) {
+            $resize = true;
+        }
+
+        if (!$resize && empty($dest)) {
+            return true;
+        }
+        if (!is_writeable(dirname($dest))) {
+            throw new \Exception('Files cannot be saved in this directory.');
+        }
+        if (!$resize && !@copy($source, $dest)) {
+            throw new \Exception('An error has occured when resizing the image.');
+        }
+
+        static::_crop_gd($image_info, $source, $thumb_width, $thumb_height, $new_width, $new_height, $h_position, $v_position, $dest);
 
         return true;
     }
@@ -143,23 +236,7 @@ class Tools_Image
     protected static function _resize_gd($image_info, $source, $width, $height, $dest)
     {
         $image_type = $image_info[2];
-
-        if (!in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
-            throw new \Exception(__('The format of this image is not allowed.'));
-        }
-
-        static $create_resource = array(
-            IMAGETYPE_GIF  => 'imagecreatefromgif',
-            IMAGETYPE_JPEG => 'imagecreatefromjpeg',
-            IMAGETYPE_PNG  => 'imagecreatefrompng',
-        );
-        static $save_resource = array(
-            IMAGETYPE_GIF  => 'imagegif',
-            IMAGETYPE_JPEG => 'imagejpeg',
-            IMAGETYPE_PNG  => 'imagepng',
-        );
-
-        $old_img = $create_resource[$image_type]($source);
+        $old_img = call_user_func('imagecreatefrom'.static::$_gd_resource_types[$image_type], $source);
         $new_img = imagecreatetruecolor($width, $height);
 
         // Allow transparency
@@ -171,9 +248,34 @@ class Tools_Image
         }
 
         imagecopyresampled($new_img, $old_img, 0, 0, 0, 0, $width, $height, $image_info[0], $image_info[1]);
-        $save_resource[$image_type]($new_img, $dest);
+        call_user_func('image'.static::$_gd_resource_types[$image_type], $new_img, $dest);
 
         imagedestroy($old_img);
         imagedestroy($new_img);
     }
+
+    protected static function _crop_gd($image_info, $source, $thumb_width, $thumb_height, $new_width, $new_height, $h_position, $v_position, $dest) {
+
+        list($width, $height, $image_type, ) = $image_info;
+
+        $image = call_user_func('imagecreatefrom'.static::$_gd_resource_types[$image_type], $source);
+
+        $thumb = imagecreatetruecolor( $thumb_width, $thumb_height );
+
+        // Allow transparency
+        if (in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_PNG))) {
+            imagealphablending($thumb, false);
+            imagesavealpha($thumb, true);
+            $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+            imagefilledrectangle($thumb, 0, 0, $thumb_width, $thumb_height, $transparent);
+        }
+
+        // Resize and crop
+        if (imagecopyresampled($thumb, $image, $h_position, $v_position, 0, 0, $new_width, $new_height, $width, $height)) {
+            call_user_func('image'.static::$_gd_resource_types[$image_type], $thumb, $dest);
+        } else {
+            throw new \Exception('Crop and resize failure');
+        }
+    }
+
 }
