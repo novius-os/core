@@ -1139,6 +1139,7 @@ define('jquery-nos-ostabs',
                 if (!iframe) {
                     self.xhr = $.ajax({
                         url: url,
+                        cache: false,
                         success: function( r, s, xhr ) {
                             var json;
 
