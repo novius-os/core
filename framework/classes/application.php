@@ -209,8 +209,12 @@ class Application
         $i18n_file = \Arr::get($metadata, 'i18n_file', false);
         $name = isset($metadata['name']) ? $metadata['name'] : $this->folder;
         if (!empty($i18n_file)) {
-            $i18n = \Nos\I18n::dictionary($i18n_file);
-            $name = $i18n($name);
+            try {
+                $i18n = \Nos\I18n::dictionary($i18n_file);
+                $name = $i18n($name);
+            } catch (\Fuel\Core\ModuleNotFoundException $e) {
+                // App not found: don't translate
+            }
         }
 
         return $name;

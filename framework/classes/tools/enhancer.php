@@ -96,9 +96,9 @@ class Tools_Enhancer
             $item = \Arr::get($params, 'item', false);
             $context = \Arr::get($params, 'context', false);
             if ($item && !$context) {
-                $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable', false);
-                if ($twinnable) {
+                try {
                     $context = $item->get_context();
+                } catch (\Exception $e) {
                 }
             }
 

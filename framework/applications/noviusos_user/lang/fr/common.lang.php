@@ -1,12 +1,12 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 45 out of 56 messages are translated (80%).
-// 200 out of 246 words are translated (80%).
+// 56 out of 56 messages are translated (100%).
+// 246 out of 246 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/user.ctrl.php:51
+    #: classes/controller/admin/user.ctrl.php:60
     'Done, your password has been changed.' => 'Voilà, votre mot de passe a été changé.',
 
     #: classes/controller/admin/account.ctrl.php:84
@@ -38,7 +38,7 @@ return array(
 
     #: views/admin/user_details_edit.view.php:38
     #: views/admin/user_add.view.php:46
-    'Roles' => '',
+    'Roles' => 'Rôles',
 
     #: views/admin/user_details_edit.view.php:46
     'Set a new password' => 'Changer le mot de passe',
@@ -51,40 +51,40 @@ return array(
 
     #. Password strength
     #: views/admin/user_edit.view.php:91
-    #: views/admin/account.view.php:94
+    #: views/admin/account.view.php:95
     #: views/admin/user_add.view.php:75
     'Insufficient' => 'Insuffisant',
 
     #: views/admin/user_edit.view.php:92
-    #: views/admin/account.view.php:95
+    #: views/admin/account.view.php:96
     #: views/admin/user_add.view.php:76
     'Weak' => 'Faible',
 
     #: views/admin/user_edit.view.php:93
-    #: views/admin/account.view.php:96
+    #: views/admin/account.view.php:97
     #: views/admin/user_add.view.php:77
     'Average' => 'Dans la moyenne',
 
     #: views/admin/user_edit.view.php:94
-    #: views/admin/account.view.php:97
+    #: views/admin/account.view.php:98
     #: views/admin/user_add.view.php:78
     'Strong' => 'Fort',
 
     #: views/admin/user_edit.view.php:95
-    #: views/admin/account.view.php:98
+    #: views/admin/account.view.php:99
     #: views/admin/user_add.view.php:79
     'Outstanding' => 'Excellent',
 
-    #: views/admin/user_roles_edit.view.php:33
-    'View and edit permissions' => '',
+    #: views/admin/user_roles_edit.view.php:35
+    'View and edit permissions' => 'Voir et modifier les permissions',
 
-    #: views/admin/account.view.php:29
+    #: views/admin/account.view.php:30
     'Sign out (see you!)' => 'Se déconnecter (à bientôt&nbsp;!)',
 
-    #: views/admin/account.view.php:41
+    #: views/admin/account.view.php:42
     'My account' => 'Mon compte',
 
-    #: views/admin/account.view.php:42
+    #: views/admin/account.view.php:43
     'Theme' => 'Thème',
 
     #: config/controller/admin/user.config.php:19
@@ -123,14 +123,14 @@ return array(
 
     #: config/controller/admin/inspector/role.config.php:22
     #: config/common/role.config.php:8
-    'Role' => '',
+    'Role' => 'Rôle',
 
     #: config/controller/admin/role.config.php:19
     #: config/common/role.config.php:34
-    'Add a role' => '',
+    'Add a role' => 'Ajouter un rôle',
 
     #: config/controller/admin/role.config.php:41
-    'Title' => '',
+    'Title' => 'Titre',
 
     #: config/controller/admin/appdesk.config.php:26
     'user' => 'utilisateur',
@@ -181,24 +181,24 @@ return array(
 
     #. Crud
     #: config/common/role.config.php:19
-    'All wrapped up! This new role is ready.' => '',
+    'All wrapped up! This new role is ready.' => 'Et voilà, le nouveau rôle est prêt.',
 
     #: config/common/role.config.php:20
-    'The role has been deleted.' => '',
+    'The role has been deleted.' => 'Le rôle a été supprimé.',
 
     #. General errors
     #: config/common/role.config.php:23
-    'This role doesn’t exist any more. It has been deleted.' => '',
+    'This role doesn’t exist any more. It has been deleted.' => 'Ce rôle n’existe plus. Il a été supprimé.',
 
     #: config/common/role.config.php:24
-    'We cannot find this role.' => '',
+    'We cannot find this role.' => 'Nous n’arrivons pas à trouver ce rôle.',
 
     #. Deletion popup
     #: config/common/role.config.php:27
-    'Deleting the role ‘{{title}}’' => '',
+    'Deleting the role ‘{{title}}’' => 'Supprimer le rôle «&nbsp;{{title}}&nbsp;»',
 
     #. Delete action's labels
     #: config/common/role.config.php:30
-    'Yes, delete this role' => '',
+    'Yes, delete this role' => 'Oui, supprimer ce rôle',
 
 );

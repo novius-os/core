@@ -129,8 +129,12 @@ class Config_Data
         foreach ($config as &$app) {
             $i18n_file = \Arr::get($app, 'i18n_file', false);
             if (!empty($i18n_file)) {
-                $i18n = \Nos\I18n::dictionary($i18n_file);
-                $app['name'] = $i18n($app['name']);
+                try {
+                    $i18n = \Nos\I18n::dictionary($i18n_file);
+                    $app['name'] = $i18n($app['name']);
+                } catch (\Fuel\Core\ModuleNotFoundException $e) {
+                    // Application does not exist, don't translate
+                }
             }
         }
     }
@@ -177,12 +181,16 @@ class Config_Data
             $application = \Arr::get($item, 'i18n_application', false);
             $i18n_file = static::get('app_installed.'.$application.'.i18n_file', false);
             if (!empty($i18n_file)) {
-                $i18n = \Nos\I18n::dictionary($i18n_file);
-                foreach ($keys as $key) {
-                    $val = \Arr::get($item, $key, false);
-                    if ($val !== false) {
-                        \Arr::set($item, $key, $i18n($val));
+                try {
+                    $i18n = \Nos\I18n::dictionary($i18n_file);
+                    foreach ($keys as $key) {
+                        $val = \Arr::get($item, $key, false);
+                        if ($val !== false) {
+                            \Arr::set($item, $key, $i18n($val));
+                        }
                     }
+                } catch (\Fuel\Core\ModuleNotFoundException $e) {
+                    // Application not found: don't translate
                 }
             }
         }

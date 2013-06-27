@@ -1,44 +1,38 @@
 <?php
 
-// Generated on 16/04/2013 19:15:50
+// Generated on 25/06/2013 11:06:52
 
-// 21 out of 22 messages are translated (95%).
-// 95 out of 112 words are translated (95%).
+// 17 out of 17 messages are translated (100%).
+// 98 out of 98 words are translated (100%).
 
 return array(
     #. Note to translator: This is a submit button
-    #: classes/controller/admin/crud.ctrl.php:316
+    #: classes/controller/admin/crud.ctrl.php:280
     'Add' => 'Ajouter',
 
-    #: classes/controller/admin/crud.ctrl.php:404
+    #: classes/controller/admin/crud.ctrl.php:369
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'Cet item existe déjà dans {{context}}. Votre item ne peut donc être ajouté.',
 
-    #: classes/controller/admin/crud.ctrl.php:600
-    #: classes/controller/admin/crud.ctrl.php:607
-    'Translate into {{context}}' => 'Traduire en {{context}}',
-
-    #: classes/controller/admin/crud.ctrl.php:602
-    #: classes/controller/admin/crud.ctrl.php:605
-    'Add to {{context}}' => 'Ajouter à {{context}}',
-
-    #: classes/controller/admin/crud.ctrl.php:611
-    'Edit {{context}}' => 'Modifier {{context}}',
-
-    #. Note to translator: action (button)
-    #: classes/controller/admin/crud.ctrl.php:628
-    'Translate' => 'Traduire',
-
-    #: classes/controller/admin/crud.ctrl.php:630
-    'Add to another site' => 'Ajouter à un autre site',
-
-    #: classes/controller/admin/crud.ctrl.php:632
-    'Translate / Add to another site' => 'Traduire / Ajouter à un autre site',
-
-    #: classes/controller/admin/crud.ctrl.php:681
-    'You cannot carry out this action, it has been disabled. Ask your colleagues to find out why.' => '',
-
-    #: classes/controller/admin/appdesk.ctrl.php:156
+    #: classes/controller/admin/appdesk.ctrl.php:165
     'Default view' => 'Affichage par défaut',
+
+    #: views/crud/context_common_fields.view.php:17
+    'This field is common to all languages' => 'Ce champ est commun à toutes les langues',
+
+    #: views/crud/context_common_fields.view.php:17
+    'This field is common to all contexts' => 'Ce champ est commun à tous les contextes',
+
+    #: views/crud/context_common_fields.view.php:19
+    'When you modify the value of this field, the change applies to the following languages:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussi aux langues suivantes&nbsp;:',
+
+    #: views/crud/context_common_fields.view.php:20
+    'When you modify the value of this field, the change applies to the following contexts:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussi aux contextes suivants&nbsp;:',
+
+    #: views/crud/context_common_fields.view.php:21
+    'Go ahead, I understand' => 'Allons-y, je comprends',
+
+    #: views/crud/context_common_fields.view.php:22
+    'Cancel, I won’t modify it' => 'Annuler, je ne veux plus modifier',
 
     #. Note to translator: this is an action (button)
     #: views/crud/blank_slate.view.php:61
@@ -64,23 +58,5 @@ return array(
 
     #: views/crud/blank_slate.view.php:118
     '(Form filled with the contents from the original version)' => '(Formulaire rempli avec le contenu de la version originale)',
-
-    #: views/crud/common_fields.view.php:21
-    'This field is common to all contexts' => 'Ce champ est commun à tous les contextes',
-
-    #: views/crud/common_fields.view.php:21
-    'This field is common to all languages' => 'Ce champ est commun à toutes les langues',
-
-    #: views/crud/common_fields.view.php:22
-    'When you modify the value of this field, the change applies to the following contexts:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussi aux contextes suivants&nbsp;:',
-
-    #: views/crud/common_fields.view.php:22
-    'When you modify the value of this field, the change applies to the following languages:' => 'Quand vous modifiez la valeur de ce champ, le changement s’applique aussi aux langues suivantes&nbsp;:',
-
-    #: views/crud/common_fields.view.php:23
-    'Go ahead, I understand' => 'Allons-y, je comprends',
-
-    #: views/crud/common_fields.view.php:24
-    'Cancel, I won’t modify it' => 'Annuler, je ne veux plus modifier',
 
 );

@@ -118,7 +118,7 @@ class Model_Role extends \Nos\Orm\Model
      * access, or the permission name does not exists.
      *
      * @param   string  $permission_name  The name of the permission to retrieve categories from
-     * @return  array|false   An array containing the list of categories (values) for the request permission name
+     * @return  array|false   An array containing the list of categories (values) for the requested permission name
      */
     public function listPermissionCategories($permission_name)
     {
@@ -177,9 +177,9 @@ class Model_Role extends \Nos\Orm\Model
     protected function _authorised($permission_name)
     {
         // Retrieve application name based on the permission name ('noviusos_page::test' would return 'noviusos_page')
-        list($application, ) = explode($permission_name.'::', 2);
+        list($application, ) = explode('::', $permission_name.'::', 2);
         // If this application is loaded, check the user has access to it
-        if (\Module::loaded($application) && !$this->checkPermission('nos::access', $application)) {
+        if ($application != 'nos' && !$this->checkPermission('nos::access', $application)) {
             return false;
         }
 
