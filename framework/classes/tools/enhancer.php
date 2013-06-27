@@ -54,10 +54,13 @@ class Tools_Enhancer
         $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
 
         $callback  = array($namespace.'\\'.$controller_name, 'get_url_model');
-        $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable', false);
-        if ($twinnable) {
+
+        $item_context = null;
+        try {
             $item_context = $item->get_context();
+        } catch (\Exception $e) {
         }
+
         $urlItem   = call_user_func($callback, $item, $params);
         // Now fetch all the possible URLS
         $urls = array();
@@ -71,7 +74,7 @@ class Tools_Enhancer
                 } else {
                     $published = $params['published'] == true;
                 }
-                if ((!$twinnable || $params['context'] == $item_context) && ($preview || $published)) {
+                if (($item_context === null || $params['context'] == $item_context) && ($preview || $published)) {
                     $page_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($page_params) {
                         $urls[$page_id.'::'.$urlItem] = \Nos\Tools_Url::context($page_params['context']).$page_params['url'].$urlItem;

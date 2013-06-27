@@ -126,7 +126,9 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                         $now = \Db::expr('NOW()');
                         $where[$published_key] = array(
                             array($this->_properties['publication_state_property'], $published_value),
-                            'or' => array(
+                        );
+                        if ($this->_properties['publication_start_property']) {
+                            $where[$published_key]['or'] = array(
                                 array($this->_properties['publication_state_property'], 2),
                                 array(
                                     array($this->_properties['publication_start_property'], 'IS', null),
@@ -136,8 +138,8 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                                     array($this->_properties['publication_end_property'], 'IS', null),
                                     'or' => array($this->_properties['publication_end_property'], $published_value ? '>=' : '<', $now),
                                 ),
-                            ),
-                        );
+                            );
+                        }
                         break;
                     }
                 }
