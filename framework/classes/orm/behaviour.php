@@ -44,7 +44,7 @@ abstract class Orm_Behaviour extends \Orm\Observer
         $valuesFrom = \Arr::get($this->_config, $keyFrom, array());
         foreach ($valuesFrom as $key => $value) {
             $valueTo = \Arr::get($config, $keyTo.'.'.$key);
-            if ($valueTo === null) {
+            if ($valueTo === null || $valueTo === true) {
                 $valueTo = array();
             }
 

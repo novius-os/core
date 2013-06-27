@@ -37,12 +37,6 @@ return array(
                 return (bool) (int) $page->page_entrance;
             }
         ),
-        'page_published' => array(
-            'title' => __('Status'),
-            'method' => 'publication_status',
-            'isSafeHtml' => true,
-            'multiContextHide' => true,
-        ),
         'iconClasses' => array(
             'value' => function($page) {
                 return $page->page_entrance ? 'ui-icon ui-icon-home' : false;
