@@ -265,9 +265,10 @@ $config = array(
 );
 
 if (!$assets_minified) {
-    if (Fuel::$env === Fuel::DEVELOPMENT) {
+    // To use when software is in a dev branch
+    /*if (Fuel::$env === Fuel::DEVELOPMENT) {
         $config['deps'][] = 'jquery-migrate';
-    }
+    }*/
 
     $config['paths'] = array_merge($config['paths'], array(
         'tinymce' => 'static/novius-os/admin/vendor/tinymce/jquery.tinymce_src',
