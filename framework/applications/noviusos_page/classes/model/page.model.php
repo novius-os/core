@@ -370,38 +370,34 @@ class Model_Page extends \Nos\Orm\Model
         static::_remove_url_enhanced($this->page_id);
         static::_remove_page_enhanced($this->page_id);
 
-        $regexps = array(
-            '`<(\w+)\s[^>]*data-enhancer="([^"]+)" data-config="([^"]+)"[^>]*>.*?</\\1>`u' => 2,
-            '`<(\w+)\s[^>]*data-config="([^"]+)" data-enhancer="([^"]+)"[^>]*>.*?</\\1>`u' => 3,
-        );
-        foreach ($regexps as $regexp => $name_index) {
-            preg_match_all($regexp, $content, $matches);
-            foreach ($matches[$name_index] as $i => $name) {
-                $config = \Nos\Config_Data::get('enhancers.'.$name, false);
+        $page = $this;
+        \Nos\Nos::parse_enhancers(
+            $content,
+            function ($enhancer, $data_config, $tag) use ($page) {
+                $config = \Nos\Config_Data::get('enhancers.'.$enhancer, false);
                 if ($config && !empty($config['urlEnhancer'])) {
                     $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
-                    $url = $this->page_entrance ? '' : $this->virtual_path(true);
-                    $url_enhanced[$this->page_id] = array(
+                    $url = $page->page_entrance ? '' : $page->virtual_path(true);
+                    $url_enhanced[$page->page_id] = array(
                         'url' => $url,
-                        'context' => $this->page_context,
+                        'context' => $page->page_context,
                     );
                     \Nos\Config_Data::save('url_enhanced', $url_enhanced);
 
                     $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
-                    $page_enhanced[$name][$this->page_id] = array(
-                        'config' => (array) json_decode(strtr($matches[$name_index === 3 ? 2 : 3][$i], array('&quot;' => '"',))),
-                        'context' => $this->page_context,
-                        'published' => $this->planificationStatus() == 2 ? array(
-                            'start' => $this->publicationStart(),
-                            'end' => $this->publicationEnd(),
-                        ) : $this->published(),
+                    $page_enhanced[$enhancer][$page->page_id] = array(
+                        'config' => (array) json_decode(strtr($data_config, array('&quot;' => '"',))),
+                        'context' => $page->page_context,
+                        'published' => $page->planificationStatus() == 2 ? array(
+                            'start' => $page->publicationStart(),
+                            'end' => $page->publicationEnd(),
+                        ) : $page->published(),
                     );
 
                     \Nos\Config_Data::save('page_enhanced', $page_enhanced);
-                    break 2;
                 }
             }
-        }
+        );
 
         $this->delete_cache();
     }
