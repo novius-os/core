@@ -10,7 +10,8 @@ define('jquery-nos-ostabs',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'wijmo.wijmenu', 'modernizr'],
     function( $ ) {
         "use strict";
-        var undefined = void(0);
+        var undefined = void(0),
+            touchDevice = Modernizr.touch;
 
         $.widget( "nos.ostabs", {
             options: {
@@ -125,7 +126,7 @@ define('jquery-nos-ostabs',
 
                 // initialization from scratch
                 if ( init ) {
-                    self.element.addClass('nos-ostabs ui-widget ui-widget-content' + (Modernizr.touch ? ' nos-ostabs-touch' : ''));
+                    self.element.addClass('nos-ostabs ui-widget ui-widget-content' + (touchDevice ? ' nos-ostabs-touch' : ''));
 
                     self.uiOstabsHeader = $( '<div></div>' )
                         .addClass( 'nos-ostabs-header' )
@@ -620,7 +621,7 @@ define('jquery-nos-ostabs',
                     .addClass( 'nos-ostabs-actions ui-state-active' )
                     .prependTo( $panel );
 
-                if (!Modernizr.touch && !closable) {
+                if (!touchDevice && !closable) {
                     return;
                 }
 
@@ -654,7 +655,7 @@ define('jquery-nos-ostabs',
                         });
                 }
 
-                if (!Modernizr.touch || !closable) {
+                if (!touchDevice || !closable) {
                     actions.push({
                         classes: 'nos-ostabs-close-all',
                         click: function() {
@@ -686,7 +687,7 @@ define('jquery-nos-ostabs',
                 }
 
 
-                if (Modernizr.touch) {
+                if (touchDevice) {
                     $links = $( '<div></div>' )
                         .addClass( 'nos-ostabs-actions-links' )
                         .prependTo( $action_bar );
@@ -904,7 +905,7 @@ define('jquery-nos-ostabs',
                     .data( 'ui-ostab', tab )
                     .appendTo( target );
 
-                if (!Modernizr.touch && !notClosable) {
+                if (!touchDevice && !notClosable) {
                     $('<span><span></span></span>').addClass('nos-ostabs-closetab')
                         .attr('title', o.texts.closeTab)
                         .click(function(e) {
