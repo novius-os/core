@@ -102,6 +102,8 @@ if ($is_media) {
         $send_file = $source;
     }
 
+    \Event::trigger_function('404.mediaFound', array(array('url' => $nos_url, 'media' => $media, 'send_file' => &$send_file)));
+
     if (false !== $send_file && is_file($send_file)) {
         //Nos\Tools_File::$use_xsendfile = false;
         // This is a 404 error handler, so force status 200
@@ -179,6 +181,8 @@ if ($is_attachment) {
             $send_file = $source;
         }
     }
+
+    \Event::trigger_function('404.attachmentFound', array(array('url' => $nos_url, 'attachment' => $attachment, 'send_file' => &$send_file)));
 
     if (false !== $send_file && is_file($send_file)) {
         //Nos\Tools_File::$use_xsendfile = false;
