@@ -82,6 +82,7 @@ if ($is_media) {
                 \Nos\Tools_Image::resize($source, $max_width, $max_height, $dest);
                 $send_file = $dest;
             } catch (\Exception $e) {
+                Log::error($e->getMessage());
                 $send_file = false;
             }
         } else {
@@ -158,6 +159,7 @@ if ($is_attachment) {
                 !is_dir($dir) && \File::create_dir(APPPATH.'cache', \Str::sub($dir, \Str::length(APPPATH.'cache')));
                 \Nos\Tools_Image::resize($source, $max_width, $max_height, $send_file);
             } catch (\Exception $e) {
+                Log::error($e->getMessage());
                 $send_file = false;
             }
         } else if ($send_file) {

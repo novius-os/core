@@ -115,15 +115,15 @@ class Tools_Image
                 $source = $dest;
             }
 
-            $cmd = strtr("(:cmd) -size (:size) (:source) -colorspace RGB + profile 'icc' (:antialias) -geometry (:size)\\> (:dest)", array(
+            $cmd = strtr("(:cmd) -size (:size) (:source) -colorspace RGB +profile 'icc' (:antialias) -geometry (:size) (:dest)", array(
                 '(:cmd)'       => static::$cmd_convert,
-                '(:size)'      => $max_width * $i, $max_height * $i,
+                '(:size)'      => $max_width * $i . 'x' . $max_height * $i,
                 '(:source)'    => $source,
                 '(:dest)'      => $dest,
                 '(:antialias)' => $i == $iteration_count ? '+antialias' : '',
             ));
 
-            system($cmd, $return_value);
+            exec($cmd, $output, $return_value);
 
             if ($return_value != 0) {
                 throw new \Exception(__('An error occured when resizing the image.'));
