@@ -694,6 +694,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     public function crudFields(&$fields, $crud)
     {
+        parent::crudFields($fields, $crud);
+
         $fields = \Arr::merge(
             $fields,
             array(
