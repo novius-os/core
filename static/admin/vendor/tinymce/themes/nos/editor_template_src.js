@@ -320,6 +320,11 @@
 
             // Previously "onSaveContent". But it seems useless...
 			ed.onPostProcess.add(function(ed, o) {
+
+                if (o.node !== document.body && !o.source_view && !o.save) {
+                    // onPaste detection
+                    return;
+                }
 				var content = $('<div></div>').html(o.content);
 
                 if (!o.source_view) {
