@@ -609,8 +609,9 @@ class Application
     protected function unsymlink($folder)
     {
         $public = DOCROOT.$folder.DS.'apps'.DS.$this->folder;
-        if (\File::is_link($public) || file_exists($public)) {
-            return \File::delete($public);
+        if (is_link($public) || file_exists($public)) {
+            // Warning: calling File::delete() here solves the symlink and try to delete the destination folder (which does not work, because it's not a file)
+            return unlink($public);
         }
 
         return true;
