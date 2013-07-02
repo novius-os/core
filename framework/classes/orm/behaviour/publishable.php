@@ -123,7 +123,8 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                     }
 
                     if ($published_key !== null) {
-                        $now = \Db::expr('NOW()');
+                        // Round to last minute to benefit from the SQL query cache
+                        $now = date('Y-m-d H:i:00', strtotime('now'));
                         $where[$published_key] = array(
                             array($this->_properties['publication_state_property'], $published_value),
                         );
