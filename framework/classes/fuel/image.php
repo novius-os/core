@@ -14,21 +14,14 @@ class Image extends \Fuel\Core\Image
     {
         $params = \Arr::merge(
             array(
-            'gravatar_id'   => md5(strtolower(trim($email))),
-            'rating'        => 'G',
-            'size'          => 80,
-            'default'		=> 'http://www.gravatar.com/avatar/00000000000000000000000000000000' //default image
+                'gravatar_id'   => md5(strtolower(trim($email))),
+                'rating'        => 'G',
+                'size'          => 80,
+                'default'		=> 'http://www.gravatar.com/avatar/00000000000000000000000000000000', //default image
             ),
             $options
         );
 
-        $url = 'http://gravatar.com/avatar.php?';
-        $appended_to_url = array();
-        foreach ($params as $key => $value) {
-            $appended_to_url[] = urlencode($key).'='.urlencode($value);
-        }
-        /*\Debug::$js_toggle_open= true;
-        \Debug::dump($appended_to_url);*/
-        return $url.implode('&', $appended_to_url);
+        return 'http://gravatar.com/avatar.php?'.http_build_query($params, '', '&');
     }
 }
