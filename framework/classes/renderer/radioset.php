@@ -31,6 +31,7 @@ class Renderer_Radioset extends \Fieldset_Field
     {
         if (empty($this->options['item'])) {
             $this->options['item'] = $this->fieldset()->getInstance();
+            $this->options['value'] = $this->options['item']->{$this->options['name']};
         }
         return $this->template((string) \View::forge($this->options['view'], $this->options, false));
     }

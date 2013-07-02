@@ -15,7 +15,7 @@ foreach ($choices as $key => $choice) {
 
     $choice = \Arr::merge(
         array(
-            'checked' => $item->{$name} === $key,
+            'checked' => $value === $key,
             'side_label' => '',
         ),
         $choice
