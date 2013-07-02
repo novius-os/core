@@ -10,11 +10,11 @@
 
 namespace Nos;
 
-class Renderer_Buttonset extends \Fieldset_Field
+class Renderer_Radioset extends \Fieldset_Field
 {
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'item' => null,
-        'view' => 'nos::renderer/buttonset',
+        'view' => 'nos::renderer/radioset',
     );
 
     protected $options = array();

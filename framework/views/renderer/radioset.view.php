@@ -20,7 +20,7 @@ foreach ($choices as $key => $choice) {
         ),
         $choice
     );
-    echo '<input type="radio" id="'.($uniqid = uniqid($name.'_choice_')).'" name="'.htmlspecialchars($name).'" class="notransform" value="'.htmlspecialchars($key).'" '.($choice['checked'] ? 'checked' : '').' data-side_label="'.$choice['side_label'].'"><label for="'.$uniqid.'">'.$choice['label'].'</label>';
+    echo '<input type="radio" id="'.($uniqid = uniqid($name.'_choice_')).'" name="'.htmlspecialchars($name).'" class="notransform" value="'.htmlspecialchars($key).'" '.($choice['checked'] ? 'checked' : '').' data-side_label="'.htmlspecialchars($choice['side_label']).'"><label for="'.$uniqid.'">'.$choice['label'].'</label>';
 }
 ?>
     <span class="buttonset_side_label" id="<?= $buttonset_side_label_id = uniqid($name.'_side_label_') ?>"></span>
