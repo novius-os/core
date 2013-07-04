@@ -827,14 +827,19 @@ define('jquery-nos-ostabs',
             },
 
             add: function( tab, index ) {
-                var self = this;
+                var self = this,
+                    o = self.options;
 
                 if ( !$.isPlainObject(tab) || tab.url === undefined ) {
                     return false;
                 }
 
                 if ( index === undefined ) {
-                    index = self.anchors.length - 1;
+                    if ($(self.lis.get(o.selected)).hasClass('nos-ostabs-appstab')) {
+                        index = self.anchors.length - 1;
+                    } else {
+                        index = o.selected + 1;
+                    }
                 }
 
                 var $li = self._add(tab);
