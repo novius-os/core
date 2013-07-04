@@ -24,15 +24,15 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
     {
         $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
         if (!class_exists($to)) {
-            throw new \FuelException('Related model not found by Belongs_To relation "'.$name.'": '.$to);
+            throw new \FuelException('The related model ‘'.$to.'’ cannot be found by the belongs_to relation ‘'.$name.'’.');
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$to_behaviour) {
-            throw new \FuelException('The related model of the twinnable_belongs_to relation "'.$name.'" of the model "'.$from.'" not have Twinnable behaviour.');
+            throw new \FuelException('The twinnable_belongs_to relation ‘'.$name.'’ of the model ‘'.$from.'’ refers to a model which doesn’t have the Twinnable behaviour.');
         }
         $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('The model "'.$from.'" has a twinnable_belongs_to relation but not a Twinnable behaviour.');
+            throw new \FuelException('The model ‘'.$from.'’ has a twinnable_belongs_to relation but no Twinnable behaviour. Surprising, don’t you think?');
         }
         $config['key_to'] = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
 
@@ -40,7 +40,7 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 
         foreach ($this->key_from as $key_from) {
             if (!in_array($key_from, $from_behaviour['common_fields'])) {
-                throw new \FuelException('The field "'.$key_from.'" of the model "'.$from.'" has to be declared common in Twinnable behaviour');
+                throw new \FuelException('The field ‘'.$key_from.'’ of the model ‘'.$from.'’ must be declared as common in the Twinnable behaviour.');
             }
         }
 
