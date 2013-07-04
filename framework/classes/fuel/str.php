@@ -186,18 +186,4 @@ class Str extends \Fuel\Core\Str
 
         return $text;
     }
-
-    /**
-     *  Get a human readable file size
-     *
-     * @param int $bytes Bytes number
-     * @param string $format Display format
-     * @return string File size in a human readable format.
-     */
-    public static function humanFileSize($bytes, $format = '%01.2f %s')
-    {
-        $sizes = array('Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-        $size = $bytes / pow(1024, ($i = floor(log($bytes, 1024))));
-        return sprintf($format, $size, $sizes[$i]);
-    }
 }

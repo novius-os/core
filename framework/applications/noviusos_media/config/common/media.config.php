@@ -98,7 +98,7 @@ return array(
         ),
         'filesize' => array(
             'value' => function ($item) {
-                return empty($item->media_filesize) ? false : \Str::humanFileSize($item->media_filesize);
+                return empty($item->media_filesize) ? false : \Num::format_bytes($item->media_filesize, 1);
             },
         ),
         'dimensions' => array(

@@ -54,7 +54,7 @@ if ($item->is_image()) {
                 </tr>
                 <tr>
                     <th style="vertical-align: top;"><?= __('File size:') ?></th>
-                    <td class="media_filesize"><?= \Str::humanFileSize($item->media_filesize) ?></td>
+                    <td class="media_filesize"><?= \Num::format_bytes($item->media_filesize, 1) ?></td>
                 </tr>
 <?php
 if ($item->is_image()) {
