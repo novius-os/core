@@ -89,8 +89,12 @@ if ($is_media) {
             $send_file = APPPATH.$media->get_private_path();
             $target = $media->get_public_path();
         }
+    }
 
+    if (false !== $send_file) {
         $send_file =  \File::validOSPath($send_file);
+
+        \Event::trigger_function('404.mediaFound', array(array('url' => $nos_url, 'media' => $media, 'send_file' => &$send_file)));
 
         $source = $send_file;
         $target = DOCROOT.$target;
@@ -102,8 +106,6 @@ if ($is_media) {
         \File::relativeSymlink($source, $target);
         $send_file = $source;
     }
-
-    \Event::trigger_function('404.mediaFound', array(array('url' => $nos_url, 'media' => $media, 'send_file' => &$send_file)));
 
     if (false !== $send_file && is_file($send_file)) {
         //Nos\Tools_File::$use_xsendfile = false;
@@ -165,8 +167,12 @@ if ($is_attachment) {
         } else if ($send_file) {
             $target_relative = $attachment->url();
         }
+    }
 
-        if ($send_file && $check === false && is_file($send_file)) {
+    if (false !== $send_file) {
+        \Event::trigger_function('404.attachmentFound', array(array('url' => $nos_url, 'attachment' => $attachment, 'send_file' => &$send_file)));
+
+        if ($check === false) {
             $source = $send_file;
             $target = DOCROOT.$target_relative;
             $dir = dirname($target);
@@ -183,8 +189,6 @@ if ($is_attachment) {
             $send_file = $source;
         }
     }
-
-    \Event::trigger_function('404.attachmentFound', array(array('url' => $nos_url, 'attachment' => $attachment, 'send_file' => &$send_file)));
 
     if (false !== $send_file && is_file($send_file)) {
         //Nos\Tools_File::$use_xsendfile = false;
