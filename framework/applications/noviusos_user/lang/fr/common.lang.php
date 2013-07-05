@@ -1,12 +1,12 @@
 <?php
 
-// Generated on 25/06/2013 11:06:52
+// Generated on 05/07/2013 14:57:58
 
 // 56 out of 56 messages are translated (100%).
 // 246 out of 246 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/user.ctrl.php:60
+    #: classes/controller/admin/user.ctrl.php:70
     'Done, your password has been changed.' => 'Voilà, votre mot de passe a été changé.',
 
     #: classes/controller/admin/account.ctrl.php:84

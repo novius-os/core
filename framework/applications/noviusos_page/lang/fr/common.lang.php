@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 25/06/2013 11:06:52
+// Generated on 05/07/2013 14:57:58
 
-// 104 out of 112 messages are translated (92%).
-// 488 out of 620 words are translated (92%).
+// 103 out of 111 messages are translated (92%).
+// 487 out of 619 words are translated (92%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
@@ -58,7 +58,7 @@ return array(
     'Duplicate these {{count}} pages' => 'Dupliquer ces {{count}} pages',
 
     #: views/admin/popup_duplicate.view.php:102
-    #: config/common/page.config.php:226
+    #: config/common/page.config.php:220
     'Duplicate' => 'Dupliquer',
 
     #: views/admin/popup_duplicate.view.php:103
@@ -161,8 +161,8 @@ return array(
     'Permissions for this application' => '',
 
     #: config/controller/admin/page.config.php:25
-    #: config/common/page.config.php:138
-    #: config/common/page.config.php:166
+    #: config/common/page.config.php:132
+    #: config/common/page.config.php:160
     'Add a page' => 'Ajouter une page',
 
     #: config/controller/admin/page.config.php:26
@@ -266,102 +266,99 @@ return array(
     #: config/model/page.config.php:11
     'Use page title' => 'Reprendre le titre de la page',
 
-    #: config/common/page.config.php:41
-    'Status' => 'Statut',
-
     #. Crud
-    #: config/common/page.config.php:54
+    #: config/common/page.config.php:48
     'And voilà! The page has been added.' => 'Aussitôt demandé, aussitôt fait. Votre nouvelle page est prête.',
 
-    #: config/common/page.config.php:55
+    #: config/common/page.config.php:49
     'The page has been deleted.' => 'La page a été supprimée.',
 
     #. General errors
-    #: config/common/page.config.php:58
+    #: config/common/page.config.php:52
     'This page doesn’t exist any more. It has been deleted.' => 'Cette page n’existe plus. Elle a été supprimée.',
 
-    #: config/common/page.config.php:59
+    #: config/common/page.config.php:53
     'We cannot find this page.' => 'Cette page n’existe plus. Elle a été supprimée.',
 
     #. Blank slate
-    #: config/common/page.config.php:62
+    #: config/common/page.config.php:56
     'We’re afraid this page cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cette page ne peut être ajoutée à {{context}} car elledépend d’<a>une autre page</a> qui n’est pas encore disponible dans cecontexte.',
 
-    #: config/common/page.config.php:63
+    #: config/common/page.config.php:57
     'We’re afraid this page cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cette page ne peut être traduite en {{language}} car elledépend d’<a>une autre page</a> qui n’est pas encore disponible dans cettelangue.',
 
     #. Deletion popup
-    #: config/common/page.config.php:66
+    #: config/common/page.config.php:60
     'Deleting the page ‘{{title}}’' => 'Supprimer la page «&nbsp;{{title}}&nbsp;»',
 
     #. Delete action's labels
-    #: config/common/page.config.php:69
+    #: config/common/page.config.php:63
     'Yes, delete this page' => 'Oui, supprimer cette page',
 
-    #: config/common/page.config.php:70
+    #: config/common/page.config.php:64
     'Yes, delete these {{count}} pages' => 'Oui, supprimer ces {{count}} pages',
 
-    #: config/common/page.config.php:72
+    #: config/common/page.config.php:66
     '1 page' => '1 page',
 
-    #: config/common/page.config.php:73
+    #: config/common/page.config.php:67
     '{{count}} pages' => '{{count}} pages',
 
     #. Keep only if the model has the behaviour Contextable
-    #: config/common/page.config.php:76
+    #: config/common/page.config.php:70
     'This page exists in <strong>{{context_count}} contexts</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong>.',
 
-    #: config/common/page.config.php:77
+    #: config/common/page.config.php:71
     'This page exists in <strong>{{language_count}} languages</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong>.',
 
     #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/common/page.config.php:80
+    #: config/common/page.config.php:74
     'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a <strong>{{children_count}} sous-pages</strong>.',
 
-    #: config/common/page.config.php:81
+    #: config/common/page.config.php:75
     'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a <strong>une sous-page</strong>.',
 
-    #: config/common/page.config.php:82
+    #: config/common/page.config.php:76
     'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a <strong>{{children_count}} sous-pages</strong>.',
 
-    #: config/common/page.config.php:83
+    #: config/common/page.config.php:77
     'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a <strong>une sous-page</strong>.',
 
     #. Keep only if the model has the behaviour Tree
-    #: config/common/page.config.php:86
+    #: config/common/page.config.php:80
     'This page has <strong>1 sub-page</strong>.' => 'Cette page a <strong>une sous-page</strong>.',
 
-    #: config/common/page.config.php:87
+    #: config/common/page.config.php:81
     'This page has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page a <strong>{{children_count}} sous-pages</strong>.',
 
-    #: config/common/page.config.php:95
+    #: config/common/page.config.php:89
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => '',
 
-    #: config/common/page.config.php:98
+    #: config/common/page.config.php:92
     'You can’t delete this page. It is locked.' => 'Vous ne pouvez supprimer cette page. Elle est verrouillée.',
 
-    #: config/common/page.config.php:141
+    #: config/common/page.config.php:135
     'Visualise' => 'Visualiser',
 
-    #: config/common/page.config.php:160
+    #: config/common/page.config.php:154
     'Add a sub-page to this page' => 'Ajouter une sous-page à cette page',
 
-    #: config/common/page.config.php:175
+    #: config/common/page.config.php:169
     'Set as home page' => 'Définir comme page d’accueil',
 
-    #: config/common/page.config.php:202
+    #: config/common/page.config.php:196
     'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => '',
 
-    #: config/common/page.config.php:204
+    #: config/common/page.config.php:198
     'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => '',
 
-    #: config/common/page.config.php:212
+    #: config/common/page.config.php:206
     'You cannot set this page as home page because it isn’t published. Publish it first.' => '',
 
-    #: config/common/page.config.php:215
+    #: config/common/page.config.php:209
     'This page is the home page already.' => 'Cette page est déjà la page d\'accueil.',
 
-    #: config/common/page.config.php:235
+    #: config/common/page.config.php:229
     'Renew pages’ cache' => 'Régénérer le cache des pages',
 
 );
