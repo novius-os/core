@@ -26,15 +26,15 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
     {
         $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
         if (!class_exists($to)) {
-            throw new \FuelException('Related model not found by Has_Many relation "'.$this->name.'": '.$this->model_to);
+            throw new \FuelException('The related model ‘'.$this->model_to.'’ cannot be found by the has_many relation ‘'.$this->name.'’.');
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$to_behaviour) {
-            throw new \FuelException('The related model of the twinnable_has_many relation "'.$name.'" of the model "'.$from.'" not have Twinnable behaviour.');
+            throw new \FuelException('The twinnable_has_many relation ‘'.$name.'’ of the model ‘'.$from.'’ refers to a model which doesn’t have the Twinnable behaviour.');
         }
         $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('The model "'.$from.'" has a twinnable_has_many relation but not a Twinnable behaviour.');
+            throw new \FuelException('The model ‘'.$from.'’ has a twinnable_has_many relation but no Twinnable behaviour. Unusual, isn’t it?');
         }
         $config['key_from'] = array_key_exists('key_from', $config) ? (array) $config['key_from'] : $from_behaviour['common_id_property'];
 
