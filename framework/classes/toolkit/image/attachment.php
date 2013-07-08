@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Toolkit_Image_Media extends Toolkit_Image_Driver
+class Toolkit_Image_Attachment extends Toolkit_Image_Driver
 {
     /**
      * Return the url of the current image
@@ -19,7 +19,7 @@ class Toolkit_Image_Media extends Toolkit_Image_Driver
      */
     public function url()
     {
-        return $this->image->get_public_path();
+        return $this->image->url();
     }
 
     /**
@@ -29,7 +29,7 @@ class Toolkit_Image_Media extends Toolkit_Image_Driver
      */
     public function title()
     {
-        return $this->image->media_title;
+        return $this->image->filename();
     }
 
     /**
@@ -39,7 +39,7 @@ class Toolkit_Image_Media extends Toolkit_Image_Driver
      */
     public function file()
     {
-        return APPPATH.$this->image->get_private_path();
+        return $this->image->path();
     }
 
     /**
@@ -49,7 +49,7 @@ class Toolkit_Image_Media extends Toolkit_Image_Driver
      */
     public function sizes()
     {
-        return (object) array('width' => $this->image->media_width, 'height' => $this->image->media_height);
+        return \Image::forge(array(), $this->image->path())->sizes();
     }
 
     /**
@@ -61,7 +61,8 @@ class Toolkit_Image_Media extends Toolkit_Image_Driver
      */
     public function isIdentical($width, $height)
     {
-        return $this->image->media_width == $width && $this->image->media_height == $height;
+        $sizes = $this->sizes();
+        return $sizes->width == $width && $sizes->height == $height;
     }
 }
 

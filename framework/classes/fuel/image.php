@@ -71,8 +71,18 @@ class Image extends \Fuel\Core\Image
      * @see parent::resize
      * @return  Image_Driver
      */
-    public static function shrink($max_width, $max_height, $keepar = true, $pad = false)
+    public static function shrink($max_width, $max_height = null, $keepar = true, $pad = false)
     {
         return static::instance()->shrink($max_width, $max_height, $keepar, $pad);
+    }
+
+    /**
+     * Returns sizes for the currently loaded image modified by the queue transformations.
+     *
+     * @return  object  An object containing width and height variables.
+     */
+    public static function queueSizes()
+    {
+        return static::instance()->queueSizes();
     }
 }

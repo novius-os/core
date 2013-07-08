@@ -109,12 +109,12 @@ if ($is_media) {
 
 $is_attachment = preg_match('`^(?:cache/)?data/files/`', $nos_url);
 if ($is_attachment) {
-    $is_resized = preg_match('`cache/data/files/(.+/(\d+)-(\d+)(?:-(\w+))?.([a-z]+))$`Uu', $nos_url, $m);
+    $is_resized = \Str::sub($nos_url, 0, 6) === 'cache/';
 
     if ($is_resized) {
-        list($target_resized, $path, $max_width, $max_height, $verification, $extension) = $m;
-        $attachment_url = str_replace("/$max_width-$max_height-$verification", '', $path);
-        $attachment_url = str_replace("/$max_width-$max_height", '', $attachment_url);
+        $pathinfo = pathinfo($nos_url);
+        // Remove 12 characteres for cache/data/files/
+        $attachment_url = \Str::sub($pathinfo['dirname'].'.'.$pathinfo['extension'], 17);
     } else {
         $attachment_url = str_replace('data/files/', '', $nos_url);
     }
@@ -141,13 +141,18 @@ if ($is_attachment) {
         }
 
         if ($send_file && $is_resized) {
-            $source = $send_file;
-            $target_relative = $target_resized;
-            $send_file = APPPATH.$target_relative;
-            $dir = dirname($send_file);
+            $toolkit_image = \Nos\Toolkit_Image::forge($attachment);
             try {
-                !is_dir($dir) && \File::create_dir(APPPATH.'cache', \Str::sub($dir, \Str::length(APPPATH.'cache')));
-                \Nos\Tools_Image::resize($source, $max_width, $max_height, $send_file);
+                $toolkit_image->parse($nos_url);
+            } catch (\Exception $e) {
+                header('HTTP/1.0 403 Forbidden');
+                header('HTTP/1.1 403 Forbidden');
+                exit();
+            }
+
+            try {
+                $send_file = $toolkit_image->apply();
+                $target_relative = $toolkit_image->url();
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
                 $send_file = false;

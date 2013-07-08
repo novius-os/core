@@ -194,46 +194,36 @@ class Model_Media extends \Nos\Orm\Model
         if (!$this->is_image()) {
             return false;
         }
-        $params_default = array(
-            'max_width' => null,
-            'max_height' => null,
-        );
-        $params = array_merge($params_default, $params);
 
-        list($src, $width, $height) = $this->get_img_infos($params['max_width'], $params['max_height']);
+        $toolkit_image = $this->getToolkitImage();
 
-        $params = array_diff_key(array_merge(array(
-            'width' => $width,
-            'height' => $height,
-            'alt' => $this->media_title,
-        ), $params), $params_default);
+        if (isset($params['max_width']) || isset($params['max_height'])) {
+            if (!isset($params['transformations'])) {
+                $params['transformations'] = array();
+            }
+            $max_width = isset($params['max_width']) ? $params['max_width'] : null;
+            $max_height = isset($params['max_height']) ? $params['max_height'] : null;
+            unset($params['max_width']);
+            unset($params['max_height']);
+            $params['transformations'][] = array('shrink', $max_width, $max_height);
+        }
+        if (isset($params['transformations'])) {
+            $transformations = (array) $params['transformations'];
+            $toolkit_image->transformations($transformations);
+            unset($params['transformations']);
+        }
 
-        return \Html::img($src, $params);
+        return $toolkit_image->html($params);
     }
 
     public function get_img_tag_resized($max_width = null, $max_height = null, $params = array())
     {
-        return $this->get_img_tag(array_merge($params, array(
-            'max_width'  => $max_width,
-            'max_height' => $max_height,
-        )));
-    }
-
-    public function get_img_infos($max_width = null, $max_height = null)
-    {
-        if (!$this->is_image()) {
-            return false;
+        if (!isset($params['transformations'])) {
+            $params['transformations'] = array();
         }
-        if (!empty($max_width) || !empty($max_height)) {
-            list($width, $height, $ratio) = \Nos\Tools_Image::calculate_ratio($this->media_width, $this->media_height, $max_width, $max_height);
-            $src = $this->get_public_path_resized($max_width, $max_height);
-        } else {
-            list($width, $height) = array($this->media_width, $this->media_height);
-            $src = $this->get_public_path();
-            $ratio = 1;
-        }
+        $params['transformations'][] = array('shrink', $max_width, $max_height);
 
-        return array($src, $width, $height, $ratio);
+        return $this->get_img_tag($params);
     }
 
     public function is_image()
@@ -241,7 +231,7 @@ class Model_Media extends \Nos\Orm\Model
         return in_array($this->media_ext, array('jpg', 'png', 'gif', 'jpeg', 'bmp'));
     }
 
-    public function getImageToolkit()
+    public function getToolkitImage()
     {
         if (!$this->is_image()) {
             return false;
@@ -261,7 +251,14 @@ class Model_Media extends \Nos\Orm\Model
             return false;
         }
 
-        return $this->getImageToolkit()->shrink($max_width, $max_height)->url();
+        if ($max_width === 0) {
+            $max_width = null;
+        }
+        if ($max_height === 0) {
+            $max_height = null;
+        }
+
+        return $this->getToolkitImage()->shrink($max_width, $max_height)->url();
     }
 
     public function _event_before_save()

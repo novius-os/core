@@ -46,4 +46,80 @@ abstract class Image_Driver extends \Fuel\Core\Image_Driver
         }
         $this->_resize($max_width, $max_height, $keepar, $pad);
     }
+
+    /**
+     * Returns sizes for the currently loaded image modified by the queue transformations.
+     *
+     * @return  object  An object containing width and height variables.
+     */
+    public function queueSizes()
+    {
+        $sizes = $this->sizes();
+        foreach ($this->queued_actions as $action) {
+            $transformation = array_shift($action);
+            switch($transformation) {
+                case 'crop':
+                    list($x1, $y1, $x2, $y2) = $action;
+                    $return = parent::_crop($x1, $y1, $x2, $y2);
+                    $sizes->width = $return['x2'] - $return['x1'];
+                    $sizes->height = $return['y2'] - $return['y1'];
+                    break;
+
+                case 'resize':
+                    list($width, $height, $keepar, $pad) = $action;
+                    $return = parent::_resize($width, $height, $keepar, $pad);
+                    $sizes->width = $return['cwidth'];
+                    $sizes->height = $return['cheight'];
+                    break;
+
+                case 'shrink':
+                    $max_width = $action[0];
+                    $max_height = $action[1];
+                    $dont_resize =
+                        ($sizes->width <= $max_width && $sizes->height <= $max_height) ||
+                        (empty($max_width) && $sizes->height <= $max_height) ||
+                        (empty($max_height) && $sizes->width <= $max_width) ||
+                        (empty($max_width) && empty($max_height));
+
+                    if (!$dont_resize) {
+                        $ratio_width  = $max_width / $sizes->width;
+                        $ratio_height =  $max_height / $sizes->height;
+                        if (empty($max_width) || (!empty($max_height) && $ratio_width > $ratio_height)) {
+                            $sizes->width = (int) round($sizes->width * $ratio_height);
+                            $sizes->height = $max_height;
+                        } else {
+                            $sizes->width = $max_width;
+                            $sizes->height = (int) round($sizes->height * $ratio_width);
+                        }
+                    }
+                    break;
+
+                case 'crop_resize':
+                    list($width, $height) = $action;
+
+                    $y = floor(max(0, $sizes->height - $height) / 2);
+                    $x = floor(max(0, $sizes->width - $width) / 2);
+                    $return = parent::_crop($x, $y, $x + $width, $y + $height);
+                    $sizes->width = $return['x2'] - $return['x1'];
+                    $sizes->height = $return['y2'] - $return['y1'];
+                    break;
+
+                case 'rotate':
+                    $radian = deg2rad($action[0]);
+                    $width = $sizes->width;
+                    $height = $sizes->height;
+                    $sizes->width = ceil($width * cos($radian) + $height * sin($radian));
+                    $sizes->height = ceil($width * sin($radian) + $height * cos($radian));
+
+                    break;
+
+                case 'border':
+                    $size = $action[0];
+                    $sizes->width += $size * 2;
+                    $sizes->height += $size * 2;
+            }
+        }
+
+        return $sizes;
+    }
 }

@@ -146,6 +146,18 @@ class Attachment
     }
 
     /**
+     * Return a Toolkit_Image based on the attachment
+     */
+    public function getToolkitImage()
+    {
+        if (!$this->isImage()) {
+            return false;
+        }
+
+        return Toolkit_Image::forge($this);
+    }
+
+    /**
      * Get the url or FALSE if no file
      *
      * @return	string|bool
@@ -173,10 +185,8 @@ class Attachment
         if (!$this->isImage()) {
             return false;
         }
-        $filename = $this->filename();
-        $extension = $this->extension();
 
-        return 'cache/data/files/'.$this->config['alias'].$this->attached.'/'.substr($filename, 0, - (strlen($extension) + 1)).'/'.(int) $max_width.'-'.(int) $max_height.'.'.$extension;
+        return $this->getToolkitImage()->shrink($max_width, $max_height)->url();
     }
 
     /**

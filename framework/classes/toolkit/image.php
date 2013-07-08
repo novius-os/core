@@ -49,6 +49,11 @@ class Toolkit_Image
     protected $_url;
 
     /**
+     * @var  string The current image sizes
+     */
+    protected $_sizes;
+
+    /**
      * @var  boolean Indicates whether transformations have been added since the last url generation
      */
     protected $_dirty = false;
@@ -63,11 +68,13 @@ class Toolkit_Image
      *
      * @param string $image The image object
      * @param array $transformations Any transformations to add to the URL
+     * @throws \FuelException If the image object have no driver
      */
     protected function __construct($image, $transformations)
     {
         $config = \Config::get('toolkit_image', array(
-            'Nos\Media\Model_Media' => 'Nos\Toolkit_Image_Media'
+            'Nos\Media\Model_Media' => 'Nos\Toolkit_Image_Media',
+            'Nos\Attachment' => 'Nos\Toolkit_Image_Attachment',
         ));
 
         $class = get_class($image);
@@ -78,24 +85,38 @@ class Toolkit_Image
 
         $this->_image = new $driver($image);
 
-        foreach ($transformations as $transformation => $transformation_args) {
-            $transformation_args = (array) $transformation_args;
-            if (method_exists($this, $transformation)) {
-                call_user_func_array(array($this, $transformation), $transformation_args);
-            }
-        }
+        $this->transformations($transformations);
     }
 
     protected function _transformation($transformation)
     {
         $this->_dirty = true;
+        if (!isset(static::$_methods_mapping[$transformation[0]])) {
+            throw new \FuelException('Unknown transformation: '.$transformation[0]);
+        }
         $this->_transformations[] = $transformation;
 
         return $this;
     }
 
+
     /**
-     * Add a crop transformation to the image URL.
+     * Add multiple transformations to the image.
+     *
+     * @param array $transformations Any transformations to add to the URL
+     * @return Toolkit_Image
+     */
+    public function transformations($transformations)
+    {
+        foreach ($transformations as $transformation_args) {
+            $this->_transformation($transformation_args);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a crop transformation to the image.
      *
      * Absolute integer or percentages accepted for all 4.
      *
@@ -307,10 +328,28 @@ class Toolkit_Image
         return $this->_url;
     }
 
+    /**
+     * Build and return dimensions of the modify image
+     *
+     * @return  object  An object containing width and height variables.
+     */
+    public function sizes()
+    {
+        if (count($this->_transformations) === 0) {
+            return $this->_image->sizes();
+        }
+
+        if ($this->_dirty) {
+            $image = $this->_image();
+            $this->_sizes = $image->queueSizes();
+        }
+
+        return $this->_sizes;
+    }
+
     public function html($params = array())
     {
-        $image = $this->_image();
-        $sizes = $image->sizes();
+        $sizes = $this->sizes();
 
         $params = array_merge(array(
             'width' => $sizes->width,

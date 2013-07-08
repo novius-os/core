@@ -28,7 +28,7 @@ $main_col_size = 11;
 if ($item->is_image()) {
     $main_col_size -= 3;
     echo '<div class="col c3 preview_zone">';
-    list($src, $width, $height, $ratio) = $item->get_img_infos(512, 512);
+    list($src, $width, $height, $ratio) = $item->get_public_path_resized(512, 512);
     echo '<img src="'.$src.'" />';
     echo '</div>';
 }
