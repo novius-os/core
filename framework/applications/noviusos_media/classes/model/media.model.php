@@ -198,6 +198,7 @@ class Model_Media extends \Nos\Orm\Model
         $toolkit_image = $this->getToolkitImage();
 
         if (isset($params['max_width']) || isset($params['max_height'])) {
+            logger(\Fuel::L_WARNING, 'Use of keys "max_width" and "max_height" in the array parameter of \Nos\Media\Model_Media::get_img_tag($params) is deprecated. Please set a "transmorations" key with array value, filled with a item array("shrink", $max_width, $max_height).');
             if (!isset($params['transformations'])) {
                 $params['transformations'] = array();
             }
