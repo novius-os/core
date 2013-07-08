@@ -12,7 +12,20 @@ namespace Nos;
 
 abstract class Toolkit_Image_Driver
 {
-    public function __construct($image)
+    /**
+     * Create a new instance of the Toolkit_Image class.
+     *
+     * @param object $image The image object
+     * @return    Toolkit_Image    newly created instance
+     */
+    public static function forge($image)
+    {
+        $driver = new static($image);
+
+        return Toolkit_Image::forge($driver);
+    }
+
+    protected function __construct($image)
     {
         $this->image = $image;
     }

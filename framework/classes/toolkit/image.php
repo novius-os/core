@@ -71,16 +71,12 @@ class Toolkit_Image
     /**
      * Create a new instance of the Toolkit_Image class.
      *
-     * @param string $image_driver The image driver object
+     * @param Toolkit_Image_Driver $image_driver The image driver object
      * @param array $transformations Any transformations to add to the URL
      * @throws \FuelException If the image object have no driver
      */
-    protected function __construct($image_driver, $transformations)
+    protected function __construct(Toolkit_Image_Driver $image_driver, $transformations)
     {
-        if (!is_a($image_driver, 'Nos\Toolkit_Image_Driver')) {
-            throw new \FuelException('The image driver '.get_class($image_driver).' not extend Nos\Toolkit_Image_Driver.');
-        }
-
         $this->_image = $image_driver;
 
         $this->transformations($transformations);

@@ -238,7 +238,7 @@ class Model_Media extends \Nos\Orm\Model
             return false;
         }
 
-        return \Nos\Toolkit_Image::forge(new Toolkit_Image($this));
+        return Toolkit_Image::forge($this);
     }
 
     public function get_public_path()

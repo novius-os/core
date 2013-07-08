@@ -154,7 +154,7 @@ class Attachment
             return false;
         }
 
-        return Toolkit_Image::forge(new Toolkit_Image_Attachment($this));
+        return Toolkit_Image_Attachment::forge($this);
     }
 
     /**
