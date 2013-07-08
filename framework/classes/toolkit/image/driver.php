@@ -49,15 +49,6 @@ abstract class Toolkit_Image_Driver
      * @return  object  An object containing width and height variables.
      */
     abstract public function sizes();
-
-    /**
-     * Check if dimension is identical to initial dimension
-     *
-     * @param integer $width The current width
-     * @param integer $height The current height
-     * @return boolean
-     */
-    abstract public function isIdentical($width, $height);
 }
 
 

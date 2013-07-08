@@ -8,9 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-namespace Nos;
+namespace Nos\Media;
 
-class Toolkit_Image_Media extends Toolkit_Image_Driver
+class Toolkit_Image extends \Nos\Toolkit_Image_Driver
 {
     /**
      * Return the url of the current image
@@ -51,18 +51,4 @@ class Toolkit_Image_Media extends Toolkit_Image_Driver
     {
         return (object) array('width' => $this->image->media_width, 'height' => $this->image->media_height);
     }
-
-    /**
-     * Check if dimension is identical to initial dimension
-     *
-     * @param integer $width The current width
-     * @param integer $height The current height
-     * @return boolean
-     */
-    public function isIdentical($width, $height)
-    {
-        return $this->image->media_width == $width && $this->image->media_height == $height;
-    }
 }
-
-

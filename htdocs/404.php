@@ -55,19 +55,19 @@ if ($is_media) {
         $send_file = false;
     } else {
         if ($is_resized) {
-            $toolkit_image = \Nos\Toolkit_Image::forge($media);
+            $toolkit_image = $media->getToolkitImage();
             try {
-                $toolkit_image->parse($nos_url);
-            } catch (\Exception $e) {
-                if (!\Nos\Auth::check()) {
-                    header('HTTP/1.0 403 Forbidden');
-                    header('HTTP/1.1 403 Forbidden');
-                    exit();
+                if (!$toolkit_image->parse($nos_url) && !\Nos\Auth::check()) {
+                    throw new \Exception();
                 }
+            } catch (\Exception $e) {
+                header('HTTP/1.0 403 Forbidden');
+                header('HTTP/1.1 403 Forbidden');
+                exit();
             }
 
             try {
-                $send_file = $toolkit_image->apply();
+                $send_file = $toolkit_image->save();
                 $target = $toolkit_image->url();
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
@@ -141,9 +141,11 @@ if ($is_attachment) {
         }
 
         if ($send_file && $is_resized) {
-            $toolkit_image = \Nos\Toolkit_Image::forge($attachment);
+            $toolkit_image = $attachment->getToolkitImage();
             try {
-                $toolkit_image->parse($nos_url);
+                if (!$toolkit_image->parse($nos_url)) {
+                    throw new \Exception();
+                }
             } catch (\Exception $e) {
                 header('HTTP/1.0 403 Forbidden');
                 header('HTTP/1.1 403 Forbidden');
@@ -151,7 +153,7 @@ if ($is_attachment) {
             }
 
             try {
-                $send_file = $toolkit_image->apply();
+                $send_file = $toolkit_image->save();
                 $target_relative = $toolkit_image->url();
             } catch (\Exception $e) {
                 Log::error($e->getMessage());

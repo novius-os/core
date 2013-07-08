@@ -54,9 +54,14 @@ class Toolkit_Image
     protected $_sizes;
 
     /**
-     * @var  boolean Indicates whether transformations have been added since the last url generation
+     * @var  boolean Indicates whether transformations have been added since the last URL generation
      */
-    protected $_dirty = false;
+    protected $_dirty_url = false;
+
+    /**
+     * @var  boolean Indicates whether transformations have been added since the last sizes computing
+     */
+    protected $_dirty_sizes = false;
 
     /**
      * @var  array Queue of transformations to made on image
@@ -66,35 +71,29 @@ class Toolkit_Image
     /**
      * Create a new instance of the Toolkit_Image class.
      *
-     * @param string $image The image object
+     * @param string $image_driver The image driver object
      * @param array $transformations Any transformations to add to the URL
      * @throws \FuelException If the image object have no driver
      */
-    protected function __construct($image, $transformations)
+    protected function __construct($image_driver, $transformations)
     {
-        $config = \Config::get('toolkit_image', array(
-            'Nos\Media\Model_Media' => 'Nos\Toolkit_Image_Media',
-            'Nos\Attachment' => 'Nos\Toolkit_Image_Attachment',
-        ));
-
-        $class = get_class($image);
-        $driver = \Arr::get($config, $class, false);
-        if ($driver === false) {
-            throw new \FuelException('Not found a Toolkit_Image driver for class '.$class.'.');
+        if (!is_a($image_driver, 'Nos\Toolkit_Image_Driver')) {
+            throw new \FuelException('The image driver '.get_class($image_driver).' not extend Nos\Toolkit_Image_Driver.');
         }
 
-        $this->_image = new $driver($image);
+        $this->_image = $image_driver;
 
         $this->transformations($transformations);
     }
 
     protected function _transformation($transformation)
     {
-        $this->_dirty = true;
         if (!isset(static::$_methods_mapping[$transformation[0]])) {
             throw new \FuelException('Unknown transformation: '.$transformation[0]);
         }
         $this->_transformations[] = $transformation;
+        $this->_dirty_sizes = true;
+        $this->_dirty_url = true;
 
         return $this;
     }
@@ -282,13 +281,22 @@ class Toolkit_Image
         return $this;
     }
 
-    protected function _isIdentical()
+    protected function _isDirty()
     {
+        if (!$this->_dirty) {
+            return false;
+        }
+
         if (count($this->_transformations) === 1 &&
             in_array($this->_transformations[0][0], array('shrink', 'resize'))) {
-            return $this->_image->isIdentical($this->_transformations[0][1], $this->_transformations[0][2]);
+            $sizes = $this->sizes();
+            if ($sizes->width == $this->_transformations[0][1] && $sizes->height == $this->_transformations[0][2]) {
+                $this->_sizes = $sizes;
+                $this->_url = $this->_image->url();
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -302,29 +310,37 @@ class Toolkit_Image
             return $this->_image->url();
         }
 
-        if ($this->_dirty) {
-            if ($this->_isIdentical()) {
-                $this->_url =  $this->_image->url();
-                return $this->_url;
-            }
-
-            \Config::load('crypt', true);
-            $hash = \Config::get('crypt.crypto_hmac').'$'. $this->_image->url();
-            $ext = pathinfo($this->_image->url(), PATHINFO_EXTENSION);
-            $url = array();
-
-            foreach ($this->_transformations as $transformation_args) {
-                $transformation = array_shift($transformation_args);
-                $hash = '$'.$transformation.(count($transformation_args) ? '$'.rtrim(join('$', $transformation_args), '$') : '');
-                $url[] = static::$_methods_mapping[$transformation].(count($transformation_args) ? ','.rtrim(join(',', $transformation_args), ',') : '');
-            }
-
-            $url[] = substr(md5($hash), 0, 6);
-            $url = '/'.join('-', $url);
-            $url = preg_replace('`'.preg_quote('.'.$ext).'$`iUu', '', $this->_image->url()).$url;
-            $this->_url = 'cache/'.ltrim($url, '/').'.'.$ext;
+        if (!$this->_dirty_url) {
+            return $this->_url;
         }
 
+        if (count($this->_transformations) === 1 &&
+            in_array($this->_transformations[0][0], array('shrink', 'resize'))) {
+            $sizes = $this->_image->sizes();
+            if ($sizes->width == $this->_transformations[0][1] && $sizes->height == $this->_transformations[0][2]) {
+                $this->_url = $this->_image->url();
+                $this->_dirty_url = false;
+                return $this->_url;
+            }
+        }
+
+        \Config::load('crypt', true);
+        $hash = \Config::get('crypt.crypto_hmac').'$'. $this->_image->url();
+        $ext = pathinfo($this->_image->url(), PATHINFO_EXTENSION);
+        $url = array();
+
+        foreach ($this->_transformations as $transformation_args) {
+            $transformation = array_shift($transformation_args);
+            $hash .= '$'.$transformation.(count($transformation_args) ? '$'.rtrim(implode('$', $transformation_args), '$') : '');
+            $url[] = static::$_methods_mapping[$transformation].(count($transformation_args) ? ','.rtrim(implode(',', $transformation_args), ',') : '');
+        }
+
+        $url[] = substr(md5($hash), 0, 6);
+        $url = '/'.implode('-', $url);
+        $url = preg_replace('`'.preg_quote('.'.$ext).'$`iUu', '', $this->_image->url()).$url;
+        $this->_url = 'cache/'.ltrim($url, '/').'.'.$ext;
+
+        $this->_dirty_url = false;
         return $this->_url;
     }
 
@@ -339,9 +355,10 @@ class Toolkit_Image
             return $this->_image->sizes();
         }
 
-        if ($this->_dirty) {
+        if ($this->_dirty_sizes) {
             $image = $this->_image();
             $this->_sizes = $image->queueSizes();
+            $this->_dirty_sizes = false;
         }
 
         return $this->_sizes;
@@ -380,12 +397,13 @@ class Toolkit_Image
      *
      * @return  string The save file path
      */
-    public function apply()
+    public function save()
     {
         $image = $this->_image();
 
         $destination = APPPATH.$this->url();
         $dir = dirname($destination);
+
         if (!is_dir($dir)) {
             if (!@mkdir($dir, 0755, true)) {
                 error_log("Can't create dir ".$dir);
@@ -420,9 +438,11 @@ class Toolkit_Image
             $this->_transformation($transformation_args);
         }
 
+        // Check if hash part matched and if all transformations exist
         if ($this->url() !== $image_url) {
-            throw new \Exception('Forbidden');
+            return false;
         }
+        return true;
     }
 
     public function __toString()

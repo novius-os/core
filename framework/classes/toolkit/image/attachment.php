@@ -51,19 +51,6 @@ class Toolkit_Image_Attachment extends Toolkit_Image_Driver
     {
         return \Image::forge(array(), $this->image->path())->sizes();
     }
-
-    /**
-     * Check if dimension is identical to initial dimension
-     *
-     * @param integer $width The current width
-     * @param integer $height The current height
-     * @return boolean
-     */
-    public function isIdentical($width, $height)
-    {
-        $sizes = $this->sizes();
-        return $sizes->width == $width && $sizes->height == $height;
-    }
 }
 
 
