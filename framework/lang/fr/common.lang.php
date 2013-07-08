@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 25/06/2013 11:06:52
+// Generated on 05/07/2013 14:57:58
 
-// 143 out of 164 messages are translated (87%).
-// 790 out of 880 words are translated (87%).
+// 159 out of 164 messages are translated (96%).
+// 849 out of 880 words are translated (96%).
 
 return array(
     #: classes/tools/image.php:129
@@ -78,6 +78,7 @@ return array(
     'Years' => 'Années',
 
     #: classes/controller/inspector.ctrl.php:77
+    #: config/orm/behaviour/publishable.config.php:5
     'Status' => 'Statut',
 
     #: classes/controller/admin/login.ctrl.php:45
@@ -150,16 +151,16 @@ return array(
     'Add to {{context}}' => 'Ajouter à {{context}}',
 
     #: views/renderer/publishable.view.php:117
-    '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Planifié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:118
-    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Publié depuis&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>jusqu\'au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:119
-    '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>A été publié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:122
-    '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera planifié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:123
     '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
@@ -168,10 +169,10 @@ return array(
     '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
 
     #: views/renderer/publishable.view.php:126
-    'Pick a date' => '',
+    'Pick a date' => 'Choisir une date',
 
     #: views/renderer/publishable.view.php:127
-    'Clear' => '',
+    'Clear' => 'Annuler',
 
     #: views/renderer/publishable.view.php:132
     'Will not be published' => 'Ne sera pas publié',
@@ -237,25 +238,25 @@ return array(
     '{{Save}} or <a>Cancel</a>' => '{{Save}} ou <a>Annuler</a>',
 
     #: views/admin/permissions/list_app.view.php:4
-    'Check all' => '',
+    'Check all' => 'Tout cocher',
 
     #: views/admin/login.view.php:45
     'Let’s get started' => 'Allez, au travail',
 
-    #: views/admin/html.view.php:465
+    #: views/admin/html.view.php:466
     'Select a media file' => 'Sélectionner un média',
 
-    #: views/admin/html.view.php:466
+    #: views/admin/html.view.php:467
     'Pick an image' => 'Sélectionner une image',
 
-    #: views/admin/html.view.php:467
+    #: views/admin/html.view.php:468
     'We’re afraid we cannot find this image.' => 'Malheureusement nous n’arrivons pas à trouver cette image.',
 
     #: views/admin/orm/publishable_label.view.php:21
-    'Scheduled for {{date}}' => '',
+    'Scheduled for {{date}}' => 'Planifié pour le {{date}}',
 
     #: views/admin/orm/publishable_label.view.php:27
-    'Published until {{date}}' => '',
+    'Published until {{date}}' => 'Publié jusqu\'au {{date}}',
 
     #: views/admin/about.view.php:19
     'Create Once Publish Everywhere with Novius OS, a Cross-Channel Open Source CMS.' => 'Avec Novius OS, CMS Open Source, créez votre contenu une fois, publiez-le partout.',
@@ -331,7 +332,7 @@ return array(
     'Is granted access to the following contexts:' => '',
 
     #: config/permissions.config.php:26
-    'Is granted access to the following applications:' => '',
+    'Is granted access to the following applications:' => 'A accès aux applications suivantes&nbsp;:',
 
     #. Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
     #: config/common.config.php:17
@@ -350,20 +351,20 @@ return array(
 
     #. Note to translator: action (button)
     #: config/orm/behaviour/twinnable.config.php:23
-    'Translate' => '',
+    'Translate' => 'Traduire',
 
     #: config/orm/behaviour/twinnable.config.php:25
-    'Add to another site' => '',
+    'Add to another site' => 'Ajouter à un autre site',
 
     #: config/orm/behaviour/twinnable.config.php:27
-    'Translate / Add to another site' => '',
+    'Translate / Add to another site' => 'Traduire / Ajouter à un autre site',
 
     #: config/orm/behaviour/twinnable.config.php:64
     #: config/orm/behaviour/twinnable.config.php:71
-    'Translate into {{context}}' => '',
+    'Translate into {{context}}' => 'Traduire en {{context}}',
 
     #: config/orm/behaviour/twinnable.config.php:75
-    'Edit {{context}}' => '',
+    'Edit {{context}}' => 'Modifier {{context}}',
 
     #: config/orm/behaviour/sharable.config.php:5
     'Share' => 'Partager',
@@ -462,7 +463,7 @@ return array(
 
     #. Visualise action's labels
     #: config/i18n_common.config.php:56
-    'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => '',
+    'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'Cette application n’a pas encore été ajoutée à une page. La visualisation est donc impossible.',
 
     #. Appdesk: allLanguages
     #: config/i18n_common.config.php:59

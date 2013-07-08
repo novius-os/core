@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 25/06/2013 11:06:52
+// Generated on 05/07/2013 14:57:58
 
-// 141 out of 164 messages are translated (85%).
-// 786 out of 880 words are translated (85%).
+// 160 out of 164 messages are translated (97%).
+// 854 out of 880 words are translated (97%).
 
 return array(
     #: classes/tools/image.php:129
@@ -15,7 +15,7 @@ return array(
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
     #. Example value: '%d %b %Y %H:%M' (day of month, month name, year, hour, minutes).
     #: classes/fuel/date.php:79
-    'DATE_FORMAT_DEFAULT' => '',
+    'DATE_FORMAT_DEFAULT' => '%d %b %Y %H:%M',
 
     #: classes/fuel/validation_error.php:47
     'The field ‘{{field}}’ doesn’t respect the rule ‘{{rule}}’' => 'フィールド‘{{field}}’はルール‘{{rule}}’に従っていないようです。',
@@ -78,6 +78,7 @@ return array(
     'Years' => '年',
 
     #: classes/controller/inspector.ctrl.php:77
+    #: config/orm/behaviour/publishable.config.php:5
     'Status' => '公開状態',
 
     #: classes/controller/admin/login.ctrl.php:45
@@ -150,28 +151,28 @@ return array(
     'Add to {{context}}' => '{{context}}に追加',
 
     #: views/renderer/publishable.view.php:117
-    '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>公開開始予定:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>公開終了:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:118
-    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>公開日時:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>公開終了:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:119
-    '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>公開日時:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>公開終了:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:122
-    '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>公開開始予定:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>公開終了:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:123
-    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>公開開始予定:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:124
-    '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>公開中止予定:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>公開中止終了:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:126
-    'Pick a date' => '',
+    'Pick a date' => '日付を選択',
 
     #: views/renderer/publishable.view.php:127
-    'Clear' => '',
+    'Clear' => '消去',
 
     #: views/renderer/publishable.view.php:132
     'Will not be published' => '公開しない',
@@ -237,25 +238,25 @@ return array(
     '{{Save}} or <a>Cancel</a>' => '{{Save}} または<a>取り消し</a>',
 
     #: views/admin/permissions/list_app.view.php:4
-    'Check all' => '',
+    'Check all' => '全て選択',
 
     #: views/admin/login.view.php:45
     'Let’s get started' => 'では始めましょう',
 
-    #: views/admin/html.view.php:465
+    #: views/admin/html.view.php:466
     'Select a media file' => 'メディアファイルを選択',
 
-    #: views/admin/html.view.php:466
+    #: views/admin/html.view.php:467
     'Pick an image' => '画像を選択',
 
-    #: views/admin/html.view.php:467
+    #: views/admin/html.view.php:468
     'We’re afraid we cannot find this image.' => 'この画像は見つかりませんでした。',
 
     #: views/admin/orm/publishable_label.view.php:21
-    'Scheduled for {{date}}' => '',
+    'Scheduled for {{date}}' => '{{date}}に公開予定',
 
     #: views/admin/orm/publishable_label.view.php:27
-    'Published until {{date}}' => '',
+    'Published until {{date}}' => '{{date}}まで公開',
 
     #: views/admin/about.view.php:19
     'Create Once Publish Everywhere with Novius OS, a Cross-Channel Open Source CMS.' => '様々なメディアに対応したオープンソースの CMS である Novius OS では、一度作成したコンテンツはどこでも配信できます。',
@@ -331,7 +332,7 @@ return array(
     'Is granted access to the following contexts:' => '',
 
     #: config/permissions.config.php:26
-    'Is granted access to the following applications:' => '',
+    'Is granted access to the following applications:' => '以下のアプリケーションからアクセスできます。',
 
     #. Note to translator: Default copy meant to be overwritten by applications (e.g. Add Page > Add a page)
     #: config/common.config.php:17
@@ -350,20 +351,20 @@ return array(
 
     #. Note to translator: action (button)
     #: config/orm/behaviour/twinnable.config.php:23
-    'Translate' => '',
+    'Translate' => '翻訳する',
 
     #: config/orm/behaviour/twinnable.config.php:25
-    'Add to another site' => '',
+    'Add to another site' => '別のサイトに追加する',
 
     #: config/orm/behaviour/twinnable.config.php:27
-    'Translate / Add to another site' => '',
+    'Translate / Add to another site' => '別のサイトに翻訳 / 追加する',
 
     #: config/orm/behaviour/twinnable.config.php:64
     #: config/orm/behaviour/twinnable.config.php:71
-    'Translate into {{context}}' => '',
+    'Translate into {{context}}' => '{{context}}に翻訳する',
 
     #: config/orm/behaviour/twinnable.config.php:75
-    'Edit {{context}}' => '',
+    'Edit {{context}}' => '{{context}}を編集する',
 
     #: config/orm/behaviour/sharable.config.php:5
     'Share' => '共有',
@@ -462,7 +463,7 @@ return array(
 
     #. Visualise action's labels
     #: config/i18n_common.config.php:56
-    'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => '',
+    'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'このアプリケーションは、ページに追加されていません。そのため閲覧できません。',
 
     #. Appdesk: allLanguages
     #: config/i18n_common.config.php:59

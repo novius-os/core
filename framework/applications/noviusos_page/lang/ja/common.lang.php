@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 25/06/2013 11:06:52
+// Generated on 05/07/2013 14:57:58
 
-// 104 out of 112 messages are translated (92%).
-// 488 out of 620 words are translated (92%).
+// 103 out of 111 messages are translated (92%).
+// 487 out of 619 words are translated (92%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
@@ -58,7 +58,7 @@ return array(
     'Duplicate these {{count}} pages' => 'これら{{count}}ページを複製',
 
     #: views/admin/popup_duplicate.view.php:102
-    #: config/common/page.config.php:226
+    #: config/common/page.config.php:220
     'Duplicate' => '複製',
 
     #: views/admin/popup_duplicate.view.php:103
@@ -161,8 +161,8 @@ return array(
     'Permissions for this application' => '',
 
     #: config/controller/admin/page.config.php:25
-    #: config/common/page.config.php:138
-    #: config/common/page.config.php:166
+    #: config/common/page.config.php:132
+    #: config/common/page.config.php:160
     'Add a page' => 'ページを追加',
 
     #: config/controller/admin/page.config.php:26
@@ -266,102 +266,99 @@ return array(
     #: config/model/page.config.php:11
     'Use page title' => 'ページタイトルを使用',
 
-    #: config/common/page.config.php:41
-    'Status' => '公開状態',
-
     #. Crud
-    #: config/common/page.config.php:54
+    #: config/common/page.config.php:48
     'And voilà! The page has been added.' => 'ページが追加されました。',
 
-    #: config/common/page.config.php:55
+    #: config/common/page.config.php:49
     'The page has been deleted.' => 'このページは削除されました。',
 
     #. General errors
-    #: config/common/page.config.php:58
+    #: config/common/page.config.php:52
     'This page doesn’t exist any more. It has been deleted.' => 'このページは存在しません。削除されました。',
 
-    #: config/common/page.config.php:59
+    #: config/common/page.config.php:53
     'We cannot find this page.' => 'このページは見つかりませんでした。',
 
     #. Blank slate
-    #: config/common/page.config.php:62
+    #: config/common/page.config.php:56
     'We’re afraid this page cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => '申し訳ありませんが、このページを{{context}}に追加できません。このページの<a>親</a>がこのコンテキストで利用可能になっていないからです。',
 
-    #: config/common/page.config.php:63
+    #: config/common/page.config.php:57
     'We’re afraid this page cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => '申し訳ありませんが、このページを{{language}}に翻訳できません。このページの<a>親</a>がこの言語で利用可能になっていないからです。',
 
     #. Deletion popup
-    #: config/common/page.config.php:66
+    #: config/common/page.config.php:60
     'Deleting the page ‘{{title}}’' => 'ページ‘{{title}}’を削除します',
 
     #. Delete action's labels
-    #: config/common/page.config.php:69
+    #: config/common/page.config.php:63
     'Yes, delete this page' => 'はい、このページを削除します',
 
-    #: config/common/page.config.php:70
+    #: config/common/page.config.php:64
     'Yes, delete these {{count}} pages' => 'はい、これら{{count}}ページを削除します',
 
-    #: config/common/page.config.php:72
+    #: config/common/page.config.php:66
     '1 page' => '1ページ',
 
-    #: config/common/page.config.php:73
+    #: config/common/page.config.php:67
     '{{count}} pages' => '{{count}}ページ',
 
     #. Keep only if the model has the behaviour Contextable
-    #: config/common/page.config.php:76
+    #: config/common/page.config.php:70
     'This page exists in <strong>{{context_count}} contexts</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
 
-    #: config/common/page.config.php:77
+    #: config/common/page.config.php:71
     'This page exists in <strong>{{language_count}} languages</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>子ページが{{children_count}}ページ</strong>あります。',
 
     #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/common/page.config.php:80
+    #: config/common/page.config.php:74
     'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>子ページが{{children_count}}ページ</strong>あります。',
 
-    #: config/common/page.config.php:81
+    #: config/common/page.config.php:75
     'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>子ページが1ページ</strong>あります。',
 
-    #: config/common/page.config.php:82
+    #: config/common/page.config.php:76
     'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'このページは<strong>{{language_count}}つの言語</strong>に翻訳されており、<strong>子ページが{{children_count}}ページ</strong>あります。',
 
-    #: config/common/page.config.php:83
+    #: config/common/page.config.php:77
     'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'このページは<strong>{{language_count}}つの言語</strong>に翻訳されており、<strong>子ページが1ページ</strong>あります。',
 
     #. Keep only if the model has the behaviour Tree
-    #: config/common/page.config.php:86
+    #: config/common/page.config.php:80
     'This page has <strong>1 sub-page</strong>.' => 'このページは<strong>子ページが1ページ</strong>があります。',
 
-    #: config/common/page.config.php:87
+    #: config/common/page.config.php:81
     'This page has <strong>{{children_count}} sub-pages</strong>.' => 'このページは<strong>子ページが{{children_count}}ページ</strong>あります。',
 
-    #: config/common/page.config.php:95
+    #: config/common/page.config.php:89
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => '',
 
-    #: config/common/page.config.php:98
+    #: config/common/page.config.php:92
     'You can’t delete this page. It is locked.' => 'このページは削除できません。ロックされています。',
 
-    #: config/common/page.config.php:141
+    #: config/common/page.config.php:135
     'Visualise' => '閲覧',
 
-    #: config/common/page.config.php:160
+    #: config/common/page.config.php:154
     'Add a sub-page to this page' => 'このページに子ページを追加',
 
-    #: config/common/page.config.php:175
+    #: config/common/page.config.php:169
     'Set as home page' => 'ホームページに設定する',
 
-    #: config/common/page.config.php:202
+    #: config/common/page.config.php:196
     'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => '',
 
-    #: config/common/page.config.php:204
+    #: config/common/page.config.php:198
     'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => '',
 
-    #: config/common/page.config.php:212
+    #: config/common/page.config.php:206
     'You cannot set this page as home page because it isn’t published. Publish it first.' => '',
 
-    #: config/common/page.config.php:215
+    #: config/common/page.config.php:209
     'This page is the home page already.' => 'このページはホームページに設定されています。',
 
-    #: config/common/page.config.php:235
+    #: config/common/page.config.php:229
     'Renew pages’ cache' => 'ページのキャッシュを更新',
 
 );
