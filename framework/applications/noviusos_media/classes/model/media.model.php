@@ -184,11 +184,6 @@ class Model_Media extends \Nos\Orm\Model
         return ltrim($this->virtual_path(), '/');
     }
 
-    public function get_public_path()
-    {
-        return static::$public_path.$this->get_path();
-    }
-
     public function get_private_path()
     {
         return static::$private_path.$this->get_path();
@@ -246,25 +241,27 @@ class Model_Media extends \Nos\Orm\Model
         return in_array($this->media_ext, array('jpg', 'png', 'gif', 'jpeg', 'bmp'));
     }
 
+    public function getImageToolkit()
+    {
+        if (!$this->is_image()) {
+            return false;
+        }
+
+        return \Nos\Toolkit_Image::forge($this);
+    }
+
+    public function get_public_path()
+    {
+        return static::$public_path.$this->get_path();
+    }
+
     public function get_public_path_resized($max_width = 0, $max_height = 0)
     {
         if (!$this->is_image()) {
             return false;
         }
 
-        if ($this->media_width == $max_width && $this->media_height == $max_height) {
-            return $this->get_public_path();
-        }
-
-        \Config::load('crypt', true);
-        $hash = md5(\Config::get('crypt.crypto_hmac').'$'.$this->virtual_path().'$'.$max_width.'$'.$max_height);
-
-        return str_replace('media/', 'cache/media/', static::$public_path).ltrim($this->virtual_path(true), '/').sprintf('%s-%s-%s.%s',
-            (int) $max_width,
-            (int) $max_height,
-            substr($hash, 0, 6),
-            $this->media_ext
-        );
+        return $this->getImageToolkit()->shrink($max_width, $max_height)->url();
     }
 
     public function _event_before_save()
