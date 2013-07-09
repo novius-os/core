@@ -306,13 +306,17 @@
 					if ($img.attr('width') && $img.attr('height')) {
 						src += '/' + $img.attr('width') + '/' + $img.attr('height');
 					}
-					return $('<img />').attr({
+					var $new_img = $('<img />').attr({
                         'data-media-id': media_id,
 						src:    $img.attr('src'),
 						title:  $img.attr('title'),
 						alt:    $img.attr('alt'),
 						style:  $img.attr('style')
-					})
+					});
+                    if ($img.attr('usemap')) {
+                        $new_img.attr('usemap', $img.attr('usemap'));
+                    }
+                    return $new_img;
 				});
 				o.content = $('<div></div>').append(content).html();
 			});
@@ -344,6 +348,9 @@
 						alt:    $img.attr('alt'),
 						style:  $img.attr('style')
 					});
+                    if ($img.attr('usemap')) {
+                        $new_img.attr('usemap', $img.attr('usemap'));
+                    }
                     return $new_img;
 				});
                 o.content = content.html();
@@ -2081,10 +2088,24 @@
                     ed.selection.moveToBookmark(bookmark);
                 }
 
-                var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
+                var $img = $(img);
+
                 if (editCurrentImage) {
-                    ed.execCommand('mceReplaceContent', false, html, {skip_undo : 1});
+                    var node = ed.selection.getNode();
+                    if (node.nodeName == 'IMG') {
+                        var $node = $(node);
+                        $.each('title alt width height style'.split(' '), function(i, name) {
+                            var value = $img.attr(name);
+                            if (value == '') {
+                                $node.removeAttr(name);
+                            } else {
+                                $node.attr(name, value);
+                            }
+                        });
+                        ed.undoManager.add();
+                    }
                 } else {
+                    var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
                     ed.execCommand('mceInsertContent', false, html, {skip_undo : 1});
                 }
                 ed.execCommand("mceEndUndoLevel");
