@@ -83,7 +83,7 @@ class Model_Role extends \Nos\Orm\Model
      */
     public function check_permission($application, $key)
     {
-        logger(\Fuel::L_WARNING, '\Nos\User\Model_Role->check_permission($application, $key) is deprecated. Please use \Nos\User\Model_Role->checkPermission($permission_name, $category_key).');
+        \Log::deprecated('->check_permission($application, $key) is deprecated, use ->checkPermission($permission_name, $category_key) instead.', 'Chiba.2');
 
         return $this->checkPermission($application, $key);
     }

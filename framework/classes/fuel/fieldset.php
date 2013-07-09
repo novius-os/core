@@ -281,13 +281,13 @@ class Fieldset extends \Fuel\Core\Fieldset
         // Compatibility with 0.1 configuration (widgets have been renamed to renderers)
         foreach ($properties as &$property) {
             if (isset($property['widget'])) {
-                logger(\Fuel::L_WARNING, 'The widget key is deprecated ('.$property['widget'].'). Please use the renderer key and update class name.');
+                \Log::deprecated('The widget key is deprecated ('.$property['widget'].'). Please use the renderer key and update class name.');
 
                 $property['renderer'] = preg_replace('`^Nos(.+)Widget_(.+)$`', 'Nos$1Renderer_$2', $property['widget']);
                 unset($property['widget']);
             }
             if (isset($property['widget_options'])) {
-                logger(\Fuel::L_WARNING, 'The widget_options key is deprecated. Please use the renderer_options key.');
+                \Log::deprecated('The widget_options key is deprecated. Please use the renderer_options key.');
 
                 $property['renderer_options'] =& $property['widget_options'];
                 unset($property['widget_options']);

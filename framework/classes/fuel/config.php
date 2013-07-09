@@ -106,7 +106,7 @@ class Config extends \Fuel\Core\Config
 
     public static function extendable_load($module_name, $file_name)
     {
-        logger(\Fuel::L_WARNING, '\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
+        \Log::deprecated('\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
         return static::loadConfiguration($module_name, $file_name);
     }
 

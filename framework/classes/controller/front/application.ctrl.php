@@ -72,8 +72,7 @@ class Controller_Front_Application extends Controller
         if (method_exists($class, 'get_url_model')) {
             static $classes = array();
             if (!in_array($class, $classes)) {
-                logger(\Fuel::L_WARNING, '\Nos\Controller_Front_Application::get_url_model($item, $params) is deprecated.'.
-                    ' Please use \Nos\Controller_Front_Application::getURLEnhanced($params) and $item in a key "item" of $params.');
+                \Log::deprecated('::get_url_model($item, $params) is deprecated. Please use ::getURLEnhanced($params) and $item in a key "item" of $params.');
 
                 $classes[] = $class;
             }

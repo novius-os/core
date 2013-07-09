@@ -187,7 +187,7 @@ class Model_User extends \Nos\Orm\Model
      */
     public function check_permission($app, $key)
     {
-        logger(\Fuel::L_WARNING, '\Nos\User\Model_User->check_permission($app, $key) is deprecated. Please use \Nos\User\Model_User->checkPermission($permission_name, $category_key).');
+        \Log::deprecated('->check_permission($app, $key) is deprecated, use ->checkPermission($permission_name, $category_key) instead.', 'Chiba.2');
 
         return $this->checkPermission($app, $key);
     }
