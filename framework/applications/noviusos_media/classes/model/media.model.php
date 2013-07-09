@@ -242,7 +242,7 @@ class Model_Media extends \Nos\Orm\Model
     }
 
     /**
-     * Creates an html image tag of the media
+     * Return an html image tag of the media
      *
      * Sets width, height, alt attributes is not supplied.
      *
@@ -267,7 +267,7 @@ class Model_Media extends \Nos\Orm\Model
     }
 
     /**
-     * Creates an html image tag of the media resized
+     * Return an html image tag of the media resized
      *
      * Sets width, height, alt attributes is not supplied.
      *
