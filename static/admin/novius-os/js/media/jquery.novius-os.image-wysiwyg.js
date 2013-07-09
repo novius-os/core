@@ -112,6 +112,7 @@ define('jquery-nos-image-wysiwyg',
                                 } else {
                                     $alt.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
                                 }
+                                $title.triggerHandler('change');
                             }),
                         media = null,
                         tinymce_image_select = function(media_json, image_dom) {

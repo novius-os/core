@@ -140,6 +140,8 @@
 
 		stateControls : ['bold', 'italic', 'underline', 'strikethrough', 'bullist', 'numlist', 'sub', 'sup', 'blockquote'],
 
+        //extended_valid_elements : 'img[usemap],map,area',
+
 		init : function(ed, url) {
 			var t = this, s, v, o;
 
@@ -258,97 +260,100 @@
                 cmd : 'mceMedia'
             });
 
-			function makeItNice(ed) {
+            var mediaCached = {};
 
-                var $body = $(ed.getBody());
-				// Rebuilds the enhancer, as if we just inserted them (adds the action links like delete)
-				$body.find('.nosEnhancer, .nosEnhancerInline').each(function() {
-					var enhancer = $(this);
+            function enhancerEmptyPreview(content) {
+                // Empty enhancer previews (data and useful informations are stored as html attributes on the higest div)
+                content.filter('.nosEnhancer, .nosEnhancerInline').empty();
+                content.find('.nosEnhancer, .nosEnhancerInline').empty();
+            }
+
+            function enhancerRestorePreview(content) {
+                content.find('.nosEnhancer, .nosEnhancerInline').each(function() {
+                    var enhancer = $(this);
                     enhancer.html(ed.getLang('nos.enhancer_loading'));
                     self.onEnhancerAdd(enhancer);
 
-					var enhancer_id = $(this).data('enhancer');
-					var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
-					var data      = $.extend(true, {enhancer: enhancer_id}, $(this).data('config'));
-					$.ajax({
-						url: metadata.previewUrl,
-						type: 'POST',
-						dataType: 'json',
-						data: data,
-						success: function(json) {
+                    var enhancer_id = $(this).data('enhancer');
+                    var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
+                    var data      = $.extend(true, {enhancer: enhancer_id}, $(this).data('config'));
+                    $.ajax({
+                        url: metadata.previewUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        success: function(json) {
                             enhancer.html(json.preview);
-							self.onEnhancerAdd(enhancer, metadata);
-						},
-						error: function() {
+                            self.onEnhancerAdd(enhancer, metadata);
+                        },
+                        error: function() {
                             enhancer.html(ed.getLang('nos.enhancer_loading_error'));
                             self.onEnhancerAdd(enhancer);
-						}
-					});
-				});
-			}
+                        }
+                    });
+                });
+            }
 
-			// When editing HTML content, we clean up enhancer preview, we'll make them nice again after
-			ed.onGetContent.add(function(ed, o) {
-				var content = $(o.content);
-				// Empty enhancer previews (data and useful informations are stored as html attributes on the higest div)
-				content.filter('.nosEnhancer, .nosEnhancerInline').empty();
-				content.find('.nosEnhancer, .nosEnhancerInline').empty();
+            function mediaTransformSrcIntoNos(content) {
+                content.find('img').each(function() {
+                    var $img = $(this);
+                    var media_id = $img.data('mediaId') || ($img.data('media') || {}).id;
+                    if (!media_id) {
+                        return;
+                    }
+                    var origSrc = $img.attr('src');
+                    if (origSrc.substr(0, 6) !== 'nos://') {
+                        mediaCached[media_id] = {
+                            attrs : {
+                                src: $img.attr('src'),
+                                'data-media-id' : media_id
+                            }
+                        };
 
-                // Replace image SRC
-				content.find('img').filter(function() {
-					return $(this).data('mediaId') || ($(this).data('media') || {}).id;
-				}).replaceWith(function() {
-					var $img = $(this);
-					var media = $img.data('media');
-                    var media_id = (media && media.id) ? media.id : $img.data('mediaId');
-					return $('<img />').attr({
-                        'data-media-id': media_id,
-						src:    $img.attr('src'),
-						title:  $img.attr('title'),
-						alt:    $img.attr('alt'),
-						style:  $img.attr('style')
-					})
-				});
-				o.content = $('<div></div>').append(content).html();
-			});
-
-			ed.onSetContent.add(function(ed, o) {
-				setTimeout(function() {
-					makeItNice(ed);
-				}, 1);
-			});
-
-            // Previously "onSaveContent". But it seems useless...
-			ed.onPostProcess.add(function(ed, o) {
-
-                if (o.node !== document.body && !o.source_view && !o.save) {
-                    // onPaste detection
-                    return;
-                }
-				var content = $('<div></div>').html(o.content);
-
-                if (!o.source_view) {
-                    content.find('img').filter(function() {
-                        return $(this).data('mediaId') || ($(this).data('media') || {}).id;// || $(this).attr('src').substr(0, 12) == 'nos://media/';
-                    }).replaceWith(function() {
-                        var $img = $(this);
-                        var media = $img.data('media');
-                        var media_id = (media && media.id) ? media.id : $img.data('media-id');
                         var src = 'nos://media/' + media_id;
 
                         if ($img.attr('width') && $img.attr('height')) {
                             src += '/' + $img.attr('width') + '/' + $img.attr('height');
                         }
-                        var $new_img = $('<img />').attr({
-                            src:    src,
-                            title:  $img.attr('title'),
-                            alt:    $img.attr('alt'),
-                            style:  $img.attr('style')
-                        });
-                        return $new_img;
-                    });
-                    o.content = content.html();
-                }
+
+                        $img.attr({
+                            src: src
+                        }).removeClass('nosMedia').removeAttr('data-media').removeAttr('data-media-id');
+                    }
+                    $img.removeData().attr('data-mce-src', origSrc).removeAttr('data-mce-src');
+                });
+            }
+
+            function mediaRestoreSrc(content) {
+                content.find('img').each(function() {
+                    var $img = $(this);
+                    $img.removeData().removeAttr('data-mce-src');
+                    var origSrc = $img.attr('src');
+                    if (origSrc.substr(0, 6) == 'nos://') {
+                        // remove 'nos://media/'
+                        var media_id = origSrc.substr(12).split('/')[0];
+                        if (media_id && mediaCached[media_id]) {
+                            $img.attr(mediaCached[media_id]['attrs']).addClass('nosMedia');
+                        }
+                    }
+                });
+            }
+
+			// When editing HTML content, we clean up enhancer preview, we'll make them nice again after
+			ed.onGetContent.add(function(ed, o) {
+				var content = $(o.content);
+				// Empty enhancer previews (data and useful informations are stored as html attributes on the higest div)
+                enhancerEmptyPreview(content);
+                mediaTransformSrcIntoNos(content);
+				o.content = $('<div></div>').append(content).html();
+			});
+
+			ed.onSetContent.add(function(ed, o) {
+				setTimeout(function() {
+                    var content = $(ed.getBody());
+                    enhancerRestorePreview(content);
+                    mediaRestoreSrc(content);
+				}, 1);
 			});
 
 			// Global onClick handlers to execute actions from the enhancers
@@ -2083,10 +2088,24 @@
                     ed.selection.moveToBookmark(bookmark);
                 }
 
-                var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
+                var $img = $(img);
+
                 if (editCurrentImage) {
-                    ed.execCommand('mceReplaceContent', false, html, {skip_undo : 1});
+                    var node = ed.selection.getNode();
+                    if (node.nodeName == 'IMG') {
+                        var $node = $(node);
+                        $.each('title alt width height style'.split(' '), function(i, name) {
+                            var value = $img.attr(name);
+                            if (value == '') {
+                                $node.removeAttr(name);
+                            } else {
+                                $node.attr(name, value);
+                            }
+                        });
+                        ed.undoManager.add();
+                    }
                 } else {
+                    var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
                     ed.execCommand('mceInsertContent', false, html, {skip_undo : 1});
                 }
                 ed.execCommand("mceEndUndoLevel");
