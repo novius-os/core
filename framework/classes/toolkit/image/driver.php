@@ -38,9 +38,10 @@ abstract class Toolkit_Image_Driver
     /**
      * Return the url of the current image
      *
+     * @param bool $absolute Default true, if false return relative URL
      * @return string
      */
-    abstract public function url();
+    abstract public function url($absolute = true);
 
     /**
      * Return the title of the current image

@@ -101,7 +101,7 @@ class Renderer_Media extends \Fieldset_Field
         if (!empty($attributes['value'])) {
             $media = \Nos\Media\Model_Media::find($attributes['value']);
             if (!empty($media)) {
-                $options['inputFileThumb']['file'] = $media->is_image() ? $media->get_public_path_resized(64, 64) : $media->get_public_path();
+                $options['inputFileThumb']['file'] = $media->isImage() ? $media->urlResized(64, 64) : $media->url();
             }
         }
         if (!empty($attributes['required'])) {

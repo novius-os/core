@@ -62,4 +62,18 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
 
         \Response::json($item);
     }
+
+    public function post_clear_cache()
+    {
+        try {
+            $folder = Model_Folder::find(1);
+            $folder->deleteCache();
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+        $__ = \Nos\I18n::dictionary('noviusos_media::common');
+        \Response::json(array(
+            'notify' => $__('The cache has been renewed. All ready for you to enjoy!'),
+        ));
+    }
 }

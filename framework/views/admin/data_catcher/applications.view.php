@@ -15,7 +15,7 @@ if (isset($nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
     if (empty($image)) {
         unset($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
     } else {
-        $nuggets['media_url'] = Uri::base(false).$image->get_public_path();
+        $nuggets['media_url'] = $image->url();
     }
 }
 if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {

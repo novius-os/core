@@ -15,11 +15,12 @@ class Toolkit_Image_Attachment extends Toolkit_Image_Driver
     /**
      * Return the url of the current image
      *
+     * @param bool $absolute Default true, if false return relative URL
      * @return string
      */
-    public function url()
+    public function url($absolute = true)
     {
-        return $this->image->url();
+        return $this->image->url($absolute);
     }
 
     /**

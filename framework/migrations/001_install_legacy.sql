@@ -1,3 +1,12 @@
+/**
+ * NOVIUS OS - Web OS for digital communication
+ *
+ * @copyright  2011 Novius
+ * @license    GNU Affero General Public License v3 or (at your option) any later version
+ *             http://www.gnu.org/licenses/agpl-3.0.html
+ * @link http://www.novius-os.org
+ */
+
 # delete old legacy migrations
 DELETE FROM `nos_migration` WHERE `nos_migration`.`type` = 'app' AND `nos_migration`.`name` = 'default' AND `nos_migration`.`migration` = '001_installation_0_1' LIMIT 1;
 DELETE FROM `nos_migration` WHERE `nos_migration`.`type` = 'app' AND `nos_migration`.`name` = 'default' AND `nos_migration`.`migration` = '002_migrate_0_1_1' LIMIT 1;

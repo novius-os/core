@@ -20,7 +20,7 @@ class Tools_Image
      */
     public static function resize($source, $max_width = null, $max_height = null, $dest = null)
     {
-        logger(\Fuel::L_WARNING, '\Nos\Tools_Image::resize($source, $max_width, $max_height, $dest) is deprecated. Please use \Image class with methods load(), shrink() and save().');
+        \Log::deprecated('\Nos\Tools_Image::resize($source, $max_width, $max_height, $dest) is deprecated. Please use \Image class with methods load(), shrink() and save().', 'Chiba.2');
 
         $image = \Image::forge();
         $image->load($source);

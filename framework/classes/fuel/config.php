@@ -106,7 +106,7 @@ class Config extends \Fuel\Core\Config
 
     public static function extendable_load($module_name, $file_name)
     {
-        logger(\Fuel::L_WARNING, '\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
+        \Log::deprecated('\Config::extendable_load is deprecated. Please rename to \Config::loadConfiguration.');
         return static::loadConfiguration($module_name, $file_name);
     }
 
@@ -230,7 +230,7 @@ class Config extends \Fuel\Core\Config
         return $ordered_selected_actions;
     }
 
-    protected static function canAddAction($action, $params)
+    public static function canAddAction($action, $params)
     {
         if ($params['all_targets']) {
             return true;

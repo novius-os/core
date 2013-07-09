@@ -8,21 +8,30 @@
  * @link http://www.novius-os.org
  */
 
-class Fuel extends Fuel\Core\Fuel
+class Log extends Fuel\Core\Log
 {
-    protected static $dependencies = array();
-
-    public static $namespace_aliases = array();
-
-    // We have a different base url because we changed the index.php
-    protected static function generate_base_url()
+    public static function deprecated($message, $since = null)
     {
-        // X-Forwarded-Proto is pretty standard
-        if (\Input::server('HTTP_X_FORWARDED_PROTO') === 'https') {
-            $protocol = 'https';
-        } else {
-            $protocol = \Input::protocol();
+        $debug_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        array_shift($debug_backtrace);
+        $returns = \Event::trigger('nos.deprecated', array('message' => $message, 'since' => $since, 'debug_backtrace' => $debug_backtrace), 'array');
+        $returns = array_filter($returns, function($val) {
+            return $val === false;
+        });
+        if (count($returns) > 0) {
+            return;
         }
-        return $protocol.'://'.\Input::server('http_host').'/';
+
+        if (!empty($debug_backtrace[0]['class'])) {
+            $method = $debug_backtrace[0]['class'].$debug_backtrace[0]['type'].$debug_backtrace[0]['function'].'()';
+        } else {
+            $method = $debug_backtrace[0]['function'].'()';
+        }
+        $log = 'Deprecated in '.$method;
+        if (!empty($since)) {
+            $log .= ', since '.$since;
+        }
+        $log .= ': '.$message;
+        logger(\Fuel::L_WARNING, $log);
     }
 }

@@ -123,7 +123,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
                                             '{{title}}' => $media->media_title,
                                         )
                                     );
-                                    $body['wallpaper_url'] = \Uri::create($media->get_public_path());
+                                    $body['wallpaper_url'] = \Uri::create($media->url());
                                 } else {
                                     $data['background'] = null;
                                     $error = __('This is unexpected: The selected image doesn’t exist any more. It must have been deleted while you were selecting it.');

@@ -15,11 +15,12 @@ class Toolkit_Image extends \Nos\Toolkit_Image_Driver
     /**
      * Return the url of the current image
      *
+     * @param bool $absolute Default true, if false return relative URL
      * @return string
      */
-    public function url()
+    public function url($absolute = true)
     {
-        return $this->image->get_public_path();
+        return $this->image->url($absolute);
     }
 
     /**
@@ -39,7 +40,7 @@ class Toolkit_Image extends \Nos\Toolkit_Image_Driver
      */
     public function file()
     {
-        return APPPATH.$this->image->get_private_path();
+        return $this->image->path();
     }
 
     /**

@@ -42,7 +42,7 @@ require(
     function($) {
         $(function() {
             $('#<?= $id ?>').nosAppsTab({
-                backgroundUrl: <?= $background ? \Format::forge(Uri::create($background->get_public_path()))->to_json() : 'null' ?>
+                backgroundUrl: <?= $background ? \Format::forge(Uri::create($background->url()))->to_json() : 'null' ?>
             });
         });
     });

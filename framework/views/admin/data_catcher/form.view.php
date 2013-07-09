@@ -126,7 +126,7 @@ echo \View::forge(
                         $media = \Nos\Media\Model_Media::find($media_id);
                         $field->set_options(
                             array(
-                                $media_id => $media->get_img_tag(array('max_width' => 80, 'max_height' => 80)),
+                                $media_id => $media->getImgTagResized(80, 80),
                             )
                         );
                     }

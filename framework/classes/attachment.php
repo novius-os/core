@@ -160,33 +160,34 @@ class Attachment
     /**
      * Get the url or FALSE if no file
      *
+     * @param bool $absolute Default true, if false return relative URL
      * @return	string|bool
      */
-    public function url()
+    public function url($absolute = true)
     {
         $filename = $this->filename();
         if ($filename === false) {
             return false;
         }
 
-        return 'data/files/'.$this->config['alias'].$this->attached.'/'.$filename;
-
+        return ($absolute ? \Uri::base(false) : '').'data/files/'.$this->config['alias'].$this->attached.'/'.$filename;
     }
 
     /**
      * Get the url of Attachment resized or FALSE if no file or not an image.
      *
-     * @param   int $max_width
-     * @param   int $max_height
+     * @param int $max_width The max width of the image.
+     * @param int $max_height The max height of the image.
+     * @param bool $absolute Default true, if false return relative URL
      * @return  string|bool
      */
-    public function urlResized($max_width = 0, $max_height = 0)
+    public function urlResized($max_width = 0, $max_height = 0, $absolute = true)
     {
         if (!$this->isImage()) {
             return false;
         }
 
-        return $this->getToolkitImage()->shrink($max_width, $max_height)->url();
+        return $this->getToolkitImage()->shrink($max_width, $max_height)->url($absolute);
     }
 
     /**

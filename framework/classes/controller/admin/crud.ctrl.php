@@ -535,7 +535,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function check_permission($action_name)
     {
-        logger(\Fuel::L_WARNING, '\Nos\Controller_Admin_Crud->check_permission($action_name) is deprecated. Please use \Nos\Controller_Admin_Crud->checkPermission($action_name).');
+        \Log::deprecated('->check_permission($action_name) is deprecated, use ->checkPermission($action_name) instead.', 'Chiba.1');
 
         return $this->checkPermission($action_name);
     }

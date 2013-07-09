@@ -51,7 +51,7 @@ if ($is_media) {
         $media = \Nos\Media\Model_Media::forge(reset($res));
     }
 
-    if (false === $media || !is_file(APPPATH.$media->get_private_path())) {
+    if (false === $media || !is_file($media->path())) {
         $send_file = false;
     } else {
         if ($is_resized) {
@@ -74,8 +74,8 @@ if ($is_media) {
                 $send_file = false;
             }
         } else {
-            $send_file = APPPATH.$media->get_private_path();
-            $target = $media->get_public_path();
+            $send_file = $media->path();
+            $target = $media->url(false);
         }
     }
 

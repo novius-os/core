@@ -30,7 +30,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         if (!isset($this->_properties['publication_state_property']) && isset($this->_properties['publication_bool_property'])) {
             $this->_properties['publication_state_property'] = $this->_properties['publication_bool_property'];
             unset($this->_properties['publication_bool_property']);
-            \Log::warning("Deprecated Orm_Behaviour_Publishable::publication_bool_property in class '$class'. Please use 'publication_state_property' instead.");
+            \Log::deprecated('Deprecated Orm_Behaviour_Publishable::publication_bool_property in class "'.$class.'". Please use "publication_state_property" instead.');
         }
     }
 

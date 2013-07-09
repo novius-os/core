@@ -151,27 +151,42 @@ class Model_Media extends \Nos\Orm\Model
      * media_height
      */
 
-    public function delete_from_disk()
+    /**
+     * Delete the media from disk
+     */
+    public function deleteFromDisk()
     {
-        $file = APPPATH.$this->get_private_path();
-        if (is_file($file)) {
-            \File::delete($file);
-        }
-
-        return true;
+        $this->deleteCache();
+        $file = $this->path();
+        is_file($file) and \File::delete($file);
     }
 
-    public function delete_public_cache()
+    /**
+     * @deprecated Use deleteFromDisk() method instead
+     */
+    public function delete_from_disk()
     {
-        // Delete cached media entries
-        $path_public     = DOCROOT.$this->get_public_path();
-        $path_thumbnails = dirname(DOCROOT.str_replace('media/', 'cache/media', static::$public_path).$this->media_path);
-        try {
-            // delete_dir($path, $recursive, $delete_top)
-            \File::is_link($path_public)    and \File::delete($path_public);
-            is_dir($path_thumbnails) and \File::delete_dir($path_thumbnails, true, true);
+        \Log::deprecated('->delete_from_disk() is deprecated, use ->deleteFromDisk() instead.', 'Chiba.2');
+        return $this->deleteFromDisk();
+    }
 
-            return true;
+    /**
+     * Delete all caches of the media
+     */
+    public function deleteCache()
+    {
+        try {
+            $image_url = $this->url(false);
+            $pathinfo = pathinfo($image_url);
+            $path = ltrim($pathinfo['dirname'], '/').DS.$pathinfo['filename'];
+
+            $path_public = DOCROOT.$image_url;
+            $path_public_cache = DOCROOT.'cache'.DS.$path;
+            $path_private_cache = \Config::get('cache_dir').$path;
+
+            \File::is_link($path_public) and \File::delete($path_public);
+            is_dir($path_public_cache) and \File::delete_dir($path_public_cache, true, true);
+            is_dir($path_private_cache) and \File::delete_dir($path_private_cache, true, true);
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
                 throw $e;
@@ -179,35 +194,69 @@ class Model_Media extends \Nos\Orm\Model
         }
     }
 
-    public function get_path()
+    /**
+     * @deprecated Use deleteCache() method instead
+     */
+    public function delete_public_cache()
+    {
+        \Log::deprecated('->delete_public_cache() is deprecated, use ->deleteCache() instead.', 'Chiba.2');
+        return $this->deleteCache();
+    }
+
+    /**
+     * Return the media virtual path.
+     *
+     * @return	string
+     */
+    protected function _getVirtualPath()
     {
         return ltrim($this->virtual_path(), '/');
     }
 
-    public function get_private_path()
+    /**
+     * @deprecated Use getPath() method instead
+     */
+    public function get_path()
     {
-        return static::$private_path.$this->get_path();
+        \Log::deprecated('->get_path() is deprecated, use ->_getVirtualPath() instead.', 'Chiba.2');
+        return $this->_getVirtualPath();
     }
 
-    public function get_img_tag($params = array())
+    /**
+     * Return the path of the media relative to APPPATH
+     *
+     * @return	string
+     */
+    public function path()
     {
-        if (!$this->is_image()) {
+        return APPPATH.static::$private_path.$this->_getVirtualPath();
+    }
+
+    /**
+     * @deprecated Use get_private_path() method instead
+     */
+    public function get_private_path()
+    {
+        \Log::deprecated('->get_private_path() is deprecated, use ->path() instead.', 'Chiba.2');
+        return \Str::sub($this->path(), \Str::length(APPPATH));
+    }
+
+    /**
+     * Creates an html image tag of the media
+     *
+     * Sets width, height, alt attributes is not supplied.
+     *
+     * @param   array   $params the attributes array
+     * @return	string	The image tag
+     */
+    public function getImgTag($params = array())
+    {
+        if (!$this->isImage()) {
             return false;
         }
 
         $toolkit_image = $this->getToolkitImage();
 
-        if (isset($params['max_width']) || isset($params['max_height'])) {
-            logger(\Fuel::L_WARNING, 'Use of keys "max_width" and "max_height" in the array parameter of \Nos\Media\Model_Media::get_img_tag($params) is deprecated. Please set a "transformations" key with array value, filled with a item array("shrink", $max_width, $max_height).');
-            if (!isset($params['transformations'])) {
-                $params['transformations'] = array();
-            }
-            $max_width = isset($params['max_width']) ? $params['max_width'] : null;
-            $max_height = isset($params['max_height']) ? $params['max_height'] : null;
-            unset($params['max_width']);
-            unset($params['max_height']);
-            $params['transformations'][] = array('shrink', $max_width, $max_height);
-        }
         if (isset($params['transformations'])) {
             $transformations = (array) $params['transformations'];
             $toolkit_image->transformations($transformations);
@@ -217,56 +266,141 @@ class Model_Media extends \Nos\Orm\Model
         return $toolkit_image->html($params);
     }
 
-    public function get_img_tag_resized($max_width = null, $max_height = null, $params = array())
+    /**
+     * Creates an html image tag of the media resized
+     *
+     * Sets width, height, alt attributes is not supplied.
+     *
+     * @param   int     $max_width The max width of the image.
+     * @param   int     $max_height The max height of the image.
+     * @param   array   $params the attributes array
+     * @return	string	The image tag
+     */
+    public function getImgTagResized($max_width = null, $max_height = null, $params = array())
     {
         if (!isset($params['transformations'])) {
             $params['transformations'] = array();
         }
         $params['transformations'][] = array('shrink', $max_width, $max_height);
 
-        return $this->get_img_tag($params);
+        return $this->getImgTag($params);
     }
 
-    public function is_image()
+    /**
+     * @deprecated Use getImgTag() method instead
+     */
+    public function get_img_tag($params = array())
+    {
+        if (isset($params['max_width']) || isset($params['max_height'])) {
+            \Log::deprecated('->get_img_tag() is deprecated, use ->getImgTag() instead. Use a "transformations" key with array value, filled with a item array("shrink", $max_width, $max_height) instead of keys "max_width" and "max_height" in the array parameter', 'Chiba.2');
+            if (!isset($params['transformations'])) {
+                $params['transformations'] = array();
+            }
+            $max_width = isset($params['max_width']) ? $params['max_width'] : null;
+            $max_height = isset($params['max_height']) ? $params['max_height'] : null;
+            unset($params['max_width']);
+            unset($params['max_height']);
+            $params['transformations'][] = array('shrink', $max_width, $max_height);
+        } else {
+            \Log::deprecated('->get_img_tag() is deprecated, use ->getImgTag() instead.', 'Chiba.2');
+        }
+        return $this->getImgTag($params);
+    }
+
+    /**
+     * @deprecated Use getImgTagResized() method instead
+     */
+    public function get_img_tag_resized($max_width = null, $max_height = null, $params = array())
+    {
+        \Log::deprecated('->get_img_tag_resized() is deprecated, use ->getImgTagResized() instead.', 'Chiba.2');
+        return $this->getImgTagResized($max_width, $max_height, $params);
+    }
+
+    /**
+     * Checks if the Attachment is an image.
+     *
+     * @return bool
+     */
+    public function isImage()
     {
         return in_array($this->media_ext, array('jpg', 'png', 'gif', 'jpeg', 'bmp'));
     }
 
+    /**
+     * @deprecated Use isImage() method instead
+     */
+    public function is_image()
+    {
+        \Log::deprecated('->is_image() is deprecated, use ->isImage() instead.', 'Chiba.2');
+        return $this->isImage();
+    }
+
     public function getToolkitImage()
     {
-        if (!$this->is_image()) {
+        if (!$this->isImage()) {
             return false;
         }
 
         return Toolkit_Image::forge($this);
     }
 
-    public function get_public_path()
+    /**
+     * Get the url of the media
+     *
+     * @param bool $absolute Default true, if false return relative URL
+     * @return string
+     */
+    public function url($absolute = true)
     {
-        return static::$public_path.$this->get_path();
+        return ($absolute ? \Uri::base(false) : '').static::$public_path.$this->_getVirtualPath();
     }
 
-    public function get_public_path_resized($max_width = 0, $max_height = 0)
+    /**
+     * Get the url of the media resized or FALSE if not an image.
+     *
+     * @param int $max_width The max width of the image.
+     * @param int $max_height The max height of the image.
+     * @param bool $absolute Default true, if false return relative URL
+     * @return  string|bool
+     */
+    public function urlResized($max_width, $max_height = null, $absolute = true)
     {
-        if (!$this->is_image()) {
+        if (!$this->isImage()) {
             return false;
         }
 
+        return $this->getToolkitImage()->shrink($max_width, $max_height)->url($absolute);
+    }
+
+    /**
+     * @deprecated Use url() method instead
+     */
+    public function get_public_path()
+    {
+        \Log::deprecated('->get_public_path() is deprecated, use ->url() instead.', 'Chiba.2');
+        return $this->url(false);
+    }
+
+    /**
+     * @deprecated Use urlResized() method instead
+     */
+    public function get_public_path_resized($max_width = 0, $max_height = 0)
+    {
+        \Log::deprecated('->get_public_path_resized() is deprecated, use ->urlResized() instead.', 'Chiba.2');
         if ($max_width === 0) {
             $max_width = null;
         }
         if ($max_height === 0) {
             $max_height = null;
         }
-
-        return $this->getToolkitImage()->shrink($max_width, $max_height)->url();
+        return $this->urlResized($max_width, $max_height, false);
     }
 
     public function _event_before_save()
     {
         parent::_event_before_save();
 
-        $file = APPPATH.$this->get_private_path();
+        $file = $this->path();
         if (is_file($file)) {
             $is_image = @getimagesize($file);
             if ($is_image !== false) {
