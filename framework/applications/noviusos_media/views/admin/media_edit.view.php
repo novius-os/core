@@ -25,7 +25,7 @@ $media_title->set_attribute('placeholder', $media_title->label);
     <div class="col c1" ></div>
 <?php
 $main_col_size = 11;
-if ($item->is_image()) {
+if ($item->isImage()) {
     $main_col_size -= 3;
     echo '<div class="col c3 preview_zone">';
     $src = $item->urlResized(512, 512);
@@ -57,7 +57,7 @@ if ($item->is_image()) {
                     <td class="media_filesize"><?= \Num::format_bytes($item->media_filesize, 1) ?></td>
                 </tr>
 <?php
-if ($item->is_image()) {
+if ($item->isImage()) {
     ?>
                 <tr>
                     <th style="vertical-align: top;"><?= __('Dimensions:') ?></th>

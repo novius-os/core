@@ -134,7 +134,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         $return = parent::save($item, $data) + array(
             'thumbnailUrl' => $this->item->urlResized(512, 512),
         );
-        if ($this->item->is_image() != $this->clone->is_image()) {
+        if ($this->item->isImage() != $this->clone->isImage()) {
             $return += array(
                 'replaceTab' => $this->config['controller_url'].'/insert_update/'.$item->{$this->pk},
             );
