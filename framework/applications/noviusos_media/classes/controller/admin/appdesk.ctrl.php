@@ -62,4 +62,21 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
 
         \Response::json($item);
     }
+
+    public function post_clear_cache()
+    {
+        try {
+            \File::delete_dir(\Config::get('cache_dir').'media', true, false);
+            \File::delete_dir(DOCROOT.'cache'.DS.'media', true, false);
+            \File::delete_dir(DOCROOT.'media', true, false);
+        } catch (\InvalidPathException $e) {
+            // Dir doesn't exists, no problem
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+        $__ = \Nos\I18n::dictionary('noviusos_media::common');
+        \Response::json(array(
+            'notify' => $__('The cache has been renewed. All ready for you to enjoy!'),
+        ));
+    }
 }
