@@ -160,6 +160,12 @@ class Model_Folder extends \Nos\Orm\Model
             is_dir($path_public) and \File::delete_dir($path_public, true, $top);
             is_dir($path_public_cache) and \File::delete_dir($path_public_cache, true, $top);
             is_dir($path_private_cache) and \File::delete_dir($path_private_cache, true, $top);
+
+            if (!$top) {
+                is_dir($path_public) and \File::create($path_public, '.gitkeep');
+                is_dir($path_public_cache) and \File::create($path_public_cache, '.gitkeep');
+                is_dir($path_private_cache) and \File::create($path_private_cache, '.gitkeep');
+            }
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
                 throw $e;
