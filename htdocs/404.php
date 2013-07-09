@@ -75,7 +75,7 @@ if ($is_media) {
             }
         } else {
             $send_file = $media->path();
-            $target = $media->get_public_path();
+            $target = $media->url(false);
         }
     }
 

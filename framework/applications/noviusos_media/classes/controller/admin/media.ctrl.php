@@ -132,7 +132,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
     public function save($item, $data)
     {
         $return = parent::save($item, $data) + array(
-            'thumbnailUrl' => $this->item->get_public_path_resized(512, 512),
+            'thumbnailUrl' => $this->item->urlResized(512, 512),
         );
         if ($this->item->is_image() != $this->clone->is_image()) {
             $return += array(

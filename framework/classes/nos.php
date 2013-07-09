@@ -221,9 +221,9 @@ class Nos
                     }
                 } else {
                     if (!empty($params['height'])) {
-                        $media_url = $media->get_public_path_resized($params['width'], $params['height']);
+                        $media_url = $media->urlResized($params['width'], $params['height']);
                     } else {
-                        $media_url = $media->get_public_path();
+                        $media_url = $media->url();
                     }
                     $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', $media_url, $content);
                 }

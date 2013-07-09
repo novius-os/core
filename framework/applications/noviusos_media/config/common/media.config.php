@@ -72,22 +72,22 @@ return array(
          ),
         'path' => array(
             'value' => function ($item) {
-                return $item->get_public_path();
+                return $item->url();
             },
         ),
         'path_folder' => array(
             'value' => function ($item) {
-                return dirname($item->get_public_path());
+                return dirname($item->url(false));
             },
         ),
         'image' => array(
             'value' => function ($item) {
-                return $item->is_image();
+                return $item->isImage();
             },
         ),
         'thumbnail' => array(
             'value' => function ($item) {
-                return $item->is_image() ? $item->get_public_path_resized(64, 64) : '';
+                return $item->isImage() ? $item->urlResized(64, 64) : '';
             },
         ),
         'height' => array(
