@@ -30,7 +30,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
                         $item->media_ext = $attachment->extension();
 
                         $item->observe('before_save');
-                        $dest = APPPATH.$item->get_private_path();
+                        $dest = $item->path();
 
                         if ($item->is_new()) {
 
@@ -77,7 +77,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
             $fieldset->field('media_folder_id')->set_value($root->medif_id);
-            $fieldset->field('attachment')->set_value($attachment->url());
+            $fieldset->field('attachment')->set_value($attachment->url(false));
             $fieldset->field('media_title')->set_value(pathinfo($attachment->filename(), PATHINFO_FILENAME));
 
             $view_params = array(

@@ -277,33 +277,16 @@ class Toolkit_Image
         return $this;
     }
 
-    protected function _isDirty()
-    {
-        if (!$this->_dirty) {
-            return false;
-        }
-
-        if (count($this->_transformations) === 1 &&
-            in_array($this->_transformations[0][0], array('shrink', 'resize'))) {
-            $sizes = $this->sizes();
-            if ($sizes->width == $this->_transformations[0][1] && $sizes->height == $this->_transformations[0][2]) {
-                $this->_sizes = $sizes;
-                $this->_url = $this->_image->url();
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Build and return the URL of the modify image
      *
+     * @param bool $absolute Default true, if false return relative URL
      * @return  string
      */
-    public function url()
+    public function url($absolute = true)
     {
         if (count($this->_transformations) === 0) {
-            return $this->_image->url();
+            return $this->_image->url($absolute);
         }
 
         if (!$this->_dirty_url) {
@@ -314,15 +297,15 @@ class Toolkit_Image
             in_array($this->_transformations[0][0], array('shrink', 'resize'))) {
             $sizes = $this->_image->sizes();
             if ($sizes->width == $this->_transformations[0][1] && $sizes->height == $this->_transformations[0][2]) {
-                $this->_url = $this->_image->url();
+                $this->_url = $this->_image->url(false);
                 $this->_dirty_url = false;
-                return $this->_url;
+                return ($absolute ? \Uri::base(false) : '').$this->_url;
             }
         }
 
         \Config::load('crypt', true);
-        $hash = \Config::get('crypt.crypto_hmac').'$'. $this->_image->url();
-        $ext = pathinfo($this->_image->url(), PATHINFO_EXTENSION);
+        $image_url = $this->_image->url(false);
+        $hash = \Config::get('crypt.crypto_hmac').'$'.$image_url;
         $url = array();
 
         foreach ($this->_transformations as $transformation_args) {
@@ -331,13 +314,16 @@ class Toolkit_Image
             $url[] = static::$_methods_mapping[$transformation].(count($transformation_args) ? ','.rtrim(implode(',', $transformation_args), ',') : '');
         }
 
+        $pathinfo = pathinfo($image_url);
         $url[] = substr(md5($hash), 0, 6);
-        $url = '/'.implode('-', $url);
-        $url = preg_replace('`'.preg_quote('.'.$ext).'$`iUu', '', $this->_image->url()).$url;
-        $this->_url = 'cache/'.ltrim($url, '/').'.'.$ext;
+        $this->_url = 'cache/'.
+            ltrim($pathinfo['dirname'], '/').'/'.
+            $pathinfo['filename'].'/'.
+            implode('-', $url).
+            '.'.$pathinfo['extension'];
 
         $this->_dirty_url = false;
-        return $this->_url;
+        return ($absolute ? \Uri::base(false) : '').$this->_url;
     }
 
     /**
@@ -360,6 +346,14 @@ class Toolkit_Image
         return $this->_sizes;
     }
 
+    /**
+     * Creates an html image tag of the modify image
+     *
+     * Sets width, height, alt attributes is not supplied.
+     *
+     * @param   array   $params the attributes array
+     * @return	string	The image tag
+     */
     public function html($params = array())
     {
         $sizes = $this->sizes();

@@ -63,7 +63,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
                 throw new \Exception(__('This extension is not allowed due to security reasons.'));
             }
         } elseif (!$this->is_new) {
-            $pathinfo = pathinfo(APPPATH.$media->get_private_path());
+            $pathinfo = pathinfo($media->path());
         }
 
         // Empty title = auto-generated from file name
@@ -82,8 +82,8 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         parent::before_save($media, $data);
 
         $media->observe('before_save');
-        $dest = APPPATH.$media->get_private_path();
-        $is_renamed = $this->clone->get_private_path() != $media->get_private_path();
+        $dest = $media->path();
+        $is_renamed = $this->clone->path() != $dest;
 
         // Check duplicate / write permissions
         if ($this->is_new || $is_renamed) {
@@ -107,12 +107,11 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         if (!$this->is_new) {
             // A new file will be copied, we don't need the old one
             if ($is_uploaded) {
-                $this->clone->delete_from_disk();
-                $this->clone->delete_public_cache();
+                $this->clone->deleteFromDisk();
             }
             // Don't delete the old file, we'll rename it
             if ($is_renamed) {
-                $this->clone->delete_public_cache();
+                $this->clone->deleteCache();
             }
         }
 
@@ -126,7 +125,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             }
         } else if ($is_renamed) {
             // From existing file
-            \File::rename(APPPATH.$this->clone->get_private_path(), $dest);
+            \File::rename($this->clone->path(), $dest);
         }
     }
 
@@ -147,9 +146,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
     {
         // Delete database & relations (link)
         $this->item->delete();
-        // Delete file from the hard drive
-        $this->item->delete_from_disk();
-        // Delete cached entries (image thumbnails)
-        $this->item->delete_public_cache();
+        // Delete file and cached entries from the hard drive
+        $this->item->deleteFromDisk();
     }
 }

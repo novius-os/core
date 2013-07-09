@@ -66,11 +66,8 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
     public function post_clear_cache()
     {
         try {
-            \File::delete_dir(\Config::get('cache_dir').'media', true, false);
-            \File::delete_dir(DOCROOT.'cache'.DS.'media', true, false);
-            \File::delete_dir(DOCROOT.'media', true, false);
-        } catch (\InvalidPathException $e) {
-            // Dir doesn't exists, no problem
+            $folder = Model_Folder::find(1);
+            $folder->deleteCache();
         } catch (\Exception $e) {
             $this->send_error($e);
         }

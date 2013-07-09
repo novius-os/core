@@ -10,7 +10,7 @@ class Media_Filesize extends \Nos\Migration
         parent::up();
 
         foreach (Model_Media::find('all') as $media) {
-            $file = APPPATH.$media->get_private_path();
+            $file = $media->path();
             if (is_file($file)) {
                 $media->media_filesize = filesize($file);
                 $media->save();

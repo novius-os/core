@@ -36,7 +36,7 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
                     }
                 }
 
-                $this->clone->delete_public_cache();
+                $this->clone->deleteCache();
             }
         }
     }
@@ -90,8 +90,7 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
                 media_folder_id IN ($escaped_folder_ids)")->execute();
 
         // Can throw an exception
-        $this->item->delete_from_disk();
-        $this->item->delete_public_cache();
+        $this->item->deleteFromDisk();
 
         // Delete folder entries
         \DB::query("
