@@ -345,6 +345,17 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['appdesk']['appdesk']['buttons'])) {
                 $config['appdesk']['appdesk']['buttons'] = array();
 
+                $config_toolbar_actions = array();
+                foreach ($config['toolbar']['actions'] as $key => $action) {
+                    if (\Config::canAddAction($action, array(
+                            'all_targets' => false,
+                            'target' => 'toolbar-grid',
+                            'class' => get_called_class()
+                        ))) {
+                        $config_toolbar_actions[$key] = $action;
+                    }
+                }
+
                 $actions = \Arr::merge(
                     \Config::actions(
                         array(
@@ -353,7 +364,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                             'class' => get_called_class()
                         )
                     ),
-                    $config['toolbar']['actions']
+                    $config_toolbar_actions
                 );
 
                 $primary = false;

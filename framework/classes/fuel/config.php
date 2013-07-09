@@ -230,7 +230,7 @@ class Config extends \Fuel\Core\Config
         return $ordered_selected_actions;
     }
 
-    protected static function canAddAction($action, $params)
+    public static function canAddAction($action, $params)
     {
         if ($params['all_targets']) {
             return true;
