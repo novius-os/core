@@ -10,13 +10,10 @@
 
 namespace Nos\Migrations;
 
-class Images_Url_Transformations extends \Nos\Migration
+class Empty_Cache_Pages extends \Nos\Migration
 {
     public function up()
     {
-        $folder = \Nos\Media\Model_Folder::find(1);
-        $folder->deleteCache();
-
         try {
             \File::delete_dir(\Config::get('cache_dir').'pages', true, false);
         } catch (\InvalidPathException $e) {
