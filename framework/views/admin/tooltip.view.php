@@ -37,7 +37,7 @@ if (!isset($options)) {
                 showing: function(e, ui) {
 
                     // http://stackoverflow.com/questions/152975/how-to-detect-a-click-outside-an-element
-                    ui._tooltip.addClass('tooltip').on('click', function(e) {
+                    ui._tooltipCache._$tooltip.addClass('tooltip').on('click', function(e) {
                         e.stopPropagation();
                     });
                     $('body').on('click.wijtooltip', function(e) {
