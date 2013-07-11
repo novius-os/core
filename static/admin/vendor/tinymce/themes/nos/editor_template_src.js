@@ -2113,7 +2113,7 @@
                         ed.undoManager.add();
                     }
                 } else {
-                    var html = $('<div></div>').append($(img).addClass('nosMedia')).html();
+                    var html = $('<div></div>').append($(img).addClass('nosMedia').attr('data-media-id', $(img).data('media').id)).html();
                     ed.execCommand('mceInsertContent', false, html, {skip_undo : 1});
                 }
                 ed.execCommand("mceEndUndoLevel");

@@ -53,7 +53,7 @@ define('jquery-nos-image-wysiwyg',
                                 img.attr('style',  $style.val());
 
                                 img.attr('data-media', JSON.stringify(media));
-                                img.attr('src', params.base_url + media.path);
+                                img.attr('src', media.path);
 
                                 $dialog.trigger('insert.media', img);
                                 e.stopPropagation();
