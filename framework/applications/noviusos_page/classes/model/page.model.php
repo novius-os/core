@@ -230,7 +230,6 @@ class Model_Page extends \Nos\Orm\Model
             'context_property'      => 'page_context',
             'common_id_property' => 'page_context_common_id',
             'is_main_property' => 'page_context_is_main',
-            'common_fields'   => array(),
         ),
         'Nos\Orm_Behaviour_Tree' => array(
             'parent_relation' => 'parent',

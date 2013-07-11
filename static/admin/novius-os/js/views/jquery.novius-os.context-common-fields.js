@@ -88,7 +88,9 @@ define('jquery-nos-context-common-fields',
                                     });
                             };
 
-                        init($element);
+                        $element.nosOnShow('one', function() {
+                            init($element);
+                        });
 
                         $element.one('inputfilethumbenter', function() {
                             init($element.parents('.ui-inputfilethumb'), function() {
