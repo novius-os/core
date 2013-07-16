@@ -17,7 +17,7 @@ class Response extends \Fuel\Core\Response
             $status = 200;
         }
         static::forge(\Format::forge()->to_json($data), $status, array(
-            'Content-Type' => 'application/json',
+            'Content-Type' => \Input::is_ajax() ? 'application/json' : 'text/plain',
             'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
             'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
             'Pragma' => 'no-cache',
