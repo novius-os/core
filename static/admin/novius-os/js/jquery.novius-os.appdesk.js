@@ -716,7 +716,9 @@ define('jquery-nos-appdesk',
                 $.each(o.inspectors, function() {
                     if (!this.hide) {
                         $('<li></li>').addClass('nos-appdesk-inspector ui-widget-content')
-                            .data('inspector', this)
+                            .data('inspector', $.extend({
+                                loadingText: o.texts.loading
+                            }, this))
                             .appendTo( this.vertical ? self.uiInspectorsVertical : self.uiInspectorsHorizontal );
                     }
                 });

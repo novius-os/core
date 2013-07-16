@@ -7,8 +7,13 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
+
+\Nos\I18n::current_dictionary('nos::common');
 empty($attributes) and $attributes = array();
 empty($attributes['id']) and $attributes['id'] = uniqid('temp_');
+$params = array_merge(array(
+    'loadingText' => __('Loading...'),
+), $params);
 ?>
 <div <?= array_to_attr($attributes); ?>><table class="nos-treegrid"></table></div>
 <script type="text/javascript">
