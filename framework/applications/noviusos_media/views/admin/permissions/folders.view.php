@@ -11,7 +11,7 @@
 Nos\I18n::current_dictionary('noviusos_media::common');
 ?>
 <p>
-    <?= __('Note: when nothing is selected, there is no restriction and this user can access all folders. The root folder is always accessible.') ?>
+    <?= __('Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.') ?>
 </p>
 
 <p>
