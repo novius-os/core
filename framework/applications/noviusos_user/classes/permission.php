@@ -17,7 +17,8 @@ class Permission
      */
     public static function check($permissionName, $categoryKey = null, $allowEmpty = false)
     {
-        return \Session::user()->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
+        $user = \Session::user();
+        return !empty($user) && $user->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
     }
 
     /**
@@ -29,7 +30,8 @@ class Permission
      */
     public static function exists($permissionName, $categoryKey = null, $allowEmpty = false)
     {
-        return \Session::user()->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
+        $user = \Session::user();
+        return !empty($user) && $user->checkRolesPermission('Exists', $permissionName, $categoryKey, $allowEmpty);
     }
 
     /**
@@ -41,7 +43,8 @@ class Permission
      */
     public static function existsOrEmpty($permissionName, $categoryKey = null)
     {
-        return \Session::user()->checkRolesPermission('ExistsOrEmpty', $permissionName, $categoryKey);
+        $user = \Session::user();
+        return !empty($user) && $user->checkRolesPermission('ExistsOrEmpty', $permissionName, $categoryKey);
     }
 
     /**
@@ -53,7 +56,8 @@ class Permission
      */
     public static function isAllowed($permissionName, $allowEmpty = false)
     {
-        return  \Session::user()->checkRolesPermission('IsAllowed', $permissionName, $allowEmpty);
+        $user = \Session::user();
+        return !empty($user) && $user->checkRolesPermission('IsAllowed', $permissionName, $allowEmpty);
     }
 
     /**
@@ -66,7 +70,8 @@ class Permission
      */
     public static function atLeast($permissionName, $threshold, $valueWhenEmpty = 0)
     {
-        return  \Session::user()->checkRolesPermission('AtLeast', $permissionName, (int) $threshold, $valueWhenEmpty);
+        $user = \Session::user();
+        return !empty($user) && $user->checkRolesPermission('AtLeast', $permissionName, (int) $threshold, $valueWhenEmpty);
     }
 
     /**
@@ -79,12 +84,14 @@ class Permission
      */
     public static function atMost($permissionName, $threshold, $valueWhenEmpty = 0)
     {
-        return \Session::user()->checkRolesPermission('AtMost', $permissionName, (int) $threshold, (int) $valueWhenEmpty);
+        $user = \Session::user();
+        return !empty($user) && $user->checkRolesPermission('AtMost', $permissionName, (int) $threshold, (int) $valueWhenEmpty);
     }
 
     public static function listPermissionCategories($permissionName)
     {
-        return \Session::user()->listPermissionCategories($permissionName);
+        $user = \Session::user();
+        return !empty($user) && $user->listPermissionCategories($permissionName);
     }
 
     /**
@@ -122,9 +129,9 @@ class Permission
 
         $contexts = \Nos\Tools_Context::contexts();
 
-        $full_access = \Nos\User\Permission::check('nos::context', 'does_not_exists', true);
+        $full_access = static::check('nos::context', 'does_not_exists', true);
         if (!$full_access) {
-            $allowedContexts = \Nos\User\Permission::listPermissionCategories('nos::context');
+            $allowedContexts = static::listPermissionCategories('nos::context');
             $contexts = array_intersect_key(array_combine($allowedContexts, $allowedContexts), $contexts);
         }
 
