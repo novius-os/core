@@ -4,7 +4,7 @@
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
- * 
+ *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
@@ -148,7 +148,7 @@ var wijmo;
         };
         return JQueryUIDialog;
     })(wijmo.JQueryUIWidget);
-    wijmo.JQueryUIDialog = JQueryUIDialog;    
+    wijmo.JQueryUIDialog = JQueryUIDialog;
     var WijDialog = (function (_super) {
         __extends(WijDialog, _super);
         function WijDialog() {
@@ -418,6 +418,10 @@ var wijmo;
                     }, function () {
                         buttonObject.removeClass(uiStateHover);
                     }).click(function (event) {
+                        // Novius OS : Case of double modal dialog, the browser stop javascript with an ERROR on close click. Must preventDefault before all other code execution
+                        if (buttonHash.button == 'close') {
+                            event.preventDefault();
+                        }
                         if(buttonIcon.hasClass(info.iconClassOff)) {
                             buttonIcon.removeClass(info.iconClassOff);
                         } else {
@@ -1043,7 +1047,7 @@ var wijmo;
         };
         return WijDialog;
     })(JQueryUIDialog);
-    wijmo.WijDialog = WijDialog;    
+    wijmo.WijDialog = WijDialog;
     if($.ui && $.ui.dialog) {
         $.extend($.ui.dialog.overlay, {
             create: function (dialog) {
