@@ -5,7 +5,7 @@
 * http://wijmo.com/
 *
 * Copyright(c) GrapeCity, Inc.  All rights reserved.
-* 
+*
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * licensing@wijmo.com
 * http://www.wijmo.com/license
@@ -26,26 +26,26 @@
 	$.widget("wijmo.wijdialog", $.ui.dialog, {
 		options: {
 			/// <summary>
-			/// An object determines the caption buttons to show on wijdialog title bar. 
+			/// An object determines the caption buttons to show on wijdialog title bar.
 			/// Type: Object.
 			/// Default: {}
 			/// </summary>
 			/// <remarks>
-			/// The default value for this option is: 
+			/// The default value for this option is:
 			/// {
-			/// pin: {visible: true, click: self.pin, 
+			/// pin: {visible: true, click: self.pin,
 			/// iconClassOn: "ui-icon-pin-w", iconClassOff:"ui-icon-pin-s"},
-			/// refresh: {visible: true, click: self.refresh, 
+			/// refresh: {visible: true, click: self.refresh,
 			/// iconClassOn: "ui-icon-refresh"},
 			/// toggle: {visible: true, click: self.toggle},
-			/// minimize: {visible: true, click: self.minimize, 
+			/// minimize: {visible: true, click: self.minimize,
 			/// iconClassOn: "ui-icon-minus"},
-			/// maximize: {visible: true, click: self.maximize, 
+			/// maximize: {visible: true, click: self.maximize,
 			/// iconClassOn: "ui-icon-extlink"},
-			/// close: {visible: true, click: self.close, 
+			/// close: {visible: true, click: self.close,
 			/// iconClassOn: "ui-icon-close"}
 			/// };
-			/// Each button is represented by an object in this object. 
+			/// Each button is represented by an object in this object.
 			/// property name: The name of the button.
 			/// visible: A value specifies whether this button is visible.
 			/// click: The event handler to handle the click event of this button.
@@ -54,14 +54,14 @@
 			/// </remarks>
 			captionButtons: {},
 			/// <summary>
-			/// A value determines the settings of the animation effect 
+			/// A value determines the settings of the animation effect
 			/// to be used when the wijdialog is collapsed.
 			/// Type: Object.
 			/// Default: null.
 			/// </summary>
 			collapsingAnimation: null,
 			/// <summary>
-			/// A value determines the settings of the animation effect 
+			/// A value determines the settings of the animation effect
 			/// to be used when the wijdialog is expanded.
 			/// Type: Object.
 			/// Default: null.
@@ -74,22 +74,22 @@
 			/// </summary>
 			contentUrl: "",
 			/// <summary>
-			/// A string specifies the ID of the DOM element to 
+			/// A string specifies the ID of the DOM element to
 			/// dock to when wijdialog is minimized.
 			/// Type: String.
 			/// Default: "".
 			/// </summary>
 			minimizeZoneElementId: "",
 			/// <summary>
-			/// Buttoncreating event handler. 
-			/// A function gets called before the caption buttons are created. 
-			/// A user could use this event to change the array of the buttons to 
-			/// change, add, or remove buttons from title bar. 
-			/// The buttoncreating event handler is a function that gets called 
-			/// before the caption buttons are created. 
-			/// Type: Function 
-			/// Default: null 
-			/// Code example: 
+			/// Buttoncreating event handler.
+			/// A function gets called before the caption buttons are created.
+			/// A user could use this event to change the array of the buttons to
+			/// change, add, or remove buttons from title bar.
+			/// The buttoncreating event handler is a function that gets called
+			/// before the caption buttons are created.
+			/// Type: Function
+			/// Default: null
+			/// Code example:
 			/// Supply a function as an option.
 			/// $(".selector").wijdialog({ buttonCreating: function (e, data) { } });
 			/// Bind to the event by type: wijdialogbuttoncreating
@@ -100,15 +100,15 @@
 			/// jQuery.Event object.
 			/// </param>
 			/// <param name="data" type="Object">
-			/// Buttons array that will be created. 
+			/// Buttons array that will be created.
 			buttonCreating: null,
 			/// <summary>
 			/// The stateChanged event handler.
-			/// A function called when the state ("minimized", "maximized", "normal") 
+			/// A function called when the state ("minimized", "maximized", "normal")
 			/// of this dialog is changed.
 			/// Default: null
 			/// Type: Function
-			/// Code example: 
+			/// Code example:
 			/// Supply a function as an option.
 			/// $(".selector").wijdialog({ stateChanged: function (e, data) { } });
 			/// Bind to the event by type: wijdialogstatechanged
@@ -128,7 +128,7 @@
 			/// A function called when the dialog lose focus.
 			/// Default: null
 			/// Type: Function
-			/// Code example: 
+			/// Code example:
 			/// Supply a function as an option.
 			/// $(".selector").wijdialog({ blur: function (e, data) { } });
 			/// Bind to the event by type: wijdialogstatechanged
@@ -309,7 +309,7 @@
 		//			var textWidth = $("#ui-dialog-title-dialog").width(),
 		//			iconWidth = $(".wijmo-wijdialog-captionbutton:eq(0)")
 		//			.width(),
-		//			minWidth = textWidth + 
+		//			minWidth = textWidth +
 		//			$(".wijmo-wijdialog-captionbutton").length * iconWidth;
 		//			self._setOption("minWidth",minWidth);
 		//		},
@@ -335,7 +335,7 @@
 			//				// todo: reset captionButtons
 			//			}
 			//			//Add for support disabled option at 2011/7/8
-			//			else 
+			//			else
 			if (key === "disabled") {
 				self._handleDisabledOption(value, self.element);
 			}
@@ -430,6 +430,10 @@
 						}
 					)
 					.click(function (event) {
+                        // Novius OS : Case of double modal dialog, the browser stop javascript with an ERROR on close click. Must preventDefault before all other code execution
+                        if (buttonHash.button == 'close') {
+                            event.preventDefault();
+                        }
 						if (buttonIcon.hasClass(info.iconClassOff)) {
 							buttonIcon.removeClass(info.iconClassOff);
 						}
@@ -587,7 +591,7 @@
 			originalPosition, originalSize = {}, position, size = {},
 			content = "uiDialog", originalState;
 			//content has 2 value 'uiDialog' for normal content,'copy' for iframe
-			//to resolve the issue that iframe reload when minimize.  
+			//to resolve the issue that iframe reload when minimize.
 
 			//Only minimize from normal,maximized state
 			if (!self.minimized) {
@@ -867,7 +871,7 @@
 			position, size = {}, $from = $("<div></div>"), $to = $("<div></div>"),
 			content = "uiDialog", state;
 			//content has 2 value 'uiDialog' for normal content,'copy' for iframe
-			//to resolve the issue that iframe reload when minimize on ff & webkit.  
+			//to resolve the issue that iframe reload when minimize on ff & webkit.
 
 			// restore form minimized state.
 			if (self.minimized) {
@@ -999,7 +1003,7 @@
 
 		getState: function () {
 			/// <summary>
-			///		Gets the state of this dialog, the possible values are: 
+			///		Gets the state of this dialog, the possible values are:
 			//		"minimized", "maximized", "normal".
 			/// </summary>
 			var self = this;
@@ -1009,7 +1013,7 @@
 
 		reset: function () {
 			/// <summary>
-			///		Resets the properties ("width" ,"height", "position") 
+			///		Resets the properties ("width" ,"height", "position")
 			///     to their default values.
 			/// </summary>
 			var self = this;
