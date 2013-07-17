@@ -756,4 +756,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             $options = array_merge($options, $context_options);
         }
     }
+
+    public function afterClone(Orm\Model $item)
+    {
+        $item->{$this->_properties['is_main_property']} = false;
+    }
 }

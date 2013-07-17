@@ -917,6 +917,7 @@ class Model extends \Orm\Model
         foreach ($medias as $key => $media) {
             $this->medias->{$key} = $media;
         }
+        $this->event('afterClone');
     }
 
     protected function initProviders()
