@@ -146,6 +146,22 @@ class Attachment
     }
 
     /**
+     * Returns an HTML anchor tag with, by default, attachment URL in href and attachment filename in text.
+     *
+     * If key 'text' is set in $attributes parameter, its value replace attachment filename
+     *
+     * @param array $attributes Array of attributes to be applied to the anchor tag.
+     * @return string
+     */
+    public function htmlAnchor(array $attributes = array())
+    {
+        $text = \Arr::get($attributes, 'text', e($this->filename()));
+        \Arr::delete($attributes, 'text');
+
+        return \Html::anchor($this->url(), $text, $attributes);
+    }
+
+    /**
      * Return a Toolkit_Image based on the attachment
      */
     public function getToolkitImage()

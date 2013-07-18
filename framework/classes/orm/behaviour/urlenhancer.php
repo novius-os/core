@@ -135,4 +135,32 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     {
         return $item->url_canonical(array('preview' => true));
     }
+
+    /**
+     * Returns an HTML anchor tag with, by default, item URL in href and item title in text.
+     *
+     * If key 'href' is set in $attributes parameter :
+     * - if is a string, used for href attribute
+     * - if is an array, used as argument of ->url() method
+     *
+     * If key 'text' is set in $attributes parameter, its value replace item title
+     *
+     * @param Orm\Model $item
+     * @param array $attributes Array of attributes to be applied to the anchor tag.
+     * @return string
+     */
+    public function htmlAnchor(Orm\Model $item, array $attributes = array())
+    {
+        $text = \Arr::get($attributes, 'text', e($item->title_item()));
+        \Arr::delete($attributes, 'text');
+
+        $href = \Arr::get($attributes, 'href', $item->url());
+        if (is_array($href)) {
+            $href = $item->url($href);
+        }
+        $href = Tools_Url::encodePath($href);
+        \Arr::delete($attributes, 'href');
+
+        return \Html::anchor($href, $text, $attributes);
+    }
 }

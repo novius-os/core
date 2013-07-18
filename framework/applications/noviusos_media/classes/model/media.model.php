@@ -287,6 +287,22 @@ class Model_Media extends \Nos\Orm\Model
     }
 
     /**
+     * Returns an HTML anchor tag with, by default, media URL in href and media title in text.
+     *
+     * If key 'text' is set in $attributes parameter, its value replace media title
+     *
+     * @param array $attributes Array of attributes to be applied to the anchor tag.
+     * @return string
+     */
+    public function htmlAnchor(array $attributes = array())
+    {
+        $text = \Arr::get($attributes, 'text', e($this->media_title));
+        \Arr::delete($attributes, 'text');
+
+        return \Html::anchor($this->url(), $text, $attributes);
+    }
+
+    /**
      * @deprecated Use getImgTag() method instead
      */
     public function get_img_tag($params = array())
