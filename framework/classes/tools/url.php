@@ -59,4 +59,15 @@ class Tools_Url
         }
         return \Uri::base(false);
     }
+
+    public static function encodePath($url)
+    {
+        $parse = parse_url($url);
+        $path = explode('/', $parse['path']);
+        foreach ($path as $i => $segment) {
+            $path[$i] = urlencode($segment);
+        }
+        $parse['path'] = implode('/', $path);
+        return http_build_url($parse);
+    }
 }
