@@ -111,7 +111,7 @@ class Nos
         if (NOS_ENTRY_POINT === Nos::ENTRY_POINT_FRONT) {
             $content = preg_replace(
                 '`href="#([^#"])`iUu',
-                'href="'.static::main_controller()->getUrl().(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
+                'href="'.\Nos\Tools_Url::encodePath(static::main_controller()->getUrl()).(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '').'#\\1',
                 $content
             );
         }
@@ -225,7 +225,7 @@ class Nos
                     } else {
                         $media_url = $media->url();
                     }
-                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', $media_url, $content);
+                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $content);
                 }
             }
         );
@@ -243,7 +243,7 @@ class Nos
             $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_id', 'IN', $page_ids))));
             foreach ($matches[1] as $match_id => $page_id) {
                 if (isset($pages[$page_id])) {
-                    $content = preg_replace('`'.preg_quote($matches[0][$match_id], '`').'(?!\d)`u', $pages[$page_id]->url(), $content);
+                    $content = preg_replace('`'.preg_quote($matches[0][$match_id], '`').'(?!\d)`u', Tools_Url::encodePath($pages[$page_id]->url()), $content);
                 } else {
                     $content = str_replace('href="'.$matches[0][$match_id].'"', '', $content);
                 }

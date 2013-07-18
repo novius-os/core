@@ -364,7 +364,7 @@ class Toolkit_Image
             'alt' => $this->_image->title(),
         ), $params);
 
-        return \Html::img($this->url(), $params);
+        return \Html::img(Tools_Url::encodePath($this->url()), $params);
     }
 
     protected function _image()

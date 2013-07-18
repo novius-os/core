@@ -185,7 +185,7 @@ class Pagination
             if ($this->current_page == $i) {
                 $pagination .= $this->template['regular_start'].$this->template['active_start'].$i.$this->template['active_end'].$this->template['regular_end']."\n";
             } else {
-                $pagination .= $this->template['regular_start'].'<a href="'.call_user_func($this->pagination_url, $i).'">'.$i."</a>".$this->template['regular_end']."\n";
+                $pagination .= $this->template['regular_start'].'<a href="'.Tools_Url::encodePath(call_user_func($this->pagination_url, $i)).'">'.$i."</a>".$this->template['regular_end']."\n";
             }
         }
 
@@ -213,7 +213,7 @@ class Pagination
             $next_page = $this->current_page + 1;
             $url = call_user_func($this->pagination_url, $next_page);
 
-            $pagination = '<a href="'.$url.'">'.$pagination.'</a>';
+            $pagination = '<a href="'.Tools_Url::encodePath($url).'">'.$pagination.'</a>';
         }
 
         return $this->template['next_start'].$pagination.$this->template['next_end'];
@@ -240,7 +240,7 @@ class Pagination
             $previous_page = $this->current_page - 1;
             $url = call_user_func($this->pagination_url, $previous_page);
 
-            $pagination = '<a href="'.$url.'">'.$pagination.'</a>';
+            $pagination = '<a href="'.Tools_Url::encodePath($url).'">'.$pagination.'</a>';
         }
 
         return $this->template['previous_start'].$pagination.$this->template['previous_end'];

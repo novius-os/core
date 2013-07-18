@@ -29,7 +29,7 @@ return array(
         ),
         'previewUrl' => array(
             'value' => function($page) {
-                return $page->url(array('preview'  => true));
+                return \Nos\Tools_Url::encodePath($page->url(array('preview'  => true)));
             },
         ),
         'is_home' => array(

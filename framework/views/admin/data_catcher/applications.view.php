@@ -15,7 +15,7 @@ if (isset($nuggets[\Nos\DataCatcher::TYPE_IMAGE])) {
     if (empty($image)) {
         unset($nuggets[\Nos\DataCatcher::TYPE_IMAGE]);
     } else {
-        $nuggets['media_url'] = $image->url();
+        $nuggets['media_url'] = Tools_Url::encodePath($image->url());
     }
 }
 if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
@@ -26,7 +26,7 @@ if (isset($nuggets[\Nos\DataCatcher::TYPE_URL])) {
             if (empty($page)) {
                 unset($nuggets[\Nos\DataCatcher::TYPE_URL]);
             } else {
-                $page_path = preg_replace('`'.preg_quote('.html').'$`iUu', '', $page->url());
+                $page_path = preg_replace('`'.preg_quote('.html').'$`iUu', '', Tools_Url::encodePath($page->url()));
                 $nuggets['absolute_url'] = rtrim($page_path, '/').'/'.$path;
             }
         }
