@@ -68,7 +68,7 @@ if ($is_media) {
 
             try {
                 $send_file = $toolkit_image->save();
-                $target = $toolkit_image->url();
+                $target = $toolkit_image->url(false);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
                 $send_file = false;
@@ -154,13 +154,13 @@ if ($is_attachment) {
 
             try {
                 $send_file = $toolkit_image->save();
-                $target_relative = $toolkit_image->url();
+                $target_relative = $toolkit_image->url(false);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
                 $send_file = false;
             }
         } else if ($send_file) {
-            $target_relative = $attachment->url();
+            $target_relative = $attachment->url(false);
         }
     }
 
