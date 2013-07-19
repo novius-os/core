@@ -8,18 +8,12 @@
  * @link http://www.novius-os.org
  */
 
-\Package::load('email');
-
-abstract class Email_Driver extends \Email\Email_Driver
+class Session_File extends \Fuel\Core\Session_File
 {
-    public function send($validate = null)
+    public function write()
     {
-        \Event::trigger('email.before_send', $this);
-
-        $return = parent::send($validate);
-
-        \Event::trigger('email.after_send', $this);
-
-        return $return;
+        if (!headers_sent()) {
+            parent::write();
+        }
     }
 }
