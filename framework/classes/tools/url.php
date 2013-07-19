@@ -60,6 +60,12 @@ class Tools_Url
         return \Uri::base(false);
     }
 
+    /**
+     * Encode the path part of an URL
+     *
+     * @param string $url Url to encode
+     * @return string
+     */
     public static function encodePath($url)
     {
         $parse = parse_url($url);
