@@ -25,6 +25,39 @@ class Response extends \Fuel\Core\Response
         Event::shutdown();
         exit();
     }
-}
 
-/* End of file date.php */
+    /**
+     * Redirects to another uri/url.  Sets the redirect header,
+     * sends the headers and exits.  Can redirect via a Location header
+     * or using a refresh header.
+     *
+     * The refresh header works better on certain servers like IIS.
+     *
+     * @param   string  $url     The url
+     * @param   string  $method  The redirect method
+     * @param   int     $code    The redirect status code
+     *
+     * @return  void
+     */
+    public static function redirect($url = '', $method = 'location', $code = 302)
+    {
+        $response = new static;
+
+        $response->set_status($code);
+
+        if (strpos($url, '://') === false) {
+            $url = $url !== '' ? \Uri::create($url) : \Uri::base();
+        }
+
+        if ($method == 'location') {
+            $response->set_header('Location', $url);
+        } elseif ($method == 'refresh') {
+            $response->set_header('Refresh', '0;url='.$url);
+        } else {
+            return;
+        }
+
+        $response->send(true);
+        exit;
+    }
+}
