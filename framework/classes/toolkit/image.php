@@ -98,7 +98,7 @@ class Toolkit_Image
     /**
      * Add multiple transformations to the image.
      *
-     * @param array $transformations Any transformations to add to the URL
+     * @param array $transformations Transformations to add to the image. A transformation is an array where first value is the method name, others values are method arguments.
      * @return Toolkit_Image
      */
     public function transformations($transformations)
@@ -349,7 +349,7 @@ class Toolkit_Image
     /**
      * Creates an html image tag of the modify image
      *
-     * Sets width, height, alt attributes is not supplied.
+     * Sets width, height, alt attributes if not supplied.
      *
      * @param   array   $params the attributes array
      * @return	string	The image tag
@@ -408,7 +408,7 @@ class Toolkit_Image
      * Parse an existing modify URL and set transformations in queue. Check if the hash part of the URL match.
      *
      * @param string $image_url Modify URL of the image
-     * @throws \Exception If the hash part of the URL not match
+     * @return bool ``True`` or ``false`` if the hash part of the URL not match.
      */
     public function parse($image_url)
     {
