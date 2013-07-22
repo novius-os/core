@@ -1467,7 +1467,8 @@ define('jquery-nos-appdesk',
                     } else if (o.defaultView === 'treeGrid') {
                         self._uiList();
                     } else {
-                        self.uiGrid.noslistgrid("ensureControl", true);
+                        self.uiGrid.noslistgrid('option', 'pageIndex', self.pageIndex)
+                            .noslistgrid('ensureControl', true);
                     }
                 }
 
