@@ -1552,6 +1552,12 @@ define('jquery-nos-appdesk',
 
                             recursive = function(object) {
                                 $.each(object, function(key, val) {
+                                    // `i18n` key must not be processed. For instance, it can contain the `columns` key
+                                    // but we would not want it to be processed.
+                                    if (key === 'i18n') {
+                                        return;
+                                    }
+
                                     var i, nosContext,
                                         actions = [];
                                     if ($.isPlainObject(val)) {
