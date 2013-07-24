@@ -12,6 +12,14 @@ namespace Nos;
 
 class Renderer_Virtualname extends \Fieldset_Field
 {
+    protected static $_friendly_slug_always_last = array();
+
+    public static function _init()
+    {
+        \Config::load('friendly_slug', true);
+        static::$_friendly_slug_always_last = \Config::get('friendly_slug.always_last');
+    }
+
     public $template = '{label}{required} <div class="table-field">{field} <span>&nbsp;.html</span></div> {use_title_checkbox}';
 
     public function build()
@@ -40,8 +48,16 @@ class Renderer_Virtualname extends \Fieldset_Field
 
     public function js_init()
     {
+        $default = \Config::get('friendly_slug.active_setup', 'default');
+        $options = array(
+            \Config::get('friendly_slug.setups.'.$default, array())
+        );
+        $this->fieldset()->getInstance()->event('friendlySlug', array(&$options));
+        $options[] = static::$_friendly_slug_always_last;
+
         return \View::forge('renderer/virtualname/js', array(
             'id' => $this->get_attribute('id'),
+            'options' => $options,
         ), false);
     }
 
