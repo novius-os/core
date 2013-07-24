@@ -872,7 +872,7 @@ class Model extends \Orm\Model
                     $diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
                 }
             } else {
-                $original_pks = $this->_original_relations[$key];
+                $original_pks = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : array();
                 $new_pks = array();
                 foreach ($val as $v) {
                     if (!in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
