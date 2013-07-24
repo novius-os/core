@@ -91,7 +91,7 @@ class Permission
     public static function listPermissionCategories($permissionName)
     {
         $user = \Session::user();
-        return !empty($user) && $user->listPermissionCategories($permissionName);
+        return !empty($user) ? $user->listPermissionCategories($permissionName) : array();
     }
 
     /**
