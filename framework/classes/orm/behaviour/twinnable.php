@@ -752,14 +752,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
     }
 
-    public function wysiwygOptions(Orm\Model $item, &$options)
-    {
-        $context_options = \Config::get('wysiwyg.setups.'.$item->{$this->_properties['context_property']}, false);
-        if ($context_options) {
-            $options = array_merge($options, $context_options);
-        }
-    }
-
     public function afterClone(Orm\Model $item)
     {
         $item->{$this->_properties['is_main_property']} = false;
