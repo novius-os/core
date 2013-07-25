@@ -71,9 +71,9 @@ a:hover {
 
 <body>
     <div id="blank_slate">
-        <?php
+<?php
 if (!empty($error)) {
-            ?>
+    ?>
             <img src="static/novius-os/admin/novius-os/img/logo.png" />
             <h1 class="error"><?= htmlspecialchars($error) ?></h1>
             <?php
@@ -96,7 +96,7 @@ if (!empty($error)) {
             <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
             <?php
 }
-        ?>
+?>
     </div>
 </body>
 </html>
