@@ -27,4 +27,5 @@ try {
     }
 }
 
+$response->set_header('X-FRAME-OPTIONS', 'SAMEORIGIN');
 $response->send(true);

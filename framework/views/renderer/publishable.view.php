@@ -80,13 +80,13 @@ if ($yes_no_mode) {
                 </div>
             </td>
             <td class="publishable_label"></td>
-            <?php
+<?php
 if ($planification_mode) {
     ?>
     <td class="publishable_schedule" style="display:none;"></td>
     <?php
 }
-            ?>
+?>
         </tr>
     </table>
 </td>

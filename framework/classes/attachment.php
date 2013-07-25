@@ -221,7 +221,7 @@ class Attachment
         }
 
         if (empty($filename)) {
-            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $filename = pathinfo($file, PATHINFO_BASENAME);
         }
 
         $extension = \Str::lower(pathinfo($filename, PATHINFO_EXTENSION));
@@ -251,11 +251,17 @@ class Attachment
             $this->delete();
 
             !is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached) && \File::create_dir(APPPATH.'data', 'files'.DS.$this->config['dir'].$this->attached);
-            copy($this->new_file, APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached.DS.$this->new_file_name);
+            if (!copy($this->new_file, APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached.DS.$this->new_file_name)) {
+                return false;
+            }
 
             $this->new_file = null;
             $this->new_file_name = null;
+
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -264,8 +270,9 @@ class Attachment
     public function delete()
     {
         if (is_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached)) {
-            \File::delete_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached);
+            return \File::delete_dir(APPPATH.'data'.DS.'files'.DS.$this->config['dir'].$this->attached);
         }
+        return false;
     }
 
     /**
