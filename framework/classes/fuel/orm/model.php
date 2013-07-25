@@ -845,53 +845,6 @@ class Model extends \Orm\Model
     }
 
     /**
-     * Generates an array with keys new & old that contain ONLY the values that differ between the original and
-     * the current unsaved model.
-     * Note: relations are given as single or array of imploded pks
-     *
-     * @return  array
-     */
-    public function get_diff()
-    {
-        $diff = array(0 => array(), 1 => array());
-        foreach ($this->_data as $key => $val) {
-            if ($this->is_changed($key)) {
-                $diff[0][$key] = array_key_exists($key, $this->_original) ? $this->_original[$key] : null;
-                $diff[1][$key] = $val;
-            }
-        }
-        foreach ($this->_data_relations as $key => $val) {
-            $rel = static::relations($key);
-            if ($rel->singular) {
-                if (empty($this->_original_relations[$key]) !== empty($val)
-                    or (!empty($this->_original_relations[$key])
-                        and $new_pk = $val->implode_pk($val)
-                            and $this->_original_relations[$key] !== $new_pk)
-                ) {
-                    $diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
-                    $diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
-                }
-            } else {
-                $original_pks = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : array();
-                $new_pks = array();
-                foreach ($val as $v) {
-                    if (!in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
-                        $new_pks[] = $new_pk;
-                    } else {
-                        $original_pks = array_diff($original_pks, array($new_pk));
-                    }
-                }
-                if (!empty($original_pks) or !empty($new_pks)) {
-                    $diff[0][$key] = empty($original_pks) ? null : $original_pks;
-                    $diff[1][$key] = empty($new_pks) ? null : $new_pks;
-                }
-            }
-        }
-
-        return $diff;
-    }
-
-    /**
      * Clone nested objects manually, it's not native
      */
     public function __clone()
