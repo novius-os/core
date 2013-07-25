@@ -102,6 +102,10 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
             foreach ($regexps as $regexp => $replacement) {
                 if (is_int($regexp) && $replacement === 'lowercase') {
                     $slug = \Str::lower($slug);
+                } elseif (is_array($replacement)) {
+                    $flags = str_replace('u', '', \Arr::get($replacement, 'flags', '')).'u';
+                    $replacement = \Arr::get($replacement, 'replacement', '');
+                    $slug = preg_replace("`".$regexp."`".$flags, $replacement, $slug);
                 } else {
                     $slug = preg_replace("`".$regexp."`u", $replacement, $slug);
                 }

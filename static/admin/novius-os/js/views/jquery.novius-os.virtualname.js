@@ -24,6 +24,11 @@ define('jquery-nos-virtualname',
                             $.each(regexps, function(regexp, replacement) {
                                 if (!isNaN(regexp) && replacement === 'lowercase') {
                                     str = str.toLowerCase();
+                                } else if ($.isPlainObject(replacement)) {
+                                    var flags = (replacement['flags'] || '').replace('g', '') + 'g';
+                                    var replacement = replacement['replacement'] || '';
+                                    var re = new RegExp(regexp, flags);
+                                    str = str.replace(re, replacement);
                                 } else {
                                     var re = new RegExp(regexp, 'g');
                                     str = str.replace(re, replacement);
