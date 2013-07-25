@@ -382,7 +382,6 @@
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
 					ed.focus(false);
-					ed.execCommand('mceSelectNode', false, p.get(0), {skip_undo : 1});
 					// Tell undoManager to add a checkpoint
 					ed.execCommand("mceEndUndoLevel");
 					e.preventDefault();
@@ -395,7 +394,6 @@
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
 					ed.focus(false);
-					ed.execCommand('mceSelectNode', false, p.get(0), {skip_undo : 1});
 					// Tell undoManager to add a checkpoint
 					ed.execCommand("mceEndUndoLevel");
 					e.preventDefault();
