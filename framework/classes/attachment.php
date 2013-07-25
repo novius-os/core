@@ -194,7 +194,7 @@ class Attachment
         }
 
         if (empty($filename)) {
-            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $filename = pathinfo($file, PATHINFO_BASENAME);
         }
 
         $extension = \Str::lower(pathinfo($filename, PATHINFO_EXTENSION));
