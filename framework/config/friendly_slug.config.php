@@ -16,7 +16,7 @@ return array(
         'lowercase',
     ),
 
-    'active_setup' => 'no_accent_and_special',
+    'active_setup' => 'default',
 
     'setups' => array(
         'default' => array(
