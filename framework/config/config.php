@@ -231,6 +231,8 @@ return array(
         '_404_' => null,
     ),
 
+    'temp_dir' => APPPATH.'data'.DS.'temp',
+
     'novius-os' => array(
         'cache' => true,
         'cache_duration_page' => \Fuel::$env !== \Fuel::PRODUCTION ? 3600 : 600,
