@@ -10,10 +10,10 @@
 
 
 return array(
-	/**
-	 * Temporary directory to store image files in that are being edited.
-	 */
-	'temp_dir' => \Config::get('novius-os.temp_dir'),
+    /**
+     * Temporary directory to store image files in that are being edited.
+     */
+    'temp_dir' => \Config::get('novius-os.temp_dir'),
 );
 
 
