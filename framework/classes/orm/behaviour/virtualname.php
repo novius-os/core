@@ -76,9 +76,9 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         }
     }
 
-    public function virtual_name(\Nos\Orm\Model $item, $slug = null)
+    public function virtual_name(\Nos\Orm\Model $item, $virtual_name = null)
     {
-        if (empty($slug)) {
+        if (empty($virtual_name)) {
             return $item->{$this->_properties['virtual_name_property']};
         }
 
@@ -92,8 +92,10 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         $item->event('friendlySlug', array(&$options));
         $options[] = static::$_friendly_slug_always_last;
 
-        $slug = static::_friendlySlug($slug, $options);
-        $item->{$this->_properties['virtual_name_property']} = $slug;
+        $virtual_name = static::_friendlySlug($virtual_name, $options);
+        $item->{$this->_properties['virtual_name_property']} = $virtual_name;
+
+        return $item->{$this->_properties['virtual_name_property']};
     }
 
     protected static function _friendlySlug($slug, array $options)
