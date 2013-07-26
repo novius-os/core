@@ -13,7 +13,7 @@ return array(
 	/**
 	 * Temporary directory to store image files in that are being edited.
 	 */
-	'temp_dir' => APPPATH.'data'.DS.'temp',
+	'temp_dir' => \Config::get('novius-os.temp_dir'),
 );
 
 
