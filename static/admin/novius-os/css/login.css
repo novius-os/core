@@ -30,6 +30,9 @@ body {
 #login p {
     margin: 1em 0;
 }
+#login input {
+    font-size: 20px;
+}
 #login .wijmo-checkbox label  {
 	display: inline-block;
 	text-align: right;
