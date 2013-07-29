@@ -249,7 +249,7 @@ class Model_Media extends \Nos\Orm\Model
      * @param   array   $params the attributes array
      * @return	string	The image tag
      */
-    public function getImgTag($params = array())
+    public function htmlImg($params = array())
     {
         if (!$this->isImage()) {
             return false;
@@ -276,23 +276,39 @@ class Model_Media extends \Nos\Orm\Model
      * @param   array   $params the attributes array
      * @return	string	The image tag
      */
-    public function getImgTagResized($max_width = null, $max_height = null, $params = array())
+    public function htmlImgResized($max_width = null, $max_height = null, $params = array())
     {
         if (!isset($params['transformations'])) {
             $params['transformations'] = array();
         }
         $params['transformations'][] = array('shrink', $max_width, $max_height);
 
-        return $this->getImgTag($params);
+        return $this->htmlImg($params);
     }
 
     /**
-     * @deprecated Use getImgTag() method instead
+     * Returns an HTML anchor tag with, by default, media URL in href and media title in text.
+     *
+     * If key 'text' is set in $attributes parameter, its value replace media title
+     *
+     * @param array $attributes Array of attributes to be applied to the anchor tag.
+     * @return string
+     */
+    public function htmlAnchor(array $attributes = array())
+    {
+        $text = \Arr::get($attributes, 'text', e($this->media_title));
+        \Arr::delete($attributes, 'text');
+
+        return \Html::anchor($this->url(), $text, $attributes);
+    }
+
+    /**
+     * @deprecated Use htmlImg() method instead
      */
     public function get_img_tag($params = array())
     {
         if (isset($params['max_width']) || isset($params['max_height'])) {
-            \Log::deprecated('->get_img_tag() is deprecated, use ->getImgTag() instead. Use a "transformations" key with array value, filled with a item array("shrink", $max_width, $max_height) instead of keys "max_width" and "max_height" in the array parameter', 'Chiba.2');
+            \Log::deprecated('->get_img_tag() is deprecated, use ->htmlImg() instead. Use a "transformations" key with array value, filled with a item array("shrink", $max_width, $max_height) instead of keys "max_width" and "max_height" in the array parameter', 'Chiba.2');
             if (!isset($params['transformations'])) {
                 $params['transformations'] = array();
             }
@@ -302,18 +318,18 @@ class Model_Media extends \Nos\Orm\Model
             unset($params['max_height']);
             $params['transformations'][] = array('shrink', $max_width, $max_height);
         } else {
-            \Log::deprecated('->get_img_tag() is deprecated, use ->getImgTag() instead.', 'Chiba.2');
+            \Log::deprecated('->get_img_tag() is deprecated, use ->htmlImg() instead.', 'Chiba.2');
         }
-        return $this->getImgTag($params);
+        return $this->htmlImg($params);
     }
 
     /**
-     * @deprecated Use getImgTagResized() method instead
+     * @deprecated Use htmlImgResized() method instead
      */
     public function get_img_tag_resized($max_width = null, $max_height = null, $params = array())
     {
-        \Log::deprecated('->get_img_tag_resized() is deprecated, use ->getImgTagResized() instead.', 'Chiba.2');
-        return $this->getImgTagResized($max_width, $max_height, $params);
+        \Log::deprecated('->get_img_tag_resized() is deprecated, use ->htmlImgResized() instead.', 'Chiba.2');
+        return $this->htmlImgResized($max_width, $max_height, $params);
     }
 
     /**

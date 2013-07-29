@@ -15,7 +15,8 @@ $usage_count = count($item->link);
 ?>
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
-    <p><?php
+<p>
+<?php
 if ($usage_count == 0) {
     ?>
     <p><?= __('The media is not used anywhere and can be safely deleted.') ?></p>
@@ -34,6 +35,7 @@ if ($usage_count == 0) {
     )); ?></p>
     <?php
 }
-?></p>
+?>
+</p>
     <input type="checkbox" name="contexts[]" class="count" data-count="1" value="all" checked style="display:none;" />
 </div>

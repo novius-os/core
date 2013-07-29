@@ -30,9 +30,9 @@ class Tools_Wysiwyg
                     $replaces[$params['content']] = '';
                 } else {
                     if (!empty($params['width']) && !empty($params['height']) && ($params['width'] != $media->media_width || $params['height'] != $media->media_height)) {
-                        $replaces[$params['url'].'"'] = $media->urlResized($params['width'], $params['height']).'" width="'.$params['width'].'" height="'.$params['height'].'" data-media-id="'.$media->id.'"';
+                        $replaces[$params['url'].'"'] = Tools_Url::encodePath($media->urlResized($params['width'], $params['height'])).'" width="'.$params['width'].'" height="'.$params['height'].'" data-media-id="'.$media->id.'"';
                     } else {
-                        $replaces[$params['url'].'"'] = $media->url().'" data-media-id="'.$media->id.'"';
+                        $replaces[$params['url'].'"'] = Tools_Url::encodePath($media->url()).'" data-media-id="'.$media->id.'"';
                     }
                 }
             }

@@ -382,7 +382,6 @@
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
 					ed.focus(false);
-					ed.execCommand('mceSelectNode', false, p.get(0), {skip_undo : 1});
 					// Tell undoManager to add a checkpoint
 					ed.execCommand("mceEndUndoLevel");
 					e.preventDefault();
@@ -395,7 +394,6 @@
 					// All 3 commands are needed to select the node and focus the editor
 					ed.selection.select(p.get(0), true);
 					ed.focus(false);
-					ed.execCommand('mceSelectNode', false, p.get(0), {skip_undo : 1});
 					// Tell undoManager to add a checkpoint
 					ed.execCommand("mceEndUndoLevel");
 					e.preventDefault();
@@ -2101,15 +2099,13 @@
                 if (editCurrentImage) {
                     var node = ed.selection.getNode();
                     if (node.nodeName == 'IMG') {
-                        var $node = $(node);
+                        var args = {};
                         $.each('title alt width height style'.split(' '), function(i, name) {
                             var value = $img.attr(name);
-                            if (value == '') {
-                                $node.removeAttr(name);
-                            } else {
-                                $node.attr(name, value);
-                            }
+                            args[name] = value;
                         });
+                        ed.dom.setAttribs(node, args);
+                        ed.execCommand('mceRepaint');
                         ed.undoManager.add();
                     }
                 } else {

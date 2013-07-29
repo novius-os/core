@@ -438,6 +438,9 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      */
     public function find_main_context(Orm\Model $item)
     {
+        if ($item->is_main_context()) {
+            return $item;
+        }
         return $item->find_context('main');
     }
 
@@ -749,11 +752,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
     }
 
-    public function wysiwygOptions(Orm\Model $item, &$options)
+    public function afterClone(Orm\Model $item)
     {
-        $context_options = \Config::get('wysiwyg.setups.'.$item->{$this->_properties['context_property']}, false);
-        if ($context_options) {
-            $options = array_merge($options, $context_options);
-        }
+        $item->{$this->_properties['is_main_property']} = false;
     }
 }

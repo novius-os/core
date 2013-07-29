@@ -115,8 +115,8 @@ class Tools_Enhancer
                 if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
                     $url_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($url_params) {
-                        if (empty($urlEnhanced) && !empty($page_params['url'])) {
-                            $url_params['url'] = substr($page_params['url'], 0, -1).'.html';
+                        if (empty($urlEnhanced) && !empty($url_params['url'])) {
+                            $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
                         }
                         $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
                             Tools_Url::context($url_params['context']).

@@ -12,9 +12,14 @@ namespace Nos;
 
 class Orm_Behaviour_Virtualname extends Orm_Behaviour
 {
+    protected static $_friendly_slug_always_last = array();
+
     public static function _init()
     {
         I18n::current_dictionary('nos::orm');
+
+        \Config::load('friendly_slug', true);
+        static::$_friendly_slug_always_last = \Config::get('friendly_slug.always_last');
     }
 
     protected $_properties = array();
@@ -38,11 +43,11 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         if ($item->is_new() || !empty($diff[0][$this->_properties['virtual_name_property']])) {
 
             // Enforce virtual name restrictions
-            $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$this->_properties['virtual_name_property']});
+            $item->virtual_name($item->{$this->_properties['virtual_name_property']});
 
             // If the virtual name is empty, generate a default one from the title
             if (empty($item->{$this->_properties['virtual_name_property']})) {
-                $item->{$this->_properties['virtual_name_property']} = static::friendly_slug($item->{$item->title_property()});
+                $item->virtual_name($item->{$item->title_property()});
             }
 
             // If it's still empty, we have an error
@@ -71,20 +76,57 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         }
     }
 
-    public function virtual_name(\Nos\Orm\Model $item)
+    public function virtual_name(\Nos\Orm\Model $item, $virtual_name = null)
     {
+        if (empty($virtual_name)) {
+            return $item->{$this->_properties['virtual_name_property']};
+        }
+
+        // Build an array of regexps array. First default regexps,
+        // then call event friendlySlug
+        // and then add always_last regexps
+        $default = \Config::get('friendly_slug.active_setup', 'default');
+        $options = array(
+            \Config::get('friendly_slug.setups.'.$default, array())
+        );
+        $item->event('friendlySlug', array(&$options));
+        $options[] = static::$_friendly_slug_always_last;
+
+        $virtual_name = static::_friendlySlug($virtual_name, $options);
+        $item->{$this->_properties['virtual_name_property']} = $virtual_name;
+
         return $item->{$this->_properties['virtual_name_property']};
+    }
+
+    protected static function _friendlySlug($slug, array $options)
+    {
+        foreach ($options as $regexps) {
+            foreach ($regexps as $regexp => $replacement) {
+                if (is_int($regexp) && $replacement === 'lowercase') {
+                    $slug = \Str::lower($slug);
+                } elseif (is_int($regexp) && is_string($replacement)) {
+                    $slug = static::_friendlySlug($slug, \Config::get('friendly_slug.setups.'.$replacement, array()));
+                } elseif (is_array($replacement)) {
+                    $flags = str_replace('u', '', \Arr::get($replacement, 'flags', '')).'u';
+                    $replacement = \Arr::get($replacement, 'replacement', '');
+                    $slug = preg_replace("`".$regexp."`".$flags, $replacement, $slug);
+                } else {
+                    $slug = preg_replace("`".$regexp."`u", $replacement, $slug);
+                }
+            }
+        }
+
+        return $slug;
     }
 
     public static function friendly_slug($slug)
     {
-        $slug = preg_replace("` `u", '-', $slug);
-        $slug = preg_replace("`[\?|:|\\|\/|\#|\[|\]|@|&]`u", '-', $slug);
-        $slug = preg_replace("`-{2,}`u", '-', $slug);
-        $slug = preg_replace("`-$`u", '', $slug);
-        $slug = preg_replace("`^-`u", '', $slug);
-        $slug = \Str::lower($slug);
+        $default = \Config::get('friendly_slug.active_setup', 'default');
+        $options = array(
+            \Config::get('friendly_slug.setups.'.$default, array()),
+            static::$_friendly_slug_always_last,
+        );
 
-        return $slug;
+        return static::_friendlySlug($slug, $options);
     }
 }

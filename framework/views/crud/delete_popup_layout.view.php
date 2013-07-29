@@ -61,18 +61,23 @@ $id = $uniqid = uniqid('form_');
 
                 $checkboxes = $form.find(':checkbox.count');
                 $checkboxes.change(function() {
-                    var sum = 0;
-                    $checkboxes.filter(':checked').each(function() {
-                        sum += parseInt($(this).data('count'));
-                    });
-                    $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
-                    $confirmButton.find('.ui-button-text').text(
-                        $.nosDataReplace($confirmButton.data('texts')[(sum > 1 ? '+' : sum).toString()], {
-                            'count': sum.toString()
-                        })
-                    );
-                    $(this).removeClass('ui-state-focus');
-                }).first().trigger('change');
+                        var sum = 0;
+                        $checkboxes.filter(':checked').each(function() {
+                            sum += parseInt($(this).data('count'));
+                        });
+                        $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
+                        $confirmButton.find('.ui-button-text').text(
+                            $.nosDataReplace($confirmButton.data('texts')[(sum > 1 ? '+' : sum).toString()], {
+                                'count': sum.toString()
+                            })
+                        );
+                        $(this).removeClass('ui-state-focus');
+                    })
+                    .click(function(e) {
+                        e.stopPropagation();
+                    })
+                    .first()
+                    .trigger('change');
 
 
                 $table.find('tr').css({cursor: 'pointer'}).click(function() {

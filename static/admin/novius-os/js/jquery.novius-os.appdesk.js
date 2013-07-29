@@ -716,7 +716,9 @@ define('jquery-nos-appdesk',
                 $.each(o.inspectors, function() {
                     if (!this.hide) {
                         $('<li></li>').addClass('nos-appdesk-inspector ui-widget-content')
-                            .data('inspector', this)
+                            .data('inspector', $.extend({
+                                loadingText: o.texts.loading
+                            }, this))
                             .appendTo( this.vertical ? self.uiInspectorsVertical : self.uiInspectorsHorizontal );
                     }
                 });
@@ -1465,7 +1467,8 @@ define('jquery-nos-appdesk',
                     } else if (o.defaultView === 'treeGrid') {
                         self._uiList();
                     } else {
-                        self.uiGrid.noslistgrid("ensureControl", true);
+                        self.uiGrid.noslistgrid('option', 'pageIndex', self.pageIndex)
+                            .noslistgrid('ensureControl', true);
                     }
                 }
 
@@ -1549,6 +1552,12 @@ define('jquery-nos-appdesk',
 
                             recursive = function(object) {
                                 $.each(object, function(key, val) {
+                                    // `i18n` key must not be processed. For instance, it can contain the `columns` key
+                                    // but we would not want it to be processed.
+                                    if (key === 'i18n') {
+                                        return;
+                                    }
+
                                     var i, nosContext,
                                         actions = [];
                                     if ($.isPlainObject(val)) {
@@ -1649,6 +1658,7 @@ define('jquery-nos-appdesk',
                                                                     oldCellFormatter.call(this, args);
                                                                 }
                                                                 $.each(cellFormatters, function(i, formatter) {
+                                                                    formatter = $.nosDataReplace($.extend(true, {}, formatter), args.row.data);
                                                                     formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
                                                                     if (formatter.replace) {
                                                                         args.$container.empty();

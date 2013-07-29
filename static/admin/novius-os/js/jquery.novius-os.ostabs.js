@@ -110,8 +110,8 @@ define('jquery-nos-ostabs',
                     .find( "span.nos-ostabs-icon" )
                     .removeClass( 'nos-ostabs-loader' )
                     .each(function() {
-                        if ( $.isFunction($.fn.loadspinner) ) {
-                            $(this).loadspinner( 'destroy' );
+                        if ($.isFunction($.fn.loadspinner) && $(this).data('nos-loadspinner')) {
+                            $(this).loadspinner('destroy');
                         }
                     })
                     .html( ' ' );

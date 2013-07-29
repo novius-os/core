@@ -36,7 +36,9 @@ define('jquery-nos-media-add-form',
                                 path = path.replace(/^([a-z])|\s+([a-z])/g, function ($1) {
                                     return $1.toUpperCase();
                                 });
-                                $title.val(path).triggerHandler('change');
+                                if (!$title.val()) {
+                                    $title.val(path).triggerHandler('change');
+                                }
                             }),
                     // Same title and description (alt)
                         $title = $container.find('input[name=media_title]')

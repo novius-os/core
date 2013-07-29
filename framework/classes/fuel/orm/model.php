@@ -863,25 +863,28 @@ class Model extends \Orm\Model
         foreach ($this->_data_relations as $key => $val) {
             $rel = static::relations($key);
             if ($rel->singular) {
+                // fix coming from the latest version of 1.6/master orm (unable to merge at the moment)
+                $new_pk = null;
                 if (empty($this->_original_relations[$key]) !== empty($val)
-                    or (!empty($this->_original_relations[$key])
-                        and $new_pk = $val->implode_pk($val)
-                            and $this->_original_relations[$key] !== $new_pk)
-                ) {
+                    or ( ! empty($this->_original_relations[$key]) and ! empty($val)
+                        and $this->_original_relations[$key] !== $new_pk = $val->implode_pk($val)
+                    )) {
                     $diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;
-                    $diff[1][$key] = isset($val) ? (isset($new_pk) ? $new_pk : $val->implode_pk($val)) : null;
+                    $diff[1][$key] = isset($val) ? $new_pk : null;
                 }
             } else {
-                $original_pks = $this->_original_relations[$key];
+                $original_pks = empty($this->_original_relations[$key]) ? array() : $this->_original_relations[$key];
                 $new_pks = array();
-                foreach ($val as $v) {
-                    if (!in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
-                        $new_pks[] = $new_pk;
-                    } else {
-                        $original_pks = array_diff($original_pks, array($new_pk));
+                if ($val) {
+                    foreach ($val as $v) {
+                        if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
+                            $new_pks[] = $new_pk;
+                        } else {
+                            $original_pks = array_diff($original_pks, array($new_pk));
+                        }
                     }
                 }
-                if (!empty($original_pks) or !empty($new_pks)) {
+                if ( ! empty($original_pks) or ! empty($new_pks)) {
                     $diff[0][$key] = empty($original_pks) ? null : $original_pks;
                     $diff[1][$key] = empty($new_pks) ? null : $new_pks;
                 }
@@ -917,6 +920,7 @@ class Model extends \Orm\Model
         foreach ($medias as $key => $media) {
             $this->medias->{$key} = $media;
         }
+        $this->event('afterClone');
     }
 
     protected function initProviders()

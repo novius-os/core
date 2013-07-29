@@ -73,6 +73,7 @@ define('jquery-nos-inspector-model',
                             pageSize: pageSize,
                             allowColSizing : true,
                             allowColMoving : true,
+                            loadingText: inspectorData.loadingText || 'Loading...',
                             columns : inspectorData.grid.columns,
                             data: new wijdatasource({
                                 dynamic: true,

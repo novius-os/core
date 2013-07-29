@@ -142,7 +142,7 @@ class Tools_File
             if (static::$use_xsendfile and $xsendfile_allowed) {
                 header(static::$xsendfile_header.': '.$file);
             } else {
-                readfile($file);
+                \File::download($file);
             }
         }
 

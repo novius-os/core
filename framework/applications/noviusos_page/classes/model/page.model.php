@@ -10,8 +10,6 @@
 
 namespace Nos\Page;
 
-use Fuel\Core\Uri;
-
 class Model_Page extends \Nos\Orm\Model
 {
     protected static $_table_name = 'nos_page';
@@ -276,14 +274,14 @@ class Model_Page extends \Nos\Orm\Model
     }
 
     /**
-     * Returns the href and target attributes for an HTML link <a>
-     *
-     * @return string
+     * @deprecated Use htmlAnchor() method instead
      */
     public function link()
     {
+        \Log::deprecated('->link() is deprecated, use ->htmlAnchor() instead.', 'Chiba.2');
+
         $attr = array(
-            'href' => $this->url(),
+            'href' => \Nos\Tools_Url::encodePath($this->url()),
         );
         if ($this->page_type == self::TYPE_EXTERNAL_LINK) {
             if ($this->page_external_link_type == self::EXTERNAL_TARGET_NEW) {
@@ -292,6 +290,39 @@ class Model_Page extends \Nos\Orm\Model
         }
 
         return array_to_attr($attr);
+    }
+
+    /**
+     * Returns an HTML anchor tag with, by default, page URL in href and page title in text.
+     *
+     * If key 'href' is set in $attributes parameter :
+     * - if is a string, used for href attribute
+     * - if is an array, used as argument of ->url() method
+     *
+     * If key 'text' is set in $attributes parameter, its value replace page title
+     *
+     * @param array $attributes Array of attributes to be applied to the anchor tag.
+     * @return string
+     */
+    public function htmlAnchor(array $attributes = array())
+    {
+        $text = \Arr::get($attributes, 'text', e($this->page_title));
+        \Arr::delete($attributes, 'text');
+
+        $href = \Arr::get($attributes, 'href', $this->url());
+        if (is_array($href)) {
+            $href = $this->url($href);
+        }
+        $href = \Nos\Tools_Url::encodePath($href);
+        \Arr::delete($attributes, 'href');
+
+        if ($this->page_type == self::TYPE_EXTERNAL_LINK &&
+            $this->page_external_link_type == self::EXTERNAL_TARGET_NEW &&
+            empty($attributes['target'])) {
+            $attributes['target'] = '_blank';
+        }
+
+        return \Html::anchor($href, $text, $attributes);
     }
 
     /**

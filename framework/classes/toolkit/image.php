@@ -98,7 +98,7 @@ class Toolkit_Image
     /**
      * Add multiple transformations to the image.
      *
-     * @param array $transformations Any transformations to add to the URL
+     * @param array $transformations Transformations to add to the image. A transformation is an array where first value is the method name, others values are method arguments.
      * @return Toolkit_Image
      */
     public function transformations($transformations)
@@ -290,7 +290,7 @@ class Toolkit_Image
         }
 
         if (!$this->_dirty_url) {
-            return $this->_url;
+            return ($absolute ? \Uri::base(false) : '').$this->_url;
         }
 
         if (count($this->_transformations) === 1 &&
@@ -349,7 +349,7 @@ class Toolkit_Image
     /**
      * Creates an html image tag of the modify image
      *
-     * Sets width, height, alt attributes is not supplied.
+     * Sets width, height, alt attributes if not supplied.
      *
      * @param   array   $params the attributes array
      * @return	string	The image tag
@@ -364,7 +364,7 @@ class Toolkit_Image
             'alt' => $this->_image->title(),
         ), $params);
 
-        return \Html::img($this->url(), $params);
+        return \Html::img(Tools_Url::encodePath($this->url()), $params);
     }
 
     protected function _image()
@@ -391,7 +391,7 @@ class Toolkit_Image
     {
         $image = $this->_image();
 
-        $destination = APPPATH.$this->url();
+        $destination = APPPATH.$this->url(false);
         $dir = dirname($destination);
 
         if (!is_dir($dir)) {
@@ -408,7 +408,7 @@ class Toolkit_Image
      * Parse an existing modify URL and set transformations in queue. Check if the hash part of the URL match.
      *
      * @param string $image_url Modify URL of the image
-     * @throws \Exception If the hash part of the URL not match
+     * @return bool ``True`` or ``false`` if the hash part of the URL not match.
      */
     public function parse($image_url)
     {

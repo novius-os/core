@@ -85,7 +85,7 @@ class Controller_Front extends Controller
             $url = \Str::sub($url, 0, - strlen($this->_extension) - 1);
         }
 
-        $this->_is_preview = \Input::get('_preview', false);
+        $this->_is_preview = \Input::get('_preview', false) && \Session::get('logged_user_id', false);
 
         $cache_path = (empty($this->_url) ? 'index/' : $this->_url);
 

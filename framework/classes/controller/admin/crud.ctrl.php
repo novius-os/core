@@ -208,7 +208,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function init_item()
     {
-        $create_from_id = \Input::get('create_from_id', 0);
+        $create_from_id = \Input::get('create_from_id', \Input::post('create_from_id', 0));
         $common_id = \Input::get('common_id', null);
         $environment_id = \Input::get('environment_id', null);
         if (!empty($create_from_id)) {
@@ -262,7 +262,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $fields['create_from_id'] = array(
                 'form' => array(
                     'type' => 'hidden',
-                    'value' => \Input::get('create_from_id', 0),
+                    'value' => \Input::get('create_from_id', \Input::post('create_from_id', 0)),
                 ),
             );
         }

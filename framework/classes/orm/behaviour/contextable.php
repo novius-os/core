@@ -139,4 +139,20 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
             )
         );
     }
+
+    public function wysiwygOptions(Orm\Model $item, &$options)
+    {
+        $context_options = \Config::get('wysiwyg.setups.'.$item->{$this->_properties['context_property']}, false);
+        if ($context_options) {
+            $options = array_merge($options, $context_options);
+        }
+    }
+
+    public function friendlySlug(Orm\Model $item, &$options)
+    {
+        $context_regexps = \Config::get('friendly_slug.setups.'.$item->{$this->_properties['context_property']}, false);
+        if ($context_regexps) {
+            $options[] = $context_regexps;
+        }
+    }
 }

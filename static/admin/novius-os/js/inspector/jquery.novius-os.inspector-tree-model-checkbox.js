@@ -66,6 +66,7 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                 initialDepth : params.initialDepth || 2,
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',
+                                loadingText: params.loadingText || 'Loading...',
                                 cellStyleFormatter: function(args) {
                                     if (args.$cell.is('td')) {
                                         args.$cell.removeClass("ui-state-highlight");

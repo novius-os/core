@@ -229,7 +229,7 @@ class FrontCache
         if ($duration == -1) {
             //flock($this->_lock_fp, LOCK_UN);
             $expires = 0;
-            $this->_path = \Config::get('tmp_dir', '/tmp/'.uniqid('page/').'.php');
+            $this->_path = \Config::get('novius-os.temp_dir').DS.uniqid('page/').'.php';
         } else {
             $expires = time() + $duration;
             $prepend .= '<?php

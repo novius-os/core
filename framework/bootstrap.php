@@ -29,7 +29,7 @@ define('APPPATH', NOSROOT.'local'.DIRECTORY_SEPARATOR);
 define('PKGPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
 define('COREPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'fuel-core'.DIRECTORY_SEPARATOR);
 define('NOSPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR);
-define('VENDORPATH', NOSROOT.'vendor'.DIRECTORY_SEPARATOR);
+define('VENDORPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR);
 
 
 
@@ -78,6 +78,7 @@ if (!MBSTRING) {
         'Response' => FUEL_EXTEND_PATH.'response.php',
         'Security' => FUEL_EXTEND_PATH.'security.php',
         'Session' => FUEL_EXTEND_PATH.'session.php',
+        'Session_File' => FUEL_EXTEND_PATH.'session'.DIRECTORY_SEPARATOR.'file.php',
         'Str' => FUEL_EXTEND_PATH.'str.php',
         'Validation_Error'  => FUEL_EXTEND_PATH.'validation_error.php',
         'View' => FUEL_EXTEND_PATH.'view.php',

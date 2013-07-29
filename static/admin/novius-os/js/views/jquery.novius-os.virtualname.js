@@ -12,21 +12,35 @@ define('jquery-nos-virtualname',
         "use strict";
 
         $.fn.extend({
-            nosVirtualName : function() {
-                return this.each(function() {
-                    var replace_url = function(str) {
-                                if (!str) {
-                                    return str;
-                                }
+            nosVirtualName : function(options) {
+                var replace_url = function(str) {
+                        if (!str) {
+                            return str;
+                        }
+                        var i = 0, regexps;
 
-                                return str.replace(/ /g, '-')
-                                    .replace(/[\?|:|\\|\/|\#|\[|\]|@|&]/g, '-')
-                                    .replace(/-{2,}/g, '-')
-                                    .replace(/-$/g, '')
-                                    .replace(/^-/g, '')
-                                    .toLowerCase();
-                            },
-                        $virtual_name = $(this),
+                        for (i; i < options.length; i++) {
+                            regexps = options[i];
+                            $.each(regexps, function(regexp, replacement) {
+                                if (!isNaN(regexp) && replacement === 'lowercase') {
+                                    str = str.toLowerCase();
+                                } else if ($.isPlainObject(replacement)) {
+                                    var flags = (replacement['flags'] || '').replace('g', '') + 'g';
+                                    var replacement = replacement['replacement'] || '';
+                                    var re = new RegExp(regexp, flags);
+                                    str = str.replace(re, replacement);
+                                } else {
+                                    var re = new RegExp(regexp, 'g');
+                                    str = str.replace(re, replacement);
+                                }
+                            });
+                        }
+
+                        return str;
+                    };
+
+                return this.each(function() {
+                    var $virtual_name = $(this),
                         id = $virtual_name.attr('id'),
                         $use_title_checkbox = $('#' + id + '__use_title_checkbox'),
                         $title = $virtual_name.closest('form').find('input.ui-priority-primary');
