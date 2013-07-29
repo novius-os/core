@@ -188,6 +188,7 @@ class Model_Role extends \Nos\Orm\Model
             try {
                 static::$permissions[$this->role_id] = \Cache::get('role_permissions.'.$this->role_id);
             } catch (\CacheNotFoundException $e) {
+                static::$permissions[$this->role_id] = array();
                 $query = \Db::query('SELECT * FROM nos_role_permission WHERE perm_role_id = '.\Db::quote($this->role_id));
                 foreach ($query->as_object()->execute() as $permission) {
                     static::$permissions[$this->role_id][$permission->perm_name][] = $permission->perm_category_key;
