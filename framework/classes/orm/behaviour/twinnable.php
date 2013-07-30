@@ -471,7 +471,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
 
         if ($context === 'main' ? ($item->{$this->_properties['is_main_property']}) : ($item->{$this->_properties['context_property']} == $context)) {
-            return $item;
+            return $item->is_new() ? null : $item;
         } else {
             return $item->find('first', array(
                 'where' => array(
