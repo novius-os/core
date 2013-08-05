@@ -166,7 +166,7 @@ class Model_Role extends \Nos\Orm\Model
     public function getPermissionValue($permissionName, $default = null)
     {
         if (!$this->_authorised($permissionName)) {
-            return false;
+            return $default;
         }
         if (isset(static::$permissions[$this->role_id][$permissionName])) {
             return static::$permissions[$this->role_id][$permissionName][0];
