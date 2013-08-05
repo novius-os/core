@@ -934,6 +934,9 @@ define('jquery-nos-appdesk',
                                     }
                                     if (presentation.id === 'treeGrid') {
                                         self.uiSearchInput.val('');
+                                        self.uiResetSearch.hide();
+                                        self.uiNbResult.hide();
+
                                     }
                                     self._uiList();
                                 }
