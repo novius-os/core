@@ -14,7 +14,7 @@ class Renderer_Media extends \Fieldset_Field
 {
     public static function _init()
     {
-        \Nos\I18n::current_dictionary('nos::common');
+        \Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
     }
     /**
      * Standalone build of the media renderer.
