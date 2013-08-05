@@ -14,13 +14,13 @@ return array(
     #: classes/controller/admin/attachment.ctrl.php:55
     #: classes/controller/admin/media.ctrl.php:103
     #: classes/controller/admin/media.ctrl.php:125
-    'You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.' => 'Il y a un souci&nbsp;: Votre Novius OS n’est pas autorisé à enregistrer desfichiers sur ce serveur. Demandez à votre développeur ou administrateursystème de régler ce problème.',
+    'You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.' => 'Il y a un souci&nbsp;: Votre Novius OS n’est pas autorisé à enregistrer des fichiers sur ce serveur. Demandez à votre développeur ou administrateur système de régler ce problème.',
 
     #: classes/controller/admin/attachment.ctrl.php:66
     'Here you go, this attachment is now available in the Media Center.' => 'Et voilà, cette pièce jointe est maintenant disponible dans la Médiathèque.',
 
     #: classes/controller/admin/attachment.ctrl.php:116
-    'This is unexpected: We cannot find the file. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inattendu&nbsp;: Nous n’arrivons pas à trouver ce fichier.Merci de ré-essayer. Contactez votre développeur ou Novius OS si le problèmepersiste. Nos excuses pour le désagrément occasionné.',
+    'This is unexpected: We cannot find the file. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inattendu&nbsp;: Nous n’arrivons pas à trouver ce fichier. Merci de ré-essayer. Contactez votre développeur ou Novius OS si le problème persiste. Nos excuses pour le désagrément occasionné.',
 
     #: classes/controller/admin/media.ctrl.php:42
     'Change the file:' => 'Changer de fichier&nbsp;:',
@@ -32,7 +32,7 @@ return array(
     'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
 
     #: classes/controller/admin/folder.ctrl.php:56
-    'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'Voilà qui est étrange&nbsp;: Ce dossier devrait être vide et ne l’est pas.Merci de contacter votre développeur ou Novius OS pour régler ce problème.Nos excuses pour le désagrément occasionné.',
+    'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'Voilà qui est étrange&nbsp;: Ce dossier devrait être vide et ne l’est pas. Merci de contacter votre développeur ou Novius OS pour régler ce problème. Nos excuses pour le désagrément occasionné.',
 
     #: classes/renderer/media.php:76
     'Image from the Media Centre' => 'Image de la Médiathèque',
@@ -123,7 +123,7 @@ return array(
     'Cancel' => 'Annuler',
 
     #: views/admin/wysiwyg_image.view.php:76
-    'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inhabituel&nbsp;: Il semble qu’aucune image n’ait étésélectionnée. Merci de ré-essayer. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
+    'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inhabituel&nbsp;: Il semble qu’aucune image n’ait été sélectionnée. Merci de ré-essayer. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
 
     #: views/admin/media_edit.view.php:56
     #: config/controller/admin/appdesk.config.php:50
