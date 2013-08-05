@@ -78,7 +78,10 @@ return array(
                 'grid' => true,
             ),
             'disabled' => array(
-                'check_permission' => array('Nos\Media\Permission', 'checkMediaDisabled'),
+                'check_permission' => array(
+                    array('Nos\Media\Permission', 'checkFolderDisabled'),
+                    array('Nos\Media\Permission', 'checkPermissionDraft'),
+                ),
             ),
         ),
         'add_subfolder' => array(
