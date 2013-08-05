@@ -167,8 +167,10 @@ if ($context_count > 1 || $children_count > 0) {
                     }).triggerHandler('change');
 
 
-                    $tables.find('tr').css({cursor: 'pointer'}).click(function() {
-                        $(this).find(':checkbox').click();
+                    $tables.find('tr').css({cursor: 'pointer'}).click(function(e) {
+                        if (!$(e.target).is(':checkbox')) {
+                            $(this).find(':checkbox').click();
+                        }
                     });
 
 

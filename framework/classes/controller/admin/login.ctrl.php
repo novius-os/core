@@ -57,7 +57,9 @@ class Controller_Admin_Login extends Controller
         }
 
         // Bypass the template
-        return \View::forge('admin/login_popup');
+        return \View::forge('admin/login_popup', array(
+            'lang' => \Input::get('lang', false),
+        ), false);
     }
 
     public function action_index()

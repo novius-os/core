@@ -470,11 +470,15 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             return $item->find('all', array('where' => $where));
         }
 
-        return $item->find('first', array(
-            'where' => array(
-                array($common_id_property, $common_id),
-                $context === 'main' ? array($this->_properties['is_main_property'], true) : array($this->_properties['context_property'], $context),
-            )));
+        if ($context === 'main' ? ($item->{$this->_properties['is_main_property']}) : ($item->{$this->_properties['context_property']} == $context)) {
+            return $item->is_new() ? null : $item;
+        } else {
+            return $item->find('first', array(
+                'where' => array(
+                    array($common_id_property, $common_id),
+                    $context === 'main' ? array($this->_properties['is_main_property'], true) : array($this->_properties['context_property'], $context),
+                )));
+        }
     }
 
     /**
