@@ -84,7 +84,7 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
             $fieldset->repopulate();
             $fieldset->set_config(array(
                 'field_template' => '<p style="margin-bottom:0.5em;">{label}{required}<br />{field} {error_msg}</p>',
-                'multi_field_template' => "<p style='margin-bottom:0.5em;'> {group_label}{required} {fields} \n {field} {label} \n{fields}\n{error_msg}</p>",
+                'multi_field_template' => "<p style='margin-bottom:0.5em;'> {group_label}{required} {fields} <br />\n {field} {label} \n{fields}\n{error_msg}</p>",
             ));
             foreach ($this->config['popup']['layout'] as &$view) {
                 if (isset($view['view'])) {
