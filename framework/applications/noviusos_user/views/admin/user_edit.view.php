@@ -73,7 +73,7 @@ if (!$enable_roles) {
 
                 $container.find('> div').addClass('fill-parent').css({
                     left: '15%',
-                    width : '85%'
+                    width : 'auto'
                 });
             }
 
