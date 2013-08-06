@@ -136,6 +136,38 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $item->url_canonical(array('preview' => true));
     }
 
+    public function after_save(Orm\Model $item)
+    {
+        $this->delete_cache_urlenhancer($item);
+    }
+
+    /**
+     * Delete the cache of the pages containing an URL enhancer for the item.
+     *
+     * @param Orm\Model $item
+     */
+    public function delete_cache_pages(Orm\Model $item)
+    {
+        $page_ids = array();
+        foreach ($this->_properties['enhancers'] as $enhancer_name) {
+            foreach (Tools_Enhancer::url_item($enhancer_name, $item) as $key => $url) {
+                list($page_id, ) = explode('::', $key);
+                $page_ids[] = $page_id;
+            }
+        }
+
+        if (!empty($page_ids)) {
+            $pages = \Nos\Page\Model_Page::find('all', array(
+                'where' => array(
+                    array('page_id', 'IN', $page_ids),
+                ),
+            ));
+            foreach ($pages as $page) {
+                $page->delete_cache();
+            }
+        }
+    }
+
     /**
      * Returns an HTML anchor tag with, by default, item URL in href and item title in text.
      *
