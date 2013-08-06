@@ -16,10 +16,20 @@ abstract class Email_Driver extends \Email\Email_Driver
     {
         \Event::trigger('email.before_send', $this);
 
-        $return = parent::send($validate);
+        try {
+            $return = parent::send($validate);
+        } catch (\Exception $e) {
+            \Event::trigger('email.error', array('email' => $this, 'exception' => $e));
+            throw $e;
+        }
 
         \Event::trigger('email.after_send', $this);
 
         return $return;
+    }
+
+    public function __get($property)
+    {
+        return $this->$property;
     }
 }
