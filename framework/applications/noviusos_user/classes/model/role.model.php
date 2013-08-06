@@ -145,14 +145,18 @@ class Model_Role extends \Nos\Orm\Model
 
     public function checkPermissionAtLeast($permissionName, $threshold, $valueWhenEmpty = 0)
     {
-        $value = $this->getPermissionValue($permissionName, $valueWhenEmpty);
-        return  ($value === false) ? false : ($value >= $threshold);
+        if (!$this->_authorised($permissionName)) {
+            return false;
+        }
+        return  $this->getPermissionValue($permissionName, $valueWhenEmpty) >= $threshold;
     }
 
     public function checkPermissionAtMost($permissionName, $threshold, $valueWhenEmpty = 0)
     {
-        $value = $this->getPermissionValue($permissionName, $valueWhenEmpty);
-        return  ($value === false) ? false : ($value <= $threshold);
+        if (!$this->_authorised($permissionName)) {
+            return false;
+        }
+        return $this->getPermissionValue($permissionName, $valueWhenEmpty) <= $threshold;
     }
 
     public function checkPermissionIsAllowed($permissionName, $valueWhenEmpty = false)
