@@ -138,7 +138,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 
     public function after_save(Orm\Model $item)
     {
-        $this->delete_cache_urlenhancer($item);
+        $this->delete_cache_pages($item);
     }
 
     /**
