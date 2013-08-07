@@ -53,7 +53,7 @@ class Orm_Attachment extends \Orm\Relation
         $this->attachment_config = $attachment_config;
     }
 
-    private function attached($from)
+    protected function attached($from)
     {
         reset($this->key_from);
         $attached = '';
