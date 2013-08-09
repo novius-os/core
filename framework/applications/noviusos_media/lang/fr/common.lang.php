@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 05/07/2013 14:57:58
+// Generated on 09/08/2013 10:16:42
 
-// 87 out of 95 messages are translated (91%).
-// 489 out of 543 words are translated (91%).
+// 97 out of 97 messages are translated (100%).
+// 554 out of 554 words are translated (100%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -13,7 +13,7 @@ return array(
     #: classes/controller/admin/attachment.ctrl.php:49
     #: classes/controller/admin/attachment.ctrl.php:55
     #: classes/controller/admin/media.ctrl.php:103
-    #: classes/controller/admin/media.ctrl.php:125
+    #: classes/controller/admin/media.ctrl.php:124
     'You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.' => 'Il y a un souci&nbsp;: Votre Novius OS n’est pas autorisé à enregistrer des fichiers sur ce serveur. Demandez à votre développeur ou administrateur système de régler ce problème.',
 
     #: classes/controller/admin/attachment.ctrl.php:66
@@ -30,6 +30,9 @@ return array(
 
     #: classes/controller/admin/media.ctrl.php:63
     'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
+
+    #: classes/controller/admin/appdesk.ctrl.php:76
+    'The cache has been renewed. All ready for you to enjoy!' => 'Et voici un beau cache tout neuf. Il vient d’être régénéré.',
 
     #: classes/controller/admin/folder.ctrl.php:56
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'Voilà qui est étrange&nbsp;: Ce dossier devrait être vide et ne l’est pas. Merci de contacter votre développeur ou Novius OS pour régler ce problème. Nos excuses pour le désagrément occasionné.',
@@ -51,27 +54,27 @@ return array(
     'This extension is not allowed.' => 'Cette extension n’est pas autorisée.',
 
     #: views/admin/permissions/folders.view.php:14
-    'Note: when nothing is selected, there is no restriction and this user can access all folders. The root folder is always accessible.' => '',
+    'Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.' => 'Note&nbsp;: Quand aucun dossier n\'est sélectionné, il n’y a pas de restriction, tous les dossiers sont accessibles. Le dossier racine est toujours accessible.',
 
     #: views/admin/permissions/general.view.php:16
-    'Can add, edit and delete media files' => '',
+    'Can add, edit and delete media files' => 'Peut ajouter, modifier et supprimer des médias',
 
     #: views/admin/permissions/general.view.php:23
-    'Can visualise and use media files only' => '',
+    'Can visualise and use media files only' => 'Peut uniquement visualiser et utiliser des médias',
 
     #: views/admin/permissions/general.view.php:30
-    'Can add, edit and delete folders' => '',
+    'Can add, edit and delete folders' => 'Peut ajouter, modifier et supprimer des dossiers',
 
-    #: views/admin/media_delete.view.php:20
+    #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'Ce média n’est utilisé nulle part et peut ainsi être supprimé sans problème.',
 
-    #: views/admin/media_delete.view.php:25
+    #: views/admin/media_delete.view.php:26
     'The media is used <strong>once</strong> by an application.' => 'Ce média est utilisé <strong>une fois</strong> par une application.',
 
-    #: views/admin/media_delete.view.php:26
+    #: views/admin/media_delete.view.php:27
     'The media is used <strong>{{count}} times</strong> by your applications.' => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
 
-    #: views/admin/media_delete.view.php:31
+    #: views/admin/media_delete.view.php:32
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -127,22 +130,22 @@ return array(
 
     #: views/admin/media_edit.view.php:56
     #: config/controller/admin/appdesk.config.php:50
-    'File size:' => '',
+    'File size:' => 'Taille du fichier&nbsp;:',
 
     #: views/admin/media_edit.view.php:63
     #: config/controller/admin/appdesk.config.php:53
-    'Dimensions:' => '',
+    'Dimensions:' => 'Dimensions&nbsp;:',
 
-    #: views/admin/folder_delete.view.php:20
+    #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'Le dossier est vide et peut donc être supprimé sans problème.',
 
-    #: views/admin/folder_delete.view.php:25
+    #: views/admin/folder_delete.view.php:26
     'There is <strong>one media file</strong> in this folder.' => 'Il y a <strong>un média</strong> dans ce dossier.',
 
-    #: views/admin/folder_delete.view.php:26
+    #: views/admin/folder_delete.view.php:27
     'There are <strong>{{count}} media files</strong> in this folder.' => 'Il y a <strong>{{count}} médias</strong> dans ce dossier.',
 
-    #: views/admin/folder_delete.view.php:31
+    #: views/admin/folder_delete.view.php:32
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Oui, je veux supprimer ce dossier et les {{count}} médias qu’il contient.',
 
     #: views/admin/folder.view.php:51
@@ -152,10 +155,10 @@ return array(
     'Warning: moving a folder changes the URL of all the files it contains.' => 'Attention&nbsp;: déplacer un dossier change l’URL de tous les fichiers qu’il contient.',
 
     #: config/permissions.config.php:19
-    'Permissions for this application' => '',
+    'Permissions for this application' => 'Droits d’accès pour cette application',
 
     #: config/permissions.config.php:23
-    'Restrict access to specific folders' => '',
+    'Restrict access to specific folders' => 'Restreindre l’accès à certains dossiers',
 
     #: config/controller/admin/inspector/folder.config.php:40
     #: config/common/folder.config.php:17
@@ -263,6 +266,9 @@ return array(
     #: config/controller/admin/appdesk.config.php:105
     'Pick' => 'Choisir',
 
+    #: config/controller/admin/appdesk.config.php:123
+    'Renew media cache' => 'Régénérer le cache média',
+
     #. Crud
     #: config/common/folder.config.php:27
     'Right, your new folder is ready.' => 'C’est bon, votre nouveau dossier est prêt.',
@@ -294,7 +300,7 @@ return array(
     #: config/common/folder.config.php:69
     'Add a media file in this folder' => 'Ajouter un média dans ce dossier',
 
-    #: config/common/folder.config.php:85
+    #: config/common/folder.config.php:88
     'Add a sub-folder to this folder' => 'Ajouter un sous-dossier dans ce dossier',
 
     #. Crud

@@ -1,21 +1,15 @@
 <?php
 
-// Generated on 05/07/2013 14:57:58
+// Generated on 09/08/2013 10:16:42
 
-// 159 out of 164 messages are translated (96%).
-// 849 out of 880 words are translated (96%).
+// 162 out of 162 messages are translated (100%).
+// 865 out of 865 words are translated (100%).
 
 return array(
-    #: classes/tools/image.php:129
-    'An error occured when resizing the image.' => 'Une erreur est survenue lors du redimensionnement de l’image.',
-
-    #: classes/tools/image.php:148
-    'The format of this image is not allowed.' => 'Le format de cette image n’est pas autorisé.',
-
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
     #. Example value: '%d %b %Y %H:%M' (day of month, month name, year, hour, minutes).
     #: classes/fuel/date.php:79
-    'DATE_FORMAT_DEFAULT' => '',
+    'DATE_FORMAT_DEFAULT' => '%d %b %Y %H:%M',
 
     #: classes/fuel/validation_error.php:47
     'The field ‘{{field}}’ doesn’t respect the rule ‘{{rule}}’' => 'Le champ «&nbsp;{{field}}&nbsp;» ne respecte pas la règle«&nbsp;{{rule}}&nbsp;»',
@@ -78,13 +72,13 @@ return array(
     'Years' => 'Années',
 
     #: classes/controller/inspector.ctrl.php:77
-    #: config/orm/behaviour/publishable.config.php:5
+    #: config/orm/behaviour/publishable.config.php:16
     'Status' => 'Statut',
 
     #: classes/controller/admin/login.ctrl.php:45
     'Welcome back, {{user}}.' => 'Re-bonjour {{user}}',
 
-    #: classes/controller/admin/login.ctrl.php:114
+    #: classes/controller/admin/login.ctrl.php:116
     'These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.' => 'Il doit y avoir une erreur, vous ne pouvez entrer. Êtes-vous sûr(e) que cesont les bons email et mot de passe&nbsp;? Merci de ré-essayer.',
 
     #: classes/controller/admin/datacatcher.ctrl.php:49
@@ -126,6 +120,8 @@ return array(
     'Reload tab' => 'Recharger l’onglet',
 
     #: classes/controller/admin/noviusos.ctrl.php:123
+    #: views/inspector/modeltree_checkbox.view.php:15
+    #: views/inspector/modeltree_radio.view.php:15
     #: config/i18n_common.config.php:66
     'Loading...' => 'Chargement...',
 
@@ -146,8 +142,8 @@ return array(
     'Save' => 'Enregistrer',
 
     #: views/form/layout_standard.view.php:82
-    #: config/orm/behaviour/twinnable.config.php:66
-    #: config/orm/behaviour/twinnable.config.php:69
+    #: config/orm/behaviour/twinnable.config.php:68
+    #: config/orm/behaviour/twinnable.config.php:71
     'Add to {{context}}' => 'Ajouter à {{context}}',
 
     #: views/renderer/publishable.view.php:117
@@ -163,10 +159,10 @@ return array(
     '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera planifié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:123
-    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera publié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>jusqu\'au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:124
-    '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '',
+    '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera anti-daté du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:126
     'Pick a date' => 'Choisir une date',
@@ -243,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'Allez, au travail',
 
-    #: views/admin/html.view.php:466
+    #: views/admin/html.view.php:467
     'Select a media file' => 'Sélectionner un média',
 
-    #: views/admin/html.view.php:467
+    #: views/admin/html.view.php:468
     'Pick an image' => 'Sélectionner une image',
 
-    #: views/admin/html.view.php:468
+    #: views/admin/html.view.php:469
     'We’re afraid we cannot find this image.' => 'Malheureusement nous n’arrivons pas à trouver cette image.',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -329,7 +325,7 @@ return array(
     'Applications' => 'Applications',
 
     #: config/permissions.config.php:21
-    'Is granted access to the following contexts:' => '',
+    'Is granted access to the following contexts:' => 'A accès aux contextes suivants&nbsp;:',
 
     #: config/permissions.config.php:26
     'Is granted access to the following applications:' => 'A accès aux applications suivantes&nbsp;:',
@@ -343,33 +339,33 @@ return array(
     'Edit' => 'Modifier',
 
     #: config/common.config.php:61
-    #: config/i18n_common.config.php:25
+    #: config/i18n_common.config.php:20
     'Deleting the item ‘{{title}}’' => 'Supprimer l’item «&nbsp;{{title}}&nbsp;»',
 
     #: config/common.config.php:64
     'Delete' => 'Supprimer',
 
     #. Note to translator: action (button)
-    #: config/orm/behaviour/twinnable.config.php:23
+    #: config/orm/behaviour/twinnable.config.php:25
     'Translate' => 'Traduire',
 
-    #: config/orm/behaviour/twinnable.config.php:25
+    #: config/orm/behaviour/twinnable.config.php:27
     'Add to another site' => 'Ajouter à un autre site',
 
-    #: config/orm/behaviour/twinnable.config.php:27
+    #: config/orm/behaviour/twinnable.config.php:29
     'Translate / Add to another site' => 'Traduire / Ajouter à un autre site',
 
-    #: config/orm/behaviour/twinnable.config.php:64
-    #: config/orm/behaviour/twinnable.config.php:71
+    #: config/orm/behaviour/twinnable.config.php:66
+    #: config/orm/behaviour/twinnable.config.php:73
     'Translate into {{context}}' => 'Traduire en {{context}}',
 
-    #: config/orm/behaviour/twinnable.config.php:75
+    #: config/orm/behaviour/twinnable.config.php:77
     'Edit {{context}}' => 'Modifier {{context}}',
 
-    #: config/orm/behaviour/sharable.config.php:5
+    #: config/orm/behaviour/sharable.config.php:16
     'Share' => 'Partager',
 
-    #: config/orm/behaviour/urlenhancer.config.php:5
+    #: config/orm/behaviour/urlenhancer.config.php:16
     'Visualise' => 'Visualiser',
 
     #. Crud
@@ -391,68 +387,68 @@ return array(
     'Bye bye' => 'Adieu',
 
     #: config/i18n_common.config.php:17
-    'You’re not allowed to carry out this action. Ask your colleagues to find out why.' => '',
-
-    #. Blank slate
-    #: config/i18n_common.config.php:20
-    'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cet item ne peut être ajouté à {{context}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans ce contexte.',
+    'You’re not allowed to carry out this action. Ask your colleagues to find out why.' => 'Vous n‘êtes pas autorisé(e) à réaliser cette action. Demandez à vos collègues pourquoi.',
 
     #: config/i18n_common.config.php:21
-    'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cet item ne peut être traduit en {{language}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans cette langue.',
-
-    #: config/i18n_common.config.php:22
-    'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Cet item ne peut être ajouté à {{context}}. (Mais comment avez-vous obtenu ce message&nbsp;? Vous bidouillez le système, non&nbsp;?)',
-
-    #: config/i18n_common.config.php:26
     'Last chance, there’s no undo. Are you sure you want to do this?' => 'Attention, vous ne pouvez revenir en arrière. Êtes-vous bien sûr(e) de vouloir faire ça ?',
 
     #. Delete action's labels
-    #: config/i18n_common.config.php:29
+    #: config/i18n_common.config.php:24
     '{{Button}} or <a>No, cancel</a>' => '{{Button}} ou <a>Non, annuler</a>',
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:25
     'Yes, delete' => 'Oui, supprimer',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:26
     'Nothing to delete' => 'Rien à supprimer',
 
-    #: config/i18n_common.config.php:32
+    #: config/i18n_common.config.php:27
     'Yes, delete this item' => 'Oui, supprimer cet item',
 
-    #: config/i18n_common.config.php:33
+    #: config/i18n_common.config.php:28
     'Yes, delete these {{count}} items' => 'Oui, supprimer ces {{count}} items',
 
-    #: config/i18n_common.config.php:35
+    #: config/i18n_common.config.php:30
     'To confirm the deletion, you need to enter this number in the field below:' => 'Pour confirmer la suppression, vous devez entrer ce nombre dans le champ ci-dessous&nbsp;:',
 
-    #: config/i18n_common.config.php:36
+    #: config/i18n_common.config.php:31
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Nous ne pouvons supprimer cet item car le nombre de sous-items indiqué est faux. Merci de le corriger.',
 
-    #: config/i18n_common.config.php:38
+    #: config/i18n_common.config.php:33
     '1 item' => '1 item',
 
-    #: config/i18n_common.config.php:39
+    #: config/i18n_common.config.php:34
     '{{count}} items' => '{{count}} items',
 
     #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:42
+    #: config/i18n_common.config.php:37
     'This item exists in <strong>{{context_count}} contexts</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong>.',
 
-    #: config/i18n_common.config.php:43
+    #: config/i18n_common.config.php:38
     'This item exists in <strong>{{language_count}} languages</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong>.',
 
     #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:46
+    #: config/i18n_common.config.php:41
     'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>{{children_count}} sous-items</strong>.',
 
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:42
     'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>un sous-item</strong>.',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:43
     'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>{{children_count}} sous-items</strong>.',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:44
     'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>un sous-item</strong>.',
+
+    #. Keep only if the model has the behaviour Twinnable
+    #: config/i18n_common.config.php:47
+    'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cet item ne peut être ajouté à {{context}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans ce contexte.',
+
+    #: config/i18n_common.config.php:48
+    'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cet item ne peut être traduit en {{language}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans cette langue.',
+
+    #: config/i18n_common.config.php:49
+    'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Cet item ne peut être ajouté à {{context}}. (Mais comment avez-vous obtenu ce message&nbsp;? Vous bidouillez le système, non&nbsp;?)',
 
     #. Keep only if the model has the behaviour Tree
     #: config/i18n_common.config.php:52

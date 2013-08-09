@@ -1,13 +1,13 @@
 <?php
 
-// Generated on 05/07/2013 14:57:58
+// Generated on 09/08/2013 10:16:42
 
-// 103 out of 111 messages are translated (92%).
-// 487 out of 619 words are translated (92%).
+// 111 out of 111 messages are translated (100%).
+// 619 out of 619 words are translated (100%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => '',
+    'The home page must be published. To unpublish this page, set another page as home page first.' => 'La page d’accueil doit être publiée. Pour dépublier cette page, définissez d’abord une autre page comme page d’accueil.',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'Reprendre le titre',
@@ -40,10 +40,10 @@ return array(
     'The cache has been renewed. All ready for you to enjoy!' => 'Et voici un beau cache tout neuf. Il vient d’être régénéré.',
 
     #: views/admin/permissions.view.php:7
-    'Can add, edit, delete and publish pages' => '',
+    'Can add, edit, delete and publish pages' => 'Peut ajouter, modifier et supprimer des pages',
 
     #: views/admin/permissions.view.php:14
-    'Can add, edit and delete unpublished pages only' => '',
+    'Can add, edit and delete unpublished pages only' => 'Peut ajouter, modifier et supprimer des pages non-publiées uniquement',
 
     #: views/admin/popup_duplicate.view.php:58
     'Duplicate sub-pages' => 'Dupliquer les sous-pages',
@@ -158,7 +158,7 @@ return array(
     'Insert this link' => 'Insérer ce lien',
 
     #: config/permissions.config.php:11
-    'Permissions for this application' => '',
+    'Permissions for this application' => 'Droits d’accès pour cette application',
 
     #: config/controller/admin/page.config.php:25
     #: config/common/page.config.php:132
@@ -332,7 +332,7 @@ return array(
     'This page has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page a <strong>{{children_count}} sous-pages</strong>.',
 
     #: config/common/page.config.php:89
-    'The home page cannot be deleted. To delete this page, set another page as home page first.' => '',
+    'The home page cannot be deleted. To delete this page, set another page as home page first.' => 'La page d’accueil ne peut être supprimée. Pour supprimer cette page, définissez d’abord une autre page comme page d’accueil.',
 
     #: config/common/page.config.php:92
     'You can’t delete this page. It is locked.' => 'Vous ne pouvez supprimer cette page. Elle est verrouillée.',
@@ -347,13 +347,13 @@ return array(
     'Set as home page' => 'Définir comme page d’accueil',
 
     #: config/common/page.config.php:196
-    'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => '',
+    'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => 'C’est frustrant, il est vrai, mais vous ne pouvez définir une page comme page d’accueil uniquement quand une seule langue est affichée. Sélectionnez une langue dans la liste déroulante en haut à droite.',
 
     #: config/common/page.config.php:198
-    'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => '',
+    'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => 'C’est frustrant, il est vrai, mais vous ne pouvez définir une page comme page d’accueil uniquement quand un seul contexte est affiché. Sélectionnez une langue dans la liste déroulante en haut à droite.',
 
     #: config/common/page.config.php:206
-    'You cannot set this page as home page because it isn’t published. Publish it first.' => '',
+    'You cannot set this page as home page because it isn’t published. Publish it first.' => 'Vous ne pouvez définir cette page comme page d’accueil, car elle doit être d’abord être publiée.',
 
     #: config/common/page.config.php:209
     'This page is the home page already.' => 'Cette page est déjà la page d\'accueil.',
