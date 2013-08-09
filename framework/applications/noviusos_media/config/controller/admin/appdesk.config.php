@@ -120,7 +120,7 @@ return array(
     'toolbar' => array(
         'actions' => array(
             'renew_cache' => array(
-                'label' => __('Renew media’ cache'),
+                'label' => __('Renew media cache'),
                 'action' => array(
                     'action' => 'nosAjax',
                     'params' => array(
