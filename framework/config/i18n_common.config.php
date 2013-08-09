@@ -77,10 +77,4 @@ return array(
     'sites' => __('Sites'),
     'languages' => __('Languages'),
 
-    'item' => __('item'),
-    'items' => __('item'),
-    'showNbItems' => __('Showing {{x}} items out of {{y}}'),
-    'showOneItem' => __('Showing 1 item'),
-    'showNoItem' => __('No items'),
-    'showAll' => __('Showing all item'),
 );
