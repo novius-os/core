@@ -331,4 +331,6 @@ return array(
     #: config/common/media.config.php:134
     'Visualise' => 'Visualiser',
 
+    'The file size must not exceed {{size}}.' => 'Le fichier ne doit pas dépasser {{size}}.',
+    'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
 );

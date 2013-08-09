@@ -45,6 +45,12 @@ if ($item->isImage()) {
                     <td><?= $fieldset->field('media')->build() ?></td>
                 </tr>
                 <tr>
+                    <th></th>
+                    <td>
+                        <p><em><?= strtr(__('The file size must not exceed {{size}}.'), array('{{size}}' => ini_get('upload_max_filesize'), '.')) ?> <?= strtr(__('What’s more these file types are not allowed: {{extensions}}.'), array('{{extensions}}' => implode(', ', \Config::get('novius-os.upload.disabled_extensions', array('php'))))) ?></em></p>
+                    </td>
+                </tr>
+                <tr>
                     <th><?= $fieldset->field('media_file')->label ?></th>
                     <td class="table-field"><?= $fieldset->field('media_file')->build() ?><span>.<span class="media_extension"><?= $item->media_ext ?></span> &nbsp; <label><input type="checkbox" data-id="same_title" /> <?= __('Use title') ?></label></span></td>
                 </tr>

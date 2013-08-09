@@ -26,6 +26,12 @@ $fieldset->set_config('field_template', '{field}');
                     <td><?= $fieldset->field('media')->build() ?></td>
                 </tr>
                 <tr>
+                    <th></th>
+                    <td>
+                        <p><em><?= strtr(__('The file size must not exceed {{size}}.'), array('{{size}}' => ini_get('upload_max_filesize'))) ?> <?= strtr(__('What’s more these file types are not allowed: {{extensions}}.'), array('{{extensions}}' => implode(', ', \Config::get('novius-os.upload.disabled_extensions', array('php'))))) ?></em></p>
+                    </td>
+                </tr>
+                <tr>
                     <th><?= $fieldset->field('media_title')->label ?></th>
                     <td><?= $fieldset->field('media_title')->build() ?></td>
                 </tr>
