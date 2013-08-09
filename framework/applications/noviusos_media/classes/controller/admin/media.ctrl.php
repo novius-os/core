@@ -56,6 +56,10 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
 
         // Retrieve pathinfo, either from uploaded or existing file
         if ($is_uploaded) {
+
+            if ($_FILES['media']['error'] == UPLOAD_ERR_INI_SIZE) {
+                throw new \Exception(__('We’re afraid you’re not allowed to upload files this big. Don’t blame Novius OS though, your developer or system administrator are the ones who make the rules.'));
+            }
             $pathinfo = pathinfo(mb_strtolower($_FILES['media']['name']));
 
             $disallowed_extensions = \Config::get('novius-os.upload.disabled_extensions', array('php'));
