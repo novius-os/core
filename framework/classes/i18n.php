@@ -103,7 +103,7 @@ class I18n
             foreach ($languages as $lang) {
                 if ($path = \Finder::search('lang', $namespace.$lang.DS.$local_file, '.php', true)) {
                     foreach ($path as $p) {
-                        static::$_messages[static::$_locale][$group] = \Arr::merge(\Fuel::load($p), static::$_messages[static::$_locale][$group]);
+                        static::$_messages[static::$_locale][$group] = \Arr::merge(array_filter(\Fuel::load($p)), static::$_messages[static::$_locale][$group]);
                     }
                 }
             }
