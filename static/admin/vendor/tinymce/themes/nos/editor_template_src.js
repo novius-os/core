@@ -1226,7 +1226,7 @@
 			// Create external toolbar
 			if (lo == 'external') {
 				n = c = DOM.create('div', {style : 'position:relative'});
-				n = DOM.add(n, 'div', {id : ed.id + '_external', 'class' : 'mceExternalToolbar', style : 'z-index:1000;'});
+				n = DOM.add(n, 'div', {id : ed.id + '_external', 'class' : 'mceExternalToolbar', style : 'z-index:999;'});
 				DOM.add(n, 'a', {id : ed.id + '_external_close', href : 'javascript:;', 'class' : 'mceExternalClose'});
 				n = DOM.add(n, 'table', {id : ed.id + '_tblext', cellSpacing : 0, cellPadding : 0});
 				etb = DOM.add(n, 'tbody');

@@ -132,6 +132,9 @@ class Permission
         $full_access = static::check('nos::context', 'does_not_exists', true);
         if (!$full_access) {
             $allowedContexts = static::listPermissionCategories('nos::context');
+            if (empty($allowedContexts)) {
+                return array();
+            }
             $contexts = array_intersect_key(array_combine($allowedContexts, $allowedContexts), $contexts);
         }
 
