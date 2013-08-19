@@ -14,11 +14,15 @@ class ModuleNotFoundException extends \FuelException
 
 class Module extends Fuel\Core\Module
 {
+    protected static $modulesCanonical = array();
+
     public static function load($module, $path = null)
     {
         $loaded = parent::load($module, $path);
         if ($loaded) {
             $path = static::$modules[$module];
+            // This allows to browse/scan the array starting from the most new loaded module in findFromCanonicalPath()
+            \Arr::prepend(static::$modulesCanonical, $module, realpath($path));
 
             // Load the config (namespace + dependencies)
 
@@ -68,5 +72,25 @@ class Module extends Fuel\Core\Module
         }
 
         return $exists;
+    }
+
+    /**
+     * Returns the module name which a file belongs to. This only works for already loaded modules.
+     *
+     * @param   $path         Canonical path to guess the module from
+     * @return  string|false  The module name or false if not found
+     */
+    public static function findFromCanonicalPath($path)
+    {
+        foreach (static::$modulesCanonical as $module => $canonicalPath) {
+            if (\Str::sub($path, 0, \Str::length($canonicalPath)) === $canonicalPath) {
+                // Framework use "nos" as application name
+                if ($module === 'framework') {
+                    return 'nos';
+                }
+                return $module;
+            }
+        }
+        return false;
     }
 }
