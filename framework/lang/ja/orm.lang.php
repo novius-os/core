@@ -1,15 +1,15 @@
 <?php
 
-// Generated on 05/07/2013 14:57:58
+// Generated on 19/08/2013 18:12:14
 
 // 5 out of 5 messages are translated (100%).
 // 74 out of 74 words are translated (100%).
 
 return array(
-    #: classes/orm/behaviour/virtualname.php:50
+    #: classes/orm/behaviour/virtualname.php:55
     'An URL is needed.' => 'URL を入力してください。',
 
-    #: classes/orm/behaviour/virtualname.php:68
+    #: classes/orm/behaviour/virtualname.php:73
     #: classes/orm/behaviour/virtualpath.php:75
     'This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.' => 'この URL は既に使用されています。同じ名前は付けられません。申し訳ありませんが、別の名前を付けてください。',
 
@@ -17,10 +17,10 @@ return array(
     #: classes/orm/behaviour/tree.php:142
     'No, it cannot be moved here. Why? Because you cannot put something into itself.' => 'ここから移動させることはできません。なぜなら、この中にデータがあるからです。',
 
-    #: classes/orm/behaviour/twinnable.php:357
+    #: classes/orm/behaviour/twinnable.php:365
     'We’re afraid it cannot be added to {{context}} because its parent is not available in this context yet.' => '{{context}}に追加できません。まず親を追加してください。',
 
-    #: classes/orm/behaviour/twinnable.php:366
+    #: classes/orm/behaviour/twinnable.php:374
     'We’re afraid it cannot be moved here because the parent is not available in the following contexts: {{contexts}}' => '親が{{contexts}}で利用可能になっていないため、ここに移動することはできません。',
 
 );
