@@ -100,7 +100,7 @@ define('jquery-nos-context-common-fields',
                         });
                         $element.one('inputfilethumbinit', function() {
                             $element.inputFileThumb('option', 'disabled', true);
-                            $div.remove();
+                            $div && $div.remove();
                         });
 
                     });
