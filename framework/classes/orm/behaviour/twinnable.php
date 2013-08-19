@@ -16,6 +16,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     protected static $_shared_wysiwygs_context_cached = array();
 
+    protected $_in_progress_check = array();
+
     public static function _init()
     {
         I18n::current_dictionary('nos::orm');
@@ -307,12 +309,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             return;
         }
 
-        static $in_progress_before_save = array();
-
         // Prevents looping in the observer
-        if (!in_array($item->id, $in_progress_before_save)) {
+        if (!in_array($item->id, $this->_in_progress_check)) {
             $items = $this->find_other_context($item);
-            $in_progress_before_save = array_keys($items);
+            $this->_in_progress_check = array_keys($items);
 
             foreach ($items as $it) {
                 foreach ($this->_properties['common_fields'] as $common_field) {
@@ -323,7 +323,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             foreach ($items as $it) {
                 $it->save();
             }
-            $in_progress_before_save = array();
+            $this->_in_progress_check = array();
         }
     }
 
@@ -383,12 +383,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
         $item->observe('check_change_parent');
 
-        static $in_progress_check = array();
-
         // Prevents looping in the observer
-        if (!in_array($item->id, $in_progress_check)) {
+        if (!in_array($item->id, $this->_in_progress_check)) {
             $items = $this->find_other_context($item);
-            $in_progress_check = array_keys($items);
+            $this->_in_progress_check = array_keys($items);
 
             foreach ($items as $it) {
                 $parent = $new_parent === null ? null : $new_parent->find_context($it->get_context());
@@ -399,7 +397,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             foreach ($items as $it) {
                 $it->save();
             }
-            $in_progress_check = array();
+            $this->_in_progress_check = array();
         }
     }
 
