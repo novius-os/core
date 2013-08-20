@@ -138,15 +138,16 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
 
     public function after_save(Orm\Model $item)
     {
-        $this->delete_cache_pages($item);
+        $this->deleteCacheItem($item);
     }
 
     /**
      * Delete the cache of the pages containing an URL enhancer for the item.
+     * Warning: this will delete for all the enhancer, not only the pages containing the item.
      *
      * @param Orm\Model $item
      */
-    public function delete_cache_pages(Orm\Model $item)
+    public function deleteCacheEnhancers(Orm\Model $item)
     {
         $page_ids = array();
         foreach ($this->_properties['enhancers'] as $enhancer_name) {
@@ -164,6 +165,23 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
             ));
             foreach ($pages as $page) {
                 $page->delete_cache();
+            }
+        }
+    }
+
+    /**
+     * Delete the cache of the pages containing the item.
+     *
+     * @param Orm\Model $item
+     */
+    public function deleteCacheItem(Orm\Model $item)
+    {
+        $base = \Uri::base(false);
+        foreach ($this->_properties['enhancers'] as $enhancer_name) {
+            foreach (Tools_Enhancer::url_item($enhancer_name, $item) as $key => $url) {
+
+                $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
+                \Nos\FrontCache::forge($cache_path)->delete();
             }
         }
     }
