@@ -141,6 +141,11 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         $this->deleteCacheItem($item);
     }
 
+    public function after_delete(Orm\Model $item)
+    {
+        $this->deleteCacheItem($item);
+    }
+
     /**
      * Delete the cache of the pages containing an URL enhancer for the item.
      * Warning: this will delete for all the enhancer, not only the pages containing the item.
