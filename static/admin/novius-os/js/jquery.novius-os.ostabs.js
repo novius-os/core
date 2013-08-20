@@ -847,7 +847,8 @@ define('jquery-nos-ostabs',
                 if ( index < self.lis.length ) {
                     $li.insertBefore( self.lis[ index ] );
                 } else {
-                    index = self.lis.eq($li);
+                    $li.insertBefore( self.lis[ self.lis.length - 1 ] );
+                    index = self.lis.length - 1;
                 }
                 self.uiOstabsTabs.sortable( 'refresh' );
 
