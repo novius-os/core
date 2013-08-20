@@ -12,7 +12,7 @@ define('jquery-nos-listgrid',
         "use strict";
         $.widget( "nos.noslistgrid", $.wijmo.wijgrid, {
             options: {
-                culture: 'en-GB',
+                culture: $.nosLang.substr(0, 2),
                 loadingText : 'Loading...'
             },
 

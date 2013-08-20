@@ -20,7 +20,7 @@ define('jquery-nos-appdesk',
                 defaultView : 'grid',
                 locales : {},
                 sites : {},
-                culture: 'en-GB',
+                culture: $.nosLang.substr(0, 2),
                 contexts : {},
                 hideContexts : false,
                 texts : {
