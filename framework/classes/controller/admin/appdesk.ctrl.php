@@ -313,6 +313,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $config['appdesk']['tab']['iconUrl'] = \Config::icon($config['model'], 32);
             }
 
+            if (!isset($config['appdesk']['tab']['iconSize'])) {
+                $config['appdesk']['tab']['iconSize'] = '32';
+            }
+
+            if (!isset($config['appdesk']['tab']['labelDisplay'])) {
+                $config['appdesk']['tab']['labelDisplay'] = false;
+            }
+
             if (!isset($config['appdesk']['reloadEvent'])) {
                 $config['appdesk']['reloadEvent'] = isset($common_config['reloadEvent']) ? $common_config['reloadEvent'] : $config['model'];
             }
