@@ -16,12 +16,6 @@ class Controller_Inspector_Date extends Controller_Inspector
 {
     protected static $default_view = 'inspector/date';
 
-    public function prepare_i18n()
-    {
-        parent::prepare_i18n();
-        I18n::current_dictionary('nos::common');
-    }
-
     public static function getView($config)
     {
         $view = View::forge(static::$default_view);
@@ -143,6 +137,7 @@ class Controller_Inspector_Date extends Controller_Inspector
     {
         $inspector_path = static::get_path();
 
+        I18n::current_dictionary('nos::common');
         $default_config = array(
             'input_begin'           => 'date_begin',
             'input_end'             => 'date_end',
