@@ -20,6 +20,7 @@ define('jquery-nos-renderer-datetimepicker',
             }
 
             $.datepicker.setDefaults($.datepicker.regional[$.nosLang.substr(0, 2)]);
+            $.timepicker.setDefaults($.timepicker.regional[$.nosLang.substr(0, 2)]);
 
             if (o.wrapper !== null) {
                 $input.wrap(o.wrapper);
