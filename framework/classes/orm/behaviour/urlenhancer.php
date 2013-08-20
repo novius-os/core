@@ -152,7 +152,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
      *
      * @param Orm\Model $item
      */
-    public function deleteCacheEnhancers(Orm\Model $item)
+    public function deleteCacheEnhancer(Orm\Model $item)
     {
         $page_ids = array();
         foreach ($this->_properties['enhancers'] as $enhancer_name) {
