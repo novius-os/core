@@ -388,6 +388,6 @@ class FrontCache
     public static function getPathFromUrl($base, $url)
     {
         $url = (empty($url) ? 'index/' : $url);
-        return 'pages'.DS.str_replace(array('http://', 'https://'), array('', ''), rtrim($base, '/')).DS.rtrim($url, '/');
+        return 'pages'.DS.str_replace(array('http://', 'https://'), array('', ''), rtrim($base, '/')).DS.trim($url, '/');
     }
 }
