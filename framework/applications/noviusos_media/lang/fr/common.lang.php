@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 09/08/2013 10:16:42
+// Generated on 19/08/2013 18:12:14
 
 // 97 out of 97 messages are translated (100%).
 // 554 out of 554 words are translated (100%).
@@ -331,6 +331,4 @@ return array(
     #: config/common/media.config.php:134
     'Visualise' => 'Visualiser',
 
-    'The file size must not exceed {{size}}.' => 'Le fichier ne doit pas dépasser {{size}}.',
-    'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
 );

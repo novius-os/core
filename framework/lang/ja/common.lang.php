@@ -1,17 +1,11 @@
 <?php
 
-// Generated on 05/07/2013 14:57:58
+// Generated on 19/08/2013 18:12:14
 
-// 160 out of 164 messages are translated (97%).
-// 854 out of 880 words are translated (97%).
+// 158 out of 162 messages are translated (97%).
+// 839 out of 865 words are translated (97%).
 
 return array(
-    #: classes/tools/image.php:129
-    'An error occured when resizing the image.' => '画像サイズを変更するときにエラーが発生しました。',
-
-    #: classes/tools/image.php:148
-    'The format of this image is not allowed.' => 'この形式の画像は許可されていません。',
-
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
     #. Example value: '%d %b %Y %H:%M' (day of month, month name, year, hour, minutes).
     #: classes/fuel/date.php:79
@@ -78,13 +72,13 @@ return array(
     'Years' => '年',
 
     #: classes/controller/inspector.ctrl.php:77
-    #: config/orm/behaviour/publishable.config.php:5
+    #: config/orm/behaviour/publishable.config.php:16
     'Status' => '公開状態',
 
     #: classes/controller/admin/login.ctrl.php:45
     'Welcome back, {{user}}.' => 'ようこそ、{{user}}さん。',
 
-    #: classes/controller/admin/login.ctrl.php:114
+    #: classes/controller/admin/login.ctrl.php:116
     'These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.' => 'ログインに失敗しました。メールアドレスとパスワードが正しいか、確認して、もう一度お試しください。',
 
     #: classes/controller/admin/datacatcher.ctrl.php:49
@@ -126,6 +120,8 @@ return array(
     'Reload tab' => 'タブを再読み込み',
 
     #: classes/controller/admin/noviusos.ctrl.php:123
+    #: views/inspector/modeltree_checkbox.view.php:15
+    #: views/inspector/modeltree_radio.view.php:15
     #: config/i18n_common.config.php:66
     'Loading...' => '読み込み中...',
 
@@ -146,8 +142,8 @@ return array(
     'Save' => '保存',
 
     #: views/form/layout_standard.view.php:82
-    #: config/orm/behaviour/twinnable.config.php:66
-    #: config/orm/behaviour/twinnable.config.php:69
+    #: config/orm/behaviour/twinnable.config.php:68
+    #: config/orm/behaviour/twinnable.config.php:71
     'Add to {{context}}' => '{{context}}に追加',
 
     #: views/renderer/publishable.view.php:117
@@ -243,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'では始めましょう',
 
-    #: views/admin/html.view.php:466
+    #: views/admin/html.view.php:467
     'Select a media file' => 'メディアファイルを選択',
 
-    #: views/admin/html.view.php:467
+    #: views/admin/html.view.php:468
     'Pick an image' => '画像を選択',
 
-    #: views/admin/html.view.php:468
+    #: views/admin/html.view.php:469
     'We’re afraid we cannot find this image.' => 'この画像は見つかりませんでした。',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -343,33 +339,33 @@ return array(
     'Edit' => '編集',
 
     #: config/common.config.php:61
-    #: config/i18n_common.config.php:25
+    #: config/i18n_common.config.php:20
     'Deleting the item ‘{{title}}’' => 'アイテム‘{{title}}’を削除します',
 
     #: config/common.config.php:64
     'Delete' => '削除',
 
     #. Note to translator: action (button)
-    #: config/orm/behaviour/twinnable.config.php:23
+    #: config/orm/behaviour/twinnable.config.php:25
     'Translate' => '翻訳する',
 
-    #: config/orm/behaviour/twinnable.config.php:25
+    #: config/orm/behaviour/twinnable.config.php:27
     'Add to another site' => '別のサイトに追加する',
 
-    #: config/orm/behaviour/twinnable.config.php:27
+    #: config/orm/behaviour/twinnable.config.php:29
     'Translate / Add to another site' => '別のサイトに翻訳 / 追加する',
 
-    #: config/orm/behaviour/twinnable.config.php:64
-    #: config/orm/behaviour/twinnable.config.php:71
+    #: config/orm/behaviour/twinnable.config.php:66
+    #: config/orm/behaviour/twinnable.config.php:73
     'Translate into {{context}}' => '{{context}}に翻訳する',
 
-    #: config/orm/behaviour/twinnable.config.php:75
+    #: config/orm/behaviour/twinnable.config.php:77
     'Edit {{context}}' => '{{context}}を編集する',
 
-    #: config/orm/behaviour/sharable.config.php:5
+    #: config/orm/behaviour/sharable.config.php:16
     'Share' => '共有',
 
-    #: config/orm/behaviour/urlenhancer.config.php:5
+    #: config/orm/behaviour/urlenhancer.config.php:16
     'Visualise' => '閲覧',
 
     #. Crud
@@ -393,66 +389,66 @@ return array(
     #: config/i18n_common.config.php:17
     'You’re not allowed to carry out this action. Ask your colleagues to find out why.' => '',
 
-    #. Blank slate
-    #: config/i18n_common.config.php:20
-    'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => '申し訳ないですが、このアイテムは{{context}}に追加できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
-
     #: config/i18n_common.config.php:21
-    'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => '申し訳ないですが、このアイテムは{{language}}に翻訳できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
-
-    #: config/i18n_common.config.php:22
-    'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'このアイテムは、{{context}}に追加できません。(どうやってこのエラーメッセージを表示しているのでしょう？ハッキングしてきたのでしょうか？)',
-
-    #: config/i18n_common.config.php:26
     'Last chance, there’s no undo. Are you sure you want to do this?' => '最終確認です。この作業は取り消しできません。本当に実行しますか？',
 
     #. Delete action's labels
-    #: config/i18n_common.config.php:29
+    #: config/i18n_common.config.php:24
     '{{Button}} or <a>No, cancel</a>' => '{{Button}} または<a>取り消し</a>',
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:25
     'Yes, delete' => 'はい、削除します',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:26
     'Nothing to delete' => '削除するものがありません',
 
-    #: config/i18n_common.config.php:32
+    #: config/i18n_common.config.php:27
     'Yes, delete this item' => 'はい、このアイテムを削除します',
 
-    #: config/i18n_common.config.php:33
+    #: config/i18n_common.config.php:28
     'Yes, delete these {{count}} items' => 'はい、これら{{count}}個のアイテムを削除します',
 
-    #: config/i18n_common.config.php:35
+    #: config/i18n_common.config.php:30
     'To confirm the deletion, you need to enter this number in the field below:' => '削除の意思を確認するため、この数字を下の欄に入力してください。',
 
-    #: config/i18n_common.config.php:36
+    #: config/i18n_common.config.php:31
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => '入力した数字が間違っているため、このアイテムを削除できません。修正してください。',
 
-    #: config/i18n_common.config.php:38
+    #: config/i18n_common.config.php:33
     '1 item' => '1個のアイテム',
 
-    #: config/i18n_common.config.php:39
+    #: config/i18n_common.config.php:34
     '{{count}} items' => '{{count}}個のアイテム',
 
     #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:42
+    #: config/i18n_common.config.php:37
     'This item exists in <strong>{{context_count}} contexts</strong>.' => 'このアイテムは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
 
-    #: config/i18n_common.config.php:43
+    #: config/i18n_common.config.php:38
     'This item exists in <strong>{{language_count}} languages</strong>.' => 'このアイテムは<strong>{{language_count}}つの言語</strong>に翻訳されています。',
 
     #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:46
+    #: config/i18n_common.config.php:41
     'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'この項目は<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>{{children_count}}つの子項目</strong>があります。',
 
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:42
     'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'この項目は<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>1つの子項目</strong>があります。',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:43
     'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'この項目は<strong>{{language_count}}つの言語</strong>に翻訳され、<strong>{{children_count}}つの子項目</strong>があります。',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:44
     'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'この項目は<strong>{{language_count}}つの言語</strong>に翻訳され、<strong>1つの子項目</strong>があります。',
+
+    #. Keep only if the model has the behaviour Twinnable
+    #: config/i18n_common.config.php:47
+    'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => '申し訳ないですが、このアイテムは{{context}}に追加できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
+
+    #: config/i18n_common.config.php:48
+    'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => '申し訳ないですが、このアイテムは{{language}}に翻訳できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
+
+    #: config/i18n_common.config.php:49
+    'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'このアイテムは、{{context}}に追加できません。(どうやってこのエラーメッセージを表示しているのでしょう？ハッキングしてきたのでしょうか？)',
 
     #. Keep only if the model has the behaviour Tree
     #: config/i18n_common.config.php:52

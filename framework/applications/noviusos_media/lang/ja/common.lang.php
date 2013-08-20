@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 05/07/2013 14:57:58
+// Generated on 19/08/2013 18:12:14
 
-// 87 out of 95 messages are translated (91%).
-// 489 out of 543 words are translated (91%).
+// 87 out of 97 messages are translated (89%).
+// 489 out of 554 words are translated (89%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -13,7 +13,7 @@ return array(
     #: classes/controller/admin/attachment.ctrl.php:49
     #: classes/controller/admin/attachment.ctrl.php:55
     #: classes/controller/admin/media.ctrl.php:103
-    #: classes/controller/admin/media.ctrl.php:125
+    #: classes/controller/admin/media.ctrl.php:124
     'You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.' => '問題が発生しました。このサーバではファイルを保存する権限がありません。開発者またはシステム管理者に相談してください。',
 
     #: classes/controller/admin/attachment.ctrl.php:66
@@ -30,6 +30,9 @@ return array(
 
     #: classes/controller/admin/media.ctrl.php:63
     'This extension is not allowed due to security reasons.' => 'セキュリティ上の理由で、この拡張子のファイルは許可されていません。',
+
+    #: classes/controller/admin/appdesk.ctrl.php:76
+    'The cache has been renewed. All ready for you to enjoy!' => '',
 
     #: classes/controller/admin/folder.ctrl.php:56
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'おかしなことが起きました。このフォルダは空のはずですが、空ではありません。開発者または Novius OS に相談して、修復してください。ご迷惑をかけたことをお詫びします。',
@@ -51,7 +54,7 @@ return array(
     'This extension is not allowed.' => 'この拡張子の画像は許可されていません。',
 
     #: views/admin/permissions/folders.view.php:14
-    'Note: when nothing is selected, there is no restriction and this user can access all folders. The root folder is always accessible.' => '',
+    'Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.' => '',
 
     #: views/admin/permissions/general.view.php:16
     'Can add, edit and delete media files' => '',
@@ -62,16 +65,16 @@ return array(
     #: views/admin/permissions/general.view.php:30
     'Can add, edit and delete folders' => '',
 
-    #: views/admin/media_delete.view.php:20
+    #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'このメディアは使用されていません。削除しても構いません。',
 
-    #: views/admin/media_delete.view.php:25
+    #: views/admin/media_delete.view.php:26
     'The media is used <strong>once</strong> by an application.' => 'このメディアはアプリケーションで<strong>1回</strong>使用しています。',
 
-    #: views/admin/media_delete.view.php:26
+    #: views/admin/media_delete.view.php:27
     'The media is used <strong>{{count}} times</strong> by your applications.' => 'このメディアはアプリケーションで<strong>{{count}}回</strong>使用しています。',
 
-    #: views/admin/media_delete.view.php:31
+    #: views/admin/media_delete.view.php:32
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'はい、このメディアファイルは{{count}}回使用していますが、それでも削除します。',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -133,16 +136,16 @@ return array(
     #: config/controller/admin/appdesk.config.php:53
     'Dimensions:' => '',
 
-    #: views/admin/folder_delete.view.php:20
+    #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'このフォルダは空です。削除しても構いません。',
 
-    #: views/admin/folder_delete.view.php:25
+    #: views/admin/folder_delete.view.php:26
     'There is <strong>one media file</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが1個</strong>あります。',
 
-    #: views/admin/folder_delete.view.php:26
+    #: views/admin/folder_delete.view.php:27
     'There are <strong>{{count}} media files</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが{{count}}個</strong>あります。',
 
-    #: views/admin/folder_delete.view.php:31
+    #: views/admin/folder_delete.view.php:32
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'はい、このフォルダには{{count}}個のメディアファイルがありますが、このフォルダを削除します。',
 
     #: views/admin/folder.view.php:51
@@ -263,6 +266,9 @@ return array(
     #: config/controller/admin/appdesk.config.php:105
     'Pick' => '選択する',
 
+    #: config/controller/admin/appdesk.config.php:123
+    'Renew media cache' => '',
+
     #. Crud
     #: config/common/folder.config.php:27
     'Right, your new folder is ready.' => '新しいフォルダが作成されました。',
@@ -294,7 +300,7 @@ return array(
     #: config/common/folder.config.php:69
     'Add a media file in this folder' => 'このフォルダにメディアファイルを追加',
 
-    #: config/common/folder.config.php:85
+    #: config/common/folder.config.php:88
     'Add a sub-folder to this folder' => 'このフォルダにサブフォルダを追加',
 
     #. Crud
