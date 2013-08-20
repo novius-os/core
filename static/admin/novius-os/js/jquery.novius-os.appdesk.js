@@ -1663,6 +1663,9 @@ define('jquery-nos-appdesk',
                                                                 $.each(cellFormatters, function(i, formatter) {
                                                                     formatter = $.nosDataReplace($.extend(true, {}, formatter), args.row.data);
                                                                     formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
+                                                                    if (formatter.ignore && parseInt(formatter.ignore) > 0) {
+                                                                        return;
+                                                                    }
                                                                     if (formatter.replace) {
                                                                         args.$container.empty();
                                                                     }
