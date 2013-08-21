@@ -340,13 +340,10 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         if ($this->is_new) {
             $return['replaceTab'] = $this->config['controller_url'].'/insert_update/'.$item->{$this->pk};
         } else {
-            $labelUpdate = $this->config['tab']['labels']['update'];
             $return['action'] = array(
                 'action' => 'nosTabs',
                 'method' => 'update',
-                'tab' => array(
-                    'label' => (is_callable($labelUpdate) ? $labelUpdate($this->item) : (empty($labelUpdate) ? $this->item->title_item() : $this->item->{$labelUpdate})),
-                ),
+                'tab' => $this->get_tab_params(),
             );
             $return['dataset'] = \Nos\Controller::dataset_item($this->item);
         }
