@@ -43,4 +43,34 @@ class Orm_Behaviour_Author extends Orm_Behaviour
             $item->{$updated_by_property} = $user->user_id;
         }
     }
+
+    /**
+     * Add relations for created_by and updated_by
+     */
+    public function buildRelations()
+    {
+        $class = $this->_class;
+
+        $created_by_property = \Arr::get($this->_properties, 'created_by_property', null);
+        if ($created_by_property !== null) {
+            $class::addRelation('belongs_to', 'created_by', array(
+                'key_from' => $created_by_property,
+                'model_to' => 'Nos\User\Model_User',
+                'key_to' => 'user_id',
+                'cascade_save' => false,
+                'cascade_delete' => false,
+            ));
+        }
+
+        $updated_by_property = \Arr::get($this->_properties, 'updated_by_property', null);
+        if ($updated_by_property !== null) {
+            $class::addRelation('belongs_to', 'updated_by', array(
+                'key_from' => $updated_by_property,
+                'model_to' => 'Nos\User\Model_User',
+                'key_to' => 'user_id',
+                'cascade_save' => false,
+                'cascade_delete' => false,
+            ));
+        }
+    }
 }
