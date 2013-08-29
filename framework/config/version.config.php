@@ -9,6 +9,6 @@
  */
 
 return array(
-    'fullname' => 'Chiba 1.0.1',
-    'date'     => \Date::create_from_string('2013-05-17', 'mysql_date'),
+    'fullname' => 'Chiba 2',
+    'date'     => \Date::create_from_string('2013-08-29', 'mysql_date'),
 );

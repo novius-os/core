@@ -86,11 +86,11 @@ if (!empty($error)) {
 
             <h2>I want a <strong>website</strong></h2>
             <p>Novius OS is a CMS: you can create pages and manage your content. Once set up, your website will show here.</p>
-            <p><a href="http://docs.novius-os.org/en/chiba.1/install/whats_next/first_page.html" target="_blank">Check out our guide</a> to get started.</p>
+            <p><a href="http://docs.novius-os.org/en/chiba.2/install/whats_next/first_page.html" target="_blank">Check out our guide</a> to get started.</p>
 
             <h2>I want an <strong>application</strong></h2>
             <p>Novius OS is a web OS and framework: you can create custom applications which fit your business logic.</p>
-            <p><a href="http://docs.novius-os.org/en/chiba.1/app_create/index.html" target="_blank">Have a look at the documentation</a>.</p>
+            <p><a href="http://docs.novius-os.org/en/chiba.2/app_create/index.html" target="_blank">Have a look at the documentation</a>.</p>
 
             <h2>I don't know</h2>
             <p><a href="admin">Go to the administration panel</a>, it’s a good place to start.</p>
