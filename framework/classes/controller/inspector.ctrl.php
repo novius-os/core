@@ -42,7 +42,7 @@ class Controller_Inspector extends Controller_Admin_Application
             $inspector_path = static::get_path();
             $model = $config['model'];
 
-            if (!isset($config['appdesk']['inputName'])) {
+            if (!isset($config['appdesk']['inputName']) && isset($config['input']['key'])) {
                 $config['appdesk']['inputName'] = $config['input']['key'].'[]';
             }
 

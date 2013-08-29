@@ -269,6 +269,10 @@ class Config_Common
                     $data_mapping_key = $value;
                 }
 
+                if (!isset($initial_data_mapping[$data_mapping_key])) {
+                    throw new \Exception('Key `'.$data_mapping_key.'` is not defined in the model common configuration.');
+                }
+
                 if (!is_array($initial_data_mapping[$data_mapping_key])) {
                     $data_mapping[$data_mapping_key] = $data_mapping_extend === null ?
                         $initial_data_mapping[$data_mapping_key] : $data_mapping_extend;
