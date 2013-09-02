@@ -15,7 +15,8 @@ $media_count = $item->count_media();
 ?>
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
-<p><?php
+<p>
+<?php
 if ($media_count == 0) {
     ?>
     <p><?= __('The folder is empty and can be safely deleted.') ?></p>
@@ -34,6 +35,7 @@ if ($media_count == 0) {
     )); ?></p>
     <?php
 }
-?></p>
+?>
+</p>
     <input type="checkbox" name="contexts[]" class="count" data-count="1" value="all" checked style="display:none;" />
 </div>
