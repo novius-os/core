@@ -14,8 +14,9 @@ class Finder extends Fuel\Core\Finder
 
     public static function instance()
     {
+        $paths = \Config::get('novius-os.finder_paths');
         if (!static::$instance) {
-            static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
+            static::$instance = static::forge($paths);
         }
 
         return static::$instance;
