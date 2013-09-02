@@ -108,9 +108,9 @@ class Finder extends Fuel\Core\Finder
             $paths = $this->paths;
 
             // get extra information of the active request
-            if (class_exists('Request', false) and ($uri = \Uri::string()) !== null) {
-                $cache_id .= $uri;
-                $paths = array_merge(\Request::active()->get_paths(), $paths);
+            if (class_exists('Request', false) and ($request = \Request::active())) {
+                $request->module and $cache_id .= $request->module;
+                $paths = array_merge($request->get_paths(), $paths);
             }
         }
 
