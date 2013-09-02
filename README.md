@@ -1,3 +1,3 @@
-‘Blog’ application for Novius OS, an Open Source CMS
+This the core of Novius OS, an Open Source CMS
 
-See [noviusos_blognews](http://github.com/novius-os/noviusos_blognews) repository for more details.
+See [noviusos](http://github.com/novius-os/noviusos) repository for more details.
