@@ -212,7 +212,8 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     {
         $urls = array();
         foreach ($this->_properties['enhancers'] as $enhancer_name) {
-            foreach (Tools_Enhancer::cachedUrls($enhancer_name, $item) as $key => $url) {
+            $cachedUrls = Tools_Enhancer::cachedUrls($enhancer_name, $item);
+            foreach ($cachedUrls as $key => $url) {
                 $urls[] = $url;
             }
         }
