@@ -60,25 +60,6 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $urls;
     }
 
-    public function cachedUrls($item, $params = array())
-    {
-        $urls = array();
-        $enhancers = $this->_properties['enhancers'];
-        if (!empty($params['enhancer'])) {
-            if (in_array($params['enhancer'], $enhancers)) {
-                $enhancers = array($params['enhancer']);
-            }
-            unset($params['enhancer']);
-        }
-        foreach ($enhancers as $enhancer_name) {
-            foreach (\Nos\Tools_Enhancer::cachedUrls($enhancer_name, $item) as $key => $url) {
-                $urls[$key] = $url;
-            }
-        }
-
-        return $urls;
-    }
-
     /**
      * This is an alias for `$item->url(array('canonical' => true));`.
      *
