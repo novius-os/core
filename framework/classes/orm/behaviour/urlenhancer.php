@@ -60,6 +60,25 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
         return $urls;
     }
 
+    public function cachedUrls($item, $params = array())
+    {
+        $urls = array();
+        $enhancers = $this->_properties['enhancers'];
+        if (!empty($params['enhancer'])) {
+            if (in_array($params['enhancer'], $enhancers)) {
+                $enhancers = array($params['enhancer']);
+            }
+            unset($params['enhancer']);
+        }
+        foreach ($enhancers as $enhancer_name) {
+            foreach (\Nos\Tools_Enhancer::cachedUrls($enhancer_name, $item) as $key => $url) {
+                $urls[$key] = $url;
+            }
+        }
+
+        return $urls;
+    }
+
     /**
      * This is an alias for `$item->url(array('canonical' => true));`.
      *
@@ -182,13 +201,24 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     public function deleteCacheItem(Orm\Model $item)
     {
         $base = \Uri::base(false);
-        foreach ($this->_properties['enhancers'] as $enhancer_name) {
-            foreach (Tools_Enhancer::url_item($enhancer_name, $item) as $key => $url) {
+        $cachedUrls = $this->getCachedUrls($item);
+        foreach ($cachedUrls as $url) {
+            $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
+            \Nos\FrontCache::forge($cache_path)->delete();
+        }
+    }
 
-                $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
-                \Nos\FrontCache::forge($cache_path)->delete();
+    public function getCachedUrls(Orm\Model $item)
+    {
+        $urls = array();
+        foreach ($this->_properties['enhancers'] as $enhancer_name) {
+            foreach (Tools_Enhancer::cachedUrls($enhancer_name, $item) as $key => $url) {
+                $urls[] = $url;
             }
         }
+
+        \Event::trigger_function($this->_class.'.cachedUrls', array($item, &$urls));
+        return $urls;
     }
 
     /**

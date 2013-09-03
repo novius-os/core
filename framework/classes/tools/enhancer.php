@@ -43,12 +43,34 @@ class Tools_Enhancer
 
     protected static function _urls($enhancer_name, $params, $key_has_url_enhanced = false)
     {
-        // Check if any page contains this enhancer
-        $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
-        if (empty($page_enhanced)) {
-            return array();
+        $urlEnhanced = call_user_func(static::getEnhancerCallback($enhancer_name, 'getUrlEnhanced'), $params);
+
+        $urlPath = \Arr::get($params, 'urlPath', false);
+        $preview = \Arr::get($params, 'preview', false);
+
+        // Now fetch all the possible URLS
+        $urls = array();
+        if ($urlPath === false) {
+
+            $item = \Arr::get($params, 'item', false);
+            $context = \Arr::get($params, 'context', false);
+            if ($item && !$context) {
+                try {
+                    $context = $item->get_context();
+                } catch (\Exception $e) {
+                }
+            }
+
+            $urls = \Arr::merge($urls, static::getAllUrlsPrefixes($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced));
+        } else {
+            $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
         }
 
+        return $urls;
+    }
+
+    protected static function getEnhancerCallback($enhancer_name, $function_name)
+    {
         // Check if this enhancer exists
         $enhancer = Config_Data::get('enhancers.'.$enhancer_name, array());
         if (empty($enhancer)) {
@@ -79,53 +101,40 @@ class Tools_Enhancer
             return array();
         }
 
+        return method_exists($namespace.'\\'.$controller_name, $function_name) ? array($namespace.'\\'.$controller_name, $function_name) : null;
+    }
+
+    protected static function getAllUrlsPrefixes($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced = false)
+    {
+        // Check if any page contains this enhancer
+        $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
+        if (empty($page_enhanced)) {
+            return array();
+        }
+        $urls = array();
         // This files contains all the urlPath for the pages containing an URL enhancer
         $url_enhanced = Config_Data::get('url_enhanced', array());
-
-        $urlPath = \Arr::get($params, 'urlPath', false);
-        $preview = \Arr::get($params, 'preview', false);
-
-        $callback = array($namespace.'\\'.$controller_name, 'getUrlEnhanced');
-
-        $urlEnhanced = call_user_func($callback, $params);
-
-        // Now fetch all the possible URLS
-        $urls = array();
-        if ($urlPath === false) {
-
-            $item = \Arr::get($params, 'item', false);
-            $context = \Arr::get($params, 'context', false);
-            if ($item && !$context) {
-                try {
-                    $context = $item->get_context();
-                } catch (\Exception $e) {
-                }
+        foreach ($page_enhanced as $page_id => $page_params) {
+            if (is_array($page_params['published'])) {
+                $now = \Date::forge()->format('mysql');
+                $published = (empty($page_params['published']['start']) ||
+                    $page_params['published']['start'] < $now) &&
+                    (empty($page_params['published']['end']) ||
+                        $now < $page_params['published']['end']);
+            } else {
+                $published = $page_params['published'] == true;
             }
-
-            foreach ($page_enhanced as $page_id => $page_params) {
-                if (is_array($page_params['published'])) {
-                    $now = \Date::forge()->format('mysql');
-                    $published = (empty($page_params['published']['start']) ||
-                            $page_params['published']['start'] < $now) &&
-                        (empty($page_params['published']['end']) ||
-                            $now < $page_params['published']['end']);
-                } else {
-                    $published = $page_params['published'] == true;
-                }
-                if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
-                    $url_params = \Arr::get($url_enhanced, $page_id, false);
-                    if ($url_params) {
-                        if (empty($urlEnhanced) && !empty($url_params['url'])) {
-                            $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
-                        }
-                        $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
-                            Tools_Url::context($url_params['context']).
-                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
+            if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
+                $url_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($url_params) {
+                    if (empty($urlEnhanced) && !empty($url_params['url'])) {
+                        $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
                     }
+                    $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
+                        Tools_Url::context($url_params['context']).
+                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
                 }
             }
-        } else {
-            $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
         }
 
         return $urls;
@@ -143,5 +152,19 @@ class Tools_Enhancer
     {
         $urls = static::urls($enhancer_name, $params);
         return reset($urls) ?: null;
+    }
+
+    public static function cachedUrls($enhancer_name, $item)
+    {
+        $urls = static::url_item($enhancer_name, $item);
+        $cb = static::getEnhancerCallback($enhancer_name, 'getCachedUrls');
+        if ($cb !== null) {
+            $cachedUrls = call_user_func($cb, $item);
+            $context = $item->get_context();
+            foreach ($cachedUrls as $url) {
+                $urls = array_merge($urls, static::getAllUrlsPrefixes($enhancer_name, $context, $url, false, false));
+            }
+        }
+        return $urls;
     }
 }
