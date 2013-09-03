@@ -115,7 +115,7 @@ class Tools_Image
                 $source = $dest;
             }
 
-            $cmd = strtr("(:cmd) -size (:size) (:source) -colorspace RGB + profile 'icc' (:antialias) -geometry (:size)\\> (:dest)", array(
+            $cmd = strtr("(:cmd) -size (:size) (:source) -colorspace RGB +profile 'icc' (:antialias) -geometry (:size)\\> (:dest)", array(
                 '(:cmd)'       => static::$cmd_convert,
                 '(:size)'      => $max_width * $i, $max_height * $i,
                 '(:source)'    => $source,
