@@ -1,5 +1,20 @@
+before_commands:
+    - 'wget -O /tmp/noviusos.xml http://raw.github.com/novius-os/ci/master/chiba2/phpcs/ruleset.xml'
 tools:
     php_code_sniffer:
-        command: wget -O /tmp/noviusos.xml http://raw.github.com/novius-os/ci/master/chiba2/phpcs/ruleset.xml;phpcs -n
+        command: 'phpcs -n'
         config:
-            standard:   /tmp/noviusos.xml
+            standard: /tmp/noviusos.xml
+        filter:
+            excluded_paths:
+                - 'vendor/*'
+                - 'vendor/**'
+                - 'fuel-core/*'
+                - 'packages/*'
+                - 'static/*'
+                - 'hooks/*'
+                - 'logs/*'
+                - 'ci/*'
+                - 'framework/vendor/*'
+                - 'local/config/*'
+                - 'local/metadata/*'
