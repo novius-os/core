@@ -7,14 +7,7 @@ tools:
             standard: /tmp/noviusos.xml
         filter:
             excluded_paths:
-                - 'vendor/*'
                 - 'vendor/**'
                 - 'fuel-core/*'
                 - 'packages/*'
-                - 'static/*'
-                - 'hooks/*'
-                - 'logs/*'
-                - 'ci/*'
                 - 'framework/vendor/*'
-                - 'local/config/*'
-                - 'local/metadata/*'
