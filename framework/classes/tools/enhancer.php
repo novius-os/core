@@ -43,6 +43,12 @@ class Tools_Enhancer
 
     protected static function _urls($enhancer_name, $params, $key_has_url_enhanced = false)
     {
+        // Check if any page contains this enhancer
+        $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
+        if (empty($page_enhanced)) {
+            return array();
+        }
+
         $urlEnhanced = call_user_func(static::getEnhancerCallback($enhancer_name, 'getUrlEnhanced'), $params);
 
         $urlPath = \Arr::get($params, 'urlPath', false);
@@ -61,7 +67,30 @@ class Tools_Enhancer
                 }
             }
 
-            $urls = \Arr::merge($urls, static::getAllEnhancedUrls($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced));
+            // This files contains all the urlPath for the pages containing an URL enhancer
+            $url_enhanced = Config_Data::get('url_enhanced', array());
+            foreach ($page_enhanced as $page_id => $page_params) {
+                if (is_array($page_params['published'])) {
+                    $now = \Date::forge()->format('mysql');
+                    $published = (empty($page_params['published']['start']) ||
+                            $page_params['published']['start'] < $now) &&
+                        (empty($page_params['published']['end']) ||
+                            $now < $page_params['published']['end']);
+                } else {
+                    $published = $page_params['published'] == true;
+                }
+                if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
+                    $url_params = \Arr::get($url_enhanced, $page_id, false);
+                    if ($url_params) {
+                        if (empty($urlEnhanced) && !empty($url_params['url'])) {
+                            $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
+                        }
+                        $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
+                            Tools_Url::context($url_params['context']).
+                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
+                    }
+                }
+            }
         } else {
             $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
         }
@@ -102,42 +131,6 @@ class Tools_Enhancer
         }
 
         return method_exists($namespace.'\\'.$controller_name, $function_name) ? array($namespace.'\\'.$controller_name, $function_name) : null;
-    }
-
-    public static function getAllEnhancedUrls($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced = false)
-    {
-        // Check if any page contains this enhancer
-        $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
-        if (empty($page_enhanced)) {
-            return array();
-        }
-        $urls = array();
-        // This files contains all the urlPath for the pages containing an URL enhancer
-        $url_enhanced = Config_Data::get('url_enhanced', array());
-        foreach ($page_enhanced as $page_id => $page_params) {
-            if (is_array($page_params['published'])) {
-                $now = \Date::forge()->format('mysql');
-                $published = (empty($page_params['published']['start']) ||
-                    $page_params['published']['start'] < $now) &&
-                    (empty($page_params['published']['end']) ||
-                        $now < $page_params['published']['end']);
-            } else {
-                $published = $page_params['published'] == true;
-            }
-            if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
-                $url_params = \Arr::get($url_enhanced, $page_id, false);
-                if ($url_params) {
-                    if (empty($urlEnhanced) && !empty($url_params['url'])) {
-                        $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
-                    }
-                    $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
-                        Tools_Url::context($url_params['context']).
-                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
-                }
-            }
-        }
-
-        return $urls;
     }
 
     /**
