@@ -12,4 +12,3 @@ tools:
         config:
             standard: /tmp/noviusos.xml
     php_cpd: true
-    
