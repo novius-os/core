@@ -153,18 +153,4 @@ class Tools_Enhancer
         $urls = static::urls($enhancer_name, $params);
         return reset($urls) ?: null;
     }
-
-    public static function cachedUrls($enhancer_name, $item)
-    {
-        $urls = static::url_item($enhancer_name, $item);
-        $cb = static::getEnhancerCallback($enhancer_name, 'getCachedUrls');
-        if ($cb !== null) {
-            $cachedUrls = call_user_func($cb, $item);
-            $context = $item->get_context();
-            foreach ($cachedUrls as $url) {
-                $urls = array_merge($urls, static::getAllEnhancedUrls($enhancer_name, $context, $url, false, false));
-            }
-        }
-        return $urls;
-    }
 }
