@@ -61,7 +61,7 @@ class Tools_Enhancer
                 }
             }
 
-            $urls = \Arr::merge($urls, static::getAllUrls($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced));
+            $urls = \Arr::merge($urls, static::getAllEnhancedUrls($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced));
         } else {
             $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
         }
@@ -104,7 +104,7 @@ class Tools_Enhancer
         return method_exists($namespace.'\\'.$controller_name, $function_name) ? array($namespace.'\\'.$controller_name, $function_name) : null;
     }
 
-    protected static function getAllUrls($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced = false)
+    public static function getAllEnhancedUrls($enhancer_name, $context, $urlEnhanced, $preview, $key_has_url_enhanced = false)
     {
         // Check if any page contains this enhancer
         $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
@@ -162,7 +162,7 @@ class Tools_Enhancer
             $cachedUrls = call_user_func($cb, $item);
             $context = $item->get_context();
             foreach ($cachedUrls as $url) {
-                $urls = array_merge($urls, static::getAllUrls($enhancer_name, $context, $url, false, false));
+                $urls = array_merge($urls, static::getAllEnhancedUrls($enhancer_name, $context, $url, false, false));
             }
         }
         return $urls;

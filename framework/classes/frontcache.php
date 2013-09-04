@@ -372,6 +372,37 @@ class FrontCache
         }
     }
 
+    public static function deleteUrls($urls, $base = null)
+    {
+        if (!is_array($urls)) {
+            $urls = array($urls);
+        }
+        if ($base === null) {
+            $base = \Uri::base(false);
+        }
+        foreach ($urls as $url) {
+            $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
+            \Nos\FrontCache::forge($cache_path)->delete();
+        }
+    }
+
+    public static function deleteEnhancersUrls($enhancers, $urls, $context = null)
+    {
+        if (!is_array($enhancers)) {
+            $enhancers = array($enhancers);
+        }
+        if (!is_array($urls)) {
+            $urls = array($urls);
+        }
+        $enhancedUrls = array();
+        foreach ($enhancers as $enhancer) {
+            foreach ($urls as $url) {
+                $enhancedUrls = array_merge($enhancedUrls, Tools_Enhancer::getAllEnhancedUrls($enhancer, $context, $url, false, false));
+            }
+        }
+        static::deleteUrls($enhancedUrls);
+    }
+
     public static function deleteDir($path)
     {
         try {

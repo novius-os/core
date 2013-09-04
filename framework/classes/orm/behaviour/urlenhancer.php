@@ -182,25 +182,12 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     public function deleteCacheItem(Orm\Model $item)
     {
         $base = \Uri::base(false);
-        $cachedUrls = $this->getCachedUrls($item);
-        foreach ($cachedUrls as $url) {
-            $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
-            \Nos\FrontCache::forge($cache_path)->delete();
-        }
-    }
-
-    public function getCachedUrls(Orm\Model $item)
-    {
-        $urls = array();
         foreach ($this->_properties['enhancers'] as $enhancer_name) {
-            $cachedUrls = Tools_Enhancer::cachedUrls($enhancer_name, $item);
-            foreach ($cachedUrls as $key => $url) {
-                $urls[] = $url;
+            foreach (Tools_Enhancer::url_item($enhancer_name, $item) as $key => $url) {
+                $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
+                \Nos\FrontCache::forge($cache_path)->delete();
             }
         }
-
-        \Event::trigger_function($this->_class.'.cachedUrls', array($item, &$urls));
-        return $urls;
     }
 
     /**
