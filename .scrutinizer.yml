@@ -11,3 +11,4 @@ tools:
                 - 'fuel-core/*'
                 - 'packages/*'
                 - 'framework/vendor/*'
+  php_cpd: true
