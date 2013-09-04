@@ -1,14 +1,15 @@
 before_commands:
     - 'wget -O /tmp/noviusos.xml http://raw.github.com/novius-os/ci/master/chiba2/phpcs/ruleset.xml'
+filter:
+    excluded_paths:
+        - 'vendor/**'
+        - 'fuel-core/*'
+        - 'packages/*'
+        - 'framework/vendor/*'
 tools:
     php_code_sniffer:
         command: 'phpcs -n'
         config:
             standard: /tmp/noviusos.xml
-        filter:
-            excluded_paths:
-                - 'vendor/**'
-                - 'fuel-core/*'
-                - 'packages/*'
-                - 'framework/vendor/*'
-  php_cpd: true
+    php_cpd: true
+    
