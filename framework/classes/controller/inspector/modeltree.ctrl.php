@@ -119,30 +119,7 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
                 $config['roots'][0]['order_by'] = $config['order_by'];
             }
 
-            if (!isset($config['input']['query']) && isset($config['input']['key'])) {
-                $input_key = $config['input']['key'];
-                $config['input']['query'] = function($value, $query) use ($input_key) {
-                    //\Debug::dump(isset($_REQUEST['inspectors'][$input_key]) ? $_REQUEST['inspectors'][$input_key] : false, $input_key, $value);
-                    if (is_array($value) && count($value) && $value[0]) {
-                        //\Debug::dump('here');
-                        $table = explode('.', $input_key);
-                        if (count($table) == 1) {
-                            $query->where(array($input_key, 'in', $value));
-                        } else {
-                            $query->related(
-                                $table[0],
-                                array(
-                                    'where' => array(
-                                        array($input_key, 'in', $value),
-                                    ),
-                                )
-                            );
-                        }
-                    }
-
-                    return $query;
-                };
-            }
+            $config = static::_configInputQuery($config);
         }
         return parent::process_config($application, $config, $item_actions, $gridKey);
     }
