@@ -20,9 +20,13 @@ class Controller_Front_Application extends Controller
 
     public $default_config = array();
 
+    protected $enhancer_args;
+
     public function before()
     {
         $this->main_controller = Nos::main_controller();
+        $params = $this->request->method_params[count($this->request->method_params) - 1];
+        $this->enhancer_args = $params[count($params) - 1];
 
         return parent::before();
     }

@@ -68,7 +68,9 @@ class Tools_Enhancer
         // Replace the application name with 'controller'
         $parts[0] = 'controller';
         // Remove the action
-        array_pop($parts);
+        if (!isset($enhancer['use_routes']) || !$enhancer['use_routes']) {
+            array_pop($parts);
+        }
         // We're left with the fuel Controller classname!
         $controller_name = implode('_', $parts);
         $controller_name = \Inflector::words_to_upper($controller_name);

@@ -188,14 +188,23 @@ class Nos
         );
 
         if ($found) {
+            $use_routes = isset($config['use_routes']) && $config['use_routes'];
+            $request_url = (!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']);
+            if ($use_routes) {
+                $enhancer_url = static::main_controller()->getEnhancerUrl();
+                $request_url = $request_url.(empty($enhancer_url) ? '' : '/'.$enhancer_url);
+            }
+
             $function_content = self::hmvc(
-                (!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']),
+                $request_url,
                 array(
                     'args' => array($args),
                 )
             );
+
+
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
-                $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
+                $function_content = 'Enhancer '.$enhancer.' ('.$request_url.') returned empty content.';
             }
         } else {
             $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found.' : '';
