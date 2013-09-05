@@ -232,10 +232,6 @@ return array(
     #: config/controller/admin/page.config.php:204
     'Regenerate the cache every {{duration}} seconds' => 'Régénérer le cache toutes les {{duration}} secondes',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/page.config.php:217
-    'Save' => 'Enregistrer',
-
     #: config/controller/admin/inspector/page.config.php:33
     'Root' => 'Racine',
 

@@ -216,11 +216,6 @@ return array(
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'Référencement, URL du dossier&nbsp;:',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/folder.config.php:72
-    #: config/controller/admin/media.config.php:73
-    'Save' => 'Enregistrer',
-
     #: config/controller/admin/media.config.php:20
     #: config/common/media.config.php:118
     'Add a media file' => 'Ajouter un média',

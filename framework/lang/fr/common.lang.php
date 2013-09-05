@@ -141,6 +141,10 @@ return array(
     #: views/admin/data_catcher/form.view.php:166
     'Save' => 'Enregistrer',
 
+    #. Note to translator: This is a submit button
+    #: views/crud/toolbar.view.php:18
+    'Add' => 'Ajouter',
+
     #: views/form/layout_standard.view.php:82
     #: config/orm/behaviour/twinnable.config.php:68
     #: config/orm/behaviour/twinnable.config.php:71

@@ -29,7 +29,6 @@ $uniqid = uniqid('id_');
         'id' => 'user_id',
 
         'published' => null,
-        'save' => 'save',
 
         'subtitle' => array(),
 
