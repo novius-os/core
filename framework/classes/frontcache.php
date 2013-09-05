@@ -372,6 +372,10 @@ class FrontCache
         }
     }
 
+    /**
+     * @param $urls: list of absolute urls to be deleted
+     * @param null $base; base url (by default, take \Uri::base(false)
+     */
     public static function deleteUrls($urls, $base = null)
     {
         if (!is_array($urls)) {
@@ -386,17 +390,22 @@ class FrontCache
         }
     }
 
-    public static function deleteEnhancersUrls($enhancers, $urls, $context = null)
+    /**
+     * @param $enhancers: list of enhancer in which to delete urls
+     * @param $relative_urls: list of relative urls to be deleted
+     * @param null $context: context where to find
+     */
+    public static function deleteEnhancersUrls($enhancers, $relative_urls, $context = null)
     {
         if (!is_array($enhancers)) {
             $enhancers = array($enhancers);
         }
-        if (!is_array($urls)) {
-            $urls = array($urls);
+        if (!is_array($relative_urls)) {
+            $relative_urls = array($relative_urls);
         }
         $enhancedUrls = array();
         foreach ($enhancers as $enhancer) {
-            foreach ($urls as $url) {
+            foreach ($relative_urls as $url) {
                 $enhancedUrls = array_merge($enhancedUrls, static::getAllEnhancedUrls($enhancer, $url, $context));
             }
         }
@@ -413,7 +422,7 @@ class FrontCache
 
     /**
      * Inspired from the Tool_Enhancer::_url method.
-     * @todo: _url needs to be refactored and then this function can be moved to  Tool_Enhancer...
+     * @todo: _url needs to be refactored and then this function can be moved to Tool_Enhancer...
      *
      * @param $enhancer_name: name of the enhancer inside which want to search the url
      * @param $relative_enhanced_url: relative url after the page name
