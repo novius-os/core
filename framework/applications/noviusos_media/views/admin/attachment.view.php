@@ -17,7 +17,7 @@ $fieldset->set_config('field_template', '{field}');
 echo $fieldset->open('admin/noviusos_media/attachment/popup');
 
 //Note to translator: This is a submit button
-$saveField = __('Add')
+$saveField = __('Add');
 ?>
 <script type="text/javascript">
     require(['jquery-nos-toolbar-crud'],

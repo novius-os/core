@@ -10,7 +10,7 @@
 
 \Nos\I18n::current_dictionary('nos::common');
 
-if (is_a($save_field, 'Fieldset_Field')) {
+if ($save_field instanceof Fuel\Core\Fieldset_Field) {
     echo $save_field->set_template('{field}')->build();
 } elseif (!is_null($save_field)) {
     echo '<button type="submit" value="', $save_field, '" class="ui-priority-primary" data-icon="check">', $save_field, '</button>';
