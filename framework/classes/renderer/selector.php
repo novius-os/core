@@ -10,25 +10,23 @@
 
 namespace Nos;
 
-abstract class Renderer_Selector extends \Fieldset_Field
+abstract class Renderer_Selector extends Renderer
 {
-    protected $renderer_options = array();
-
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
         $this->before_construct($attributes, $rules);
-
-        if (!empty($attributes['renderer_options'])) {
-            $this->set_renderer_options($attributes['renderer_options']);
-        }
-        unset($attributes['renderer_options']);
-
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
+
+    /**
+     * @deprecated Use setRendererOptions() method instead
+     */
     public function set_renderer_options(array $options)
     {
-        $this->renderer_options = \Arr::merge($this->renderer_options, $options);
+        \Log::deprecated('The method Renderer_Selector->set_renderer_options() is deprecated, '.
+            'use Renderer_Selector->setRendererOptions() instead.', 'Chiba.2');
+        parent::setRendererOptions($options);
     }
 
     /**

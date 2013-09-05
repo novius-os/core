@@ -10,7 +10,7 @@
 
 namespace Nos\Media;
 
-class Renderer_Media extends \Fieldset_Field
+class Renderer_Media extends \Nos\Renderer
 {
     public static function _init()
     {
@@ -32,12 +32,6 @@ class Renderer_Media extends \Fieldset_Field
     }
 
     protected $options = array();
-
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($attributes, $this->options) = static::parse_options($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
-    }
 
     /**
      * How to display the field
@@ -61,7 +55,7 @@ class Renderer_Media extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($renderer = array())
+    protected static function parseOptions($renderer = array())
     {
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' media';
 
@@ -70,7 +64,7 @@ class Renderer_Media extends \Fieldset_Field
         }
 
         // Default options of the renderer
-        $renderer_options = array(
+        static::$DEFAULT_RENDERER_OPTIONS = array(
             'mode' => 'image',
             'inputFileThumb' => array(
                 'title' => __('Image from the Media Centre'),
@@ -83,12 +77,7 @@ class Renderer_Media extends \Fieldset_Field
             ),
         );
 
-        if (!empty($renderer['renderer_options'])) {
-            $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
-        }
-        unset($renderer['renderer_options']);
-
-        return array($renderer, $renderer_options);
+        return parent::parseOptions($renderer);
     }
 
     /**

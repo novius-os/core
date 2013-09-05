@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Virtualname extends \Fieldset_Field
+class Renderer_Virtualname extends Renderer
 {
     protected static $_friendly_slug_always_last = array();
 
