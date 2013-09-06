@@ -21,7 +21,6 @@ class Renderer_Radioset extends Renderer
     {
         $this->renderer_options['name'] = $name;
         parent::__construct($name, $label, $renderer, $rules, $fieldset);
-
     }
 
     public function build()

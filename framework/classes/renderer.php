@@ -18,7 +18,8 @@ class Renderer extends \Fieldset_Field
 
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        list($attributes, $this->renderer_options) = static::parseOptions($renderer);
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
+        $this->renderer_options = \Arr::merge($this->renderer_options, $renderer_options);
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
