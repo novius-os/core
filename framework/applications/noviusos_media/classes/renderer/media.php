@@ -31,8 +31,6 @@ class Renderer_Media extends \Nos\Renderer
         return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id']);
     }
 
-    protected $options = array();
-
     /**
      * How to display the field
      * @return type
@@ -41,11 +39,11 @@ class Renderer_Media extends \Nos\Renderer
     {
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
-        static::hydrate_options($this->options, array(
+        static::hydrate_options($this->renderer_options, array(
             'value' => $this->value,
             'required' => isset($this->rules['required']),
         ));
-        $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+        $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->renderer_options)));
 
         return (string) parent::build();
     }
