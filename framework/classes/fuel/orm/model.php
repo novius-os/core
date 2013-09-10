@@ -613,8 +613,8 @@ class Model extends \Orm\Model
             $check = true;
             if (is_array($cache_model_properties) &&
                 is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
-                $check = \Arr::get($cache_model_properties, 'check_property_callback');
-                $check = call_user_func($check, $class, $property);
+                $callback = \Arr::get($cache_model_properties, 'check_property_callback');
+                $check = call_user_func($callback, $class, $property);
             }
             if ($properties_reload && isset($this->_custom_data[$property]) && $check) {
                 static::properties(true);
@@ -751,10 +751,11 @@ class Model extends \Orm\Model
         $cache_model_properties = \Config::get('novius-os.cache_model_properties', false);
         if ($cache_model_properties !== false) {
             $check = true;
-            if (is_array($cache_model_properties) && is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
+            if (is_array($cache_model_properties)
+                && is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
                 $class = get_called_class();
-                $check = \Arr::get($cache_model_properties, 'check_property_callback');
-                $check = call_user_func($check, $class, $property);
+                $callback = \Arr::get($cache_model_properties, 'check_property_callback');
+                $check = call_user_func($callback, $class, $property);
             }
             if ($check) {
                 try {
