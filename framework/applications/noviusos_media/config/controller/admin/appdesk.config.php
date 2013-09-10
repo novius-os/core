@@ -119,6 +119,19 @@ return array(
     ),
     'toolbar' => array(
         'actions' => array(
+            'mass_upload' => array(
+                'label' => __('Add many files at once'),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'method' => 'add',
+                    'tab' => array(
+                        'url' => 'admin/noviusos_media/upload',
+                    ),
+                ),
+                'targets' => array(
+                    'toolbar-grid' => true,
+                ),
+            ),
             'renew_cache' => array(
                 'label' => __('Renew media cache'),
                 'action' => array(
