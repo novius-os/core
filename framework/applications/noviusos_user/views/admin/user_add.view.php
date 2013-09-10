@@ -54,7 +54,7 @@ $uniqid = uniqid('id_');
 </div>
 
 <?php
-echo \View::forge('noviusos_user::admin/password_srength', array(
+echo \View::forge('noviusos_user::admin/password_strength', array(
     'uniqid' => $uniqid,
     'input_name' => 'user_password',
 ), false);
