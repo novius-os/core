@@ -14,8 +14,9 @@ class Finder extends Fuel\Core\Finder
 
     public static function instance()
     {
+        $paths = \Config::get('novius-os.finder_paths');
         if (!static::$instance) {
-            static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
+            static::$instance = static::forge($paths);
         }
 
         return static::$instance;
@@ -107,9 +108,9 @@ class Finder extends Fuel\Core\Finder
             $paths = $this->paths;
 
             // get extra information of the active request
-            if (class_exists('Request', false) and ($uri = \Uri::string()) !== null) {
-                $cache_id .= $uri;
-                $paths = array_merge(\Request::active()->get_paths(), $paths);
+            if (class_exists('Request', false) and ($request = \Request::active())) {
+                $request->module and $cache_id .= $request->module;
+                $paths = array_merge($request->get_paths(), $paths);
             }
         }
 

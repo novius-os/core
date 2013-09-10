@@ -267,6 +267,12 @@ return array(
         'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
 
         'migration_config_file' => false,
+
+        'finder_paths' => array(
+            APPPATH,
+            NOSPATH,
+            COREPATH,
+        ),
     ),
 );
 
