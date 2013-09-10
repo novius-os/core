@@ -607,17 +607,25 @@ class Model extends \Orm\Model
 
         $return = parent::set($property, $value);
 
-        if (\Config::get('novius-os.cache_model_properties', false)) {
-            if ($properties_reload && isset($this->_custom_data[$property])) {
+        $class = get_called_class();
+        $cache_model_properties = \Config::get('novius-os.cache_model_properties', false);
+        if ($cache_model_properties !== false) {
+            $check = true;
+            if (is_array($cache_model_properties) &&
+                is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
+                $check = \Arr::get($cache_model_properties, 'check_property_callback');
+                $check = call_user_func($check, $class, $property);
+            }
+            if ($properties_reload && isset($this->_custom_data[$property]) && $check) {
                 static::properties(true);
                 unset($this->_custom_data[$property]);
                 $return = parent::set($property, $value);
             }
         }
 
-        $class = get_called_class();
         if ($value === '' && array_key_exists($property, static::$_properties_cached[$class]) &&
-            isset(static::$_properties_cached[$class][$property]['convert_empty_to_null']) && static::$_properties_cached[$class][$property]['convert_empty_to_null']) {
+            isset(static::$_properties_cached[$class][$property]['convert_empty_to_null']) &&
+            static::$_properties_cached[$class][$property]['convert_empty_to_null']) {
             $return = parent::set($property, null);
         }
 
@@ -740,11 +748,20 @@ class Model extends \Orm\Model
             $property = static::prefix().$property;
         }
 
-        if (\Config::get('novius-os.cache_model_properties', false)) {
-            try {
-                return parent::get($property);
-            } catch (\OutOfBoundsException $e) {
-                static::properties(true);
+        $cache_model_properties = \Config::get('novius-os.cache_model_properties', false);
+        if ($cache_model_properties !== false) {
+            $check = true;
+            if (is_array($cache_model_properties) && is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
+                $class = get_called_class();
+                $check = \Arr::get($cache_model_properties, 'check_property_callback');
+                $check = call_user_func($check, $class, $property);
+            }
+            if ($check) {
+                try {
+                    return parent::get($property);
+                } catch (\OutOfBoundsException $e) {
+                    static::properties(true);
+                }
             }
         }
 
