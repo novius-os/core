@@ -75,6 +75,7 @@ if (!MBSTRING) {
         'ModuleNotFoundException' => FUEL_EXTEND_PATH.'module.php',
         'Profiler' => FUEL_EXTEND_PATH.'profiler.php',
         'Refine' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'refine.php',
+        'Request' => FUEL_EXTEND_PATH.'request.php',
         'Response' => FUEL_EXTEND_PATH.'response.php',
         'Security' => FUEL_EXTEND_PATH.'security.php',
         'Session' => FUEL_EXTEND_PATH.'session.php',
