@@ -19,7 +19,7 @@ Nos\I18n::current_dictionary('noviusos_media::common');
 
 <p>
     <label>
-        <input type="radio" name="perm[noviusos_media::media][]" value="1_draft_only" <?= (int) $role->getPermissionValue('noviusos_media::media', 1) == 1 ? 'checked' : '' ?> />
+        <input type="radio" name="perm[noviusos_media::media][]" value="1_draft_only" <?= (int) $role->getPermissionValue('noviusos_media::media', 2) == 1 ? 'checked' : '' ?> />
         <?= __('Can visualise and use media files only') ?>
     </label>
 </p>
