@@ -44,7 +44,7 @@ define(
                         media_extension: ['image']
                     },
                     inspectors : {
-                        extensions : {
+                        extension : {
                             hide : true
                         }
                     }
