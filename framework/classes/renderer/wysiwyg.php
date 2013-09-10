@@ -10,14 +10,8 @@
 
 namespace Nos;
 
-class Renderer_Wysiwyg extends \Fieldset_Field
+class Renderer_Wysiwyg extends Renderer
 {
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($attributes, $this->options) = static::parse_options($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
-    }
-
     /**
      * Standalone build of the wysiwyg renderer.
      *
@@ -26,7 +20,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
      */
     public static function renderer($renderer = array())
     {
-        list($attributes, $renderer_options) = static::parse_options($renderer);
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
 
         $value = '';
         if ( !empty($attributes['value']) ) {
@@ -46,18 +40,19 @@ class Renderer_Wysiwyg extends \Fieldset_Field
     }
 
     /**
-     * How to display the field
-     * @return string
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
 
-        $this->options = Tools_Wysiwyg::jsOptions($this->options, $this->fieldset()->getInstance());
+        $this->renderer_options = Tools_Wysiwyg::jsOptions($this->renderer_options, $this->fieldset()->getInstance());
 
         $this->value = Tools_Wysiwyg::prepare_renderer($this->value);
-        $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+        $this->set_attribute('data-wysiwyg-options', htmlspecialchars(\Format::forge()->to_json($this->renderer_options)));
 
         // Need to encode twice since timymce decodes its content one time (bug fix added for the enhancer bug)
         $this->value = htmlspecialchars($this->value);
@@ -69,7 +64,7 @@ class Renderer_Wysiwyg extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($renderer = array())
+    protected static function parseOptions($renderer = array())
     {
         $renderer['type']  = 'textarea';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' tinymce not_initialized';
@@ -93,9 +88,8 @@ class Renderer_Wysiwyg extends \Fieldset_Field
     /**
      * Generates the JavaScript to initialise the renderer
      *
-     * @param       $id
-     * @param array $renderer_options
-     *
+     * @param string $id ID attribute of the <input> tag
+     * @param array $renderer_options The renderer options
      * @return string JavaScript to execute to initialise the renderer
      */
     public static function js_init($id, $renderer_options = array())

@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Date_Picker extends \Fieldset_Field
+class Renderer_Date_Picker extends Renderer
 {
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'datepicker' => array(
@@ -33,7 +33,7 @@ class Renderer_Date_Picker extends \Fieldset_Field
     );
 
     /**
-     * Standalone build of the media renderer.
+     * Standalone build of the renderer.
      *
      * @param  array  $renderer Renderer definition (attributes + renderer_options)
      * @return string The <input> tag + JavaScript to initialise it
@@ -47,30 +47,23 @@ class Renderer_Date_Picker extends \Fieldset_Field
         return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
     }
 
-    protected $options = array();
-
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($attributes, $this->options) = static::parse_options($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
-    }
-
     /**
-     * How to display the field
-     * @return type
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
         parent::build();
         $attributes = $this->attributes;
-        $datepicker_options = $this->options['datepicker'];
+        $datepicker_options = $this->renderer_options['datepicker'];
         $this->attributes = array();
         $this->set_attribute(array(
             'type' => 'hidden',
             'id' => $attributes['id'],
             'data-datepicker-options' => htmlspecialchars(\Format::forge()->to_json($datepicker_options)),
         ));
-        $this->fieldset()->append(static::js_init($attributes['id'], $this->options));
+        $this->fieldset()->append(static::js_init($attributes['id'], $this->renderer_options));
         $attributes['type'] = 'text';
         $attributes['id'] = ltrim($datepicker_options['altField'], '#');
         unset($attributes['value']);
@@ -89,7 +82,7 @@ class Renderer_Date_Picker extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($renderer = array())
+    protected static function parseOptions($renderer = array())
     {
         $renderer['type'] = 'hidden';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' datepicker';
@@ -102,13 +95,7 @@ class Renderer_Date_Picker extends \Fieldset_Field
             $renderer['size'] = 9;
         }
 
-        // Default options of the renderer
-        $renderer_options = static::$DEFAULT_RENDERER_OPTIONS;
-
-        if (!empty($renderer['renderer_options'])) {
-            $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
-        }
-        unset($renderer['renderer_options']);
+        list($renderer, $renderer_options) = parent::parseOptions($renderer);
 
         if (empty($renderer_options['datepicker']['altField'])) {
             $renderer_options['datepicker']['altField'] = '#alt_'.$renderer['id'];
@@ -120,7 +107,8 @@ class Renderer_Date_Picker extends \Fieldset_Field
     /**
      * Generates the JavaScript to initialise the renderer
      *
-     * @param   string  HTML ID attribute of the <input> tag
+     * @param string $id ID attribute of the <input> tag
+     * @param array $renderer_options The renderer options
      * @return string JavaScript to execute to initialise the renderer
      */
     protected static function js_init($id, $renderer_options = array())

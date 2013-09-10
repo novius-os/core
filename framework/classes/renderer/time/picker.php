@@ -10,21 +10,21 @@
 
 namespace Nos;
 
-class Renderer_Time_Picker extends \Fieldset_Field
+class Renderer_Time_Picker extends Renderer
 {
     static protected $DEFAULT_RENDERER_OPTIONS = array(
         'timeFormat' => 'HH:mm',
     );
 
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($attributes, $this->options) = static::parse_options($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
-    }
-
+    /**
+     * Standalone build of the renderer.
+     *
+     * @param  array  $renderer Renderer definition (attributes + renderer_options)
+     * @return string The <input> tag + JavaScript to initialise it
+     */
     public static function renderer($renderer = array())
     {
-        list($attributes, $renderer_options) = static::parse_options($renderer);
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
         $attributes['data-timepicker-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
 
         return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id']);
@@ -35,43 +35,46 @@ class Renderer_Time_Picker extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($attributes = array())
+    protected static function parseOptions($renderer = array())
     {
-        $attributes['type'] = 'text';
-        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' timepicker';
+        $renderer['type'] = 'text';
+        $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' timepicker';
 
-        if (empty($attributes['id'])) {
-            $attributes['id'] = uniqid('date_');
+        if (empty($renderer['id'])) {
+            $renderer['id'] = uniqid('date_');
         }
 
-        $renderer_options = static::$DEFAULT_RENDERER_OPTIONS;
+        list($renderer, $renderer_options) = parent::parseOptions($renderer);
 
-        if (!empty($attributes['renderer_options'])) {
-            $renderer_options = \Arr::merge($renderer_options, $attributes['renderer_options']);
-        }
-        unset($attributes['renderer_options']);
-
-        if (empty($attributes['size'])) {
-            $attributes['size'] = 5;
+        if (empty($renderer['size'])) {
+            $renderer['size'] = 5;
         }
 
-        return array($attributes, $renderer_options);
+        return array($renderer, $renderer_options);
     }
+
     /**
-     * How to display the field
-     * @return string
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
         parent::build();
 
         $this->fieldset()->append($this->js_init($this->get_attribute('id')));
-        $timepicker_options = $this->options;
+        $timepicker_options = $this->renderer_options;
         $this->set_attribute('data-timepicker-options', htmlspecialchars(\Format::forge()->to_json($timepicker_options)));
 
         return (string) parent::build();
     }
 
+    /**
+     * Generates the JavaScript to initialise the renderer
+     *
+     * @param string $id ID attribute of the <input> tag
+     * @return string JavaScript to execute to initialise the renderer
+     */
     public function js_init($id)
     {
         return \View::forge(

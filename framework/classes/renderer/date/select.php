@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Date_Select extends \Fieldset_Field
+class Renderer_Date_Select extends Renderer
 {
     /**
      * @var \Nos\Fieldset_Field

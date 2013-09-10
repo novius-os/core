@@ -10,10 +10,8 @@
 
 namespace Nos;
 
-class Renderer_Tag extends \Fieldset_Field
+class Renderer_Tag extends Renderer
 {
-    protected $options = array();
-
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
         $attributes['type']  = 'text';
@@ -23,18 +21,13 @@ class Renderer_Tag extends \Fieldset_Field
             $attributes['id'] = uniqid('tag_');
         }
 
-        if (!empty($attributes['renderer_options'])) {
-            $this->options = \Arr::merge($this->options, $attributes['renderer_options']);
-        }
-        unset($attributes['renderer_options']);
-
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
     public function set_value($value, $repopulate = false)
     {
         if (is_array($value)) {
-            $labels = static::get_labels_from_tags($value, $this->options['label_column']);
+            $labels = static::get_labels_from_tags($value, $this->renderer_options['label_column']);
             $value = implode(',', $labels);
         }
 
@@ -54,29 +47,30 @@ class Renderer_Tag extends \Fieldset_Field
                 $tags[$tag] = $tag;
             }
         }
-        $item->{$this->options['relation_name']} = array();
+        $item->{$this->renderer_options['relation_name']} = array();
         if (!count($tags)) {
             return;
         }
 
-        $tag_class = $this->options['model'];
+        $tag_class = $this->renderer_options['model'];
 
-        $item->{$this->options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->options['label_column'], 'IN', array_keys($tags)))));
+        $item->{$this->renderer_options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->renderer_options['label_column'], 'IN', array_keys($tags)))));
 
-        foreach ($item->{$this->options['relation_name']} as $obj) {
-            unset($tags[$obj->{$this->options['label_column']}]);
+        foreach ($item->{$this->renderer_options['relation_name']} as $obj) {
+            unset($tags[$obj->{$this->renderer_options['label_column']}]);
         }
         foreach ($tags as $tag) {
-            $tag_obj = new $tag_class(array($this->options['label_column'] => $tag));
-            $item->{$this->options['relation_name']}[] = $tag_obj;
+            $tag_obj = new $tag_class(array($this->renderer_options['label_column'] => $tag));
+            $item->{$this->renderer_options['relation_name']}[] = $tag_obj;
         }
 
         return false;
     }
 
     /**
-     * How to display the field
-     * @return string
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
@@ -86,13 +80,18 @@ class Renderer_Tag extends \Fieldset_Field
         return (string) parent::build();
     }
 
+    /**
+     * Generates the JavaScript to initialise the renderer
+     *
+     * @return string JavaScript to execute to initialise the renderer
+     */
     public function js_init()
     {
         // we have to find why it's called two times...
-        // @todo: This renderer is supposing that they are not a lot of tags (< 500) : this is generally the case, but if there is more, think of an Ajax mode       $tags = $this->options['model']::find('all');
-        $model = $this->options['model'];
+        // @todo: This renderer is supposing that they are not a lot of tags (< 500) : this is generally the case, but if there is more, think of an Ajax mode       $tags = $this->renderer_options['model']::find('all');
+        $model = $this->renderer_options['model'];
         $tags = $model::find('all');
-        $labels = static::get_labels_from_tags($tags, $this->options['label_column']);
+        $labels = static::get_labels_from_tags($tags, $this->renderer_options['label_column']);
 
         return \View::forge('renderer/tag', array(
             'id' => $this->get_attribute('id'),

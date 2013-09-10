@@ -10,33 +10,43 @@
 
 namespace Nos;
 
-class Renderer
+class Renderer extends \Fieldset_Field
 {
-    public static function date($field, $value = null, array $attributes = array())
+    protected static $DEFAULT_RENDERER_OPTIONS = array();
+
+    protected $renderer_options = array();
+
+    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        if (is_array($field)) {
-            $attributes = $field;
-            ! array_key_exists('value', $attributes) and $attributes['value'] = '';
-        } else {
-            $attributes['name'] = (string) $field;
-            $attributes['value'] = (string) $value;
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
+        $this->renderer_options = \Arr::merge($this->renderer_options, $renderer_options);
+        parent::__construct($name, $label, $attributes, $rules, $fieldset);
+    }
+
+    /**
+     * Set the renderer options
+     * @param  array $options
+     */
+    public function setRendererOptions(array $options)
+    {
+        $this->renderer_options = \Arr::merge($this->renderer_options, $options);
+    }
+
+    /**
+     * Parse the renderer array to get attributes and the renderer options
+     * @param  array $renderer
+     * @return array 0: attributes, 1: renderer options
+     */
+    protected static function parseOptions($renderer = array())
+    {
+        // Default options of the renderer
+        $renderer_options = static::$DEFAULT_RENDERER_OPTIONS;
+
+        if (!empty($renderer['renderer_options'])) {
+            $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
         }
+        unset($renderer['renderer_options']);
 
-        $attrs  = $attributes;
-        $output = '';
-
-        $attrs['name'] = $attributes['name'].'_year';
-        $attrs['value'] = mb_substr($attributes['value'], 0, 4);
-        $output .= html_tag('input', Form::attr_to_string($attrs));
-
-        $attrs['name'] = $attributes['name'].'_month';
-        $attrs['value'] = mb_substr($attributes['value'], 5, 2);
-        $output .= html_tag('input', Form::attr_to_string($attrs));
-
-        $attrs['name'] = $attributes['name'].'_day';
-        $attrs['value'] = mb_substr($attributes['value'], 8, 2);
-        $output .= html_tag('input', Form::attr_to_string($attrs));
-
-        return $output;
+        return array($renderer, $renderer_options);
     }
 }

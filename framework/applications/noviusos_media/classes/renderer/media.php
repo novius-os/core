@@ -10,11 +10,35 @@
 
 namespace Nos\Media;
 
-class Renderer_Media extends \Fieldset_Field
+class Renderer_Media extends \Nos\Renderer
 {
+    protected static $DEFAULT_RENDERER_OPTIONS = array(
+        'mode' => 'image',
+        'inputFileThumb' => array(
+            'title' => 'Image from the Media Centre',
+            'texts' => array(
+                'add'            => 'Pick an image',
+                'edit'           => 'Pick another image',
+                'delete'         => 'No image',
+                'wrongExtension' => 'This extension is not allowed.',
+            ),
+        ),
+    );
+
     public static function _init()
     {
         \Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
+        // Translate default options of the renderer
+        static::$DEFAULT_RENDERER_OPTIONS['inputFileThumb'] = array(
+            'title' => __('Image from the Media Centre'),
+            'texts' => array(
+                'add'            => __('Pick an image'),
+                'edit'           => __('Pick another image'),
+                'delete'         => __('No image'),
+                'wrongExtension' => __('This extension is not allowed.'),
+            ),
+        );
     }
     /**
      * Standalone build of the media renderer.
@@ -31,27 +55,20 @@ class Renderer_Media extends \Fieldset_Field
         return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id']);
     }
 
-    protected $options = array();
-
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($attributes, $this->options) = static::parse_options($renderer);
-        parent::__construct($name, $label, $attributes, $rules, $fieldset);
-    }
-
     /**
-     * How to display the field
-     * @return type
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
         parent::build();
         $this->fieldset()->append(static::js_init($this->get_attribute('id')));
-        static::hydrate_options($this->options, array(
+        static::hydrate_options($this->renderer_options, array(
             'value' => $this->value,
             'required' => isset($this->rules['required']),
         ));
-        $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->options)));
+        $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->renderer_options)));
 
         return (string) parent::build();
     }
@@ -61,7 +78,7 @@ class Renderer_Media extends \Fieldset_Field
      * @param  array $renderer
      * @return array 0: attributes, 1: renderer options
      */
-    protected static function parse_options($renderer = array())
+    protected static function parseOptions($renderer = array())
     {
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' media';
 
@@ -69,37 +86,18 @@ class Renderer_Media extends \Fieldset_Field
             $renderer['id'] = uniqid('media_');
         }
 
-        // Default options of the renderer
-        $renderer_options = array(
-            'mode' => 'image',
-            'inputFileThumb' => array(
-                'title' => __('Image from the Media Centre'),
-                'texts' => array(
-                    'add'            => __('Pick an image'),
-                    'edit'           => __('Pick another image'),
-                    'delete'         => __('No image'),
-                    'wrongExtension' => __('This extension is not allowed.'),
-                ),
-            ),
-        );
-
-        if (!empty($renderer['renderer_options'])) {
-            $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
-        }
-        unset($renderer['renderer_options']);
-
-        return array($renderer, $renderer_options);
+        return parent::parseOptions($renderer);
     }
 
     /**
      * Hydrate the options array to fill in the media URL for the specified value
      * @param array $options
-     * @param int   $media_id
+     * @param array $attributes
      */
     protected static function hydrate_options(&$options, $attributes = array())
     {
         if (!empty($attributes['value'])) {
-            $media = \Nos\Media\Model_Media::find($attributes['value']);
+            $media = Model_Media::find($attributes['value']);
             if (!empty($media)) {
                 $options['inputFileThumb']['file'] = $media->isImage() ? $media->urlResized(64, 64) : $media->url();
             }

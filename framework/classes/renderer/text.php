@@ -12,6 +12,11 @@ namespace Nos;
 
 class Renderer_Text extends \Fieldset_Field
 {
+    /**
+     * Build the field
+     *
+     * @return  string
+     */
     public function build()
     {
         return $this->template((string) $this->value);

@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Datetime_Picker extends \Fieldset_Field
+class Renderer_Datetime_Picker extends Renderer
 {
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'datepicker' => array(
@@ -36,7 +36,7 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
     );
 
     /**
-     * Standalone build of the media renderer.
+     * Standalone build of the renderer.
      *
      * @param  array  $renderer Renderer definition (attributes + renderer_options)
      * @return string The <input> tag + JavaScript to initialise it
@@ -50,30 +50,23 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
     }
 
-    protected $options = array();
-
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($this->attributes, $this->options) = static::parseOptions($renderer);
-        parent::__construct($name, $label, $this->attributes, $rules, $fieldset);
-    }
-
     /**
-     * How to display the field
-     * @return type
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
         parent::build();
         $attributes = $this->attributes;
-        $datepicker_options = $this->options['datepicker'];
+        $datepicker_options = $this->renderer_options['datepicker'];
         $this->attributes = array();
         $this->set_attribute(array(
             'type' => 'hidden',
             'id' => $attributes['id'],
             'data-datepicker-options' => htmlspecialchars(\Format::forge()->to_json($datepicker_options)),
         ));
-        $this->fieldset()->append(static::jsInit($attributes['id'], $this->options));
+        $this->fieldset()->append(static::jsInit($attributes['id'], $this->renderer_options));
         $attributes['type'] = 'text';
         $attributes['id'] = ltrim($attributes['id'].'_displayed', '#');
         unset($attributes['value']);
@@ -105,21 +98,14 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             $renderer['size'] = 17;
         }
 
-        // Default options of the renderer
-        $renderer_options = static::$DEFAULT_RENDERER_OPTIONS;
-
-        if (!empty($renderer['renderer_options'])) {
-            $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
-        }
-        unset($renderer['renderer_options']);
-
-        return array($renderer, $renderer_options);
+        return parent::parseOptions($renderer);
     }
 
     /**
      * Generates the JavaScript to initialise the renderer
      *
-     * @param   string  HTML ID attribute of the <input> tag
+     * @param string $id ID attribute of the <input> tag
+     * @param array $renderer_options The renderer options
      * @return string JavaScript to execute to initialise the renderer
      */
     protected static function jsInit($id, $renderer_options = array())
