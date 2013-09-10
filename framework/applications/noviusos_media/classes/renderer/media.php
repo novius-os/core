@@ -12,9 +12,33 @@ namespace Nos\Media;
 
 class Renderer_Media extends \Nos\Renderer
 {
+    protected static $DEFAULT_RENDERER_OPTIONS = array(
+        'mode' => 'image',
+        'inputFileThumb' => array(
+            'title' => 'Image from the Media Centre',
+            'texts' => array(
+                'add'            => 'Pick an image',
+                'edit'           => 'Pick another image',
+                'delete'         => 'No image',
+                'wrongExtension' => 'This extension is not allowed.',
+            ),
+        ),
+    );
+
     public static function _init()
     {
         \Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
+
+        // Translate default options of the renderer
+        static::$DEFAULT_RENDERER_OPTIONS['inputFileThumb'] = array(
+            'title' => __('Image from the Media Centre'),
+            'texts' => array(
+                'add'            => __('Pick an image'),
+                'edit'           => __('Pick another image'),
+                'delete'         => __('No image'),
+                'wrongExtension' => __('This extension is not allowed.'),
+            ),
+        );
     }
     /**
      * Standalone build of the media renderer.
@@ -32,8 +56,9 @@ class Renderer_Media extends \Nos\Renderer
     }
 
     /**
-     * How to display the field
-     * @return type
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
@@ -61,32 +86,18 @@ class Renderer_Media extends \Nos\Renderer
             $renderer['id'] = uniqid('media_');
         }
 
-        // Default options of the renderer
-        static::$DEFAULT_RENDERER_OPTIONS = array(
-            'mode' => 'image',
-            'inputFileThumb' => array(
-                'title' => __('Image from the Media Centre'),
-                'texts' => array(
-                    'add'            => __('Pick an image'),
-                    'edit'           => __('Pick another image'),
-                    'delete'         => __('No image'),
-                    'wrongExtension' => __('This extension is not allowed.'),
-                ),
-            ),
-        );
-
         return parent::parseOptions($renderer);
     }
 
     /**
      * Hydrate the options array to fill in the media URL for the specified value
      * @param array $options
-     * @param int   $media_id
+     * @param array $attributes
      */
     protected static function hydrate_options(&$options, $attributes = array())
     {
         if (!empty($attributes['value'])) {
-            $media = \Nos\Media\Model_Media::find($attributes['value']);
+            $media = Model_Media::find($attributes['value']);
             if (!empty($media)) {
                 $options['inputFileThumb']['file'] = $media->isImage() ? $media->urlResized(64, 64) : $media->url();
             }

@@ -40,8 +40,9 @@ class Renderer_Wysiwyg extends Renderer
     }
 
     /**
-     * How to display the field
-     * @return string
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
@@ -87,9 +88,8 @@ class Renderer_Wysiwyg extends Renderer
     /**
      * Generates the JavaScript to initialise the renderer
      *
-     * @param       $id
-     * @param array $renderer_options
-     *
+     * @param string $id ID attribute of the <input> tag
+     * @param array $renderer_options The renderer options
      * @return string JavaScript to execute to initialise the renderer
      */
     public static function js_init($id, $renderer_options = array())

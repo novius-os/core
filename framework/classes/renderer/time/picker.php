@@ -16,6 +16,12 @@ class Renderer_Time_Picker extends Renderer
         'timeFormat' => 'HH:mm',
     );
 
+    /**
+     * Standalone build of the renderer.
+     *
+     * @param  array  $renderer Renderer definition (attributes + renderer_options)
+     * @return string The <input> tag + JavaScript to initialise it
+     */
     public static function renderer($renderer = array())
     {
         list($attributes, $renderer_options) = static::parseOptions($renderer);
@@ -46,9 +52,11 @@ class Renderer_Time_Picker extends Renderer
 
         return array($renderer, $renderer_options);
     }
+
     /**
-     * How to display the field
-     * @return string
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
@@ -61,6 +69,12 @@ class Renderer_Time_Picker extends Renderer
         return (string) parent::build();
     }
 
+    /**
+     * Generates the JavaScript to initialise the renderer
+     *
+     * @param string $id ID attribute of the <input> tag
+     * @return string JavaScript to execute to initialise the renderer
+     */
     public function js_init($id)
     {
         return \View::forge(

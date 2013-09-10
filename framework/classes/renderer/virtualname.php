@@ -22,6 +22,11 @@ class Renderer_Virtualname extends Renderer
 
     public $template = '{label}{required} <div class="table-field">{field} <span>&nbsp;.html</span></div> {use_title_checkbox}';
 
+    /**
+     * Build the field
+     *
+     * @return  string
+     */
     public function build()
     {
         parent::build();
@@ -46,6 +51,11 @@ class Renderer_Virtualname extends Renderer
 
     }
 
+    /**
+     * Generates the JavaScript to initialise the renderer
+     *
+     * @return string JavaScript to execute to initialise the renderer
+     */
     public function js_init()
     {
         $default = \Config::get('friendly_slug.active_setup', 'default');

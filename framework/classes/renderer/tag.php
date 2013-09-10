@@ -68,8 +68,9 @@ class Renderer_Tag extends Renderer
     }
 
     /**
-     * How to display the field
-     * @return string
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
@@ -79,6 +80,11 @@ class Renderer_Tag extends Renderer
         return (string) parent::build();
     }
 
+    /**
+     * Generates the JavaScript to initialise the renderer
+     *
+     * @return string JavaScript to execute to initialise the renderer
+     */
     public function js_init()
     {
         // we have to find why it's called two times...

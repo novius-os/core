@@ -23,6 +23,10 @@ class Renderer extends \Fieldset_Field
         parent::__construct($name, $label, $attributes, $rules, $fieldset);
     }
 
+    /**
+     * Set the renderer options
+     * @param  array $options
+     */
     public function setRendererOptions(array $options)
     {
         $this->renderer_options = \Arr::merge($this->renderer_options, $options);

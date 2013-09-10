@@ -33,7 +33,7 @@ class Renderer_Date_Picker extends Renderer
     );
 
     /**
-     * Standalone build of the media renderer.
+     * Standalone build of the renderer.
      *
      * @param  array  $renderer Renderer definition (attributes + renderer_options)
      * @return string The <input> tag + JavaScript to initialise it
@@ -48,8 +48,9 @@ class Renderer_Date_Picker extends Renderer
     }
 
     /**
-     * How to display the field
-     * @return type
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
@@ -106,7 +107,8 @@ class Renderer_Date_Picker extends Renderer
     /**
      * Generates the JavaScript to initialise the renderer
      *
-     * @param   string  HTML ID attribute of the <input> tag
+     * @param string $id ID attribute of the <input> tag
+     * @param array $renderer_options The renderer options
      * @return string JavaScript to execute to initialise the renderer
      */
     protected static function js_init($id, $renderer_options = array())

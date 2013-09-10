@@ -17,6 +17,11 @@ class Renderer_Publishable extends Renderer
         'view' => 'nos::renderer/publishable',
     );
 
+    /**
+     * Build the field
+     *
+     * @return  string
+     */
     public function build()
     {
         if (empty($this->renderer_options['item'])) {

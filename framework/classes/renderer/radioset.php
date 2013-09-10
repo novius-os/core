@@ -23,6 +23,11 @@ class Renderer_Radioset extends Renderer
         parent::__construct($name, $label, $renderer, $rules, $fieldset);
     }
 
+    /**
+     * Build the field
+     *
+     * @return  string
+     */
     public function build()
     {
         if (empty($this->renderer_options['item'])) {
