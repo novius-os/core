@@ -20,8 +20,6 @@
     'title' => array('user_firstname', 'user_name'),
     'id' => 'user_id',
 
-    'save' => 'save',
-
     'subtitle' => array(),
 
     'content' => array(

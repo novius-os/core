@@ -63,16 +63,5 @@ return array(
                 'min_length' => array(2),
             ),
         ),
-        'save' => array(
-            'label' => '',
-            'form' => array(
-                'type' => 'submit',
-                'tag' => 'button',
-                // Note to translator: This is a submit button
-                'value' => __('Save'),
-                'class' => 'ui-priority-primary',
-                'data-icon' => 'check',
-            ),
-        ),
     ),
 );

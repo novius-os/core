@@ -125,16 +125,5 @@ return array(
                 'match_field' => array('password_reset'),
             ),
         ),
-        'save' => array(
-            'label' => '',
-            'form' => array(
-                'type' => 'submit',
-                'tag' => 'button',
-                'data-icon' => 'check',
-                'class' => 'ui-priority-primary',
-                // Note to translator: This is a submit button
-                'value' => __('Save'),
-            ),
-        ),
     ),
 );

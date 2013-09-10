@@ -216,11 +216,6 @@ return array(
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'SEO、フォルダURL:',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/folder.config.php:72
-    #: config/controller/admin/media.config.php:73
-    'Save' => '保存',
-
     #: config/controller/admin/media.config.php:20
     #: config/common/media.config.php:118
     'Add a media file' => 'メディアファイルを追加',

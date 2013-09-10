@@ -8,9 +8,10 @@
  * @link http://www.novius-os.org
  */
 
-\Nos\I18n::current_dictionary('noviusos_user::common');
+\Nos\I18n::current_dictionary(array('noviusos_user::common', 'nos::common'));
 
 $uniqid = uniqid('id_');
+$saveField = __('Save');
 ?>
 <script type="text/javascript">
     require([
@@ -20,7 +21,7 @@ $uniqid = uniqid('id_');
             var $container = $('#<?= $uniqid ?>');
             $container.nosToolbar('create');
             $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
-                'save_field' => $fieldset_infos->field('save')
+                'save_field' => $saveField
             ), false))->to_json() ?>)
                 .filter(':submit')
                 .click(function() {

@@ -33,7 +33,6 @@ return array(
                 'title' => 'page_title',
                 'medias' => array(),
                 'large' => true,
-                'save' => 'save',
                 'subtitle' => array('page_type', 'page_template'),
                 'content' => array(
                     'content' => array(
@@ -207,17 +206,6 @@ return array(
                 'size' => 4,
             ),
             'expert' => true,
-        ),
-        'save' => array(
-            'label' => '',
-            'form' => array(
-                'type' => 'submit',
-                'tag' => 'button',
-                // Note to translator: This is a submit button
-                'value' => __('Save'),
-                'class' => 'ui-priority-primary',
-                'data-icon' => 'check',
-            ),
         ),
     ),
 );

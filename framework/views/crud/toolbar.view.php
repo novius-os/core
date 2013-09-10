@@ -8,8 +8,20 @@
  * @link http://www.novius-os.org
  */
 
+\Nos\I18n::current_dictionary('nos::common');
+
 if (empty($saveField) && !empty($fieldset)) {
-    $saveField = (string) \View::forge('form/layout_save', array('save_field' => $fieldset->field('save')), false);
+    $saveField = $fieldset->field('save');
+    if (!$saveField) {
+        if ($crud['is_new']) {
+            //Note to translator: This is a submit button
+            $saveField = __('Add');
+        } else {
+            //Note to translator: This is a submit button
+            $saveField = __('Save');
+        }
+    }
+    $saveField = (string) \View::forge('form/layout_save', array('save_field' => $saveField), false);
 }
 ?>
 <script type="text/javascript">
