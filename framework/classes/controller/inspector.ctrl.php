@@ -103,4 +103,31 @@ class Controller_Inspector extends Controller_Admin_Application
         }
         return $config;
     }
+
+    protected static function _configInputQuery($config)
+    {
+        if (!isset($config['input']['query']) && isset($config['input']['key'])) {
+            $input_key = $config['input']['key'];
+            $config['input']['query'] = function($value, $query) use ($input_key) {
+                if (is_array($value) && count($value) && $value[0]) {
+                    $table = explode('.', $input_key);
+                    if (count($table) == 1) {
+                        $query->where(array($input_key, 'in', $value));
+                    } else {
+                        $query->related(
+                            $table[0],
+                            array(
+                                'where' => array(
+                                    array($input_key, 'in', $value),
+                                ),
+                            )
+                        );
+                    }
+                }
+
+                return $query;
+            };
+        }
+        return $config;
+    }
 }
