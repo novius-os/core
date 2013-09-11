@@ -12,6 +12,7 @@
 
 $uniqid = uniqid('id_');
 $saveField = __('Save');
+$fieldset_infos->add('my_account', '', array('type' => 'hidden', 'value' => '1'));
 ?>
 <script type="text/javascript">
     require([
