@@ -624,7 +624,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if ($this->isExpert($field_name)) {
             return true;
         }
-        $show_when = \Arr::get($this->config_used[$field_name], 'show_when', false);
+        $show_when = \Arr::get($this->config_used, $field_name.'.show_when', false);
         if ($show_when === false || !is_callable($show_when)) {
             return false;
         }
