@@ -10,5 +10,5 @@
 
 return array(
     'fullname' => 'Chiba 2.1',
-    'date'     => \Date::create_from_string('2013-08-29', 'mysql_date'),
+    'date'     => \Date::create_from_string('2013-09-11', 'mysql_date'),
 );
