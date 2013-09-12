@@ -446,24 +446,6 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
     }
 
-    public function readonly_context($instance)
-    {
-        if (empty($instance)) {
-            return;
-        }
-        $behaviour_twinnable = $instance->behaviours('Nos\Orm_Behaviour_Twinnable');
-        if (empty($behaviour_twinnable) || $instance->is_main_context()) {
-            return;
-        }
-        foreach ($behaviour_twinnable['common_fields'] as $f) {
-            $field = $this->field($f);
-            if (!empty($field)) {
-                $field->set_attribute('readonly', true);
-                $field->set_attribute('disabled', true);
-            }
-        }
-    }
-
     public function populate_with_instance($instance = null, $generate_id = true)
     {
         $this->instance = $instance;
