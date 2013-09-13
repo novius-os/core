@@ -135,4 +135,19 @@ class Autoloader extends Fuel\Core\Autoloader
     {
         return isset(static::$class_aliases[$class]) ? static::$class_aliases[$class] : false;
     }
+
+    public static function generateSuffixedNamespace($name, $type, $suffix)
+    {
+        if ($name == 'nos' && $type == 'package') {
+            return 'Nos\\'.$suffix.'\\';
+        } else if ($type == 'module') {
+            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
+            if ($namespace === null) {
+                return false;
+            }
+            return $namespace.'\\'.$suffix.'\\';
+        } else {
+            return 'Fuel\\'.$suffix.'\\';
+        }
+    }
 }

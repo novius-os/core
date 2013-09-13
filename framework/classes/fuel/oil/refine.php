@@ -67,9 +67,13 @@ class Refine extends Oil\Refine
         require_once $file;
 
         $originalTask = $task;
-        $task = '\\Nos\\Tasks\\'.ucfirst($task);
-        if (!class_exists($task)) {
-            $task = '\\Fuel\\Tasks\\'.ucfirst($originalTask);
+        if ($module == false) {
+            $task = \Autoloader::generateSuffixedNamespace('nos', 'package', 'Tasks').ucfirst($task);
+            if (!class_exists($task)) {
+                $task = \Autoloader::generateSuffixedNamespace('fuel', 'fuel', 'Tasks').ucfirst($originalTask);
+            }
+        } else {
+            $task = \Autoloader::generateSuffixedNamespace($module, 'module', 'Tasks').ucfirst($task);
         }
 
         $new_task = new $task;

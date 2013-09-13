@@ -105,17 +105,11 @@ class Migrate extends \Fuel\Core\Migrate
 
     protected static function generatePrefix($name, $type)
     {
-        if ($name == 'nos' && $type == 'package') {
-            static::$prefix = 'Nos\\Migrations\\';
-        } else if ($type == 'module') {
-            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
-            if ($namespace === null) {
-                return false;
-            }
-            static::$prefix = $namespace.'\\Migrations\\';
-        } else {
-            static::$prefix = 'Fuel\\Migrations\\';
+        $prefix = \Autoloader::generateSuffixedNamespace($name, $type, 'Migrations');
+        if (!$prefix) {
+            return false;
         }
+        static::$prefix = $prefix;
         return true;
     }
 
