@@ -12,8 +12,4 @@ namespace Nos;
 
 class Task
 {
-    public function run()
-    {
-        echo 'toto';
-    }
 }
