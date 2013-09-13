@@ -170,6 +170,7 @@ spl_autoload_register(
 );
 //*/
 
+\Autoloader::addClassAlias('Nos\\Task');
 // Initialize the framework with the config file.
 $config_nos = include(NOSPATH.'config/config.php');
 
