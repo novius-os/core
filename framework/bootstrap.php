@@ -170,7 +170,6 @@ spl_autoload_register(
 );
 //*/
 
-
 // Initialize the framework with the config file.
 $config_nos = include(NOSPATH.'config/config.php');
 
