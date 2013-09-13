@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Task
+abstract class Task
 {
     protected $_config = array();
 
@@ -36,4 +36,6 @@ class Task
         \Log::error($msg);
         throw new \Exception($msg);
     }
+
+    abstract public function run();
 }
