@@ -120,4 +120,19 @@ class Autoloader extends Fuel\Core\Autoloader
 
         return false;
     }
+
+
+    protected static $class_aliases = array();
+    public static function addClassAlias($class, $alias = null)
+    {
+        if ($alias === null) {
+            $alias = substr($class, strripos($class, '\\') + 1);
+        }
+        static::$class_aliases[$alias] = $class;
+    }
+
+    public static function getClassAliases($class)
+    {
+        return isset(static::$class_aliases[$class]) ? static::$class_aliases[$class] : false;
+    }
 }
