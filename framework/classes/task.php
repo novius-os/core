@@ -12,4 +12,16 @@ namespace Nos;
 
 class Task
 {
+    protected $_config = array();
+
+    public function __construct()
+    {
+        $this->_config();
+    }
+
+    protected function _config()
+    {
+        list($application, $relative_path) = \Config::configFile(str_replace('Tasks\\', 'Tasks_', get_called_class()));
+        $this->_config = \Config::loadConfiguration($application, $relative_path);
+    }
 }
