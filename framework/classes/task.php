@@ -24,4 +24,16 @@ class Task
         list($application, $relative_path) = \Config::configFile(str_replace('Tasks\\', 'Tasks_', get_called_class()));
         $this->_config = \Config::loadConfiguration($application, $relative_path);
     }
+
+    public function success($msg)
+    {
+        \Log::info($msg);
+    }
+
+    public function error($msg)
+    {
+        $msg = 'Task '.get_called_class().': '.$msg;
+        \Log::error($msg);
+        throw new \Exception($msg);
+    }
 }
