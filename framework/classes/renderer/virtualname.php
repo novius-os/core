@@ -80,7 +80,7 @@ class Renderer_Virtualname extends Renderer
     {
         $regexps_compiled = array();
         foreach ($regexps as $regexp => $replacement) {
-            if (is_int($regexp) && is_string($replacement)) {
+            if (is_int($regexp) && is_string($replacement) && $replacement !== 'lowercase') {
                 $setup_regexps = \Config::get('friendly_slug.setups.'.$replacement, array());
                 $regexps_compiled = array_merge($regexps_compiled, static::_regexpsCompiled($setup_regexps));
             } else {
