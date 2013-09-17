@@ -38,6 +38,7 @@ class Model_Folder extends \Nos\Orm\Model
             'data_type' => 'varchar',
             'null' => true,
             'convert_empty_to_null' => true,
+            'character_maximum_length' => 100,
         ),
         'medif_title' => array(
             'default' => null,

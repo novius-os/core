@@ -135,6 +135,7 @@ class Model_Page extends \Nos\Orm\Model
             'data_type' => 'varchar',
             'null' => true,
             'convert_empty_to_null' => true,
+            'character_maximum_length' => 100,
         ),
         'page_virtual_url' => array(
             'default' => null,

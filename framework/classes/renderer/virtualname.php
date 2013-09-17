@@ -30,6 +30,12 @@ class Renderer_Virtualname extends Renderer
     public function build()
     {
         parent::build();
+        if ($this->fieldset) {
+            $field_properties = $this->fieldset->getInstance()->property($this->name);
+            if (isset($field_properties['character_maximum_length'])) {
+                $this->attributes['maxlength'] = $field_properties['character_maximum_length'];
+            }
+        }
 
         $this->apply_use_title_checkbox();
 

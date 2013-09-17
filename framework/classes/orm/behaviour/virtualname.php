@@ -93,6 +93,13 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         $options[] = static::$_friendly_slug_always_last;
 
         $virtual_name = static::_friendlySlug($virtual_name, $options);
+
+        // truncate $virtual_name if longer than database field
+        $virtual_name_property = $item->property($this->_properties['virtual_name_property']);
+        if (!empty($virtual_name_property['character_maximum_length'])) {
+            $virtual_name = \Str::sub($virtual_name, 0, intval($virtual_name_property['character_maximum_length']));
+        }
+
         $item->{$this->_properties['virtual_name_property']} = $virtual_name;
 
         return $item->{$this->_properties['virtual_name_property']};
