@@ -254,10 +254,8 @@ class Model_Folder extends \Nos\Orm\Model
             return false;
         }
 
-        if ($use_transaction) {
-            $db = \Database_Connection::instance(static::connection(true));
-            $db->start_transaction();
-        }
+        $db = \Database_Connection::instance(static::connection(true));
+        $db->start_transaction();
 
         try {
             $this->observe('before_delete');
@@ -310,9 +308,9 @@ class Model_Folder extends \Nos\Orm\Model
 
             $this->observe('after_delete');
 
-            $use_transaction and $db->commit_transaction();
+            $db->commit_transaction();
         } catch (\Exception $e) {
-            $use_transaction and $db->rollback_transaction();
+            $db->rollback_transaction();
             throw $e;
         }
 
