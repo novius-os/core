@@ -195,12 +195,12 @@ class I18n
     }
 
     static protected $_priority_messages = array();
-    public static function addPriorityDictionary($dictionary, $locale)
+    public static function addPriorityDictionary($locale, $dictionary)
     {
-        static::priorityMessages(\Fuel::load($dictionary), $locale);
+        static::priorityMessages($locale, \Fuel::load($dictionary));
     }
 
-    public static function addPriorityMessages($messages, $locale)
+    public static function addPriorityMessages($locale, $messages)
     {
         if ( ! isset(static::$_priority_messages[$locale])) {
             static::$_priority_messages[$locale] = array();
