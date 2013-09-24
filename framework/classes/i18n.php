@@ -124,6 +124,10 @@ class I18n
 
     public static function gget($group, $message, $default = null)
     {
+        if (isset(static::$_priority_messages[static::$_locale][$message])) {
+            return static::$_priority_messages[static::$_locale][$message];
+        }
+
         $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
 
         if (empty($result)) {
@@ -146,6 +150,10 @@ class I18n
 
     public static function translate_from_file($file, $message, $default)
     {
+        if (isset(static::$_priority_messages[static::$_locale][$message])) {
+            return static::$_priority_messages[static::$_locale][$message];
+        }
+
         if (empty(static::$_files_dict[$file])) {
             $application_name = \Module::findFromCanonicalPath($file);
             if (!empty($application_name)) {
@@ -184,5 +192,19 @@ class I18n
             }
             return $result;
         };
+    }
+
+    static protected $_priority_messages = array();
+    public static function priorityDictionary($dictionary, $locale)
+    {
+        static::priorityMessages(\Fuel::load($dictionary), $locale);
+    }
+
+    public static function priorityMessages($messages, $locale)
+    {
+        if ( ! isset(static::$_priority_messages[$locale])) {
+            static::$_priority_messages[$locale] = array();
+        }
+        static::$_priority_messages[$locale] = array_merge(static::$_priority_messages[$locale], $messages);
     }
 }
