@@ -19,6 +19,8 @@ class I18n
 
     private static $_locale;
 
+    private static $_language;
+
     private static $_encoding;
 
     private static $_locale_stack = array();
@@ -28,6 +30,8 @@ class I18n
     public static $_files_dict = array();
 
     public static $fallback;
+
+    static protected $_priority_messages = array();
 
     public static function _init()
     {
@@ -57,6 +61,7 @@ class I18n
             static::$_locale_stack[] = static::$_locale;
         }
         static::$_locale = $language.'_'.$country;
+        static::$_language = $language;
         if (!empty($encoding)) {
             static::$_encoding = $encoding;
         }
@@ -124,8 +129,12 @@ class I18n
 
     public static function gget($group, $message, $default = null)
     {
+        // same as translate_from_file
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
             return static::$_priority_messages[static::$_locale][$message];
+        }
+        if (isset(static::$_priority_messages[static::$_language][$message])) {
+            return static::$_priority_messages[static::$_language][$message];
         }
 
         $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
@@ -150,8 +159,12 @@ class I18n
 
     public static function translate_from_file($file, $message, $default)
     {
+        // same as gget
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
             return static::$_priority_messages[static::$_locale][$message];
+        }
+        if (isset(static::$_priority_messages[static::$_language][$message])) {
+            return static::$_priority_messages[static::$_language][$message];
         }
 
         if (empty(static::$_files_dict[$file])) {
@@ -194,10 +207,9 @@ class I18n
         };
     }
 
-    static protected $_priority_messages = array();
     public static function addPriorityDictionary($locale, $dictionary)
     {
-        static::priorityMessages($locale, \Fuel::load($dictionary));
+        static::addPriorityMessages($locale, \Fuel::load($dictionary));
     }
 
     public static function addPriorityMessages($locale, $messages)
