@@ -129,7 +129,7 @@ class I18n
 
     public static function gget($group, $message, $default = null)
     {
-        // same as translate_from_file
+        // same as in translate_from_file
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
             return static::$_priority_messages[static::$_locale][$message];
         }
@@ -159,7 +159,7 @@ class I18n
 
     public static function translate_from_file($file, $message, $default)
     {
-        // same as gget
+        // same as in gget
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
             return static::$_priority_messages[static::$_locale][$message];
         }
