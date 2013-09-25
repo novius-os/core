@@ -77,6 +77,7 @@ class I18n
     public static function restoreLocale()
     {
         static::$_locale = array_pop(static::$_locale_stack);
+        list(static::$_language) = explode('_', static::$_locale);
     }
 
     public static function load($file, $group = null)
