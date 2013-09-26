@@ -153,6 +153,7 @@ $config = array(
         'jquery-nos-inspector-plain-data' => 'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-plain-data',
     ),
     'shim' => array(
+        'jquery-migrate' => array('jquery'),
         'jquery.cookie' => array('jquery'),
         'jquery.globalize' => array('jquery'),
         'jquery.globalize.cultures' => array('jquery', 'jquery.globalize'),
