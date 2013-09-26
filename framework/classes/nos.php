@@ -168,11 +168,8 @@ class Nos
     public static function get_enhancer_content($enhancer, $args)
     {
         $args = json_decode(
-            strtr(
-                $args,
-                array(
-                    '&quot;' => '"',
-                )
+            htmlspecialchars_decode(
+                $args
             ),
             true
         );
