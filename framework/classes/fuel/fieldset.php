@@ -598,7 +598,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     protected function isExpert($field_name)
     {
-        return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+        return !\Session::user()->user_expert && \Arr::get($this->config_used, $field_name.'.expert', false);
     }
 
     public function isRestricted($field_name)
