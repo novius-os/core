@@ -358,7 +358,7 @@
     background-color: transparent;
 }
 
-.bootstrapSkin .mceListBoxMenu {
+.bootstrapSkin .mceListBoxMenu, .bootstrapSkin .mceButtonMenu {
     overflow: auto;
     overflow-x: hidden
 }
