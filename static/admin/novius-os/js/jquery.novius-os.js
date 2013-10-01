@@ -559,10 +559,6 @@ define('jquery-nos',
                                 break;
 
                             case 'window.open' :
-                                url = $.nosDataReplace(obj.url, data);
-                                window.open(url);
-                                break;
-
                             case 'document.location' :
                                 url = $.nosDataReplace(obj.url, data);
                                 if (!(url.substr(0, 5) === 'http:' || url.substr(0, 6) === 'https:')) {
@@ -571,7 +567,11 @@ define('jquery-nos',
                                         url = $base.attr('href') + url;
                                     }
                                 }
-                                document.location.href = url;
+                                if (obj.action === 'window.open') {
+                                    window.open(url);
+                                } else {
+                                    document.location.href = url;
+                                }
                                 break;
                         }
                     }
