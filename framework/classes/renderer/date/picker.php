@@ -17,7 +17,7 @@ class Renderer_Date_Picker extends Renderer_Datetime_Picker
      */
     public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
-        \Log::deprecated('Renderer_Date_Picker is deprecated, use Renderer_Datetime_Picker instead.', 'Chiba.2');
+        \Log::deprecated('Renderer_Date_Picker is deprecated, use Renderer_Datetime_Picker instead.', 'Chiba.2.1');
         parent::__construct($name, $label, $renderer, $rules, $fieldset);
     }
 
