@@ -417,7 +417,9 @@ class Model_Page extends \Nos\Orm\Model
 
                     $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
                     $page_enhanced[$enhancer][$page->page_id] = array(
-                        'config' => (array) json_decode(strtr($data_config, array('&quot;' => '"',))),
+                        // (array) json_decode(strtr($data_config, array('&quot;' => '"',))) doesn't
+                        // recursively transform an object to an array
+                        'config' => json_decode(strtr($data_config, array('&quot;' => '"',)), true),
                         'context' => $page->page_context,
                         'published' => $page->planificationStatus() == 2 ? array(
                             'start' => $page->publicationStart(),
