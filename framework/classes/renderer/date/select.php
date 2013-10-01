@@ -86,8 +86,7 @@ class Renderer_Date_Select extends Renderer
         $this->add_rule(
             array(
                 'valid_date' =>
-                    function ($value)
-                    {
+                    function ($value) {
                         list($date, $time) = explode(' ', $value.' ');
                         $date = explode('-', $date);
                         if (count($date) >= 3) {

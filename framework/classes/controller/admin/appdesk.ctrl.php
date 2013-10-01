@@ -10,7 +10,9 @@
 
 namespace Nos;
 
-use Format, Input, View;
+use Format;
+use Input;
+use View;
 
 /**
  * The cloud Controller.
@@ -439,10 +441,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             }
 
             foreach ($config['appdesk']['appdesk']['grid']['columns'] as $key => $column) {
-                if (
-                    (empty($column['column']) && $key === $config['model']::title_property()) ||
+                if ((empty($column['column']) && $key === $config['model']::title_property()) ||
                     (!empty($column['column']) && $column['column'] == $config['model']::title_property())
-                ) {
+                    ) {
                     if (!is_array($column['cellFormatters']) || !isset($column['cellFormatters']['link'])) {
                         $config['appdesk']['appdesk']['grid']['columns'][$key]['cellFormatters']['link'] = array(
                             'type' => 'link',

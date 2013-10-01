@@ -15,7 +15,7 @@ return array(
     'query' => array(
         'limit' => 10,
         'callback' => array(
-            'permissions' => function($query) {
+            'permissions' => function ($query) {
                 $restricted_folders = \Nos\Media\Permission::getRestrictedFolders();
                 if (empty($restricted_folders)) {
                     return $query;
@@ -144,7 +144,7 @@ return array(
                     'toolbar-grid' => true,
                 ),
                 'visible' => array(
-                    'check_expert' => function() {
+                    'check_expert' => function () {
                         return \Session::user()->user_expert;
                     }
                 ),

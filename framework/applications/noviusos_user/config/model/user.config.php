@@ -9,7 +9,7 @@
  */
 
 return array(
-    'title_property'  => function($item) {
+    'title_property'  => function ($item) {
         return $item->fullname();
     },
 );

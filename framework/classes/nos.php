@@ -206,7 +206,7 @@ class Nos
     {
         Tools_Wysiwyg::parse_medias(
             $content,
-            function($media, $params) use (&$content) {
+            function ($media, $params) use (&$content) {
                 if (empty($media)) {
                     if ($params['tag'] == 'img') {
                         // Remove dead images

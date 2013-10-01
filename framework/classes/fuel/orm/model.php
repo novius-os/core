@@ -895,14 +895,14 @@ class Model extends \Orm\Model
                 $new_pks = array();
                 if ($val) {
                     foreach ($val as $v) {
-                        if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
+                        if (!in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
                             $new_pks[] = $new_pk;
                         } else {
                             $original_pks = array_diff($original_pks, array($new_pk));
                         }
                     }
                 }
-                if ( ! empty($original_pks) or ! empty($new_pks)) {
+                if (!empty($original_pks) or ! empty($new_pks)) {
                     $diff[0][$key] = empty($original_pks) ? null : $original_pks;
                     $diff[1][$key] = empty($new_pks) ? null : $new_pks;
                 }

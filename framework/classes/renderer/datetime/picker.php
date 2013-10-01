@@ -130,5 +130,4 @@ class Renderer_Datetime_Picker extends Renderer
         $data[$this->name] = \Date::create_from_string($data[$this->name], '%Y-%m-%d %H:%M:%S')->format('mysql');
         return true;
     }
-
 }

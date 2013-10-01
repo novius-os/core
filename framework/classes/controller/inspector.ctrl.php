@@ -108,7 +108,7 @@ class Controller_Inspector extends Controller_Admin_Application
     {
         if (!isset($config['input']['query']) && isset($config['input']['key'])) {
             $input_key = $config['input']['key'];
-            $config['input']['query'] = function($value, $query) use ($input_key) {
+            $config['input']['query'] = function ($value, $query) use ($input_key) {
                 if (is_array($value) && count($value) && $value[0]) {
                     $table = explode('.', $input_key);
                     if (count($table) == 1) {

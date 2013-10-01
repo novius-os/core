@@ -170,5 +170,4 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
         return $content;
     }
-
 }

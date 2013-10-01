@@ -14,5 +14,3 @@ return array(
         'path'  =>	APPPATH.'cache/fuelphp/',
     ),
 );
-
-

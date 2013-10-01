@@ -21,8 +21,7 @@ return array(
                 'url' => '{{preview_url}}',
             ),
             'disabled' => array(
-                function($item, $params)
-                {
+                function ($item, $params) {
                     if ($item::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                         $url = $item->url_canonical(array('preview' => true));
                         if ($item->is_new()) {
@@ -41,7 +40,7 @@ return array(
                 'toolbar-edit' => true,
             ),
             'visible' => array(
-                function($params) {
+                function ($params) {
                     if (isset($params['item']) && $params['item']::behaviours('Nos\Orm_Behaviour_Urlenhancer', false)) {
                         $url = $params['item']->url_canonical(array('preview' => true));
                         return !$params['item']->is_new() && !empty($url);

@@ -141,5 +141,4 @@ class Migrate extends \Fuel\Core\Migrate
     {
         return static::$migrations;
     }
-
 }

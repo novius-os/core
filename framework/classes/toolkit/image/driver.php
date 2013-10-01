@@ -64,5 +64,3 @@ abstract class Toolkit_Image_Driver
      */
     abstract public function sizes();
 }
-
-

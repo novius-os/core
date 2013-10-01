@@ -15,7 +15,7 @@ class Log extends Fuel\Core\Log
         $debug_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         array_shift($debug_backtrace);
         $returns = \Event::trigger('nos.deprecated', array('message' => $message, 'since' => $since, 'debug_backtrace' => $debug_backtrace), 'array');
-        $returns = array_filter($returns, function($val) {
+        $returns = array_filter($returns, function ($val) {
             return $val === false;
         });
         if (count($returns) > 0) {

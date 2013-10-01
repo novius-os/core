@@ -500,7 +500,7 @@ class Controller_Front extends Controller
         );
 
         $content = $this->_content;
-        $replace_fct = function($pattern, $replace) use (&$content) {
+        $replace_fct = function ($pattern, $replace) use (&$content) {
             $content_old = $content;
             $content = preg_replace(
                 '`'.$pattern.'`iUu',

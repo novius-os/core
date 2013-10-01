@@ -37,4 +37,3 @@ class Renderer_Radioset extends Renderer
         return $this->template((string) \View::forge($this->renderer_options['view'], $this->renderer_options, false));
     }
 }
-

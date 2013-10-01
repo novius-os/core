@@ -81,11 +81,11 @@ class I18n
 
         if (empty(static::$_loaded_files[static::$_locale][$file])) {
 
-            if ( ! isset(static::$_messages[static::$_locale])) {
+            if (!isset(static::$_messages[static::$_locale])) {
                 static::$_messages[static::$_locale] = array();
             }
 
-            if ( ! isset(static::$_messages[static::$_locale][$group])) {
+            if (!isset(static::$_messages[static::$_locale][$group])) {
                 static::$_messages[static::$_locale][$group] = array();
             }
 
@@ -170,7 +170,7 @@ class I18n
 
         $messages = static::$_messages[static::$_locale];
 
-        return function($message, $default = null) use ($list, $messages) {
+        return function ($message, $default = null) use ($list, $messages) {
             foreach ($list as $group) {
                 $result = isset($messages[$group][$message]) ? $messages[$group][$message] : false;
 

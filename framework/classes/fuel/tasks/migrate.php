@@ -30,5 +30,4 @@ class Migrate extends \Fuel\Tasks\Migrate
         // set the module and package count
         static::$package_count = count(static::$packages);
     }
-
 }

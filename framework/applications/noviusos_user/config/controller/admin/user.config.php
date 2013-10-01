@@ -17,7 +17,7 @@ return array(
         //'iconUrl' => 'static/apps/noviusos_user/img/16/user.png',
         'labels' => array(
             'insert' => __('Add a user'),
-            'update' => function($user) {
+            'update' => function ($user) {
                 return $user->fullname();
             },
         ),
@@ -75,7 +75,7 @@ return array(
             'form' => array(
                 'type' => 'select',
                 'options' => array_map(
-                    function($val) {
+                    function ($val) {
                         return $val['title'];
                     },
                     \Config::get('novius-os.locales', array())
@@ -101,8 +101,7 @@ return array(
                 'value' => '',
             ),
             'before_save' =>
-                function ($item, $data)
-                {
+                function ($item, $data) {
                     if (!empty($data['password_reset'])) {
                         $item->user_password = $data['password_reset'];
                     }
@@ -118,8 +117,7 @@ return array(
                 'size' => 20,
             ),
             'before_save' =>
-                function ($item, $data)
-                {
+                function ($item, $data) {
                 },
             'validation' => array(
                 'match_field' => array('password_reset'),

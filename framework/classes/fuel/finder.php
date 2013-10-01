@@ -47,7 +47,7 @@ class Finder extends Fuel\Core\Finder
 
         // absolute path requested?
         if ($file[0] === '/' or (isset($file[1]) and $file[1] === ':')) {
-            if ( ! is_file($file)) {
+            if (!is_file($file)) {
                 // at this point, found would be either empty array or false
                 return $found;
             }
@@ -149,7 +149,7 @@ class Finder extends Fuel\Core\Finder
                 }
 
                 if (is_file($file_path_alt)) {
-                    if ( ! $multiple) {
+                    if (!$multiple) {
                         $found = $file_path_alt;
                         break;
                     }
@@ -158,7 +158,7 @@ class Finder extends Fuel\Core\Finder
                 }
             }
             if (is_file($file_path)) {
-                if ( ! $multiple) {
+                if (!$multiple) {
                     $found = $file_path;
                     break;
                 }
@@ -167,7 +167,7 @@ class Finder extends Fuel\Core\Finder
             }
         }
 
-        if ( ! empty($found) and $cache) {
+        if (!empty($found) and $cache) {
             $this->add_to_cache($cache_id, $found);
             $this->cache_valid = false;
         }

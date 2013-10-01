@@ -316,7 +316,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (isset($settings['template'])) {
                 $field->set_template($settings['template']);
             }
-            if ( ! empty($settings['validation'])) {
+            if (!empty($settings['validation'])) {
                 foreach ($settings['validation'] as $rule => $args) {
                     if (is_int($rule) and is_string($args)) {
                         $args = array($args);
@@ -509,7 +509,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
 
         if (empty($options['error'])) {
-            $options['error'] = function(\Exception $e, $item, $data) {
+            $options['error'] = function (\Exception $e, $item, $data) {
                 return array(
                     'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'),
                 );

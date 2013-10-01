@@ -26,7 +26,7 @@ return array(
                 'toolbar-edit' => true,
             ),
             'visible' => array(
-                function($params) {
+                function ($params) {
                     $model = get_class($params['item']);
                     return !$params['item']->is_new() && $model::behaviours('Nos\Orm_Behaviour_Sharable', false);
                 }

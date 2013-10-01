@@ -24,10 +24,10 @@ class File extends Fuel\Core\File
     public static function symlink($target, $link, $is_file = null, $area = null)
     {
         $methods = array(
-            function($target, $link, $is_file) {
+            function ($target, $link, $is_file) {
                 return @symlink($target, $link);
             },
-            function($target, $link, $is_file) {
+            function ($target, $link, $is_file) {
                 if (OS_WIN) {
                     return false;
                 }
@@ -36,7 +36,7 @@ class File extends Fuel\Core\File
                 exec('cd '.$dirname.'; ln -s '.$target.' '.$basename);
                 return \File::is_link($link);
             },
-            function($target, $link, $is_file) {
+            function ($target, $link, $is_file) {
                 if (!OS_WIN) {
                     return false;
                 }

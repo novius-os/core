@@ -105,7 +105,7 @@ class Event_Instance extends Fuel\Core\Event_Instance
 
         // if the arguments are valid, register the event
         if (is_string($event) and is_callable($callback)) {
-            $callback_function = function() use ($callback) {
+            $callback_function = function () use ($callback) {
                 return $callback;
             };
             array_unshift($args, $event, $priority, $callback_function);

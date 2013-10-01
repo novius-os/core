@@ -189,7 +189,6 @@ class Console extends \Oil\Console
 
         return '???';
     }
-
 }
 
 /* End of file oil/classes/console.php */

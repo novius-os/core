@@ -25,7 +25,7 @@ class Tools_Wysiwyg
         $replaces = array();
         static::parse_medias(
             $content,
-            function($media, $params) use (&$replaces) {
+            function ($media, $params) use (&$replaces) {
                 if (empty($media)) {
                     $replaces[$params['content']] = '';
                 } else {
@@ -92,7 +92,7 @@ class Tools_Wysiwyg
             $enhancers = Config_Data::get('enhancers', array());
 
             if (!$urlEnhancers) {
-                $enhancers = array_filter($enhancers, function($enhancer) {
+                $enhancers = array_filter($enhancers, function ($enhancer) {
                     return empty($enhancer['urlEnhancer']);
                 });
             }

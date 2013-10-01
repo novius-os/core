@@ -44,7 +44,7 @@ class Refine extends Oil\Refine
         list($task, $method) = array_pad(explode(':', $task), 2, 'run');
 
         // Find the task
-        if ( ! $file = \Finder::search('tasks', $task)) {
+        if (!$file = \Finder::search('tasks', $task)) {
             $files = \Finder::instance()->list_files('tasks');
             $possibilities = array();
             foreach ($files as $file) {
@@ -83,5 +83,4 @@ class Refine extends Oil\Refine
             \Cli::write($return);
         }
     }
-
 }

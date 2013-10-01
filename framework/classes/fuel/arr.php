@@ -16,12 +16,12 @@ class Arr extends Fuel\Core\Arr
             if (is_array($value)) {
                 $value = static::recursive_filter($value, $callback);
             } else {
-                if ( ! is_null($callback)) {
-                    if ( ! $callback($value)) {
+                if (!is_null($callback)) {
+                    if (!$callback($value)) {
                         unset($array[$key]);
                     }
                 } else {
-                    if ( ! (bool) $value) {
+                    if (!(bool) $value) {
                         unset($array[$key]);
                     }
                 }

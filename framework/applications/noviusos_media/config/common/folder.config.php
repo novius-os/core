@@ -17,7 +17,7 @@ return array(
             'title' => __('Folder'),
         ),
         'path' => array(
-            'value' => function($obj) {
+            'value' => function ($obj) {
                 return $obj->medif_path;
             },
         ),
@@ -49,7 +49,7 @@ return array(
         ),
         'edit' => array(
             'disabled' => array(
-                'check_root' => function($item) {
+                'check_root' => function ($item) {
                     return empty($item->medif_parent_id) ? __('You can’t edit the root folder.') : false;
                 },
                 'check_permission' => array('Nos\Media\Permission', 'checkFolderDisabled'),
@@ -58,7 +58,7 @@ return array(
         ),
         'delete' => array(
             'disabled' => array(
-                'check_root' => function($item) {
+                'check_root' => function ($item) {
                     return empty($item->medif_parent_id) ? __('You can’t delete the root folder.') : false;
                 },
                 'check_permission' => array('Nos\Media\Permission', 'checkFolderDisabled'),

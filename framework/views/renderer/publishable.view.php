@@ -93,7 +93,7 @@ if ($planification_mode) {
 
 <?php
 
-$replacePlaceholders = function($txt) {
+$replacePlaceholders = function ($txt) {
     return strtr($txt, array(
         '<row>' => '<tr>',
         '</row>' => '</tr>',
