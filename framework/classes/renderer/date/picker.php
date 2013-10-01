@@ -23,7 +23,7 @@ class Renderer_Date_Picker extends Renderer_Datetime_Picker
 
     protected static function parseOptions($renderer = array())
     {
-        $renderer['format'] = 'date';
+        $renderer['renderer_options']['format'] = 'date';
         return parent::parseOptions($renderer);
     }
 }

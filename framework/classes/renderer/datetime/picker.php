@@ -63,7 +63,7 @@ class Renderer_Datetime_Picker extends Renderer
      */
     public static function renderer($renderer = array())
     {
-        $renderer['renderer'] = __CLASS__;
+        $renderer['renderer'] = get_called_class();
         $fieldset = \Fieldset::build_from_config(array(
             $renderer['name'] => $renderer,
         ));
@@ -109,6 +109,10 @@ class Renderer_Datetime_Picker extends Renderer
         $renderer['type'] = 'hidden';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' datepicker';
 
+        if (!isset($renderer['renderer_options'])) {
+            $renderer['renderer_options'] = array();
+        }
+
         if (empty($renderer['id'])) {
             $renderer['id'] = uniqid('datepicker_');
         }
@@ -117,12 +121,15 @@ class Renderer_Datetime_Picker extends Renderer
             $renderer['size'] = 17;
         }
 
-        $format = isset($renderer['format']) ? $renderer['format'] : static::$DEFAULT_RENDERER_OPTIONS['format'];
+        $format = isset($renderer['renderer_options']['format']) ?
+            $renderer['renderer_options']['format'] : static::$DEFAULT_RENDERER_OPTIONS['format'];
+
 
         $renderer_options = \Arr::merge(
             static::$DEFAULT_RENDERER_OPTIONS,
             static::$DEFAULT_RENDERER_OPTIONS_BY_FORMAT[$format]
         );
+        $renderer_options['renderer_options']['format'] = $format;
 
         if (!empty($renderer['renderer_options'])) {
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
