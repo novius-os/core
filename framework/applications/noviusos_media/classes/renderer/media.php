@@ -48,7 +48,7 @@ class Renderer_Media extends \Nos\Renderer
      */
     public static function renderer($renderer = array())
     {
-        list($attributes, $renderer_options) = static::parse_options($renderer);
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
         static::hydrate_options($renderer_options, $attributes);
         $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
 
