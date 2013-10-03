@@ -5,7 +5,7 @@
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
- * @link http://www.novius-os.org
+ * @link http://www.novius-os.orgF
  */
 
 namespace Nos\Media;
@@ -48,7 +48,7 @@ class Renderer_Media extends \Nos\Renderer
      */
     public static function renderer($renderer = array())
     {
-        list($attributes, $renderer_options) = static::parse_options($renderer);
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
         static::hydrate_options($renderer_options, $attributes);
         $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
 
