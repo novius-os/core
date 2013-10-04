@@ -73,6 +73,19 @@ class Renderer_Media extends \Nos\Renderer
         return (string) parent::build();
     }
 
+
+    /**
+     * Parse the renderer array to get attributes and the renderer options
+     * @param  array $renderer
+     * @return array 0: attributes, 1: renderer options
+     */
+    protected static function parse_options($renderer = array())
+    {
+        \Log::deprecated('Renderer_Media::parse_options($renderer) is deprecated, '.
+            'use Renderer_Media::parseOptions($renderer) instead.', 'Chiba.2.1');
+        return static::parseOptions($renderer);
+    }
+
     /**
      * Parse the renderer array to get attributes and the renderer options
      * @param  array $renderer
