@@ -222,7 +222,8 @@ class Nos
                     } else {
                         $media_url = $media->url();
                     }
-                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $content);
+                    $new_content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $params['content']);
+                    $content = str_replace($params['content'], $new_content, $content);
                 }
             }
         );
