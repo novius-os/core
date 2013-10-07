@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-inspector-date',
-    ['jquery-nos-listgrid', 'jquery-ui.datepicker.i18n'],
+    ['jquery-nos-listgrid', 'jquery-nos-renderer-datetimepicker'],
     function($) {
         "use strict";
 
@@ -34,7 +34,7 @@ define('jquery-nos-inspector-date',
                                 }
                             }),
                         inspectorData = parent.data('inspector'),
-                        dates = label_custom.find(':input[type=hidden]').each(function() {
+                        dates = label_custom.find(':input[type=text]').each(function() {
                             var onSelect = $(this).datepicker('option', 'onSelect');
                             $(this).datepicker('option', 'onSelect', function(selectedDate, instance) {
                                 if ($.isFunction(onSelect)) {
