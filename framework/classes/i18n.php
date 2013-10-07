@@ -19,6 +19,8 @@ class I18n
 
     private static $_locale;
 
+    private static $_language;
+
     private static $_encoding;
 
     private static $_locale_stack = array();
@@ -28,6 +30,8 @@ class I18n
     public static $_files_dict = array();
 
     public static $fallback;
+
+    static protected $_priority_messages = array();
 
     public static function _init()
     {
@@ -39,16 +43,16 @@ class I18n
     {
         list($remaining, $variant) = explode('@', $locale.'@');
         list($remaining, $encoding) = explode('.', $remaining.'.');
-        list($language, $country) = explode('_', $remaining.'_');
+        list(static::$_language, $country) = explode('_', $remaining.'_');
         if (!$country) {
-            $country = mb_strtoupper($language);
+            $country = mb_strtoupper(static::$_language);
         }
         // Front-office can use any language
         if (NOS_ENTRY_POINT === Nos::ENTRY_POINT_ADMIN) {
             $available = \Config::get('novius-os.locales', array());
             // Check the language is supported (because it can be injected via GET on the login screens)
-            if (!isset($available[$language.'_'.$country])) {
-                list($language, $country) =  explode('_', \Config::get('novius-os.default_locale', 'en_GB'));
+            if (!isset($available[static::$_language.'_'.$country])) {
+                list(static::$_language, $country) =  explode('_', \Config::get('novius-os.default_locale', 'en_GB'));
                 $encoding = null;
                 $variant = null;
             }
@@ -56,7 +60,7 @@ class I18n
         if (static::$_locale) {
             static::$_locale_stack[] = static::$_locale;
         }
-        static::$_locale = $language.'_'.$country;
+        static::$_locale = static::$_language.'_'.$country;
         if (!empty($encoding)) {
             static::$_encoding = $encoding;
         }
@@ -72,6 +76,7 @@ class I18n
     public static function restoreLocale()
     {
         static::$_locale = array_pop(static::$_locale_stack);
+        list(static::$_language) = explode('_', static::$_locale);
     }
 
     public static function load($file, $group = null)
@@ -89,7 +94,7 @@ class I18n
                 static::$_messages[static::$_locale][$group] = array();
             }
 
-            $languages = array(static::$_locale, mb_substr(static::$_locale, 0, 2), static::$fallback);
+            $languages = array(static::$_locale, static::$_language, static::$fallback);
 
             if ($pos = strripos($file, '::')) {
                 $namespace = substr($file, 0, $pos + 2);
@@ -124,6 +129,14 @@ class I18n
 
     public static function gget($group, $message, $default = null)
     {
+        // same as in translate_from_file
+        if (isset(static::$_priority_messages[static::$_locale][$message])) {
+            return static::$_priority_messages[static::$_locale][$message];
+        }
+        if (isset(static::$_priority_messages[static::$_language][$message])) {
+            return static::$_priority_messages[static::$_language][$message];
+        }
+
         $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
 
         if (empty($result)) {
@@ -146,6 +159,14 @@ class I18n
 
     public static function translate_from_file($file, $message, $default)
     {
+        // same as in gget
+        if (isset(static::$_priority_messages[static::$_locale][$message])) {
+            return static::$_priority_messages[static::$_locale][$message];
+        }
+        if (isset(static::$_priority_messages[static::$_language][$message])) {
+            return static::$_priority_messages[static::$_language][$message];
+        }
+
         if (empty(static::$_files_dict[$file])) {
             $application_name = \Module::findFromCanonicalPath($file);
             if (!empty($application_name)) {
@@ -184,5 +205,18 @@ class I18n
             }
             return $result;
         };
+    }
+
+    public static function addPriorityDictionary($locale, $dictionary)
+    {
+        static::addPriorityMessages($locale, \Fuel::load($dictionary));
+    }
+
+    public static function addPriorityMessages($locale, $messages)
+    {
+        if ( ! isset(static::$_priority_messages[$locale])) {
+            static::$_priority_messages[$locale] = array();
+        }
+        static::$_priority_messages[$locale] = array_merge(static::$_priority_messages[$locale], $messages);
     }
 }
