@@ -60,7 +60,7 @@ class Migrate extends \Fuel\Core\Migrate
     // change migration prefix and changed include to include_once in order to prevent duplicate classes errors
     protected static function find_migrations($name, $type, $start = null, $end = null, $direction = 'up')
     {
-        if (static::generatePrefix($name, $type)) {
+        if (static::generateNamespace($name, $type)) {
             return parent::find_migrations($name, $type, $start, $end, $direction);
         } else {
             return array();
@@ -70,7 +70,7 @@ class Migrate extends \Fuel\Core\Migrate
     // Overloaded function in order to support \Nos\Migration
     protected static function run($migrations, $name, $type, $method = 'up')
     {
-        if (!static::generatePrefix($name, $type)) {
+        if (!static::generateNamespace($name, $type)) {
             return array();
         }
         // storage for installed migrations
@@ -103,19 +103,13 @@ class Migrate extends \Fuel\Core\Migrate
         return $done;
     }
 
-    protected static function generatePrefix($name, $type)
+    protected static function generateNamespace($name, $type)
     {
-        if ($name == 'nos' && $type == 'package') {
-            static::$prefix = 'Nos\\Migrations\\';
-        } else if ($type == 'module') {
-            $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
-            if ($namespace === null) {
-                return false;
-            }
-            static::$prefix = $namespace.'\\Migrations\\';
-        } else {
-            static::$prefix = 'Fuel\\Migrations\\';
+        $prefix = \Autoloader::generateSuffixedNamespace($name, $type, 'Migrations');
+        if (!$prefix) {
+            return false;
         }
+        static::$prefix = $prefix;
         return true;
     }
 
