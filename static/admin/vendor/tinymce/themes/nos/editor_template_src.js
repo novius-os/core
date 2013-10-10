@@ -2094,10 +2094,12 @@
                     var node = ed.selection.getNode();
                     if (node.nodeName == 'IMG') {
                         var args = {};
-                        $.each('title alt width height style'.split(' '), function(i, name) {
+                        $.each('src title alt width height style'.split(' '), function(i, name) {
                             var value = $img.attr(name);
                             args[name] = value;
                         });
+                        args['data-media-id'] = $img.data('media').id;
+                        $(node).data('media-id', args['data-media-id']);
                         ed.dom.setAttribs(node, args);
                         ed.execCommand('mceRepaint');
                         ed.undoManager.add();
