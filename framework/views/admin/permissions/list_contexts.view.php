@@ -48,6 +48,7 @@ foreach (\Nos\Tools_Context::sites() as $site => $site_params) {
 require(['jquery-nos', 'wijmo.wijgrid'], function($) {
     var $table = $('#<?= $uniqid_context ?>');
     $table.wijgrid({
+        scrollMode : "auto",
         columns: [
             {
                 cellFormatter: function(args) {
