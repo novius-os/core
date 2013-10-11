@@ -265,7 +265,7 @@ class Model extends \Orm\Model
             static::eventStatic('buildRelations');
         }
 
-        if ($specific) {
+        if ($specific !== false) {
             return \Arr::get(static::$_relations_cached[$class], $specific, false);
         }
 
