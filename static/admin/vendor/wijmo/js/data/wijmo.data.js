@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.15
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -15,6 +15,7 @@
 var wijmo;
 (function (wijmo) {
     wijmo.expando = ".wijmo";
+    /** @ignore */
     var WijmoError = (function () {
         function WijmoError(message) {
             this.message = message;
@@ -31,6 +32,7 @@ var wijmo;
 var wijmo;
 (function (wijmo) {
     (function (data) {
+        /** @ignore */
         var Expando = (function () {
             function Expando(object) {
                 this.object = object;
@@ -69,6 +71,7 @@ var wijmo;
 var wijmo;
 (function (wijmo) {
     (function (data) {
+        /** @ignore */
         (function (util) {
             function funcClass(ctor) {
                 return function () {
@@ -97,6 +100,7 @@ var wijmo;
     /// <reference path="./util.ts"/>
     (function (data) {
         var $ = jQuery;
+        /** @ignore */
         var SubscriberEntry = (function () {
             function SubscriberEntry(handler, context) {
                 this.handler = handler;
@@ -108,6 +112,7 @@ var wijmo;
             return SubscriberEntry;
         })();
         data.SubscriberEntry = SubscriberEntry;        
+        /** @ignore */
         var Subscribable = (function () {
             function Subscribable(defaultContext) {
                 this.defaultContext = defaultContext;
@@ -145,6 +150,7 @@ var wijmo;
             return $.isFunction(subscribable.subscribe);
         }
         data.isSubscriptable = isSubscriptable;
+        /** @ignore */
         var BaseObservable = (function () {
             function BaseObservable() { }
             BaseObservable.prototype.subscribe = function (handler, context) {
@@ -163,6 +169,7 @@ var wijmo;
             return BaseObservable;
         })();
         data.BaseObservable = BaseObservable;        
+        /** @ignore */
         var _ReadOnlyObservable = (function (_super) {
             __extends(_ReadOnlyObservable, _super);
             function _ReadOnlyObservable(mutable) {
@@ -176,6 +183,7 @@ var wijmo;
         })(BaseObservable);
         data._ReadOnlyObservable = _ReadOnlyObservable;        
         var ReadOnlyObservable = data.util.funcClass(_ReadOnlyObservable);
+        /** @ignore */
         var _MutableObservable = (function (_super) {
             __extends(_MutableObservable, _super);
             function _MutableObservable(value, checkNewValue) {
@@ -207,6 +215,7 @@ var wijmo;
             return new MutableObservable(value);
         }
         data.observable = observable;
+        /** @ignore */
         function observableWithNewValueCheck(value) {
             if (typeof value === "undefined") { value = null; }
             return new MutableObservable(value, true);
@@ -224,6 +233,7 @@ var wijmo;
     (function (data) {
         /// <reference path="./core.ts"/>
         /// <reference path="./observable.ts"/>
+        /** @ignore */
         (function (util) {
             var $ = jQuery;
             function clone(obj, deep) {
@@ -332,6 +342,8 @@ var wijmo;
                     }
                     return a.length - b.length;
                 } else if(isString(a) && isString(b)) {
+                    a = a.toLowerCase();
+                    b = b.toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
                 }
                 cmp = a - b;
@@ -384,7 +396,7 @@ var wijmo;
             }
             util.executeDelayed = executeDelayed;
             function logError(message) {
-                if(!console) {
+                if(typeof console == "undefined") {
                     return;
                 }
                 if(console.error) {
@@ -469,6 +481,61 @@ var wijmo;
                 });
             }
             util.convertDateProperties = convertDateProperties;
+            var HashMapEntry = (function () {
+                function HashMapEntry(key) {
+                    this.key = key;
+                }
+                return HashMapEntry;
+            })();
+            util.HashMapEntry = HashMapEntry;            
+            var HashMap = (function () {
+                function HashMap() {
+                    this.hash = {
+                    };
+                }
+                HashMap.prototype.getEntry = function (key, create) {
+                    if (typeof create === "undefined") { create = false; }
+                    if(key === null) {
+                        if(!this.nullEntry && create) {
+                            this.nullEntry = new HashMapEntry(key);
+                        }
+                        return this.nullEntry;
+                    }
+                    var strKey = String(key);
+                    var list = this.hash[strKey];
+                    var entry;
+                    if(list == null) {
+                        if(!create) {
+                            return null;
+                        }
+                        list = [];
+                        this.hash[strKey] = list;
+                    }
+                    for(var i = 0; i < list.length; i++) {
+                        if(list[i].key === key) {
+                            return list[i];
+                        }
+                    }
+                    if(create) {
+                        entry = new HashMapEntry(key);
+                        list.push(entry);
+                    }
+                    return null;
+                };
+                HashMap.prototype.containsKey = function (key) {
+                    return !!this.getEntry(key);
+                };
+                HashMap.prototype.get = function (key, defaultValue) {
+                    if (typeof defaultValue === "undefined") { defaultValue = null; }
+                    var entry = this.getEntry(key);
+                    return entry ? entry.value : defaultValue;
+                };
+                HashMap.prototype.put = function (key, value) {
+                    this.getEntry(key, true).value = value;
+                };
+                return HashMap;
+            })();
+            util.HashMap = HashMap;            
         })(data.util || (data.util = {}));
         var util = data.util;
     })(wijmo.data || (wijmo.data = {}));
@@ -477,6 +544,7 @@ var wijmo;
 var wijmo;
 (function (wijmo) {
     /// <reference path="./util.ts"/>
+    /** @ignore */
     (function (data) {
         data.errors = {
         };
@@ -510,7 +578,7 @@ var wijmo;
         data.errors._register({
             indexOutOfBounds: "Index is outside the bounds of the array.",
             notImplemented: "The operation is not implemented",
-            unsupprtedOperation: "Unsupported operation",
+            unsupportedOperation: "Unsupported operation",
             unsupportedFilterOperator: "Unsupported filter operator: {0}",
             unsupportedDataSource: "Unsupported data source",
             argument: function (paramName) {
@@ -537,6 +605,7 @@ var wijmo;
 (function (wijmo) {
     (function (data) {
         /// <reference path="dataView.ts"/>
+        /** @ignore */
         (function (filtering) {
             var $ = jQuery;
             filtering.opMap = {
@@ -561,7 +630,7 @@ var wijmo;
                     }
                 }
                 if(!op && throwIfNotFound) {
-                    data.errors.unsupportedOperator(name);
+                    data.errors.unsupportedFilterOperator(name);
                 }
                 return op;
             }
@@ -581,7 +650,7 @@ var wijmo;
                     }
                     op = findOperator(cond.operator, true);
                 } else if(!$.isFunction(op.apply)) {
-                    data.errors.unsupportedOperator(op);
+                    data.errors.unsupportedFilterOperator(op);
                 }
                 return {
                     operator: cond.operator,
@@ -592,6 +661,7 @@ var wijmo;
             filtering.normalizeCondition = normalizeCondition;
             function compile(filter) {
                 var result = {
+                    isEmpty: false,
                     original: filter,
                     func: null,
                     normalized: null
@@ -626,6 +696,7 @@ var wijmo;
                     }
                 }
                 if(!result.normalized && !result.func) {
+                    result.isEmpty = true;
                     result.func = function (x) {
                         return true;
                     };
@@ -648,9 +719,10 @@ var wijmo;
                         "boolean"
                     ]
                 };
-                function op(name, arity, types, apply) {
+                function op(name, displayName, arity, types, apply) {
                     return ops[name.toLowerCase()] = {
                         name: name,
+                        displayName: displayName,
                         arity: arity,
                         applicableTo: types,
                         apply: apply
@@ -665,50 +737,50 @@ var wijmo;
                     }
                     return value;
                 }
-                function bin(name, types, apply) {
-                    op(name, 2, types, function (left, right) {
+                function bin(name, displayName, types, apply) {
+                    op(name, displayName, 2, types, function (left, right) {
                         return apply(preprocessOperand(left), preprocessOperand(right));
                     });
                 }
-                function unary(name, types, apply) {
-                    op(name, 1, types, apply);
+                function unary(name, displayName, types, apply) {
+                    op(name, displayName, 1, types, apply);
                 }
-                function binprim(name, apply) {
-                    bin(name, types.prim, apply);
+                function binprim(name, displayName, apply) {
+                    bin(name, displayName, types.prim, apply);
                 }
-                function binstr(name, apply) {
-                    bin(name, types.str, apply);
+                function binstr(name, displayName, apply) {
+                    bin(name, displayName, types.str, apply);
                 }
                 // Primitive binary operators
-                binprim("Equals", function (l, r) {
+                binprim("Equals", "Equals", function (l, r) {
                     return l == r;
                 });
-                binprim("NotEqual", function (l, r) {
+                binprim("NotEqual", "Not equal", function (l, r) {
                     return l != r;
                 });
-                binprim("Greater", function (l, r) {
+                binprim("Greater", "Greater than", function (l, r) {
                     return l > r;
                 });
-                binprim("Less", function (l, r) {
+                binprim("Less", "Less than", function (l, r) {
                     return l < r;
                 });
-                binprim("GreaterOrEqual", function (l, r) {
+                binprim("GreaterOrEqual", "Greater or equal", function (l, r) {
                     return l >= r;
                 });
-                binprim("LessOrEqual", function (l, r) {
+                binprim("LessOrEqual", "Less or equal", function (l, r) {
                     return l <= r;
                 });
                 // String operators
-                binstr("Contains", function (left, right) {
+                binstr("Contains", "Contains", function (left, right) {
                     return left == right || left && left.indexOf && left.indexOf(right) >= 0;
                 });
-                binstr("NotContain", function (left, right) {
+                binstr("NotContain", "Does not contain", function (left, right) {
                     return left != right && (!left || !left.indexOf || left.indexOf(right) < 0);
                 });
-                binstr("BeginsWith", function (left, right) {
+                binstr("BeginsWith", "Begins with", function (left, right) {
                     return left == right || left && left.indexOf && left.indexOf(right) == 0;
                 });
-                binstr("EndsWith", function (left, right) {
+                binstr("EndsWith", "Ends with", function (left, right) {
                     var idx;
                     if(!data.util.isString(left) || !data.util.isString(right)) {
                         return false;
@@ -717,17 +789,17 @@ var wijmo;
                     return idx >= 0 && left.length - idx === right.length;
                 });
                 // Unary operators
-                unary("IsEmpty", types.str, function (x) {
+                unary("IsEmpty", "Is empty", types.str, function (x) {
                     return !x && x !== 0 && x !== false;
                 })// null, undefined, or empty string
                 ;
-                unary("NotIsEmpty", types.str, function (x) {
+                unary("NotIsEmpty", "Is not empty", types.str, function (x) {
                     return !!x || x === 0 || x === false;
                 });
-                unary("IsNull", types.prim, function (x) {
+                unary("IsNull", "Is null", types.prim, function (x) {
                     return x == null;
                 });
-                unary("NotIsNull", types.prim, function (x) {
+                unary("NotIsNull", "Is not null", types.prim, function (x) {
                     return x != null;
                 });
                 return ops;
@@ -742,6 +814,7 @@ var wijmo;
 (function (wijmo) {
     (function (data) {
         /// <reference path="dataView.ts"/>
+        /** @ignore */
         (function (sorting) {
             function normalize(sort) {
                 var result = [];
@@ -777,18 +850,20 @@ var wijmo;
                         asc: asc
                     });
                 });
-                return result;
+                return result.length > 0 ? result : null;
             }
             function compile(sort, compareTo) {
                 if (typeof compareTo === "undefined") { compareTo = data.util.compare; }
                 var normalized = normalize(sort);
                 var result = {
+                    isEmpty: true,
                     original: sort,
                     propertyCompareTo: compareTo,
                     compare: null,
                     normalized: normalized
                 };
                 if(normalized != null) {
+                    result.isEmpty = false;
                     result.compare = function (a, b) {
                         var i = 0, cmp, descr;
                         for(i = 0; i < normalized.length; i++) {
@@ -826,7 +901,6 @@ var wijmo;
         * @returns An IDisposable that can be used to remove the registration.
         * @remarks
         * Use this method to provide your own IDataView implementation for a specific data source. See wijmo.data.breeze.ts for an example.
-        * @metagen
         */
         function registerDataViewFactory(factory) {
             if(!$.isFunction(factory)) {
@@ -850,7 +924,6 @@ var wijmo;
         /** Creates an IDataView for a data source.
         * @param src A data source, can be anything that is supported by the registered IDataView providers
         * @returns An IDataView instance for the data source.
-        * @metagen
         */
         function asDataView(src) {
             if(isDataView(src)) {
@@ -874,6 +947,7 @@ var wijmo;
 (function (wijmo) {
     /// <reference path="./core.ts"/>
     /// <reference path="./arrayDataView.ts"/>
+    /** @ignore */
     (function (data) {
         var $ = jQuery;
         var CurrencyManager = (function () {
@@ -920,6 +994,10 @@ function synced(fn) {
                     this.currentPosition(newIndex);
                 } else if(pos >= 0 && pos < this.array.length) {
                     this.currentItem(this.array[pos]);
+                } else if(pos == this.array.length && this.array.length > 0) {
+                    pos = this.array.length - 1;
+                    this.currentPosition(pos);
+                    this.currentItem(this.array[pos]);
                 } else {
                     this.currentPosition(-1);
                     this.currentItem(null);
@@ -938,11 +1016,14 @@ var wijmo;
 (function (wijmo) {
     (function (data) {
         var $ = jQuery;
+        /** @ignore */
         var Shape = (function () {
             function Shape(onChanged) {
                 this.onChanged = onChanged;
                 this.filter = data.observable();
+                this._compiledFilter = data.filtering.compile(null);
                 this.sort = data.observable();
+                this._compiledSort = data.sorting.compile(null);
                 this.pageIndex = data.observable(0);
                 this.pageSize = data.observable(0);
                 this._skip = 0;
@@ -988,40 +1069,57 @@ function updatePaging() {
                     this.pageIndex(shape.pageIndex);
                 }
             };
-            Shape.prototype.apply = function (array, applyPaging) {
+            Shape.prototype.apply = function (array, applyPaging, destination) {
                 if (typeof applyPaging === "undefined") { applyPaging = true; }
-                var _this = this;
-                var result = [];
+                if (typeof destination === "undefined") { destination = null; }
+                var i;
                 // filter
-                data.util.each(array, function (i, item) {
-                    if(_this._compiledFilter && !_this._compiledFilter.func(item)) {
-                        return;
+                if(!this._compiledFilter.isEmpty) {
+                    if(destination) {
+                        destination.length = 0;
+                    } else {
+                        destination = [];
                     }
-                    result.push(item);
-                });
+                    for(i = 0; i < array.length; i++) {
+                        var item = array[i];
+                        if(this._compiledFilter.func(item)) {
+                            destination.push(item);
+                        }
+                    }
+                } else {
+                    // just clone it
+                    if(!destination) {
+                        destination = array.slice(0);
+                    } else {
+                        destination.length = array.length;
+                        for(i = 0; i < array.length; i++) {
+                            destination[i] = array[i];
+                        }
+                    }
+                }
                 // sort
-                if(this._compiledSort) {
-                    result.sort(this._compiledSort.compare);
+                if(!this._compiledSort.isEmpty) {
+                    destination.sort(this._compiledSort.compare);
                 }
                 // page
-                var totalCount = result.length;
+                var totalCount = destination.length;
                 if(applyPaging && this._take > 0) {
                     if(this._skip > 0) {
-                        result.splice(0, Math.min(this._skip, result.length));
+                        destination.splice(0, Math.min(this._skip, destination.length));
                     }
-                    if(this._take < result.length) {
-                        result.length = this._take;
+                    if(this._take < destination.length) {
+                        destination.length = this._take;
                     }
                 }
                 return {
-                    results: result,
+                    results: destination,
                     totalCount: totalCount
                 };
             };
             Shape.prototype.toObj = function () {
                 return {
-                    filter: this._compiledFilter && this._compiledFilter.normalized,
-                    sort: this._compiledSort && this._compiledSort.normalized,
+                    filter: this._compiledFilter.normalized,
+                    sort: this._compiledSort.normalized,
                     pageSize: this.pageSize(),
                     pageIndex: this.pageIndex()
                 };
@@ -1077,9 +1175,9 @@ function updatePaging() {
                 }
                 return this._koArray;
             };
-            ArrayDataViewBase.prototype._getProps = //#endregion items
+            ArrayDataViewBase._getProps = //#endregion items
             //#region properties
-            function (item) {
+            function _getProps(item) {
                 var cols = [];
                 data.util.each(item, function (key, value) {
                     key = String(key);
@@ -1096,31 +1194,31 @@ function updatePaging() {
                 return cols;
             };
             ArrayDataViewBase.prototype.getProperties = function () {
-                return this.count() ? this._getProps(this.item(0)) : [];
+                return this.count() ? ArrayDataViewBase._getProps(this.item(0)) : [];
             };
             ArrayDataViewBase.prototype._readProperty = function (item, property) {
                 return data.util.getProperty(item, property);
             };
             ArrayDataViewBase.prototype.getProperty = function (itemOrIndex, property) {
-                var entry = this._resolve(itemOrIndex, true);
-                return this._readProperty(entry.item, property);
+                var item = this._getItem(itemOrIndex);
+                return this._readProperty(item, property);
             };
             ArrayDataViewBase.prototype._writeProperty = function (item, property, newValue) {
                 data.util.setProperty(item, property, newValue);
             };
             ArrayDataViewBase.prototype.setProperty = function (itemOrIndex, property, newValue) {
-                var entry = this._resolve(itemOrIndex, true);
-                if(entry.item === this.currentEditItem() && this._currentEditItemSnapshot && !(property in this._currentEditItemSnapshot)) {
+                var item = this._getItem(itemOrIndex);
+                if(item === this.currentEditItem() && this._currentEditItemSnapshot && !(property in this._currentEditItemSnapshot)) {
                     this._currentEditItemSnapshot[property] = this.getProperty(itemOrIndex, property);
                 }
-                this._writeProperty(entry.item, property, newValue);
+                this._writeProperty(item, property, newValue);
                 return this;
             };
             ArrayDataViewBase.prototype.subscribe = function (handler, context) {
                 return this._changed.subscribe(handler, context);
             };
             ArrayDataViewBase.prototype.trigger = function () {
-                this._currencyManager.updateDelayed();
+                this._currencyManager.update();
                 this._changed.trigger(this.local);
                 if(this._koArray) {
                     this._koArray.notifySubscribers(this.local);
@@ -1178,12 +1276,7 @@ function updatePaging() {
             };
             ArrayDataViewBase.prototype._localRefresh = function (doPaging) {
                 if (typeof doPaging === "undefined") { doPaging = this.localPaging; }
-                var _this = this;
-                var result = this._shape.apply(this.sourceArray, doPaging);
-                this.local.length = 0;
-                $.each(result.results, function (_, x) {
-                    return _this.local.push(x);
-                });
+                var result = this._shape.apply(this.sourceArray, doPaging, this.local);
                 if(doPaging) {
                     this._totalItemCount(result.totalCount);
                 }
@@ -1247,9 +1340,9 @@ function updatePaging() {
             ArrayDataViewBase.prototype.editItem = function (item) {
                 if (typeof item === "undefined") { item = this.currentItem(); }
                 this.commitEdit();
-                var entry = this._resolve(item);
-                if(entry) {
-                    this._beginEdit(entry.item, false);
+                item = this._getItem(item);
+                if(item) {
+                    this._beginEdit(item, false);
                 }
             };
             ArrayDataViewBase.prototype.canRemove = function () {
@@ -1297,19 +1390,27 @@ function updatePaging() {
                 if(!this.currentEditItem()) {
                     return;
                 }
-                var item = this.currentEditItem;
+                var item = this.currentEditItem();
                 this._currentEditItem(null);
                 if(this._isCurrentEditItemNew) {
                     this.sourceArray.push(item);
                 }
-                var filter = this._shape._compiledFilter && this._shape._compiledFilter.func;
-                if(filter && !filter(item)) {
+                var filter = this._shape._compiledFilter;
+                if(!filter.isEmpty && !filter.func(item)) {
                     data.util.remove(this.local, item);
                 }
                 this.trigger();
             };
-            ArrayDataViewBase.prototype._resolve = //#endregion editing
-            function (itemOrIndex, raiseIfNotContained) {
+            ArrayDataViewBase.prototype._getItem = //#endregion editing
+            function (itemOrIndex) {
+                var index;
+                if(data.util.isNumeric(itemOrIndex)) {
+                    return this.item(itemOrIndex);
+                } else {
+                    return itemOrIndex;
+                }
+            };
+            ArrayDataViewBase.prototype._resolve = function (itemOrIndex, raiseIfNotContained) {
                 if (typeof raiseIfNotContained === "undefined") { raiseIfNotContained = false; }
                 var index;
                 if(data.util.isNumeric(itemOrIndex)) {

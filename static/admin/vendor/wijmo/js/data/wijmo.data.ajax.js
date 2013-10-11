@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.15
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -170,22 +170,32 @@ var wijmo;
                         return settings;
                     },
                     onResponse: function (res) {
-                        res = res.d;
-                        if($.isArray(res)) {
-                            return {
-                                results: res
+                        var result;
+                        if(res.d) {
+                            res = res.d;
+                            if($.isArray(res)) {
+                                result = {
+                                    results: res
+                                };
+                            } else {
+                                result = {
+                                    results: res.results
+                                };
+                                var totalCount = parseInt(res.__count, 10);
+                                if(data.util.isNumeric(totalCount) && !options.localPaging) {
+                                    result.totalItemCount = totalCount;
+                                }
+                            }
+                        } else if(res.value) {
+                            result = {
+                                results: res.value
                             };
-                        } else {
-                            var result = {
-                                results: res.results
-                            };
-                            var totalCount = parseInt(res.__count, 10);
+                            var totalCount = parseInt(res["odata.count"], 10);
                             if(data.util.isNumeric(totalCount) && !options.localPaging) {
                                 result.totalItemCount = totalCount;
                             }
-                            return result;
                         }
-                        return null;
+                        return result;
                     }
                 }, options);
                 _super.prototype._construct.call(this, options);

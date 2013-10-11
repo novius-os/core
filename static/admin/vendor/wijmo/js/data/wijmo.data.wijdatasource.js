@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.15
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -18,6 +18,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
+    /// <reference path="src/arrayDataView.ts"/>
     /*globals jQuery, Globalize, wijmo */
     /*
     * Depends:
@@ -72,6 +73,13 @@ var wijmo;
                     }
                 };
                 dataSource.reader = new wijdatasourceReader(dataSource.reader);
+                var hasItems = dataSource.items && dataSource.items.length > 0;
+                if($.isArray(dataSource.data) && !hasItems) {
+                    dataSource.read();
+                }
+                if(dataSource.items) {
+                    this._loaded();
+                }
             }
             WijdatasourceView.prototype.dispose = function () {
                 this.dataSource.loaded = this._origLoaded;
@@ -79,7 +87,7 @@ var wijmo;
                 _super.prototype.dispose.call(this);
             };
             WijdatasourceView.prototype.getProperties = function () {
-                return this.sourceArray && this.sourceArray.length ? this._getProps(this.sourceArray[0]) : [];
+                return this.sourceArray && this.sourceArray.length ? data.ArrayDataViewBase._getProps(this.sourceArray[0]) : [];
             };
             WijdatasourceView.prototype._loaded = function () {
                 this.sourceArray = this.dataSource.items;
@@ -122,7 +130,7 @@ var wijmo;
             };
             WijdatasourceView.prototype._prepareFilterRequest = function () {
                 var result = [];
-                if(this._shape._compiledFilter && this._shape._compiledFilter.normalized) {
+                if(!this._shape._compiledFilter.isEmpty && this._shape._compiledFilter.normalized) {
                     $.each(this._shape._compiledFilter.normalized, function (prop, cond) {
                         result.push({
                             dataKey: prop,
@@ -140,7 +148,7 @@ var wijmo;
                 };
             };
             WijdatasourceView.prototype._prepareSortRequest = function () {
-                if(!this._shape._compiledSort || !this._shape._compiledSort.normalized || this._shape._compiledSort.normalized.length == 0) {
+                if(this._shape._compiledSort.isEmpty || !this._shape._compiledSort.normalized || this._shape._compiledSort.normalized.length == 0) {
                     return [];
                 }
                 return $.map(this._shape._compiledSort.normalized, function (sd) {

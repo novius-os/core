@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.15
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -19,6 +19,7 @@ var __extends = this.__extends || function (d, b) {
 var wijmo;
 (function (wijmo) {
     /// <reference path="src/remoteDataView.ts"/>
+    /// <reference path="../External/declarations/jquery.d.ts"/>
     /// <reference path="../External/declarations/breeze.d.ts"/>
     /*globals jQuery, Globalize, wijmo */
     /*
@@ -29,6 +30,7 @@ var wijmo;
     *
     */
     (function (data) {
+        /** @ignore */
         var BreezeShape = (function (_super) {
             __extends(BreezeShape, _super);
             function BreezeShape() {
@@ -36,11 +38,19 @@ var wijmo;
 
                 this._skipUpdatePredicate = false;
             }
+            BreezeShape.opNameMap = {
+                Greater: "GreaterThan",
+                Less: "LessThan",
+                GreaterOrEqual: "GreaterOrEqualThan",
+                LessOrEqual: "LessOrEqualThan",
+                BeginsWith: "StartsWith"
+            };
             BreezeShape.prototype.toPredicate = function (normalizedFilter) {
                 var result = null;
                 if(normalizedFilter && typeof normalizedFilter === "object") {
                     data.util.each(normalizedFilter, function (prop, cond) {
-                        var predicate = new breeze.Predicate(prop, cond.op.name, cond.value);
+                        var opName = BreezeShape.opNameMap[cond.op.name] || cond.op.name;
+                        var predicate = new breeze.Predicate(prop, opName, cond.value);
                         result = !result ? predicate : result.and(predicate);
                     });
                 }
@@ -72,7 +82,7 @@ var wijmo;
                 if(this.predicate) {
                     query = query.where(this.predicate);
                 }
-                if(sort && sort.normalized.length) {
+                if(!sort.isEmpty) {
                     var sortString = $.map(sort.normalized, function (sd) {
                         return sd.property + (sd.asc ? "" : " desc");
                     }).join(", ");
@@ -117,7 +127,32 @@ var wijmo;
                 }, options);
                 _super.prototype._construct.call(this, options);
             };
+            BreezeDataView._breezeDataTypeToString = function _breezeDataTypeToString(dataType) {
+                if(!dataType) {
+                    return null;
+                }
+                if(dataType == breeze.DataType.Decimal) {
+                    return "number";
+                } else if(dataType.isNumeric) {
+                    return "number";
+                } else if(dataType == breeze.DataType.String) {
+                    return "string";
+                } else if(dataType == breeze.DataType.DateTime || dataType == breeze.DataType.Time) {
+                    return "datetime";
+                } else if(dataType == breeze.DataType.Boolean) {
+                    return "boolean";
+                }
+                return null;
+            };
             BreezeDataView.prototype.getProperties = function () {
+                if(this.entityType && this.entityType.dataProperties) {
+                    return $.map(this.entityType.dataProperties, function (prop) {
+                        return {
+                            name: prop.name,
+                            type: BreezeDataView._breezeDataTypeToString(prop.dataType)
+                        };
+                    });
+                }
                 return this.entityType ? this.entityType.dataProperties : [];
             };
             BreezeDataView.prototype._createShape = function (onChanged) {

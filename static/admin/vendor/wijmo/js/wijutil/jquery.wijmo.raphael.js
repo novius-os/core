@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.15
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -140,8 +140,23 @@ var wijmo;
     });
     var whitespace = "[\\x20\\t\\r\\n\\f]";
     var jqueryFilterCLASS = $.expr.filter.CLASS;
+    var compareVersion = function (version, versionToCompare) {
+        var arrVer = version.split("."), arrVerTC = versionToCompare.split("."), len = Math.max(arrVer.length, arrVerTC.length), result = 0, i, v1, v2;
+        for(i = 0; i < len; i++) {
+            v1 = arrVer[i] ? parseInt(arrVer[i]) : 0;
+            v2 = arrVerTC[i] ? parseInt(arrVerTC[i]) : 0;
+            if(v1 > v2) {
+                result = 1;
+                break;
+            } else if(v1 < v2) {
+                result = -1;
+                break;
+            }
+        }
+        return result;
+    };
     $.expr.filter.CLASS = function (elem, match) {
-        if(parseFloat($.fn.jquery) < 1.8) {
+        if(compareVersion($.fn.jquery, "1.8") < 0) {
             var className = (!($.wijraphael && $.wijraphael.isSVGElem(elem)) ? elem.className : (elem.className ? elem.className.baseVal : elem.getAttribute('class')));
             return (' ' + className + ' ').indexOf(match) > -1;
         } else {
@@ -153,7 +168,7 @@ var wijmo;
             };
         }
     };
-    if(parseFloat($.fn.jquery) < 1.8) {
+    if(compareVersion($.fn.jquery, "1.8") < 0) {
         $.expr.preFilter.CLASS = function (match, curLoop, inplace, result, not, isXML) {
             var i = 0, elem = null, className = null;
             match = ' ' + match[1].replace(/\\/g, '') + ' ';
@@ -785,6 +800,27 @@ var wijmo;
             width: mmax[apply](0, w) - bx,
             height: mmax[apply](0, h) - by
         };
+    };
+    // fixed an issue that when set to width/height/r to negative value,
+    // the browser will throw exception in console.  This issue is found in
+    // bar chart seriesTransition animation when the easing is backIn.
+    var raphaelAttr = Raphael.el.attr;
+    Raphael.el.attr = function (name, value) {
+        if($.isPlainObject(name)) {
+            $.each(name, function (key, val) {
+                if(key === "width" || key === "height" || key === "r") {
+                    if(!isNaN(val) && val < 0) {
+                        name[key] = 0;
+                    }
+                }
+            });
+        }
+        if(name === "width" || name === "height" || name === "r") {
+            if(!isNaN(value) && value < 0) {
+                value = 0;
+            }
+        }
+        return raphaelAttr.apply(this, arguments);
     };
     //var raphaelAttr = Raphael.el.attr;
     //Raphael.el.attr = function (name, value) {
