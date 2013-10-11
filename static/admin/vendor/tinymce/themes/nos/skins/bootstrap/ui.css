@@ -604,7 +604,10 @@
 
 .bootstrapSkin .mceMenu a {
     position: relative;
-    padding: 3px 0 4px 0
+    /*padding: 3px 0 4px 0*/
+    /* <novius-os> */
+    padding: 1px 0 2px 0;
+    /* </novius-os> */
 }
 
 .bootstrapSkin .mceMenu .mceText {
@@ -615,7 +618,11 @@
     cursor: default;
     margin: 0;
     padding: 0 25px 0 25px;
-    display: block
+    display: block;
+    /* <novius-os> */
+    height: 16px;
+    line-height: 16px;
+    /* </novius-os> */
 }
 
 .bootstrapSkin .mceMenu span.mceText, .bootstrapSkin .mceMenu .mcePreview {
