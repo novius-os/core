@@ -341,11 +341,17 @@ define('jquery-nos-appdesk',
                             $.each(o.selectedContexts, function(i, context) {
                                 self.uiToolbarContextsDialog.find(':checkbox[value="' + context + '"]').prop('checked', true);
                             });
-                            self.uiToolbarContextsDialog.wijdialog('option', 'width', parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth());
+                            self.uiToolbarContextsDialog.wijdialog('option', 'width',
+                                Math.min(
+                                    parseInt(self.uiToolbarContextsDialog.css('padding-left').replace('px')) * 2 + $table.outerWidth(),
+                                    window.innerWidth - 200
+                                )
+                            );
                         }
                     })
                     .nosOnShow('one', function() {
                         $table.wijgrid({
+                            scrollMode : "auto",
                             columns: [
                                 {
                                     cellFormatter: function(args) {
@@ -479,7 +485,7 @@ define('jquery-nos-appdesk',
                         .find('a')
                         .append(o.texts.workInContext.replace('{{context}}', self.nosContext.contextLabel(context)));
 
-                    if (count > 10 && Object.key(o.contexts).length > 12) {
+                    if (count > 10 && Object.keys(o.contexts).length > 12) {
                         $('<li><a></a></li>')
                             .appendTo($ul)
                             .find('a')
