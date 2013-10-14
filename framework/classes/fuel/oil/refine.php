@@ -30,6 +30,20 @@ class Refine extends Oil\Refine
             $module = false;
         }
 
+        // Just call and run() or did they have a specific method in mind?
+        list($task, $method) = array_pad(explode(':', $task), 2, 'run');
+
+        // Added support for FuelPHP 2 tasks
+        if ($module) {
+            $namespaces = \Nos\Config_Data::load('app_namespaces', true);
+            $class = $namespaces[$module].'\\Task_'.ucfirst($task);
+            if (class_exists($class)) {
+                $new_task = new $class;
+                echo call_user_func_array(array($new_task, $method), $args);
+                return;
+            }
+        }
+
         $path = false;
         if ($module) {
             if ($module == 'nos') {
@@ -44,9 +58,6 @@ class Refine extends Oil\Refine
                 }
             }
         }
-
-        // Just call and run() or did they have a specific method in mind?
-        list($task, $method) = array_pad(explode(':', $task), 2, 'run');
 
         $files = \Finder::search('tasks', $task, '.php', true);
         $file = false;
