@@ -35,8 +35,15 @@ class Refine extends Oil\Refine
 
         // Added support for FuelPHP 2 tasks
         if ($module) {
-            $namespaces = \Nos\Config_Data::load('app_namespaces', true);
-            $class = $namespaces[$module].'\\Task_'.ucfirst($task);
+            if ($module == 'local') {
+                $namespace = 'Local';
+            } else if ($module == 'nos') {
+                $namespace = 'Nos';
+            } else {
+                $namespaces = \Nos\Config_Data::load('app_namespaces', true);
+                $namespace = $namespaces[$module];
+            }
+            $class = $namespace.'\\Task_'.ucfirst($task);
             if (class_exists($class)) {
                 $new_task = new $class;
                 echo call_user_func_array(array($new_task, $method), $args);
