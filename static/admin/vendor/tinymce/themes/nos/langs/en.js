@@ -67,7 +67,6 @@ tinyMCE.addI18n('en.nos',{
 	"rich_text_area":"Rich Text Area",
 	"shortcuts_desc":"Accessability Help",
     toolbar:"Use arrow keys to select functions",
-    visualthml_desc : "Show paragraphs",
     media_title: "Insert/Edit Embedded Media",
     media_label: "Embedded Media",
     image_edit: 'Edit an image',

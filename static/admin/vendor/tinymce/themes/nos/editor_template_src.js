@@ -155,7 +155,7 @@
 
                 theme_nos_buttons1 : "tablecontrols",
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
-                theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,visualhtmlcontrols,code",
+                theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,nosvisualhtml,code",
                 theme_nos_buttons4 : "image,nosmedia,noslink,nosenhancer",
                 theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,nostoolbartoggle",
 
@@ -282,9 +282,6 @@
                 case "pastecontrols":
                     return this._createPaste();
 
-                case "visualhtmlcontrols" :
-                    return this._createVisualHtml();
-
 				case "styleselect":
 					return this._createStyleSelect();
 
@@ -384,18 +381,6 @@
                         t.editor.execCommand('nosPasteHtml', true, '');
                     }
                 });
-            });
-            return c;
-        },
-
-        _createVisualHtml : function() {
-            var c, t = this, s = t.settings, o = {}, v;
-            c = t.editor.controlManager.createButton('visualhtml', {
-                title : 'nos.visualthml_desc',
-                icon: 'visualhtml',
-                onclick: function(){
-                    t.editor.execCommand('nosVisualHtml', false, '');
-                }
             });
             return c;
         },
@@ -1112,9 +1097,6 @@
 			t._updateUndoStatus(ed);
 			cm.setDisabled('outdent', !ed.queryCommandState('Outdent'));
 
-            // mode debug
-            cm.setActive('visualhtml',!(ed.dom.select('body.debug') == ''));
-
 			p = getParent('A');
 
 			if (c = cm.get('anchor')) {
@@ -1448,23 +1430,6 @@
             }, {
                 theme_url : this.url
             });
-        },
-
-        _nosVisualHtml : function(ui, val) {
-            var ed = this.editor;
-            if
-                (
-                (ed.dom.select('body.debug') == '')
-
-                )
-            {
-                ed.dom.addClass(ed.dom.select('body'), 'debug');
-
-            }
-            else {
-                ed.dom.removeClass(ed.dom.select('body'), 'debug');
-
-            }
         },
 
         _nosImage : function(ui, val) {
