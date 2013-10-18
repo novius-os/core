@@ -156,7 +156,7 @@
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,nosvisualhtml,code",
                 theme_nos_buttons4 : "nosimage,nosmedia,noslink,nosenhancer",
-                theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,nostoolbartoggle",
+                theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,nospaste,undo,redo,|,nostoolbartoggle",
 
                 theme_nos_style_formats : [
                     { block : 'p', title : 'nos.paragraph'},
@@ -278,9 +278,6 @@
 				return c;
 
 			switch (n) {
-                case "pastecontrols":
-                    return this._createPaste();
-
 				case "styleselect":
 					return this._createStyleSelect();
 
@@ -332,56 +329,6 @@
                     }
             }
             return false;
-        },
-
-        _createPaste : function() {
-            var c, t = this, s = t.settings, o = {}, v;
-
-            c = t.editor.controlManager.createSplitButton('paste', {
-                title : 'nos.paste_desc',
-                cmd : 'nosPaste',
-                'class' : 'mcePasteBouton'
-            });
-
-            c.onRenderMenu.add(function(c, m) {
-                m.add({
-                    title : 'nos.paste_desc',
-                    'class' : 'mceMenuItemTitle'
-                }).setDisabled(1);
-
-                m.add({
-                    title : 'nos.paste_desc',
-                    icon : 'paste',
-                    cmd : 'nosPaste'
-                });
-
-                m.addSeparator();
-
-                m.add({
-                    title : 'paste.paste_text_desc',
-                    icon : 'pastetext',
-                    onclick : function() {
-                        t.editor.execCommand('mcePasteText', true, '');
-                    }
-                });
-
-                m.add({
-                    title : 'paste.paste_word_desc',
-                    icon : 'pasteword',
-                    onclick : function() {
-                        t.editor.execCommand('mcePasteWord', true, '');
-                    }
-                });
-
-                m.add({
-                    title : 'nos.paste_html_desc',
-                    icon : 'pastehtml',
-                    onclick : function() {
-                        t.editor.execCommand('nosPasteHtml', true, '');
-                    }
-                });
-            });
-            return c;
         },
 
 		_createFontSelect : function() {
@@ -1417,19 +1364,6 @@
 				}
 			});
 		},
-
-        _nosPasteHtml : function(ui, val) {
-            var ed = this.editor;
-
-            ed.windowManager.open({
-                url : this.url + '/pastehtml.htm',
-                width : 600,
-                height : 420,
-                inline : true
-            }, {
-                theme_url : this.url
-            });
-        },
 
 		_ufirst : function(s) {
 			return s.substring(0, 1).toUpperCase() + s.substring(1);
