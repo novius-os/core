@@ -72,7 +72,6 @@ tinyMCE.addI18n('ja.nos', {
     "image_title":"Insert/Edit Image",
     "image_label":"Image",
     // Novius OS new texts
-    "brclearall_desc" : "New line under the image",
     visualthml_desc : "Show paragraph in box",
     media_title: "Insert/Edit Embedded Media",
     media_label: "Embedded Media",

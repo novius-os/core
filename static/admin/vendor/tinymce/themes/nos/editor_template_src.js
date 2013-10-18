@@ -134,7 +134,6 @@
 			anchor : ['anchor_desc', 'mceInsertAnchor'],
 			newdocument : ['newdocument_desc', 'mceNewDocument'],
 			blockquote : ['blockquote_desc', 'mceBlockQuote'],
-            brclearall : ['brclearall_desc', 'nosBrClearAll'],
             image : ['image_title', 'nosImage', null, null, 'image_label']
         },
 
@@ -155,7 +154,7 @@
 		        theme_nos_statusbar_location : "bottom",
 
                 theme_nos_buttons1 : "tablecontrols",
-                theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,brclearall,|,styleprops,removeformat",
+                theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,visualhtmlcontrols,code",
                 theme_nos_buttons4 : "image,nosmedia,noslink,nosenhancer",
                 theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,toolbar_toggle",
@@ -1541,14 +1540,6 @@
             }, {
                 theme_url : this.url
             });
-        },
-
-        _nosBrClearAll : function(ui, val) {
-            var ed = this.editor;
-
-            br = '<br style="clear: both"/>';
-
-            ed.execCommand("mceInsertContent", false, br);
         },
 
         _nosVisualHtml : function(ui, val) {

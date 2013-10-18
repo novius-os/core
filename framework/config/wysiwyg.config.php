@@ -14,7 +14,7 @@ return array(
         'doctype' => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
         'theme' => 'nos',
         'skin' => 'bootstrap',
-        'plugins' => 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking,nosenhancer,noslink,nosalign',
+        'plugins' => 'spellchecker,xhtmlxtras,style,table,advlist,inlinepopups,media,searchreplace,paste,noneditable,visualchars,nonbreaking,nosenhancer,noslink,nosalign,nosbrclearall',
         'paste_text_use_dialog' => true,
     ),
 

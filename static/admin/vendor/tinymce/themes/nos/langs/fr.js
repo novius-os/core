@@ -72,7 +72,6 @@ tinyMCE.addI18n('fr.nos', {
     "image_title":"Ins\u00e9rer / Modifier une image",
     "image_label":"Image",
     // Novius OS new texts
-    "brclearall_desc" : "Nouveau ligne sous l\u0027image",
     visualthml_desc : "Montrer les paragraphes",
     media_title: "Ins\u00e9rer / Modifier un m\u00e9dia externe",
     media_label: "M\u00e9dia externe",
