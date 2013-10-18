@@ -13,7 +13,7 @@
 
     tinymce.create('tinymce.plugins.NosLinkPlugin', {
         init : function(ed, url) {
-            var self = this, mediaCached = {};
+            var self = this;
 
             self.editor = ed;
 
@@ -38,7 +38,7 @@
                         if (func(parents[i]))
                             return parents[i];
                     }
-                };
+                }
 
                 p = getParent('A');
                 if (c = cm.get('noslink')) {

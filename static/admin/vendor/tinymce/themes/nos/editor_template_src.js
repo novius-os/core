@@ -158,7 +158,7 @@
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,brclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,visualhtmlcontrols,code",
                 theme_nos_buttons4 : "image,nosmedia,noslink,nosenhancer",
-                theme_nos_buttons5 : "styleselect,bold,italic,justifycontrols,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,toolbar_toggle",
+                theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,toolbar_toggle",
 
                 theme_nos_style_formats : [
                     { block : 'p', title : 'nos.paragraph'},
@@ -280,9 +280,6 @@
 				return c;
 
 			switch (n) {
-                case "justifycontrols" :
-                    return this._createJustify();
-
                 case "pastecontrols":
                     return this._createPaste();
 
@@ -587,52 +584,6 @@
 
 			return c;
 		},
-
-        _createJustify : function(n) {
-            var t = this, ed = t.editor, ctrlMan = ed.controlManager, ctrl,
-                tab_justify = {
-                    justifyleft : {
-                        title : 'nos.justifyleft_desc',
-                            cmd : 'JustifyLeft'
-                    },
-                    justifycenter : {
-                        title : 'nos.justifycenter_desc',
-                            cmd : 'JustifyCenter'
-                    },
-                    justifyright : {
-                        title : 'nos.justifyright_desc',
-                            cmd : 'JustifyRight'
-                    },
-                    justifyfull : {
-                        title : 'nos.justifyfull_desc',
-                            cmd : 'JustifyFull'
-                    }
-                };
-;
-
-            ctrl = ctrlMan.createListBox('justifycontrols', {
-                title : 'nos.justify_select',
-                onselect : function(name) {
-                    var align = tab_justify[name];
-
-                    ed.execCommand(align.cmd, false);
-
-                    return false; // No auto select
-                }
-            }, tinymce.ui.NosListBox);
-
-            ed.onInit.add(function() {
-                var counter = 0;
-
-                each(tab_justify, function(item, key) {
-                    ctrl.add(item.title, key, tinymce.extend(item, {
-                        icon : key
-                    }));
-                });
-            });
-
-            return ctrl;
-        },
 
         _createStyleSelect : function(n) {
             var t = this, ed = t.editor, ctrlMan = ed.controlManager, ctrl;
@@ -1283,14 +1234,6 @@
                 tinymce.each(matches, function(match, index) {
                     if (index > 0) {
                         c.mark(match);
-                    }
-                });
-            }
-
-            if (c = cm.get('justifycontrols')) {
-                each(c.items, function(item, i) {
-                    if (ed.queryCommandState(item.cmd)) {
-                        c.selectByIndex(i)
                     }
                 });
             }

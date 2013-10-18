@@ -52,10 +52,6 @@ tinyMCE.addI18n('fr.nos', {
     "outdent_desc": "Retirer l\u0027indentation",
     "numlist_desc": "Liste num\u00e9rot\u00e9e",
     "bullist_desc": "Liste \u00e0 puces",
-    "justifyfull_desc": "Justifi\u00e9",
-    "justifyright_desc": "Align\u00e9 \u00e0 droite",
-    "justifycenter_desc": "Centr\u00e9",
-    "justifyleft_desc": "Align\u00e9 \u00e0 gauche",
     "striketrough_desc": "Barr\u00e9",
     "help_shortcut": "Faites ALT-F10 pour acc\u00e9der \u00e0 la barre d\u0027outils. Faites ALT-0 pour acc\u00e9der \u00e0 l\u0027aide",
     "rich_text_area": "Zone de texte enrichi",
@@ -75,7 +71,6 @@ tinyMCE.addI18n('fr.nos', {
     "paste_html_desc" : "Copier le code HTML",
     "image_title":"Ins\u00e9rer / Modifier une image",
     "image_label":"Image",
-    "justify_select":"Alignement",
     // Novius OS new texts
     "brclearall_desc" : "Nouveau ligne sous l\u0027image",
     visualthml_desc : "Montrer les paragraphes",

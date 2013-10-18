@@ -52,10 +52,6 @@ tinyMCE.addI18n('ja.nos', {
     "outdent_desc": "\u5b57\u4e0b\u3052\u3092\u6e1b\u3089\u3059",
     "numlist_desc": "\u756a\u53f7\u3064\u304d\u30ea\u30b9\u30c8",
     "bullist_desc": "\u756a\u53f7\u306a\u3057\u30ea\u30b9\u30c8",
-    "justifyfull_desc": "\u5747\u7b49\u5272\u4ed8",
-    "justifyright_desc": "\u53f3\u63c3\u3048",
-    "justifycenter_desc": "\u4e2d\u592e\u63c3\u3048",
-    "justifyleft_desc": "\u5de6\u63c3\u3048",
     "striketrough_desc": "\u53d6\u308a\u6d88\u3057\u7dda",
     "help_shortcut": "ALT-F10 \u3067\u30c4\u30fc\u30eb\u30d0\u30fc\u3001ALT-0 \u3067\u30d8\u30eb\u30d7",
     "rich_text_area": "\u30ea\u30c3\u30c1\u30c6\u30ad\u30b9\u30c8\u30a8\u30ea\u30a2",
@@ -75,7 +71,6 @@ tinyMCE.addI18n('ja.nos', {
     "paste_html_desc" : "Paste HTML code",
     "image_title":"Insert/Edit Image",
     "image_label":"Image",
-    "justify_select":"Alignement",
     // Novius OS new texts
     "brclearall_desc" : "New line under the image",
     visualthml_desc : "Show paragraph in box",
