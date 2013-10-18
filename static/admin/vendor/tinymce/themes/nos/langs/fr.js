@@ -75,9 +75,6 @@ tinyMCE.addI18n('fr.nos', {
     visualthml_desc : "Montrer les paragraphes",
     media_title: "Ins\u00e9rer / Modifier un m\u00e9dia externe",
     media_label: "M\u00e9dia externe",
-    toolbar_toggle_title: "Montrer / Cacher plus d\u0027outils",
-    toolbar_toggle_label_close: "Moins d\u0027outils",
-    toolbar_toggle_label_open: "Plus d\u0027outils",
     image_edit: 'Modifier une image',
     image_insert: 'Ins\u00e9rer une image'
 });

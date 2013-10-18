@@ -75,9 +75,6 @@ tinyMCE.addI18n('ja.nos', {
     visualthml_desc : "Show paragraph in box",
     media_title: "Insert/Edit Embedded Media",
     media_label: "Embedded Media",
-    toolbar_toggle_title: "Show / Hide more toolbars",
-    toolbar_toggle_label_close: "Less toolbars",
-    toolbar_toggle_label_open: "More toolbars",
     image_edit: 'Edit an image',
     image_insert: 'Insert an image'
 });

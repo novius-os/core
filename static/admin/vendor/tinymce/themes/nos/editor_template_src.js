@@ -157,7 +157,7 @@
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,visualhtmlcontrols,code",
                 theme_nos_buttons4 : "image,nosmedia,noslink,nosenhancer",
-                theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,toolbar_toggle",
+                theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,nostoolbartoggle",
 
                 theme_nos_style_formats : [
                     { block : 'p', title : 'nos.paragraph'},
@@ -282,9 +282,6 @@
                 case "pastecontrols":
                     return this._createPaste();
 
-                case "toolbar_toggle" :
-                    return this._createToolbarToggle();
-
                 case "visualhtmlcontrols" :
                     return this._createVisualHtml();
 
@@ -339,95 +336,6 @@
                     }
             }
             return false;
-        },
-
-        _createToolbarToggle : function() {
-            var c, t = this, s = t.settings, o = {}, v, ed = t.editor, tbIds = new Array(), toolbars = ['1', '2', '3'], i;
-
-            for(i = 0; i < toolbars.length; i++){
-                tbIds[i] = ed.getParam('', 'toolbar' + (toolbars[i]).replace(' ',''));
-            }
-
-            c = t.editor.controlManager.createButton('toolbar_toggle', {
-                title : 'nos.toolbar_toggle_title',
-                label : 'nos.toolbar_toggle_label_open',
-                'class' : 'mce_toolbar_toggle_open',
-                cmd : 'mceToggleToolbars'
-            });
-
-            var resizeIframe = function(ed, dy) {
-                    if (s.theme_nos_toolbar_location === 'external') {
-                        var toolbar = DOM.get(ed.id + '_external');
-
-                        $(toolbar).css('top', ($(toolbar).position().top + dy) + 'px');
-                    } else {
-                        var ifr = ed.getContentAreaContainer().firstChild;
-
-                        DOM.setStyle(ifr, 'height',DOM.getSize(ifr).h + dy); // Resize iframe
-                        ed.theme.deltaHeight += dy; // For resize cookie
-                    }
-                },
-                setState = function(state) {
-                    c.setActive(state);
-                    DOM.setAttrib(DOM.select('.mceIcon', c.id), 'class', 'mceIcon');
-                    DOM.addClass(DOM.select('.mceIcon', c.id), state ? 'mce_toolbar_toggle_close' : 'mce_toolbar_toggle_open');
-                    DOM.setHTML(DOM.select('.mceButtonLabel', c.id), ed.getLang(state ? 'nos.toolbar_toggle_label_close' : 'nos.toolbar_toggle_label_open', 0));
-                };
-
-            // Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceExample');
-            ed.addCommand('mceToggleToolbars', function() {
-
-                var cm = ed.controlManager, id, j, Cookie = tinymce.util.Cookie, Open_Toolbar, Toggle = Cookie.getHash("TinyMCE_toggle") || new Object(), resize = 0;
-                for(j = 0; j < tbIds.length; j++){
-
-                    obj = ed.controlManager.get(tbIds[j]);
-                    if(typeof obj =="undefined") {
-                        continue;
-                    }
-                    id = obj.id;
-
-                    if (DOM.isHidden(id)) {
-                        Open_Toolbar = 1;
-                        DOM.show(id);
-                        resize = resize - 26;
-                    } else {
-                        Open_Toolbar = 0;
-                        DOM.hide(id);
-                        resize = resize + 26;
-                    }
-                }
-                resizeIframe(ed, resize);
-                setState(Open_Toolbar);
-
-                Toggle[ed.id] = Open_Toolbar;
-                Cookie.setHash("TinyMCE_toggle", Toggle);
-            });
-
-            ed.onPostRender.add(function(){
-                var toggle = tinymce.util.Cookie.getHash("TinyMCE_toggle") || new Object(), resize = 0, run = false;
-
-                // Check if value is stored in cookie
-                if(toggle[ed.id] == null){
-                    run = true;
-                } else if(toggle[ed.id] === "0"){
-                    run = true;
-                }
-
-                if (run) {
-                    var cm = ed.controlManager, tdId, id;
-
-                    for(i = 0; i < toolbars.length; i++){
-                        tbId = ed.getParam('', 'toolbar' + (toolbars[i]).replace(' ',''));
-                        id = ed.controlManager.get(tbId).id;
-                        DOM.hide(id);
-                        resize = resize + 26;
-                    }
-                    resizeIframe(ed, resize);
-                    setState(0);
-                }
-            });
-
-            return c;
         },
 
         _createPaste : function() {
