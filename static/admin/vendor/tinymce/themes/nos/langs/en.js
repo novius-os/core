@@ -27,8 +27,6 @@ tinyMCE.addI18n('en.nos',{
 	"charmap_delta_width":"",
 	"colorpicker_delta_height":"",
 	"colorpicker_delta_width":"",
-	"link_delta_height":"",
-	"link_delta_width":"",
 	"image_delta_height":"",
 	"image_delta_width":"",
 	"more_colors":"More Colors...",
@@ -58,9 +56,6 @@ tinyMCE.addI18n('en.nos',{
 	"cleanup_desc":"Cleanup Messy Code",
 	"image_title":"Insert/Edit Image",
     "image_label":"Image",
-	"unlink_desc":"Unlink",
-	"link_title":"Insert/Edit Link",
-    "link_label":"Link",
 	"redo_desc":"Redo (Ctrl+Y)",
 	"undo_desc":"Undo (Ctrl+Z)",
 	"indent_desc":"Increase Indent",
@@ -85,7 +80,5 @@ tinyMCE.addI18n('en.nos',{
     toolbar_toggle_label_close: "Less toolbars",
     toolbar_toggle_label_open: "More toolbars",
     image_edit: 'Edit an image',
-    image_insert: 'Insert an image',
-    link_edit: 'Edit a link',
-    link_insert: 'Insert a link'
+    image_insert: 'Insert an image'
 });

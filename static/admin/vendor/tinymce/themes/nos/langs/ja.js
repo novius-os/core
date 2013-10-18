@@ -46,8 +46,6 @@ tinyMCE.addI18n('ja.nos', {
     "code_desc": "HTML\u306e\u30bd\u30fc\u30b9\u3092\u7de8\u96c6",
     "cleanup_desc": "\u4e71\u96d1\u306a\u30b3\u30fc\u30c9\u3092\u6574\u5f62",
     "image_desc": "\u753b\u50cf\u306e\u633f\u5165/\u7de8\u96c6",
-    "unlink_desc": "\u30ea\u30f3\u30af\u3092\u89e3\u9664",
-    "link_desc": "\u30ea\u30f3\u30af\u306e\u633f\u5165/\u7de8\u96c6",
     "redo_desc": "\u3084\u308a\u76f4\u3059 (Ctrl+Y)",
     "undo_desc": "\u5143\u306b\u623b\u3059 (Ctrl+Z)",
     "indent_desc": "\u5b57\u4e0b\u3052\u3092\u5897\u3084\u3059",
@@ -69,8 +67,6 @@ tinyMCE.addI18n('ja.nos', {
     "charmap_delta_width": "",
     "colorpicker_delta_height": "",
     "colorpicker_delta_width": "",
-    "link_delta_height": "",
-    "link_delta_width": "",
     "image_delta_height": "",
     "image_delta_width": "",
 
@@ -79,8 +75,6 @@ tinyMCE.addI18n('ja.nos', {
     "paste_html_desc" : "Paste HTML code",
     "image_title":"Insert/Edit Image",
     "image_label":"Image",
-    "link_title":"Insert/Edit Link",
-    "link_label":"Link",
     "justify_select":"Alignement",
     // Novius OS new texts
     "brclearall_desc" : "New line under the image",
@@ -91,7 +85,5 @@ tinyMCE.addI18n('ja.nos', {
     toolbar_toggle_label_close: "Less toolbars",
     toolbar_toggle_label_open: "More toolbars",
     image_edit: 'Edit an image',
-    image_insert: 'Insert an image',
-    link_edit: 'Edit a link',
-    link_insert: 'Insert a link'
+    image_insert: 'Insert an image'
 });

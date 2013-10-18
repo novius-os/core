@@ -46,8 +46,6 @@ tinyMCE.addI18n('fr.nos', {
     "code_desc": "\u00c9diter le code source HTML",
     "cleanup_desc": "Nettoyer le code",
     "image_desc": "Ins\u00e9rer / \u00e9diter l\u0027image",
-    "unlink_desc": "Supprimer le lien",
-    "link_desc": "Ins\u00e9rer / \u00e9diter le lien",
     "redo_desc": "R\u00e9tablir (Ctrl+Y)",
     "undo_desc": "Annuler (Ctrl+Z)",
     "indent_desc": "Indenter",
@@ -69,8 +67,6 @@ tinyMCE.addI18n('fr.nos', {
     "charmap_delta_width": "",
     "colorpicker_delta_height": "",
     "colorpicker_delta_width": "",
-    "link_delta_height": "",
-    "link_delta_width": "",
     "image_delta_height": "",
     "image_delta_width": "",
 
@@ -79,8 +75,6 @@ tinyMCE.addI18n('fr.nos', {
     "paste_html_desc" : "Copier le code HTML",
     "image_title":"Ins\u00e9rer / Modifier une image",
     "image_label":"Image",
-    "link_title":"Ins\u00e9rer / Modifier un lien",
-    "link_label":"Lien",
     "justify_select":"Alignement",
     // Novius OS new texts
     "brclearall_desc" : "Nouveau ligne sous l\u0027image",
@@ -91,7 +85,5 @@ tinyMCE.addI18n('fr.nos', {
     toolbar_toggle_label_close: "Moins d\u0027outils",
     toolbar_toggle_label_open: "Plus d\u0027outils",
     image_edit: 'Modifier une image',
-    image_insert: 'Ins\u00e9rer une image',
-    link_edit: 'Modifier un lien',
-    link_insert: 'Ins\u00e9rer un lien'
+    image_insert: 'Ins\u00e9rer une image'
 });

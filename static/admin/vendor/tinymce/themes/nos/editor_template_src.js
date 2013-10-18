@@ -157,7 +157,7 @@
                 theme_nos_buttons1 : "tablecontrols",
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,brclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,visualhtmlcontrols,code",
-                theme_nos_buttons4 : "image,nosmedia,linkcontrols,nosenhancer",
+                theme_nos_buttons4 : "image,nosmedia,noslink,nosenhancer",
                 theme_nos_buttons5 : "styleselect,bold,italic,justifycontrols,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,toolbar_toggle",
 
                 theme_nos_style_formats : [
@@ -280,9 +280,6 @@
 				return c;
 
 			switch (n) {
-                case "linkcontrols" :
-                    return this._createLink();
-
                 case "justifycontrols" :
                     return this._createJustify();
 
@@ -346,57 +343,6 @@
                     }
             }
             return false;
-        },
-
-        _createLink : function() {
-            var c, t = this, s = t.settings, o = {}, v;
-
-            c = t.editor.controlManager.createSplitButton('linkcontrols', {
-                title : 'nos.link_title',
-                label : 'nos.link_label',
-                onclick: function(){
-                    t.editor.execCommand('nosLink', true, '');
-                },
-                'class' : 'mce_link'
-            }, tinymce.ui.NosSplitButton);
-
-            c.onRenderMenu.add(function(c, m) {
-                m.add({
-                    title : 'nos.link_title',
-                    'class' : 'mceMenuItemTitle'
-                }).setDisabled(1);
-
-                m.add({
-                    title : 'nos.link_title',
-                    icon : 'link',
-                    onclick: function(){
-                        t.editor.execCommand('nosLink', true, '');
-                    },
-                    id : 'link'
-                });
-
-                m.add({
-                    title : 'nos.unlink_desc',
-                    icon : 'unlink',
-                    onclick: function(){
-                        t.editor.execCommand('unlink', false, '');
-                    },
-                    id : 'unlink'
-                });
-
-                m.onShowMenu.add(function(m) {
-                    var ed = t.editor, n = ed.selection.getNode(), p, link, anchor;
-
-                    p = DOM.getParent(n, 'A');
-                    link = !!p;
-                    anchor = link && (p.name || (p.id && !p.href));
-
-                    m.items['link'].setDisabled(anchor);
-                    m.items['link'].setActive(link && !anchor);
-                    m.items['unlink'].setDisabled(!link);
-                });
-            });
-            return c;
         },
 
         _createToolbarToggle : function() {
@@ -1312,10 +1258,6 @@
             cm.setActive('visualhtml',!(ed.dom.select('body.debug') == ''));
 
 			p = getParent('A');
-            if (c = cm.get('linkcontrols')) {
-                c.setDisabled(!p && co);
-                c.setActive(!!p);
-            }
 
 			if (c = cm.get('anchor')) {
                 c.setActive(!co && !!p && (p.name || (p.id && !p.href)));
@@ -1681,65 +1623,6 @@
                 ed.dom.removeClass(ed.dom.select('body'), 'debug');
 
             }
-        },
-
-        _nosLink : function(ui, val) {
-            var ed = this.editor,
-                e = ed.dom.getParent(ed.selection.getNode(), 'A');
-
-            var bookmark = ed.selection.getBookmark(1);
-
-            var dialog = null;
-            dialog = $nos(ed.getElement()).nosDialog({
-                contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
-                title: e ? ed.getLang('nos.link_edit') : ed.getLang('nos.link_insert'),
-                ajax: true,
-                open : function(event) {
-                    $(event.target).data('tinymce', ed);
-                }
-            });
-            dialog.bind('insert.link', function(event, link) {
-                // Cleanup
-                dialog.nosDialog('close');
-
-                if (tinymce.isIE) {
-                    ed.selection.moveToBookmark(bookmark);
-                }
-
-                if (e == null) {
-                    ed.getDoc().execCommand("unlink", false, null);
-                    ed.execCommand("mceInsertLink", false, "#mce_temp_url#", {skip_undo : 1});
-
-                    tinymce.each(ed.dom.select("a"), function(n) {
-                        if (ed.dom.getAttrib(n, 'href') == '#mce_temp_url#') {
-                            e = n;
-
-                            ed.dom.setAttribs(e, {
-                                href : link.href,
-                                title : link.title,
-                                target : link.target
-                            });
-                        }
-                    });
-                } else {
-                    ed.dom.setAttribs(e, {
-                        href : link.href,
-                        title : link.title,
-                        target : link.target
-                    });
-                }
-
-                // Don't move caret if selection was image
-                if (e.childNodes.length != 1 || e.firstChild.nodeName != 'IMG') {
-                    ed.focus();
-                    ed.selection.select(e);
-                    ed.selection.collapse(0);
-                    ed.windowManager.bookmark = ed.selection.getBookmark(1);
-                }
-
-                ed.execCommand("mceEndUndoLevel");
-            });
-
         },
 
         _nosImage : function(ui, val) {
