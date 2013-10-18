@@ -227,14 +227,8 @@
 
 
 
-.defaultSkin span.mce_enhancer {
-    background : url(../../img/enhancer.gif) no-repeat 1px 1px;
-}
 .defaultSkin span.mce_file {
 	background : url(../../img/file.gif) no-repeat 1px 1px;
-}
-.defaultSkin .mce_enhancer .mceButtonLabel {
-    font-size : 11px;
 }
 
 .defaultSkin .mcePasteBouton span.mceAction {

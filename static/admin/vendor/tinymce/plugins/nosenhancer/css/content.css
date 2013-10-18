@@ -1,0 +1,35 @@
+.nosEnhancer {
+    margin: 0 0 10px;
+    border:1px solid #A8A8A8;
+    padding:5px;
+}
+.nos_enhancer_action {
+    display: inline-block;
+    text-indent: -10000px;
+    width : 16px;
+    height : 16px;
+    vertical-align: middle;
+    margin-right: 8px;
+    background-position:center; background-repeat:no-repeat;
+}
+.nos_enhancer_action_block {
+    float : right;
+    display:none;
+    cursor: pointer;cursor: hand;
+}
+.nosEnhancer:hover .nos_enhancer_action_block {
+    display : block;
+    cursor: pointer;cursor: hand;
+}
+.nos_enhancer_action_before {
+    background-image:url(../img/insert_before.png);
+}
+.nos_enhancer_action_after {
+    background-image:url(../img/insert_after.png);
+}
+.nos_enhancer_action_edit {
+    background-image:url(../img/edit.png);
+}
+.nos_enhancer_action_delete {
+    background-image:url(../img/delete.png);
+}

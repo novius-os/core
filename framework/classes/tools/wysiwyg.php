@@ -108,7 +108,7 @@ class Tools_Wysiwyg
                 }
             }
 
-            $options['theme_nos_enhancers'] = $enhancers;
+            $options['nosenhancer_enhancers'] = $enhancers;
 
             $item->event('wysiwygOptions', array(&$options));
         }

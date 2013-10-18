@@ -1123,14 +1123,8 @@
 }
 
 
-.bootstrapSkin span.mce_enhancer {
-    background : url(../../img/enhancer.gif) no-repeat 1px 1px;
-}
 .bootstrapSkin span.mce_file {
     background : url(../../img/file.gif) no-repeat 1px 1px;
-}
-.bootstrapSkin .mce_enhancer .mceButtonLabel {
-    font-size : 11px;
 }
 
 .bootstrapSkin .mcePasteBouton span.mceAction {
