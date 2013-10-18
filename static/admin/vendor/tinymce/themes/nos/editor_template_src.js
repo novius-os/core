@@ -133,8 +133,7 @@
 			charmap : ['charmap_desc', 'mceCharMap'],
 			anchor : ['anchor_desc', 'mceInsertAnchor'],
 			newdocument : ['newdocument_desc', 'mceNewDocument'],
-			blockquote : ['blockquote_desc', 'mceBlockQuote'],
-            image : ['image_title', 'nosImage', null, null, 'image_label']
+			blockquote : ['blockquote_desc', 'mceBlockQuote']
         },
 
 		stateControls : ['bold', 'italic', 'underline', 'strikethrough', 'bullist', 'numlist', 'sub', 'sup', 'blockquote'],
@@ -156,7 +155,7 @@
                 theme_nos_buttons1 : "tablecontrols",
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,nosvisualhtml,code",
-                theme_nos_buttons4 : "image,nosmedia,noslink,nosenhancer",
+                theme_nos_buttons4 : "nosimage,nosmedia,noslink,nosenhancer",
                 theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,pastecontrols,undo,redo,|,nostoolbartoggle",
 
                 theme_nos_style_formats : [
@@ -1431,59 +1430,6 @@
                 theme_url : this.url
             });
         },
-
-        _nosImage : function(ui, val) {
-			var ed = this.editor;
-
-			// Internal image object like a flash placeholder
-            if (ed.dom.getAttrib(ed.selection.getNode(), 'class', '').indexOf('mceItem') != -1)
-				return;
-
-            var editCurrentImage = ed.selection.getNode().nodeName == 'IMG';
-
-            var bookmark = ed.selection.getBookmark(1);
-
-			var dialog = null;
-            dialog = $nos(ed.getElement()).nosDialog({
-				contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
-				title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
-				ajax: true,
-                open : function(e) {
-                    $(e.target).data('tinymce', ed);
-                }
-			});
-            dialog.bind('insert.media', function(e, img) {
-                // Cleanup
-                dialog.nosDialog('close');
-
-                if (tinymce.isIE) {
-                    ed.selection.moveToBookmark(bookmark);
-                }
-
-                var $img = $(img);
-
-                if (editCurrentImage) {
-                    var node = ed.selection.getNode();
-                    if (node.nodeName == 'IMG') {
-                        var args = {};
-                        $.each('src title alt width height style'.split(' '), function(i, name) {
-                            var value = $img.attr(name);
-                            args[name] = value;
-                        });
-                        args['data-media-id'] = $img.data('media').id;
-                        $(node).data('media-id', args['data-media-id']);
-                        ed.dom.setAttribs(node, args);
-                        ed.execCommand('mceRepaint');
-                        ed.undoManager.add();
-                    }
-                } else {
-                    var html = $('<div></div>').append($(img).addClass('nosMedia').attr('data-media-id', $(img).data('media').id)).html();
-                    ed.execCommand('mceInsertContent', false, html, {skip_undo : 1});
-                }
-                ed.execCommand("mceEndUndoLevel");
-            });
-
-		},
 
 		_ufirst : function(s) {
 			return s.substring(0, 1).toUpperCase() + s.substring(1);
