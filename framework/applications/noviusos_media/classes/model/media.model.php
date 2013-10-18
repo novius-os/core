@@ -427,4 +427,9 @@ class Model_Media extends \Nos\Orm\Model
             $this->media_filesize = filesize($file);
         }
     }
+
+    public function _event_after_delete()
+    {
+        $this->deleteFromDisk();
+    }
 }

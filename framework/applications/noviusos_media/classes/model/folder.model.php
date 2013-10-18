@@ -125,6 +125,7 @@ class Model_Folder extends \Nos\Orm\Model
     );
 
     protected $_data_events = array();
+    protected $_folder_ids_for_delete = array();
 
     /**
      * Delete the folder from disk
@@ -234,5 +235,72 @@ class Model_Folder extends \Nos\Orm\Model
                 ->where('media_path', 'LIKE', $diff[0]['medif_path'].'%')
                 ->execute();
         }
+    }
+
+
+    public function _event_before_delete()
+    {
+        $count_medias = $this->count_media();
+        // Basic check to prevent false suppression
+        if (!is_dir($this->path()) && $count_medias > 0) {
+            throw new \Exception(__('This is strange: This folder should be empty but isn’t. '.
+            'Please contact your developer or Novius OS to fix this. '.
+            'We apologise for the inconvenience caused.'));
+        }
+
+        // Strategy : try to delete the database records first,
+        // as we can sometimes (if supported) rollback with the transaction
+        // Delete the files afterwards and commit the transaction if it's a success
+
+        // find_children_recursive($include_self = true)
+        $all_folders = $this->find_children_recursive(true);
+        $this->_folder_ids_for_delete = array_keys($all_folders);
+    }
+
+    /**
+     * Delete current folder
+     *
+     * @param   mixed $cascade
+     *     null = use default config,
+     *     bool = force/prevent cascade,
+     *     array cascades only the relations that are in the array
+     * @param   bool $use_transaction
+     * @return  Model_Folder this instance as a new object without primary key(s)
+     */
+    public function delete($cascade = null, $use_transaction = false)
+    {
+        parent::delete($cascade, true);
+    }
+
+
+    public function _event_after_delete()
+    {
+        $escaped_folder_ids = array();
+        foreach ($this->_folder_ids_for_delete as $id) {
+            $escaped_folder_ids[] = (int) $id;
+        }
+        // Cleanup empty values
+        $escaped_folder_ids = array_filter($escaped_folder_ids);
+        $escaped_folder_ids = implode(',', $escaped_folder_ids);
+
+        $table_folder = Model_Folder::table();
+        $table_media  = Model_Media::table();
+        $table_link   = Model_Link::table();
+
+        // Delete linked medias
+        \DB::query('DELETE '.$table_link.'.* FROM '.$table_link.'
+            LEFT JOIN '.$table_media.' ON media_id = medil_media_id
+            WHERE media_folder_id IN ('.$escaped_folder_ids.')')->execute();
+
+        // Delete media entries
+        \DB::query('DELETE '.$table_media.'.* FROM '.$table_media.'
+            WHERE media_folder_id IN ('.$escaped_folder_ids.')')->execute();
+
+        // Can throw an exception
+        $this->deleteFromDisk();
+
+        // Delete folder entries
+        \DB::query('DELETE '.$table_folder.'.* FROM '.$table_folder.'
+            WHERE medif_id IN ('.$escaped_folder_ids.')')->execute();
     }
 }

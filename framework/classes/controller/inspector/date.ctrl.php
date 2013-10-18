@@ -124,11 +124,17 @@ class Controller_Inspector_Date extends Controller_Inspector
         $view->set('content', $content, false);
         $view->set('labels', $config['labels']);
 
-        $view->set('date_begin', \Nos\Renderer_Date_Picker::renderer(array(
+        $view->set('date_begin', \Nos\Renderer_Datetime_Picker::renderer(array(
             'name' => $config['input_begin'],
+            'renderer_options' => array(
+                'format' => 'date',
+            ),
         )), false);
-        $view->set('date_end', \Nos\Renderer_Date_Picker::renderer(array(
+        $view->set('date_end', \Nos\Renderer_Datetime_Picker::renderer(array(
             'name' => $config['input_end'],
+            'renderer_options' => array(
+                'format' => 'date',
+            ),
         )), false);
 
         return $view;

@@ -145,12 +145,4 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
         }
         return $return;
     }
-
-    public function delete()
-    {
-        // Delete database & relations (link)
-        $this->item->delete();
-        // Delete file and cached entries from the hard drive
-        $this->item->deleteFromDisk();
-    }
 }

@@ -30,21 +30,62 @@ class Refine extends Oil\Refine
             $module = false;
         }
 
-        if ($module) {
-            try {
-                \Module::load($module);
-                $path = \Module::exists($module);
-                \Finder::instance()->add_path($path);
-            } catch (\FuelException $e) {
-                throw new Exception(sprintf('Module "%s" does not exist.', $module));
-            }
-        }
-
         // Just call and run() or did they have a specific method in mind?
         list($task, $method) = array_pad(explode(':', $task), 2, 'run');
 
+        // Added support for FuelPHP 2 tasks
+        if ($module) {
+            if ($module == 'local') {
+                $namespace = 'Local';
+            } else if ($module == 'nos') {
+                $namespace = 'Nos';
+            } else {
+                $namespaces = \Nos\Config_Data::load('app_namespaces', true);
+                $namespace = $namespaces[$module];
+            }
+            $class = $namespace.'\\Task_'.ucfirst($task);
+            if (class_exists($class)) {
+                $new_task = new $class;
+                echo call_user_func_array(array($new_task, $method), $args);
+                return;
+            }
+        }
+
+        $path = false;
+        if ($module) {
+            if ($module == 'nos') {
+                $path = NOSPATH;
+            } else {
+                try {
+                    \Module::load($module);
+                    $path = \Module::exists($module);
+                    \Finder::instance()->add_path($path);
+                } catch (\FuelException $e) {
+                    throw new Exception(sprintf('Module "%s" does not exist.', $module));
+                }
+            }
+        }
+
+        $files = \Finder::search('tasks', $task, '.php', true);
+        $file = false;
+        // Multiple files can have the same names... Lines below allow to select the correct file depending on which
+        // module / local / core we want to call the task on.
+        if (count($files) > 0) {
+            $file = $files[0];
+        }
+        if ($path != false) {
+            foreach ($files as $f) {
+                if ($module) {
+                    if (\Str::starts_with($f, $path)) {
+                        $file = $f;
+                        break;
+                    }
+                }
+            }
+        }
+
         // Find the task
-        if (!$file = \Finder::search('tasks', $task)) {
+        if (!$file) {
             $files = \Finder::instance()->list_files('tasks');
             $possibilities = array();
             foreach ($files as $file) {
@@ -67,20 +108,35 @@ class Refine extends Oil\Refine
         require_once $file;
 
         $originalTask = $task;
-        $task = '\\Nos\\Tasks\\'.ucfirst($task);
-        if (!class_exists($task)) {
-            $task = '\\Fuel\\Tasks\\'.ucfirst($originalTask);
+        if ($module == false) {
+            $task = \Autoloader::generateSuffixedNamespace('nos', 'package', 'Tasks').ucfirst($task);
+            if (!class_exists($task)) {
+                $task = \Autoloader::generateSuffixedNamespace('default', 'app', 'Tasks').ucfirst($originalTask);
+            }
+        } else {
+            if ($module == 'local') {
+                $task = \Autoloader::generateSuffixedNamespace('default', 'app', 'Tasks').ucfirst($originalTask);
+            } else if ($module == 'nos') {
+                $task = \Autoloader::generateSuffixedNamespace('nos', 'package', 'Tasks').ucfirst($originalTask);
+            } else {
+                $task = \Autoloader::generateSuffixedNamespace($module, 'module', 'Tasks').ucfirst($task);
+            }
         }
 
         $new_task = new $task;
 
-        // The help option hs been called, so call help instead
-        if (\Cli::option('help') && is_callable(array($new_task, 'help'))) {
-            $method = 'help';
-        }
+        // Testing if we are using Cli (we can't use the Cli class if Refine is called from a webpage).
+        if (\Fuel::$is_cli) {
+            // The help option hs been called, so call help instead
+            if (\Cli::option('help') && is_callable(array($new_task, 'help'))) {
+                $method = 'help';
+            }
 
-        if ($return = call_user_func_array(array($new_task, $method), $args)) {
-            \Cli::write($return);
+            if ($return = call_user_func_array(array($new_task, $method), $args)) {
+                \Cli::write($return);
+            }
+        } else {
+            echo call_user_func_array(array($new_task, $method), $args);
         }
     }
 }
