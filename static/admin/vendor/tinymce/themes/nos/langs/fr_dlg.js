@@ -1,5 +1,4 @@
 tinyMCE.addI18n('fr.nos_dlg', {
-    "pastehtml_title" : "Utilisez le raccourci CTRL+V de votre clavier pour coller le HTML dans la fen\u00eatre.",
     "charmap_title": "Choisir le caract\u00e8re \u00e0 ins\u00e9rer",
     "charmap_usage": "Utilisez les fl\u00e8ches gauche et droite pour naviguer.",
     "colorpicker_name": "Nom :",

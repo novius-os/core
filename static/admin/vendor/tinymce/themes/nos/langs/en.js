@@ -39,7 +39,6 @@ tinyMCE.addI18n('en.nos',{
 	"newdocument_desc":"New Document",
 	"image_props_desc":"Image Properties",
 	"paste_desc":"Paste (Ctrl+V)",
-    "paste_html_desc" : "Paste HTML code",
 	"copy_desc":"Copy (Ctrl+C)",
 	"cut_desc":"Cut (Ctrl+X)",
 	"anchor_desc":"Insert/Edit Anchor",
@@ -54,8 +53,6 @@ tinyMCE.addI18n('en.nos',{
 	"sub_desc":"Subscript",
 	"code_desc":"Edit HTML Source",
 	"cleanup_desc":"Cleanup Messy Code",
-	"image_title":"Insert/Edit Image",
-    "image_label":"Image",
 	"redo_desc":"Redo (Ctrl+Y)",
 	"undo_desc":"Undo (Ctrl+Z)",
 	"indent_desc":"Increase Indent",
@@ -68,7 +65,5 @@ tinyMCE.addI18n('en.nos',{
 	"shortcuts_desc":"Accessability Help",
     toolbar:"Use arrow keys to select functions",
     media_title: "Insert/Edit Embedded Media",
-    media_label: "Embedded Media",
-    image_edit: 'Edit an image',
-    image_insert: 'Insert an image'
+    media_label: "Embedded Media"
 });

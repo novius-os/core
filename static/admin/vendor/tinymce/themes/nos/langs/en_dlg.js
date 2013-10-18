@@ -1,5 +1,4 @@
 tinyMCE.addI18n('en.nos_dlg',{
-    "pastehtml_title" : "Use CTRL+V on your keyboard to paste the HTML code into the window.",
 	"charmap_title":"Select Special Character",
     "charmap_usage":"Use left and right arrows to navigate.",
 	"colorpicker_name":"Name:",

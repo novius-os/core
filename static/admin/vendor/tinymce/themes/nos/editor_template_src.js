@@ -121,6 +121,7 @@
             paste : ['paste_desc', 'nosPaste'],
 			undo : ['undo_desc', 'Undo'],
 			redo : ['redo_desc', 'Redo'],
+			cleanup : ['cleanup_desc', 'mceCleanup'],
 			code : ['code_desc', 'mceCodeEditor'],
 			hr : ['hr_desc', 'InsertHorizontalRule'],
 			removeformat : ['removeformat_desc', 'RemoveFormat'],
@@ -149,6 +150,7 @@
 			t.settings = s = extend({
 				theme_nos_path : true,
 				theme_nos_toolbar_location : 'external',
+				theme_nos_blockformats : "p,address,pre,h1,h2,h3,h4,h5,h6",
 		        theme_nos_toolbar_align : "left",
 		        theme_nos_statusbar_location : "bottom",
 
@@ -156,26 +158,8 @@
                 theme_nos_buttons2 : "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
                 theme_nos_buttons3 : "search,replace,|,spellchecker,|,newdocument,nosvisualhtml,code",
                 theme_nos_buttons4 : "nosimage,nosmedia,noslink,nosenhancer",
-                theme_nos_buttons5 : "styleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,nospaste,undo,redo,|,nostoolbartoggle",
+                theme_nos_buttons5 : "nosstyleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,nospaste,undo,redo,|,nostoolbartoggle",
 
-                theme_nos_style_formats : [
-                    { block : 'p', title : 'nos.paragraph'},
-                    { block : 'address', title : 'nos.address'},
-                    { block : 'pre', title : 'nos.pre'},
-                    { block : 'h1', title : 'nos.h1'},
-                    { block : 'h2', title : 'nos.h2'},
-                    { block : 'h3', title : 'nos.h3'},
-                    { block : 'h4', title : 'nos.h4'},
-                    { block : 'h5', title : 'nos.h5'},
-                    { block : 'h6', title : 'nos.h6'},
-                    { block : 'div', title : 'nos.div'},
-                    { block : 'blockquote', title : 'nos.blockquote'},
-                    { block : 'code', title : 'nos.code'},
-                    { block : 'dt', title : 'nos.dt'},
-                    { block : 'dd', title : 'nos.dd'},
-                    { block : 'samp', title : 'nos.samp'}
-                ],
-				theme_nos_blockformats : "p,address,pre,h1,h2,h3,h4,h5,h6",
 				theme_nos_fonts : "Andale Mono=andale mono,times;Arial=arial,helvetica,sans-serif;Arial Black=arial black,avant garde;Book Antiqua=book antiqua,palatino;Comic Sans MS=comic sans ms,sans-serif;Courier New=courier new,courier;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Symbol=symbol;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;Webdings=webdings;Wingdings=wingdings,zapf dingbats",
 				theme_nos_more_colors : 1,
 				theme_nos_row_height : 23,
@@ -280,7 +264,6 @@
 			switch (n) {
 				case "styleselect":
 					return this._createStyleSelect();
-
 				case "formatselect":
 					return this._createBlockFormats();
 
@@ -331,6 +314,127 @@
             return false;
         },
 
+		_importClasses : function(e) {
+			var ed = this.editor, ctrl = ed.controlManager.get('styleselect');
+
+			if (ctrl.getLength() == 0) {
+				each(ed.dom.getClasses(), function(o, idx) {
+					var name = 'style_' + idx, fmt;
+
+					fmt = {
+						inline : 'span',
+						attributes : {'class' : o['class']},
+						selector : '*'
+					};
+
+					ed.formatter.register(name, fmt);
+
+					ctrl.add(o['class'], name, {
+						style: function() {
+							return getPreviewCss(ed, fmt);
+						}
+					});
+				});
+			}
+		},
+
+        _createStyleSelect : function(n) {
+            var t = this, ed = t.editor, ctrlMan = ed.controlManager, ctrl;
+
+            // Setup style select box
+            ctrl = ctrlMan.createListBox('styleselect', {
+                title : 'nos.style_select',
+                onselect : function(name) {
+                    var matches, formatNames = [], removedFormat;
+
+                    each(ctrl.items, function(item) {
+                        formatNames.push(item.value);
+                    });
+
+                    ed.focus();
+                    ed.undoManager.add();
+
+                    // Toggle off the current format(s)
+                    matches = ed.formatter.matchAll(formatNames);
+                    tinymce.each(matches, function(match) {
+                        if (!name || match == name) {
+                            if (match)
+                                ed.formatter.remove(match);
+
+                            removedFormat = true;
+                        }
+                    });
+
+                    if (!removedFormat)
+                        ed.formatter.apply(name);
+
+                    ed.undoManager.add();
+                    ed.nodeChanged();
+
+                    return false; // No auto select
+                }
+            });
+
+			// Handle specified format
+
+            ed.onPreInit.add(function() {
+				var counter = 0, formats = ed.getParam('style_formats');
+
+				if (formats) {
+		            each(formats, function(fmt) {
+		                var name, keys = 0;
+
+		                each(fmt, function() {keys++;});
+
+		                if (keys > 1) {
+		                    name = fmt.name = fmt.name || 'style_' + (counter++);
+		                    ed.formatter.register(name, fmt);
+		                    ctrl.add(fmt.title, name, {
+		                        style: function() {
+		                            return getPreviewCss(ed, fmt);
+		                        }
+		                    });
+		                } else
+		                    ctrl.add(fmt.title);
+		            });
+				} else {
+					each(ed.getParam('theme_nos_styles', '', 'hash'), function(val, key) {
+						var name, fmt;
+
+						if (val) {
+							name = 'style_' + (counter++);
+							fmt = {
+								inline : 'span',
+								classes : val,
+								selector : '*'
+							};
+
+							ed.formatter.register(name, fmt);
+							ctrl.add(t.editor.translate(key), name, {
+								style: function() {
+									return getPreviewCss(ed, fmt);
+								}
+            				});
+						}
+					});
+				}
+			});
+
+			// Auto import classes if the ctrl box is empty
+			if (ctrl.getLength() == 0) {
+				ctrl.onPostRender.add(function(ed, n) {
+					if (!ctrl.NativeListBox) {
+						Event.add(n.id + '_text', 'focus', t._importClasses, t);
+						Event.add(n.id + '_text', 'mousedown', t._importClasses, t);
+						Event.add(n.id + '_open', 'focus', t._importClasses, t);
+						Event.add(n.id + '_open', 'mousedown', t._importClasses, t);
+					} else
+						Event.add(n.id, 'focus', t._importClasses, t);
+				});
+			}
+
+            return ctrl;
+        },
 		_createFontSelect : function() {
 			var c, t = this, ed = t.editor;
 
@@ -422,69 +526,6 @@
 
 			return c;
 		},
-
-        _createStyleSelect : function(n) {
-            var t = this, ed = t.editor, ctrlMan = ed.controlManager, ctrl;
-
-            // Setup style select box
-            ctrl = ctrlMan.createListBox('styleselect', {
-                title : 'nos.style_select',
-                onselect : function(name) {
-                    var matches, formatNames = [], removedFormat;
-
-                    each(ctrl.items, function(item) {
-                        formatNames.push(item.value);
-                    });
-
-                    ed.focus();
-                    ed.undoManager.add();
-
-                    // Toggle off the current format(s)
-                    matches = ed.formatter.matchAll(formatNames);
-                    tinymce.each(matches, function(match) {
-                        if (!name || match == name) {
-                            if (match)
-                                ed.formatter.remove(match);
-
-                            removedFormat = true;
-                        }
-                    });
-
-                    if (!removedFormat)
-                        ed.formatter.apply(name);
-
-                    ed.undoManager.add();
-                    ed.nodeChanged();
-
-                    return false; // No auto select
-                }
-            });
-
-            var formats = ed.getParam('theme_nos_style_formats', t.settings.theme_nos_style_formats);
-
-            ed.onPreInit.add(function() {
-                var counter = 0;
-
-                each(formats, function(fmt) {
-                    var name, keys = 0;
-
-                    each(fmt, function() {keys++;});
-
-                    if (keys > 1) {
-                        name = fmt.name = fmt.name || 'style_' + (counter++);
-                        ed.formatter.register(name, fmt);
-                        ctrl.add(fmt.title, name, {
-                            style: function() {
-                                return getPreviewCss(ed, fmt);
-                            }
-                        });
-                    } else
-                        ctrl.add(fmt.title);
-                });
-            });
-
-            return ctrl;
-        },
 
         _createBlockFormats : function() {
             var c, fmts = {
@@ -922,7 +963,7 @@
 			}
             // Handle case when there are no toolbar buttons and ensure editor height is adjusted accordingly
             if (!toolbarsExist)
-                o.deltaHeight -= s.theme_advanced_row_height;
+                o.deltaHeight -= s.theme_nos_row_height;
             h.push(toolbarGroup.renderHTML());
 			h.push(DOM.createHTML('a', {href : '#', accesskey : 'z', title : ed.getLang("nos.toolbar_focus"), onfocus : 'tinyMCE.getInstanceById(\'' + ed.id + '\').focus();'}, '<!-- IE -->'));
 			DOM.setHTML(n, h.join(''));

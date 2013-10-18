@@ -66,14 +66,7 @@ tinyMCE.addI18n('ja.nos', {
     "image_delta_height": "",
     "image_delta_width": "",
 
-    // Novius OS redefinition / tweak
-    "clipboard_msg" : "Copy/Cut/Paste buttons are not available in Mozilla and Firefox but you can use the following shortcuts: Ctrl + C/Ctrl + X/Ctrl + V.\r\nIf your text comes from Word, use the 'Paste from Word' button.",
-    "paste_html_desc" : "Paste HTML code",
-    "image_title":"Insert/Edit Image",
-    "image_label":"Image",
     // Novius OS new texts
     media_title: "Insert/Edit Embedded Media",
-    media_label: "Embedded Media",
-    image_edit: 'Edit an image',
-    image_insert: 'Insert an image'
+    media_label: "Embedded Media"
 });

@@ -25,7 +25,7 @@ tinyMCE.addI18n('fr.nos', {
     "toolbar_focus": "Atteindre les boutons de l\u0027\u00e9diteur - Alt+Q, Aller \u00e0 l\u0027\u00e9diteur - Alt-Z, Aller au chemin de l\u0027\u00e9l\u00e9ment - Alt-X",
     newdocument: "\u00cates-vous s\u00fbr de vouloir effacer l\u0027int\u00e9gralit\u00e9 du document ?",
     path: "Chemin",
-    "clipboard_msg": "Les fonctions Copier/Couper/Coller ne sont pas valables sur Mozilla et Firefox.\nSouhaitez-vous avoir plus d\u0027informations sur ce sujet ?",
+    "clipboard_msg" : "Les boutons Copier, Couper et Coller ne sont pas disponibles avec Firefox, mais vous pouvez utiliser les raccourcis suivants\0000a0: Ctrl + C, Ctrl + X, Ctrl + V.\r\nSi vous avez copi\u00e9 du texte dans Word, merci d\u0027utiliser le bouton \u00AB\0000a0Copier depuis Word\0000a0\u00BB.",
     "blockquote_desc": "Citation",
     "help_desc": "Aide",
     "newdocument_desc": "Nouveau document",
@@ -45,7 +45,6 @@ tinyMCE.addI18n('fr.nos', {
     "sub_desc": "Indice",
     "code_desc": "\u00c9diter le code source HTML",
     "cleanup_desc": "Nettoyer le code",
-    "image_desc": "Ins\u00e9rer / \u00e9diter l\u0027image",
     "redo_desc": "R\u00e9tablir (Ctrl+Y)",
     "undo_desc": "Annuler (Ctrl+Z)",
     "indent_desc": "Indenter",
@@ -62,18 +61,9 @@ tinyMCE.addI18n('fr.nos', {
     "charmap_delta_height": "",
     "charmap_delta_width": "",
     "colorpicker_delta_height": "",
-    "colorpicker_delta_width": "",
-    "image_delta_height": "",
-    "image_delta_width": "",
+    "colorpicker_delta_width": ""
 
-    // Novius OS redefinition / tweak
-    "clipboard_msg" : "Les boutons Copier, Couper et Coller ne sont pas disponibles avec Firefox, mais vous pouvez utiliser les raccourcis suivants\0000a0: Ctrl + C, Ctrl + X, Ctrl + V.\r\nSi vous avez copi\u00e9 du texte dans Word, merci d\u0027utiliser le bouton \u00AB\0000a0Copier depuis Word\0000a0\u00BB.",
-    "paste_html_desc" : "Copier le code HTML",
-    "image_title":"Ins\u00e9rer / Modifier une image",
-    "image_label":"Image",
     // Novius OS new texts
     media_title: "Ins\u00e9rer / Modifier un m\u00e9dia externe",
-    media_label: "M\u00e9dia externe",
-    image_edit: 'Modifier une image',
-    image_insert: 'Ins\u00e9rer une image'
+    media_label: "M\u00e9dia externe"
 });
