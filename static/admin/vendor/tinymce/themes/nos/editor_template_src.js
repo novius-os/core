@@ -1496,42 +1496,6 @@
 (function(tinymce) {
     var DOM = tinymce.DOM, Event = tinymce.dom.Event, each = tinymce.each;
 
-    tinymce.create('tinymce.ui.NosSplitButton:tinymce.ui.SplitButton', {
-        NosSplitButton : function(id, s, ed) {
-            this.parent(id, s, ed);
-            this.classPrefix = 'mceSplitButton';
-            s.label = ed.translate(s.label);
-        },
-
-        renderHTML : function() {
-            var cp = this.classPrefix, s = this.settings, h, l, t = this, h1;
-
-            l = DOM.encode(s.label || '');
-            h = '<tbody><tr>';
-
-            if (s.image)
-                h1 = DOM.createHTML('img ', {src : s.image, role: 'presentation', 'class' : 'mceAction ' + s['class']}) + l;
-            else
-                h1 = DOM.createHTML('span', {'class' : 'mceAction ' + s['class']}, '');
-                h1 += (l ? '<span class="' + cp + 'Label">' + l + '</span>' : '');
-
-
-            h1 += DOM.createHTML('span', {'class': 'mceVoiceLabel mceIconOnly', id: t.id + '_voice', style: 'display:none;'}, s.title);
-            h += '<td >' + DOM.createHTML('a', {role: 'button', id : t.id + '_action', tabindex: '-1', href : 'javascript:;', 'class' : 'nosActionLabel mceAction ' + (l ? ' ' + cp + 'Labeled' : '') + ' ' + s['class'], onclick : "return false;", onmousedown : 'return false;', title : s.title}, h1) + '</td>';
-
-            h1 = DOM.createHTML('span', {'class' : 'mceOpen ' + s['class']}, '<span style="display:none;" class="mceIconOnly" aria-hidden="true">\u25BC</span>');
-            h += '<td >' + DOM.createHTML('a', {role: 'button', id : t.id + '_open', tabindex: '-1', href : 'javascript:;', 'class' : 'mceOpen ' + s['class'], onclick : "return false;", onmousedown : 'return false;', title : s.title}, h1) + '</td>';
-
-            h += '</tr></tbody>';
-            h = DOM.createHTML('table', { role: 'presentation',   'class' : 'mceSplitButton mceSplitButtonEnabled ' + s['class'], cellpadding : '0', cellspacing : '0', title : s.title}, h);
-            return DOM.createHTML('div', {id : t.id, role: 'button', tabindex: '0', 'aria-labelledby': t.id + '_voice', 'aria-haspopup': 'true'}, h);
-        }
-    });
-})(tinymce);
-
-(function(tinymce) {
-    var DOM = tinymce.DOM, Event = tinymce.dom.Event, each = tinymce.each;
-
     tinymce.create('tinymce.ui.NosListBox:tinymce.ui.ListBox', {
         NosListBox : function(id, s, ed) {
             this.parent(id, s, ed);
