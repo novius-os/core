@@ -900,7 +900,7 @@ define('jquery-nos-ostabs',
                 icon = self._icon( tab ).appendTo( a );
 
                 label = $( '<span></span>' ).addClass( 'nos-ostabs-label' )
-                    .html( tab.label ? tab.label.replace(/</g, '&lt;') : 'New tab' )
+                    .html( tab.label ? (tab.label + '').replace(/</g, '&lt;') : 'New tab' )
                     .appendTo( a );
                 if ( !tab.labelDisplay ) {
                     label.hide();
