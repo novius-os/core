@@ -36,7 +36,30 @@ class I18n
 
     public static $fallback;
 
-    static protected $_priority_messages = array();
+    protected static $_priority_messages = array();
+
+    private static $plural_expressions = array(
+        'ja' => 'Asian',
+        'vi' => 'Asian',
+        'ko' => 'Asian',
+        'fr' => 'Zero singular',
+        'pt_BR' => 'Zero singular',
+        'lv' => 'Latvian',
+        'ga' => 'Gaeilge',
+        'ro' => 'Romanian',
+        'lt' => 'Lithuanian',
+        'ru' => 'Russian',
+        'uk' => 'Russian',
+        'be' => 'Russian',
+        'sr' => 'Russian',
+        'hr' => 'Russian',
+        'cs' => 'Czech',
+        'sk' => 'Czech',
+        'pl' => 'Polish',
+        'sl' => 'Slovenian',
+    );
+
+    private static $locale_plural = array();
 
     public static function _init()
     {
@@ -141,7 +164,7 @@ class I18n
      *
      * @param string $_message The message to translate.
      * @param string $default The default text to return when the message is not found. Default value is the message itself.
-     * @return string|null The translation or null if not founded
+     * @return string The translation or initial message if not founded
      */
     public static function get($_message, $default = null)
     {
@@ -154,12 +177,25 @@ class I18n
     }
 
     /**
+     * The plural version of get(). Some languages have more than one form for plural messages dependent on the count.
+     *
+     * @param string $singular The singular form of the string to be converted. Used as the key for the search in the dictionary
+     * @param string $plural The plural form
+     * @param string $n Used to determine which plural form to used depending locale.
+     * @return string The translation or, if not founded, $singular is returned if n == 1, otherwise $plural
+     */
+    public static function nget($singular, $plural, $n)
+    {
+        return static::ngget(static::$_group, $singular, $plural, $n);
+    }
+
+    /**
      * Retrieves a translation from a specific dictionary.
      *
      * @param string $group Which dictionary to look into.
      * @param string $message The message to translate.
      * @param string|null $default The default text to return when the message is not found. Default value is the message itself.
-     * @return string|null The translation or null if not founded
+     * @return string The translation or initial message if not founded
      * @warning The dictionary must have been loaded manually before.
      */
     public static function gget($group, $message, $default = null)
@@ -179,6 +215,89 @@ class I18n
         }
 
         return $result;
+    }
+
+    /**
+     * Retrieves a plural translation from a specific dictionary.
+     *
+     * @param string $group Which dictionary to look into.
+     * @param string $singular The singular form of the string to be converted. Used as the key for the search in the dictionary
+     * @param string $plural The plural form
+     * @param string $n Used to determine which plural form to used depending locale.
+     * @return string The translation or, if not founded, $singular is returned if n == 1, otherwise $plural
+     * @warning The dictionary must have been loaded manually before.
+     */
+    public static function ngget($group, $singular, $plural, $n)
+    {
+        $result = static::gget($group, $singular, false);
+
+        return static::plural($result, $singular, $plural, $n);
+    }
+
+    protected static function plural($result, $singular, $plural, $n)
+    {
+        if ($result === false) {
+            return $n == 1 ? $singular : $plural;
+        } elseif (is_array($result)) {
+            $plural_indice = static::pluralKey($n);
+            return isset($result[$plural_indice]) ? $result[$plural_indice] : current($result);
+        }
+
+        return $result;
+    }
+
+    protected static function pluralKey($n)
+    {
+        if (!isset(static::$locale_plural[static::$_locale])) {
+            $plurals = array(
+                'Default' => function ($n) {
+                    return $n != 1 ? 1 : 0;
+                },
+                'Asian' => function () {
+                    return 0;
+                },
+                'Zero singular' => function ($n) {
+                    return $n > 1 ? 1 : 0;
+                },
+                'Latvian' => function ($n) {
+                    return $n%10 == 1 && $n%100 != 11 ? 0 : $n != 0 ? 1 : 2;
+                },
+                'Gaeilge' => function ($n) {
+                    return $n == 1 ? 0 : $n == 2 ? 1 : 2;
+                },
+                'Romanian' => function ($n) {
+                    return $n == 1 ? 0 : ($n == 0 || ($n%100 > 0 && $n%100 < 20)) ? 1 : 2;
+                },
+                'Lithuanian' => function ($n) {
+                    return $n%10 == 1 && $n%100 != 11 ? 0 : $n%10 >= 2 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2;
+                },
+                'Russian' => function ($n) {
+                    return $n%10 == 1 && $n%100 != 11 ? 0 : $n%10 >= 2 && $n%10 <= 4 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2;
+                },
+                'Czech' => function ($n) {
+                    return ($n == 1) ? 0 : ($n >= 2 && $n <= 4) ? 1 : 2;
+                },
+                'Polish' => function ($n) {
+                    return $n == 1 ? 0 : $n%10 >= 2 && $n%10 <= 4 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2;
+                },
+                'Slovenian' => function ($n) {
+                    return $n%100 == 1 ? 0 : $n%100 == 2 ? 1 : $n%100 == 3 || $n%100 == 4 ? 2 : 3;
+                },
+            );
+
+            if (isset(static::$plural_expressions[static::$_locale])) {
+                static::$locale_plural[static::$_locale] = $plurals[static::$plural_expressions[static::$_locale]];
+            } else {
+                $lang = substr(static::$_locale, 0, 2);
+                if (isset(static::$plural_expressions[$lang])) {
+                    static::$locale_plural[static::$_locale] = $plurals[static::$plural_expressions[$lang]];
+                } else {
+                    static::$locale_plural[static::$_locale] = $plurals['Default'];
+                }
+            }
+        }
+
+        return call_user_func(static::$locale_plural[static::$_locale], $n);
     }
 
     /**
@@ -217,6 +336,13 @@ class I18n
         }
         $lookup = static::$_files_dict[$file];
         return call_user_func($lookup, $message, $default);
+    }
+
+    public static function nTranslateFromFile($file, $singular, $plural, $n)
+    {
+        $result = static::translate_from_file($file, $singular, false);
+
+        return static::plural($result, $singular, $plural, $n);
     }
 
     /**

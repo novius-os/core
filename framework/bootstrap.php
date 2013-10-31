@@ -100,6 +100,17 @@ function __($message, $default = null)
     return \Nos\I18n::translate_from_file($dbg[$i]['file'], $message, $default);
 }
 
+function n__($singular, $plural, $n)
+{
+    $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    $i = -1;
+    do {
+        $function = $dbg[++$i]['function'];
+    } while ($function == '{closure}');
+
+    return \Nos\I18n::nTranslateFromFile($dbg[$i]['file'], $singular, $plural, $n);
+}
+
 function ___($group, $message, $default = null)
 {
     return \Nos\I18n::gget($group, $message, $default);
