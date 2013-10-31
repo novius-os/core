@@ -23,12 +23,13 @@ if ($media_count == 0) {
     <?php
 } else {
     ?>
-    <p><?= strtr(__(
-            $media_count == 1 ? __('There is <strong>one media file</strong> in this folder.')
-                              : __('There are <strong>{{count}} media files</strong> in this folder.')
-    ), array(
-        '{{count}}' => $media_count,
-    )) ?></p>
+    <p><?= strtr(n__(
+            'There is <strong>one media file</strong> in this folder.',
+            'There are <strong>{{count}} media files</strong> in this folder.',
+            $media_count
+        ), array(
+            '{{count}}' => $media_count,
+        )) ?></p>
     <p><?= $crud['config']['i18n']['deleting confirmation number'] ?></p>
     <p><?= strtr(__('Yes, I want to delete this folder and the {{count}} media files it contains.'), array(
         '{{count}}' => '<input class="verification" data-verification="'.$media_count.'" size="'.(mb_strlen($media_count) + 1).'" />',
