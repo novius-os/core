@@ -73,7 +73,7 @@ class Nos
             throw $e;
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
-                \Debug::dump('Error in enhancer "'.$where.'"');
+                \Debug::dump('Error when executing HMVC request "'.$where.'"');
                 $old_continue_on = \Config::get('errors.continue_on', array());
                 $continue_on = $old_continue_on;
                 $continue_on[] = $e->getCode();
@@ -88,6 +88,7 @@ class Nos
 
                 \Config::set('errors.continue_on', $old_continue_on);
             }
+            \Log::logException($e, 'HMVC - ');
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
         }
         $content = ob_get_clean();
