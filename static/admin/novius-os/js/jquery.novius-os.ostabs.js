@@ -707,7 +707,7 @@ define('jquery-nos-ostabs',
                             .appendTo(link);
                     });
                 } else {
-                    if (('HTMLMenuItemElement' in window) && ('HTMLCommandElement' in window)) {
+                    if (('HTMLMenuItemElement' in window)) {
                         self.element.find('#' + $panel.attr('id') + '-menucontext').remove();
 
                         $links = $('<menu></menu>')
@@ -751,8 +751,11 @@ define('jquery-nos-ostabs',
                                             .appendTo(links)
                                             .find('a')
                                             .click(function() {
-                                                links.remove();
-                                                return action.click();
+                                                action.click();
+                                                setTimeout(function() {
+                                                    links.remove();
+                                                }, 200)
+                                                return false;
                                             });
                                     $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ' + action.iconClass)
                                         .appendTo(menu);
