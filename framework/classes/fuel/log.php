@@ -35,7 +35,7 @@ class Log extends Fuel\Core\Log
         logger(\Fuel::L_WARNING, $log);
     }
 
-    public static function logException($e, $prefix = '') {
+    public static function exception($e, $prefix = '') {
         \Log::error($prefix.$e->getCode().' - '.$e->getMessage().' in '.$e->getFile().' on line '.$e->getLine());
     }
 }
