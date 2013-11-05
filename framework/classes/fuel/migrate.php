@@ -84,7 +84,16 @@ class Migrate extends \Fuel\Core\Migrate
 
             // <<<<<<<<<<<<<<<<<<< CHANGES ARE HERE
             $migration_inst = new $migration['class']($migration['path']);
-            $result = $migration_inst->$method();
+            try {
+                $result = $migration_inst->$method();
+            } catch (\Exception $e) {
+                $ignore = false;
+                $result = true;
+                \Event::trigger_function('on_migration_exception', array($e, &$ignore, $migration));
+                if (!$ignore) {
+                    throw $e;
+                }
+            }
             // >>>>>>>>>>>>>>>>>>>
             if ($result === false) {
                 logger(Fuel::L_INFO, 'Skipped migration to '.$ver.'.');
