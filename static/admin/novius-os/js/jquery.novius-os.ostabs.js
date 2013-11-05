@@ -707,7 +707,7 @@ define('jquery-nos-ostabs',
                             .appendTo(link);
                     });
                 } else {
-                    if (('HTMLMenuItemElement' in window) && ('HTMLCommandElement' in window)) {
+                    if (('HTMLMenuItemElement' in window)) {
                         self.element.find('#' + $panel.attr('id') + '-menucontext').remove();
 
                         $links = $('<menu></menu>')
