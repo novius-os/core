@@ -14,7 +14,7 @@ class New_Dependencies_Configuration extends \Nos\Migration
 {
     public function up()
     {
-        if ($this->canUpdateMetadata()) {
+        try {
             $config = \Nos\Config_Data::load('app_dependencies');
             $has_changed = false;
             foreach ($config as &$dependencies) {
@@ -34,6 +34,8 @@ class New_Dependencies_Configuration extends \Nos\Migration
             if ($has_changed) {
                 \Nos\Config_Data::save('app_dependencies', $config);
             }
+        } catch (\FileAccessException $e) {
+            \Log::logException($e, 'Unable to update metadata during New_Dependencies_Configuration migration - ');
         }
     }
 }

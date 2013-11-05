@@ -21,7 +21,7 @@ class Version_0_2 extends \Nos\Migration
             return true;
         }
 
-        if ($this->canUpdateMetadata()) {
+        try {
             // Add new namespaces before everything else, or run into 'Fatal error: class Nos\Page\Model_Page not found!'
             $app_namespaces = \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces', true, true) +
                 array(
@@ -49,6 +49,8 @@ class Version_0_2 extends \Nos\Migration
 
             // Update native apps into 0.2
             \Nos\Application::installNativeApplications(true);
+        } catch (\FileAccessException $e) {
+            \Log::logException($e, 'Unable to update metadata during 002_version_0_2 migration - ');
         }
 
         parent::up();
