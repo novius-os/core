@@ -102,7 +102,7 @@ class Config_Data
         try {
             return \Config::save($file, $data);
         } catch (\FileAccessException $e) {
-            \Log::logException($e, 'Config_Data ('.$file.') - ');
+            \Log::exception($e, 'Config_Data ('.$file.') - ');
             throw $e;
         }
     }

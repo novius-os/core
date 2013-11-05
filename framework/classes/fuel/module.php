@@ -68,7 +68,7 @@ class Module extends Fuel\Core\Module
                 try {
                     $application->uninstall();
                 } catch (\FileAccessException $e) {
-                    \Log::logException($e, 'Unable to automatically the '.$module.' application - ');
+                    \Log::exception($e, 'Unable to automatically the '.$module.' application - ');
                 }
             }
         }
