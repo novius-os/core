@@ -99,7 +99,12 @@ class Config_Data
     {
         \Config::set('data::'.$name, $data);
         list($file, $callback) = static::getFile($name);
-        return \Config::save($file, $data);
+        try {
+            return \Config::save($file, $data);
+        } catch (\FileAccessException $e) {
+            \Log::logException($e, 'Config_Data ('.$file.') - ');
+            throw $e;
+        }
     }
 
     /**
