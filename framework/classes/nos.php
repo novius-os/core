@@ -88,7 +88,7 @@ class Nos
 
                 \Config::set('errors.continue_on', $old_continue_on);
             }
-            \Log::logException($e, 'HMVC - ');
+            \Log::exception($e, 'HMVC - ');
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
         }
         $content = ob_get_clean();
