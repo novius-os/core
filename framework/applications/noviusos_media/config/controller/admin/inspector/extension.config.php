@@ -52,8 +52,7 @@ return array(
     'input' => array(
         'key' => 'media_extension',
         'query' =>
-            function ($value, $query)
-            {
+            function ($value, $query) {
                 \Config::load('noviusos_media::icons', true);
                 $extensions = \Config::get('noviusos_media::icons.extensions', array());
                 $ext = array();

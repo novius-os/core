@@ -57,7 +57,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     {
         $fieldset = parent::fieldset($fieldset);
 
-        $fieldset->field('page_parent_id')->set_renderer_options(array(
+        $fieldset->field('page_parent_id')->setRendererOptions(array(
             'context' => $this->item->page_context,
         ));
 

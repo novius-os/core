@@ -78,6 +78,20 @@ class Controller_Admin_User extends \Nos\Controller_Admin_Crud
                 'name' => 'Nos\Application',
             );
         }
+        if (\Input::post('my_account', false)) {
+            $actions = \Arr::get($return, 'action', array());
+            if (\Arr::is_assoc($actions)) {
+                $actions = array($actions);
+            }
+            foreach ($actions as $i => $action) {
+                if (\Arr::get($action, 'action', null) === 'nosTabs' &&
+                    \Arr::get($action, 'method', null) === 'update') {
+                    unset($actions[$i]);
+                }
+            }
+            $return['action'] = $actions;
+        }
+
         return $return;
     }
 }

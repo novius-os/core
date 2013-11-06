@@ -269,21 +269,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         $model = $this->config['model'];
         $model::eventStatic('crudFields', array(&$fields, $this));
 
-        if ($this->is_new) {
-            $fields = \Arr::merge(
-                $fields,
-                array(
-                    'save' => array(
-                        'form' => array(
-                            'type' => 'submit',
-                            // Note to translator: This is a submit button
-                            'value' => __('Add'),
-                        ),
-                    ),
-                )
-            );
-        }
-
         return $fields;
     }
 

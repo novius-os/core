@@ -15,13 +15,16 @@ $uniqid = uniqid('id_');
 $fieldset->set_config('field_template', '{field}');
 
 echo $fieldset->open('admin/noviusos_media/attachment/popup');
+
+//Note to translator: This is a submit button
+$saveField = __('Add');
 ?>
 <script type="text/javascript">
     require(['jquery-nos-toolbar-crud'],
             function ($) {
                 $(function () {
                     var $container = $('#<?= $fieldset->form()->get_attribute('id') ?>');
-                    $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array('save_field' => $fieldset->field('save')), false))->to_json() ?>)
+                    $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array('save_field' => $saveField), false))->to_json() ?>)
                             .click(function() {
                                 if ($container.is('form')) {
                                     $container.submit();

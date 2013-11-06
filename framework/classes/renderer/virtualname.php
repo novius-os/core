@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Virtualname extends \Fieldset_Field
+class Renderer_Virtualname extends Renderer
 {
     protected static $_friendly_slug_always_last = array();
 
@@ -22,9 +22,20 @@ class Renderer_Virtualname extends \Fieldset_Field
 
     public $template = '{label}{required} <div class="table-field">{field} <span>&nbsp;.html</span></div> {use_title_checkbox}';
 
+    /**
+     * Build the field
+     *
+     * @return  string
+     */
     public function build()
     {
         parent::build();
+        if ($this->fieldset) {
+            $field_properties = $this->fieldset->getInstance()->property($this->name);
+            if (isset($field_properties['character_maximum_length'])) {
+                $this->attributes['maxlength'] = $field_properties['character_maximum_length'];
+            }
+        }
 
         $this->apply_use_title_checkbox();
 
@@ -46,6 +57,11 @@ class Renderer_Virtualname extends \Fieldset_Field
 
     }
 
+    /**
+     * Generates the JavaScript to initialise the renderer
+     *
+     * @return string JavaScript to execute to initialise the renderer
+     */
     public function js_init()
     {
         $default = \Config::get('friendly_slug.active_setup', 'default');
@@ -70,7 +86,7 @@ class Renderer_Virtualname extends \Fieldset_Field
     {
         $regexps_compiled = array();
         foreach ($regexps as $regexp => $replacement) {
-            if (is_int($regexp) && is_string($replacement)) {
+            if (is_int($regexp) && is_string($replacement) && $replacement !== 'lowercase') {
                 $setup_regexps = \Config::get('friendly_slug.setups.'.$replacement, array());
                 $regexps_compiled = array_merge($regexps_compiled, static::_regexpsCompiled($setup_regexps));
             } else {

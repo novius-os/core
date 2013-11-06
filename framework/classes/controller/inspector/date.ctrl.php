@@ -10,7 +10,8 @@
 
 namespace Nos;
 
-use Date, View;
+use Date;
+use View;
 
 class Controller_Inspector_Date extends Controller_Inspector
 {
@@ -27,7 +28,7 @@ class Controller_Inspector_Date extends Controller_Inspector
         if (is_array($config['options'])) {
             foreach ($config['options'] as $type) {
                 switch ($type) {
-                    case 'since' :
+                    case 'since':
                         if (is_array($config['since']) && is_array($config['since']['options'])) {
                             foreach ($config['since']['options'] as $key => $label) {
                                 if ($key == 'current month') {
@@ -48,7 +49,7 @@ class Controller_Inspector_Date extends Controller_Inspector
                         }
                         break;
 
-                    case 'month' :
+                    case 'month':
                         $date = new Date();
                         $date->modify($config['month']['first_month']);
                         $date->modify('first day of this month');
@@ -73,7 +74,7 @@ class Controller_Inspector_Date extends Controller_Inspector
                         }
                         break;
 
-                    case 'year' :
+                    case 'year':
                         $date = new Date();
                         $date->modify($config['year']['first_year']);
                         $date->modify('first day of January');
@@ -97,7 +98,7 @@ class Controller_Inspector_Date extends Controller_Inspector
             }
             foreach ($config['options'] as $type) {
                 switch ($type) {
-                    case 'custom' :
+                    case 'custom':
                         $content = array_merge($content, array(array(
                             'value' => 'custom',
                             'title' => $config['labels']['Custom dates'],
@@ -105,15 +106,15 @@ class Controller_Inspector_Date extends Controller_Inspector
                         )));
                         break;
 
-                    case 'since' :
+                    case 'since':
                         $content = array_merge($content, $since);
                         break;
 
-                    case 'month' :
+                    case 'month':
                         $content = array_merge($content, $month);
                         break;
 
-                    case 'year' :
+                    case 'year':
                         $content = array_merge($content, $year);
                         break;
                 }
@@ -123,11 +124,17 @@ class Controller_Inspector_Date extends Controller_Inspector
         $view->set('content', $content, false);
         $view->set('labels', $config['labels']);
 
-        $view->set('date_begin', \Nos\Renderer_Date_Picker::renderer(array(
+        $view->set('date_begin', \Nos\Renderer_Datetime_Picker::renderer(array(
             'name' => $config['input_begin'],
+            'renderer_options' => array(
+                'format' => 'date',
+            ),
         )), false);
-        $view->set('date_end', \Nos\Renderer_Date_Picker::renderer(array(
+        $view->set('date_end', \Nos\Renderer_Datetime_Picker::renderer(array(
             'name' => $config['input_end'],
+            'renderer_options' => array(
+                'format' => 'date',
+            ),
         )), false);
 
         return $view;
@@ -187,7 +194,7 @@ class Controller_Inspector_Date extends Controller_Inspector
 
         if (!isset($config['input']['query'])) {
             $column = $config['input']['key'];
-            $config['input']['query'] = function($value, $query) use ($column) {
+            $config['input']['query'] = function ($value, $query) use ($column) {
                 list($begin, $end) = explode('|', $value.'|');
                 if ($begin) {
                     if ($begin = Date::create_from_string($begin, '%Y-%m-%d')) {

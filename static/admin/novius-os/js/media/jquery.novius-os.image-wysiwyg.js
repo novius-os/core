@@ -99,18 +99,18 @@ define('jquery-nos-image-wysiwyg',
                         $proportional = $container.find('input[data-id=proportional]')
                             .change(function() {
                                 if ($proportional.is(':checked')) {
-                                    $height.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                                    $height.attr('readonly', true).addClass('ui-state-disabled');
                                     $width.triggerHandler('change');
                                 } else {
-                                    $height.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                                    $height.removeAttr('readonly').removeClass('ui-state-disabled');
                                 }
                             }),
                         $same_title_alt = $container.find('input[data-id=same_title_alt]')
                             .change(function() {
                                 if ($same_title_alt.is(':checked')) {
-                                    $alt.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                                    $alt.attr('readonly', true).addClass('ui-state-disabled');
                                 } else {
-                                    $alt.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                                    $alt.removeAttr('readonly').removeClass('ui-state-disabled');
                                 }
                                 $title.triggerHandler('change');
                             }),

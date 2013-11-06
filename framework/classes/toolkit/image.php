@@ -429,7 +429,7 @@ class Toolkit_Image
         }
 
         // Check if hash part matched and if all transformations exist
-        if ($this->url() !== $image_url) {
+        if ($this->url(false) !== $image_url) {
             return false;
         }
         return true;

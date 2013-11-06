@@ -37,8 +37,8 @@ class Generate extends \Oil\Generate
             // Override the (most recent) migration with the same name by using its number
             if (\Cli::option('f', \Cli::option('force')) === true) {
                 list($number) = explode('_', $file_name);
-            } // Name clashes but this is done by hand. Assume they know what they're doing and just increment the file
-            elseif (static::$scaffolding === false) {
+            } elseif (static::$scaffolding === false) {
+                // Name clashes but this is done by hand. Assume they know what they're doing and just increment the file
                 // Increment the name of this
                 $migration_name = \Str::increment(mb_substr($file_name, 4), 2);
             }
@@ -72,35 +72,37 @@ class Generate extends \Oil\Generate
                 // create_{table}
                 if (count($matches) == 1) {
                     $subjects = array(false, $matches[0]);
-                } // add_{field}_to_{table}
-                elseif (count($matches) == 3 && $matches[1] == 'to') {
+                } elseif (count($matches) == 3 && $matches[1] == 'to') {
+                    // add_{field}_to_{table}
                     $subjects = array($matches[0], $matches[2]);
-                } // rename_field_{field}_to_{field}_in_{table} (with underscores in field names)
-                else {
+                } else {
+                    // rename_field_{field}_to_{field}_in_{table} (with underscores in field names)
+
                     if (count($matches) >= 5 && in_array('to', $matches) && in_array('in', $matches)) {
                         $subjects = array(
                             implode('_', array_slice($matches, array_search('in', $matches) + 1)),
                             implode('_', array_slice($matches, 0, array_search('to', $matches))),
                             implode('_', array_slice($matches, array_search('to', $matches) + 1, array_search('in', $matches) - 2))
                         );
-                    } // create_{table} or drop_{table} (with underscores in table name)
-                    else {
+                    } else {
+                        // create_{table} or drop_{table} (with underscores in table name)
+
                         if (count($matches) !== 0) {
                             $name = str_replace(array('create_', 'add_', '_to_'), array('create-', 'add-', '-to-'), $migration_name);
 
                             if (preg_match('/^(create|add)\-([a-z0-9\_]*)(\-to\-)?([a-z0-9\_]*)?$/iu', $name, $deep_matches)) {
                                 switch ($deep_matches[1]) {
-                                    case 'create' :
+                                    case 'create':
                                         $subjects = array(false, $deep_matches[2]);
                                         break;
 
-                                    case 'add' :
+                                    case 'add':
                                         $subjects = array($deep_matches[2], $deep_matches[4]);
                                         break;
                                 }
                             }
-                        } // There is no subject here so just carry on with a normal empty migration
-                        else {
+                        } else {
+                            // There is no subject here so just carry on with a normal empty migration
                             break;
                         }
                     }
@@ -151,8 +153,8 @@ class Generate extends \Oil\Generate
                                             $option[1] = '"'.implode('","', $values).'"';
 
                                             $field_array['constraint'] = $option[1];
-                                        } // should support field_name:decimal[10,2]
-                                        elseif (in_array($type, array('decimal', 'float'))) {
+                                        } elseif (in_array($type, array('decimal', 'float'))) {
+                                            // should support field_name:decimal[10,2]
                                             $field_array['constraint'] = $option[1];
                                         } else {
                                             $field_array['constraint'] = (int) $option[1];
@@ -277,5 +279,4 @@ HELP;
 
         return str_pad($last + 1, 3, '0', STR_PAD_LEFT);
     }
-
 }

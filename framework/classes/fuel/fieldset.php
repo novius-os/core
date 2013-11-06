@@ -316,7 +316,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             if (isset($settings['template'])) {
                 $field->set_template($settings['template']);
             }
-            if ( ! empty($settings['validation'])) {
+            if (!empty($settings['validation'])) {
                 foreach ($settings['validation'] as $rule => $args) {
                     if (is_int($rule) and is_string($args)) {
                         $args = array($args);
@@ -446,24 +446,6 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
     }
 
-    public function readonly_context($instance)
-    {
-        if (empty($instance)) {
-            return;
-        }
-        $behaviour_twinnable = $instance->behaviours('Nos\Orm_Behaviour_Twinnable');
-        if (empty($behaviour_twinnable) || $instance->is_main_context()) {
-            return;
-        }
-        foreach ($behaviour_twinnable['common_fields'] as $f) {
-            $field = $this->field($f);
-            if (!empty($field)) {
-                $field->set_attribute('readonly', true);
-                $field->set_attribute('disabled', true);
-            }
-        }
-    }
-
     public function populate_with_instance($instance = null, $generate_id = true)
     {
         $this->instance = $instance;
@@ -527,7 +509,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
 
         if (empty($options['error'])) {
-            $options['error'] = function(\Exception $e, $item, $data) {
+            $options['error'] = function (\Exception $e, $item, $data) {
                 return array(
                     'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'),
                 );
@@ -616,7 +598,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     protected function isExpert($field_name)
     {
-        return !\Session::user()->user_expert && \Arr::get($this->config_used[$field_name], 'expert', false);
+        return !\Session::user()->user_expert && \Arr::get($this->config_used, $field_name.'.expert', false);
     }
 
     public function isRestricted($field_name)
@@ -624,7 +606,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if ($this->isExpert($field_name)) {
             return true;
         }
-        $show_when = \Arr::get($this->config_used[$field_name], 'show_when', false);
+        $show_when = \Arr::get($this->config_used, $field_name.'.show_when', false);
         if ($show_when === false || !is_callable($show_when)) {
             return false;
         }

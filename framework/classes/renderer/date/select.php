@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Renderer_Date_Select extends \Fieldset_Field
+class Renderer_Date_Select extends Renderer
 {
     /**
      * @var \Nos\Fieldset_Field
@@ -86,8 +86,7 @@ class Renderer_Date_Select extends \Fieldset_Field
         $this->add_rule(
             array(
                 'valid_date' =>
-                    function ($value)
-                    {
+                    function ($value) {
                         list($date, $time) = explode(' ', $value.' ');
                         $date = explode('-', $date);
                         if (count($date) >= 3) {

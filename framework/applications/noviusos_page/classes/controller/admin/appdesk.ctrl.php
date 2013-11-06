@@ -66,5 +66,4 @@ class Controller_Admin_Appdesk extends \Nos\Controller_Admin_Appdesk
             'notify' => $__('The cache has been renewed. All ready for you to enjoy!'),
         ));
     }
-
 }

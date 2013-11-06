@@ -37,16 +37,16 @@ foreach ($layout as $view) {
 <?php
 $enhancerAction = \Arr::get($enhancer_args, 'enhancerAction', null);
 switch ($enhancerAction) {
-    case 'update' :
+    case 'update':
         // Note to translator: action (button)
         $submit_label = __('Update');
         break;
 
-    case 'insert' :
+    case 'insert':
         $submit_label = __('Insert');
         break;
 
-    default :
+    default:
         $submit_label = __('Save');
         break;
 }

@@ -10,18 +10,15 @@
 
 namespace Nos;
 
-class Renderer_Datetime_Picker extends \Fieldset_Field
+class Renderer_Datetime_Picker extends Renderer
 {
     protected static $DEFAULT_RENDERER_OPTIONS = array(
+        'format' => 'datetime',
         'datepicker' => array(
             'showOn' => 'both',
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
             'buttonImageOnly' => true,
             'autoSize' => true,
-            'dateFormat' => 'dd/mm/yy', // Custom user formatting
-            'timeFormat' => 'HH:mm', // Custom user formatting
-            'altFormat' => 'yy-mm-dd', // MySQL formatting
-            'altTimeFormat' => 'HH:mm:ss', // MySQL formatting
             'altFieldTimeOnly' => false,
             'showButtonPanel' => true,
             'changeMonth' => true,
@@ -35,49 +32,64 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         'wrapper' => '', //'<div class="datepicker-wrapper"></div>',
     );
 
+    protected static $DEFAULT_RENDERER_OPTIONS_BY_FORMAT = array(
+        'datetime' => array(
+            'datepicker' => array(
+                'dateFormat' => 'dd/mm/yy', // Custom user formatting
+                'timeFormat' => 'HH:mm', // Custom user formatting
+                'altFormat' => 'yy-mm-dd', // MySQL formatting
+                'altTimeFormat' => 'HH:mm:ss', // MySQL formatting
+            ),
+            'mysql_input_format' => '%Y-%m-%d %H:%M:%S', // when retrieving the value, defines how to decode it
+            'mysql_store_format' => 'mysql', // format when saving in the database
+            'plugin'             => 'datetimepicker', // js plugin to call when displaying the input
+        ),
+        'date' => array(
+            'datepicker' => array(
+                'dateFormat' => 'dd/mm/yy', // Custom user formatting
+                'altFormat' => 'yy-mm-dd', // MySQL formatting
+            ),
+            'mysql_input_format' => '%Y-%m-%d', // when retrieving the value, defines how to decode it
+            'mysql_store_format' => 'mysql_date', // format when saving in the database
+            'plugin'             => 'datepicker', // js plugin to call when displaying the input
+        ),
+    );
+
     /**
-     * Standalone build of the media renderer.
+     * Standalone build of the renderer.
      *
      * @param  array  $renderer Renderer definition (attributes + renderer_options)
      * @return string The <input> tag + JavaScript to initialise it
      */
     public static function renderer($renderer = array())
     {
-        $renderer['renderer'] = __CLASS__;
+        $renderer['renderer'] = get_called_class();
         $fieldset = \Fieldset::build_from_config(array(
             $renderer['name'] => $renderer,
         ));
         return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
     }
 
-    protected $options = array();
-
-    public function __construct($name, $label = '', array $renderer = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
-    {
-        list($this->attributes, $this->options) = static::parseOptions($renderer);
-        parent::__construct($name, $label, $this->attributes, $rules, $fieldset);
-    }
-
     /**
-     * How to display the field
-     * @return type
+     * Build the field
+     *
+     * @return  string
      */
     public function build()
     {
         parent::build();
         $attributes = $this->attributes;
-        $datepicker_options = $this->options['datepicker'];
         $this->attributes = array();
         $this->set_attribute(array(
             'type' => 'hidden',
             'id' => $attributes['id'],
-            'data-datepicker-options' => htmlspecialchars(\Format::forge()->to_json($datepicker_options)),
+            'data-options' => htmlspecialchars(\Format::forge()->to_json($this->renderer_options)),
         ));
-        $this->fieldset()->append(static::jsInit($attributes['id'], $this->options));
+        $this->fieldset()->append(static::jsInit($attributes['id'], $this->renderer_options));
         $attributes['type'] = 'text';
         $attributes['id'] = ltrim($attributes['id'].'_displayed', '#');
         unset($attributes['value']);
-        $this->set_value(static::processValue($this->value));
+        $this->set_value($this->processValue($this->value));
 
         $build = $this->template((string) parent::build());
         // A bit hacky, but can't see another way to keep the template
@@ -97,6 +109,10 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         $renderer['type'] = 'hidden';
         $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' datepicker';
 
+        if (!isset($renderer['renderer_options'])) {
+            $renderer['renderer_options'] = array();
+        }
+
         if (empty($renderer['id'])) {
             $renderer['id'] = uniqid('datepicker_');
         }
@@ -105,8 +121,15 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
             $renderer['size'] = 17;
         }
 
-        // Default options of the renderer
-        $renderer_options = static::$DEFAULT_RENDERER_OPTIONS;
+        $format = isset($renderer['renderer_options']['format']) ?
+            $renderer['renderer_options']['format'] : static::$DEFAULT_RENDERER_OPTIONS['format'];
+
+
+        $renderer_options = \Arr::merge(
+            static::$DEFAULT_RENDERER_OPTIONS,
+            static::$DEFAULT_RENDERER_OPTIONS_BY_FORMAT[$format]
+        );
+        $renderer_options['renderer_options']['format'] = $format;
 
         if (!empty($renderer['renderer_options'])) {
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
@@ -119,7 +142,8 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
     /**
      * Generates the JavaScript to initialise the renderer
      *
-     * @param   string  HTML ID attribute of the <input> tag
+     * @param string $id ID attribute of the <input> tag
+     * @param array $renderer_options The renderer options
      * @return string JavaScript to execute to initialise the renderer
      */
     protected static function jsInit($id, $renderer_options = array())
@@ -130,19 +154,18 @@ class Renderer_Datetime_Picker extends \Fieldset_Field
         ), false);
     }
 
-    protected static function processValue($value)
+    protected function processValue($value)
     {
         if ($value && $value!='0000-00-00 00:00:00') {
-            return \Date::create_from_string($value, 'mysql')->format('%Y-%m-%d %H:%M:%S');
+            return \Date::create_from_string($value, $this->renderer_options['mysql_store_format'])->format($this->renderer_options['mysql_input_format']);
         } else {
-            return \Date::forge()->format('%Y-%m-%d %H:%M:%S'); //'%Y-%m-%d %H:%M'
+            return \Date::forge()->format($this->renderer_options['mysql_input_format']); //'%Y-%m-%d %H:%M'
         }
     }
 
     public function before_save($item, $data)
     {
-        $data[$this->name] = \Date::create_from_string($data[$this->name], '%Y-%m-%d %H:%M:%S')->format('mysql');
+        $data[$this->name] = \Date::create_from_string($data[$this->name], $this->renderer_options['mysql_input_format'])->format($this->renderer_options['mysql_store_format']);
         return true;
     }
-
 }

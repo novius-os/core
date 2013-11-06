@@ -96,7 +96,7 @@ class Config extends \Fuel\Core\Config
         }
         $config = \Arr::recursive_filter(
             $config,
-            function($var) {
+            function ($var) {
                 return $var !== null;
             }
         );
@@ -247,7 +247,7 @@ class Config extends \Fuel\Core\Config
         return true;
     }
 
-    static public function getActionDisabledState($disabled, $item, $params = array())
+    public static function getActionDisabledState($disabled, $item, $params = array())
     {
         $common_config = \Nos\Config_Common::load(get_class($item), array());
         return static::processCallbackValue($disabled, false, $item, array('config' => $common_config) + $params);
@@ -264,7 +264,7 @@ class Config extends \Fuel\Core\Config
      *
      * @return mixed
      */
-    static public function processCallbackValue()
+    public static function processCallbackValue()
     {
         $arg_list = func_get_args();
         $value = $arg_list[0];
@@ -301,7 +301,7 @@ class Config extends \Fuel\Core\Config
     public static function placeholderReplace($to_be_replaced, $placeholders, $remove_unset = true)
     {
         if (is_string($to_be_replaced)) {
-            $retrieveFromData = function($placeholder, $fallback) use ($placeholders) {
+            $retrieveFromData = function ($placeholder, $fallback) use ($placeholders) {
                 if (is_array($placeholders) && isset($placeholders[$placeholder])) {
                     return $placeholders[$placeholder];
                 }
@@ -317,14 +317,14 @@ class Config extends \Fuel\Core\Config
                 return $fallback;
             };
 
-            $to_be_replaced = preg_replace_callback('/{{([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+            $to_be_replaced = preg_replace_callback('/{{([\w]+)}}/', function ($matches) use ($retrieveFromData, $remove_unset) {
                 return $retrieveFromData($matches[1], $remove_unset ? '' : $matches[0]);
             }, $to_be_replaced);
-            $to_be_replaced = preg_replace_callback('/{{urlencode:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+            $to_be_replaced = preg_replace_callback('/{{urlencode:([\w]+)}}/', function ($matches) use ($retrieveFromData, $remove_unset) {
                 $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
                 return $value === false ? $matches[0] : urlencode($value);
             }, $to_be_replaced);
-            $to_be_replaced = preg_replace_callback('/{{htmlspecialchars:([\w]+)}}/', function($matches) use($retrieveFromData, $remove_unset) {
+            $to_be_replaced = preg_replace_callback('/{{htmlspecialchars:([\w]+)}}/', function ($matches) use ($retrieveFromData, $remove_unset) {
                 $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
                 return $value === false ? $matches[0] : htmlspecialchars($value);
             }, $to_be_replaced);
@@ -362,7 +362,6 @@ class Config extends \Fuel\Core\Config
     {
         \Event::trigger_function('config|'.$filepath, $args, $return_type);
     }
-
 }
 
 /* End of file config.php */

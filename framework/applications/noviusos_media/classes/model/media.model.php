@@ -36,6 +36,7 @@ class Model_Media extends \Nos\Orm\Model
             'default' => null,
             'data_type' => 'varchar',
             'null' => false,
+            'character_maximum_length' => 100,
         ),
         'media_ext' => array(
             'default' => null,
@@ -425,5 +426,10 @@ class Model_Media extends \Nos\Orm\Model
 
             $this->media_filesize = filesize($file);
         }
+    }
+
+    public function _event_after_delete()
+    {
+        $this->deleteFromDisk();
     }
 }

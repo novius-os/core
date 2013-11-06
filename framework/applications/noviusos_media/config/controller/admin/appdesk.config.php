@@ -15,7 +15,7 @@ return array(
     'query' => array(
         'limit' => 10,
         'callback' => array(
-            'permissions' => function($query) {
+            'permissions' => function ($query) {
                 $restricted_folders = \Nos\Media\Permission::getRestrictedFolders();
                 if (empty($restricted_folders)) {
                     return $query;
@@ -119,6 +119,19 @@ return array(
     ),
     'toolbar' => array(
         'actions' => array(
+            'mass_upload' => array(
+                'label' => __('Add many files at once'),
+                'action' => array(
+                    'action' => 'nosTabs',
+                    'method' => 'add',
+                    'tab' => array(
+                        'url' => 'admin/noviusos_media/upload',
+                    ),
+                ),
+                'targets' => array(
+                    'toolbar-grid' => true,
+                ),
+            ),
             'renew_cache' => array(
                 'label' => __('Renew media cache'),
                 'action' => array(
@@ -131,7 +144,7 @@ return array(
                     'toolbar-grid' => true,
                 ),
                 'visible' => array(
-                    'check_expert' => function() {
+                    'check_expert' => function () {
                         return \Session::user()->user_expert;
                     }
                 ),

@@ -715,5 +715,4 @@ class Application
         // Get current application called on controllers
         return \Nos\Controller::getCurrentApplication();
     }
-
 }

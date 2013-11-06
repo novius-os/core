@@ -116,11 +116,6 @@ return array(
     #: config/controller/admin/user.config.php:115
     'Password (confirmation):' => 'Mot de passe (confirmation)&nbsp;:',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/user.config.php:136
-    #: config/controller/admin/role.config.php:59
-    'Save' => 'Enregistrer',
-
     #: config/controller/admin/inspector/role.config.php:22
     #: config/common/role.config.php:8
     'Role' => 'Rôle',

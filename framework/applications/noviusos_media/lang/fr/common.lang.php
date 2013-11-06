@@ -216,11 +216,6 @@ return array(
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'Référencement, URL du dossier&nbsp;:',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/folder.config.php:72
-    #: config/controller/admin/media.config.php:73
-    'Save' => 'Enregistrer',
-
     #: config/controller/admin/media.config.php:20
     #: config/common/media.config.php:118
     'Add a media file' => 'Ajouter un média',
@@ -331,4 +326,18 @@ return array(
     #: config/common/media.config.php:134
     'Visualise' => 'Visualiser',
 
+    'Mass upload' => 'Import en masse',
+    'Please pick a file from your hard drive.' => 'Merci de sélectionner un fichier sur votre disque.',
+    'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
+    'Done! All files have been uploaded.' => 'C’est fait, tous les fichiers ont été importés.',
+    'Add many files at once' => 'Ajouter plusieurs fichiers d’un coup',
+    'Files from your hard drive:' => 'Fichiers sur votre disque dur&nbsp;:',
+    'Unzip (both files and folders)' => 'Dézipper (fichiers et dossiers)',
+    'Leave unzipped' => 'Ne pas dézipper',
+    'What to do with ZIP files:' => 'Que faire avec les fichiers ZIP&nbsp;:',
+    'Select a folder where to put your media files:' => 'Sélectionner un dossier où ranger vos médias&nbsp;:',
+    'Hold the Ctrl/Cmd key to select multiple files.' => 'Maintenir la touche Ctrl/Cmd enfoncée pour sélectionner plusieurs fichiers.',
+    'Total files size must not exceed {{size}}.' => 'La somme des fichiers ne doit pas dépasser {{size}}.',
+    'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
+    'Total files size exceeds the upload limit {{size}}.' => 'La somme des fichiers dépasse la limite {{size}}.',
 );

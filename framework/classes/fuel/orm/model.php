@@ -265,7 +265,7 @@ class Model extends \Orm\Model
             static::eventStatic('buildRelations');
         }
 
-        if ($specific) {
+        if ($specific !== false) {
             return \Arr::get(static::$_relations_cached[$class], $specific, false);
         }
 
@@ -607,17 +607,25 @@ class Model extends \Orm\Model
 
         $return = parent::set($property, $value);
 
-        if (\Config::get('novius-os.cache_model_properties', false)) {
-            if ($properties_reload && isset($this->_custom_data[$property])) {
+        $class = get_called_class();
+        $cache_model_properties = \Config::get('novius-os.cache_model_properties', false);
+        if ($cache_model_properties !== false) {
+            $check = true;
+            if (is_array($cache_model_properties) &&
+                is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
+                $callback = \Arr::get($cache_model_properties, 'check_property_callback');
+                $check = call_user_func($callback, $class, $property);
+            }
+            if ($properties_reload && isset($this->_custom_data[$property]) && $check) {
                 static::properties(true);
                 unset($this->_custom_data[$property]);
                 $return = parent::set($property, $value);
             }
         }
 
-        $class = get_called_class();
         if ($value === '' && array_key_exists($property, static::$_properties_cached[$class]) &&
-            isset(static::$_properties_cached[$class][$property]['convert_empty_to_null']) && static::$_properties_cached[$class][$property]['convert_empty_to_null']) {
+            isset(static::$_properties_cached[$class][$property]['convert_empty_to_null']) &&
+            static::$_properties_cached[$class][$property]['convert_empty_to_null']) {
             $return = parent::set($property, null);
         }
 
@@ -740,11 +748,21 @@ class Model extends \Orm\Model
             $property = static::prefix().$property;
         }
 
-        if (\Config::get('novius-os.cache_model_properties', false)) {
-            try {
-                return parent::get($property);
-            } catch (\OutOfBoundsException $e) {
-                static::properties(true);
+        $cache_model_properties = \Config::get('novius-os.cache_model_properties', false);
+        if ($cache_model_properties !== false) {
+            $check = true;
+            if (is_array($cache_model_properties)
+                && is_callable(\Arr::get($cache_model_properties, 'check_property_callback'))) {
+                $class = get_called_class();
+                $callback = \Arr::get($cache_model_properties, 'check_property_callback');
+                $check = call_user_func($callback, $class, $property);
+            }
+            if ($check) {
+                try {
+                    return parent::get($property);
+                } catch (\OutOfBoundsException $e) {
+                    static::properties(true);
+                }
             }
         }
 
@@ -877,14 +895,14 @@ class Model extends \Orm\Model
                 $new_pks = array();
                 if ($val) {
                     foreach ($val as $v) {
-                        if ( ! in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
+                        if (!in_array(($new_pk = $v->implode_pk($v)), $original_pks)) {
                             $new_pks[] = $new_pk;
                         } else {
                             $original_pks = array_diff($original_pks, array($new_pk));
                         }
                     }
                 }
-                if ( ! empty($original_pks) or ! empty($new_pks)) {
+                if (!empty($original_pks) or ! empty($new_pks)) {
                     $diff[0][$key] = empty($original_pks) ? null : $original_pks;
                     $diff[1][$key] = empty($new_pks) ? null : $new_pks;
                 }

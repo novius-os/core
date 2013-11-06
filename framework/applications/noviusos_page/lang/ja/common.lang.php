@@ -232,10 +232,6 @@ return array(
     #: config/controller/admin/page.config.php:204
     'Regenerate the cache every {{duration}} seconds' => 'キャッシュを{{duration}}秒毎に再生成する',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/page.config.php:217
-    'Save' => '保存',
-
     #: config/controller/admin/inspector/page.config.php:33
     'Root' => 'ルート',
 

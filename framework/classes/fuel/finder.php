@@ -14,8 +14,9 @@ class Finder extends Fuel\Core\Finder
 
     public static function instance()
     {
+        $paths = \Config::get('novius-os.finder_paths');
         if (!static::$instance) {
-            static::$instance = static::forge(array(APPPATH, NOSPATH, COREPATH));
+            static::$instance = static::forge($paths);
         }
 
         return static::$instance;
@@ -46,7 +47,7 @@ class Finder extends Fuel\Core\Finder
 
         // absolute path requested?
         if ($file[0] === '/' or (isset($file[1]) and $file[1] === ':')) {
-            if ( ! is_file($file)) {
+            if (!is_file($file)) {
                 // at this point, found would be either empty array or false
                 return $found;
             }
@@ -107,9 +108,9 @@ class Finder extends Fuel\Core\Finder
             $paths = $this->paths;
 
             // get extra information of the active request
-            if (class_exists('Request', false) and ($uri = \Uri::string()) !== null) {
-                $cache_id .= $uri;
-                $paths = array_merge(\Request::active()->get_paths(), $paths);
+            if (class_exists('Request', false) and ($request = \Request::active())) {
+                $request->module and $cache_id .= $request->module;
+                $paths = array_merge($request->get_paths(), $paths);
             }
         }
 
@@ -148,7 +149,7 @@ class Finder extends Fuel\Core\Finder
                 }
 
                 if (is_file($file_path_alt)) {
-                    if ( ! $multiple) {
+                    if (!$multiple) {
                         $found = $file_path_alt;
                         break;
                     }
@@ -157,7 +158,7 @@ class Finder extends Fuel\Core\Finder
                 }
             }
             if (is_file($file_path)) {
-                if ( ! $multiple) {
+                if (!$multiple) {
                     $found = $file_path;
                     break;
                 }
@@ -166,7 +167,7 @@ class Finder extends Fuel\Core\Finder
             }
         }
 
-        if ( ! empty($found) and $cache) {
+        if (!empty($found) and $cache) {
             $this->add_to_cache($cache_id, $found);
             $this->cache_valid = false;
         }

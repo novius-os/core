@@ -2,7 +2,7 @@
 
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::application', 'nos::common'));
 
-$check_draft = function($page) {
+$check_draft = function ($page) {
     // Not published => don't disable
     if ($page->planificationStatus() == 0) {
         return false;
@@ -28,17 +28,17 @@ return array(
             'method' => 'url',
         ),
         'previewUrl' => array(
-            'value' => function($page) {
+            'value' => function ($page) {
                 return \Nos\Tools_Url::encodePath($page->url(array('preview'  => true)));
             },
         ),
         'is_home' => array(
-            'value' => function($page) {
+            'value' => function ($page) {
                 return (bool) (int) $page->page_entrance;
             }
         ),
         'iconClasses' => array(
-            'value' => function($page) {
+            'value' => function ($page) {
                 return $page->page_entrance ? 'ui-icon ui-icon-home' : false;
             }
         ),
@@ -85,14 +85,14 @@ return array(
             'delete' => array(
                 'primary' => false,
                 'disabled' => array(
-                    'check_home' => function($page) {
+                    'check_home' => function ($page) {
                         return !!$page->page_home ? __('The home page cannot be deleted. To delete this page, set another page as home page first.') : false;
                     },
-                    'check_locked' => function($page) {
+                    'check_locked' => function ($page) {
                         return ($page->page_lock == $page::LOCK_DELETION) ? __('You can’t delete this page. It is locked.') : false;
                     },
                     'check_draft' => $check_draft,
-                    'check_draft_children' => function($item, $params = array()) {
+                    'check_draft_children' => function ($item, $params = array()) {
                         // This will check if any children is published to ensure people with the draft access
                         // cannot delete an unpublished page which contains published children
 
@@ -145,7 +145,7 @@ return array(
                     'toolbar-edit' => true,
                 ),
                 'visible' => array(
-                    'is_new' => function($params) {
+                    'is_new' => function ($params) {
                         return !isset($params['item']) || !$params['item']->is_new();
                     },
                 ),
@@ -183,7 +183,7 @@ return array(
                     'grid' => true,
                 ),
                 'disabled' => array(
-                    'check_monocontext' => function($page) {
+                    'check_monocontext' => function ($page) {
                         $controller = \Nos\Nos::main_controller();
                         static $disabled = null;
                         if ($disabled === null) {
@@ -202,10 +202,10 @@ return array(
                         }
                         return $disabled;
                     },
-                    'check_published' => function($page) {
+                    'check_published' => function ($page) {
                         return !$page->published() ? __('You cannot set this page as home page because it isn’t published. Publish it first.') : false;
                     },
-                    'check_home' => function($page) {
+                    'check_home' => function ($page) {
                         return !!$page->page_home ? __('This page is the home page already.') : false;
                     },
                 ),

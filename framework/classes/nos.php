@@ -73,7 +73,7 @@ class Nos
             throw $e;
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
-                \Debug::dump('Error in enhancer "'.$where.'"');
+                \Debug::dump('Error when executing HMVC request "'.$where.'"');
                 $old_continue_on = \Config::get('errors.continue_on', array());
                 $continue_on = $old_continue_on;
                 $continue_on[] = $e->getCode();
@@ -88,6 +88,7 @@ class Nos
 
                 \Config::set('errors.continue_on', $old_continue_on);
             }
+            \Log::exception($e, 'HMVC - ');
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
         }
         $content = ob_get_clean();
@@ -168,11 +169,8 @@ class Nos
     public static function get_enhancer_content($enhancer, $args)
     {
         $args = json_decode(
-            strtr(
-                $args,
-                array(
-                    '&quot;' => '"',
-                )
+            htmlspecialchars_decode(
+                $args
             ),
             true
         );
@@ -218,7 +216,7 @@ class Nos
     {
         Tools_Wysiwyg::parse_medias(
             $content,
-            function($media, $params) use (&$content) {
+            function ($media, $params) use (&$content) {
                 if (empty($media)) {
                     if ($params['tag'] == 'img') {
                         // Remove dead images
@@ -234,7 +232,8 @@ class Nos
                     } else {
                         $media_url = $media->url();
                     }
-                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $content);
+                    $new_content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $params['content']);
+                    $content = str_replace($params['content'], $new_content, $content);
                 }
             }
         );

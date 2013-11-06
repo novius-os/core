@@ -29,7 +29,6 @@ $uniqid = uniqid('id_');
         'id' => 'user_id',
 
         'published' => null,
-        'save' => 'save',
 
         'subtitle' => array(),
 
@@ -54,31 +53,8 @@ $uniqid = uniqid('id_');
     ), false); ?>
 </div>
 
-<script type="text/javascript">
-    require([
-        'jquery-nos',
-        'jquery.passwordstrength'
-    ], function($) {
-        $(function() {
-            var $container = $('#<?= $uniqid ?>');
-            var $password = $container.find('input[name=user_password]');
-
-            <?php $formatter = \Format::forge(); ?>
-            // Password strength
-            var strength_id = '<?= $uniqid ?>_strength';
-            var $strength = $('<span id="' + strength_id + '"></span>');
-            $password.after($strength);
-            $password.password_strength({
-                container : '#' + strength_id,
-                texts : {
-                    <?php // Password strength ?>
-                    1 : ' <span class="color"></span><span class="box"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Insufficient')) ?> + '</span>',
-                    2 : ' <span class="color"></span><span class="color"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Weak')) ?> + '</span>',
-                    3 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Average')) ?> + '</span>',
-                    4 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Strong')) ?> + '</span>',
-                    5 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Outstanding')) ?> + '</span>'
-                }
-            });
-        });
-    });
-</script>
+<?php
+echo \View::forge('noviusos_user::admin/password_strength', array(
+    'uniqid' => $uniqid,
+    'input_name' => 'user_password',
+), false);

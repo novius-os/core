@@ -19,5 +19,4 @@ class Renderer_Empty extends \Fieldset_Field
     {
         return '';
     }
-
 }

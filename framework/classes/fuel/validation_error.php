@@ -57,4 +57,3 @@ class Validation_Error extends Fuel\Core\Validation_Error
         return $open.(strpos($msg, ':') === false ? $msg : $this->_replace_tags($msg)).$close;
     }
 }
-

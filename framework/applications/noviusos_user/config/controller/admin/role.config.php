@@ -26,7 +26,6 @@ return array(
                 'title' => 'role_name',
                 'medias' => array(),
                 'large' => true,
-                'save' => 'save',
                 'subtitle' => array(),
                 'content' => array(
                     'permissions' => array(
@@ -46,17 +45,6 @@ return array(
         'role_user_id' => array(
             'form' => array(
                 'type' => 'hidden',
-            ),
-        ),
-        'save' => array(
-            'label' => '',
-            'form' => array(
-                'type' => 'submit',
-                'tag' => 'button',
-                'data-icon' => 'check',
-                'class' => 'ui-priority-primary',
-                // Note to translator: This is a submit button
-                'value' => __('Save'),
             ),
         ),
     ),

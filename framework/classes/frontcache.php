@@ -372,12 +372,97 @@ class FrontCache
         }
     }
 
+    /**
+     * @param $urls: list of absolute urls to be deleted
+     * @param null $base; base url (by default, take \Uri::base(false)
+     */
+    public static function deleteUrls($urls, $base = null)
+    {
+        if (!is_array($urls)) {
+            $urls = array($urls);
+        }
+        if ($base === null) {
+            $base = \Uri::base(false);
+        }
+        foreach ($urls as $url) {
+            $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
+            \Nos\FrontCache::forge($cache_path)->delete();
+        }
+    }
+
+    /**
+     * @param $enhancers: list of enhancer in which to delete urls
+     * @param $relative_urls: list of relative urls to be deleted
+     * @param null $context: context where to find
+     */
+    public static function deleteEnhancersUrls($enhancers, $relative_urls, $context = null)
+    {
+        if (!is_array($enhancers)) {
+            $enhancers = array($enhancers);
+        }
+        if (!is_array($relative_urls)) {
+            $relative_urls = array($relative_urls);
+        }
+        $enhancedUrls = array();
+        foreach ($enhancers as $enhancer) {
+            foreach ($relative_urls as $url) {
+                $enhancedUrls = array_merge($enhancedUrls, static::getAllEnhancedUrls($enhancer, $url, $context));
+            }
+        }
+        static::deleteUrls($enhancedUrls);
+    }
+
     public static function deleteDir($path)
     {
         try {
             \File::delete_dir(\Config::get('cache_dir').$path, true, true);
         } catch (\Exception $e) {
         }
+    }
+
+    /**
+     * Inspired from the Tool_Enhancer::_url method.
+     * @todo: _url needs to be refactored and then this function can be moved to Tool_Enhancer...
+     *
+     * @param $enhancer_name: name of the enhancer inside which want to search the url
+     * @param $relative_enhanced_url: relative url after the page name
+     * @param null $context: context (null = all contexts)
+     * @return array: list of urls
+     */
+    protected static function getAllEnhancedUrls($enhancer_name, $relative_enhanced_url, $context = null)
+    {
+        // Check if any page contains this enhancer
+        $page_enhanced = Config_Data::get('page_enhanced.'.$enhancer_name, array());
+        if (empty($page_enhanced)) {
+            return array();
+        }
+        $urls = array();
+        // This files contains all the urlPath for the pages containing an URL enhancer
+        $url_enhanced = Config_Data::get('url_enhanced', array());
+        foreach ($page_enhanced as $page_id => $page_params) {
+            if (is_array($page_params['published'])) {
+                $now = \Date::forge()->format('mysql');
+                $published = (empty($page_params['published']['start']) ||
+                    $page_params['published']['start'] < $now) &&
+                    (empty($page_params['published']['end']) ||
+                        $now < $page_params['published']['end']);
+            } else {
+                $published = $page_params['published'] == true;
+            }
+            if ((!$context || $page_params['context'] == $context) && $published) {
+                $url_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($url_params) {
+                    if (empty($relative_enhanced_url) && !empty($url_params['url'])) {
+                        $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
+                    }
+                    $urls[$page_id] =
+                        Tools_Url::context($url_params['context']).
+                            $url_params['url'].$relative_enhanced_url;
+                }
+            }
+        }
+
+        return $urls;
     }
 
     public function get_path()

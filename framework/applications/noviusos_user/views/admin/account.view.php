@@ -8,9 +8,11 @@
  * @link http://www.novius-os.org
  */
 
-\Nos\I18n::current_dictionary('noviusos_user::common');
+\Nos\I18n::current_dictionary(array('noviusos_user::common', 'nos::common'));
 
 $uniqid = uniqid('id_');
+$saveField = __('Save');
+$fieldset_infos->add('my_account', '', array('type' => 'hidden', 'value' => '1'));
 ?>
 <script type="text/javascript">
     require([
@@ -20,7 +22,7 @@ $uniqid = uniqid('id_');
             var $container = $('#<?= $uniqid ?>');
             $container.nosToolbar('create');
             $container.nosToolbar('add', <?= \Format::forge((string) \View::forge('form/layout_save', array(
-                'save_field' => $fieldset_infos->field('save')
+                'save_field' => $saveField
             ), false))->to_json() ?>)
                 .filter(':submit')
                 .click(function() {
@@ -59,8 +61,7 @@ $uniqid = uniqid('id_');
     require(
         [
             'jquery-nos',
-            'wijmo.wijtabs',
-            'jquery.passwordstrength'
+            'wijmo.wijtabs'
         ],
         function($) {
             $(function() {
@@ -81,24 +82,13 @@ $uniqid = uniqid('id_');
                     left: '15%',
                     width : '85%'
                 });
-
-                var $password = $container.find('input[name=password_reset]');
-
-                // Password strength
-                var strength_id = '<?= $uniqid ?>_strength';
-                var $strength = $('<span id="' + strength_id + '"></span>');
-                $password.after($strength);
-                <?php $formatter = \Format::forge(); ?>
-                $password.password_strength({
-                    container : '#' + strength_id,
-                    texts : {
-                        1 : ' <span class="color"></span><span class="box"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Insufficient')) ?> + '</span>',
-                        2 : ' <span class="color"></span><span class="color"></span><span class="box"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Weak')) ?> + '</span>',
-                        3 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="box"></span> <span class="optional">' + <?= $formatter->to_json(__('Average')) ?> + '</span>',
-                        4 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Strong')) ?> + '</span>',
-                        5 : ' <span class="color"></span><span class="color"></span><span class="color"></span><span class="color"></span> <span class="optional">' + <?= $formatter->to_json(__('Outstanding')) ?> + '</span>'
-                    }
-                });
             });
         });
 </script>
+
+<?php
+echo \View::forge('noviusos_user::admin/password_strength', array(
+    'uniqid' => $uniqid,
+    'input_name' => 'password_reset',
+), false);
+
