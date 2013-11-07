@@ -246,7 +246,9 @@ return array(
     'media files' => 'メディアファイル',
 
     #: config/controller/admin/appdesk.config.php:99
-    'Showing {{x}} media files out of {{y}}' => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
+    'Showing 1 media file out of {{y}}' => array(
+        0 => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
+    ),
 
     #: config/controller/admin/appdesk.config.php:100
     'Showing 1 media file' => '1 個のメディアファイルを表示しています',
@@ -284,7 +286,9 @@ return array(
 
     #. Delete action's labels
     #: config/common/folder.config.php:38
-    'Yes, delete this folder' => 'はい、このフォルダを削除します',
+    'Yes, delete this folder' => array(
+        0 => 'はい、このフォルダを削除します',
+    ),
 
     #: config/common/folder.config.php:53
     'You can’t edit the root folder.' => 'ルートフォルダは編集できません。',
@@ -318,7 +322,9 @@ return array(
 
     #. Delete action's labels
     #: config/common/media.config.php:42
-    'Yes, delete this media file' => 'はい、このメディアファイルを削除します',
+    'Yes, delete this media file' => array(
+        0 => 'はい、このメディアファイルを削除します',
+    ),
 
     #: config/common/media.config.php:59
     'Extension' => '拡張子',

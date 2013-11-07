@@ -246,10 +246,10 @@ return array(
     'media files' => 'médias',
 
     #: config/controller/admin/appdesk.config.php:99
-    'Showing {{x}} media files out of {{y}}' => '{{x}} médias sur {{y}} affichés',
-
-    #: config/controller/admin/appdesk.config.php:100
-    'Showing 1 media file' => '1 média affiché',
+    'Showing 1 media file out of {{y}}' => array(
+        '1 média sur {{y}} affiché',
+        '{{x}} médias sur {{y}} affichés',
+    ),
 
     #: config/controller/admin/appdesk.config.php:101
     'No media files' => 'Pas de média',
@@ -284,7 +284,10 @@ return array(
 
     #. Delete action's labels
     #: config/common/folder.config.php:38
-    'Yes, delete this folder' => 'Oui, supprimer ce dossier',
+    'Yes, delete this folder' => array(
+        0 => 'Oui, supprimer ce dossier',
+        1 => 'Oui, supprimer ces {{count}} dossiers',
+    ),
 
     #: config/common/folder.config.php:53
     'You can’t edit the root folder.' => 'Vous ne pouvez modifier le dossier racine.',
@@ -318,9 +321,12 @@ return array(
 
     #. Delete action's labels
     #: config/common/media.config.php:42
-    'Yes, delete this media file' => 'Oui, supprimer ce média',
+    'Yes, delete this media file' => array(
+        0 => 'Oui, supprimer ce média',
+        1 => 'Oui, supprimer ces {{count}} médias',
+    ),
 
-    #: config/common/media.config.php:59
+        #: config/common/media.config.php:59
     'Extension' => 'Extension',
 
     #: config/common/media.config.php:134

@@ -35,7 +35,10 @@ return array(
         'deleting item title' => __('Deleting the folder ‘{{title}}’'),
 
         # Delete action's labels
-        'deleting button 1 item' => __('Yes, delete this folder'),
+        'deleting button N items' => n__(
+            'Yes, delete this folder',
+            'Yes, delete these {{count}} folders'
+        ),
     ),
     'actions' => array(
         'add' => array(

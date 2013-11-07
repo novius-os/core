@@ -48,14 +48,10 @@ return array(
     #: views/admin/popup_duplicate.view.php:58
     'Duplicate sub-pages' => '子ページを複製',
 
-    #: views/admin/popup_duplicate.view.php:99
-    'Nothing to duplicate' => '複製するページがありません',
-
     #: views/admin/popup_duplicate.view.php:100
-    'Duplicate this page' => 'このページを複製',
-
-    #: views/admin/popup_duplicate.view.php:101
-    'Duplicate these {{count}} pages' => 'これら{{count}}ページを複製',
+    'Duplicate this page' => array(
+        0 => 'これら{{count}}ページを複製',
+    ),
 
     #: views/admin/popup_duplicate.view.php:102
     #: config/common/page.config.php:220
@@ -248,10 +244,9 @@ return array(
     'pages' => 'ページ',
 
     #: config/controller/admin/appdesk.config.php:32
-    'Showing {{x}} pages out of {{y}}' => '{{y}}ページのうち、{{x}}ページを表示しています',
-
-    #: config/controller/admin/appdesk.config.php:33
-    'Showing 1 page' => '1ページを表示しています',
+    'Showing 1 page out of {{y}}' => array(
+        0 => '{{y}}ページのうち、{{x}}ページを表示しています',
+    ),
 
     #: config/controller/admin/appdesk.config.php:34
     'No pages' => 'ページがありません',
@@ -289,43 +284,31 @@ return array(
 
     #. Delete action's labels
     #: config/common/page.config.php:63
-    'Yes, delete this page' => 'はい、このページを削除します',
-
-    #: config/common/page.config.php:64
-    'Yes, delete these {{count}} pages' => 'はい、これら{{count}}ページを削除します',
+    'Yes, delete this page' => array(
+        0 => 'はい、これら{{count}}ページを削除します',
+    ),
 
     #: config/common/page.config.php:66
-    '1 page' => '1ページ',
-
-    #: config/common/page.config.php:67
-    '{{count}} pages' => '{{count}}ページ',
+    '1 page' => array(
+        0 => '{{count}}ページ',
+    ),
 
     #. Keep only if the model has the behaviour Contextable
     #: config/common/page.config.php:70
-    'This page exists in <strong>{{context_count}} contexts</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
+    'This page exists in <strong>one context</strong>.' => array(
+        0 => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
+    ),
 
     #: config/common/page.config.php:71
-    'This page exists in <strong>{{language_count}} languages</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>子ページが{{children_count}}ページ</strong>あります。',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/common/page.config.php:74
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>子ページが{{children_count}}ページ</strong>あります。',
-
-    #: config/common/page.config.php:75
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>子ページが1ページ</strong>あります。',
-
-    #: config/common/page.config.php:76
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'このページは<strong>{{language_count}}つの言語</strong>に翻訳されており、<strong>子ページが{{children_count}}ページ</strong>あります。',
-
-    #: config/common/page.config.php:77
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'このページは<strong>{{language_count}}つの言語</strong>に翻訳されており、<strong>子ページが1ページ</strong>あります。',
+    'This page exists in <strong>one language</strong>.' => array(
+        0 => 'このページは<strong>{{language_count}}つの言語</strong>あります。',
+    ),
 
     #. Keep only if the model has the behaviour Tree
     #: config/common/page.config.php:80
-    'This page has <strong>1 sub-page</strong>.' => 'このページは<strong>子ページが1ページ</strong>があります。',
-
-    #: config/common/page.config.php:81
-    'This page has <strong>{{children_count}} sub-pages</strong>.' => 'このページは<strong>子ページが{{children_count}}ページ</strong>あります。',
+    'This page has <strong>one sub-page</strong>.' => array(
+        0 => 'このページは<strong>子ページが{{children_count}}ページ</strong>あります。',
+    ),
 
     #: config/common/page.config.php:89
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => '',

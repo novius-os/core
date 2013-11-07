@@ -29,8 +29,14 @@ return array(
     'i18n' => array(
         'item' => __('page'),
         'items' => __('pages'),
-        'showNbItems' => __('Showing {{x}} pages out of {{y}}'),
-        'showOneItem' => __('Showing 1 page'),
+        'NItems' => n__(
+            '1 page',
+            '{{count}} pages'
+        ),
+        'showNbItems' => n__(
+            'Showing 1 page out of {{y}}',
+            'Showing {{x}} pages out of {{y}}'
+        ),
         'showNoItem' => __('No pages'),
         'showAll' => __('Showing all pages'),
     ),

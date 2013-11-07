@@ -407,10 +407,9 @@ return array(
     'Nothing to delete' => '削除するものがありません',
 
     #: config/i18n_common.config.php:27
-    'Yes, delete this item' => 'はい、このアイテムを削除します',
-
-    #: config/i18n_common.config.php:28
-    'Yes, delete these {{count}} items' => 'はい、これら{{count}}個のアイテムを削除します',
+    'Yes, delete this item' => array(
+        0 => 'はい、これら{{count}}個のアイテムを削除します',
+    ),
 
     #: config/i18n_common.config.php:30
     'To confirm the deletion, you need to enter this number in the field below:' => '削除の意思を確認するため、この数字を下の欄に入力してください。',
@@ -419,30 +418,20 @@ return array(
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => '入力した数字が間違っているため、このアイテムを削除できません。修正してください。',
 
     #: config/i18n_common.config.php:33
-    '1 item' => '1個のアイテム',
-
-    #: config/i18n_common.config.php:34
-    '{{count}} items' => '{{count}}個のアイテム',
+    '1 item' => array(
+        0 => '{{count}}個のアイテム',
+    ),
 
     #. Keep only if the model has the behaviour Contextable
     #: config/i18n_common.config.php:37
-    'This item exists in <strong>{{context_count}} contexts</strong>.' => 'このアイテムは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
+    'This item exists in <strong>one context</strong>.' => array(
+        0 => 'このアイテムは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
+    ),
 
     #: config/i18n_common.config.php:38
-    'This item exists in <strong>{{language_count}} languages</strong>.' => 'このアイテムは<strong>{{language_count}}つの言語</strong>に翻訳されています。',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:41
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'この項目は<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>{{children_count}}つの子項目</strong>があります。',
-
-    #: config/i18n_common.config.php:42
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'この項目は<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>1つの子項目</strong>があります。',
-
-    #: config/i18n_common.config.php:43
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'この項目は<strong>{{language_count}}つの言語</strong>に翻訳され、<strong>{{children_count}}つの子項目</strong>があります。',
-
-    #: config/i18n_common.config.php:44
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'この項目は<strong>{{language_count}}つの言語</strong>に翻訳され、<strong>1つの子項目</strong>があります。',
+    'This item exists in <strong>one language</strong>.' => array(
+        0 => 'このアイテムは<strong>{{language_count}}つの言語</strong>に翻訳されています。',
+    ),
 
     #. Keep only if the model has the behaviour Twinnable
     #: config/i18n_common.config.php:47
@@ -456,10 +445,9 @@ return array(
 
     #. Keep only if the model has the behaviour Tree
     #: config/i18n_common.config.php:52
-    'This item has <strong>1 sub-item</strong>.' => 'この項目には<strong>1つの子項目</strong>があります。',
-
-    #: config/i18n_common.config.php:53
-    'This item has <strong>{{children_count}} sub-items</strong>.' => 'この項目には<strong>{{children_count}}つの子項目</strong>があります。',
+    'This item has <strong>one sub-item</strong>.' => array(
+        0 => 'この項目には<strong>{{children_count}}つの子項目</strong>があります。',
+    ),
 
     #. Visualise action's labels
     #: config/i18n_common.config.php:56

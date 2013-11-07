@@ -48,14 +48,11 @@ return array(
     #: views/admin/popup_duplicate.view.php:58
     'Duplicate sub-pages' => 'Dupliquer les sous-pages',
 
-    #: views/admin/popup_duplicate.view.php:99
-    'Nothing to duplicate' => 'Rien à dupliquer',
-
     #: views/admin/popup_duplicate.view.php:100
-    'Duplicate this page' => 'Dupliquer cette page',
-
-    #: views/admin/popup_duplicate.view.php:101
-    'Duplicate these {{count}} pages' => 'Dupliquer ces {{count}} pages',
+    'Duplicate this page' => array(
+        0 => 'Dupliquer cette page',
+        1 => 'Dupliquer ces {{count}} pages',
+    ),
 
     #: views/admin/popup_duplicate.view.php:102
     #: config/common/page.config.php:220
@@ -248,10 +245,10 @@ return array(
     'pages' => 'pages',
 
     #: config/controller/admin/appdesk.config.php:32
-    'Showing {{x}} pages out of {{y}}' => '{{x}} pages sur {{y}} affichées',
-
-    #: config/controller/admin/appdesk.config.php:33
-    'Showing 1 page' => '1 page affichée',
+    'Showing 1 page out of {{y}}' => array(
+        '1 page sur {{y}} affichée',
+        '{{x}} pages sur {{y}} affichées',
+    ),
 
     #: config/controller/admin/appdesk.config.php:34
     'No pages' => 'Pas de page',
@@ -289,43 +286,36 @@ return array(
 
     #. Delete action's labels
     #: config/common/page.config.php:63
-    'Yes, delete this page' => 'Oui, supprimer cette page',
-
-    #: config/common/page.config.php:64
-    'Yes, delete these {{count}} pages' => 'Oui, supprimer ces {{count}} pages',
+    'Yes, delete this page' => array(
+        0 => 'Oui, supprimer cette page',
+        1 => 'Oui, supprimer ces {{count}} pages',
+    ),
 
     #: config/common/page.config.php:66
-    '1 page' => '1 page',
-
-    #: config/common/page.config.php:67
-    '{{count}} pages' => '{{count}} pages',
+    '1 page' => array(
+        0 => '1 page',
+        1 => '{{count}} pages',
+    ),
 
     #. Keep only if the model has the behaviour Contextable
     #: config/common/page.config.php:70
-    'This page exists in <strong>{{context_count}} contexts</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong>.',
+    'This page exists in <strong>one context</strong>.' => array(
+        0 => 'Cette page existe dans <strong>un contexte</strong>.',
+        1 => 'Cette page existe dans <strong>{{context_count}} contextes</strong>.',
+    ),
 
     #: config/common/page.config.php:71
-    'This page exists in <strong>{{language_count}} languages</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong>.',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/common/page.config.php:74
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a <strong>{{children_count}} sous-pages</strong>.',
-
-    #: config/common/page.config.php:75
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{context_count}} contextes</strong> et a <strong>une sous-page</strong>.',
-
-    #: config/common/page.config.php:76
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a <strong>{{children_count}} sous-pages</strong>.',
-
-    #: config/common/page.config.php:77
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'Cette page existe dans <strong>{{language_count}} langues</strong> et a <strong>une sous-page</strong>.',
+    'This page exists in <strong>one language</strong>.' => array(
+        0 => 'Cette page existe dans <strong>une langue</strong>.',
+        1 => 'Cette page existe dans <strong>{{language_count}} langues</strong>.',
+    ),
 
     #. Keep only if the model has the behaviour Tree
     #: config/common/page.config.php:80
-    'This page has <strong>1 sub-page</strong>.' => 'Cette page a <strong>une sous-page</strong>.',
-
-    #: config/common/page.config.php:81
-    'This page has <strong>{{children_count}} sub-pages</strong>.' => 'Cette page a <strong>{{children_count}} sous-pages</strong>.',
+    'This page has <strong>one sub-page</strong>.' => array(
+        0 => 'Cette page a <strong>une sous-page</strong>.',
+        1 => 'Cette page a <strong>{{children_count}} sous-pages</strong>.',
+    ),
 
     #: config/common/page.config.php:89
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => 'La page d’accueil ne peut être supprimée. Pour supprimer cette page, définissez d’abord une autre page comme page d’accueil.',

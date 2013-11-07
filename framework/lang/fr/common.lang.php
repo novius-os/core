@@ -407,10 +407,10 @@ return array(
     'Nothing to delete' => 'Rien à supprimer',
 
     #: config/i18n_common.config.php:27
-    'Yes, delete this item' => 'Oui, supprimer cet item',
-
-    #: config/i18n_common.config.php:28
-    'Yes, delete these {{count}} items' => 'Oui, supprimer ces {{count}} items',
+    'Yes, delete this item' => array(
+        0 => 'Oui, supprimer cet item',
+        1 => 'Oui, supprimer ces {{count}} items',
+    ),
 
     #: config/i18n_common.config.php:30
     'To confirm the deletion, you need to enter this number in the field below:' => 'Pour confirmer la suppression, vous devez entrer ce nombre dans le champ ci-dessous&nbsp;:',
@@ -419,30 +419,23 @@ return array(
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Nous ne pouvons supprimer cet item car le nombre de sous-items indiqué est faux. Merci de le corriger.',
 
     #: config/i18n_common.config.php:33
-    '1 item' => '1 item',
-
-    #: config/i18n_common.config.php:34
-    '{{count}} items' => '{{count}} items',
+    '1 item' => array(
+        0 => '1 item',
+        1 => '{{count}} items',
+    ),
 
     #. Keep only if the model has the behaviour Contextable
     #: config/i18n_common.config.php:37
-    'This item exists in <strong>{{context_count}} contexts</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong>.',
+    'This item exists in <strong>one context</strong>.' => array(
+        0 => 'Cet item existe dans <strong>un contexte</strong>.',
+        1 => 'Cet item existe dans <strong>{{context_count}} contextes</strong>.',
+    ),
 
     #: config/i18n_common.config.php:38
-    'This item exists in <strong>{{language_count}} languages</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong>.',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:41
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>{{children_count}} sous-items</strong>.',
-
-    #: config/i18n_common.config.php:42
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>un sous-item</strong>.',
-
-    #: config/i18n_common.config.php:43
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>{{children_count}} sous-items</strong>.',
-
-    #: config/i18n_common.config.php:44
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>un sous-item</strong>.',
+    'This item exists in <strong>one language</strong>.' => array(
+        0 => 'Cet item existe dans <strong>une langue</strong>.',
+        1 => 'Cet item existe dans <strong>{{language_count}} langues</strong>.',
+    ),
 
     #. Keep only if the model has the behaviour Twinnable
     #: config/i18n_common.config.php:47
@@ -456,10 +449,10 @@ return array(
 
     #. Keep only if the model has the behaviour Tree
     #: config/i18n_common.config.php:52
-    'This item has <strong>1 sub-item</strong>.' => 'Cet item a <strong>un sous-item</strong>.',
-
-    #: config/i18n_common.config.php:53
-    'This item has <strong>{{children_count}} sub-items</strong>.' => 'Cet item a <strong>{{children_count}} sous-items</strong>.',
+    'This item has <strong>one sub-item</strong>.' => array(
+        0 => 'Cet item a <strong>un sous-item</strong>.',
+        1 => 'Cet item a <strong>{{children_count}} sous-items</strong>.',
+    ),
 
     #. Visualise action's labels
     #: config/i18n_common.config.php:56

@@ -134,10 +134,9 @@ return array(
     'users' => 'ユーザー',
 
     #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => '{{y}}人のユーザーのうち{{x}}人を表示しています',
-
-    #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => '1人のユーザーを表示しています',
+    'Showing 1 user out of {{y}}' => array(
+        0 => '{{y}}人のユーザーのうち{{x}}人を表示しています',
+    ),
 
     #: config/controller/admin/appdesk.config.php:30
     'No users' => 'ユーザー無し',
@@ -172,7 +171,9 @@ return array(
 
     #. Delete action's labels
     #: config/common/user.config.php:43
-    'Yes, delete this user' => 'はい、このユーザーを削除します',
+    'Yes, delete this user' => array(
+        0 => 'はい、このユーザーを削除します',
+    ),
 
     #. Crud
     #: config/common/role.config.php:19
@@ -194,6 +195,8 @@ return array(
 
     #. Delete action's labels
     #: config/common/role.config.php:30
-    'Yes, delete this role' => 'はい、このロールを削除します',
+    'Yes, delete this role' => array(
+        0 => 'はい、このロールを削除します',
+    ),
 
 );

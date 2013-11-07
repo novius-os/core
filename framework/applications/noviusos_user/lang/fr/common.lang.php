@@ -134,10 +134,10 @@ return array(
     'users' => 'utilisateurs',
 
     #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => '{{x}} utilisateurs sur {{y}} affichés',
-
-    #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => '1 utilisateur affiché',
+    'Showing 1 user out of {{y}}' => array(
+        '1 utilisateur sur {{y}} affiché',
+        '{{x}} utilisateurs sur {{y}} affichés',
+    ),
 
     #: config/controller/admin/appdesk.config.php:30
     'No users' => 'Pas d’utilisateur',
@@ -172,9 +172,12 @@ return array(
 
     #. Delete action's labels
     #: config/common/user.config.php:43
-    'Yes, delete this user' => 'Oui, supprimer cet utilisateur',
+    'Yes, delete this user' => array(
+        0 => 'Oui, supprimer cet utilisateur',
+        1 => 'Oui, supprimer ces {{count}} utilisateurs',
+    ),
 
-    #. Crud
+        #. Crud
     #: config/common/role.config.php:19
     'All wrapped up! This new role is ready.' => 'Et voilà, le nouveau rôle est prêt.',
 
@@ -194,6 +197,9 @@ return array(
 
     #. Delete action's labels
     #: config/common/role.config.php:30
-    'Yes, delete this role' => 'Oui, supprimer ce rôle',
+    'Yes, delete this role' => array(
+        0 => 'Oui, supprimer ce rôle',
+        1 => 'Oui, supprimer ces {{count}} rôles',
+    ),
 
 );
