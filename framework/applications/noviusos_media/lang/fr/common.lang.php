@@ -69,10 +69,10 @@ return array(
     'The media is not used anywhere and can be safely deleted.' => 'Ce média n’est utilisé nulle part et peut ainsi être supprimé sans problème.',
 
     #: views/admin/media_delete.view.php:26
-    'The media is used <strong>once</strong> by an application.' => 'Ce média est utilisé <strong>une fois</strong> par une application.',
-
-    #: views/admin/media_delete.view.php:27
-    'The media is used <strong>{{count}} times</strong> by your applications.' => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
+    'The media is used <strong>once</strong> by an application.' => array(
+        0 => 'Ce média est utilisé <strong>une fois</strong> par une application.',
+        1 => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
+    ),
 
     #: views/admin/media_delete.view.php:32
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
@@ -140,10 +140,10 @@ return array(
     'The folder is empty and can be safely deleted.' => 'Le dossier est vide et peut donc être supprimé sans problème.',
 
     #: views/admin/folder_delete.view.php:26
-    'There is <strong>one media file</strong> in this folder.' => 'Il y a <strong>un média</strong> dans ce dossier.',
-
-    #: views/admin/folder_delete.view.php:27
-    'There are <strong>{{count}} media files</strong> in this folder.' => 'Il y a <strong>{{count}} médias</strong> dans ce dossier.',
+    'There is <strong>one media file</strong> in this folder.' => array(
+        0 => 'Il y a <strong>un média</strong> dans ce dossier.',
+        1 => 'Il y a <strong>{{count}} médias</strong> dans ce dossier.',
+    ),
 
     #: views/admin/folder_delete.view.php:32
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Oui, je veux supprimer ce dossier et les {{count}} médias qu’il contient.',

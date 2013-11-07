@@ -69,10 +69,9 @@ return array(
     'The media is not used anywhere and can be safely deleted.' => 'このメディアは使用されていません。削除しても構いません。',
 
     #: views/admin/media_delete.view.php:26
-    'The media is used <strong>once</strong> by an application.' => 'このメディアはアプリケーションで<strong>1回</strong>使用しています。',
-
-    #: views/admin/media_delete.view.php:27
-    'The media is used <strong>{{count}} times</strong> by your applications.' => 'このメディアはアプリケーションで<strong>{{count}}回</strong>使用しています。',
+    'The media is used <strong>once</strong> by an application.' => array(
+        0 => 'このメディアはアプリケーションで<strong>{{count}}回</strong>使用しています。',
+    ),
 
     #: views/admin/media_delete.view.php:32
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'はい、このメディアファイルは{{count}}回使用していますが、それでも削除します。',
@@ -140,10 +139,9 @@ return array(
     'The folder is empty and can be safely deleted.' => 'このフォルダは空です。削除しても構いません。',
 
     #: views/admin/folder_delete.view.php:26
-    'There is <strong>one media file</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが1個</strong>あります。',
-
-    #: views/admin/folder_delete.view.php:27
-    'There are <strong>{{count}} media files</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが{{count}}個</strong>あります。',
+    'There is <strong>one media file</strong> in this folder.' => array(
+        0 => 'このフォルダには<strong>メディアファイルが{{count}}個</strong>あります。',
+    ),
 
     #: views/admin/folder_delete.view.php:32
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'はい、このフォルダには{{count}}個のメディアファイルがありますが、このフォルダを削除します。',
@@ -249,9 +247,6 @@ return array(
     'Showing 1 media file out of {{y}}' => array(
         0 => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
     ),
-
-    #: config/controller/admin/appdesk.config.php:100
-    'Showing 1 media file' => '1 個のメディアファイルを表示しています',
 
     #: config/controller/admin/appdesk.config.php:101
     'No media files' => 'メディアファイルがありません',

@@ -125,7 +125,7 @@ if ($context_count > 1 || $children_count > 0) {
     <p style="margin: 1em 0;">
     <button type="submit" class="ui-priority-primary ui-state-default"
             data-texts="<?= htmlspecialchars(\Format::forge()->to_json(n__(
-                'Duplicate this one page',
+                'Duplicate this page',
                 'Duplicate these {{count}} pages'
             ))) ?>"><?= __('Duplicate') ?></button>
     <span><?= __('or') ?></span>
