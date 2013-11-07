@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 103 out of 111 messages are translated (92%).
-// 487 out of 619 words are translated (92%).
+// 100 out of 100 messages are translated (100%).
+// 556 out of 556 words are translated (100%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
@@ -45,23 +45,23 @@ return array(
     #: views/admin/permissions.view.php:14
     'Can add, edit and delete unpublished pages only' => '',
 
-    #: views/admin/popup_duplicate.view.php:58
+    #: views/admin/popup_duplicate.view.php:70
     'Duplicate sub-pages' => '子ページを複製',
 
-    #: views/admin/popup_duplicate.view.php:100
+    #: views/admin/popup_duplicate.view.php:128
     'Duplicate this page' => array(
         0 => 'これら{{count}}ページを複製',
     ),
 
-    #: views/admin/popup_duplicate.view.php:102
-    #: config/common/page.config.php:220
+    #: views/admin/popup_duplicate.view.php:130
+    #: config/common/page.config.php:226
     'Duplicate' => '複製',
 
-    #: views/admin/popup_duplicate.view.php:103
+    #: views/admin/popup_duplicate.view.php:131
     #: views/admin/wysiwyg_link.view.php:91
     'or' => 'または',
 
-    #: views/admin/popup_duplicate.view.php:104
+    #: views/admin/popup_duplicate.view.php:132
     #: views/admin/wysiwyg_link.view.php:91
     'Cancel' => '取り消し',
 
@@ -97,7 +97,7 @@ return array(
     'Internal link' => '内部リンク',
 
     #: views/admin/wysiwyg_link.view.php:43
-    #: config/controller/admin/page.config.php:188
+    #: config/controller/admin/page.config.php:187
     'External link' => '外部リンク',
 
     #: views/admin/wysiwyg_link.view.php:44
@@ -116,8 +116,8 @@ return array(
     'Title:' => 'タイトル:',
 
     #: views/admin/wysiwyg_link.view.php:60
-    #: config/controller/admin/page.config.php:117
-    #: config/controller/admin/page.config.php:167
+    #: config/controller/admin/page.config.php:116
+    #: config/controller/admin/page.config.php:166
     'URL:' => 'URL:',
 
     #: views/admin/wysiwyg_link.view.php:64
@@ -136,15 +136,15 @@ return array(
     'Hint (tooltip):' => 'ヒント:',
 
     #: views/admin/wysiwyg_link.view.php:85
-    #: config/controller/admin/page.config.php:173
+    #: config/controller/admin/page.config.php:172
     'Opens in:' => 'リンクを開く:',
 
     #: views/admin/wysiwyg_link.view.php:86
-    #: config/controller/admin/page.config.php:177
+    #: config/controller/admin/page.config.php:176
     'A new window or tab' => '新規ウィンドウまたはタブ',
 
     #: views/admin/wysiwyg_link.view.php:87
-    #: config/controller/admin/page.config.php:178
+    #: config/controller/admin/page.config.php:177
     'The same window or tab' => '現在のウィンドウまたはタブ',
 
     #: views/admin/wysiwyg_link.view.php:91
@@ -157,75 +157,75 @@ return array(
     'Permissions for this application' => '',
 
     #: config/controller/admin/page.config.php:25
-    #: config/common/page.config.php:132
-    #: config/common/page.config.php:160
+    #: config/common/page.config.php:138
+    #: config/common/page.config.php:166
     'Add a page' => 'ページを追加',
 
     #: config/controller/admin/page.config.php:26
     'Translate a page' => 'ページを翻訳',
 
-    #: config/controller/admin/page.config.php:42
+    #: config/controller/admin/page.config.php:41
     'Content' => 'コンテンツ',
 
-    #: config/controller/admin/page.config.php:64
+    #: config/controller/admin/page.config.php:63
     'Menu' => 'メニュー',
 
-    #: config/controller/admin/page.config.php:67
+    #: config/controller/admin/page.config.php:66
     'URL (page address)' => 'URL (ページのアドレス)',
 
-    #: config/controller/admin/page.config.php:70
+    #: config/controller/admin/page.config.php:69
     'SEO' => 'SEO',
 
-    #: config/controller/admin/page.config.php:73
+    #: config/controller/admin/page.config.php:72
     'Advanced options' => '詳細オプション',
 
-    #: config/controller/admin/page.config.php:85
+    #: config/controller/admin/page.config.php:84
     'ID:' => 'ID:',
 
-    #: config/controller/admin/page.config.php:91
+    #: config/controller/admin/page.config.php:90
     #: config/common/page.config.php:17
     'Title' => 'タイトル',
 
-    #: config/controller/admin/page.config.php:105
+    #: config/controller/admin/page.config.php:104
     'Location:' => '位置:',
 
-    #: config/controller/admin/page.config.php:109
+    #: config/controller/admin/page.config.php:108
     'Template:' => 'テンプレート:',
 
-    #: config/controller/admin/page.config.php:125
+    #: config/controller/admin/page.config.php:124
     'SEO title:' => 'SEO タイトル:',
 
-    #: config/controller/admin/page.config.php:131
+    #: config/controller/admin/page.config.php:130
     'Description:' => '説明:',
 
-    #: config/controller/admin/page.config.php:138
+    #: config/controller/admin/page.config.php:137
     'Keywords:' => 'キーワード:',
 
-    #: config/controller/admin/page.config.php:145
+    #: config/controller/admin/page.config.php:144
     'Don’t index on search engines' => '検索エンジンに登録しない',
 
-    #: config/controller/admin/page.config.php:153
+    #: config/controller/admin/page.config.php:152
     'Shows in the menu' => 'メニューで表示する',
 
-    #: config/controller/admin/page.config.php:161
+    #: config/controller/admin/page.config.php:160
     'What’s the page called in the menu:' => 'メニューでの表示名:',
 
-    #: config/controller/admin/page.config.php:183
+    #: config/controller/admin/page.config.php:182
     'Type:' => '種類:',
 
-    #: config/controller/admin/page.config.php:187
+    #: config/controller/admin/page.config.php:186
     'Page' => 'ページ',
 
-    #: config/controller/admin/page.config.php:193
+    #: config/controller/admin/page.config.php:192
     'Lock the page:' => 'ページを削除不可にする:',
 
-    #: config/controller/admin/page.config.php:197
+    #: config/controller/admin/page.config.php:196
     'No, leave unlocked' => '削除可能にする',
 
-    #: config/controller/admin/page.config.php:198
+    #: config/controller/admin/page.config.php:197
     'Prevent deletion' => '削除不可にする',
 
-    #: config/controller/admin/page.config.php:204
+    #: config/controller/admin/page.config.php:203
     'Regenerate the cache every {{duration}} seconds' => 'キャッシュを{{duration}}秒毎に再生成する',
 
     #: config/controller/admin/inspector/page.config.php:33
@@ -243,15 +243,21 @@ return array(
     #: config/controller/admin/appdesk.config.php:31
     'pages' => 'ページ',
 
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:33
+    #: config/common/page.config.php:69
+    '1 page' => array(
+        0 => '{{count}}ページ',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:37
     'Showing 1 page out of {{y}}' => array(
         0 => '{{y}}ページのうち、{{x}}ページを表示しています',
     ),
 
-    #: config/controller/admin/appdesk.config.php:34
+    #: config/controller/admin/appdesk.config.php:40
     'No pages' => 'ページがありません',
 
-    #: config/controller/admin/appdesk.config.php:35
+    #: config/controller/admin/appdesk.config.php:41
     'Showing all pages' => '全てのページを表示しています',
 
     #: config/model/page.config.php:11
@@ -282,62 +288,54 @@ return array(
     #: config/common/page.config.php:60
     'Deleting the page ‘{{title}}’' => 'ページ‘{{title}}’を削除します',
 
-    #. Delete action's labels
-    #: config/common/page.config.php:63
+    #: config/common/page.config.php:64
     'Yes, delete this page' => array(
         0 => 'はい、これら{{count}}ページを削除します',
     ),
 
-    #: config/common/page.config.php:66
-    '1 page' => array(
-        0 => '{{count}}ページ',
-    ),
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/common/page.config.php:70
+    #: config/common/page.config.php:75
     'This page exists in <strong>one context</strong>.' => array(
         0 => 'このページは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
     ),
 
-    #: config/common/page.config.php:71
+    #: config/common/page.config.php:79
     'This page exists in <strong>one language</strong>.' => array(
         0 => 'このページは<strong>{{language_count}}つの言語</strong>あります。',
     ),
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/common/page.config.php:80
+    #: config/common/page.config.php:85
     'This page has <strong>one sub-page</strong>.' => array(
         0 => 'このページは<strong>子ページが{{children_count}}ページ</strong>あります。',
     ),
 
-    #: config/common/page.config.php:89
+    #: config/common/page.config.php:95
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => '',
 
-    #: config/common/page.config.php:92
+    #: config/common/page.config.php:98
     'You can’t delete this page. It is locked.' => 'このページは削除できません。ロックされています。',
 
-    #: config/common/page.config.php:135
+    #: config/common/page.config.php:141
     'Visualise' => '閲覧',
 
-    #: config/common/page.config.php:154
+    #: config/common/page.config.php:160
     'Add a sub-page to this page' => 'このページに子ページを追加',
 
-    #: config/common/page.config.php:169
+    #: config/common/page.config.php:175
     'Set as home page' => 'ホームページに設定する',
 
-    #: config/common/page.config.php:196
+    #: config/common/page.config.php:202
     'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => '',
 
-    #: config/common/page.config.php:198
+    #: config/common/page.config.php:204
     'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => '',
 
-    #: config/common/page.config.php:206
+    #: config/common/page.config.php:212
     'You cannot set this page as home page because it isn’t published. Publish it first.' => '',
 
-    #: config/common/page.config.php:209
+    #: config/common/page.config.php:215
     'This page is the home page already.' => 'このページはホームページに設定されています。',
 
-    #: config/common/page.config.php:229
+    #: config/common/page.config.php:235
     'Renew pages’ cache' => 'ページのキャッシュを更新',
 
 );

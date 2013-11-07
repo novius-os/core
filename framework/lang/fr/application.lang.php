@@ -1,19 +1,15 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 17 out of 17 messages are translated (100%).
-// 98 out of 98 words are translated (100%).
+// 18 out of 18 messages are translated (100%).
+// 99 out of 99 words are translated (100%).
 
 return array(
-    #. Note to translator: This is a submit button
-    #: classes/controller/admin/crud.ctrl.php:280
-    'Add' => 'Ajouter',
-
-    #: classes/controller/admin/crud.ctrl.php:369
+    #: classes/controller/admin/crud.ctrl.php:351
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'Cet item existe déjà dans {{context}}. Votre item ne peut donc être ajouté.',
 
-    #: classes/controller/admin/appdesk.ctrl.php:165
+    #: classes/controller/admin/appdesk.ctrl.php:167
     'Default view' => 'Affichage par défaut',
 
     #: views/crud/context_common_fields.view.php:17
@@ -58,5 +54,13 @@ return array(
 
     #: views/crud/blank_slate.view.php:118
     '(Form filled with the contents from the original version)' => '(Formulaire rempli avec le contenu de la version originale)',
+
+    #. Note to translator: This is a submit button
+    #: views/crud/toolbar.view.php:18
+    'Add' => 'Ajouter',
+
+    #. Note to translator: This is a submit button
+    #: views/crud/toolbar.view.php:21
+    'Save' => 'Enregistrer',
 
 );

@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 158 out of 162 messages are translated (97%).
-// 839 out of 865 words are translated (97%).
+// 155 out of 155 messages are translated (100%).
+// 813 out of 813 words are translated (100%).
 
 return array(
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
@@ -17,58 +17,58 @@ return array(
     #: classes/fuel/fieldset_field.php:59
     'Mandatory' => '必須',
 
-    #: classes/fuel/fieldset.php:532
+    #: classes/fuel/fieldset.php:514
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => '問題が発生しました。ブラウザを再読み込みして、もう一度試してみてください。それでも同じ問題が発生する場合は、ソフト開発者または Novius OS に連絡してください。ご迷惑をお掛けして申し訳ありません。',
 
-    #: classes/fuel/fieldset.php:587
+    #: classes/fuel/fieldset.php:569
     'OK, it’s done.' => '保存されました。',
 
-    #: classes/controller/inspector/date.ctrl.php:150
+    #: classes/controller/inspector/date.ctrl.php:152
     'Custom dates' => '日付を指定',
 
-    #: classes/controller/inspector/date.ctrl.php:151
+    #: classes/controller/inspector/date.ctrl.php:153
     'from {{begin}} to {{end}}' => '{{begin}}から{{end}}まで',
 
-    #: classes/controller/inspector/date.ctrl.php:152
+    #: classes/controller/inspector/date.ctrl.php:154
     'until {{end}}' => '',
 
-    #: classes/controller/inspector/date.ctrl.php:153
+    #: classes/controller/inspector/date.ctrl.php:155
     'since {{begin}}' => '',
 
-    #: classes/controller/inspector/date.ctrl.php:157
+    #: classes/controller/inspector/date.ctrl.php:159
     'Since' => '以降',
 
-    #: classes/controller/inspector/date.ctrl.php:159
+    #: classes/controller/inspector/date.ctrl.php:161
     '3 last days' => '過去3日間',
 
-    #: classes/controller/inspector/date.ctrl.php:160
+    #: classes/controller/inspector/date.ctrl.php:162
     'Week beginning' => '週の初め',
 
-    #: classes/controller/inspector/date.ctrl.php:161
+    #: classes/controller/inspector/date.ctrl.php:163
     'Less than a week' => '一週間以内',
 
-    #: classes/controller/inspector/date.ctrl.php:162
+    #: classes/controller/inspector/date.ctrl.php:164
     'Month beginning' => '月の初め',
 
-    #: classes/controller/inspector/date.ctrl.php:163
+    #: classes/controller/inspector/date.ctrl.php:165
     'Less than one month' => '一ヶ月以内',
 
-    #: classes/controller/inspector/date.ctrl.php:164
+    #: classes/controller/inspector/date.ctrl.php:166
     'Less than two months' => '二ヶ月以内',
 
-    #: classes/controller/inspector/date.ctrl.php:165
+    #: classes/controller/inspector/date.ctrl.php:167
     'Less than three months' => '三ヶ月以内',
 
-    #: classes/controller/inspector/date.ctrl.php:166
+    #: classes/controller/inspector/date.ctrl.php:168
     'Less than six months' => '六ヶ月以内',
 
-    #: classes/controller/inspector/date.ctrl.php:167
+    #: classes/controller/inspector/date.ctrl.php:169
     'Less than one year' => '一年以内',
 
-    #: classes/controller/inspector/date.ctrl.php:171
+    #: classes/controller/inspector/date.ctrl.php:173
     'Previous months' => '先月',
 
-    #: classes/controller/inspector/date.ctrl.php:177
+    #: classes/controller/inspector/date.ctrl.php:179
     'Years' => '年',
 
     #: classes/controller/inspector.ctrl.php:77
@@ -78,7 +78,7 @@ return array(
     #: classes/controller/admin/login.ctrl.php:45
     'Welcome back, {{user}}.' => 'ようこそ、{{user}}さん。',
 
-    #: classes/controller/admin/login.ctrl.php:116
+    #: classes/controller/admin/login.ctrl.php:121
     'These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.' => 'ログインに失敗しました。メールアドレスとパスワードが正しいか、確認して、もう一度お試しください。',
 
     #: classes/controller/admin/datacatcher.ctrl.php:49
@@ -122,17 +122,17 @@ return array(
     #: classes/controller/admin/noviusos.ctrl.php:123
     #: views/inspector/modeltree_checkbox.view.php:15
     #: views/inspector/modeltree_radio.view.php:15
-    #: config/i18n_common.config.php:66
+    #: config/i18n_common.config.php:72
     'Loading...' => '読み込み中...',
 
     #: classes/controller/admin/enhancer.ctrl.php:122
     'I’m an application. Give me a name!' => 'アプリケーションに名前をつけてください。',
 
-    #: views/form/layout_save.view.php:20
+    #: views/form/layout_save.view.php:22
     #: views/form/action_or_cancel.view.php:17
     'or' => 'あるいは',
 
-    #: views/form/layout_save.view.php:20
+    #: views/form/layout_save.view.php:22
     #: views/form/action_or_cancel.view.php:19
     'Cancel' => '取り消し',
 
@@ -140,10 +140,6 @@ return array(
     #: views/admin/enhancer/popup.view.php:50
     #: views/admin/data_catcher/form.view.php:166
     'Save' => '保存',
-
-    #. Note to translator: This is a submit button
-    #: views/crud/toolbar.view.php:18
-    'Add' => '追加',
 
     #: views/form/layout_standard.view.php:82
     #: config/orm/behaviour/twinnable.config.php:68
@@ -243,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'では始めましょう',
 
-    #: views/admin/html.view.php:467
+    #: views/admin/html.view.php:479
     'Select a media file' => 'メディアファイルを選択',
 
-    #: views/admin/html.view.php:468
+    #: views/admin/html.view.php:480
     'Pick an image' => '画像を選択',
 
-    #: views/admin/html.view.php:469
+    #: views/admin/html.view.php:481
     'We’re afraid we cannot find this image.' => 'この画像は見つかりませんでした。',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -283,7 +279,7 @@ return array(
     'About Novius OS' => 'Novius OS について',
 
     #: views/admin/appstab.view.php:19
-    #: config/i18n_common.config.php:68
+    #: config/i18n_common.config.php:74
     'Search' => '検索',
 
     #: views/admin/data_catcher/applications.view.php:59
@@ -342,6 +338,7 @@ return array(
     #: config/common.config.php:38
     'Edit' => '編集',
 
+    #. Deletion popup
     #: config/common.config.php:61
     #: config/i18n_common.config.php:20
     'Deleting the item ‘{{title}}’' => 'アイテム‘{{title}}’を削除します',
@@ -406,104 +403,102 @@ return array(
     #: config/i18n_common.config.php:26
     'Nothing to delete' => '削除するものがありません',
 
-    #: config/i18n_common.config.php:27
+    #: config/i18n_common.config.php:28
     'Yes, delete this item' => array(
         0 => 'はい、これら{{count}}個のアイテムを削除します',
     ),
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:32
     'To confirm the deletion, you need to enter this number in the field below:' => '削除の意思を確認するため、この数字を下の欄に入力してください。',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:33
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => '入力した数字が間違っているため、このアイテムを削除できません。修正してください。',
 
-    #: config/i18n_common.config.php:33
+    #: config/i18n_common.config.php:36
     '1 item' => array(
         0 => '{{count}}個のアイテム',
     ),
 
-    #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:37
+    #: config/i18n_common.config.php:42
     'This item exists in <strong>one context</strong>.' => array(
         0 => 'このアイテムは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
     ),
 
-    #: config/i18n_common.config.php:38
+    #: config/i18n_common.config.php:46
     'This item exists in <strong>one language</strong>.' => array(
         0 => 'このアイテムは<strong>{{language_count}}つの言語</strong>に翻訳されています。',
     ),
 
     #. Keep only if the model has the behaviour Twinnable
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:51
     'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => '申し訳ないですが、このアイテムは{{context}}に追加できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:52
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => '申し訳ないですが、このアイテムは{{language}}に翻訳できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:53
     'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'このアイテムは、{{context}}に追加できません。(どうやってこのエラーメッセージを表示しているのでしょう？ハッキングしてきたのでしょうか？)',
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/i18n_common.config.php:52
+    #: config/i18n_common.config.php:57
     'This item has <strong>one sub-item</strong>.' => array(
         0 => 'この項目には<strong>{{children_count}}つの子項目</strong>があります。',
     ),
 
     #. Visualise action's labels
-    #: config/i18n_common.config.php:56
+    #: config/i18n_common.config.php:62
     'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'このアプリケーションは、ページに追加されていません。そのため閲覧できません。',
 
     #. Appdesk: allLanguages
-    #: config/i18n_common.config.php:59
+    #: config/i18n_common.config.php:65
     'All languages' => '全ての言語',
 
-    #: config/i18n_common.config.php:60
+    #: config/i18n_common.config.php:66
     'All sites' => '全てのサイト',
 
-    #: config/i18n_common.config.php:61
+    #: config/i18n_common.config.php:67
     'All contexts' => '全てのコンテキスト',
 
-    #: config/i18n_common.config.php:62
+    #: config/i18n_common.config.php:68
     'List' => '一覧',
 
-    #: config/i18n_common.config.php:63
+    #: config/i18n_common.config.php:69
     'Tree' => '木',
 
-    #: config/i18n_common.config.php:64
+    #: config/i18n_common.config.php:70
     'Thumbnails' => 'サムネイル',
 
-    #: config/i18n_common.config.php:65
+    #: config/i18n_common.config.php:71
     'Preview' => 'プレビュー',
 
-    #: config/i18n_common.config.php:67
-    #: config/i18n_common.config.php:78
+    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:84
     'Languages' => '言語',
 
-    #: config/i18n_common.config.php:69
+    #: config/i18n_common.config.php:75
     'Select the site(s) to show' => '表示するサイトを選択する',
 
-    #: config/i18n_common.config.php:70
+    #: config/i18n_common.config.php:76
     'Select the language(s) to show' => '表示する言語を選択する',
 
-    #: config/i18n_common.config.php:71
+    #: config/i18n_common.config.php:77
     'Select the context(s) to show' => '表示するコンテキストを選択する',
 
-    #: config/i18n_common.config.php:72
+    #: config/i18n_common.config.php:78
     'Show {{context}}' => '{{context}}を表示する',
 
-    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:79
     'Other sites' => '他のサイト',
 
-    #: config/i18n_common.config.php:74
+    #: config/i18n_common.config.php:80
     'Other languages' => '他の言語',
 
-    #: config/i18n_common.config.php:75
+    #: config/i18n_common.config.php:81
     'Other contexts' => '他のコンテキスト',
 
-    #: config/i18n_common.config.php:76
+    #: config/i18n_common.config.php:82
     'Contexts' => 'コンテキスト',
 
-    #: config/i18n_common.config.php:77
+    #: config/i18n_common.config.php:83
     'Sites' => 'サイト',
 
     #: config/validation.config.php:15

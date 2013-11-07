@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 111 out of 111 messages are translated (100%).
-// 619 out of 619 words are translated (100%).
+// 100 out of 100 messages are translated (100%).
+// 556 out of 556 words are translated (100%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
@@ -45,24 +45,24 @@ return array(
     #: views/admin/permissions.view.php:14
     'Can add, edit and delete unpublished pages only' => 'Peut ajouter, modifier et supprimer des pages non-publiées uniquement',
 
-    #: views/admin/popup_duplicate.view.php:58
+    #: views/admin/popup_duplicate.view.php:70
     'Duplicate sub-pages' => 'Dupliquer les sous-pages',
 
-    #: views/admin/popup_duplicate.view.php:100
+    #: views/admin/popup_duplicate.view.php:128
     'Duplicate this page' => array(
         0 => 'Dupliquer cette page',
         1 => 'Dupliquer ces {{count}} pages',
     ),
 
-    #: views/admin/popup_duplicate.view.php:102
-    #: config/common/page.config.php:220
+    #: views/admin/popup_duplicate.view.php:130
+    #: config/common/page.config.php:226
     'Duplicate' => 'Dupliquer',
 
-    #: views/admin/popup_duplicate.view.php:103
+    #: views/admin/popup_duplicate.view.php:131
     #: views/admin/wysiwyg_link.view.php:91
     'or' => 'ou',
 
-    #: views/admin/popup_duplicate.view.php:104
+    #: views/admin/popup_duplicate.view.php:132
     #: views/admin/wysiwyg_link.view.php:91
     'Cancel' => 'Annuler',
 
@@ -98,7 +98,7 @@ return array(
     'Internal link' => 'Lien interne',
 
     #: views/admin/wysiwyg_link.view.php:43
-    #: config/controller/admin/page.config.php:188
+    #: config/controller/admin/page.config.php:187
     'External link' => 'Lien externe',
 
     #: views/admin/wysiwyg_link.view.php:44
@@ -117,8 +117,8 @@ return array(
     'Title:' => 'Titre&nbsp;:',
 
     #: views/admin/wysiwyg_link.view.php:60
-    #: config/controller/admin/page.config.php:117
-    #: config/controller/admin/page.config.php:167
+    #: config/controller/admin/page.config.php:116
+    #: config/controller/admin/page.config.php:166
     'URL:' => 'URL&nbsp;:',
 
     #: views/admin/wysiwyg_link.view.php:64
@@ -137,15 +137,15 @@ return array(
     'Hint (tooltip):' => 'Aide (tooltip)&nbsp;:',
 
     #: views/admin/wysiwyg_link.view.php:85
-    #: config/controller/admin/page.config.php:173
+    #: config/controller/admin/page.config.php:172
     'Opens in:' => 'S’ouvre dans&nbsp;:',
 
     #: views/admin/wysiwyg_link.view.php:86
-    #: config/controller/admin/page.config.php:177
+    #: config/controller/admin/page.config.php:176
     'A new window or tab' => 'Une nouvelle fenêtre / onglet',
 
     #: views/admin/wysiwyg_link.view.php:87
-    #: config/controller/admin/page.config.php:178
+    #: config/controller/admin/page.config.php:177
     'The same window or tab' => 'La même fenêtre / onglet',
 
     #: views/admin/wysiwyg_link.view.php:91
@@ -158,75 +158,75 @@ return array(
     'Permissions for this application' => 'Droits d’accès pour cette application',
 
     #: config/controller/admin/page.config.php:25
-    #: config/common/page.config.php:132
-    #: config/common/page.config.php:160
+    #: config/common/page.config.php:138
+    #: config/common/page.config.php:166
     'Add a page' => 'Ajouter une page',
 
     #: config/controller/admin/page.config.php:26
     'Translate a page' => 'Traduire une page',
 
-    #: config/controller/admin/page.config.php:42
+    #: config/controller/admin/page.config.php:41
     'Content' => 'Contenu',
 
-    #: config/controller/admin/page.config.php:64
+    #: config/controller/admin/page.config.php:63
     'Menu' => 'Menu',
 
-    #: config/controller/admin/page.config.php:67
+    #: config/controller/admin/page.config.php:66
     'URL (page address)' => 'URL (adresse de la page)',
 
-    #: config/controller/admin/page.config.php:70
+    #: config/controller/admin/page.config.php:69
     'SEO' => 'Référencement',
 
-    #: config/controller/admin/page.config.php:73
+    #: config/controller/admin/page.config.php:72
     'Advanced options' => 'Options avancées',
 
-    #: config/controller/admin/page.config.php:85
+    #: config/controller/admin/page.config.php:84
     'ID:' => 'ID&nbsp;:',
 
-    #: config/controller/admin/page.config.php:91
+    #: config/controller/admin/page.config.php:90
     #: config/common/page.config.php:17
     'Title' => 'Titre',
 
-    #: config/controller/admin/page.config.php:105
+    #: config/controller/admin/page.config.php:104
     'Location:' => 'Emplacement&nbsp;:',
 
-    #: config/controller/admin/page.config.php:109
+    #: config/controller/admin/page.config.php:108
     'Template:' => 'Gabarit&nbsp;:',
 
-    #: config/controller/admin/page.config.php:125
+    #: config/controller/admin/page.config.php:124
     'SEO title:' => 'Titre pour le référencement&nbsp;:',
 
-    #: config/controller/admin/page.config.php:131
+    #: config/controller/admin/page.config.php:130
     'Description:' => 'Description&nbsp;:',
 
-    #: config/controller/admin/page.config.php:138
+    #: config/controller/admin/page.config.php:137
     'Keywords:' => 'Mots clefs&nbsp;:',
 
-    #: config/controller/admin/page.config.php:145
+    #: config/controller/admin/page.config.php:144
     'Don’t index on search engines' => 'Ne pas référencer sur les moteurs de recherche',
 
-    #: config/controller/admin/page.config.php:153
+    #: config/controller/admin/page.config.php:152
     'Shows in the menu' => 'Apparait dans le menu',
 
-    #: config/controller/admin/page.config.php:161
+    #: config/controller/admin/page.config.php:160
     'What’s the page called in the menu:' => 'Quel nom porte la page dans le menu&nbsp;:',
 
-    #: config/controller/admin/page.config.php:183
+    #: config/controller/admin/page.config.php:182
     'Type:' => 'Type&nbsp;:',
 
-    #: config/controller/admin/page.config.php:187
+    #: config/controller/admin/page.config.php:186
     'Page' => 'Page',
 
-    #: config/controller/admin/page.config.php:193
+    #: config/controller/admin/page.config.php:192
     'Lock the page:' => 'Verrouiller la page&nbsp;:',
 
-    #: config/controller/admin/page.config.php:197
+    #: config/controller/admin/page.config.php:196
     'No, leave unlocked' => 'Non, ne pas verrouiller',
 
-    #: config/controller/admin/page.config.php:198
+    #: config/controller/admin/page.config.php:197
     'Prevent deletion' => 'Empêcher la suppression',
 
-    #: config/controller/admin/page.config.php:204
+    #: config/controller/admin/page.config.php:203
     'Regenerate the cache every {{duration}} seconds' => 'Régénérer le cache toutes les {{duration}} secondes',
 
     #: config/controller/admin/inspector/page.config.php:33
@@ -244,16 +244,23 @@ return array(
     #: config/controller/admin/appdesk.config.php:31
     'pages' => 'pages',
 
-    #: config/controller/admin/appdesk.config.php:32
-    'Showing 1 page out of {{y}}' => array(
-        '1 page sur {{y}} affichée',
-        '{{x}} pages sur {{y}} affichées',
+    #: config/controller/admin/appdesk.config.php:33
+    #: config/common/page.config.php:69
+    '1 page' => array(
+        0 => '1 page',
+        1 => '{{count}} pages',
     ),
 
-    #: config/controller/admin/appdesk.config.php:34
+    #: config/controller/admin/appdesk.config.php:37
+    'Showing 1 page out of {{y}}' => array(
+        0 => '1 page sur {{y}} affichée',
+        1 => '{{x}} pages sur {{y}} affichées',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:40
     'No pages' => 'Pas de page',
 
-    #: config/controller/admin/appdesk.config.php:35
+    #: config/controller/admin/appdesk.config.php:41
     'Showing all pages' => 'Afficher toutes les pages',
 
     #: config/model/page.config.php:11
@@ -284,67 +291,58 @@ return array(
     #: config/common/page.config.php:60
     'Deleting the page ‘{{title}}’' => 'Supprimer la page «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/page.config.php:63
+    #: config/common/page.config.php:64
     'Yes, delete this page' => array(
         0 => 'Oui, supprimer cette page',
         1 => 'Oui, supprimer ces {{count}} pages',
     ),
 
-    #: config/common/page.config.php:66
-    '1 page' => array(
-        0 => '1 page',
-        1 => '{{count}} pages',
-    ),
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/common/page.config.php:70
+    #: config/common/page.config.php:75
     'This page exists in <strong>one context</strong>.' => array(
         0 => 'Cette page existe dans <strong>un contexte</strong>.',
         1 => 'Cette page existe dans <strong>{{context_count}} contextes</strong>.',
     ),
 
-    #: config/common/page.config.php:71
+    #: config/common/page.config.php:79
     'This page exists in <strong>one language</strong>.' => array(
         0 => 'Cette page existe dans <strong>une langue</strong>.',
         1 => 'Cette page existe dans <strong>{{language_count}} langues</strong>.',
     ),
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/common/page.config.php:80
+    #: config/common/page.config.php:85
     'This page has <strong>one sub-page</strong>.' => array(
         0 => 'Cette page a <strong>une sous-page</strong>.',
         1 => 'Cette page a <strong>{{children_count}} sous-pages</strong>.',
     ),
 
-    #: config/common/page.config.php:89
+    #: config/common/page.config.php:95
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => 'La page d’accueil ne peut être supprimée. Pour supprimer cette page, définissez d’abord une autre page comme page d’accueil.',
 
-    #: config/common/page.config.php:92
+    #: config/common/page.config.php:98
     'You can’t delete this page. It is locked.' => 'Vous ne pouvez supprimer cette page. Elle est verrouillée.',
 
-    #: config/common/page.config.php:135
+    #: config/common/page.config.php:141
     'Visualise' => 'Visualiser',
 
-    #: config/common/page.config.php:154
+    #: config/common/page.config.php:160
     'Add a sub-page to this page' => 'Ajouter une sous-page à cette page',
 
-    #: config/common/page.config.php:169
+    #: config/common/page.config.php:175
     'Set as home page' => 'Définir comme page d’accueil',
 
-    #: config/common/page.config.php:196
+    #: config/common/page.config.php:202
     'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => 'C’est frustrant, il est vrai, mais vous ne pouvez définir une page comme page d’accueil uniquement quand une seule langue est affichée. Sélectionnez une langue dans la liste déroulante en haut à droite.',
 
-    #: config/common/page.config.php:198
+    #: config/common/page.config.php:204
     'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => 'C’est frustrant, il est vrai, mais vous ne pouvez définir une page comme page d’accueil uniquement quand un seul contexte est affiché. Sélectionnez une langue dans la liste déroulante en haut à droite.',
 
-    #: config/common/page.config.php:206
+    #: config/common/page.config.php:212
     'You cannot set this page as home page because it isn’t published. Publish it first.' => 'Vous ne pouvez définir cette page comme page d’accueil, car elle doit être d’abord être publiée.',
 
-    #: config/common/page.config.php:209
+    #: config/common/page.config.php:215
     'This page is the home page already.' => 'Cette page est déjà la page d\'accueil.',
 
-    #: config/common/page.config.php:229
+    #: config/common/page.config.php:235
     'Renew pages’ cache' => 'Régénérer le cache des pages',
 
 );

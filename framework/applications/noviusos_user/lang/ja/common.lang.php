@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 56 out of 56 messages are translated (100%).
-// 246 out of 246 words are translated (100%).
+// 55 out of 56 messages are translated (98%).
+// 243 out of 245 words are translated (98%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -33,15 +33,30 @@ return array(
     #: classes/controller/admin/role.ctrl.php:29
     'OK, permissions saved.' => 'はい、権限が保存されました。',
 
-    #: views/admin/user_details_edit.view.php:29
+    #: views/admin/user_details_edit.view.php:27
     'Details' => '詳細',
 
-    #: views/admin/user_details_edit.view.php:38
-    #: views/admin/user_add.view.php:46
+    #: views/admin/user_details_edit.view.php:36
+    #: views/admin/user_add.view.php:45
     'Roles' => 'ロール（権限グループ）',
 
-    #: views/admin/user_details_edit.view.php:46
+    #: views/admin/user_details_edit.view.php:44
     'Set a new password' => 'パスワードを更新する',
+
+    #: views/admin/password_strength.view.php:14
+    'Insufficient' => '不十分',
+
+    #: views/admin/password_strength.view.php:15
+    'Weak' => '弱',
+
+    #: views/admin/password_strength.view.php:16
+    'Average' => '中',
+
+    #: views/admin/password_strength.view.php:17
+    'Strong' => '良',
+
+    #: views/admin/password_strength.view.php:18
+    'Outstanding' => '最良',
 
     #: views/admin/user_edit.view.php:38
     'User details' => 'ユーザーの詳細情報',
@@ -49,46 +64,23 @@ return array(
     #: views/admin/user_edit.view.php:39
     'Permissions' => '権限',
 
-    #. Password strength
-    #: views/admin/user_edit.view.php:91
-    #: views/admin/account.view.php:95
-    #: views/admin/user_add.view.php:75
-    'Insufficient' => '不十分',
-
-    #: views/admin/user_edit.view.php:92
-    #: views/admin/account.view.php:96
-    #: views/admin/user_add.view.php:76
-    'Weak' => '弱',
-
-    #: views/admin/user_edit.view.php:93
-    #: views/admin/account.view.php:97
-    #: views/admin/user_add.view.php:77
-    'Average' => '中',
-
-    #: views/admin/user_edit.view.php:94
-    #: views/admin/account.view.php:98
-    #: views/admin/user_add.view.php:78
-    'Strong' => '良',
-
-    #: views/admin/user_edit.view.php:95
-    #: views/admin/account.view.php:99
-    #: views/admin/user_add.view.php:79
-    'Outstanding' => '最良',
-
     #: views/admin/user_roles_edit.view.php:35
     'View and edit permissions' => 'パーミッションを閲覧／編集',
 
-    #: views/admin/account.view.php:30
+    #: views/admin/account.view.php:14
+    'Save' => '',
+
+    #: views/admin/account.view.php:32
     'Sign out (see you!)' => 'ログアウトします。それではまた。',
 
-    #: views/admin/account.view.php:42
+    #: views/admin/account.view.php:44
     'My account' => '私のアカウント',
 
-    #: views/admin/account.view.php:43
+    #: views/admin/account.view.php:45
     'Theme' => 'テーマ',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:47
+    #: config/common/user.config.php:50
     'Add a user' => 'ユーザーを追加',
 
     #: config/controller/admin/user.config.php:35
@@ -113,7 +105,7 @@ return array(
     #: config/controller/admin/user.config.php:97
     'Password:' => 'パスワード:',
 
-    #: config/controller/admin/user.config.php:115
+    #: config/controller/admin/user.config.php:114
     'Password (confirmation):' => 'パスワード (確認):',
 
     #: config/controller/admin/inspector/role.config.php:22
@@ -121,10 +113,10 @@ return array(
     'Role' => 'ロール（権限グループ）',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:34
+    #: config/common/role.config.php:37
     'Add a role' => 'ロールを追加',
 
-    #: config/controller/admin/role.config.php:41
+    #: config/controller/admin/role.config.php:40
     'Title' => 'タイトル',
 
     #: config/controller/admin/appdesk.config.php:26
@@ -133,16 +125,21 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'ユーザー',
 
-    #: config/controller/admin/appdesk.config.php:28
+    #: config/controller/admin/appdesk.config.php:29
+    '1 user' => array(
+        0 => '',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:33
     'Showing 1 user out of {{y}}' => array(
         0 => '{{y}}人のユーザーのうち{{x}}人を表示しています',
     ),
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:36
     'No users' => 'ユーザー無し',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:38
     'Show all users' => '全てのユーザーを表示する',
 
     #: config/common/user.config.php:8
@@ -169,8 +166,7 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'ユーザー‘{{title}}’を削除します',
 
-    #. Delete action's labels
-    #: config/common/user.config.php:43
+    #: config/common/user.config.php:44
     'Yes, delete this user' => array(
         0 => 'はい、このユーザーを削除します',
     ),
@@ -193,8 +189,7 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'ロール{{title}}を削除します',
 
-    #. Delete action's labels
-    #: config/common/role.config.php:30
+    #: config/common/role.config.php:31
     'Yes, delete this role' => array(
         0 => 'はい、このロールを削除します',
     ),

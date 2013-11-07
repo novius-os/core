@@ -1,19 +1,23 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 97 out of 97 messages are translated (100%).
-// 554 out of 554 words are translated (100%).
+// 107 out of 108 messages are translated (99%).
+// 638 out of 641 words are translated (99%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
-    #: classes/controller/admin/media.ctrl.php:91
+    #: classes/controller/admin/media.ctrl.php:95
     'A file with the same name already exists.' => 'Un fichier avec le même nom existe déjà.',
 
     #: classes/controller/admin/attachment.ctrl.php:49
     #: classes/controller/admin/attachment.ctrl.php:55
-    #: classes/controller/admin/media.ctrl.php:103
-    #: classes/controller/admin/media.ctrl.php:124
+    #: classes/controller/admin/media.ctrl.php:107
+    #: classes/controller/admin/media.ctrl.php:128
+    #: classes/controller/admin/upload.ctrl.php:66
+    #: classes/controller/admin/upload.ctrl.php:70
+    #: classes/controller/admin/upload.ctrl.php:163
+    #: classes/controller/admin/upload.ctrl.php:170
     'You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.' => 'Il y a un souci&nbsp;: Votre Novius OS n’est pas autorisé à enregistrer des fichiers sur ce serveur. Demandez à votre développeur ou administrateur système de régler ce problème.',
 
     #: classes/controller/admin/attachment.ctrl.php:66
@@ -26,31 +30,42 @@ return array(
     'Change the file:' => 'Changer de fichier&nbsp;:',
 
     #: classes/controller/admin/media.ctrl.php:54
-    'Please pick a file from your hard drive.' => 'Merci de sélectionner un fichier sur votre disque dur.',
+    #: classes/controller/admin/upload.ctrl.php:44
+    'Please pick a file from your hard drive.' => 'Merci de sélectionner un fichier sur votre disque.',
 
-    #: classes/controller/admin/media.ctrl.php:63
+    #: classes/controller/admin/media.ctrl.php:61
+    'We’re afraid you’re not allowed to upload files this big. Don’t blame Novius OS though, your developer or system administrator are the ones who make the rules.' => '',
+
+    #: classes/controller/admin/media.ctrl.php:67
+    #: classes/controller/admin/upload.ctrl.php:80
     'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
+
+    #: classes/controller/admin/upload.ctrl.php:30
+    'Mass upload' => 'Import en masse',
+
+    #: classes/controller/admin/upload.ctrl.php:99
+    'Done! All files have been uploaded.' => 'C’est fait, tous les fichiers ont été importés.',
 
     #: classes/controller/admin/appdesk.ctrl.php:76
     'The cache has been renewed. All ready for you to enjoy!' => 'Et voici un beau cache tout neuf. Il vient d’être régénéré.',
 
-    #: classes/controller/admin/folder.ctrl.php:56
+    #: classes/model/folder.model.php:245
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'Voilà qui est étrange&nbsp;: Ce dossier devrait être vide et ne l’est pas. Merci de contacter votre développeur ou Novius OS pour régler ce problème. Nos excuses pour le désagrément occasionné.',
 
-    #: classes/renderer/media.php:76
+    #: classes/renderer/media.php:34
     'Image from the Media Centre' => 'Image de la Médiathèque',
 
-    #: classes/renderer/media.php:78
+    #: classes/renderer/media.php:36
     'Pick an image' => 'Sélectionner une image',
 
-    #: classes/renderer/media.php:79
+    #: classes/renderer/media.php:37
     #: views/admin/wysiwyg_image.view.php:29
     'Pick another image' => 'Sélectionner une autre image',
 
-    #: classes/renderer/media.php:80
+    #: classes/renderer/media.php:38
     'No image' => 'Pas d’image',
 
-    #: classes/renderer/media.php:81
+    #: classes/renderer/media.php:39
     'This extension is not allowed.' => 'Cette extension n’est pas autorisée.',
 
     #: views/admin/permissions/folders.view.php:14
@@ -68,13 +83,13 @@ return array(
     #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'Ce média n’est utilisé nulle part et peut ainsi être supprimé sans problème.',
 
-    #: views/admin/media_delete.view.php:26
+    #: views/admin/media_delete.view.php:27
     'The media is used <strong>once</strong> by an application.' => array(
         0 => 'Ce média est utilisé <strong>une fois</strong> par une application.',
         1 => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
     ),
 
-    #: views/admin/media_delete.view.php:32
+    #: views/admin/media_delete.view.php:36
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -95,9 +110,9 @@ return array(
     'Alternative text (for accessibility):' => 'Texte alternatif (pour l’accessibilité)&nbsp;:',
 
     #: views/admin/wysiwyg_image.view.php:44
-    #: views/admin/media_edit.view.php:49
-    #: views/admin/media_add.view.php:33
-    #: views/admin/attachment.view.php:46
+    #: views/admin/media_edit.view.php:55
+    #: views/admin/media_add.view.php:39
+    #: views/admin/attachment.view.php:49
     #: views/admin/folder.view.php:47
     'Use title' => 'Reprendre le titre',
 
@@ -128,11 +143,49 @@ return array(
     #: views/admin/wysiwyg_image.view.php:76
     'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Voilà qui est inhabituel&nbsp;: Il semble qu’aucune image n’ait été sélectionnée. Merci de ré-essayer. Contactez votre développeur ou Novius OSsi le problème persiste. Nos excuses pour le désagrément occasionné.',
 
-    #: views/admin/media_edit.view.php:56
+    #: views/admin/upload.view.php:24
+    'Files from your hard drive:' => 'Fichiers sur votre disque dur&nbsp;:',
+
+    #: views/admin/upload.view.php:30
+    'Unzip (both files and folders)' => 'Dézipper (fichiers et dossiers)',
+
+    #: views/admin/upload.view.php:31
+    'Leave unzipped' => 'Ne pas dézipper',
+
+    #: views/admin/upload.view.php:34
+    'What to do with ZIP files:' => 'Que faire avec les fichiers ZIP&nbsp;:',
+
+    #: views/admin/upload.view.php:41
+    'Select a folder where to put your media files:' => 'Sélectionner un dossier où ranger vos médias&nbsp;:',
+
+    #. Note to translator: This is a submit button
+    #: views/admin/upload.view.php:48
+    #: views/admin/attachment.view.php:19
+    'Add' => 'Ajouter',
+
+    #: views/admin/upload.view.php:73
+    'Hold the Ctrl/Cmd key to select multiple files.' => 'Maintenir la touche Ctrl/Cmd enfoncée pour sélectionner plusieurs fichiers.',
+
+    #: views/admin/upload.view.php:83
+    'Total files size must not exceed {{size}}.' => 'La somme des fichiers ne doit pas dépasser {{size}}.',
+
+    #: views/admin/upload.view.php:83
+    #: views/admin/media_edit.view.php:50
+    #: views/admin/media_add.view.php:30
+    'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
+
+    #: views/admin/upload.view.php:108
+    'Total files size exceeds the upload limit {{size}}.' => 'La somme des fichiers dépasse la limite {{size}}.',
+
+    #: views/admin/media_edit.view.php:50
+    #: views/admin/media_add.view.php:30
+    'The file size must not exceed {{size}}.' => '',
+
+    #: views/admin/media_edit.view.php:62
     #: config/controller/admin/appdesk.config.php:50
     'File size:' => 'Taille du fichier&nbsp;:',
 
-    #: views/admin/media_edit.view.php:63
+    #: views/admin/media_edit.view.php:69
     #: config/controller/admin/appdesk.config.php:53
     'Dimensions:' => 'Dimensions&nbsp;:',
 
@@ -145,7 +198,7 @@ return array(
         1 => 'Il y a <strong>{{count}} médias</strong> dans ce dossier.',
     ),
 
-    #: views/admin/folder_delete.view.php:32
+    #: views/admin/folder_delete.view.php:33
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Oui, je veux supprimer ce dossier et les {{count}} médias qu’il contient.',
 
     #: views/admin/folder.view.php:51
@@ -185,8 +238,8 @@ return array(
     #: config/controller/admin/inspector/extension.config.php:47
     'Others' => 'Autres',
 
-    #: config/controller/admin/inspector/extension.config.php:87
-    #: config/controller/admin/inspector/extension.config.php:92
+    #: config/controller/admin/inspector/extension.config.php:86
+    #: config/controller/admin/inspector/extension.config.php:91
     'Types' => 'Types',
 
     #: config/controller/admin/attachment.config.php:25
@@ -197,12 +250,8 @@ return array(
     #: config/controller/admin/media.config.php:65
     'SEO, Media URL:' => 'Référencement, URL du média&nbsp;:',
 
-    #. Note to translator: This is a submit button
-    #: config/controller/admin/attachment.config.php:45
-    'Add' => 'Ajouter',
-
     #: config/controller/admin/folder.config.php:20
-    #: config/common/folder.config.php:42
+    #: config/common/folder.config.php:45
     'Add a folder' => 'Ajouter un dossier',
 
     #: config/controller/admin/folder.config.php:42
@@ -210,14 +259,14 @@ return array(
 
     #. Note to translator: This is a placeholder, i.e. a field’s label shown within the field
     #: config/controller/admin/folder.config.php:48
-    #: config/common/media.config.php:47
+    #: config/common/media.config.php:50
     'Title' => 'Titre',
 
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'Référencement, URL du dossier&nbsp;:',
 
     #: config/controller/admin/media.config.php:20
-    #: config/common/media.config.php:118
+    #: config/common/media.config.php:121
     'Add a media file' => 'Ajouter un média',
 
     #: config/controller/admin/media.config.php:53
@@ -245,23 +294,32 @@ return array(
     #: config/controller/admin/appdesk.config.php:98
     'media files' => 'médias',
 
-    #: config/controller/admin/appdesk.config.php:99
-    'Showing 1 media file out of {{y}}' => array(
-        '1 média sur {{y}} affiché',
-        '{{x}} médias sur {{y}} affichés',
+    #: config/controller/admin/appdesk.config.php:100
+    '1 media file' => array(
+        0 => '',
+        1 => '',
     ),
 
-    #: config/controller/admin/appdesk.config.php:101
+    #: config/controller/admin/appdesk.config.php:104
+    'Showing 1 media file out of {{y}}' => array(
+        0 => '1 média sur {{y}} affiché',
+        1 => '{{x}} médias sur {{y}} affichés',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:107
     'No media files' => 'Pas de média',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:103
+    #: config/controller/admin/appdesk.config.php:109
     'Show all media files' => 'Afficher tous les médias',
 
-    #: config/controller/admin/appdesk.config.php:105
+    #: config/controller/admin/appdesk.config.php:111
     'Pick' => 'Choisir',
 
-    #: config/controller/admin/appdesk.config.php:123
+    #: config/controller/admin/appdesk.config.php:129
+    'Add many files at once' => 'Ajouter plusieurs fichiers d’un coup',
+
+    #: config/controller/admin/appdesk.config.php:142
     'Renew media cache' => 'Régénérer le cache média',
 
     #. Crud
@@ -282,23 +340,22 @@ return array(
     #: config/common/folder.config.php:35
     'Deleting the folder ‘{{title}}’' => 'Supprimer le dossier «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/folder.config.php:38
+    #: config/common/folder.config.php:39
     'Yes, delete this folder' => array(
         0 => 'Oui, supprimer ce dossier',
         1 => 'Oui, supprimer ces {{count}} dossiers',
     ),
 
-    #: config/common/folder.config.php:53
+    #: config/common/folder.config.php:56
     'You can’t edit the root folder.' => 'Vous ne pouvez modifier le dossier racine.',
 
-    #: config/common/folder.config.php:62
+    #: config/common/folder.config.php:65
     'You can’t delete the root folder.' => 'Vous ne pouvez supprimer le dossier racine.',
 
-    #: config/common/folder.config.php:69
+    #: config/common/folder.config.php:72
     'Add a media file in this folder' => 'Ajouter un média dans ce dossier',
 
-    #: config/common/folder.config.php:88
+    #: config/common/folder.config.php:91
     'Add a sub-folder to this folder' => 'Ajouter un sous-dossier dans ce dossier',
 
     #. Crud
@@ -319,31 +376,16 @@ return array(
     #: config/common/media.config.php:39
     'Deleting the media ‘{{title}}’' => 'Supprimer le média «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/media.config.php:42
+    #: config/common/media.config.php:43
     'Yes, delete this media file' => array(
         0 => 'Oui, supprimer ce média',
         1 => 'Oui, supprimer ces {{count}} médias',
     ),
 
-        #: config/common/media.config.php:59
+    #: config/common/media.config.php:62
     'Extension' => 'Extension',
 
-    #: config/common/media.config.php:134
+    #: config/common/media.config.php:137
     'Visualise' => 'Visualiser',
 
-    'Mass upload' => 'Import en masse',
-    'Please pick a file from your hard drive.' => 'Merci de sélectionner un fichier sur votre disque.',
-    'This extension is not allowed due to security reasons.' => 'Cette extension n’est pas autorisée pour des raisons de sécurité.',
-    'Done! All files have been uploaded.' => 'C’est fait, tous les fichiers ont été importés.',
-    'Add many files at once' => 'Ajouter plusieurs fichiers d’un coup',
-    'Files from your hard drive:' => 'Fichiers sur votre disque dur&nbsp;:',
-    'Unzip (both files and folders)' => 'Dézipper (fichiers et dossiers)',
-    'Leave unzipped' => 'Ne pas dézipper',
-    'What to do with ZIP files:' => 'Que faire avec les fichiers ZIP&nbsp;:',
-    'Select a folder where to put your media files:' => 'Sélectionner un dossier où ranger vos médias&nbsp;:',
-    'Hold the Ctrl/Cmd key to select multiple files.' => 'Maintenir la touche Ctrl/Cmd enfoncée pour sélectionner plusieurs fichiers.',
-    'Total files size must not exceed {{size}}.' => 'La somme des fichiers ne doit pas dépasser {{size}}.',
-    'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
-    'Total files size exceeds the upload limit {{size}}.' => 'La somme des fichiers dépasse la limite {{size}}.',
 );
