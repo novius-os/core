@@ -59,6 +59,21 @@ class I18n
         'sl' => 'Slovenian',
     );
 
+    private static $plural_rules = array(
+        'Default' => '$n != 1 ? 1 : 0',
+        'Asian' => '0',
+        'Zero singular' => '$n > 1 ? 1 : 0',
+        'Latvian' => '$n%10 == 1 && $n%100 != 11 ? 0 : $n != 0 ? 1 : 2',
+        'Gaeilge' => '$n == 1 ? 0 : $n == 2 ? 1 : 2',
+        'Romanian' => '$n == 1 ? 0 : ($n == 0 || ($n%100 > 0 && $n%100 < 20)) ? 1 : 2',
+        'Lithuanian' => '$n%10 == 1 && $n%100 != 11 ? 0 : $n%10 >= 2 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2',
+        'Russian' =>
+            '$n%10 == 1 && $n%100 != 11 ? 0 : $n%10 >= 2 && $n%10 <= 4 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2',
+        'Czech' => '($n == 1) ? 0 : ($n >= 2 && $n <= 4) ? 1 : 2',
+        'Polish' => '$n == 1 ? 0 : $n%10 >= 2 && $n%10 <= 4 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2',
+        'Slovenian' => '$n%100 == 1 ? 0 : $n%100 == 2 ? 1 : $n%100 == 3 || $n%100 == 4 ? 2 : 3',
+    );
+
     private static $locale_plural = array();
 
     public static function _init()
@@ -246,58 +261,32 @@ class I18n
         return $result;
     }
 
-    protected static function pluralKey($n)
+    public static function pluralKey($n)
     {
         if (!isset(static::$locale_plural[static::$_locale])) {
-            $plurals = array(
-                'Default' => function ($n) {
-                    return $n != 1 ? 1 : 0;
-                },
-                'Asian' => function () {
-                    return 0;
-                },
-                'Zero singular' => function ($n) {
-                    return $n > 1 ? 1 : 0;
-                },
-                'Latvian' => function ($n) {
-                    return $n%10 == 1 && $n%100 != 11 ? 0 : $n != 0 ? 1 : 2;
-                },
-                'Gaeilge' => function ($n) {
-                    return $n == 1 ? 0 : $n == 2 ? 1 : 2;
-                },
-                'Romanian' => function ($n) {
-                    return $n == 1 ? 0 : ($n == 0 || ($n%100 > 0 && $n%100 < 20)) ? 1 : 2;
-                },
-                'Lithuanian' => function ($n) {
-                    return $n%10 == 1 && $n%100 != 11 ? 0 : $n%10 >= 2 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2;
-                },
-                'Russian' => function ($n) {
-                    return $n%10 == 1 && $n%100 != 11 ? 0 : $n%10 >= 2 && $n%10 <= 4 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2;
-                },
-                'Czech' => function ($n) {
-                    return ($n == 1) ? 0 : ($n >= 2 && $n <= 4) ? 1 : 2;
-                },
-                'Polish' => function ($n) {
-                    return $n == 1 ? 0 : $n%10 >= 2 && $n%10 <= 4 && ($n%100 < 10 || $n%100 >= 20) ? 1 : 2;
-                },
-                'Slovenian' => function ($n) {
-                    return $n%100 == 1 ? 0 : $n%100 == 2 ? 1 : $n%100 == 3 || $n%100 == 4 ? 2 : 3;
-                },
-            );
+            $rule = static::pluralRule(static::$_locale);
 
-            if (isset(static::$plural_expressions[static::$_locale])) {
-                static::$locale_plural[static::$_locale] = $plurals[static::$plural_expressions[static::$_locale]];
-            } else {
-                $lang = substr(static::$_locale, 0, 2);
-                if (isset(static::$plural_expressions[$lang])) {
-                    static::$locale_plural[static::$_locale] = $plurals[static::$plural_expressions[$lang]];
-                } else {
-                    static::$locale_plural[static::$_locale] = $plurals['Default'];
-                }
-            }
+            static::$locale_plural[static::$_locale] = function ($n) use ($rule) {
+                return eval('return '.$rule.';');
+            };
         }
 
         return call_user_func(static::$locale_plural[static::$_locale], $n);
+    }
+
+    public static function pluralRule($locale)
+    {
+        if (isset(static::$plural_expressions[$locale])) {
+            $rule = static::$plural_rules[static::$plural_expressions[$locale]];
+        } else {
+            $lang = substr($locale, 0, 2);
+            if (isset(static::$plural_expressions[$lang])) {
+                $rule = static::$plural_rules[static::$plural_expressions[$lang]];
+            } else {
+                $rule = static::$plural_rules['Default'];
+            }
+        }
+        return $rule;
     }
 
     /**

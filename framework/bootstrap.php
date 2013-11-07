@@ -100,7 +100,7 @@ function __($message, $default = null)
     return \Nos\I18n::translate_from_file($dbg[$i]['file'], $message, $default);
 }
 
-function n__($singular, $plural, $n)
+function n__($singular, $plural, $n = false)
 {
     $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     $i = -1;
@@ -108,7 +108,11 @@ function n__($singular, $plural, $n)
         $function = $dbg[++$i]['function'];
     } while ($function == '{closure}');
 
-    return \Nos\I18n::nTranslateFromFile($dbg[$i]['file'], $singular, $plural, $n);
+    if ($n === false) {
+        return \Nos\I18n::translate_from_file($dbg[$i]['file'], $singular, $singular);
+    } else {
+        return \Nos\I18n::nTranslateFromFile($dbg[$i]['file'], $singular, $plural, $n);
+    }
 }
 
 function ___($group, $message, $default = null)

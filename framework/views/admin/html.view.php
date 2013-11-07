@@ -469,8 +469,12 @@ if ($assets_minified) {
     require(['jquery-nos'], function($) {
         $.nosLang = '<?php
             $user = \Session::user();
-            echo !empty($user) ? $user->user_lang : \Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
+            $locale = !empty($user) ?
+                $user->user_lang :
+                \Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB'));
+            echo $locale;
             ?>';
+        $.nosLangPluralRule = <?= \Format::forge(\Nos\I18n::pluralRule($locale))->to_json() ?>;
         $.nosTexts = $.extend($.nosTexts, {
             chooseMediaFile : <?= \Format::forge(__('Select a media file'))->to_json() ?>,
             chooseMediaImage : <?= \Format::forge(__('Pick an image'))->to_json() ?>,
