@@ -69,6 +69,7 @@ if (!MBSTRING) {
         'Generate' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'generate.php',
         'Image' => FUEL_EXTEND_PATH.'image.php',
         'Image_Driver' => FUEL_EXTEND_PATH.'image'.DIRECTORY_SEPARATOR.'driver.php',
+        'Image_Noop' => FUEL_EXTEND_PATH.'image'.DIRECTORY_SEPARATOR.'noop.php',
         'Log' => FUEL_EXTEND_PATH.'log.php',
         'Migrate' => FUEL_EXTEND_PATH.'migrate.php',
         'Module' => FUEL_EXTEND_PATH.'module.php',
