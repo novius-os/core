@@ -31,6 +31,7 @@ return array(
                 return $query;
             },
         ),
+        'order_by' => array('media_id' => 'DESC'),
     ),
     'search_text' => 'media_title',
     'inspectors' => array(
