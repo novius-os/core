@@ -127,32 +127,44 @@ if (!in_array($context, $possible)) {
 require(['jquery-nos'], function ($) {
     $(function () {
         var $container = $('#<?= $uniqid ?>').nosFormUI();
+        var $wijmenu = $container.find('ul.wijmenu');
         $container.find('.buttonset').buttonset();
-        $container.find('ul.wijmenu').wijmenu({
-            orientation: 'vertical',
-            animation: {
-                animated:"slide",
-                option: {
-                    direction: "up"
+        $container.find('ul.wijmenu')
+            .wijmenu({
+                orientation: 'vertical',
+                animation: {
+                    animated:"slide",
+                    option: {
+                        direction: "up"
+                    },
+                    duration: 50,
+                    easing: null
                 },
-                duration: 50,
-                easing: null
-            },
-            hideAnimation: {
-                animated:"slide",
-                option: {
-                    direction: "up"
+                hideAnimation: {
+                    animated:"slide",
+                    option: {
+                        direction: "up"
+                    },
+                    duration: 0,
+                    easing: null
                 },
-                duration: 0,
-                easing: null
-            },
-            direction: 'rtl',
-            trigger: '#<?= $uniqid_wijmenu ?>',
-            select: function(e, data) {
-                $('#<?= $uniqid_create_from_id ?>').val($(data.item.element).data('create_from_id'));
-                $container.find('form').submit();
-            }
-        });
+                direction: 'rtl',
+                trigger: '#<?= $uniqid_wijmenu ?>',
+                shown: function (event, item) {
+                    var $contextMenu = $(item.element);
+                    $contextMenu.parent()
+                        .css({
+                            maxHeight: '200px',
+                            width: $contextMenu.outerWidth(true) + 20,
+                            overflowY: 'auto',
+                            overflowX: 'hidden'
+                        })
+                },
+                select: function(e, data) {
+                    $('#<?= $uniqid_create_from_id ?>').val($(data.item.element).data('create_from_id'));
+                    $container.find('form').submit();
+                }
+            });
         $container.find('form').submit(function(e) {
             e.preventDefault();
             var $form = $(this);

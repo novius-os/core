@@ -50,6 +50,16 @@ define('jquery-nos-layout-standard',
                                 direction: 'rtl',
                                 triggerEvent: "click",
                                 trigger: '#' + id + 'context',
+                                shown: function (event, item) {
+                                    var $contextMenu = $(item.element);
+                                    $contextMenu.parent()
+                                        .css({
+                                            maxHeight: '200px',
+                                            width: $contextMenu.outerWidth(true) + 20,
+                                            overflowY: 'auto',
+                                            overflowX: 'hidden'
+                                        })
+                                },
                                 select: function(e, data) {
                                     var $li = $(data.item.element),
                                         context = $li.data('context'),
