@@ -37,7 +37,7 @@ class Nos
     /**
      * Returns the controller instance from the main request
      *
-     * @return \Nos\Controller
+     * @return Controller | Controller_Front
      */
     public static function main_controller()
     {
@@ -45,11 +45,12 @@ class Nos
     }
 
     /**
+     * Execute a HMVC request
      *
-     * @param string  $where  Route for the request
-     * @param array   $args   The method parameters
-     * @param boolean $inline true  will execute the controller's action directly
-     *                           false will writes the function call and include it
+     * @param string $where  Route for the request
+     * @param array $args   The method parameters
+     * @throws \Exception|NotFoundException
+     * @throws \Exception|FrontIgnoreTemplateException
      * @return string
      */
     public static function hmvc($where, $args = null)
@@ -100,7 +101,6 @@ class Nos
      * Parse a wyiswyg
      *
      * @param  string          $content    Wysiwyg content to parse
-     * @param  \Nos\Controller $controller Context for the execution
      * @return string
      */
     public static function parse_wysiwyg($content)
