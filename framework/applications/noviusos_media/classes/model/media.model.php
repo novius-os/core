@@ -189,6 +189,7 @@ class Model_Media extends \Nos\Orm\Model
             is_dir($path_public_cache) and \File::delete_dir($path_public_cache, true, true);
             is_dir($path_private_cache) and \File::delete_dir($path_private_cache, true, true);
         } catch (\Exception $e) {
+            \Log::exception($e, 'Error while deleting the cache of media '.$this->media_id.'. ');
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
                 throw $e;
             }

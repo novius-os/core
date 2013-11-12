@@ -137,6 +137,7 @@ class Controller_Admin_Account extends \Nos\Controller_Admin_Application
                             $user->user_configuration = serialize($configuration);
                             $user->save();
                         } catch (\Exception $e) {
+                            \Log::exception($e, 'Error during the registration of the account setup. ');
                             $error = \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.');
                         }
 

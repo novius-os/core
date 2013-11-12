@@ -360,6 +360,7 @@ class FrontCache
             try {
                 \File::delete_dir($path, true, true);
             } catch (\Exception $e) {
+                \Log::exception($e, 'Error while deleting the directory "'.$path.'" cache. ');
             }
         }
 
@@ -368,6 +369,7 @@ class FrontCache
             try {
                 \File::delete_dir($this->_path_suffix, true, true);
             } catch (\Exception $e) {
+                \Log::exception($e, 'Error while deleting the suffix directory "'.$this->_path_suffix.'" cache. ');
             }
         }
     }
