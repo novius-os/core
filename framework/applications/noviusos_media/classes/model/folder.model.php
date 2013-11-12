@@ -169,7 +169,7 @@ class Model_Folder extends \Nos\Orm\Model
                 is_dir($path_private_cache) and \File::create($path_private_cache, '.gitkeep');
             }
         } catch (\Exception $e) {
-            \Log::exception($e, 'Error while deleting the cache of folder '.$this->medif_id.'. ');
+            \Log::exception($e, 'Error while deleting the cache of folder '.$this->medif_id.' ('.$dir_path.'). ');
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
                 throw $e;
             }
