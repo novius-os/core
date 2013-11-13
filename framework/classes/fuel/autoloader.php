@@ -123,6 +123,13 @@ class Autoloader extends Fuel\Core\Autoloader
 
 
     protected static $class_aliases = array();
+
+    /**
+     * Create a class alias
+     *
+     * @param string   $class Class to be aliased
+     * @param string   $alias Alias
+     */
     public static function addClassAlias($class, $alias = null)
     {
         if ($alias === null) {
@@ -131,11 +138,25 @@ class Autoloader extends Fuel\Core\Autoloader
         static::$class_aliases[$alias] = $class;
     }
 
+    /**
+     * Get a class' alias
+     *
+     * @param  string       $class
+     * @return bool|string  false if no class alias available, otherwise the class alias
+     */
     public static function getClassAliases($class)
     {
         return isset(static::$class_aliases[$class]) ? static::$class_aliases[$class] : false;
     }
 
+    /**
+     * Generate a customized namespace for files such as tasks or migrations
+     *
+     * @param $name        : application / package name
+     * @param $type        : local, module or package
+     * @param $suffix      : namespace suffix
+     * @return bool|string : false if no associated namespace, otherwise generated suffix
+     */
     public static function generateSuffixedNamespace($name, $type, $suffix)
     {
         if ($name == 'nos' && $type == 'package') {
