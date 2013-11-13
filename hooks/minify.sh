@@ -31,6 +31,21 @@ then
   git add static/admin/vendor/tinymce/themes/nos/editor_template.js
 fi
 
+re="static/admin/vendor/tinymce/plugins/nos"
+if [[ $files =~ $re ]]
+then
+  ./hooks/minify-nos-tinyplugins.sh
+  git add static/admin/vendor/tinymce/plugins/nosalign/*
+  git add static/admin/vendor/tinymce/plugins/nosbrclearall/*
+  git add static/admin/vendor/tinymce/plugins/nosenhancer/*
+  git add static/admin/vendor/tinymce/plugins/nosimage/*
+  git add static/admin/vendor/tinymce/plugins/noslink/*
+  git add static/admin/vendor/tinymce/plugins/nospaste/*
+  git add static/admin/vendor/tinymce/plugins/nosstyleselect/*
+  git add static/admin/vendor/tinymce/plugins/nostoolbartoggle/*
+  git add static/admin/vendor/tinymce/plugins/nosvisualhtml/*
+fi
+
 re1="static/admin/vendor/jquery/*"
 re2="static/admin/vendor/jquery-ui/*"
 re3="static/admin/vendor/wijmo/*"
