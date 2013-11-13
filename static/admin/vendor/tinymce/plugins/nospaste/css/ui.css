@@ -1,0 +1,7 @@
+span.mce_pastebouton {
+	background : url(../img/pastebutton.png)  no-repeat 1px 1px !important;
+}
+
+span.mce_pastehtml {
+    background : url(../img/pastehtml.png) no-repeat 1px 1px !important;
+}

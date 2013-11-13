@@ -18,6 +18,8 @@
             self.editor = ed;
             self.url = url;
 
+            tinymce.DOM.loadCSS(url + '/css/ui.css');
+
             ed.addCommand('nosPasteHtml', function(ui, metadata, edit) {
                 self._nosPasteHtml(ui, metadata, edit);
             });
@@ -30,7 +32,7 @@
                 c = cm.createSplitButton('paste', {
                     title : 'nospaste.paste_desc',
                     cmd : 'nosPaste',
-                    'class' : 'mcePasteBouton'
+                    'class' : 'mce_pastebouton'
                 });
 
                 c.onRenderMenu.add(function(c, m) {
