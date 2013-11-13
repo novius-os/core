@@ -18,21 +18,21 @@
             self.editor = ed;
 
             self.nosstyleselect_formats = ed.getParam('nosstyleselect_formats', [
-                { block : 'p', title : 'nos.paragraph'},
-                { block : 'address', title : 'nos.address'},
-                { block : 'pre', title : 'nos.pre'},
-                { block : 'h1', title : 'nos.h1'},
-                { block : 'h2', title : 'nos.h2'},
-                { block : 'h3', title : 'nos.h3'},
-                { block : 'h4', title : 'nos.h4'},
-                { block : 'h5', title : 'nos.h5'},
-                { block : 'h6', title : 'nos.h6'},
-                { block : 'div', title : 'nos.div'},
-                { block : 'blockquote', title : 'nos.blockquote'},
-                { block : 'code', title : 'nos.code'},
-                { block : 'dt', title : 'nos.dt'},
-                { block : 'dd', title : 'nos.dd'},
-                { block : 'samp', title : 'nos.samp'}
+                { block : 'p', title : 'nosstyleselect.paragraph'},
+                { block : 'address', title : 'nosstyleselect.address'},
+                { block : 'pre', title : 'nosstyleselect.pre'},
+                { block : 'h1', title : 'nosstyleselect.h1'},
+                { block : 'h2', title : 'nosstyleselect.h2'},
+                { block : 'h3', title : 'nosstyleselect.h3'},
+                { block : 'h4', title : 'nosstyleselect.h4'},
+                { block : 'h5', title : 'nosstyleselect.h5'},
+                { block : 'h6', title : 'nosstyleselect.h6'},
+                { block : 'div', title : 'nosstyleselect.div'},
+                { block : 'blockquote', title : 'nosstyleselect.blockquote'},
+                { block : 'code', title : 'nosstyleselect.code'},
+                { block : 'dt', title : 'nosstyleselect.dt'},
+                { block : 'dd', title : 'nosstyleselect.dd'},
+                { block : 'samp', title : 'nosstyleselect.samp'}
             ]);
 
             ed.onNodeChange.add(function(ed, cm, n, co, ob) {
