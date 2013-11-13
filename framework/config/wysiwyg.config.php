@@ -21,6 +21,14 @@ return array(
     'active_setup' => 'default',
 
     'setups' => array(
-        'default' => array(),
+        'default' => array(
+            'theme_advanced_toolbar_location' => 'external',
+
+            'theme_advanced_buttons1' => "tablecontrols",
+            'theme_advanced_buttons2' => "underline,strikethrough,sub,sup,|,forecolor,backcolor,|,outdent,indent,blockquote,|,anchor,charmap,hr,nonbreaking,nosbrclearall,|,styleprops,removeformat",
+            'theme_advanced_buttons3' => "search,replace,|,spellchecker,|,newdocument,nosvisualhtml,code",
+            'theme_advanced_buttons4' => "nosimage,nosmedia,noslink,nosenhancer",
+            'theme_advanced_buttons5' => "nosstyleselect,bold,italic,nosalign,bullist,numlist,|,cut,copy,nospaste,undo,redo,|,nostoolbartoggle",
+        ),
     ),
 );
