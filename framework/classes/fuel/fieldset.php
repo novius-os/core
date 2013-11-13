@@ -586,6 +586,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             }
 
         } catch (Exception $e) {
+            \Log::exception($e, 'Error while saving current item '.$item->id.'. ');
             if (is_callable($options['error'])) {
                 $json_response = call_user_func($options['error'], $e, $item, $data);
             } else {
