@@ -17,6 +17,8 @@
 
             self.editor = ed;
 
+            tinymce.DOM.loadCSS(url + '/css/ui.css');
+
             // Register commands
             ed.addCommand('mceNosLink', function(ui, metadata, edit) {
                 self._nosLink(ui, metadata, edit);
@@ -58,7 +60,7 @@
                     onclick: function(){
                         self.editor.execCommand('mceNosLink', true, '');
                     },
-                    'class' : 'mce_link'
+                    'class' : 'mce_noslink'
                 }, tinymce.ui.NosSplitButton);
 
                 c.onRenderMenu.add(function(c, m) {
