@@ -337,5 +337,5 @@ return array(
     'Right' => '右揃え',
     'Border:' => '枠線:',
     'Vertical space:' => '上下の余白:',
-    'Horizontale space:' => '左右の余白:',
+    'Horizontal space:' => '左右の余白:',
 );

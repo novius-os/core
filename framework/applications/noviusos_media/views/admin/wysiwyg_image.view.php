@@ -75,7 +75,7 @@ $id_properties = $uniqid.'_properties';
                     <td><input type="text" name="vspace" data-id="vspace" size="5" id="<?= $uniqid ?>_vspace" /></td>
                 </tr>
                 <tr>
-                    <th><label for="<?= $uniqid ?>_hspace"><?= __('Horizontale space:') ?> </label></th>
+                    <th><label for="<?= $uniqid ?>_hspace"><?= __('Horizontal space:') ?> </label></th>
                     <td><input type="text" name="hspace" data-id="hspace" size="5" id="<?= $uniqid ?>_hspace" /></td>
                 </tr>
                 <tr>

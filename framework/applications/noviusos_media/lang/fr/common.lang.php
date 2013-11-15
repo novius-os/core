@@ -352,5 +352,5 @@ return array(
     'Right' => 'Droite (flottant)',
     'Border:' => 'Bordure :',
     'Vertical space:' => 'Espacement vertical :',
-    'Horizontale space:' => 'Espacement horizontal :',
+    'Horizontal space:' => 'Espacement horizontal :',
 );
