@@ -95,7 +95,30 @@ define('jquery-nos-image-wysiwyg',
                                 }
                             }),
                         $alt = $container.find('input[data-id=alt]'),
-                        $style = $container.find('input[data-id=style]'),
+                        $align = $container.find('select[data-id=align]')
+                            .change(function() {
+                                updateStyle();
+                            }),
+                        $border = $container.find('input[data-id=border]')
+                            .change(function() {
+                                updateStyle();
+                            }),
+                        $vspace = $container.find('input[data-id=vspace]')
+                            .change(function() {
+                                updateStyle();
+                            }),
+                        $hspace = $container.find('input[data-id=hspace]')
+                            .change(function() {
+                                updateStyle();
+                            }),
+                        $style = $container.find('input[data-id=style]')
+                            .change(function() {
+                                var $img = $('<img style="' + $style.val() + '" />');
+                                $align.val(getAttrib($img, 'align'));
+                                $border.val(getAttrib($img, 'border'));
+                                $vspace.val(getAttrib($img, 'vspace'));
+                                $hspace.val(getAttrib($img, 'hspace'));
+                            }),
                         $proportional = $container.find('input[data-id=proportional]')
                             .change(function() {
                                 if ($proportional.is(':checked')) {
@@ -115,7 +138,106 @@ define('jquery-nos-image-wysiwyg',
                                 $title.triggerHandler('change');
                             }),
                         media = null,
-                        tinymce_image_select = function(media_json, image_dom) {
+                        updateStyle = function() {
+                                var v,
+                                    $img = $('<img style="' + $style.val() + '" />');
+
+                                // Handle align
+                                v = $align.val();
+                                if (v) {
+                                    if (v == 'left' || v == 'right') {
+                                        $img.css('float', v);
+                                        $img.css('vertical-align', '');
+                                    } else {
+                                        $img.css('vertical-align', v);
+                                        $img.css('float', '');
+                                    }
+                                } else {
+                                    $img.css('float', '');
+                                    $img.css('vertical-align', '');
+                                }
+
+                                // Handle border
+                                v = $border.val();
+                                if (v && v !== '0') {
+                                    $img.css('border-width', v + 'px');
+                                    if (!$img.css('border') && !$img.css('border-color') && !$img.css('border-style')) {
+                                        $img.css('border', v + 'px solid black');
+                                    }
+                                } else {
+                                    $img.css('border', '');
+                                }
+
+                                $img.css('margin', '');
+                                // Handle hspace
+                                v = $hspace.val();
+                                if (v && v !== '0') {
+                                    $img.css('margin-left', v + 'px');
+                                    $img.css('margin-right', v + 'px');
+                                }
+
+                                // Handle vspace
+                                v = $vspace.val();
+                                if (v && v !== '0') {
+                                    $img.css('margin-top', v + 'px');
+                                    $img.css('margin-bottom', v + 'px');
+                                }
+
+                                $style.val($img.attr('style'));
+                            },
+                        getAttrib = function(ele, attr) {
+                                var v, v2;
+
+                                switch (attr) {
+                                    case 'align':
+                                        v = $(ele).css('float');
+                                        if (v  && v != 'none') {
+                                            return v;
+                                        }
+                                        if (v = $(ele).css('vertical-align')) {
+                                            return v;
+                                        }
+                                        break;
+
+                                    case 'hspace':
+                                        v = $(ele).css('margin-left');
+                                        v2 = $(ele).css('margin-right');
+                                        if (v && v == v2) {
+                                            v = parseInt(v.replace(/[^0-9]/g, ''));
+                                            return v || '';
+                                        }
+                                        break;
+
+                                    case 'vspace':
+                                        v = $(ele).css('margin-top');
+                                        v2 = $(ele).css('margin-bottom');
+                                        if (v && v == v2) {
+                                            v = parseInt(v.replace(/[^0-9]/g, ''));
+                                            return v || '';
+                                        }
+                                        break;
+
+                                    case 'border':
+                                        v = 0;
+                                        $.each(['top', 'right', 'bottom', 'left'], function(i, val) {
+                                            val = $(ele).css('border-' + val + '-width');
+                                            if (!val || (val != v && v !== 0)) {
+                                                v = 0;
+                                                return false;
+                                            }
+                                            if (val) {
+                                                v = val;
+                                            }
+                                        });
+                                        if (v) {
+                                            v = parseInt(v.replace(/[^0-9]/g, ''));
+                                            return v || '';
+                                        }
+                                        break;
+                                }
+                                return '';
+                            },
+                    tinymce_image_select = function(media_json, image_dom) {
                                 media = media_json;
 
                                 if (media && media.thumbnail) {
@@ -128,6 +250,10 @@ define('jquery-nos-image-wysiwyg',
                                     $width.val(media_json.width);
                                     $title.val(media_json.title);
                                     $alt.val(media_json.title);
+                                    $align.val('');
+                                    $border.val('');
+                                    $vspace.val('');
+                                    $hspace.val('');
                                     $style.val('');
 
                                     $container.wijtabs('enableTab', 1)
@@ -140,7 +266,12 @@ define('jquery-nos-image-wysiwyg',
                                 $width.val(image_dom.attr('width'));
                                 $title.val(image_dom.attr('title'));
                                 $alt.val(image_dom.attr('alt'));
+                                $align.val(getAttrib(image_dom, 'align'));
+                                $border.val(getAttrib(image_dom, 'border'));
+                                $vspace.val(getAttrib(image_dom, 'vspace'));
+                                $hspace.val(getAttrib(image_dom, 'hspace'));
                                 $style.val(image_dom.attr('style'));
+                                updateStyle();
 
                                 if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {
                                     $proportional.prop('checked', false).change();
