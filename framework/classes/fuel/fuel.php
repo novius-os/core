@@ -25,4 +25,18 @@ class Fuel extends Fuel\Core\Fuel
         }
         return $protocol.'://'.\Input::server('http_host').'/';
     }
+
+    /**
+     * Cleans a file path so that it does not contain absolute file paths.
+     *
+     * @param   string  the filepath
+     * @return  string  the clean path
+     */
+    public static function clean_path($path)
+    {
+        $path = parent::clean_path($path);
+        static $search = array(NOSPATH, NOSROOT);
+        static $replace = array('NOSPATH/', 'NOSROOT/');
+        return str_ireplace($search, $replace, $path);
+    }
 }
