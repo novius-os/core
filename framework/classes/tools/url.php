@@ -69,13 +69,15 @@ class Tools_Url
     public static function encodePath($url)
     {
         $parse = parse_url($url);
-        $path = explode('/', $parse['path']);
-        foreach ($path as $i => $segment) {
-            if (urldecode($segment) === $segment) {
-                $path[$i] = urlencode($segment);
+        if (isset($parse['path'])) {
+            $path = explode('/', $parse['path']);
+            foreach ($path as $i => $segment) {
+                if (urldecode($segment) === $segment) {
+                    $path[$i] = urlencode($segment);
+                }
             }
+            $parse['path'] = implode('/', $path);
         }
-        $parse['path'] = implode('/', $path);
         return http_build_url($parse);
     }
 }
