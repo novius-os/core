@@ -36,7 +36,7 @@ $id_properties = $uniqid.'_properties';
         <div id="<?= $id_properties ?>">
             <table class="fieldset">
                 <tr>
-                    <td rowspan="6"><img /></td>
+                    <td rowspan="10"><img /></td>
                     <th><label for="<?= $uniqid ?>_title"><?= __('Title:') ?> </label></th>
                     <td><input type="text" name="title" data-id="title" size="30" id="<?= $uniqid ?>_title" /></td>
                 </tr>
@@ -51,6 +51,32 @@ $id_properties = $uniqid.'_properties';
                 <tr>
                     <th><label for="<?= $uniqid ?>_height"><?= __('Height:') ?> </label></th>
                     <td><input type="text" name="height" data-id="height" size="5" readonly id="<?= $uniqid ?>_height" /></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_align"><?= __('Alignment:') ?> </label></th>
+                    <td><select name="align" data-id="align" id="<?= $uniqid ?>_align">
+                        <option value=""></option>
+                        <option value="baseline"><?= __('Baseline') ?></option>
+                        <option value="top"><?= __('Top') ?></option>
+                        <option value="middle"><?= __('Middle') ?></option>
+                        <option value="bottom"><?= __('Bottom') ?></option>
+                        <option value="text-top"><?= __('Text Top') ?></option>
+                        <option value="text-bottom"><?= __('Text Bottom') ?></option>
+                        <option value="left"><?= __('Left') ?></option>
+                        <option value="right"><?= __('Right') ?></option>
+                    </select></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_border"><?= __('Border:') ?> </label></th>
+                    <td><input type="text" name="border" data-id="border" size="5" id="<?= $uniqid ?>_border" /></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_vspace"><?= __('Vertical space:') ?> </label></th>
+                    <td><input type="text" name="vspace" data-id="vspace" size="5" id="<?= $uniqid ?>_vspace" /></td>
+                </tr>
+                <tr>
+                    <th><label for="<?= $uniqid ?>_hspace"><?= __('Horizontal space:') ?> </label></th>
+                    <td><input type="text" name="hspace" data-id="hspace" size="5" id="<?= $uniqid ?>_hspace" /></td>
                 </tr>
                 <tr>
                     <th><label for="<?= $uniqid ?>_style"><?= __('Style:') ?> </label></th>

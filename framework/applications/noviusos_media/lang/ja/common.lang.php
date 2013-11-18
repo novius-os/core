@@ -326,4 +326,16 @@ return array(
     #: config/common/media.config.php:134
     'Visualise' => '閲覧',
 
+    'Alignment:' => '配置:',
+    'Baseline' => 'ベースライン揃え',
+    'Top' => '上揃え',
+    'Middle' => '中央揃え',
+    'Bottom' => '下揃え',
+    'Text Top' => 'テキストの上端揃え',
+    'Text Bottom' => 'テキストの下端揃え',
+    'Left' => '左揃え',
+    'Right' => '右揃え',
+    'Border:' => '枠線:',
+    'Vertical space:' => '上下の余白:',
+    'Horizontal space:' => '左右の余白:',
 );

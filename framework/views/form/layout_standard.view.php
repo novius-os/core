@@ -137,7 +137,7 @@ if (!empty($subtitle)) {
                 $field_template = str_replace(array('<tr>', '</tr>', '<td>', '</td>'), '', $field_template);
                 $field->set_template($field_template);
             }
-            $placeholder = is_array($field->label) ? $field->label['label'] : $field->label;
+            $placeholder = Arr::get($field->get_attribute(), 'placeholder', is_array($field->label) ? $field->label['label'] : $field->label);
             echo "\t\t<td>",
                 $field
                      ->set_attribute('placeholder', $placeholder)

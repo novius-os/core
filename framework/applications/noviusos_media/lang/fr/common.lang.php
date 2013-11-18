@@ -340,4 +340,17 @@ return array(
     'Total files size must not exceed {{size}}.' => 'La somme des fichiers ne doit pas dépasser {{size}}.',
     'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
     'Total files size exceeds the upload limit {{size}}.' => 'La somme des fichiers dépasse la limite {{size}}.',
+
+    'Alignment:' => 'Alignement :',
+    'Baseline' => 'Normal',
+    'Top' => 'En haut',
+    'Middle' => 'Au milieu',
+    'Bottom' => 'En bas',
+    'Text Top' => 'Texte en haut',
+    'Text Bottom' => 'Texte en bas',
+    'Left' => 'Gauche (flottant)',
+    'Right' => 'Droite (flottant)',
+    'Border:' => 'Bordure :',
+    'Vertical space:' => 'Espacement vertical :',
+    'Horizontal space:' => 'Espacement horizontal :',
 );
