@@ -138,12 +138,8 @@ if (!empty($subtitle)) {
                 $field->set_template($field_template);
             }
             $placeholder = Arr::get($field->get_attribute(), 'placeholder', is_array($field->label) ? $field->label['label'] : $field->label);
-            echo "\t\t<td>",
-                $field
-                     ->set_attribute('placeholder', $placeholder)
-                     ->set_attribute('title', $placeholder)
-                     ->build(),
-                "</td>\n";
+            $build = $field->set_attribute('placeholder', $placeholder)->set_attribute('title', $placeholder)->build();
+            echo "\t\t", (substr(ltrim($build), 0, 3) == '<td' ? $build : '<td>'.$build.'</td>'), "\n";
         }
         $fieldset->form()->set_config('field_template', "\t\t<tr><th class=\"{error_class}\">{label}{required}</th><td class=\"{error_class}\">{field} {error_msg}</td></tr>\n");
     }
