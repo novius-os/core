@@ -110,6 +110,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
             $page_enhanced = \Nos\Config_Data::get('page_enhanced', array());
 
             // The page should contain a valid enhancer for the current item
+            $page_contains_enhancer = false;
             foreach ($this->_properties['enhancers'] as $enhancer_name) {
                 $page_contains_enhancer = !empty($page_enhanced[$enhancer_name][$page_id]);
                 if ($page_contains_enhancer) {
