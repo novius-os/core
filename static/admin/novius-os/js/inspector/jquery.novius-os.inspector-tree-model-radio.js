@@ -43,7 +43,7 @@ define('jquery-nos-inspector-tree-model-radio',
                                 var match = {
                                     name : params.reloadEvent
                                 };
-                                if (connector.data('nosContext')) {
+                                if (params.contextChange && connector.data('nosContext')) {
                                     match['context'] = connector.data('nosContext');
                                 }
                                 container.nosListenEvent(match, function() {

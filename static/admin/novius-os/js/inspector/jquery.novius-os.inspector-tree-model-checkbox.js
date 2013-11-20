@@ -40,7 +40,7 @@ define('jquery-nos-inspector-tree-model-checkbox',
                                 var match = {
                                     name : params.reloadEvent
                                 };
-                                if (connector.data('nosContext')) {
+                                if (params.contextChange && connector.data('nosContext')) {
                                     match['context'] = connector.data('nosContext');
                                 }
                                 container.nosListenEvent(match, function() {
