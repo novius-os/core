@@ -14,6 +14,7 @@ class Renderer_Datetime_Picker extends Renderer
 {
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'format' => 'datetime',
+        'null_allowed' => false,
         'datepicker' => array(
             'showOn' => 'both',
             'buttonImage' => 'static/novius-os/admin/novius-os/img/icons/date-picker.png',
@@ -156,22 +157,27 @@ class Renderer_Datetime_Picker extends Renderer
 
     protected function processValue($value)
     {
-        if ($value && $value != '0000-00-00 00:00:00' && $value != '0000-00-00') {
+        if (!empty($value) && $value != '0000-00-00 00:00:00' && $value != '0000-00-00' && $value != '00:00:00') {
             return \Date::create_from_string($value,
                 $this->renderer_options['mysql_store_format'])->format($this->renderer_options['mysql_input_format']);
-        } else {
+        } else if ($this->renderer_options['null_allowed']) {
             return '';
+        } else {
+            return \Date::forge()->format($this->renderer_options['mysql_input_format']); //'%Y-%m-%d %H:%M'
         }
     }
 
     public function before_save($item, $data)
     {
-        if (!empty($data[$this->name])) {
-            $data[$this->name] = \Date::create_from_string($data[$this->name],
+        $value = $data[$this->name];
+        if (!empty($value) && $value != '0000-00-00 00:00:00' && $value != '0000-00-00' && $value != '00:00:00') {
+            $item->{$this->name} = \Date::create_from_string($value,
                 $this->renderer_options['mysql_input_format'])->format($this->renderer_options['mysql_store_format']);
+        } else if ($this->renderer_options['null_allowed']) {
+            $item->{$this->name} = '';
         } else {
-            $data[$this->name] = null;
+            $item->{$this->name} = \Date::forge()->format($this->renderer_options['mysql_input_format']);
         }
-        return true;
+        return false;
     }
 }
