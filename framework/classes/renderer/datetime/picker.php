@@ -156,16 +156,22 @@ class Renderer_Datetime_Picker extends Renderer
 
     protected function processValue($value)
     {
-        if ($value && $value!='0000-00-00 00:00:00') {
-            return \Date::create_from_string($value, $this->renderer_options['mysql_store_format'])->format($this->renderer_options['mysql_input_format']);
+        if ($value && $value != '0000-00-00 00:00:00' && $value != '0000-00-00') {
+            return \Date::create_from_string($value,
+                $this->renderer_options['mysql_store_format'])->format($this->renderer_options['mysql_input_format']);
         } else {
-            return \Date::forge()->format($this->renderer_options['mysql_input_format']); //'%Y-%m-%d %H:%M'
+            return '';
         }
     }
 
     public function before_save($item, $data)
     {
-        $data[$this->name] = \Date::create_from_string($data[$this->name], $this->renderer_options['mysql_input_format'])->format($this->renderer_options['mysql_store_format']);
+        if (!empty($data[$this->name])) {
+            $data[$this->name] = \Date::create_from_string($data[$this->name],
+                $this->renderer_options['mysql_input_format'])->format($this->renderer_options['mysql_store_format']);
+        } else {
+            $data[$this->name] = null;
+        }
         return true;
     }
 }

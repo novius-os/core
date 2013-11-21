@@ -14,7 +14,14 @@ define('jquery-nos-renderer-datetimepicker',
             var $input = this.element,
                 options = $input.data('options'),
                 datetimeOptions = options['datepicker'],
-                $displayedField = $('#' + this.element.attr('id') + '_displayed');
+                $displayedField = $('#' + this.element.attr('id') + '_displayed').change(function() {
+                    if (!$.trim($displayedField.val())) {
+                        $displayedField[options['plugin']]('setDate', null);
+                        if (options['plugin'] === 'datetimepicker') {
+                            $input.val('');
+                        }
+                    }
+                });
 
             if (typeof datetimeOptions.altField === 'undefined') {
                 datetimeOptions.altField = '#' + $input.attr('id');
