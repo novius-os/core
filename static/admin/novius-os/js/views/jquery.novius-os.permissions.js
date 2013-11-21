@@ -53,7 +53,7 @@ define('jquery-nos-permissions',
             });
 
             // When a checkbox is checked or unchecked, select the application
-            $ul.find(':checkbox').on('change', function onChangeCheckboxAccess() {
+            $ul.find(':checkbox:not(.check_all)').on('change', function onChangeCheckboxAccess() {
                 if (preventCheckAction) {
                     return;
                 }
