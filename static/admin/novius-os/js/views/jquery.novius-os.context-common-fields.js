@@ -64,8 +64,21 @@ define('jquery-nos-context-common-fields',
                             $element = $(this)
                                 .data('dialog_context_common_field', dialog)
                                 .bind('context_common_field', function(e, click, $el) {
+                                    var positioning = function() {
+                                            $div.css({
+                                                position: 'absolute',
+                                                width: $el.outerWidth() + 'px',
+                                                height: $el.outerHeight() + 'px'
+                                            }).position({
+                                                my: 'top left',
+                                                at: 'top left',
+                                                collision: 'none',
+                                                of: $el
+                                            });
+                                        };
                                     $element.data('click_context_common_field', function() {
                                         $element.prop('disabled', false);
+                                        $element.removeAttr('disabled');
                                         if ($.isFunction(click)) {
                                             click();
                                         }
@@ -74,7 +87,7 @@ define('jquery-nos-context-common-fields',
                                     $el = $el || $element;
                                     $div = $('<div class="js_context_common_field"></div>').insertAfter($el)
                                         .click(function() {
-                                            if ($element.is(':disabled')) {
+                                            if ($element.prop('disabled') || $element.attr('disabled')) {
                                                 dialog.call($element, function() {
                                                     var click = $element.data('click_context_common_field');
                                                     if ($.isFunction(click)) {
@@ -83,18 +96,16 @@ define('jquery-nos-context-common-fields',
                                                 });
                                             }
                                         });
-                                    $el.parent().on('mousemove', function() {
-                                        $div.css({
-                                            position: 'absolute',
-                                            width: $el.outerWidth() + 'px',
-                                            height: $el.outerHeight() + 'px'
-                                        }).position({
-                                            my: 'top left',
-                                            at: 'top left',
-                                            collision: 'none',
-                                            of: $el
-                                        });
-                                    }).trigger('mousemove');
+
+                                    if ($element === $el) {
+                                        // Repositioning on mousemove of the parent of element
+                                        // Mousemove on input disabled are not bind by browser
+                                        $el.parent().on('mousemove', positioning).trigger('mousemove');
+                                    } else {
+                                        // InputFileThumb case, unbind mousemove on parent just positioning
+                                        $el.parent().off('mousemove');
+                                        positioning();
+                                    }
                                 });
 
                         $element.nosOnShow('one', function() {
