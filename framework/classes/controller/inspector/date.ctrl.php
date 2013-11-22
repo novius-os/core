@@ -128,12 +128,14 @@ class Controller_Inspector_Date extends Controller_Inspector
             'name' => $config['input_begin'],
             'renderer_options' => array(
                 'format' => 'date',
+                'null_allowed' => true,
             ),
         )), false);
         $view->set('date_end', \Nos\Renderer_Datetime_Picker::renderer(array(
             'name' => $config['input_end'],
             'renderer_options' => array(
                 'format' => 'date',
+                'null_allowed' => true,
             ),
         )), false);
 
