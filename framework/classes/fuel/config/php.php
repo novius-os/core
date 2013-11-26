@@ -10,33 +10,43 @@
 
 class Config_Php extends \Fuel\Core\Config_Php
 {
-    protected static $loaded = array();
     protected static $opcache_invalidate = null;
     protected static $apc_delete_file = null;
 
     /**
-     * Loads in the given file and parses it.
+     * Formats the output and saved it to disc.
      *
-     * @param   string  $file  File to load
-     * @return  array
+     * @param   $contents  $contents    config array to save
+     * @return  bool       \File::update result
      */
-    protected function load_file($file)
+    public function save($contents)
     {
-        if (static::$opcache_invalidate === null) {
-            static::$opcache_invalidate = PHP_VERSION_ID >= 50500 && function_exists('opcache_invalidate');
-        }
-        if (static::$apc_delete_file === null) {
-            static::$apc_delete_file = function_exists('apc_delete_file');
-        }
+        $file = $this->file;
+        $return = parent::save($contents);
 
-        if (static::$apc_delete_file || static::$opcache_invalidate) {
-            if (in_array($file, static::$loaded)) {
-                static::$opcache_invalidate && opcache_invalidate($file, true);
-                static::$apc_delete_file && apc_delete_file($file);
+        // $file != $this->file only if file doesn't exist before save
+        // so not in opcode cache
+        if ($return && $file == $this->file) {
+            if (static::$opcache_invalidate === null) {
+                static::$opcache_invalidate = PHP_VERSION_ID >= 50500 && function_exists('opcache_invalidate');
             }
-            static::$loaded[] = $file;
-        }
+            if (static::$apc_delete_file === null) {
+                static::$apc_delete_file = function_exists('apc_delete_file');
+            }
 
-        return \Fuel::load($file);
+            if (static::$apc_delete_file || static::$opcache_invalidate) {
+                $path = \Finder::search('config', $this->file, $this->ext);
+                if ($this->file[0] === '/' || (isset($this->file[1]) && $this->file[1] === ':')) {
+                    $path = $this->file;
+                }
+
+                // make sure we have a fallback
+                $path || $path = APPPATH.'config'.DS.$this->file.$this->ext;
+
+                static::$opcache_invalidate && opcache_invalidate($path, true);
+                static::$apc_delete_file && apc_delete_file($path);
+            }
+        }
+        return $return;
     }
 }
