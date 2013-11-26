@@ -42,4 +42,69 @@ class Profiler extends \Fuel\Core\Profiler
 
         return $output;
     }
+
+    /**
+     * Start a delta time study
+     *
+     * \Profiler::markDeltaStart();
+     * // some code your want to study
+     * \Profiler::markDeltaStop();
+     *
+     * 'markDeltaStart' calls are stackable, that is, you may call markDeltaStart() while another markDeltaStart()
+     * is active (no call to markDeltaStop() yet)
+     *
+     * @param   string  $label  Optional label to display
+     */
+    public static function markDeltaStart($label = '')
+    {
+        static::__markDelta($label, false);
+    }
+    /**
+     * Stop a delta time study
+     *
+     * @param   string  $label  Optional label to display
+     */
+    public static function markDeltaStop($label = '')
+    {
+        self::__markDelta($label, true);
+    }
+    private function __markDelta($label = '', $end = false)
+    {
+        static $stack = array();
+        static $realnosroot = '';
+
+        if ($realnosroot == '') {
+            $realnosroot = realpath(NOSROOT) . '/';
+        }
+
+        $debug_backtrace = debug_backtrace();
+        $bt = array(
+            'time' => microtime(true),
+            'file' => str_replace(array($realnosroot.'local/applications/', $realnosroot), array('apps/', ''), $debug_backtrace[1]['file']),
+            'line' => $debug_backtrace[1]['line']
+        );
+
+        if ($end) {
+            $bt_start = array_pop($stack);
+            $dt = intval(1000 * ($bt['time'] - $bt_start['time']));
+
+            if ($label) {
+                \Profiler::mark(
+                    $label
+                    . ' - Δt: ' . $dt . 'ms'
+                );
+            } else {
+                \Profiler::mark(
+                    ($bt_start['file'] == $bt['file'] ? ($bt['file'] . ':' . $bt_start['line'] . '-' . $bt['line']) : ($bt['file'] . ':' . $bt['line']))
+                    . ' - Δt: ' . $dt . 'ms'
+                );
+            }
+
+        } else {
+            $stack[] = $bt;
+            if ($label) {
+                \Profiler::mark($label);
+            }
+        }
+    }
 }
