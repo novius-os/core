@@ -36,7 +36,7 @@ if (count($contexts) > 1) {
                 'toolbar-edit' => true,
             ),
             'visible' => array(
-                'check_is_new' => function($params) {
+                'check_is_new' => function ($params) {
                     return !isset($params['item']) || !$params['item']->is_new();
                 },
             ),
@@ -46,7 +46,7 @@ if (count($contexts) > 1) {
                     'orientation' => 'vertical',
                     'direction' => 'rtl',
                 ),
-                'menus' => function($item) use ($contexts, $locales, $sites) {
+                'menus' => function ($item) use ($contexts, $locales, $sites) {
                     $actions = array();
                     $class = get_class($item);
                     $behaviours = $class::behaviours();

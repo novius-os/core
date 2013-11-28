@@ -36,6 +36,7 @@ class Model_Media extends \Nos\Orm\Model
             'default' => null,
             'data_type' => 'varchar',
             'null' => false,
+            'character_maximum_length' => 100,
         ),
         'media_ext' => array(
             'default' => null,
@@ -188,6 +189,7 @@ class Model_Media extends \Nos\Orm\Model
             is_dir($path_public_cache) and \File::delete_dir($path_public_cache, true, true);
             is_dir($path_private_cache) and \File::delete_dir($path_private_cache, true, true);
         } catch (\Exception $e) {
+            \Log::exception($e, 'Error while deleting the cache of media '.$this->media_id.' ('.$path.'). ');
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
                 throw $e;
             }
@@ -425,5 +427,10 @@ class Model_Media extends \Nos\Orm\Model
 
             $this->media_filesize = filesize($file);
         }
+    }
+
+    public function _event_after_delete()
+    {
+        $this->deleteFromDisk();
     }
 }

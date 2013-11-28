@@ -683,7 +683,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         return $params['countProcess'] ? $count : $items;
     }
 
-    static public function dataset_item(\Nos\Orm\Model $object, array $dataset = array())
+    public static function dataset_item(\Nos\Orm\Model $object, array $dataset = array())
     {
         $model = get_class($object);
         $pk = \Arr::get($model::primary_key(), 0);

@@ -20,7 +20,7 @@ foreach ($icons['icons'] as $size => $images) {
     }
 }
 $media_icon = function ($size) use ($extensions) {
-    return function ($item) use($size, $extensions) {
+    return function ($item) use ($size, $extensions) {
         return isset($extensions[$size][$item->media_ext]) ? 'static/apps/noviusos_media/icons/'.$size.'/'.$extensions[$size][$item->media_ext] : '';
     };
 };
@@ -139,7 +139,7 @@ return array(
                 'grid' => true,
                 'toolbar-edit' => true,
             ),
-            'visible' => array(function($params) {
+            'visible' => array(function ($params) {
                 return !isset($params['item']) || !$params['item']->is_new();
             }),
             'disabled' => false,

@@ -88,10 +88,16 @@ if ($is_media) {
         $target = DOCROOT.$target;
         $dir = dirname($target);
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            if (!@mkdir($dir, 0755, true)) {
+                Log::error("Can't create dir ".$dir);
+                exit("Can't create dir ".$dir);
+            }
         }
 
-        \File::relativeSymlink($source, $target);
+        if (!\File::relativeSymlink($source, $target)) {
+            Log::error("Can't symlink in ".$source);
+            exit("Can't symlink in ".$source);
+        }
         $send_file = $source;
     }
 

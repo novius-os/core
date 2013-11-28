@@ -16,7 +16,7 @@ return array(
     'models' => array(
         'Nos\Media\Model_Folder' => array(
             'callback' => array(
-                'permissions' => function($query) {
+                'permissions' => function ($query) {
                     $restricted_folders = \Nos\Media\Permission::getRestrictedFolders();
                     if (empty($restricted_folders)) {
                         return $query;

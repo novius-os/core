@@ -48,7 +48,7 @@ class Renderer_Media extends \Nos\Renderer
      */
     public static function renderer($renderer = array())
     {
-        list($attributes, $renderer_options) = static::parse_options($renderer);
+        list($attributes, $renderer_options) = static::parseOptions($renderer);
         static::hydrate_options($renderer_options, $attributes);
         $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
 
@@ -71,6 +71,19 @@ class Renderer_Media extends \Nos\Renderer
         $this->set_attribute('data-media-options', htmlspecialchars(\Format::forge()->to_json($this->renderer_options)));
 
         return (string) parent::build();
+    }
+
+
+    /**
+     * Parse the renderer array to get attributes and the renderer options
+     * @param  array $renderer
+     * @return array 0: attributes, 1: renderer options
+     */
+    protected static function parse_options($renderer = array())
+    {
+        \Log::deprecated('Renderer_Media::parse_options($renderer) is deprecated, '.
+            'use Renderer_Media::parseOptions($renderer) instead.', 'Chiba.2.1');
+        return static::parseOptions($renderer);
     }
 
     /**

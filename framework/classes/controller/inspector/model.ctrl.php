@@ -27,7 +27,7 @@ class Controller_Inspector_Model extends Controller_Inspector
     public function action_json()
     {
         $config = $this->config;
-        $where = function($query) use ($config) {
+        $where = function ($query) use ($config) {
             Filter::apply($query, $config);
 
             return $query;

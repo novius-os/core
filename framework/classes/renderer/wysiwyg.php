@@ -23,12 +23,12 @@ class Renderer_Wysiwyg extends Renderer
         list($attributes, $renderer_options) = static::parseOptions($renderer);
 
         $value = '';
-        if ( !empty($attributes['value']) ) {
+        if (!empty($attributes['value'])) {
             $value = $attributes['value'];
             unset($attributes['value']);
         }
 
-        if ( !empty($renderer_options) ) {
+        if (!empty($renderer_options)) {
             $attributes['data-wysiwyg-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
         }
 

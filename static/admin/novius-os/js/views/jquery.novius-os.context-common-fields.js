@@ -60,42 +60,62 @@ define('jquery-nos-context-common-fields',
                             };
 
                     $container.find('[context_common_field]').each(function() {
-                        var $element = $(this),
-                            $div,
-                            init = function($el, click) {
-                                $div = $('<div></div>').css({
-                                        position: 'absolute',
-                                        width: $el.outerWidth() + 'px',
-                                        height: $el.outerHeight() + 'px'
-                                    })
-                                    .insertAfter($el)
-                                    .click(function() {
-                                        if ($element.is(':disabled')) {
-                                            dialog.call($element, function() {
-                                                $element.attr('disabled', false);
-                                                if ($.isFunction(click)) {
-                                                    click();
-                                                }
-                                                $div.detach();
+                        var $div,
+                            $element = $(this)
+                                .data('dialog_context_common_field', dialog)
+                                .bind('context_common_field', function(e, click, $el) {
+                                    var positioning = function() {
+                                            $div.css({
+                                                position: 'absolute',
+                                                width: $el.outerWidth() + 'px',
+                                                height: $el.outerHeight() + 'px'
+                                            }).position({
+                                                my: 'top left',
+                                                at: 'top left',
+                                                collision: 'none',
+                                                of: $el
                                             });
+                                        };
+                                    $element.data('click_context_common_field', function() {
+                                        $element.prop('disabled', false);
+                                        $element.removeAttr('disabled');
+                                        if ($.isFunction(click)) {
+                                            click();
                                         }
-                                    })
-                                    .position({
-                                        my: 'top left',
-                                        at: 'top left',
-                                        collision: 'none',
-                                        of: $el
+                                        $div.detach();
                                     });
-                            };
+                                    $el = $el || $element;
+                                    $div = $('<div class="js_context_common_field"></div>').insertAfter($el)
+                                        .click(function() {
+                                            if ($element.prop('disabled') || $element.attr('disabled')) {
+                                                dialog.call($element, function() {
+                                                    var click = $element.data('click_context_common_field');
+                                                    if ($.isFunction(click)) {
+                                                        click();
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    if ($element === $el) {
+                                        // Repositioning on mousemove of the parent of element
+                                        // Mousemove on input disabled are not bind by browser
+                                        $el.parent().on('mousemove', positioning).trigger('mousemove');
+                                    } else {
+                                        // InputFileThumb case, unbind mousemove on parent just positioning
+                                        $el.parent().off('mousemove');
+                                        positioning();
+                                    }
+                                });
 
                         $element.nosOnShow('one', function() {
-                            init($element);
+                            $element.trigger('context_common_field');
                         });
 
                         $element.one('inputfilethumbenter', function() {
-                            init($element.parents('.ui-inputfilethumb'), function() {
+                            $element.trigger('context_common_field', [function() {
                                 $element.inputFileThumb('option', 'disabled', false);
-                            });
+                            }, $element.parents('.ui-inputfilethumb')]);
                             return false;
                         });
                         $element.one('inputfilethumbinit', function() {

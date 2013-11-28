@@ -18,7 +18,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
             $attachment = $this->attachment(str_replace('data/files/', '', \Input::param('attachment', null)));
             $item = Model_Media::forge();
             $fieldset = \Fieldset::build_from_config($this->config['fields'], $item, array(
-                    'before_save'=> function() use ($item, $attachment) {
+                    'before_save'=> function () use ($item, $attachment) {
                         // Empty title = auto-generated from file name
                         if (empty($item->media_title)) {
                             $item->media_title = pathinfo($attachment->filename(), PATHINFO_FILENAME);
@@ -55,7 +55,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
                             throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
                         }
                     },
-                    'success' => function() use ($item) {
+                    'success' => function () use ($item) {
                         $dispatchEvent = array(
                             'name' => get_class($item),
                             'action' => 'insert',

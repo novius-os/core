@@ -49,7 +49,7 @@ class Controller_Admin_Upload extends \Nos\Controller_Admin_Application
         $folder = \Nos\Media\Model_Folder::find($media_folder_id);
 
         $tempdir = realpath(\Config::get('novius-os.temp_dir', APPPATH.'data')).DS.'massupload';
-        register_shutdown_function(function($tempdir) {
+        register_shutdown_function(function ($tempdir) {
             is_dir($tempdir) && \File::delete_dir($tempdir, true, true);
         }, $tempdir);
 

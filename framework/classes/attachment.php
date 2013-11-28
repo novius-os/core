@@ -278,7 +278,7 @@ class Attachment
     /**
      * Delete an alias
      */
-    static public function deleteAlias($alias)
+    public static function deleteAlias($alias)
     {
         $alias = rtrim($alias, '/').'/';
 

@@ -128,7 +128,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                         $where[$published_key] = array(
                             array($this->_properties['publication_state_property'], $published_value),
                         );
-                        if ($this->_properties['publication_start_property']) {
+                        if (isset($this->_properties['publication_start_property'])) {
                             $where[$published_key]['or'] = array(
                                 array($this->_properties['publication_state_property'], 2),
                                 array(

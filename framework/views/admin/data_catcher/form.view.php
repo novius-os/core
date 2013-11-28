@@ -97,7 +97,7 @@ echo \View::forge(
             \Nos\DataCatcher::TYPE_TEXT,
         ),
         'callback' =>
-            function($field) use ($item, $nugget_db, $nugget) {
+            function ($field) use ($item, $nugget_db, $nugget) {
                 $template = $field->template;
                 if (empty($template)) {
                     $template = $field->fieldset->form()->get_config('field_template');

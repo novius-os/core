@@ -36,5 +36,4 @@ abstract class Renderer_Selector extends Renderer
      * @param $rules
      */
     abstract public function before_construct(&$attributes, &$rules);
-
 }

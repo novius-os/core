@@ -55,6 +55,7 @@ if (!MBSTRING) {
         'Command' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'command.php',
         'Config' => FUEL_EXTEND_PATH.'config.php',
         'Config_File' => FUEL_EXTEND_PATH.'config_file.php',
+        'Config_Php' => FUEL_EXTEND_PATH.'config'.DIRECTORY_SEPARATOR.'php.php',
         'Cache_Storage_File' => FUEL_EXTEND_PATH.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'file.php',
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
@@ -69,6 +70,7 @@ if (!MBSTRING) {
         'Generate' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'generate.php',
         'Image' => FUEL_EXTEND_PATH.'image.php',
         'Image_Driver' => FUEL_EXTEND_PATH.'image'.DIRECTORY_SEPARATOR.'driver.php',
+        'Image_Noop' => FUEL_EXTEND_PATH.'image'.DIRECTORY_SEPARATOR.'noop.php',
         'Log' => FUEL_EXTEND_PATH.'log.php',
         'Migrate' => FUEL_EXTEND_PATH.'migrate.php',
         'Module' => FUEL_EXTEND_PATH.'module.php',
@@ -125,6 +127,11 @@ Fuel::$env = (isset($_SERVER['NOS_ENV']) ? $_SERVER['NOS_ENV'] : (isset($_SERVER
 //* Register application autoloader
 spl_autoload_register(
     function ($class) {
+        $class_alias = \Autoloader::getClassAliases($class);
+        if ($class_alias !== false) {
+            class_alias($class_alias, $class);
+            return true;
+        }
 
         $class = ltrim($class, '\\');
         $parts = explode('\\', $class);
@@ -165,6 +172,7 @@ spl_autoload_register(
 );
 //*/
 
+\Autoloader::addClassAlias('Nos\\Task');
 // Initialize the framework with the config file.
 $config_nos = include(NOSPATH.'config/config.php');
 

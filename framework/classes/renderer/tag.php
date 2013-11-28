@@ -108,5 +108,4 @@ class Renderer_Tag extends Renderer
 
         return $labels;
     }
-
 }

@@ -21,5 +21,4 @@ class Renderer_Text extends \Fieldset_Field
     {
         return $this->template((string) $this->value);
     }
-
 }

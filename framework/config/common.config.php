@@ -42,7 +42,7 @@ return array(
                 'grid' => true,
             ),
             'disabled' => array(
-                'check_context' => function($item) {
+                'check_context' => function ($item) {
                     try {
                         $context = $item->get_context();
                     } catch (\Exception $e) {
@@ -71,12 +71,12 @@ return array(
             ),
             'align' => 'end',
             'visible' => array(
-                'check_is_new' => function($params) {
+                'check_is_new' => function ($params) {
                     return !isset($params['item']) || !$params['item']->is_new();
                 },
             ),
             'disabled' => array(
-                'check_context' => function($item) {
+                'check_context' => function ($item) {
                     try {
                         $context = $item->get_context();
                     } catch (\Exception $e) {

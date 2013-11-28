@@ -37,7 +37,7 @@ class Nos
     /**
      * Returns the controller instance from the main request
      *
-     * @return \Nos\Controller
+     * @return Controller | Controller_Front
      */
     public static function main_controller()
     {
@@ -45,11 +45,12 @@ class Nos
     }
 
     /**
+     * Execute a HMVC request
      *
-     * @param string  $where  Route for the request
-     * @param array   $args   The method parameters
-     * @param boolean $inline true  will execute the controller's action directly
-     *                           false will writes the function call and include it
+     * @param string $where  Route for the request
+     * @param array $args   The method parameters
+     * @throws \Exception|NotFoundException
+     * @throws \Exception|FrontIgnoreTemplateException
      * @return string
      */
     public static function hmvc($where, $args = null)
@@ -73,7 +74,7 @@ class Nos
             throw $e;
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
-                \Debug::dump('Error in enhancer "'.$where.'"');
+                \Debug::dump('Error when executing HMVC request "'.$where.'"');
                 $old_continue_on = \Config::get('errors.continue_on', array());
                 $continue_on = $old_continue_on;
                 $continue_on[] = $e->getCode();
@@ -88,6 +89,7 @@ class Nos
 
                 \Config::set('errors.continue_on', $old_continue_on);
             }
+            \Log::exception($e, 'HMVC - ');
             \Fuel::$profiling && \Console::logError($e, "HMVC request '$where' failed.");
         }
         $content = ob_get_clean();
@@ -99,7 +101,6 @@ class Nos
      * Parse a wyiswyg
      *
      * @param  string          $content    Wysiwyg content to parse
-     * @param  \Nos\Controller $controller Context for the execution
      * @return string
      */
     public static function parse_wysiwyg($content)
@@ -168,11 +169,8 @@ class Nos
     public static function get_enhancer_content($enhancer, $args)
     {
         $args = json_decode(
-            strtr(
-                $args,
-                array(
-                    '&quot;' => '"',
-                )
+            htmlspecialchars_decode(
+                $args
             ),
             true
         );
@@ -209,7 +207,7 @@ class Nos
     {
         Tools_Wysiwyg::parse_medias(
             $content,
-            function($media, $params) use (&$content) {
+            function ($media, $params) use (&$content) {
                 if (empty($media)) {
                     if ($params['tag'] == 'img') {
                         // Remove dead images
@@ -225,7 +223,8 @@ class Nos
                     } else {
                         $media_url = $media->url();
                     }
-                    $content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $content);
+                    $new_content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $params['content']);
+                    $content = str_replace($params['content'], $new_content, $content);
                 }
             }
         );

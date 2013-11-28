@@ -39,6 +39,9 @@ foreach ($permissions as $view) {
     <div class="col c6 app_permissions">
 <?php
 foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
+    if ($app_name === 'nos') {
+        continue;
+    }
     $permissions = \Config::load($app_name.'::permissions', true);
     if (empty($permissions)) {
         continue;

@@ -53,5 +53,3 @@ class Toolkit_Image_Attachment extends Toolkit_Image_Driver
         return \Image::forge(array(), $this->image->path())->sizes();
     }
 }
-
-

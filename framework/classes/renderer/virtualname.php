@@ -30,6 +30,12 @@ class Renderer_Virtualname extends Renderer
     public function build()
     {
         parent::build();
+        if ($this->fieldset) {
+            $field_properties = $this->fieldset->getInstance()->property($this->name);
+            if (isset($field_properties['character_maximum_length'])) {
+                $this->attributes['maxlength'] = $field_properties['character_maximum_length'];
+            }
+        }
 
         $this->apply_use_title_checkbox();
 
@@ -80,7 +86,7 @@ class Renderer_Virtualname extends Renderer
     {
         $regexps_compiled = array();
         foreach ($regexps as $regexp => $replacement) {
-            if (is_int($regexp) && is_string($replacement)) {
+            if (is_int($regexp) && is_string($replacement) && $replacement !== 'lowercase') {
                 $setup_regexps = \Config::get('friendly_slug.setups.'.$replacement, array());
                 $regexps_compiled = array_merge($regexps_compiled, static::_regexpsCompiled($setup_regexps));
             } else {

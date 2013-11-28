@@ -85,5 +85,4 @@ class Renderer_Time_Picker extends Renderer
             false
         );
     }
-
 }

@@ -6,7 +6,7 @@ return array(
     'data_mapping' => array(
         'fullname' => array(
             'title' => __('Name'),
-            'value' => function($item) {
+            'value' => function ($item) {
                 return $item->fullname();
             },
             'search_column' => 'user_firstname',
@@ -22,7 +22,7 @@ return array(
         ),
         'id_permission' => array(
             'visible' => false,
-            'value' => function($item) {
+            'value' => function ($item) {
                 return $item->roles && reset($item->roles)->role_id ?: $item->user_id;
             },
         ),

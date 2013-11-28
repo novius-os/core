@@ -372,7 +372,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
                 $missing_contexts = array_diff($contexts_self, $contexts_parent);
                 if (!empty($missing_contexts)) {
                     throw new \Exception(strtr(__('We’re afraid it cannot be moved here because the parent is not available in the following contexts: {{contexts}}'), array(
-                        '{{contexts}}' => implode(', ', array_map(function($context) {
+                        '{{contexts}}' => implode(', ', array_map(function ($context) {
                                 return \Nos\Tools_Context::contextLabel($context);
 
                         }, $missing_contexts)),

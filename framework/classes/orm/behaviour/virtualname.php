@@ -93,6 +93,13 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         $options[] = static::$_friendly_slug_always_last;
 
         $virtual_name = static::_friendlySlug($virtual_name, $options);
+
+        // truncate $virtual_name if longer than database field
+        $virtual_name_property = $item->property($this->_properties['virtual_name_property']);
+        if (!empty($virtual_name_property['character_maximum_length'])) {
+            $virtual_name = \Str::sub($virtual_name, 0, intval($virtual_name_property['character_maximum_length']));
+        }
+
         $item->{$this->_properties['virtual_name_property']} = $virtual_name;
 
         return $item->{$this->_properties['virtual_name_property']};
@@ -105,7 +112,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
                 if (is_int($regexp) && $replacement === 'lowercase') {
                     $slug = \Str::lower($slug);
                 } elseif (is_int($regexp) && is_string($replacement)) {
-                    $slug = static::_friendlySlug($slug, \Config::get('friendly_slug.setups.'.$replacement, array()));
+                    $slug = static::_friendlySlug($slug, array(\Config::get('friendly_slug.setups.'.$replacement, array())));
                 } elseif (is_array($replacement)) {
                     $flags = str_replace('u', '', \Arr::get($replacement, 'flags', '')).'u';
                     $replacement = \Arr::get($replacement, 'replacement', '');

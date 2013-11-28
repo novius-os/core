@@ -468,6 +468,16 @@ define('jquery-nos',
                                                 },
                                                 duration: 0,
                                                 easing: null
+                                            },
+                                            shown: function (event, item) {
+                                                var $contextMenu = $(item.element);
+                                                $contextMenu.parent()
+                                                    .css({
+                                                        maxHeight: '200px',
+                                                        width: $contextMenu.outerWidth(true) + 20,
+                                                        overflowY: 'auto',
+                                                        overflowX: 'hidden'
+                                                    })
                                             }
                                         },
                                         element.menu.options || {},
@@ -559,10 +569,6 @@ define('jquery-nos',
                                 break;
 
                             case 'window.open' :
-                                url = $.nosDataReplace(obj.url, data);
-                                window.open(url);
-                                break;
-
                             case 'document.location' :
                                 url = $.nosDataReplace(obj.url, data);
                                 if (!(url.substr(0, 5) === 'http:' || url.substr(0, 6) === 'https:')) {
@@ -571,7 +577,11 @@ define('jquery-nos',
                                         url = $base.attr('href') + url;
                                     }
                                 }
-                                document.location.href = url;
+                                if (obj.action === 'window.open') {
+                                    window.open(url);
+                                } else {
+                                    document.location.href = url;
+                                }
                                 break;
                         }
                     }

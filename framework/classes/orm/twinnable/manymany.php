@@ -176,7 +176,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
             foreach ($c as $key => $condition) {
                 ! is_array($condition) and $condition = array($key, '=', $condition);
-                if ( ! $condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
+                if (!$condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
                     $condition[0] = $alias_to.'.'.$condition[0];
                 }
                 is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
@@ -188,7 +188,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
         $order_by = \Arr::get($conditions, 'order_by') ?: \Arr::get($this->conditions, 'order_by', array());
         foreach ($order_by as $key => $direction) {
-            if ( ! $key instanceof \Fuel\Core\Database_Expression and strpos($key, '.') === false) {
+            if (!$key instanceof \Fuel\Core\Database_Expression and strpos($key, '.') === false) {
                 $key = $alias_to.'.'.$key;
             } else {
                 $key = str_replace(array($alias_through[0],$alias_to_table[0]), array($alias_through[1],$alias_to_table[1]), $key);

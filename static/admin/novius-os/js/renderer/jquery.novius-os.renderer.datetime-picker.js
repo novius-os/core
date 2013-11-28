@@ -12,8 +12,16 @@ define('jquery-nos-renderer-datetimepicker',
                 o = self.options;
 
             var $input = this.element,
-                datetimeOptions = $input.data('datepicker-options'),
-                $displayedField = $('#' + this.element.attr('id') + '_displayed');
+                options = $input.data('options'),
+                datetimeOptions = options['datepicker'],
+                $displayedField = $('#' + this.element.attr('id') + '_displayed').change(function() {
+                    if (!$.trim($displayedField.val())) {
+                        $displayedField[options['plugin']]('setDate', null);
+                        if (options['plugin'] === 'datetimepicker') {
+                            $input.val('');
+                        }
+                    }
+                });
 
             if (typeof datetimeOptions.altField === 'undefined') {
                 datetimeOptions.altField = '#' + $input.attr('id');
@@ -31,10 +39,9 @@ define('jquery-nos-renderer-datetimepicker',
             var date = $.datepicker.parseDateTime(datetimeOptions.altFormat, datetimeOptions.altTimeFormat, inputDate);
 
             var displayFieldAttr = $displayedField.attr('size');
-            $displayedField.datetimepicker(datetimeOptions);
+            $displayedField[options['plugin']](datetimeOptions);
             $displayedField.attr('size', displayFieldAttr);
-
-            $displayedField.datetimepicker('setDate', date);
+            $displayedField[options['plugin']]('setDate', date);
         }
     });
     return $;

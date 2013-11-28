@@ -338,7 +338,8 @@ class Toolkit_Image
         }
 
         if ($this->_dirty_sizes) {
-            $image = $this->_image();
+            $image = $this->transformImage(\Image::forge(array('driver' => 'noop')));
+            $image->setSizes((array) $this->_image->sizes());
             $this->_sizes = $image->queueSizes();
             $this->_dirty_sizes = false;
         }
@@ -367,11 +368,8 @@ class Toolkit_Image
         return \Html::img(Tools_Url::encodePath($this->url()), $params);
     }
 
-    protected function _image()
+    protected function transformImage(\Image_Driver $image)
     {
-        $image = \Image::forge();
-        $image->load($this->_image->file());
-
         foreach ($this->_transformations as $transformation_args) {
             $transformation = array_shift($transformation_args);
             if (method_exists($image, $transformation)) {
@@ -389,7 +387,7 @@ class Toolkit_Image
      */
     public function save()
     {
-        $image = $this->_image();
+        $image = $this->transformImage(\Image::forge(null, $this->_image->file()));
 
         $destination = APPPATH.$this->url(false);
         $dir = dirname($destination);

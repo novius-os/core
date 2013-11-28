@@ -80,7 +80,7 @@ class Config_Data
 
         list($file, $callback) = static::getFile($name);
         if ($event && !empty($callback)) {
-            \Event::register_function('config|'.$file, function(&$config) use($callback, $name, $file) {
+            \Event::register_function('config|'.$file, function (&$config) use ($callback, $name, $file) {
                 Config_Data::$callback($config, $name);
                 // @todo Event::unregister but now make a Notice with register_function
             });

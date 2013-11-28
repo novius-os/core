@@ -40,7 +40,41 @@ define('jquery-nos-virtualname',
                     };
 
                 return this.each(function() {
-                    var $virtual_name = $(this),
+                    var $virtual_name = $(this).bind('context_common_field', function() {
+                            var $div,
+                                $el = $(this),
+                                click = $el.data('click_context_common_field');
+
+                            $el.data('click_context_common_field', function() {
+                                click();
+                                $use_title_checkbox.prop('disabled', false);
+                            });
+                            $use_title_checkbox.prop('disabled', true);
+                            $div = $('<div class="js_context_common_field"></div>')
+                                .insertAfter($use_title_checkbox)
+                                .click(function() {
+                                    var dialog = $el.data('dialog_context_common_field');
+                                    if ($el.is(':disabled')) {
+                                        dialog.call($el, function() {
+                                            click();
+                                            $use_title_checkbox.prop('disabled', false);
+                                            $div.detach();
+                                        });
+                                    }
+                                });
+                            $use_title_checkbox.parent().on('mousemove', function() {
+                                $div.css({
+                                    position: 'absolute',
+                                    width: $use_title_checkbox.outerWidth() + 'px',
+                                    height: $use_title_checkbox.outerHeight() + 'px'
+                                }).position({
+                                        my: 'top left',
+                                        at: 'top left',
+                                        collision: 'none',
+                                        of: $use_title_checkbox
+                                });
+                            }).trigger('mousemove');
+                        }),
                         id = $virtual_name.attr('id'),
                         $use_title_checkbox = $('#' + id + '__use_title_checkbox'),
                         $title = $virtual_name.closest('form').find('input.ui-priority-primary');
