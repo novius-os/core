@@ -51,10 +51,10 @@ define('jquery-nos-media-add-form',
                         $same_title = $container.find('input[data-id=same_title]')
                             .change(function() {
                                 if ($(this).is(':checked')) {
-                                    $slug.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                                    $slug.attr('readonly', true).addClass('ui-state-disabled');
                                     $title.triggerHandler('change');
                                 } else {
-                                    $slug.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                                    $slug.removeAttr('readonly').removeClass('ui-state-disabled');
                                 }
                             });
 

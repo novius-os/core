@@ -30,10 +30,10 @@ define('jquery-nos-media-folder-form',
                     });
                     $same_title.change(function() {
                         if ($(this).is(':checked')) {
-                            $seo_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                            $seo_title.attr('readonly', true).addClass('ui-state-disabled');
                             $title.triggerHandler('change');
                         } else {
-                            $seo_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                            $seo_title.removeAttr('readonly').removeClass('ui-state-disabled');
                         }
                     }).triggerHandler('change');
 

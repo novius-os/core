@@ -157,10 +157,10 @@ define(
             }
             $checkbox_menu.change(function() {
                 if ($(this).is(':checked')) {
-                    $menu_title.attr('readonly', true).addClass('ui-state-disabled').removeClass('ui-state-default');
+                    $menu_title.attr('readonly', true).addClass('ui-state-disabled');
                     $title.triggerHandler('change');
                 } else {
-                    $menu_title.removeAttr('readonly').addClass('ui-state-default').removeClass('ui-state-disabled');
+                    $menu_title.removeAttr('readonly').removeClass('ui-state-disabled');
                 }
             }).triggerHandler('change');
         }
