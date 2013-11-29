@@ -81,7 +81,6 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
                     '{{item}}' => $params['model'].'('.$params['id'].')',
                 )));
             }
-            $data_catchers = $item->data_catchers();
             if (empty($item)) {
                 throw new \Exception(Str::tr(__("Surprisingly it appears ‘{{item}}’ cannot be shared with ‘{{catcher}}’. Contact your developer for further details."), array(
                     '{{catcher}}' => $params['catcher_name'],
