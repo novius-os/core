@@ -759,12 +759,7 @@ define('jquery-nos',
                     allowDelete : true,
                     classes: data.mode,
                     choose: function() {
-                        var $dialog = $input.nosDialog({
-                                destroyOnClose : true,
-                                contentUrl: contentUrls[data.mode],
-                                ajax: true,
-                                title: titles[data.mode]
-                            }).bind('select_media', function(e, item) {
+                        var select_media = function(item) {
                                 $input.inputFileThumb({
                                     file: item.image ? item.thumbnail : item.path
                                 });
@@ -772,7 +767,29 @@ define('jquery-nos',
                                     item : item
                                 });
                                 $dialog.nosDialog('close');
-                            });
+                            },
+                            $dialog = $input.nosDialog({
+                                    destroyOnClose : true,
+                                    contentUrl: contentUrls[data.mode],
+                                    ajax: true,
+                                    title: titles[data.mode]
+                                })
+                                .bind('select_media', function(e, item) {
+                                    select_media(item);
+                                })
+                                .nosListenEvent({
+                                    name : 'Nos\\Media\\Model_Media',
+                                    action : 'insert'
+                                }, function(e) {
+                                    $.ajax({
+                                        method: 'GET',
+                                        url: 'admin/noviusos_media/appdesk/info/' + e.id,
+                                        dataType: 'json',
+                                        success: function(item) {
+                                            select_media(item);
+                                        }
+                                    });
+                                });
                     }
                 }, data.inputFileThumb || {});
 

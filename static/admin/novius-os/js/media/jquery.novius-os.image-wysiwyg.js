@@ -68,6 +68,19 @@ define('jquery-nos-image-wysiwyg',
                         $dialog = $container.closest('.ui-dialog-content')
                             .bind('select_media', function(e, data) {
                                 tinymce_image_select(data);
+                            })
+                            .nosListenEvent({
+                                name : 'Nos\\Media\\Model_Media',
+                                action : 'insert'
+                            }, function(e) {
+                                $.ajax({
+                                    method: 'GET',
+                                    url: params.base_url + 'admin/noviusos_media/appdesk/info/' + e.id,
+                                    dataType: 'json',
+                                    success: function(item) {
+                                        tinymce_image_select(item);
+                                    }
+                                });
                             }),
                         $library = $container.find('div:eq(0)')
                             .css({

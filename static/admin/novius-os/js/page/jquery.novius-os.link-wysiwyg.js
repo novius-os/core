@@ -92,20 +92,56 @@ define('jquery-nos-link-wysiwyg',
                             }),
                         $a_properties = $ul.find('li:last a'),
 
-                        $dialog = $container.closest('.ui-dialog-content')
-                            .bind('select_media', function(e, media) {
+                        select_media = function(media) {
                                 $title.text(media.title);
                                 $real_url.text(params.base_url + media.path);
                                 $input_url.val('nos://media/' + media.id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
-                            })
-                            .bind('select_page', function(e, page) {
+                            },
+                        select_page = function(page) {
                                 $title.text(page.page_title);
                                 $real_url.text(page.url);
                                 $input_url.val('nos://page/' + page.id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
+                            },
+                        $dialog = $container.closest('.ui-dialog-content')
+                            .bind('select_media', function(e, media) {
+                                select_media(media);
+                            })
+                            .nosListenEvent({
+                                name : 'Nos\\Media\\Model_Media',
+                                action : 'insert'
+                            }, function(e) {
+                                if (link_type === 'media') {
+                                    $.ajax({
+                                        method: 'GET',
+                                        url: params.base_url + 'admin/noviusos_media/appdesk/info/' + e.id,
+                                        dataType: 'json',
+                                        success: function(media) {
+                                            select_media(media);
+                                        }
+                                    });
+                                }
+                            })
+                            .bind('select_page', function(e, page) {
+                                select_page(page);
+                            })
+                            .nosListenEvent({
+                                name : 'Nos\\Page\\Model_Page',
+                                action : 'insert'
+                            }, function(e) {
+                                if (link_type === 'internal') {
+                                    $.ajax({
+                                        method: 'GET',
+                                        url: params.base_url + 'admin/noviusos_page/appdesk/info/' + e.id,
+                                        dataType: 'json',
+                                        success: function(page) {
+                                            select_page(page);
+                                        }
+                                    });
+                                }
                             }),
 
                         choose_type = function(type, select) {
