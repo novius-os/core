@@ -34,7 +34,7 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
     public function action_save()
     {
         try {
-            list($item, $catcher_name) = static::save_catcher_nugget();
+            list($item) = static::save_catcher_nugget();
             $model_name = get_class($item);
             $model_id   = $item->id;
 
@@ -82,7 +82,6 @@ class Controller_Admin_Datacatcher extends Controller_Admin_Application
                 )));
             }
             $data_catchers = $item->data_catchers();
-            $data_nugget   = $data_catchers[$params['catcher_name']];
             if (empty($item)) {
                 throw new \Exception(Str::tr(__("Surprisingly it appears ‘{{item}}’ cannot be shared with ‘{{catcher}}’. Contact your developer for further details."), array(
                     '{{catcher}}' => $params['catcher_name'],

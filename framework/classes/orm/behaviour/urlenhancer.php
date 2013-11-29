@@ -102,7 +102,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
             $nuggets = $default_nuggets->content_data;
             $nugget_url = \Arr::get($nuggets, \Nos\DataCatcher::TYPE_URL, false);
             if (!empty($nugget_url)) {
-                list($page_id, $itemPath) = explode('::', $nugget_url);
+                list($page_id) = explode('::', $nugget_url);
             }
         }
 
@@ -184,7 +184,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     {
         $base = \Uri::base(false);
         foreach ($this->_properties['enhancers'] as $enhancer_name) {
-            foreach (Tools_Enhancer::url_item($enhancer_name, $item) as $key => $url) {
+            foreach (Tools_Enhancer::url_item($enhancer_name, $item) as $url) {
 
                 $cache_path = \Nos\FrontCache::getPathFromUrl($base, parse_url($url, PHP_URL_PATH));
                 \Nos\FrontCache::forge($cache_path)->delete();

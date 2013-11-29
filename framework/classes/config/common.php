@@ -59,7 +59,7 @@ class Config_Common
 
     public static function process_placeholders($model, $config)
     {
-        list($application_name, $file) = \Config::configFile($model);
+        list($application_name) = \Config::configFile($model);
 
         $model_label = explode('_', $model);
         $model_label = $model_label[count($model_label) - 1];

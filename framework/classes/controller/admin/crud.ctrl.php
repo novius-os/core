@@ -140,7 +140,6 @@ class Controller_Admin_Crud extends Controller_Admin_Application
      */
     protected function view_params()
     {
-        $self = $this;
         $view_params = array(
             'crud' => array(
                 'model' => $this->config['model'],

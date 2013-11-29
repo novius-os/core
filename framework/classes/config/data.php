@@ -98,7 +98,7 @@ class Config_Data
     public static function save($name, array $data)
     {
         \Config::set('data::'.$name, $data);
-        list($file, $callback) = static::getFile($name);
+        list($file) = static::getFile($name);
         return \Config::save($file, $data);
     }
 

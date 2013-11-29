@@ -110,7 +110,7 @@ class Event_Instance extends Fuel\Core\Event_Instance
             };
             array_unshift($args, $event, $priority, $callback_function);
 
-            $ret = call_user_func_array(array($this, 'register'), $args);
+            call_user_func_array(array($this, 'register'), $args);
         } else {
             return false;
         }

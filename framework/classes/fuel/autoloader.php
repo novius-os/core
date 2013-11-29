@@ -33,7 +33,6 @@ class Autoloader extends Fuel\Core\Autoloader
 
         $loaded = false;
         $class = ltrim($class, '\\');
-        $namespaced = ($pos = strripos($class, '\\')) !== false;
 
         if (empty(static::$auto_initialize)) {
             static::$auto_initialize = $class;

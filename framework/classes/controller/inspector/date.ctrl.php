@@ -144,8 +144,6 @@ class Controller_Inspector_Date extends Controller_Inspector
 
     public static function process_config($application, $config, $item_actions = array(), $gridKey = null)
     {
-        $inspector_path = static::get_path();
-
         I18n::current_dictionary('nos::common');
         $default_config = array(
             'input_begin'           => 'date_begin',

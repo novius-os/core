@@ -87,7 +87,7 @@ class Renderer_Date_Select extends Renderer
             array(
                 'valid_date' =>
                     function ($value) {
-                        list($date, $time) = explode(' ', $value.' ');
+                        list($date) = explode(' ', $value.' ');
                         $date = explode('-', $date);
                         if (count($date) >= 3) {
                             list($year, $month, $day) = $date;

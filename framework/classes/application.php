@@ -97,7 +97,7 @@ class Application
             \Migrate::latest('nos', 'package');
         }
 
-        foreach (static::$repositories as $where => $repository) {
+        foreach (static::$repositories as $repository) {
             if ($repository['native']) {
 
                 $list = \File::read_dir($repository['path'], 1);
@@ -114,7 +114,7 @@ class Application
 
     public static function areNativeApplicationsDirty()
     {
-        foreach (static::$repositories as $where => $repository) {
+        foreach (static::$repositories as $repository) {
             if ($repository['native']) {
                 $list = \File::read_dir($repository['path'], 1);
                 foreach ($list as $folder => $idc) {
@@ -156,7 +156,7 @@ class Application
     public static function search_all()
     {
         $applications = array();
-        foreach (static::$repositories as $where => $repository) {
+        foreach (static::$repositories as $repository) {
             if ($repository['visible']) {
                 $list = \File::read_dir($repository['path'], 1);
 
@@ -380,9 +380,13 @@ class Application
     public function install($add_permission = true)
     {
         if (!$this->canInstall()) {
-            throw new \Exception('Application '.$this->folder.
-                ' can\'t be installed because it requires the following applications: '.implode(', ',
-                $this->applicationsRequiredAndUnavailable()).'.');
+            throw new \Exception(
+                'Application '.$this->folder.
+                ' can\'t be installed because it requires the following applications: '.implode(
+                    ', ',
+                    $this->applicationsRequiredAndUnavailable()
+                ).'.'
+            );
         }
         $this->installRequiredApplications($add_permission);
         if ($add_permission) {
@@ -428,8 +432,11 @@ class Application
     {
         if (!$this->canUninstall()) {
             $dependents = $this->installedDependentApplications();
-            throw new \Exception('Application '.$this->folder.
-                ' can\'t be uninstalled because it is required by the following applications: '.implode(', ', $dependents).'.');
+            throw new \Exception(
+                'Application '.$this->folder.
+                ' can\'t be uninstalled because it is required by the following applications: '.
+                implode(', ', $dependents).'.'
+            );
         }
         $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder);
         $new_metadata = array();

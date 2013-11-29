@@ -413,7 +413,6 @@ class Toolkit_Image
         $pathinfo = pathinfo($image_url);
 
         // Remove 6 first characters for cache/
-        $url = \Str::sub($pathinfo['dirname'].'.'.$pathinfo['extension'], 6);
         $transformations = explode('-', $pathinfo['filename']);
 
         //remove hash
