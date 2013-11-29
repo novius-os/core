@@ -79,12 +79,14 @@ $fieldset->populate($values);
 <?php
 echo $fieldset->open($action);
 
-$fieldset->form()->set_config('field_template',
+$fieldset->form()->set_config(
+    'field_template',
     "\t\t".'<tr>
         <th>{label}</th>
         <td>{field}</td>
         <td class="use_default">{default}</td>
-    </tr>'."\n");
+    </tr>'."\n"
+);
 echo $fieldset->build_hidden_fields();
 echo \View::forge(
     'form/fields',
